@@ -38,7 +38,7 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
     registry = json.loads((workspace / "deploy/build/components.json").read_text())
     require(lock["schema_version"] == registry["schema_version"] == 1, "Unsupported schema")
     require(lock["platform"] == "linux/amd64", "Unmeasured image platform")
-    require(set(lock["images"]) == {"python", "uv"}, "Unexpected build inputs")
+    require(set(lock["images"]) == {"python", "uv", "php", "composer", "node"}, "Unexpected build inputs")
     for image in lock["images"].values():
         require(bool(re.fullmatch(r"[^\s@]+@sha256:[0-9a-f]{64}", image["reference"])),
                 "Base images must use immutable SHA-256 references")
@@ -49,15 +49,23 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
     require(len(matching) == 1, "Unknown component")
     component = matching[0]
     context = safe_relative(component["context"])
-    require(len(context.parts) == 2 and context.parts[0] in {"services", "workers"},
-            "Build context must be an owned service or worker root")
-    require(bool(re.fullmatch(r"[a-z][a-z0-9_]*", component["module"])), "Invalid module")
+    require(len(context.parts) == 2 and context.parts[0] in {"apps", "services", "workers"},
+            "Build context must be an owned application, service or worker root")
     require(bool(re.fullmatch(r"[a-z][a-z0-9-]*", component["id"])), "Invalid component ID")
-    require(component["dockerfile"] == "Dockerfile" and component["target"] == "runtime",
-            "Unexpected build target")
-    require(set(component["inputs"]) == {
-        "Dockerfile", ".dockerignore", ".python-version", "pyproject.toml", "uv.lock", "README.md", "src"
-    }, "Unexpected context input list")
+    require(component["language"] in {"python", "php"}, "Unsupported image language")
+    require(component["dockerfile"] == "Dockerfile", "Unexpected Dockerfile")
+    expected_inputs = {"Dockerfile", ".dockerignore"}
+    if component["language"] == "python":
+        require(bool(re.fullmatch(r"[a-z][a-z0-9_]*", component["module"])), "Invalid module")
+        require(component["target"] == "runtime", "Unexpected Python target")
+        expected_inputs.update({".python-version", "pyproject.toml", "uv.lock", "README.md", "src"})
+    else:
+        require(component["target"] == "php-runtime", "Unexpected PHP target")
+        expected_inputs.update({"composer.json", "composer.lock", "artisan", "app", "bootstrap/app.php",
+                               "bootstrap/providers.php", "config", "public/index.php", "routes", "build/snapshot.sh"})
+        if component["id"] == "console":
+            expected_inputs.update({"resources", "package.json", "package-lock.json", "tsconfig.json", "vite.config.ts"})
+    require(set(component["inputs"]) == expected_inputs, "Unexpected context input list")
     root = workspace / context
     require(root.resolve() == root.absolute(), "Symlinked component root")
     files: list[Path] = []
@@ -73,16 +81,24 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
                 continue
             if candidate.is_file():
                 files.append(candidate)
-    project = tomllib.loads((root / "pyproject.toml").read_text())["project"]
-    require(project["name"] == component["distribution"] and project["version"] == component["version"],
-            "Distribution identity differs from registry")
-    require(project["dependencies"] == [], "Runtime dependency installation requires an explicit image change")
-    require((root / ".python-version").read_text().strip() == lock["python_version"],
-            "Interpreter selection differs from image lock")
-    require(component["entrypoint"] == "/opt/venv/bin/" + next(iter(project["scripts"])),
-            "Entrypoint differs from package manifest")
+    if component["language"] == "python":
+        project = tomllib.loads((root / "pyproject.toml").read_text())["project"]
+        require(project["name"] == component["distribution"] and project["version"] == component["version"],
+                "Distribution identity differs from registry")
+        require(project["dependencies"] == [], "Runtime dependency installation requires an explicit image change")
+        require((root / ".python-version").read_text().strip() == lock["python_version"],
+                "Interpreter selection differs from image lock")
+        require(component["entrypoint"] == "/opt/venv/bin/" + next(iter(project["scripts"])),
+                "Entrypoint differs from package manifest")
+        bases = ("python", "uv")
+    else:
+        project = json.loads((root / "composer.json").read_text())
+        require(project["name"] == component["distribution"], "Composer owner differs from registry")
+        require(component["entrypoint"] == "/usr/local/bin/service-entrypoint", "Unexpected PHP entrypoint")
+        require(lock["debian_snapshot"] == "20261004T000000Z", "Unmeasured Debian snapshot")
+        bases = ("php", "composer", "node") if component["id"] == "console" else ("php", "composer")
     dockerfile = (root / "Dockerfile").read_text()
-    for key in ("python", "uv"):
+    for key in bases:
         require(f"ARG {key.upper()}_BASE={lock['images'][key]['reference']}\n" in dockerfile,
                 f"Standalone {key} base differs from input lock")
     require("COPY ../" not in dockerfile and "spikes/" not in dockerfile,
@@ -149,6 +165,51 @@ print(json.dumps(result, sort_keys=True))
 '''
 
 
+def run_python_probes(
+    recorder: Recorder, docker: list[str], image: str, output: Path,
+    component: dict[str, Any], lock: dict[str, Any],
+) -> dict[str, Any]:
+    live = json.loads(recorder.run("liveness", [*docker, image], cwd=output))
+    require(live == component["probe_base"] | {"probe": "liveness", "status": "ok"}, "Liveness scope mismatch")
+    ready = json.loads(recorder.run("readiness", [*docker, image, "readiness"], cwd=output, expected=1))
+    require(ready == component["probe_base"] | {"probe": "readiness", "status": "not_ready", "reason": component["readiness_reason"]},
+            "Unimplemented dependency readiness must fail explicitly")
+    invalid = recorder.run("rejected-override", [*docker, image, "readiness", "--force"], cwd=output, expected=2)
+    require(not invalid, "Rejected input emitted a success payload")
+    inventory = json.loads(recorder.run("runtime-isolation", [
+        *docker, "--entrypoint", "/opt/venv/bin/python", image, "-I", "-c", isolation_program(component)
+    ], cwd=output))
+    require(inventory["python_version"] == lock["python_version"], "Interpreter differs from selected patch")
+    return inventory
+
+
+def run_php_probes(
+    recorder: Recorder, docker: list[str], image: str, output: Path,
+    workspace: Path, component: dict[str, Any], lock: dict[str, Any],
+) -> dict[str, Any]:
+    docker = [*docker,
+              "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m,mode=1777",
+              "--tmpfs", "/app/storage:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=0770",
+              "--tmpfs", "/app/bootstrap/cache:rw,noexec,nosuid,size=8m,uid=10001,gid=10001,mode=0770",
+              "--env", f"P01_COMPONENT={component['id']}"]
+    if component["id"] == "console":
+        # Deliberately public synthetic fixture key; injected only into this disposable process.
+        docker += ["--env", "APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="]
+    recorder.run("fpm-configuration", [*docker, image, "php-fpm", "-t"], cwd=output)
+    program = (workspace / "scripts/p01/php_image_probe.php").read_text().removeprefix("<?php\n")
+    runtime = json.loads(recorder.run("kernel-and-runtime-isolation", [*docker, image, "php", "-r", program], cwd=output))
+    require(runtime["php_version"] == lock["php_version"], "PHP patch differs from input selection")
+    project = json.loads((workspace / component["context"] / "composer.json").read_text())
+    require(runtime["laravel_version"] == project["require"]["laravel/framework"], "Framework version differs from manifest")
+    dependency_lock = json.loads((workspace / component["context"] / "composer.lock").read_text())
+    expected_packages = {package["name"]: package["version"] for package in dependency_lock["packages"]}
+    require(runtime["installed_packages"] == expected_packages, "Runtime dependencies differ from the production lock graph")
+    recorder.run("operating-system-packages", [
+        *docker, image, "dpkg-query", "-W", "-f=${Package}\t${Version}\n"
+    ], cwd=output)
+    return runtime
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--workspace", type=Path, default=Path(__file__).resolve().parents[2])
@@ -168,11 +229,14 @@ def main() -> int:
     output.mkdir(parents=True, exist_ok=False)
     bound = sources + [workspace / path for path in (
         "scripts/p01/run_images.py", "deploy/build/components.json", "deploy/build/inputs.lock.json",
-        ".github/workflows/p01-images.yml",
+        ".github/workflows/p01-images.yml", "scripts/p01/select_components.py",
+        "scripts/p01/check_jobs.py", "scripts/p01/candidates.json",
     )]
+    if component["language"] == "php":
+        bound.append(workspace / "scripts/p01/php_image_probe.php")
     report: dict[str, Any] = {
         "schema_version": 1, "result": "FAILED", "component": component["id"],
-        "scope": "P01 isolated development bootstrap image; no persistent service or native work",
+        "scope": "P01 isolated development image build and process probes; no operating deployment or native work",
         "source_revision": args.source_revision, "started_at": datetime.now(UTC).isoformat(),
         "source_sha256": {str(path.relative_to(workspace)): sha256(path) for path in sorted(bound)},
         "image_inputs": lock, "commands": [],
@@ -196,11 +260,19 @@ def main() -> int:
                 destination = context / source.relative_to(root)
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(source, destination)
+            bases = ("python", "uv") if component["language"] == "python" else (
+                ("php", "composer", "node") if component["id"] == "console" else ("php", "composer")
+            )
+            build_arguments = [value for key in bases for value in (
+                "--build-arg", f"{key.upper()}_BASE={lock['images'][key]['reference']}"
+            )]
+            if component["language"] == "php":
+                build_arguments += ["--build-arg", f"DEBIAN_SNAPSHOT={lock['debian_snapshot']}"]
+            report["used_base_images"] = {key: lock["images"][key] for key in bases}
             recorder.run("build", [
                 "docker", "buildx", "build", "--load", "--pull", "--platform", lock["platform"],
                 "--provenance=false", "--progress=plain", "--target", component["target"],
-                "--build-arg", f"PYTHON_BASE={lock['images']['python']['reference']}",
-                "--build-arg", f"UV_BASE={lock['images']['uv']['reference']}",
+                *build_arguments,
                 "--build-arg", f"SOURCE_REVISION={args.source_revision}",
                 "--file", str(context / component["dockerfile"]), "--tag", image, str(context),
             ], cwd=context, timeout=900)
@@ -209,9 +281,14 @@ def main() -> int:
         configuration = inspected["Config"]
         require(configuration["User"] == "10001:10001", "Image must default to a non-root identity")
         require(configuration["Entrypoint"] == [component["entrypoint"]], "Unexpected entrypoint")
-        require(configuration["Cmd"] == ["liveness"], "Unexpected default probe")
-        require(configuration.get("Healthcheck", {}).get("Test") == ["NONE"], "Bootstrap image cannot claim persistent health")
-        require(not configuration.get("ExposedPorts"), "Bootstrap image cannot expose a service port")
+        if component["language"] == "python":
+            require(configuration["Cmd"] == ["liveness"], "Unexpected default probe")
+            require(configuration.get("Healthcheck", {}).get("Test") == ["NONE"], "Bootstrap image cannot claim persistent health")
+            require(not configuration.get("ExposedPorts"), "Bootstrap image cannot expose a service port")
+        else:
+            require(configuration["Cmd"] == ["php-fpm", "-F"], "Unexpected PHP process command")
+            require(not any(value.startswith("APP_KEY=") for value in configuration.get("Env", [])),
+                    "An application key must not be baked into the image")
         require(configuration["Labels"]["org.opencontainers.image.revision"] == args.source_revision,
                 "Image source label does not match build revision")
         require(inspected["Architecture"] == "amd64" and inspected["Os"] == "linux", "Wrong image platform")
@@ -219,17 +296,10 @@ def main() -> int:
                            "platform": lock["platform"], "identity_kind": "local_image_configuration_digest"}
         docker = ["docker", "run", "--rm", "--read-only", "--network", "none", "--cap-drop", "ALL",
                   "--security-opt", "no-new-privileges", "--pids-limit", "64", "--memory", "256m", "--cpus", "1"]
-        live = json.loads(recorder.run("liveness", [*docker, image], cwd=output))
-        require(live == component["probe_base"] | {"probe": "liveness", "status": "ok"}, "Liveness scope mismatch")
-        ready = json.loads(recorder.run("readiness", [*docker, image, "readiness"], cwd=output, expected=1))
-        require(ready == component["probe_base"] | {"probe": "readiness", "status": "not_ready", "reason": component["readiness_reason"]},
-                "Unimplemented dependency readiness must fail explicitly")
-        invalid = recorder.run("rejected-override", [*docker, image, "readiness", "--force"], cwd=output, expected=2)
-        require(not invalid, "Rejected input emitted a success payload")
-        inventory = json.loads(recorder.run("runtime-isolation", [
-            *docker, "--entrypoint", "/opt/venv/bin/python", image, "-I", "-c", isolation_program(component)
-        ], cwd=output))
-        require(inventory["python_version"] == lock["python_version"], "Interpreter differs from selected patch")
+        if component["language"] == "python":
+            inventory = run_python_probes(recorder, docker, image, output, component, lock)
+        else:
+            inventory = run_php_probes(recorder, docker, image, output, workspace, component, lock)
         report["runtime"] = inventory
         report["result"] = "PASSED"
     except (OSError, ValueError, KeyError, subprocess.TimeoutExpired) as error:

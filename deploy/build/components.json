@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "scope": "P01 Python bootstrap images; no persistent service or worker execution",
+  "scope": "P01 independently owned Python and Laravel foundation images; no operating qualification",
   "components": [
     {
       "id": "planning",
@@ -25,7 +25,8 @@
         "scope": "process_bootstrap",
         "native_operations_enabled": false
       },
-      "readiness_reason": "service_dependencies_not_implemented"
+      "readiness_reason": "service_dependencies_not_implemented",
+      "language": "python"
     },
     {
       "id": "inventory",
@@ -50,7 +51,8 @@
         "scope": "process_bootstrap",
         "native_operations_enabled": false
       },
-      "readiness_reason": "service_dependencies_not_implemented"
+      "readiness_reason": "service_dependencies_not_implemented",
+      "language": "python"
     },
     {
       "id": "lifecycle",
@@ -75,7 +77,8 @@
         "scope": "process_bootstrap",
         "native_operations_enabled": false
       },
-      "readiness_reason": "service_dependencies_not_implemented"
+      "readiness_reason": "service_dependencies_not_implemented",
+      "language": "python"
     },
     {
       "id": "inventory-workers",
@@ -103,7 +106,8 @@
         "component_kind": "worker_bootstrap",
         "task_consumption_enabled": false
       },
-      "readiness_reason": "worker_dependencies_not_implemented"
+      "readiness_reason": "worker_dependencies_not_implemented",
+      "language": "python"
     },
     {
       "id": "lifecycle-workers",
@@ -131,7 +135,105 @@
         "component_kind": "worker_bootstrap",
         "task_consumption_enabled": false
       },
-      "readiness_reason": "worker_dependencies_not_implemented"
+      "readiness_reason": "worker_dependencies_not_implemented",
+      "language": "python"
+    },
+    {
+      "id": "governance",
+      "language": "php",
+      "context": "services/governance",
+      "dockerfile": "Dockerfile",
+      "target": "php-runtime",
+      "distribution": "product/governance",
+      "entrypoint": "/usr/local/bin/service-entrypoint",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        "composer.json",
+        "composer.lock",
+        "artisan",
+        "app",
+        "bootstrap/app.php",
+        "bootstrap/providers.php",
+        "config",
+        "public/index.php",
+        "routes",
+        "build/snapshot.sh"
+      ]
+    },
+    {
+      "id": "catalogue",
+      "language": "php",
+      "context": "services/catalogue",
+      "dockerfile": "Dockerfile",
+      "target": "php-runtime",
+      "distribution": "product/catalogue",
+      "entrypoint": "/usr/local/bin/service-entrypoint",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        "composer.json",
+        "composer.lock",
+        "artisan",
+        "app",
+        "bootstrap/app.php",
+        "bootstrap/providers.php",
+        "config",
+        "public/index.php",
+        "routes",
+        "build/snapshot.sh"
+      ]
+    },
+    {
+      "id": "assurance",
+      "language": "php",
+      "context": "services/assurance",
+      "dockerfile": "Dockerfile",
+      "target": "php-runtime",
+      "distribution": "product/assurance",
+      "entrypoint": "/usr/local/bin/service-entrypoint",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        "composer.json",
+        "composer.lock",
+        "artisan",
+        "app",
+        "bootstrap/app.php",
+        "bootstrap/providers.php",
+        "config",
+        "public/index.php",
+        "routes",
+        "build/snapshot.sh"
+      ]
+    },
+    {
+      "id": "console",
+      "language": "php",
+      "context": "apps/console",
+      "dockerfile": "Dockerfile",
+      "target": "php-runtime",
+      "distribution": "product/console",
+      "entrypoint": "/usr/local/bin/service-entrypoint",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        "composer.json",
+        "composer.lock",
+        "artisan",
+        "app",
+        "bootstrap/app.php",
+        "bootstrap/providers.php",
+        "config",
+        "public/index.php",
+        "routes",
+        "build/snapshot.sh",
+        "resources",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json",
+        "vite.config.ts"
+      ]
     }
   ]
 }

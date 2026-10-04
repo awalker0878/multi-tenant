@@ -49,6 +49,9 @@ class SelectionTest(unittest.TestCase):
     def test_shared_package_change_selects_consumers_conservatively(self):
         self.assertEqual(MODULE.select(["packages/technical/python/pyproject.toml"], COMPONENTS)[0], sorted(COMPONENTS))
 
+    def test_contract_changes_conservatively_select_every_consumer_candidate(self):
+        self.assertEqual(MODULE.select(["contracts/http/v1/planning.openapi.yaml"], COMPONENTS)[0], sorted(COMPONENTS))
+
     def test_traversal_and_absolute_inputs_rejected(self):
         for path in ["/services/planning/x.py", "../services/planning/x.py", "services\\planning\\x.py"]:
             with self.subTest(path=path), self.assertRaises(ValueError):

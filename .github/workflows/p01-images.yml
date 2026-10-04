@@ -3,24 +3,8 @@ name: P01 bootstrap images
 on:
   push:
     branches: [greenfield/enterprise-microservices-plan]
-    paths:
-      - services/planning/**
-      - services/inventory/**
-      - services/lifecycle/**
-      - workers/inventory/**
-      - workers/lifecycle/**
-      - deploy/build/**
-      - .github/workflows/p01-images.yml
   pull_request:
     branches: [greenfield/enterprise-microservices-plan]
-    paths:
-      - services/planning/**
-      - services/inventory/**
-      - services/lifecycle/**
-      - workers/inventory/**
-      - workers/lifecycle/**
-      - deploy/build/**
-      - .github/workflows/p01-images.yml
   workflow_dispatch:
 
 permissions:
@@ -28,27 +12,48 @@ permissions:
 
 concurrency:
   group: p01-images-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  python-image:
+  selection:
+    name: Select affected independent images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      images: ${{ steps.select.outputs.images }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check selection and aggregate outcome rules
+        run: python3 -m unittest discover -s scripts/p01 -p 'test_*.py' -v
+      - name: Select images from changed paths and owner dependencies
+        id: select
+        run: python3 scripts/p01/select_components.py --workspace "$GITHUB_WORKSPACE"
+
+  images:
     name: ${{ matrix.component }} isolated image
+    needs: selection
+    if: needs.selection.outputs.images != '[]'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        component: [planning, inventory, lifecycle, inventory-workers, lifecycle-workers]
+        component: ${{ fromJSON(needs.selection.outputs.images) }}
     steps:
       - name: Check out exact source
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           persist-credentials: false
-      - name: Build owned context and inspect bootstrap isolation
+      - name: Build owned context and inspect foundation isolation
+        env:
+          P01_COMPONENT: ${{ matrix.component }}
         run: >-
           python3 scripts/p01/run_images.py
-          --component '${{ matrix.component }}'
-          --output "$RUNNER_TEMP/p01-image-${{ matrix.component }}"
+          --component "$P01_COMPONENT"
+          --output "$RUNNER_TEMP/p01-image-$P01_COMPONENT"
           --source-revision "$GITHUB_SHA"
       - name: Retain source, input, image and execution evidence
         if: always()
@@ -58,3 +63,18 @@ jobs:
           path: ${{ runner.temp }}/p01-image-${{ matrix.component }}/
           if-no-files-found: error
           retention-days: 14
+
+  image-outcome:
+    name: Foundation images
+    if: always()
+    needs: [selection, images]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Require every selected image result
+        env:
+          P01_NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 scripts/p01/check_jobs.py --workspace "$GITHUB_WORKSPACE" --family images

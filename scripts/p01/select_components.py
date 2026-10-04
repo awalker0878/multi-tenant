@@ -10,7 +10,7 @@ import re
 import subprocess
 
 
-GLOBAL_PREFIXES = ("scripts/p01/", "deploy/build/", "architecture/", ".github/workflows/")
+GLOBAL_PREFIXES = ("scripts/p01/", "deploy/build/", "architecture/", "contracts/", ".github/workflows/")
 GLOBAL_FILES = {"scripts/validate_architecture.py", "tests/documentation/test_p01_selection.py"}
 OWNER_WORKERS = {"inventory": "inventory-workers", "lifecycle": "lifecycle-workers"}
 

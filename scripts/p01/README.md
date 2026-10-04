@@ -54,14 +54,22 @@ identity integration, service-dependency or security qualification.
 `select_components.py` selects changed private components; Inventory/Lifecycle
 service changes also select their registered worker because the architecture
 permits owner-source inclusion. Shared build scripts, workflows, architecture and
-runtime inputs select every candidate. Unrecognized product/shared-package paths
+runtime and contract inputs select every candidate. Unrecognized product/shared-package paths
 and unavailable Git comparisons conservatively select every candidate. Docs-only
 changes do not require a package build. Rename detection is disabled when reading
 the NUL-delimited Git diff so both removed and added paths influence selection.
-Nine selection tests cover private isolation, owner dependencies, renames/deletions,
+Ten selection tests cover private isolation, owner dependencies, renames/deletions,
 shared input changes, prefix collisions, and invalid paths.
 
 The workflow has read-only repository permissions and immutable action references.
 Each selected matrix job uploads evidence even if verification fails. Installing
 dependencies is allowed only in this connected development CI scope. No native
 platform credentials, endpoints, provisioning or migration effects are involved.
+
+The stable `Foundation checks` aggregate runs for every branch push and pull
+request, including documentation-only changes. It rejects failed, cancelled or
+missing selected jobs and invalid selection output. A family may be skipped only
+when its selected component list is empty. The selector compares changed paths
+between revisions against the current candidate/owner mapping; it does not claim
+a versioned consumer graph across both revisions. Contract changes therefore
+select all registered candidates conservatively.
