@@ -1,0 +1,13 @@
+Note: Using configuration file /home/runner/work/_temp/p00-integration/php/phpstan.neon.
+::error file=app/Http/Middleware/HandleInertiaRequests.php,line=14,col=0::Method App\Http\Middleware\HandleInertiaRequests::version() never returns null so it can be removed from the return type.
+ ------ ------------------------------------------------------------------- 
+  Line   Http/Middleware/HandleInertiaRequests.php                          
+ ------ ------------------------------------------------------------------- 
+  14     Method App\Http\Middleware\HandleInertiaRequests::version() never  
+         returns null so it can be removed from the return type.            
+         🪪  return.unusedType                                              
+ ------ ------------------------------------------------------------------- 
+
+
+ [ERROR] Found 1 error                                                          
+

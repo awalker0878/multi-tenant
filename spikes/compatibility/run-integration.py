@@ -63,7 +63,7 @@ def main() -> int:
 
     environment = os.environ.copy()
     environment.update({
-        "APP_ENV": "testing", "APP_DEBUG": "false", "APP_URL": "http://127.0.0.1:8000",
+        "APP_ENV": "local", "APP_DEBUG": "false", "APP_URL": "http://127.0.0.1:8000",
         "APP_KEY": "base64:" + "MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA=",
         "P00_BASE_URL": "http://127.0.0.1:8000",
         "PLAYWRIGHT_JSON_OUTPUT_FILE": str(evidence / "browser.json"),
@@ -141,7 +141,7 @@ def main() -> int:
         check("pint", ["php", "vendor/bin/pint", "--test"])
         check("larastan", ["php", "vendor/bin/phpstan", "analyse", "--no-progress", "--memory-limit=1G"])
         check("deptrac", ["php", "vendor/bin/deptrac", "analyse", "--no-cache", "--fail-on-uncovered"])
-        check("pest", ["php", "vendor/bin/pest", "--colors=never"])
+        check("pest", ["php", "vendor/bin/pest", "--colors=never", "--display-warnings", "--fail-on-warning", "--fail-on-risky", "--fail-on-empty-test-suite"])
         check("quality-canaries", ["python3", "tools/verify_quality_canaries.py"])
         check("composer-audit", ["composer", "audit", "--locked", "--no-interaction"])
         run("node-runtime", ["node", "--version"], frontend, 30)

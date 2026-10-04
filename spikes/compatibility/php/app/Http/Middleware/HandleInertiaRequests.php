@@ -11,7 +11,7 @@ final class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'app';
 
-    public function version(Request $request): ?string
+    public function version(Request $request): string
     {
         return 'p00-compatibility-v1';
     }

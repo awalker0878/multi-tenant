@@ -21,26 +21,31 @@ test('Laravel page hydrates and Inertia preserves the page through form validati
   await expect(page.getByRole('textbox', { name: 'Sample name' })).toBeVisible();
 
   // A full reload could still display the error; require the actual Inertia JSON exchange.
-  const invalidResponse = page.waitForResponse(response =>
+  const invalidResponse = page.waitForResponse(async response =>
     new URL(response.url()).pathname === '/compatibility'
-    && response.request().headers()['x-inertia'] === 'true',
+    && response.request().method() === 'GET'
+    && await response.headerValue('x-inertia') === 'true',
   );
   await page.getByRole('button', { name: 'Submit sample' }).click();
   const invalid = await invalidResponse;
   expect(invalid.status()).toBe(200);
-  expect(invalid.headers()['x-inertia']).toBe('true');
+  expect(await invalid.headerValue('content-type')).toContain('application/json');
+  expect((await invalid.request().allHeaders())['x-inertia']).toBe('true');
   expect((await invalid.json()).component).toBe('Compatibility');
   await expect(page.getByRole('alert')).toContainText('required');
   await expect(page.getByRole('textbox', { name: 'Sample name' })).toHaveAttribute('aria-invalid', 'true');
 
   await page.getByRole('textbox', { name: 'Sample name' }).fill('Browser probe');
-  const acceptedResponse = page.waitForResponse(response =>
+  const acceptedResponse = page.waitForResponse(async response =>
     new URL(response.url()).pathname === '/compatibility'
-    && response.request().headers()['x-inertia'] === 'true',
+    && response.request().method() === 'GET'
+    && await response.headerValue('x-inertia') === 'true',
   );
   await page.getByRole('button', { name: 'Submit sample' }).click();
   const accepted = await acceptedResponse;
   expect(accepted.status()).toBe(200);
+  expect(await accepted.headerValue('content-type')).toContain('application/json');
+  expect((await accepted.request().allHeaders())['x-inertia']).toBe('true');
   expect((await accepted.json()).props.notice).toBe('Compatibility request accepted');
   await expect(page.getByRole('status')).toHaveText('Compatibility request accepted');
   await expect(page.getByRole('alert')).toHaveCount(0);

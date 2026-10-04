@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-04T18:57:47.423068+00:00",
+  "run_id": 37226133015,
+  "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37226133015",
+  "tested_commit": "74b486c9fdd62d2b4574b060c6158ad1c998e4d0",
+  "test_outcome": "TIMED_OUT",
+  "actual_browser": {
+    "engine": "chromium",
+    "version": "153.0.8010.12"
+  },
+  "trace_archive_sha256": "6d69aa057f617e39f611613f8e0b8927407d6e3c4a3a7af5afc4ac32c6fdf9e1",
+  "network_member": "1-trace.network",
+  "network_member_sha256": "ab119069d66e7d16529f6ed79ccd368136c9b7ef62ff8068f5ca7a07dd35ce42",
+  "extraction": "Selected real /compatibility exchanges from retained trace; cookies and session/CSRF values omitted; no network entries synthesized.",
+  "exchanges": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/compatibility",
+      "request_headers": [
+        {
+          "name": "Sec-Fetch-Dest",
+          "value": "document"
+        },
+        {
+          "name": "Sec-Fetch-Mode",
+          "value": "navigate"
+        }
+      ],
+      "response_status": 200,
+      "response_headers": [
+        {
+          "name": "Content-Type",
+          "value": "text/html; charset=utf-8"
+        },
+        {
+          "name": "Vary",
+          "value": "X-Inertia"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/compatibility/validate",
+      "request_headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Sec-Fetch-Dest",
+          "value": "empty"
+        },
+        {
+          "name": "Sec-Fetch-Mode",
+          "value": "cors"
+        },
+        {
+          "name": "X-Inertia",
+          "value": "true"
+        },
+        {
+          "name": "X-Inertia-Version",
+          "value": "p00-compatibility-v1"
+        },
+        {
+          "name": "X-Requested-With",
+          "value": "XMLHttpRequest"
+        }
+      ],
+      "response_status": 302,
+      "response_headers": [
+        {
+          "name": "Content-Type",
+          "value": "text/html; charset=utf-8"
+        },
+        {
+          "name": "Location",
+          "value": "http://127.0.0.1:8000/compatibility"
+        },
+        {
+          "name": "Vary",
+          "value": "X-Inertia"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/compatibility",
+      "request_headers": [
+        {
+          "name": "Sec-Fetch-Dest",
+          "value": "empty"
+        },
+        {
+          "name": "Sec-Fetch-Mode",
+          "value": "cors"
+        },
+        {
+          "name": "X-Inertia",
+          "value": "true"
+        },
+        {
+          "name": "X-Inertia-Version",
+          "value": "p00-compatibility-v1"
+        },
+        {
+          "name": "X-Requested-With",
+          "value": "XMLHttpRequest"
+        }
+      ],
+      "response_status": 200,
+      "response_headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Vary",
+          "value": "X-Inertia"
+        },
+        {
+          "name": "X-Inertia",
+          "value": "true"
+        }
+      ],
+      "response_body": {
+        "component": "Compatibility",
+        "props": {
+          "errors": {
+            "name": "The name field is required."
+          },
+          "sampleCount": 0,
+          "notice": null
+        },
+        "url": "/compatibility",
+        "version": "p00-compatibility-v1",
+        "sharedProps": [
+          "errors"
+        ]
+      },
+      "response_body_member": "resources/2a5ff3a3a743f8b7b10efec0e83bce4d951c4f8c.json",
+      "response_body_sha256": "0a1d370686d1f6b70a0d0019e85ae8bf46df8ac1ab37e2687fadbed80c2484cb"
+    }
+  ],
+  "diagnosis": "The redirected validation GET has real X-Inertia request and response headers and JSON errors.name; screenshot accessibility snapshot renders the required error. The synchronous request.headers() matching predicate timed out despite this observed exchange. Correction uses asynchronous response.headerValue() to match and request.allHeaders() to assert the protocol. Corrected test has not been executed yet."
+}

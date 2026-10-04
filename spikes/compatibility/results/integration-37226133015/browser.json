@@ -1,0 +1,166 @@
+{
+  "config": {
+    "argv": [
+      "/opt/hostedtoolcache/node/24.19.0/x64/bin/node",
+      "/home/runner/work/_temp/p00-integration/frontend/node_modules/.bin/playwright",
+      "test"
+    ],
+    "configFile": "/home/runner/work/_temp/p00-integration/frontend/playwright.config.ts",
+    "rootDir": "/home/runner/work/_temp/p00-integration/frontend/tests/browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 90000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/awalker0878/multi-tenant/commit/74b486c9fdd62d2b4574b060c6158ad1c998e4d0",
+        "commitHash": "74b486c9fdd62d2b4574b060c6158ad1c998e4d0",
+        "buildHref": "https://github.com/awalker0878/multi-tenant/actions/runs/37226133015"
+      },
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/_temp/p00-integration/frontend/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/awalker0878/multi-tenant/commit/74b486c9fdd62d2b4574b060c6158ad1c998e4d0",
+            "commitHash": "74b486c9fdd62d2b4574b060c6158ad1c998e4d0",
+            "buildHref": "https://github.com/awalker0878/multi-tenant/actions/runs/37226133015"
+          },
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/runner/work/_temp/p00-integration/frontend/tests/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/home/runner/work/_temp/p00-integration/evidence/browser.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "compatibility.spec.ts",
+      "file": "compatibility.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Laravel page hydrates and Inertia preserves the page through form validation",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 30095,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/runner/work/_temp/p00-integration/frontend/tests/browser/compatibility.spec.ts",
+                        "column": 32,
+                        "line": 24
+                      },
+                      "message": "Error: page.waitForResponse: Test timeout of 30000ms exceeded.\n\n  22 |\n  23 |   // A full reload could still display the error; require the actual Inertia JSON exchange.\n> 24 |   const invalidResponse = page.waitForResponse(response =>\n     |                                ^\n  25 |     new URL(response.url()).pathname === '/compatibility'\n  26 |     && response.request().headers()['x-inertia'] === 'true',\n  27 |   );\n    at /home/runner/work/_temp/p00-integration/frontend/tests/browser/compatibility.spec.ts:24:32"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T18:54:31.274Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "browser-identity",
+                      "contentType": "application/json",
+                      "body": "eyJlbmdpbmUiOiJjaHJvbWl1bSIsInZlcnNpb24iOiIxNTMuMC44MDEwLjEyIn0="
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/home/runner/work/_temp/p00-integration/frontend/test-results/artifacts/compatibility-Laravel-page-ec93b-age-through-form-validation-chromium/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/runner/work/_temp/p00-integration/frontend/test-results/artifacts/compatibility-Laravel-page-ec93b-age-through-form-validation-chromium/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/home/runner/work/_temp/p00-integration/frontend/test-results/artifacts/compatibility-Laravel-page-ec93b-age-through-form-validation-chromium/trace.zip"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "b0b409d468a60194358f-7934f40af62612c1a11d",
+          "file": "compatibility.spec.ts",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-04T18:54:30.766Z",
+    "duration": 31624.767,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}
