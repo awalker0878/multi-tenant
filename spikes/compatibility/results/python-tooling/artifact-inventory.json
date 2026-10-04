@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-04T18:46:41.615634+00:00",
+  "scope": "Non-product P00.03 Python tooling compatibility spike",
+  "result": "PASS",
+  "command_records": [
+    {
+      "path": "spikes/compatibility/results/python-tooling/01-lock-check.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "9a336a6856808874b5e5000287c85dc5dc34053f09ab20b9bfa54096b8d3d4eb"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/02-clean-install.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "204cf4edd9258db74c7ebebb053c0bb9269524152843e4c4230e030233ca678f"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/03-environment.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "566f23d6aabb9ecd503df19e870c74de5cecb7224af2d3745c9c926c66df78e1"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/04-lint.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "2951492f49f3bb61584a5d49dd2de50fc5cc88dc70b6bf174a88cc275b040741"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/05-format.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "e7e3aa26491580c2e0aa23ceed27095dcb0be8004b9d27fce6d682fe06a5efc0"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/06-types.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "2d989bdb19b3042d007f684a987738213b592f2cf63da6bc9a494edcc9d85877"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/07-behavior.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "c24955ba6db8e56bbc6d45861c5dc3d538db8d635e77b9f053b235b7a6fc392d"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/08-positive-boundaries.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "23047d321f1a3f6d4a14d7efb6f4baf349d9ee23d6d0ab68b331b7059cc64651"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/09-negative-boundaries.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "9f5af20c99f3ed0a20498ff65b19360d1887e5c1f90649541bdefb69e062b19e"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/10-library-smoke.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "0045a909cce5fc365494f450b68413bc8ec11098bd40f73f9040324ee5931218"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/11-dependency-consistency.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "942b5fc14036fbf9ec6ff2dbacaab72d59135a229e698851ce0284d855f2d341"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/12-export-lock.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "88ffac8085e4d051d2c4aaab85c123902ac4e027b2e14c812e15ff325bf78cc5"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/13-advisories.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "120b5ec21d682a2ff637e105a6f26264d1e2e7b4e085beeaeea0b3c84fc6901b"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/14-package-manager.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "c80a5d5b5285e1a1ad26fce67f3fbde107b949d0813249ef31453b6b17f74fc4"
+    },
+    {
+      "path": "spikes/compatibility/results/python-tooling/15-strict-advisories.json",
+      "outcome": "PASS",
+      "exit_code": 0,
+      "sha256": "fd3424d5325aa091470ac0541393f3430647bb3fd8c72fb8793b131d68ef13ea"
+    }
+  ],
+  "source_artifacts": [
+    {
+      "path": "spikes/compatibility/python/.gitignore",
+      "size_bytes": 63,
+      "sha256": "6d356cefbeb2bfdb043bebf0ab0c7de8d90c057d376e501b5efe3af8aa397606"
+    },
+    {
+      "path": "spikes/compatibility/python/.importlinter",
+      "size_bytes": 736,
+      "sha256": "55d258a8f15006ac021ae11176412c79508cb1326333cd3631e3bfb5cc925880"
+    },
+    {
+      "path": "spikes/compatibility/python/boundary_probe.py",
+      "size_bytes": 3772,
+      "sha256": "f678bd29c71e0a7e2f356fc839d5ca61bc0b669a1fdc69338158bdf23349c77d"
+    },
+    {
+      "path": "spikes/compatibility/python/pyproject.toml",
+      "size_bytes": 767,
+      "sha256": "de0380f117644ebd949e317b5885ea5bc40c352d622bf9ca9fbdb00e7af50697"
+    },
+    {
+      "path": "spikes/compatibility/python/record_tooling.py",
+      "size_bytes": 2633,
+      "sha256": "f462c603d27bad1c9509649e52aada802adccd4f174bfad01959653560f2088b"
+    },
+    {
+      "path": "spikes/compatibility/python/smoke.py",
+      "size_bytes": 1991,
+      "sha256": "de6313e9c87ade5feae4747384ebfb2ef49ec4b112e2a26bd7012b78e5b2daa5"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/__init__.py",
+      "size_bytes": 41,
+      "sha256": "3e09d874b97aa622dfe66e486b5a8224b39842e7525464272fdb57cfd7785649"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/application/__init__.py",
+      "size_bytes": 41,
+      "sha256": "3e09d874b97aa622dfe66e486b5a8224b39842e7525464272fdb57cfd7785649"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/application/advance.py",
+      "size_bytes": 356,
+      "sha256": "0b4c7a7121334ce88251402cc485829d536b0e7a0c27dcdd11673b94c8ff1874"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/bootstrap.py",
+      "size_bytes": 290,
+      "sha256": "da84e8a0edef02215e3aa7e49d24c6d6124681e9a6c1777e96f3c640bb9d58e5"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/domain/__init__.py",
+      "size_bytes": 41,
+      "sha256": "3e09d874b97aa622dfe66e486b5a8224b39842e7525464272fdb57cfd7785649"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/domain/sample.py",
+      "size_bytes": 369,
+      "sha256": "fe392337e8867768ba427cb33b30d0e628ff43fb74901ce1c3424a4b27505f4c"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/infrastructure/__init__.py",
+      "size_bytes": 41,
+      "sha256": "3e09d874b97aa622dfe66e486b5a8224b39842e7525464272fdb57cfd7785649"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/infrastructure/memory.py",
+      "size_bytes": 284,
+      "sha256": "a124a213f1c4e0ec974bbdc9b7d033ef00d358df8cfc06c091229e54af34da7c"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/infrastructure/transport.py",
+      "size_bytes": 150,
+      "sha256": "654fcbad93e9da13fee9a78e88d0f5df667668c1271aa1b12b1db6f1ca85f7ab"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/interfaces/__init__.py",
+      "size_bytes": 41,
+      "sha256": "3e09d874b97aa622dfe66e486b5a8224b39842e7525464272fdb57cfd7785649"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/interfaces/command.py",
+      "size_bytes": 285,
+      "sha256": "0d1f2a3c6c4706c034996090147cf7728d69e02e541f16fab96e545c4c4e241c"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_inventory/interfaces/payload.py",
+      "size_bytes": 316,
+      "sha256": "2a3231ad8576fd7cc3db8a7828cc54614fe61c81a6e6e9b324a426a1a53cc176"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_planning/__init__.py",
+      "size_bytes": 41,
+      "sha256": "3e09d874b97aa622dfe66e486b5a8224b39842e7525464272fdb57cfd7785649"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_planning/application/__init__.py",
+      "size_bytes": 41,
+      "sha256": "3e09d874b97aa622dfe66e486b5a8224b39842e7525464272fdb57cfd7785649"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_planning/application/describe.py",
+      "size_bytes": 133,
+      "sha256": "491e53cd8a99fed0b185f05e04cb3f8fcd53fca8e3b2ebc891be75939cc39807"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_planning/bootstrap.py",
+      "size_bytes": 136,
+      "sha256": "1e6978bee38be5b8a3832b923d62393ff57b8813905bba539b8c8f5485701d8c"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_planning/domain/__init__.py",
+      "size_bytes": 41,
+      "sha256": "3e09d874b97aa622dfe66e486b5a8224b39842e7525464272fdb57cfd7785649"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_planning/domain/sample.py",
+      "size_bytes": 126,
+      "sha256": "5c06183fd2e8eec9c886c512dd6df28b18ffa5725a6bfe0fe9fcb83202e690b0"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_planning/infrastructure/__init__.py",
+      "size_bytes": 41,
+      "sha256": "3e09d874b97aa622dfe66e486b5a8224b39842e7525464272fdb57cfd7785649"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_planning/infrastructure/memory.py",
+      "size_bytes": 144,
+      "sha256": "6019256b1a1c5e285115fd04d1dc33acb7367ca7834620cacd376252fde52ff3"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_planning/interfaces/__init__.py",
+      "size_bytes": 41,
+      "sha256": "3e09d874b97aa622dfe66e486b5a8224b39842e7525464272fdb57cfd7785649"
+    },
+    {
+      "path": "spikes/compatibility/python/src/probe_planning/interfaces/command.py",
+      "size_bytes": 146,
+      "sha256": "86d7046d05ac3a22881ef6742d8aa5e3dcb65f1f64dc498e5e38217d3448a65d"
+    },
+    {
+      "path": "spikes/compatibility/python/tests/test_tooling_sample.py",
+      "size_bytes": 1446,
+      "sha256": "4425da6769b542f0fab2e5c31edb8ddee0d44701ff82213425f12cae5f44b132"
+    },
+    {
+      "path": "spikes/compatibility/python/uv.lock",
+      "size_bytes": 88554,
+      "sha256": "66070660564e8e83a8a27d5c7b149a1f6ae591b8a948b04a2fc058db55fdc302"
+    }
+  ],
+  "summary": {
+    "behavior_tests": 4,
+    "boundary_contracts_kept": 3,
+    "semantic_negative_cases": 7,
+    "known_advisories": 0,
+    "audited_packages": 49,
+    "native_platform_execution": false,
+    "product_services_analyzed": 0
+  }
+}

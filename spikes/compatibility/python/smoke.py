@@ -35,13 +35,27 @@ def main() -> None:
 
     def echo(request: httpx.Request) -> httpx.Response:
         assert request.url.host == "compatibility.invalid"
-        return httpx.Response(200, content=request.content, headers={"content-type": "application/json"})
+        return httpx.Response(
+            200, content=request.content, headers={"content-type": "application/json"}
+        )
 
     with httpx.Client(transport=httpx.MockTransport(echo), timeout=1.0) as client:
-        response = client.post("https://compatibility.invalid/probe", content=item.model_dump_json())
+        response = client.post(
+            "https://compatibility.invalid/probe", content=item.model_dump_json()
+        )
         response.raise_for_status()
         assert ProbeMessage.model_validate_json(response.content) == item
-    print(json.dumps({"result": "PASS", "checks": 5, "pydantic": version("pydantic"), "httpx": version("httpx"), "network": "MockTransport only"}))
+    print(
+        json.dumps(
+            {
+                "result": "PASS",
+                "checks": 5,
+                "pydantic": version("pydantic"),
+                "httpx": version("httpx"),
+                "network": "MockTransport only",
+            }
+        )
+    )
 
 
 if __name__ == "__main__":
