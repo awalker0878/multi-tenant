@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "scope": "Inputs and generated assets of the local P00.03 compatibility attempt, not production artifacts",
+  "files": {
+    "frontend/package.json": {
+      "sha256": "2321ff1b114852f9d37e3a7421ecd30a9eb99c3b6c38954f684b6851468d61b0",
+      "bytes": 651
+    },
+    "frontend/package-lock.json": {
+      "sha256": "c38e50f2df1bc9d4135ae1abbdbe957d786fd267a6d2344ba2182b4e8cae7756",
+      "bytes": 63954
+    },
+    "frontend/tsconfig.json": {
+      "sha256": "869ca67218bfbf48aade1c7875bce3f16733bd5a62d10accbd062cae18c512fc",
+      "bytes": 375
+    },
+    "frontend/vite.config.ts": {
+      "sha256": "df9065a949f3905c2e92c5671b0d9d592594546278114aaaf0d42e0e4b6a7318",
+      "bytes": 365
+    },
+    "python/pyproject.toml": {
+      "sha256": "1acb74c262be96cdffacc27fb6842f756b473181f4790460e75debc2e83972cd",
+      "bytes": 250
+    },
+    "python/uv.lock": {
+      "sha256": "a0b67b86cb701051af0fb6899cf3cd4d933c54c96b1c7bdf18f0c5d29257bf2b",
+      "bytes": 14617
+    },
+    "python/smoke.py": {
+      "sha256": "ef3b76d56127c8d2019790bbd737b6c3962112719793119daaf74e9e1411f5a1",
+      "bytes": 1816
+    },
+    "php/composer.json": {
+      "sha256": "449f3e570abb3eabb53b41717630bac82f1172925562c3e678f29320ac9d16de",
+      "bytes": 468
+    },
+    "php/smoke.php": {
+      "sha256": "9ac42810e0f3d98d89a7cccb7ba36a5cab465e22e22f57aedc7fc84eb8e17e98",
+      "bytes": 1815
+    },
+    "frontend/public/build/assets/Compatibility-Ds6g6RN1.js": {
+      "sha256": "eb8b80a6f681e076c4b2a6aa8da89219735da22cea686e479ab67910223d9fdb",
+      "bytes": 459
+    },
+    "frontend/public/build/assets/app-D-tpLYrj.js": {
+      "sha256": "e51dd13716807354a6b76089df71152cabcea99e05b0f45a963a4178ab3a1a99",
+      "bytes": 169856
+    },
+    "frontend/public/build/assets/app-DNgGSRmO.css": {
+      "sha256": "9021973a196fb4e3414a02621b997f68342771553eb5efbc06b6f83ead0ea7c0",
+      "bytes": 5131
+    },
+    "frontend/public/build/manifest.json": {
+      "sha256": "5d54b78c70326e6533f632c3ee06a572ba2ae5ad7ea6d42958560547827e78f4",
+      "bytes": 529
+    }
+  }
+}

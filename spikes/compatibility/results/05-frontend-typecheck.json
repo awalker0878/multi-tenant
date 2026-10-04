@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-04T18:19:00.416148+00:00",
+  "cwd": "frontend",
+  "command": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "input_sha256": {
+    ".gitignore": "c34c37add2f9714c29d802cf0723a45952130f41db18cb1171d590683960cba8",
+    "frontend/package-lock.json": "14271f72408a1b8d3a244309c23d2d294c1f91fb198f04e60597881034accbfc",
+    "frontend/package.json": "e476140119b9cefeb8cab6e5538646c4aa6d5bb944e7794b95d8b042ecf19468",
+    "frontend/resources/css/app.css": "0edbcbeadeea753c2c0c6a726186d33475731d0947e4cf3b4927ed60b3718a69",
+    "frontend/resources/js/Pages/Compatibility.vue": "f058a089b2e41d9c4dfe5b680b449f62178ee4e0c6231251e40ddb18bf3a664b",
+    "frontend/resources/js/app.ts": "61cfdda46d7b429717bd5973befbdc30c8b9adf9217e0a401f4323c10113fad4",
+    "frontend/tsconfig.json": "869ca67218bfbf48aade1c7875bce3f16733bd5a62d10accbd062cae18c512fc",
+    "frontend/vite.config.ts": "df9065a949f3905c2e92c5671b0d9d592594546278114aaaf0d42e0e4b6a7318",
+    "php/composer.json": "449f3e570abb3eabb53b41717630bac82f1172925562c3e678f29320ac9d16de",
+    "php/smoke.php": "9ac42810e0f3d98d89a7cccb7ba36a5cab465e22e22f57aedc7fc84eb8e17e98",
+    "python/pyproject.toml": "1acb74c262be96cdffacc27fb6842f756b473181f4790460e75debc2e83972cd",
+    "python/smoke.py": "ef3b76d56127c8d2019790bbd737b6c3962112719793119daaf74e9e1411f5a1",
+    "python/uv.lock": "a0b67b86cb701051af0fb6899cf3cd4d933c54c96b1c7bdf18f0c5d29257bf2b",
+    "record.py": "5a8e8e46033bc029bf69a1eeb67c5b21ac3db98b481b910c989faf26c66e22c1"
+  },
+  "exit_code": 1,
+  "stdout": "\n> p00-frontend-compatibility@0.0.0 typecheck\n> vue-tsc --noEmit\n\n",
+  "stderr": "npm warn Unknown env config \"http-proxy\". This will stop working in the next major version of npm.\n/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/frontend/node_modules/vue-tsc/index.js:68\n                throw err;\n                ^\n\nError [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './lib/tsc' is not defined by \"exports\" in /workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/frontend/node_modules/typescript/package.json\n    at exportsNotFound (node:internal/modules/esm/resolve:314:10)\n    at packageExportsResolve (node:internal/modules/esm/resolve:662:9)\n    at resolveExports (node:internal/modules/cjs/loader:707:36)\n    at Module._findPath (node:internal/modules/cjs/loader:774:31)\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1502:27)\n    at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1122:12)\n    at require.resolve (node:internal/modules/helpers:171:31)\n    at resolveTscPath (/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/frontend/node_modules/vue-tsc/index.js:73:43)\n    at main (/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/frontend/node_modules/vue-tsc/index.js:44:45) {\n  code: 'ERR_PACKAGE_PATH_NOT_EXPORTED'\n}\n\nNode.js v24.19.0\n",
+  "outcome": "FAIL",
+  "finished_at": "2026-10-04T18:19:01.248646+00:00"
+}

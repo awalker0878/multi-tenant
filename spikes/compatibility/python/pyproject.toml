@@ -1,0 +1,9 @@
+[project]
+name = "p00-python-compatibility"
+version = "0.0.0"
+description = "Disposable dependency and execution probe; not a service"
+requires-python = ">=3.12,<3.13"
+dependencies = ["pydantic>=2,<3", "httpx>=0.28,<0.29"]
+
+[tool.uv]
+package = false

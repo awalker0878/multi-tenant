@@ -53,3 +53,7 @@ A dependency reaches its accepted support boundary, an unresolved vulnerability 
 - [Decision register](decision-register.md) — authority for disposition, origin and blocking checkpoint.
 - [Phased implementation plan](../implementation/phased-plan.md) — package and gate sequence.
 - [ADR authoring template](../templates/adr.md) — required decision-record fields.
+
+## P00 compatibility execution
+
+The [P00.03 results](../implementation/p00-compatibility-results.md) record the actual resolved versions, successful probes, failed attempts and remaining runtime limits. Candidate selection now follows those measurements; upstream support tables alone do not close this decision. The spike remains separate from product service code, and this ADR remains proposed until the complete bill of materials and operating owner are reviewed.

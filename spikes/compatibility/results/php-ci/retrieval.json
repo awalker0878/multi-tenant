@@ -1,0 +1,28 @@
+{
+  "run_id": 37224453605,
+  "artifact_id": 11310773393,
+  "source_revision": "06df7bfb15d83eb5a180e10c0d6c65970c5b0a54",
+  "zip_sha256": "b97fd76c7e507439cebcaf37123f59a922695e62a5878996c9503477706f3064",
+  "files_sha256": {
+    "initial-dependencies.log": "d361fbe1513ad257e46883a4b3ef925367ac29cba264b7a54fe2add719c6e5c6",
+    "packages-clean.log": "5c909604c184f6a3891bb049a5e62907e16d4a7ff3a129cab43133c5bba534e4",
+    "platform.log": "c789778b6c3c1fcd5eaa2084622e283d0061aca65f82a0cbca17019c6630936e",
+    "validate-clean.log": "43add299dc97ecbd90ec2dc456ef5a0bd824bb9abdae2a3d7cdb520e21f8e86d",
+    "validate.log": "43add299dc97ecbd90ec2dc456ef5a0bd824bb9abdae2a3d7cdb520e21f8e86d",
+    "clean-install.log": "8a2db85d2bf6d3a340405f048d8c97566c75c09c686009fb7e31b0115f633c54",
+    "packages-initial.log": "5c909604c184f6a3891bb049a5e62907e16d4a7ff3a129cab43133c5bba534e4",
+    "composer-version.log": "1464ee7684b798ae9c75e47615280ef581cd4f41521ff7633105907a12ef0fb5",
+    "report.json": "95de4a6efa0edef987df51353d11212d8dca3b0eb9c20a2b655fc55c995c2e2b",
+    "probe.json": "c8509898a563e208b34bfd0d728a31d119f2868812ec951f147e76200d62c7e0",
+    "platform-clean.log": "c789778b6c3c1fcd5eaa2084622e283d0061aca65f82a0cbca17019c6630936e",
+    "smoke-clean.log": "523063289569018239e13fb3222a9d9728c2af15be4dea4921158208490305c8",
+    "php-runtime.log": "c794d5bd839acfa8cb770eb87158dab7316a5c28f8aab79894266566994a16c1",
+    "smoke-initial.log": "523063289569018239e13fb3222a9d9728c2af15be4dea4921158208490305c8",
+    "../../php/composer.lock": "ef1985e1756631f170f2ab2b8e0fb8e3cd0c34111ad54b87f99e3afa53b24c22"
+  },
+  "omitted_duplicate_inputs": [
+    "composer.json",
+    "smoke.php"
+  ],
+  "duplicate_inputs_verified_against": "spikes/compatibility/php/"
+}
