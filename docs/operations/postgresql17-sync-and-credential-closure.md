@@ -40,6 +40,9 @@ permission. Under `READ COMMITTED`, issuance and retirement lock the original
 grant and recheck its durable closure. SQL append triggers enforce the same
 serialization for direct inserts. Immutable custody reads and irreversible
 worker/certificate revocations need no mutation privilege to be observed.
+Migration 0037 keeps closure immutability inside `hosting_controlplane`, so a
+control-plane-only backup restores without depending on the separately
+commissioned native `hosting_sync` schema.
 
 Close the actual original SQL connections before retirement. Record durable
 closure before synchronously revoking every exact original Vault lease, then
