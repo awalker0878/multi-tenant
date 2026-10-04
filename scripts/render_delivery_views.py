@@ -43,7 +43,7 @@ def render_views(register):
           f"{p['gate_id']}: {gates[p['gate_id']]['decision']}",
           f"{len(p['evidence_ids'])} / {len(p['blocker_ids'])}"] for p in phases]
     ))
-    progress.append("\n## Packages\n\nPackage state is independent of phase roll-up. Detailed P00/P01 work appears in the [phase cards](phases/p00.md); later specifications are elaborated before implementation.\n")
+    progress.append("\n## Packages\n\nPackage state is independent of phase roll-up. Detailed work appears in the [phase documents](phases/README.md); review each specification against current decisions and evidence before implementation.\n")
     progress.append(table(
         ["Package", "Output", "Owner role", "Work", "Verification", "Native qualification", "Operating acceptance", "Evidence / blockers"],
         [[p["id"], p["title"], p["owner_role"], *(p["status"][a] for a in AXES),

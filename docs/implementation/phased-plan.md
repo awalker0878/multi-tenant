@@ -10,7 +10,7 @@ The [source and reset record](../reference/sources-and-reset.md) defines the gre
 
 This delivery creates the plan and clean branch. It does not implement the phases. Every phase below begins as **planned**.
 
-Read the [product walkthrough](../product/application-walkthrough.md) for a concrete example. The [service specifications](../services/README.md) and [domain model](../product/domain-model.md) describe candidate behavior. Detailed [P00](phases/p00.md) and [P01](phases/p01.md) cards turn the first packages into actionable work; later phases are elaborated before implementation under the [documentation guide](../documentation-guide.md).
+Read the [product walkthrough](../product/application-walkthrough.md) for a concrete example. The [service specifications](../services/README.md) and [domain model](../product/domain-model.md) describe candidate behavior. The [phase documents](phases/README.md) define every package from P00 through P11; review and refine them against actual decisions and evidence before implementation under the [documentation guide](../documentation-guide.md).
 
 ### First release boundary
 

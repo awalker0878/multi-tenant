@@ -48,6 +48,26 @@ def validate():
     require(set(packages) == normative_packages, "Register packages differ from phase plan")
     require(set(phases) == normative_phases, "Register phases differ from phase plan")
     require(set(gates) == {p["gate_id"] for p in phases.values()}, "Phase/gate mapping mismatch")
+    # Every planned phase now has its own complete set of package cards.
+    for phase_id in phases:
+        path = ROOT / f"docs/implementation/phases/{phase_id.lower()}.md"
+        require(path.is_file(), f"Missing phase document: {phase_id}")
+        if path.is_file():
+            card_ids = re.findall(r"^#{2,3} (P\d{2}\.\d{2}) —", path.read_text(), re.M)
+            expected_ids = {p["id"] for p in packages.values() if p["phase_id"] == phase_id}
+            require(len(card_ids) == len(set(card_ids)) and set(card_ids) == expected_ids, f"Missing/duplicate package cards in {phase_id}")
+    linked_adrs = re.findall(r"\[(ADR-\d{3})\]\(([^)]+)\)", adr_text)
+    require({key for key, _ in linked_adrs} == decision_ids, "Decision register does not link every ADR")
+    for decision_id, relative in linked_adrs:
+        path = ROOT / "docs/decisions" / relative
+        require(path.is_file(), f"Missing decision document: {decision_id}")
+        if path.is_file():
+            require(decision_id in path.read_text().splitlines()[0], f"Decision heading mismatch: {decision_id}")
+    for campaign_id in campaign_ids:
+        paths = list((ROOT / "docs/qualification/campaigns").glob(campaign_id.lower() + "-*.md"))
+        require(len(paths) == 1, f"Expected one campaign document: {campaign_id}")
+    for gate_id in gates:
+        require((ROOT / f"docs/qualification/gate-reviews/{gate_id.lower()}.md").is_file(), f"Missing gate review procedure: {gate_id}")
     for phase in phases.values():
         pid = phase["id"]
         require(set(phase["dependency_phase_ids"]) <= set(phases), f"Unknown dependency for {pid}")

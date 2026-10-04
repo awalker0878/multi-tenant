@@ -23,7 +23,7 @@ The example has two separate routes: provisioning a new empty deployment on Open
 | Denied connectivity | Unapproved clients → database, other tenants → either tier, unsolicited database → web sessions, and unintended direct cross-zone paths |
 | Expected service | Selected guest hardening, authenticated application access, valid DNS/address allocation, usable monitoring/backup and exercised restoration |
 
-Do not derive network permission from a domain label. P00 selects the actual security topology and required inspection; plans declare enforcement, forward/reply paths and controlled interfaces. Shared-service endpoint names are placeholders until the real service owners and APIs are selected. No vendor integration is presumed implemented.
+Do not derive network permission from a domain label. P00 selects the actual security topology and required inspection; plans declare enforcement, forward/reply paths and controlled interfaces. Shared-service endpoint names are synthetic examples; actual endpoints require selection by their service owners. No vendor integration is presumed implemented.
 
 The fixture manifest must include a reproducible seed, full dataset inventory, known record/attachment checks, role-based application actions, observed source baseline and restore checks. For example, preserve the exact set of permit IDs, row counts, attachment digests and ownership relationships, then demonstrate a new permitted write after activation. A passing ping or VM boot does not satisfy the application checks. P00 assigns and approves outage, performance, retention and data-loss thresholds; illustrative data here creates no accepted target.
 

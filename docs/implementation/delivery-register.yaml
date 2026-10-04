@@ -523,7 +523,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p02.md
+  criterion_ids:
+  - G02.01
+  - G02.03
 - id: P02.02
   phase_id: P02
   title: Tenancy
@@ -536,7 +539,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p02.md
+  criterion_ids:
+  - G02.01
+  - G02.04
 - id: P02.03
   phase_id: P02
   title: Authorization
@@ -549,7 +555,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p02.md
+  criterion_ids:
+  - G02.01
+  - G02.03
 - id: P02.04
   phase_id: P02
   title: Approval lifecycle
@@ -562,7 +571,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p02.md
+  criterion_ids:
+  - G02.02
+  - G02.04
 - id: P02.05
   phase_id: P02
   title: Console foundation
@@ -575,7 +587,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p02.md
+  criterion_ids:
+  - G02.01
+  - G02.04
 - id: P03.01
   phase_id: P03
   title: Core aggregates
@@ -588,7 +603,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p03.md
+  criterion_ids:
+  - G03.01
+  - G03.02
 - id: P03.02
   phase_id: P03
   title: Intent semantics
@@ -601,7 +619,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p03.md
+  criterion_ids:
+  - G03.01
+  - G03.02
 - id: P03.03
   phase_id: P03
   title: Revision behavior
@@ -614,7 +635,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p03.md
+  criterion_ids:
+  - G03.03
 - id: P03.04
   phase_id: P03
   title: Product workflows
@@ -627,7 +650,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p03.md
+  criterion_ids:
+  - G03.01
+  - G03.04
 - id: P03.05
   phase_id: P03
   title: Domain verification
@@ -640,7 +666,11 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p03.md
+  criterion_ids:
+  - G03.02
+  - G03.03
+  - G03.04
 - id: P04.01
   phase_id: P04
   title: Site enrollment
@@ -653,7 +683,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p04.md
+  criterion_ids:
+  - G04.02
+  - G04.04
 - id: P04.02
   phase_id: P04
   title: Collectors
@@ -666,7 +699,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p04.md
+  criterion_ids:
+  - G04.01
+  - G04.02
 - id: P04.03
   phase_id: P04
   title: Observation store
@@ -679,7 +715,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p04.md
+  criterion_ids:
+  - G04.02
+  - G04.04
 - id: P04.04
   phase_id: P04
   title: Discovery controls
@@ -692,7 +731,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p04.md
+  criterion_ids:
+  - G04.03
 - id: P04.05
   phase_id: P04
   title: Inventory experience
@@ -705,7 +746,11 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p04.md
+  criterion_ids:
+  - G04.02
+  - G04.03
+  - G04.04
 - id: P05.01
   phase_id: P05
   title: Capability registry
@@ -718,7 +763,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p05.md
+  criterion_ids:
+  - G05.01
+  - G05.03
 - id: P05.02
   phase_id: P05
   title: Policy and assessment
@@ -731,7 +779,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p05.md
+  criterion_ids:
+  - G05.01
+  - G05.03
 - id: P05.03
   phase_id: P05
   title: Capacity and reservations
@@ -744,7 +795,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p05.md
+  criterion_ids:
+  - G05.04
 - id: P05.04
   phase_id: P05
   title: Plan compilation
@@ -757,7 +810,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p05.md
+  criterion_ids:
+  - G05.02
 - id: P05.05
   phase_id: P05
   title: Review experience
@@ -770,7 +825,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p05.md
+  criterion_ids:
+  - G05.01
+  - G05.02
 - id: P05.06
   phase_id: P05
   title: Admission contract
@@ -783,7 +841,11 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p05.md
+  criterion_ids:
+  - G05.02
+  - G05.03
+  - G05.04
 - id: P06.01
   phase_id: P06
   title: Admission and dispatch
@@ -796,7 +858,11 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p06.md
+  criterion_ids:
+  - G06.01
+  - G06.02
+  - G06.03
 - id: P06.02
   phase_id: P06
   title: Workflow state
@@ -809,7 +875,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p06.md
+  criterion_ids:
+  - G06.01
+  - G06.03
 - id: P06.03
   phase_id: P06
   title: Execution authority
@@ -822,7 +891,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p06.md
+  criterion_ids:
+  - G06.02
+  - G06.03
 - id: P06.04
   phase_id: P06
   title: Evidence custody
@@ -835,7 +907,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p06.md
+  criterion_ids:
+  - G06.04
 - id: P06.05
   phase_id: P06
   title: Simulation and fault injection
@@ -848,7 +922,12 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p06.md
+  criterion_ids:
+  - G06.01
+  - G06.02
+  - G06.03
+  - G06.04
 - id: P06.06
   phase_id: P06
   title: Jobs experience
@@ -861,7 +940,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p06.md
+  criterion_ids:
+  - G06.01
+  - G06.04
 - id: P07.01
   phase_id: P07
   title: Native site readiness
@@ -874,7 +956,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p07.md
+  criterion_ids:
+  - G07.01
+  - G07.02
 - id: P07.02
   phase_id: P07
   title: Infrastructure automation
@@ -887,7 +972,11 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p07.md
+  criterion_ids:
+  - G07.01
+  - G07.02
+  - G07.03
 - id: P07.03
   phase_id: P07
   title: Guest and service integration
@@ -900,7 +989,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p07.md
+  criterion_ids:
+  - G07.01
+  - G07.03
 - id: P07.04
   phase_id: P07
   title: Activation and verification
@@ -913,7 +1005,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p07.md
+  criterion_ids:
+  - G07.01
+  - G07.02
 - id: P07.05
   phase_id: P07
   title: Failure and retirement
@@ -926,7 +1021,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p07.md
+  criterion_ids:
+  - G07.03
+  - G07.04
 - id: P07.06
   phase_id: P07
   title: Native support dossier
@@ -939,7 +1037,12 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p07.md
+  criterion_ids:
+  - G07.01
+  - G07.02
+  - G07.03
+  - G07.04
 - id: P08.01
   phase_id: P08
   title: Source readiness
@@ -952,7 +1055,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p08.md
+  criterion_ids:
+  - G08.01
+  - G08.02
 - id: P08.02
   phase_id: P08
   title: Method and data movement
@@ -965,7 +1071,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p08.md
+  criterion_ids:
+  - G08.01
 - id: P08.03
   phase_id: P08
   title: Rehearsal
@@ -978,7 +1086,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p08.md
+  criterion_ids:
+  - G08.01
+  - G08.04
 - id: P08.04
   phase_id: P08
   title: Cutover
@@ -991,7 +1102,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p08.md
+  criterion_ids:
+  - G08.02
+  - G08.04
 - id: P08.05
   phase_id: P08
   title: Recovery decisions
@@ -1004,7 +1118,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p08.md
+  criterion_ids:
+  - G08.03
 - id: P08.06
   phase_id: P08
   title: Acceptance
@@ -1017,7 +1133,12 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p08.md
+  criterion_ids:
+  - G08.01
+  - G08.02
+  - G08.03
+  - G08.04
 - id: P09.01
   phase_id: P09
   title: Platform tranches
@@ -1030,7 +1151,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p09.md
+  criterion_ids:
+  - G09.01
+  - G09.02
 - id: P09.02
   phase_id: P09
   title: Migration matrix
@@ -1043,7 +1167,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p09.md
+  criterion_ids:
+  - G09.01
+  - G09.02
 - id: P09.03
   phase_id: P09
   title: Brownfield adoption
@@ -1056,7 +1183,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p09.md
+  criterion_ids:
+  - G09.03
 - id: P09.04
   phase_id: P09
   title: Enterprise capabilities
@@ -1069,7 +1198,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p09.md
+  criterion_ids:
+  - G09.02
+  - G09.04
 - id: P09.05
   phase_id: P09
   title: Extension contract
@@ -1082,7 +1214,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p09.md
+  criterion_ids:
+  - G09.01
+  - G09.04
 - id: P10.01
   phase_id: P10
   title: Resilience and performance
@@ -1095,7 +1230,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p10.md
+  criterion_ids:
+  - G10.01
 - id: P10.02
   phase_id: P10
   title: Recovery and upgrades
@@ -1108,7 +1245,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p10.md
+  criterion_ids:
+  - G10.01
+  - G10.02
 - id: P10.03
   phase_id: P10
   title: Security assurance
@@ -1121,7 +1261,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p10.md
+  criterion_ids:
+  - G10.03
 - id: P10.04
   phase_id: P10
   title: Operations
@@ -1134,7 +1276,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p10.md
+  criterion_ids:
+  - G10.04
 - id: P10.05
   phase_id: P10
   title: Installation qualification
@@ -1147,7 +1291,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p10.md
+  criterion_ids:
+  - G10.02
+  - G10.03
 - id: P10.06
   phase_id: P10
   title: Release dossier
@@ -1160,7 +1307,12 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p10.md
+  criterion_ids:
+  - G10.01
+  - G10.02
+  - G10.03
+  - G10.04
 - id: P11.01
   phase_id: P11
   title: Production commissioning
@@ -1173,7 +1325,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p11.md
+  criterion_ids:
+  - G11.01
 - id: P11.02
   phase_id: P11
   title: Controlled pilot
@@ -1186,7 +1340,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p11.md
+  criterion_ids:
+  - G11.02
 - id: P11.03
   phase_id: P11
   title: Acceptance
@@ -1199,7 +1355,10 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p11.md
+  criterion_ids:
+  - G11.02
+  - G11.03
 - id: P11.04
   phase_id: P11
   title: Release publication
@@ -1212,7 +1371,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p11.md
+  criterion_ids:
+  - G11.04
 - id: P11.05
   phase_id: P11
   title: Historical disposition
@@ -1225,7 +1386,9 @@ work_packages:
   evidence_ids: []
   blocker_ids: []
   doc_refs:
-  - docs/implementation/phased-plan.md
+  - docs/implementation/phases/p11.md
+  criterion_ids:
+  - G11.04
 requirements:
 - id: R01
   package_ids:

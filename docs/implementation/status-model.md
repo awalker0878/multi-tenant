@@ -36,7 +36,7 @@ Proposed documents in this branch are E0 *candidates*. `evidence: []` means no r
 | Record or field | Authoritative source / accountable maintainer |
 | --- | --- |
 | Requirement ID, priority, normative outcome, context owner | `requirements-and-qualification.md` / requirement owner |
-| Phase and package scope, deliverables and dependencies | `phased-plan.md`; P00/P01 detailed task cards / delivery lead |
+| Phase and package scope, deliverables and dependencies | `phased-plan.md`; detailed phase task cards / delivery lead |
 | All execution state, requirement/package/phase links, evidence and blockers | `delivery-register.yaml` / delivery lead with owning service and reviewer |
 | Gate criteria and required evidence/environment/reviewer role | `gates.md` / qualification lead |
 | Gate decision and decision evidence | `delivery-register.yaml` gate record / named reviewer at review time |

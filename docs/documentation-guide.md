@@ -15,15 +15,15 @@ Keep product intent, target design, delivered behavior and observed evidence dis
 | `contracts/openapi/`, `contracts/asyncapi/`, `contracts/schemas/` | Future canonical machine-readable API/event/message definitions | Schemas are implemented; clients and rendered references derive from these sources |
 | `docs/decisions/` | Decision register and full ADR rationale | A consequential choice is proposed, accepted, rejected or superseded |
 | `docs/implementation/phased-plan.md` | Programme sequence, scope and milestones | Scope, dependency order or a delivery milestone changes |
-| `docs/implementation/phases/pNN.md` | Detailed phase package specifications | A phase approaches implementation; elaborate work before starting |
+| `docs/implementation/phases/pNN.md` | Detailed phase package specifications | Package scope, dependencies, acceptance or operating impact changes |
 | `docs/implementation/delivery-register.yaml` | Canonical execution status, delivery mappings and real evidence references | Work progresses, a gate is reviewed, a blocker arises or evidence changes |
 | `docs/implementation/progress.md`, `traceability.md` | Derived reader views of the register | Regenerate; do not independently maintain the same fields |
 | `docs/implementation/gates.md` | Acceptance criteria, evidence expectations and review responsibilities | Pass conditions or required environments change |
 | `docs/implementation/requirements-and-qualification.md` | Requirement wording, invariants, evidence levels and campaign intent | A requirement or qualification obligation changes |
 | `docs/implementation/support-matrix.md` | Planned release scope and support dimensions | A combination enters/leaves scope; actual support remains evidence-bound |
 | `docs/operations/` | Deployment model and environment-independent runbooks | Installation, configuration, monitoring, upgrade or recovery changes |
-| `docs/qualification/` | Future feasibility records, campaign designs and sanitized gate-review indexes | A concrete campaign or review is prepared; raw evidence remains in approved systems |
-| `docs/releases/` | Future release manifests, support statements, upgrade notes and limitations | A release candidate is assembled and accepted |
+| `docs/qualification/` | Feasibility records, campaign designs and sanitized gate-review indexes | A concrete campaign or review is prepared; raw evidence remains in approved systems |
+| `docs/releases/` | Release process, manifest rules, readiness, notes and release-specific records | A release candidate is assembled and accepted |
 | `docs/reference/` | External sources and historical provenance | Source evidence changes or historical material must be retained |
 | `docs/templates/` | Reusable authoring structures | Repeated omissions require a better template |
 | `next_work.md` | Immediate queue and navigation to package definitions | The next actionable work changes; do not duplicate the entire backlog or statuses |
@@ -72,6 +72,6 @@ Each implementation review explains what changed for the user, which authority o
 
 The [status model](implementation/status-model.md) owns status meaning; [requirements and qualification](implementation/requirements-and-qualification.md) owns E0–E4 evidence levels; the [decision register](decisions/decision-register.md) owns decisions; the delivery register owns execution state. Link to these definitions instead of copying their enums.
 
-Keep the phase plan as an overview and put detailed cards in phase pages. Add P02–P11 detail shortly before work starts so earlier learning informs it. Add a runbook when there is a concrete procedure; label unrehearsed design procedures honestly.
+Keep the phase plan as an overview and maintain detailed work in the phase pages. Review each phase against actual learning before implementation starts. Maintain procedures in the operating runbooks and bind their execution results to the tested artifact/environment rather than inferring readiness from written instructions.
 
 Run the documentation generation/validation commands in [CONTRIBUTING](../CONTRIBUTING.md). Structural checks do not prove product behavior, native safety or operating acceptance.

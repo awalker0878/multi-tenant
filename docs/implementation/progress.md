@@ -25,7 +25,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 
 ## Packages
 
-Package state is independent of phase roll-up. Detailed P00/P01 work appears in the [phase cards](phases/p00.md); later specifications are elaborated before implementation.
+Package state is independent of phase roll-up. Detailed work appears in the [phase documents](phases/README.md); review each specification against current decisions and evidence before implementation.
 
 | Package | Output | Owner role | Work | Verification | Native qualification | Operating acceptance | Evidence / blockers |
 | --- | --- | --- | --- | --- | --- | --- | --- |

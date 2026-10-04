@@ -1,6 +1,6 @@
 # Illustrative contract exchanges
 
-Status: proposed examples for schema review, not live endpoints or locked API definitions. IDs, times, qualification references and digests are synthetic. Repeated hexadecimal values are fixture placeholders, not hashes computed from these documents. All execution shown here is explicitly `simulation`; no native capability or authorization is asserted.
+Status: proposed examples for schema review, not live endpoints or locked API definitions. IDs, times, qualification references and digests are synthetic. Repeated hexadecimal values are synthetic fixture values, not hashes computed from these documents. All execution shown here is explicitly `simulation`; no native capability or authorization is asserted.
 
 These exchanges use the application in the [walkthrough](../product/application-walkthrough.md). Each HTTP request targets its owning service origin. Authentication headers are omitted: actual requests require trusted service identity and delegated actor scope; no example token is a reusable credential. Correlation `corr_demo_01` ties the journey together, while each command has its own retry key.
 

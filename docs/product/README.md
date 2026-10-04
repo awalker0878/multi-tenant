@@ -2,6 +2,8 @@
 
 Status: proposed product specification, 2026-10-04. The repository contains a delivery plan; the capabilities below are intended outcomes, not implemented features. Product scope and acceptance are resolved through P00, with the initial route feasibility required before that phase closes.
 
+The [scope and release boundaries](scope.md) define included outcomes and expansion rules. The [operating targets](operating-targets.md) define measurement and ratification. Use the [domain model](domain-model.md) for invariants and the [application walkthrough](application-walkthrough.md) for the connected user and service journey.
+
 ## What the application does
 
 Enterprise Workload Mobility is a control plane for operating applications across approved hosting platforms. An operator describes an application and its requirements, discovers available infrastructure, compares possible placements and reviews a plan that explains what will change. The product obtains the required approval, coordinates long-running work through scoped workers and records the observed result and supporting evidence.
