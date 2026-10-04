@@ -160,7 +160,7 @@ class CredentialCustodyPostgresTests(unittest.TestCase):
     def test_real_observation_cursor_issues_through_same_b10_transaction_without_second_job_connection(self):
         request=replace(self.request,operation_kind='DISCOVER_READ',step_id='step-read')
         grant=self.grants.issue_grant(self.context,self.identity,request)
-        role=VaultDynamicRole('vault:site-read','platform/creds/site-power',self.scope,
+        role=VaultDynamicRole('vault:site-read','platform/creds/site-read',self.scope,
                               'DISCOVER_READ',timedelta(minutes=2))
         issuer=VaultDynamicCredentialIssuer(vault_url=f'https://localhost:{self.fixture.server.server_port}',
             ca_bundle=self.fixture.pki.root/'ca.pem',agent_token_file=self.fixture.token_file,

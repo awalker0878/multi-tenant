@@ -36,8 +36,7 @@ class VaultNativeCredentialLeaseStore:
             _tenant(cursor,context)
             # Serialize closure against actual issuance on this original B10
             # grant. Expiry or a local process flag cannot release credentials.
-            cursor.execute('SELECT grant_id FROM hosting_controlplane.worker_grants '
-                'WHERE organization_id=%s AND tenant_id=%s AND grant_id=%s FOR UPDATE',
+            cursor.execute('SELECT hosting_controlplane.lock_native_credential_grant(%s,%s,%s)',
                 (context.organization_id,context.tenant_id,grant.grant_id))
             require(cursor.fetchone()==(grant.grant_id,),'Original credential grant is unavailable')
             cursor.execute('SELECT 1 FROM hosting_controlplane.native_credential_issuance_closures '
@@ -96,6 +95,8 @@ class VaultNativeCredentialLeaseStore:
 
     @staticmethod
     def _leases(cursor,context,bundle,worker_id,recovery_job_id):
+        # These original rows are append-only. Locking them neither prevents
+        # late leases nor adds authority; unknown custody remains a hard hold.
         cursor.execute('SELECT a.issuance_id,a.role_reference,a.creation_path,l.lease_digest,l.lease_id,g.grant_id,'
             'g.operation_id,g.lease_key,g.lease_epoch,g.platform_family,g.endpoint_id,g.native_scope_id,'
             'g.operation_kind,g.job_id '
@@ -107,7 +108,7 @@ class VaultNativeCredentialLeaseStore:
             'WHERE organization_id=%s AND tenant_id=%s AND original_job_id=%s AND recovery_job_id<>%s '
             'AND original_plan_digest=%s AND original_selection_digest=%s AND resource_bundle_digest=%s)) '
             'AND g.worker_subject=%s '
-            "AND g.operation_kind<>'DISCOVER_READ' ORDER BY a.issuance_id FOR SHARE OF a,g",
+            "AND g.operation_kind<>'DISCOVER_READ' ORDER BY a.issuance_id",
             (context.organization_id,context.tenant_id,bundle.admitted.job_id,
              context.organization_id,context.tenant_id,bundle.admitted.job_id,recovery_job_id,
              bundle.admitted.plan_digest,bundle.selection_digest,bundle.digest,worker_id))
@@ -118,13 +119,15 @@ class VaultNativeCredentialLeaseStore:
 
     @staticmethod
     def _worker_excluded(cursor,context,worker_id):
+        # Enrollment/certificate revocations are irreversible SQL transitions.
+        # Reading an explicit revocation cannot race an "unrevoke" operation.
         cursor.execute('SELECT revoked_at FROM hosting_controlplane.worker_enrollments '
-            'WHERE organization_id=%s AND tenant_id=%s AND worker_subject=%s FOR SHARE',
+            'WHERE organization_id=%s AND tenant_id=%s AND worker_subject=%s',
             (context.organization_id,context.tenant_id,worker_id))
         row=cursor.fetchone(); require(row is not None and row[0] is not None,
                 'The original worker enrollment must be explicitly revoked')
         cursor.execute('SELECT revoked_at FROM hosting_controlplane.worker_certificate_versions '
-            'WHERE organization_id=%s AND tenant_id=%s AND worker_subject=%s FOR SHARE',
+            'WHERE organization_id=%s AND tenant_id=%s AND worker_subject=%s',
             (context.organization_id,context.tenant_id,worker_id))
         rows=cursor.fetchall(); require(rows and all(row[0] is not None for row in rows),
                 'Every original worker certificate version must be explicitly revoked')

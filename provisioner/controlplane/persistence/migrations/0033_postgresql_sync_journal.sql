@@ -173,10 +173,11 @@ BEGIN
     original:=hosting_sync.current_stream(stream);
     -- No operational login receives the secret-bearing subconninfo column.
     -- The independently commissioned owner returns only this stream's boolean
-    -- empty-connection predicate and fixed nonsecret subscription metadata.
+    -- non-authorizing connection predicate and fixed subscription metadata.
     SELECT jsonb_build_array(subenabled,subslotname,subpublications,subbinary,substream,subtwophasestate,
         subdisableonerr,subpasswordrequired,subrunasowner,suborigin,subfailover,subskiplsn::text,
-        subconninfo='',pg_get_userbyid(subowner),oid::bigint) INTO result FROM pg_subscription
+        subconninfo='hostaddr=127.0.0.1 port=1 dbname=hosting_disabled_subscription user=hosting_disabled_subscription password=hosting_disabled_subscription sslmode=verify-full sslrootcert=/dev/null passfile=/dev/null connect_timeout=1',
+        pg_get_userbyid(subowner),oid::bigint) INTO result FROM pg_subscription
         WHERE subdbid=(SELECT oid FROM pg_database WHERE datname=current_database())
         AND subname=original.subscription_name;
     RETURN result;

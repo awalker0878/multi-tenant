@@ -322,6 +322,21 @@ class NativeOperationRegistry:
         self._grants = grants
         self._evidence = evidence
 
+    def get(self, ctx: TenantContext, operation_id: str) -> NativeOperation:
+        """Read one original tenant intent without acquiring mutation authority."""
+        if not isinstance(ctx, TenantContext) or not _key(operation_id):
+            raise ValueError('An exact tenant and operation identity are required')
+        with self._connect() as connection, connection.cursor() as cursor:
+            _tenant(cursor, ctx)
+            cursor.execute(
+                f'SELECT {_SELECT} FROM hosting_controlplane.native_operation_intents '
+                'WHERE organization_id = %s AND tenant_id = %s AND operation_id = %s',
+                (ctx.organization_id, ctx.tenant_id, operation_id))
+            row = cursor.fetchone()
+            if row is None:
+                raise OperationConflict('Operation is not visible in this tenant')
+            return _row(row)
+
     @staticmethod
     def _clock(cursor) -> datetime:
         cursor.execute('SELECT clock_timestamp()')

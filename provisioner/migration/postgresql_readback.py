@@ -32,9 +32,12 @@ _AVAILABLE_WRITERS="""SELECT count(*) FROM pg_roles login WHERE login.rolcanlogi
     AND EXISTS(SELECT 1 FROM pg_roles effective
         WHERE has_table_privilege(effective.oid,%s,'INSERT,UPDATE,DELETE,TRUNCATE')
         AND pg_has_role(login.oid,effective.oid,'SET'))"""
+# Restricted statistics may hide backend_type. A hidden writer session remains
+# uncertain; NOLOGIN or lack of statistics visibility never excludes it.
 _ACTIVE_WRITERS="""SELECT count(*) FROM pg_stat_activity backend
     LEFT JOIN pg_roles login ON login.oid=backend.usesysid
-    WHERE backend.datname=current_database() AND backend.backend_type IN ('client backend','walsender')
+    WHERE backend.datname=current_database()
+    AND (backend.backend_type IS NULL OR backend.backend_type IN ('client backend','walsender'))
     AND (login.oid IS NULL OR (NOT login.rolsuper
         AND EXISTS(SELECT 1 FROM pg_roles effective
             WHERE has_table_privilege(effective.oid,%s,'INSERT,UPDATE,DELETE,TRUNCATE')
@@ -147,13 +150,13 @@ class PostgresqlReadbackOwner:
         def inspect(held):
             _tenant(held,TenantContext(original['organization_id'],original['tenant_id']))
             held.execute('SELECT operation_id,selection_digest,closed_by FROM hosting_controlplane.native_credential_issuance_closures '
-                'WHERE organization_id=%s AND tenant_id=%s AND grant_id=%s FOR SHARE',
+                'WHERE organization_id=%s AND tenant_id=%s AND grant_id=%s',
                 (original['organization_id'],original['tenant_id'],original['grant_id']))
             require(held.fetchone()==(original['operation_id'],receipt['selection_sha256'],original['worker_id']),
                     'The actual original credential issuance is not durably closed')
             held.execute('SELECT a.issuance_id,l.lease_id,l.lease_digest FROM hosting_controlplane.native_credential_attempts a '
                 'LEFT JOIN hosting_controlplane.native_credential_leases l USING(organization_id,tenant_id,issuance_id) '
-                'WHERE a.organization_id=%s AND a.tenant_id=%s AND a.grant_id=%s ORDER BY a.issuance_id FOR SHARE OF a',
+                'WHERE a.organization_id=%s AND a.tenant_id=%s AND a.grant_id=%s ORDER BY a.issuance_id',
                 (original['organization_id'],original['tenant_id'],original['grant_id']))
             rows=held.fetchall()
             require(rows and all(row[1] is not None and digest(row[1].encode())==row[2] for row in rows)

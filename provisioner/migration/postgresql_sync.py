@@ -25,6 +25,14 @@ FORMAT='hosting-postgresql17-sync-selection/1'
 _IDENTIFIER=re.compile('[a-z][a-z0-9_]{0,62}')
 _ID=re.compile('[A-Za-z0-9][A-Za-z0-9._:-]{0,127}')
 _SHA=re.compile('[0-9a-f]{64}')
+# Public metadata only: never a Vault/source credential. PostgreSQL17 requires
+# a nonempty password even for connect=false under a nonsuperuser owner. The
+# pinned loopback port and empty TLS trust file cannot reach/authenticate a
+# source, including if someone enables this originally disabled subscription.
+DISABLED_SUBSCRIPTION_CONNECTION=('hostaddr=127.0.0.1 port=1 '
+    'dbname=hosting_disabled_subscription user=hosting_disabled_subscription '
+    'password=hosting_disabled_subscription sslmode=verify-full '
+    'sslrootcert=/dev/null passfile=/dev/null connect_timeout=1')
 
 
 def _identifier(value):return isinstance(value,str) and _IDENTIFIER.fullmatch(value) is not None
@@ -252,10 +260,11 @@ class _PostgresqlEngine:
                 sha=digest_snapshot(source)
                 self.target.execute('SELECT hosting_sync.record_commit(%s,%s,%s,%s,%s)',
                     (self.body['streamId'],point,sha,self.selection.sha256,'INITIAL'))
-            # Fixed disabled metadata subscription carries no source password,
+            # Fixed disabled metadata subscription carries no source credential,
             # opens no native connection, and creates no apply worker.
-            self.target.execute(sql.SQL("CREATE SUBSCRIPTION {} CONNECTION '' PUBLICATION {} WITH (connect=false,enabled=false,create_slot=false,copy_data=false,slot_name={},binary=false,streaming='off',two_phase=false,disable_on_error=true,password_required=true,run_as_owner=false,origin='none',failover=false)").format(
-                sql.Identifier(self.body['subscription']),sql.Identifier(self.body['publication']),sql.Literal(self.body['slot'])))
+            self.target.execute(sql.SQL("CREATE SUBSCRIPTION {} CONNECTION {} PUBLICATION {} WITH (connect=false,enabled=false,create_slot=false,copy_data=false,slot_name={},binary=false,streaming='off',two_phase=false,disable_on_error=true,password_required=true,run_as_owner=false,origin='none',failover=false)").format(
+                sql.Identifier(self.body['subscription']),sql.Literal(DISABLED_SUBSCRIPTION_CONNECTION),
+                sql.Identifier(self.body['publication']),sql.Literal(self.body['slot'])))
             generations={'publication':self.source.execute('SELECT oid FROM pg_publication WHERE pubname=%s',(self.body['publication'],)).fetchone()[0],
                 'subscription':self.target.execute('SELECT oid FROM pg_subscription WHERE subname=%s',(self.body['subscription'],)).fetchone()[0]}
             for side,session in (('source',self.source),('target',self.target)):

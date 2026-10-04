@@ -350,7 +350,7 @@ class RetainedImportPostgresTests(unittest.TestCase):
         self.lock_service.markers.clear()
         with self.runtime() as connection,connection.cursor() as cursor:
             _tenant(cursor,self.context)
-            with self.assertRaises(self.psycopg.errors.RaiseException):
+            with self.assertRaises(self.psycopg.errors.InsufficientPrivilege):
                 cursor.execute('UPDATE hosting_controlplane.retained_conversion_recovery SET retry_authorized=true '
                     'WHERE organization_id=%s AND tenant_id=%s AND batch_id=%s',
                     (self.context.organization_id,self.context.tenant_id,self.batch))

@@ -8,6 +8,7 @@ from psycopg import sql
 
 from provisioner.migration.postgresql_pgoutput import decode_transactions
 from provisioner.migration.postgresql_readback import _no_other_writers,_ACTIVE_WRITERS
+from provisioner.migration.postgresql_sync import DISABLED_SUBSCRIPTION_CONNECTION
 from tests.provisioning.mobility.postgresql_sync_fixture import NativeEngineFixture,EngineSession
 from tests.provisioning.mobility.prepare_postgresql_sync import PREFIX,native_admin,owner_role
 
@@ -26,6 +27,16 @@ class PostgresqlEngineTests(unittest.TestCase):
         self.assertEqual(self.fixture.target.execute('SELECT count(pid) FROM pg_stat_subscription WHERE subname=%s',(self.body['subscription'],)).fetchone(),(0,))
         with self.assertRaises(psycopg.errors.InsufficientPrivilege):self.fixture.target.execute('SELECT * FROM hosting_sync.commits')
         with self.assertRaises(psycopg.errors.InsufficientPrivilege):self.fixture.target.execute('SELECT subconninfo FROM pg_subscription')
+
+    def test_disabled_subscription_has_only_fixed_non_authorizing_metadata(self):
+        self.engine.initial_snapshot()
+        with native_admin(self.fixture.dsns['SETUP'],self.fixture.parsed['TARGET']['dbname']) as admin:
+            self.assertEqual(admin.execute('SELECT subconninfo,subenabled,subpasswordrequired '
+                'FROM pg_subscription WHERE subname=%s',(self.body['subscription'],)).fetchone(),
+                (DISABLED_SUBSCRIPTION_CONNECTION,False,True))
+            admin.execute(sql.SQL('ALTER SUBSCRIPTION {} CONNECTION {}').format(
+                sql.Identifier(self.body['subscription']),sql.Literal('hostaddr=127.0.0.1 password=changed')))
+        with self.assertRaisesRegex(ValueError,'subscription was enabled'):self.engine.observe_stream()
 
     def test_whole_committed_changes_apply_before_slot_acknowledgement(self):
         self.fixture.insert_initial();original=self.engine.initial_snapshot()['sourcePosition']

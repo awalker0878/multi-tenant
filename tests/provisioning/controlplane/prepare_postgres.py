@@ -92,6 +92,8 @@ def main() -> int:
             'hosting_controlplane.native_credential_wrappings, '
             'hosting_controlplane.native_credential_leases, '
             'hosting_controlplane.native_credential_issuance_closures TO {}',
+            'GRANT EXECUTE ON FUNCTION '
+            'hosting_controlplane.lock_native_credential_grant(text,text,text) TO {}',
             'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_worker_scope('
             'text, text, text, text, text, text, text, text, text, text) TO {}',
             'GRANT EXECUTE ON FUNCTION '

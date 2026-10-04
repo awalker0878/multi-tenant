@@ -288,7 +288,7 @@ class DatabaseCredentialRetirer:
             actual=runtime.grants.verify_intent(cursor,runtime.context,grant_id=grant.grant_id,
                 worker_identity=runtime.identity,**runtime.grant_arguments(guard.admitted))
             require(actual==grant,'Original SQL retirement grant changed')
-            cursor.execute('SELECT grant_id FROM hosting_controlplane.worker_grants WHERE organization_id=%s AND tenant_id=%s AND grant_id=%s FOR UPDATE',
+            cursor.execute('SELECT hosting_controlplane.lock_native_credential_grant(%s,%s,%s)',
                 (grant.organization_id,grant.tenant_id,grant.grant_id))
             require(cursor.fetchone()==(grant.grant_id,),'Original credential grant is unavailable')
             cursor.execute('INSERT INTO hosting_controlplane.native_credential_issuance_closures '
@@ -296,7 +296,7 @@ class DatabaseCredentialRetirer:
                 (grant.organization_id,grant.tenant_id,grant.grant_id,grant.operation_id,guard.descriptor.sha256,grant.worker_subject))
             cursor.execute('SELECT a.issuance_id,l.lease_id,l.lease_digest FROM hosting_controlplane.native_credential_attempts a '
                 'LEFT JOIN hosting_controlplane.native_credential_leases l USING(organization_id,tenant_id,issuance_id) '
-                'WHERE a.organization_id=%s AND a.tenant_id=%s AND a.grant_id=%s ORDER BY a.issuance_id FOR SHARE OF a',
+                'WHERE a.organization_id=%s AND a.tenant_id=%s AND a.grant_id=%s ORDER BY a.issuance_id',
                 (grant.organization_id,grant.tenant_id,grant.grant_id))
             rows=cursor.fetchall()
             require(rows and all(row[1] is not None and digest(row[1].encode())==row[2] for row in rows),

@@ -284,7 +284,7 @@ END $$;
 CREATE FUNCTION hosting_controlplane.retained_conversion_write_is_admitted(p_org text,p_tenant text,p_wsd text,p_workload text)
 RETURNS boolean LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,hosting_controlplane AS $$
 DECLARE b hosting_controlplane.retained_conversion_batches%ROWTYPE; h hosting_controlplane.retained_conversion_handovers%ROWTYPE;
-    k record;
+    key_row record;
 BEGIN
     IF (p_org,p_tenant) IS DISTINCT FROM (current_setting('app.organization_id',true),current_setting('app.tenant_id',true))
     THEN RAISE EXCEPTION 'Exact retained tenant context required'; END IF;
@@ -300,14 +300,14 @@ BEGIN
         AND r.tenant_id=p_tenant AND r.record_kind='Workload' AND r.record_id=p_workload
         AND r.revision=b.workload_revision AND r.record_digest=b.workload_digest)
     THEN RETURN false; END IF;
-    FOR k IN SELECT x.* FROM hosting_controlplane.retained_conversion_keys x
+    FOR key_row IN SELECT x.* FROM hosting_controlplane.retained_conversion_keys x
       JOIN hosting_controlplane.retained_conversion_proofs p ON
         (x.organization_id,x.tenant_id,x.scope_digest,x.key_id,x.purpose)=
         (p.organization_id,p.tenant_id,p.scope_digest,p.key_id,p.purpose)
       WHERE p.organization_id=p_org AND p.tenant_id=p_tenant
         AND p.event_key IN(h.native_proof,h.exclusion_proof,h.owner_proof,h.security_proof,h.custody_proof)
       ORDER BY x.scope_digest,x.key_id,x.purpose FOR SHARE OF x LOOP
-      IF clock_timestamp()>=k.valid_until THEN RETURN false; END IF;
+      IF clock_timestamp()>=key_row.valid_until THEN RETURN false; END IF;
     END LOOP;
     IF EXISTS(SELECT 1 FROM hosting_controlplane.retained_conversion_proofs p
         LEFT JOIN hosting_controlplane.retained_conversion_keys k ON

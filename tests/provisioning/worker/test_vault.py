@@ -27,7 +27,7 @@ class VaultHandler(BaseHTTPRequestHandler):
         else:
             payload = {'data': None, 'auth': None,
                        'wrap_info': {'token': 'one-use-wrapping-token', 'ttl': 30,
-                                     'creation_path': 'platform/creds/site-power'}}
+                                     'creation_path': self.path.removeprefix('/v1/')}}
         body = json.dumps(payload).encode()
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')

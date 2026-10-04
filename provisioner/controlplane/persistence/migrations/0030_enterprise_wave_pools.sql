@@ -186,7 +186,7 @@ DECLARE selected hosting_controlplane.enterprise_wave_pools%ROWTYPE;
 BEGIN
     SELECT * INTO selected FROM hosting_controlplane.enterprise_wave_pools WHERE pool_id=pool;
     SELECT m.* INTO candidate FROM hosting_controlplane.migration_wave_members m
-        JOIN hosting_controlplane.migration_waves w USING(organization_id,tenant_id,schedule_digest)
+        JOIN hosting_controlplane.migration_waves w USING(organization_id,tenant_id,schedule_digest,domain_id)
         JOIN hosting_controlplane.enterprise_wave_pool_domains d USING(organization_id,tenant_id,domain_id)
         WHERE (m.organization_id,m.tenant_id,m.schedule_digest,m.member_id)=(org,tenant,schedule,member)
             AND d.pool_id=pool;
@@ -205,14 +205,14 @@ BEGIN
     FOR dimension IN SELECT jsonb_object_keys(selected.document_json->'budget') LOOP
         SELECT COALESCE(sum((m.demand->>dimension)::numeric),0) INTO total
             FROM hosting_controlplane.migration_wave_members m
-            JOIN hosting_controlplane.migration_waves w USING(organization_id,tenant_id,schedule_digest)
+            JOIN hosting_controlplane.migration_waves w USING(organization_id,tenant_id,schedule_digest,domain_id)
             JOIN hosting_controlplane.enterprise_wave_pool_domains d USING(organization_id,tenant_id,domain_id)
             WHERE d.pool_id=pool AND m.job_id IS NOT NULL AND m.status<>'SUCCEEDED';
         IF total+(candidate.demand->>dimension)::numeric>
             (selected.document_json->'budget'->>dimension)::numeric THEN RETURN false; END IF;
     END LOOP;
     IF EXISTS (SELECT 1 FROM hosting_controlplane.migration_wave_members m
-        JOIN hosting_controlplane.migration_waves w USING(organization_id,tenant_id,schedule_digest)
+        JOIN hosting_controlplane.migration_waves w USING(organization_id,tenant_id,schedule_digest,domain_id)
         JOIN hosting_controlplane.enterprise_wave_pool_domains d USING(organization_id,tenant_id,domain_id)
         WHERE d.pool_id=pool AND m.job_id IS NOT NULL AND m.status<>'SUCCEEDED'
             AND EXISTS (SELECT 1 FROM jsonb_array_elements_text(m.resource_keys) owned
@@ -230,7 +230,7 @@ BEGIN
         FROM (
             SELECT DISTINCT m.organization_id,m.tenant_id,m.schedule_digest,m.member_id,m.demand
             FROM hosting_controlplane.migration_wave_members m
-            JOIN hosting_controlplane.migration_waves w USING(organization_id,tenant_id,schedule_digest)
+            JOIN hosting_controlplane.migration_waves w USING(organization_id,tenant_id,schedule_digest,domain_id)
             JOIN hosting_controlplane.enterprise_wave_pool_domains d USING(organization_id,tenant_id,domain_id),
                 LATERAL jsonb_array_elements_text(m.risk_groups) r
             WHERE d.pool_id=pool AND m.job_id IS NOT NULL AND m.status<>'SUCCEEDED'
@@ -270,8 +270,8 @@ BEGIN
     SELECT t.organization_id,t.tenant_id INTO chosen_org,chosen_tenant
         FROM hosting_controlplane.enterprise_wave_tickets t
         JOIN hosting_controlplane.migration_wave_members m
-            USING(organization_id,tenant_id,schedule_digest,member_id)
-        JOIN hosting_controlplane.migration_waves w USING(organization_id,tenant_id,schedule_digest)
+            USING(organization_id,tenant_id,schedule_digest,member_id,domain_id)
+        JOIN hosting_controlplane.migration_waves w USING(organization_id,tenant_id,schedule_digest,domain_id)
         JOIN hosting_controlplane.migration_wave_domains d USING(organization_id,tenant_id,domain_id)
         CROSS JOIN LATERAL (
             SELECT value FROM jsonb_array_elements(w.definition_json::jsonb->'members')

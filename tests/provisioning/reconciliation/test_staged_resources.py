@@ -55,7 +55,9 @@ class StagedEnrollmentTests(unittest.TestCase):
     os.environ.get('HOSTING_TEST_POSTGRES_ISOLATED')=='1','Requires isolated real PostgreSQL scoped roles')
 class StagedAccountingSqlTests(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):pg.PlannedCreationPostgresTests.setUpClass.__func__(cls)
+    def setUpClass(cls):
+        pg.PlannedCreationPostgresTests.setUpClass()
+        cls.psycopg=pg.PlannedCreationPostgresTests.psycopg
 
     def setUp(self):
         self.original=pg.PlannedCreationPostgresTests();self.original.setUp()
