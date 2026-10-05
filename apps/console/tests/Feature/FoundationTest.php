@@ -56,4 +56,4 @@ it('requires a fresh page when the browser supplies an obsolete asset version', 
 
 it('exposes no registration or workload endpoints in the foundation', function (string $path): void {
     $this->get($path, ['Accept' => 'application/json'])->assertNotFound();
-})->with(['/register', '/tenants', '/workloads']);
+})->with(['/register', '/workloads']);

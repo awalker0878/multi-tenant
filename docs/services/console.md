@@ -99,3 +99,7 @@ The service owner reviews source/dependency changes and maintains legal/forbidde
 ## P02 federation increment
 
 The [federation increment](../implementation/p02-federation.md) adds console-managed provider settings, write-only secrets, browser-bound administrator testing and atomic activation. Provider values remain application settings. Native provider interoperability and full G02 receiving verification remain open.
+
+## P02 tenant navigation increment
+
+The [tenant authority implementation](../implementation/p02-tenancy-and-approvals.md) adds current-membership navigation, owner-checked tenant projections and membership/quota administration. Revoked and guessed tenant navigation returns to the current account page. Real CSRF, session rechecks and history clearing apply; no browser role or selector grants authority. Hosted campaign results and their limitations remain separate from complete browser/accessibility acceptance.

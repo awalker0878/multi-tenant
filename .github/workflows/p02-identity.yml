@@ -3,7 +3,7 @@ name: P02 identity
 on:
   push:
     branches: [greenfield/enterprise-microservices-plan]
-    paths: ['services/governance/**', 'apps/console/**', 'contracts/openapi/governance-local-identity-v1.json', 'scripts/p02/**', '.github/workflows/p02-identity.yml']
+    paths: ['services/governance/**', 'apps/console/**', 'contracts/openapi/governance-*.json', 'contracts/openapi/planning-*.json', 'scripts/p02/**', '.github/workflows/p02-identity.yml']
   pull_request:
     branches: [greenfield/enterprise-microservices-plan]
   workflow_dispatch:
@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   identity:
-    name: Bootstrap identity PostgreSQL and browser
+    name: P02 identity, tenancy and approval PostgreSQL and browser
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     services:

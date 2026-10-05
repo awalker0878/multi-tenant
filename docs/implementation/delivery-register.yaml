@@ -815,13 +815,14 @@ work_packages:
   title: Tenancy
   owner_role: Governance
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/phases/p02.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
@@ -834,13 +835,14 @@ work_packages:
   title: Authorization
   owner_role: Governance/security
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/phases/p02.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
@@ -854,13 +856,14 @@ work_packages:
   title: Approval lifecycle
   owner_role: Governance
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/phases/p02.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
@@ -880,6 +883,7 @@ work_packages:
   - EV-P02-001
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/p02-local-bootstrap.md
   - docs/implementation/p02-federation.md
   - docs/implementation/phases/p02.md

@@ -42,9 +42,9 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P01.05 | Runtime dependencies | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 12 / 1 |
 | P01.06 | Baseline operations | SRE/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 13 / 2 |
 | P02.01 | Authentication | Product/IAM | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 0 |
-| P02.02 | Tenancy | Governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P02.03 | Authorization | Governance/security | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P02.04 | Approval lifecycle | Governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P02.02 | Tenancy | Governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P02.03 | Authorization | Governance/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P02.04 | Approval lifecycle | Governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.05 | Console foundation | Console | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 0 |
 | P03.01 | Core aggregates | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P03.02 | Intent semantics | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |

@@ -5,9 +5,9 @@ declare(strict_types=1);
 use App\Http\Controllers\FoundationController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\OidcController;
+use App\Http\Controllers\TenantController;
 use App\Http\Middleware\RequireIdentity;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', FoundationController::class)->name('foundation');
 
@@ -22,6 +22,10 @@ Route::middleware(RequireIdentity::class)->group(function (): void {
     Route::put('/setup', [OidcController::class, 'save']);
     Route::post('/setup/test', [OidcController::class, 'test']);
     Route::post('/setup/activate', [OidcController::class, 'activate']);
-    Route::get('/account', fn () => Inertia::render('identity/Account'));
+    Route::get('/account', [TenantController::class, 'index']);
+    Route::post('/tenants', [TenantController::class, 'create']);
+    Route::get('/tenants/{tenant}', [TenantController::class, 'show'])->whereUuid('tenant');
+    Route::post('/tenants/{tenant}/{operation}', [TenantController::class, 'update'])
+        ->whereUuid('tenant')->whereIn('operation', ['memberships', 'quota', 'state']);
     Route::post('/logout', [LocalIdentityController::class, 'logout'])->name('identity.logout');
 });

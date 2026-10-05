@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the bootstrap slice in disposable CI PostgreSQL and real browser processes.
+"""Verify P02 identity, tenancy and approval slices in disposable CI.
 
 Passwords/terminal output stay in memory/private scratch; only redacted observations
 and source bindings enter retained evidence. This never targets an operated system.
@@ -24,6 +24,8 @@ import time
 import urllib.request
 import urllib.error
 
+from synthetic_oidc import SyntheticOidc
+
 from openapi_schema_validator import OAS31Validator
 from openapi_spec_validator import validate_spec
 
@@ -37,20 +39,21 @@ def main() -> int:
     root = Path(__file__).resolve().parents[2]
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    report = {'schema_version': 1, 'result': 'RUNNING', 'scope': 'P02 local bootstrap slice only',
+    report = {'schema_version': 1, 'result': 'RUNNING', 'scope': 'P02 identity, tenancy and plan-bound approval increments',
               'source_sha': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
               'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'observed_at': dt.datetime.now(dt.UTC).isoformat(),
-              'checks': [], 'source_sha256': {}, 'limitations': ['No external OIDC handover', 'No operated deployment or G01/G02 acceptance', 'Verified PostgreSQL TLS; loopback HTTP between applications; production ingress/workload TLS topology remains unqualified']}
+              'checks': [], 'source_sha256': {}, 'limitations': ['Synthetic HTTPS OIDC peer; no operated-provider interoperability or DNS rotation qualification', 'Synthetic immutable plan authority; no real planning producer or native admission', 'No operated deployment or G01/G02 acceptance', 'Verified PostgreSQL TLS; loopback HTTP between applications; production ingress/workload TLS topology remains unqualified']}
     tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=root).decode().split('\0')
     for name in tracked:
-        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', '.github/workflows/p02-identity', 'contracts/openapi/governance-local-identity')):
+        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', '.github/workflows/p02-identity', 'contracts/openapi/governance-', 'contracts/openapi/planning-')):
             report['source_sha256'][name] = hashlib.sha256((root / name).read_bytes()).hexdigest()
     private_values = [os.environ['P02_TEST_PASSWORD']]
     processes: list[subprocess.Popen] = []
     handles = []
+    provider = None
 
     def redact(value: str) -> str:
-        for secret in private_values:
+        for secret in private_values + (provider.private_values if provider is not None else []):
             value = value.replace(secret, '[REDACTED]')
         return value
 
@@ -107,15 +110,21 @@ def main() -> int:
         api = json.loads((root / 'contracts/openapi/governance-local-identity-v1.json').read_text())
         validate_spec(api)
         check('openapi-specification-valid', True)
+        for contract in sorted((root / 'contracts/openapi').glob('governance-*.json')):
+            validate_spec(json.loads(contract.read_text()))
+            check('openapi-valid-' + contract.stem, True)
         report['php'] = run(['php', '-r', 'echo PHP_VERSION;']).strip()
         report['postgres'] = sql('SHOW server_version;').strip()
         report['node'] = run(['node', '--version']).strip()
         check('exact-php-runtime', report['php'] == '8.5.11')
-        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/OidcIdentityTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
+        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/ApprovalTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
         check('postgres-feature-suite', True)
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:
             private_path = Path(private)
+            provider = SyntheticOidc(private_path)
+            provider.start()
+            private_values.append(provider.client_secret)
             # Exercise the existing Console's verified-TLS and mounted-secret contract.
             certificate, key_file = private_path / 'postgres.crt', private_path / 'postgres.key'
             run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', str(key_file), '-out', str(certificate), '-days', '1', '-subj', '/CN=p02-disposable-postgres', '-addext', 'subjectAltName=IP:127.0.0.1,DNS:localhost'])
@@ -181,19 +190,20 @@ def main() -> int:
             check('fresh-process-retry-does-not-redisplay', 'Temporary password:' not in replay and 'already complete' in replay)
 
             runtime_password = environments['governance']['DB_PASSWORD']
-            for label, statement in [('sentinel-delete', 'DELETE FROM app.bootstrap_administrator;'), ('audit-delete', 'DELETE FROM app.identity_audit;'), ('audit-update', "UPDATE app.identity_audit SET event='forged';"), ('schema-create', 'CREATE TABLE app.forbidden (id int);')]:
+            for label, statement in [('sentinel-delete', 'DELETE FROM app.bootstrap_administrator;'), ('audit-delete', 'DELETE FROM app.identity_audit;'), ('audit-update', "UPDATE app.identity_audit SET event='forged';"), ('schema-create', 'CREATE TABLE app.forbidden (id int);'), ('governance-audit-update', "UPDATE app.governance_audit SET event='forged';"), ('governance-audit-delete', 'DELETE FROM app.governance_audit;'), ('approval-binding-update', "UPDATE app.approvals SET plan_digest='forged';"), ('receipt-delete', 'DELETE FROM app.governance_commands;')]:
                 denial = sql(statement, 'governance', 'governance_runtime', runtime_password, expected=3)
                 check('runtime-denied-' + label, 'permission denied' in denial)
             replacement = secrets.token_urlsafe(32)
             private_values.append(replacement)
             fixture = private_path / 'bootstrap.json'
-            fixture.write_text(json.dumps({'temporary': temporary, 'replacement': replacement}))
+            fixture.write_text(json.dumps({'temporary': temporary, 'replacement': replacement, 'provider': provider.fixture()}))
             fixture.chmod(0o600)
             for name, directory in [('governance', gov), ('console', root / 'apps/console')]:
                 port = 8032 if name == 'governance' else 8031
                 handle = (private_path / f'{name}.log').open('wb')
                 handles.append(handle)
-                process = subprocess.Popen(['php', 'artisan', 'serve', '--host=127.0.0.1', f'--port={port}', '--no-reload'], cwd=directory, env=environments[name], stdout=handle, stderr=subprocess.STDOUT, start_new_session=True)
+                router = directory / 'vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php'
+                process = subprocess.Popen(['php', '-d', 'curl.cainfo=' + str(provider.certificate), '-S', f'127.0.0.1:{port}', str(router)], cwd=directory / 'public', env=environments[name], stdout=handle, stderr=subprocess.STDOUT, start_new_session=True)
                 processes.append(process)
                 deadline = time.monotonic() + 20
                 while True:
@@ -235,18 +245,25 @@ def main() -> int:
             stats = json.loads(browser_report.read_text())['stats']
             report['browser_stats'] = stats
             (output / 'browser.json').write_text(redact(browser_report.read_text()))
-            check('browser-no-skips-retries-or-failures', stats['expected'] == 1 and all(stats[key] == 0 for key in ['unexpected', 'flaky', 'skipped']))
-            check('password-change-persisted', sql('SELECT state || \':\' || credential_version FROM app.bootstrap_administrator;', 'governance').strip() == 'local_setup:2')
+            check('browser-no-skips-retries-or-failures', stats['expected'] == 2 and all(stats[key] == 0 for key in ['unexpected', 'flaky', 'skipped']))
+            check('handover-retired-local-and-destroyed-password', sql("SELECT state || ':' || credential_version || ':' || (password_hash IS NULL)::text FROM app.bootstrap_administrator;", 'governance').strip() == 'retired:3:true')
+            check('provider-https-pkce-exchanges', provider.counts['token'] >= 3 and provider.counts['pkce_verified'] == provider.counts['token'])
+            report['synthetic_provider'] = provider.counts
+            check('tenant-audit-and-outbox-stay-paired', sql('SELECT count(*) FROM app.governance_audit a FULL JOIN app.governance_outbox o USING (id) WHERE a.id IS NULL OR o.id IS NULL;', 'governance').strip() == '0')
+            check('two-independent-tenants-persisted', sql('SELECT count(*) FROM app.tenants;', 'governance').strip() == '2')
+            check('reader-revocation-persisted', sql("SELECT count(*) FROM app.tenant_memberships WHERE role='reader' AND state='revoked';", 'governance').strip() == '1')
             wire('/identity/session', 'Error', expected=401, token=initial_session)
             check('audit-and-outbox-stay-paired', sql('SELECT count(*) FROM app.identity_audit a FULL JOIN app.identity_outbox o USING (id) WHERE a.id IS NULL OR o.id IS NULL;', 'governance').strip() == '0')
             for name in ['governance', 'console']:
                 log = (private_path / f'{name}.log').read_text()
-                check(name + '-logs-exclude-credentials', all(value not in log for value in private_values))
+                check(name + '-logs-exclude-credentials', all(value not in log for value in private_values + provider.private_values))
         report['result'] = 'PASS'
     except Exception as error:
         report['result'] = 'FAIL'
         report['failure'] = redact(str(error))
     finally:
+        if provider is not None:
+            provider.close()
         for process in processes:
             if process.poll() is None:
                 os.killpg(process.pid, signal.SIGTERM)

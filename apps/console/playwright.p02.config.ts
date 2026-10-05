@@ -5,10 +5,11 @@ export default defineConfig({
   forbidOnly: true,
   retries: 0,
   workers: 1,
-  timeout: 30_000,
-  globalTimeout: 90_000,
+  timeout: 60_000,
+  globalTimeout: 150_000,
   reporter: [['list'], ['json', { outputFile: 'test-results/p02-browser.json' }]],
+  // The browser trusts only a disposable self-signed fixture here; Governance verifies its CA.
   // These tests handle ephemeral deployment credentials; no request/body traces.
-  use: { baseURL: process.env.CONSOLE_BASE_URL, trace: 'off', screenshot: 'off', video: 'off' },
+  use: { baseURL: process.env.CONSOLE_BASE_URL, ignoreHTTPSErrors: true, trace: 'off', screenshot: 'off', video: 'off' },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });

@@ -1,6 +1,6 @@
 # Governance service
 
-Status: P02 local administrator, first-login password change and session authority are implemented in the [bootstrap increment](../implementation/p02-local-bootstrap.md). Console-managed external OIDC and verified handover are implemented in the [federation increment](../implementation/p02-federation.md); tenancy and approvals remain planned; the increment does not complete P02 or pass G02. Runtime: Laravel/PHP; source: `services/governance/`. Owner: product engineering with IAM/security. ADR-009 defines the identity baseline and remaining delegation checkpoints.
+Status: P02 local administrator, first-login password change and session authority are implemented in the [bootstrap increment](../implementation/p02-local-bootstrap.md). Console-managed external OIDC and verified handover are implemented in the [federation increment](../implementation/p02-federation.md); tenant authority and plan-bound approvals are implemented in the [tenancy increment](../implementation/p02-tenancy-and-approvals.md); the increment does not complete P02 or pass G02. Runtime: Laravel/PHP; source: `services/governance/`. Owner: product engineering with IAM/security. ADR-009 defines the identity baseline and remaining delegation checkpoints.
 
 The [package replay](../implementation/p01-laravel-foundations.md) and [image measurements](../implementation/p01-laravel-images.md) bind actual source, dependency and execution results. Diagnostic liveness does not establish application readiness; readiness remains HTTP 503 until real dependencies and their probes are implemented.
 
@@ -25,9 +25,9 @@ Governance owns the single installation bootstrap administrator and external ide
 
 Enforce separation of duties from effective identities, not UI roles alone. Plans and their referenced actors may outlive membership changes; retain accountability while rechecking current authority. Approval for migration does not implicitly authorize later source retirement.
 
-## Proposed API surface
+## API surface and remaining integration
 
-Routes are relative to governance. Tenant administration begins at `POST /v1/tenants`; tenant-specific routes use `/v1/tenants/{tenant_id}`.
+Implemented endpoint schemas and limits are in the [tenant](../../contracts/openapi/governance-tenancy-v1.json) and [approval](../../contracts/openapi/governance-approvals-v1.json) contracts. Native delegation and support/break-glass remain integration work. Routes are relative to governance. Tenant administration begins at `POST /v1/tenants`; tenant-specific routes use `/v1/tenants/{tenant_id}`.
 
 | Method and route | Contract |
 | --- | --- |
@@ -66,7 +66,7 @@ Cache decision results only within ADR-009's accepted freshness and revocation b
 
 Commit grants/approvals/revocations, command receipts, audit and outbox atomically. Idempotency is scoped by tenant/effective actor/command; same key with a changed digest/scope is a conflict. Grant mutations compare expected revision; concurrent approval/revocation requests preserve a deterministic versioned history.
 
-Publish `governance.tenant.changed`, `governance.grant.changed`, `governance.approval.recorded` and `governance.approval.revoked`. Events notify caches and running jobs; they do not replace current decision checks. Consume catalogue/planning references only as pointers or display projections; fetch the immutable authoritative plan for an approval decision.
+The implemented outbox records `governance.tenant.changed`, `governance.membership.changed`, `governance.grant.changed`, `governance.grant.revoked`, `governance.quota.changed` and `governance.approval.{requested,approved,rejected,revoked,expired}`. Delivery to the event transport remains pending. Events notify caches and running jobs; they do not replace current decision checks. Consume catalogue/planning references only as pointers or display projections; fetch the immutable authoritative plan for an approval decision.
 
 A plan needs explicit action/scope/expiry semantics. Governance does not approve a mutable “latest plan” alias. Any digest mismatch, changed effect scope, expired plan or missing required approval condition rejects approval/admission. Clock validity follows a monitored trusted-time policy with maximum permitted skew selected before native operations.
 

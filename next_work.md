@@ -1,6 +1,6 @@
 # Next work — P02 identity, tenancy and governance
 
-Active branch: `greenfield/enterprise-microservices-plan`. The requesting user authorized P02 development on 2026-10-05 in [the entry record](docs/implementation/p02-development-entry.md). **P02 is active; P02.01/P02.05 begin with local bootstrap and console sessions. G01 receiving review remains open and G02 is not passed.** The [delivery register](docs/implementation/delivery-register.yaml) owns state; progress and traceability are generated views.
+Active branch: `greenfield/enterprise-microservices-plan`. The requesting user authorized P02 development on 2026-10-05 in [the entry record](docs/implementation/p02-development-entry.md). **P02 is active across identity, tenancy, authorization, approvals and console navigation. G01 receiving review remains open and G02 is not passed.** The [delivery register](docs/implementation/delivery-register.yaml) owns state; progress and traceability are generated views.
 
 ## P02 handoff
 
@@ -14,10 +14,20 @@ P02 remains IN_PROGRESS. Console-managed external OIDC and verified handover now
 [regression snapshot](verification/p02/regression-runs.json) records all ten affected
 workflows passing, including the nine package/image jobs and both runtime campaigns.
 
-**Next concrete work:** qualify the new OIDC paths against the disposable runtime,
-then implement P02.02 tenant membership and quota APIs, P02.03 scoped authorization,
-and P02.04 plan-bound approvals. Provider values remain application settings and
-never deployment configuration.
+[Tenant authority and approvals](docs/implementation/p02-tenancy-and-approvals.md)
+now implement membership/grant lifecycle, revisioned quotas, explicit role/scope
+checks, independent plan-bound approval decisions and revocation-aware validation.
+The Console adds tenant selection and membership/quota administration. The local
+Governance suite passes 91 tests; hosted results for the changed source are pending.
+
+**Next concrete work:** run and retain the expanded PostgreSQL/browser campaign,
+including a disposable HTTPS provider and cross-browser tenant revocation. Then
+implement service actor delegation, support-access/break-glass policy, outbox
+delivery/background expiry and recovery reconciliation against the owning
+contracts. The real immutable plan producer belongs to P05.04; P02 uses explicitly
+synthetic plans, with a fail-closed production adapter. Complete the broader
+late-response/accessibility campaign and independent G02 review before advancing
+through the gate. Provider values remain Console-managed application settings.
 
 ## Retained P01 handoff
 
