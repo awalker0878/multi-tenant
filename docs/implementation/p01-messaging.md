@@ -53,3 +53,8 @@ and injects denied outbox/projection writes, producer/consumer process loss,
 broker/database restart, tenant denial, sequence gaps, outage and publisher
 revocation. It retains source/image identities, results and cleanup; a definition
 of a check is not evidence of its execution.
+
+Initial hosted run `37258199569` passed conformance but stopped before image build:
+the image verifier's explicit Catalogue input list had not yet admitted its owned
+contract resources. The follow-up adds that exact directory, retaining the strict
+input allowlist. The nine-package run `37258199557` passed on the preceding source.
