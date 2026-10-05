@@ -114,3 +114,16 @@ def test_transport_correlation_cannot_authorize_or_leak_input(
         assert row["trace_id"] == "b" * 32 and row["parent_span_id"] == "c" * 16
     else:
         assert row["parent_span_id"] is None and row["trace_id"] not in {"b" * 32, "0" * 32}
+
+
+def test_setgid_inheritance_keeps_buffer_private_but_group_access_is_denied(tmp_path: Path) -> None:
+    directory = tmp_path / "signals"
+    directory.mkdir(mode=0o2700)
+    directory.chmod(0o2700)
+    buffer = BoundedSignalBuffer(directory)
+    assert buffer.append({"value": "private"}) == "buffered"
+    assert json.loads(buffer.snapshot())["value"] == "private"
+    directory.chmod(0o2750)
+    assert buffer.append({"value": "must-not-write"}) == "unavailable"
+    directory.chmod(0o2700)
+    assert b"must-not-write" not in buffer.snapshot()

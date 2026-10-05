@@ -109,10 +109,14 @@ def export(rows: list[dict], directory: Path) -> dict:
 
 def control(service: str, operation: str, expected_sha256: str | None = None) -> list[str]:
     """Fixed privileged exec adapter, never an HTTP route or caller-provided code."""
-    if service not in SERVICES or operation not in {'snapshot', 'acknowledge'}:
+    if service not in SERVICES or operation not in {'snapshot', 'acknowledge', 'permissions'}:
         raise ValueError('Unknown diagnostic control')
     if operation == 'acknowledge' and not re.fullmatch('[0-9a-f]{64}', expected_sha256 or ''):
         raise ValueError('Invalid snapshot identity')
+    if operation == 'permissions':
+        if service in {'console', 'governance', 'catalogue', 'assurance'}:
+            return ['php', '-r', "echo json_encode(['directory_mode'=>fileperms('/tmp/product-telemetry') & 07777,'file_mode'=>fileperms('/tmp/product-telemetry/events.jsonl') & 07777]);"]
+        return ['/opt/venv/bin/python', '-I', '-c', "import json,os; print(json.dumps({'directory_mode':os.stat('/tmp/product-telemetry').st_mode & 0o7777,'file_mode':os.stat('/tmp/product-telemetry/events.jsonl').st_mode & 0o7777}))"]
     if service in {'console', 'governance', 'catalogue', 'assurance'}:
         code = "require '/app/vendor/autoload.php'; $b=new App\\Infrastructure\\Foundation\\BoundedSignalBuffer; "
         code += 'echo $b->snapshot();' if operation == 'snapshot' else f"$b->acknowledge('{expected_sha256}');"

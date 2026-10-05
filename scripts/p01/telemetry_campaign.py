@@ -53,6 +53,11 @@ class TelemetryCampaign:
     def measure_telemetry(self):
         for service in SERVICES:
             self.telemetry_snapshot(service, 'before-journey', acknowledge=True)
+            permissions = json.loads(self.telemetry_exec(service, control(service, 'permissions')))
+            self.check('telemetry-buffer-private-effective-permissions',
+                       permissions['directory_mode'] & 0o777 == 0o700
+                       and permissions['file_mode'] & 0o777 == 0o600,
+                       {'service': service, **permissions})
         trace, parent = secrets.token_hex(16), secrets.token_hex(8)
         headers = {'traceparent': f'00-{trace}-{parent}-01',
                    'Cookie': 'P01_PRIVATE_SIGNAL_CANARY', 'X-Tenant-Id': 'P01_PRIVATE_SIGNAL_CANARY',

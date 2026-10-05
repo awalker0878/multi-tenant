@@ -20,7 +20,8 @@ class BoundedSignalBuffer:
         info = self.directory.lstat()
         if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.geteuid():
             raise OSError("Invalid diagnostic directory")
-        if stat.S_IMODE(info.st_mode) != 0o700:
+        # Kubernetes fsGroup volumes inherit setgid; it grants no access.
+        if stat.S_IMODE(info.st_mode) & 0o777 != 0o700:
             raise OSError("Diagnostic directory must be private")
         fd = os.open(self.directory / "events.jsonl", os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
         handle = os.fdopen(fd, "r+b", buffering=0)
