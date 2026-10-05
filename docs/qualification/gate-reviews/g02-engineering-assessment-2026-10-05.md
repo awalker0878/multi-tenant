@@ -81,3 +81,17 @@ to its original bytes; no policy exclusion changed. Hosted regression outcomes
 and source identities must be inspected separately; a successful development
 campaign does not supply actual operating identities, promotion approval or native
 qualification.
+
+## Directory and browser follow-up
+
+EV-P02-013 adds local directory/Console implementation checks at `5c789a1`:
+146 Governance cases, 119 Console cases, source-only docs checks and 282 source
+bindings. The original
+[directory snapshot](../../../verification/p02/directory-hosted-runs.json) records
+the then-queued campaign. EV-P02-015 subsequently retains 59 passing checks,
+159 PostgreSQL/TLS cases, two Chromium journeys, six deliveries and 290 source
+bindings at the same implementation revision. Firefox/WebKit remain queued in the
+[follow-up](../../../verification/p02/directory-hosted-followup.json).
+EV-P02-014 retains the separate Firefox consumer pass at `b13996d`; the same-source
+WebKit failure remains, with the correction and later-source reruns tracked
+independently. These records do not pass G02 or replace actual receiving inputs.

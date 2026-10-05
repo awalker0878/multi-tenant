@@ -64,3 +64,32 @@ Each execution needs its own source-bound evidence; new test implementation is
 not a hosted pass. Managed-browser floor, manual assistive technology, full
 restore/revocation reconciliation, exceptional-access policy and independent
 G02 acceptance remain open. The new contract does not change these conditions.
+
+## Retained local qualification
+
+EV-P02-013 binds implementation `5c789a1` to 282 matching source digests,
+15 passing command observations and 30 retained logs. The complete suites pass
+146 Governance tests (2,078 assertions) and 119 Console tests (565 assertions);
+six real-broker tests per service are explicitly skipped locally. Types, formatting,
+dependency boundaries, frontend build and exact-archive documentation checks pass.
+The source-only check includes 89 documentation tests. The initial
+[hosted snapshot](../../verification/p02/directory-hosted-runs.json) records the
+then-queued campaign; its subsequent Chromium result is retained separately below. Installed vendor
+README links and generated caches are outside the exact source archive; validator
+rules and scopes were not weakened to validate the development working directory.
+
+## Hosted PostgreSQL and Chromium qualification
+
+EV-P02-015 retains run `37374667414` at `5c789a1`: 59 checks, 110 Governance
+PostgreSQL cases (1,906 assertions), 49 Console PostgreSQL/TLS cases (208
+assertions), both compiled Chromium journeys, four HTTPS/PKCE exchanges and six
+owner-to-Console deliveries. Nine artifact digests and 290 source bindings match
+the original archive. PostgreSQL cases traverse multi-page directories; the
+compiled journey exercises the new owner endpoints with two tenants.
+
+Firefox and WebKit remain queued in the
+[follow-up observation](../../verification/p02/directory-hosted-followup.json).
+The earlier correction-only run `37373325859` was cancelled across all engines;
+those cancellations are not relabelled. Changed-source package/image runs were
+cancelled before creating jobs and remain unqualified; no failed job exists for
+the failed-jobs-only retry tool. Separate operated and receiving conditions remain.

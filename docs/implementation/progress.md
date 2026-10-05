@@ -12,7 +12,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: PASSED | 11 / 2 |
 | P01 | Delivery and runtime foundation | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 32 / 4 |
-| P02 | Identity, tenancy and governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 12 / 0 |
+| P02 | Identity, tenancy and governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 15 / 0 |
 | P03 | Application catalogue and workspace | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
 | P04 | Site commissioning and inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 0 / 0 |
 | P05 | Capabilities and immutable plans | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G05: NOT_REVIEWED | 0 / 0 |
@@ -41,11 +41,11 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P01.04 | CI and supply chain | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 11 / 3 |
 | P01.05 | Runtime dependencies | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 13 / 1 |
 | P01.06 | Baseline operations | SRE/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 14 / 2 |
-| P02.01 | Authentication | Product/IAM | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 9 / 0 |
-| P02.02 | Tenancy | Governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 5 / 0 |
-| P02.03 | Authorization | Governance/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 9 / 0 |
+| P02.01 | Authentication | Product/IAM | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 11 / 0 |
+| P02.02 | Tenancy | Governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 8 / 0 |
+| P02.03 | Authorization | Governance/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 12 / 0 |
 | P02.04 | Approval lifecycle | Governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 0 |
-| P02.05 | Console foundation | Console | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 8 / 0 |
+| P02.05 | Console foundation | Console | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 11 / 0 |
 | P03.01 | Core aggregates | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P03.02 | Intent semantics | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P03.03 | Revision behavior | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **55**. Blocker records: **4**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **58**. Blocker records: **4**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -158,6 +158,9 @@ Evidence records: **55**. Blocker records: **4**. Planning inputs awaiting selec
 | EV-P02-011 | E2 | GitHub Actions Ubuntu 24.04; PHP 8.5.11; pinned PostgreSQL and verified TLS RabbitMQ with synthetic receiving witnesses. | 7b24476c71a778dcf9a865b04c13aa35aa8b3992 | Relay regression uses synthetic consumers; no Console consumer, other browser engine, operated custody, whole-store recovery, promotion or gate result is inferred. |
 | EV-P02-012 | E2 | GitHub Actions Ubuntu 24.04; PHP 8.5.11; verified PostgreSQL and broker TLS; compiled Chromium; disposable synthetic HTTPS OIDC provider. | 283e6f4cf40fe91ce6d94bd258eb1f193dfd86e6 | Chromium only. Firefox/WebKit and corrected-image source campaigns retain their own results. Synthetic provider/plans, single-node broker and loopback application HTTP do not qualify operated topology, HA, full restore, managed-browser floor, manual accessibility, native effects or receiving acceptance. |
 | EV-P01-032 | E2 | GitHub Actions Ubuntu 24.04 linux/amd64; seven independent pinned application images and disposable Compose fixture. | b13996d13db9b54736667a04be23c53f74269424 | No complete image-security admission, independent package replay, Kubernetes pass, production sizing, accepted recovery objective, broker HA or G01/G02 decision is inferred from this Compose campaign. Operating identities and receiving reviews remain open. |
+| EV-P02-013 | E1 | Local PHP 8.5.11, Node 24.19.0, SQLite fixture databases and independently installed locked Governance/Console dependencies. Documentation and registry checks run in an exact git archive of the recorded revision, excluding installed dependency files and generated runtime caches. | 5c789a1ed2a79f50611dd512855385a00b759b76 | E1 only. The actual PostgreSQL/TLS/browser campaign at the directory source remains queued in directory-hosted-runs.json. Test discovery is not browser execution. No managed-browser floor, manual assistive-technology acceptance, live-list snapshot/export guarantee, full restore/revocation reconciliation, exceptional access, native effect, promotion or G01/G02 receiving decision. |
+| EV-P02-014 | E2 | GitHub Actions Ubuntu 24.04, PHP 8.5.11, PostgreSQL 18.6 with verified database TLS, disposable RabbitMQ TLS queue, compiled Console and Playwright Firefox; synthetic HTTPS OIDC provider. | b13996d13db9b54736667a04be23c53f74269424 | Bounded Firefox-only result at b13996d, preceding the quota-save synchronization correction and directory feature. It does not qualify either newer source, other browser engines, operated OIDC/workload topology, broker HA, independent restore/custody, manual accessibility, promotion or a receiving gate. |
+| EV-P02-015 | E2 | GitHub Actions Ubuntu 24.04, PHP 8.5.11, Node 24.19.0, PostgreSQL 18.6 with verified TLS, disposable RabbitMQ TLS queue and compiled Playwright Chromium Console against a synthetic HTTPS provider. | 5c789a1ed2a79f50611dd512855385a00b759b76 | Chromium only; same-source Firefox/WebKit remain queued. PostgreSQL feature cases exercise multi-page collections; the compiled journey uses two tenants and does not establish manual assistive-technology or managed-browser acceptance. Earlier correction-only runs were cancelled and retain that outcome. Package/image campaigns cancelled before jobs remain unqualified. No operated provider/workload topology, broker HA, whole-store restore, exceptional access, native effects, promotion or G01/G02 receiving decision. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
 | BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, P01, P01.02, P01.04, P01.05, P01.06, G01, R29, R30 | Requesting user for baseline decisions; actual integration, operating and records owners at their affected checkpoints | OPEN | Supply the concrete runtime, registry/signer, trust, operating or records input before the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward checkpoints; do not request baseline approval again. | Complete the exact OP01–OP07 receiving inputs in release/operating-inputs.json with actual identities and immutable evidence. Run operating_inputs.py --require-complete, then integrate and qualify the affected trust/runtime/operations path. Preserve the accepted G00 decision and later P08/P10/P11 receiving checkpoints. |

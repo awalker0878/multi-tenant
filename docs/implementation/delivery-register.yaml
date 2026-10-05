@@ -117,6 +117,9 @@ phases:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-015
+  - EV-P02-013
+  - EV-P02-014
   - EV-P02-010
   - EV-P02-011
   - EV-P02-012
@@ -813,6 +816,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-015
+  - EV-P02-014
   - EV-P02-011
   - EV-P02-008
   - EV-P02-009
@@ -845,6 +850,9 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-015
+  - EV-P02-013
+  - EV-P02-014
   - EV-P02-010
   - EV-P02-012
   - EV-P02-003
@@ -874,6 +882,9 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-015
+  - EV-P02-013
+  - EV-P02-014
   - EV-P02-010
   - EV-P02-012
   - EV-P02-008
@@ -934,6 +945,9 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-015
+  - EV-P02-013
+  - EV-P02-014
   - EV-P02-010
   - EV-P02-012
   - EV-P02-009
@@ -1965,6 +1979,9 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-015
+  - EV-P02-013
+  - EV-P02-014
   - EV-P02-010
   - EV-P02-012
   - EV-P02-008
@@ -2018,6 +2035,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-015
+  - EV-P02-013
   - EV-P02-010
   - EV-P02-012
   - EV-P02-008
@@ -3181,6 +3200,9 @@ gates:
   reviewer: null
   reviewed_at: null
   evidence_ids:
+  - EV-P02-015
+  - EV-P02-013
+  - EV-P02-014
   - EV-P02-010
   - EV-P02-011
   - EV-P02-012
@@ -5145,6 +5167,102 @@ evidence:
   limitations: No complete image-security admission, independent package replay, Kubernetes pass, production
     sizing, accepted recovery objective, broker HA or G01/G02 decision is inferred from this Compose campaign.
     Operating identities and receiving reviews remain open.
+  valid_until: null
+  invalidated_at: null
+
+- id: EV-P02-013
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/6233bad6cdbc07e265ad7fb6d17d1c87dfe6192d/verification/p02/directory/local-20261005/report.json
+  sha256: 8430a08cb0bdcec17e16e7b6b8e971f95054afd9e4128c3c61b941831e03a423
+  source_revision: 5c789a1ed2a79f50611dd512855385a00b759b76
+  artifact_revisions:
+    retained_artifact_commit: 6233bad6cdbc07e265ad7fb6d17d1c87dfe6192d
+  environment: Local PHP 8.5.11, Node 24.19.0, SQLite fixture databases and independently installed locked Governance/Console
+    dependencies. Documentation and registry checks run in an exact git archive of the recorded revision,
+    excluding installed dependency files and generated runtime caches.
+  scope: 'Tenant and membership directories and Console integration: 206-row traversal beyond the original
+    200-row bound, stable UUID keysets, no duplicates or cross-tenant rows, encrypted session/scope-bound
+    continuation, tamper/expiry/role/revocation denials and unchanged published v1 behavior. Full local
+    suites pass 146 Governance cases (2078 assertions) and 119 Console cases (565 assertions); six real-broker
+    cases per service are explicitly skipped. Fifteen retained command observations cover those suites,
+    PHP types/format/dependency boundaries, Vue types/build/boundaries, compiled-test discovery and exact-archive
+    docs/registry checks including 89 documentation tests. Thirty log digests and 282 source bindings
+    match the recorded commit.'
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T21:11:10.656412+00:00'
+  observer: Codex local source-bound verification
+  reviewer: 'Codex: implementation/evidence consistency only; independent receiving review remains open'
+  limitations: E1 only. The actual PostgreSQL/TLS/browser campaign at the directory source remains queued
+    in directory-hosted-runs.json. Test discovery is not browser execution. No managed-browser floor,
+    manual assistive-technology acceptance, live-list snapshot/export guarantee, full restore/revocation
+    reconciliation, exceptional access, native effect, promotion or G01/G02 receiving decision.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P02-014
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/6233bad6cdbc07e265ad7fb6d17d1c87dfe6192d/verification/p02/identity/run-37371858388/firefox/report.json
+  sha256: 3209665f0ba00ff5a0e6cc109a177f7da644bee5f8da5479a8626365f912b72b
+  source_revision: b13996d13db9b54736667a04be23c53f74269424
+  artifact_revisions:
+    retained_artifact_commit: 6233bad6cdbc07e265ad7fb6d17d1c87dfe6192d
+    github_artifact_zip_sha256: 355d0f81b259c528c6194251740f97393608af8b07065268ce4cf1f78c60a1af
+  environment: GitHub Actions Ubuntu 24.04, PHP 8.5.11, PostgreSQL 18.6 with verified database TLS, disposable
+    RabbitMQ TLS queue, compiled Console and Playwright Firefox; synthetic HTTPS OIDC provider.
+  scope: 'Firefox notification regression at the sockets-corrected source: 58 campaign checks, 105 Governance
+    PostgreSQL cases (1542 assertions), 44 Console PostgreSQL/TLS notification cases (163 assertions),
+    two compiled browser journeys with no skips/retries/failures and six confirmed owner-to-Console deliveries.
+    The original archive digest, nine artifact digests and 284 source bindings are verified. The independent
+    WebKit failure at this same source remains retained; this Firefox result does not supersede it.'
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T20:54:14.784044+00:00'
+  observer: GitHub Actions run 37371858388 Firefox job; original bytes retrieved and hashed by Codex
+  reviewer: 'Codex: implementation/evidence consistency only; independent receiving review remains open'
+  limitations: Bounded Firefox-only result at b13996d, preceding the quota-save synchronization correction
+    and directory feature. It does not qualify either newer source, other browser engines, operated OIDC/workload
+    topology, broker HA, independent restore/custody, manual accessibility, promotion or a receiving gate.
+  valid_until: null
+  invalidated_at: null
+
+- id: EV-P02-015
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/4375c16d1b7dffd1bfae3fc5023940652b59b65e/verification/p02/identity/run-37374667414/chromium/report.json
+  sha256: c39caf20a61f9fa3ca381f9bd549cc0da3d05f5ca3722a51c5dee60ffd1e6c53
+  source_revision: 5c789a1ed2a79f50611dd512855385a00b759b76
+  artifact_revisions:
+    retained_artifact_commit: 4375c16d1b7dffd1bfae3fc5023940652b59b65e
+    github_artifact_zip_sha256: 7328a4c49ac1326abf5b4a66ce29a04439f41ebb3a46002e67d52da6e5884963
+  environment: GitHub Actions Ubuntu 24.04, PHP 8.5.11, Node 24.19.0, PostgreSQL 18.6 with verified TLS,
+    disposable RabbitMQ TLS queue and compiled Playwright Chromium Console against a synthetic HTTPS provider.
+  scope: 'Directory-source integration: 59 campaign checks, 110 Governance PostgreSQL cases (1906 assertions),
+    49 Console PostgreSQL/TLS cases (208 assertions), two compiled Chromium journeys without skips/retries/failures,
+    four HTTPS/PKCE exchanges and six confirmed owner-to-Console deliveries. Directory feature cases traverse
+    206 authorized records with cursor/scope/revocation denials. Original ZIP, nine artifact digests and
+    290 source bindings match. The quota-save synchronization correction is included in this source.'
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T21:16:29.826212+00:00'
+  observer: GitHub Actions run 37374667414 Chromium job; original bytes retrieved and hashed by Codex
+  reviewer: 'Codex: implementation/evidence consistency only; independent receiving review remains open'
+  limitations: Chromium only; same-source Firefox/WebKit remain queued. PostgreSQL feature cases exercise
+    multi-page collections; the compiled journey uses two tenants and does not establish manual assistive-technology
+    or managed-browser acceptance. Earlier correction-only runs were cancelled and retain that outcome.
+    Package/image campaigns cancelled before jobs remain unqualified. No operated provider/workload topology,
+    broker HA, whole-store restore, exceptional access, native effects, promotion or G01/G02 receiving
+    decision.
   valid_until: null
   invalidated_at: null
 

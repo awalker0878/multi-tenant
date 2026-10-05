@@ -82,23 +82,30 @@ The [directory increment](docs/implementation/p02-directory.md) removes the Cons
 200-entry truncation using current-authority, session-bound 50-row pages. Existing
 published APIs remain unchanged. The [quota-save campaign correction](docs/implementation/p02-browser-synchronization.md)
 waits for the returned server values before navigation; the original WebKit failure
-is retained. Local directory checks pass; hosted PostgreSQL and browser results
-must be retained against their actual source before claiming qualification.
+is retained. **EV-P02-013** retains 146 Governance and 119 Console passing local cases,
+15 command observations, 30 logs and 282 source bindings at `5c789a1`.
+Twelve real-broker cases are explicitly skipped locally. **EV-P02-014** retains the
+older Firefox consumer success at `b13996d`: 58 checks, 149 PostgreSQL cases,
+two browser journeys and six deliveries. Its independent WebKit failure remains.
+The [current workflow snapshot](verification/p02/directory-hosted-runs.json)
+keeps pending hosted qualification separate from these observations.
 
-**Immediate verification:** inspect the corrected campaign at `9716803` (run
-`37373325859`) and the subsequent directory-source campaign, retaining each
-browser's original-byte result. Retrieve remaining consumer runs and affected
-foundation package/image/Kubernetes results. Retry cancelled required checks at
-their actual source; documentation-only passes cannot replace code-source tests.
-The remaining Firefox/WebKit jobs in consumer run `37371273531` were cancelled.
-Package/image/Compose/Kubernetes workflows now retain up to 100 pending runs with
-GitHub's bounded FIFO `queue: max`; inspect the full selection triggered by
-`6f0cc5a` rather than inferring a pass. The cancelled pre-job image run `37371858446`
-could not be retried through the failed-jobs endpoint; its corrected product source
-is included in that new campaign. The older `7b24476` Chromium rerun remains queued,
-and GitHub refuses the WebKit retry while that workflow attempt is active.
-The [notification workflow snapshot](verification/p02/console-notification-hosted-runs.json)
-retains earlier observations and the Compose pass has its own receipt.
+**EV-P02-015 — Hosted directory-source qualification.** Chromium at `5c789a1`
+passes 59 campaign checks, 110 Governance and 49 Console PostgreSQL/TLS cases,
+two compiled journeys, four HTTPS/PKCE exchanges and six owner-to-Console
+deliveries. The original archive, nine artifact digests and 290 source bindings
+match. The earlier correction-only browser run `37373325859` was cancelled;
+its outcomes remain separate from this newer-source result.
+
+**Immediate verification:** retrieve Firefox/WebKit from directory run
+`37374667414`, then retain the affected foundation and event regressions.
+[The follow-up snapshot](verification/p02/directory-hosted-followup.json)
+records Chromium success, queued browsers, and package/image runs
+`37374667583`/`37374667564` cancelled before creating jobs. No failed job exists
+for the failed-jobs-only retry capability. Re-run those complete changed-source
+campaigns through an authorized full-run/dispatch path when available; do not
+substitute documentation-only checks. Preserve the bounded queue correction and
+original outcomes in [the corrections record](verification/p02/corrections.md).
 
 **Next concrete work:** finish notification restart/restore and browser-floor
 qualification, explicit owner-scoped installation consumers, and the remaining
