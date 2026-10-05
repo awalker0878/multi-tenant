@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "source_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+  "observer": "Codex via GitHub connector; archive digest, retained-byte and committed-source hashes compared",
+  "result": "PASS",
+  "run_id": 37367427132,
+  "artifact_id": 11368502144,
+  "report_path": "verification/p02/identity/run-37367427132/firefox/report.json",
+  "report_sha256": "16d7a9ecf86c6894aaadc4bef558b4f381f7be041863781974f70b6dadd1317c",
+  "archive_sha256": "6663307152326b06ea2418ff9b140c425b52f69a2b2ca3e76437eb7735ce2e87",
+  "checks": 50,
+  "matched_source_bindings": 259,
+  "matched_artifact_hashes": 6,
+  "browser_engine": "firefox",
+  "browser_stats": {
+    "startTime": "2026-10-05T20:05:49.399Z",
+    "duration": 11498.713000000002,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
