@@ -52,9 +52,15 @@ def test_locked_unavailable_oversized_and_symlink_sinks_are_explicit(tmp_path: P
     assert b"contended" not in raw
 
 
-@pytest.mark.parametrize("trace", ["00-" + "b" * 32 + "-" + "c" * 16 + "-01",
-                                  "00-" + "0" * 32 + "-" + "c" * 16 + "-01",
-                                  "malformed", "00-" + "b" * 32 + "-" + "0" * 16 + "-01"])
+@pytest.mark.parametrize(
+    "trace",
+    [
+        "00-" + "b" * 32 + "-" + "c" * 16 + "-01",
+        "00-" + "0" * 32 + "-" + "c" * 16 + "-01",
+        "malformed",
+        "00-" + "b" * 32 + "-" + "0" * 16 + "-01",
+    ],
+)
 def test_transport_correlation_cannot_authorize_or_leak_input(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, trace: str
 ) -> None:
@@ -68,14 +74,24 @@ def test_transport_correlation_cannot_authorize_or_leak_input(
     probe = AsyncMock(return_value=True)
     app = RequestTelemetry(FoundationApp(probe), buffer.append)
     scope: HTTPScope = {
-        "type": "http", "asgi": {"version": "3.0", "spec_version": "2.0"},
-        "http_version": "1.1", "method": "GET", "scheme": "http",
-        "path": "/health/dependencies", "raw_path": b"/health/dependencies",
-        "query_string": b"password=CANARY_PRIVATE", "root_path": "",
-        "headers": [(b"traceparent", trace.encode()), (b"authorization", b"Bearer CANARY_PRIVATE"),
-                    (b"cookie", b"CANARY_PRIVATE"), (b"x-tenant-id", b"CANARY_PRIVATE"),
-                    (b"baggage", b"CANARY_PRIVATE")],
-        "client": ("127.0.0.1", 8000), "server": ("127.0.0.1", 8080),
+        "type": "http",
+        "asgi": {"version": "3.0", "spec_version": "2.0"},
+        "http_version": "1.1",
+        "method": "GET",
+        "scheme": "http",
+        "path": "/health/dependencies",
+        "raw_path": b"/health/dependencies",
+        "query_string": b"password=CANARY_PRIVATE",
+        "root_path": "",
+        "headers": [
+            (b"traceparent", trace.encode()),
+            (b"authorization", b"Bearer CANARY_PRIVATE"),
+            (b"cookie", b"CANARY_PRIVATE"),
+            (b"x-tenant-id", b"CANARY_PRIVATE"),
+            (b"baggage", b"CANARY_PRIVATE"),
+        ],
+        "client": ("127.0.0.1", 8000),
+        "server": ("127.0.0.1", 8080),
     }
     messages: list[ASGISendEvent] = []
 

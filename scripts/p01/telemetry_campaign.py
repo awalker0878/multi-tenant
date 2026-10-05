@@ -79,6 +79,10 @@ class TelemetryCampaign:
         summary = export(rows, self.output / 'telemetry' / 'journey-signals')
         self.report['telemetry_journey'] = {**summary, 'trace_id': trace,
             'scope': 'Authorized operator diagnostic fan-out to seven actual services; no business workflow or native attempt.'}
+        self.report['telemetry_exports'] = [
+            {'path': str(path.relative_to(self.output)),
+             'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'bytes': path.stat().st_size}
+            for path in sorted((self.output / 'telemetry' / 'journey-signals').iterdir())]
         self.check('telemetry-three-signal-views-agree', summary['records'] == summary['spans']
                    == summary['response_count'] and summary['records'] >= 21 and summary['freshness'] == 'FRESH', summary)
 
