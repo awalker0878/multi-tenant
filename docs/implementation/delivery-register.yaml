@@ -75,9 +75,14 @@ phases:
   - EV-P01-012
   - EV-P01-013
   - EV-P01-014
+  - EV-P01-015
+  - EV-P01-016
+  - EV-P01-017
+  - EV-P01-018
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
+  - BL-P01-001
 - id: P02
   title: Identity, tenancy and governance
   owner_role: Product engineering and IAM leads
@@ -558,6 +563,8 @@ work_packages:
   - EV-P01-012
   - EV-P01-013
   - EV-P01-014
+  - EV-P01-016
+  - EV-P01-018
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -590,7 +597,9 @@ work_packages:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-015
+  - EV-P01-017
   blocker_ids: []
   dependency_package_ids:
   - P01.05
@@ -606,6 +615,7 @@ work_packages:
   - docs/engineering/data-and-messaging.md
   - docs/contracts/README.md
   - docs/implementation/p01-messaging.md
+  - docs/implementation/p01-http-contracts.md
 - id: P01.04
   phase_id: P01
   title: CI and supply chain
@@ -617,8 +627,10 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-009
+  - EV-P01-017
   blocker_ids:
   - BL-P00-001
+  - BL-P01-001
   dependency_package_ids:
   - P01.01
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
@@ -638,6 +650,7 @@ work_packages:
   - docs/implementation/p01-code-control.md
   - docs/implementation/p01-laravel-foundations.md
   - docs/implementation/p01-laravel-images.md
+  - docs/implementation/p01-http-contracts.md
 - id: P01.05
   phase_id: P01
   title: Runtime dependencies
@@ -652,6 +665,9 @@ work_packages:
   - EV-P01-011
   - EV-P01-012
   - EV-P01-014
+  - EV-P01-015
+  - EV-P01-016
+  - EV-P01-018
   blocker_ids:
   - BL-P00-001
   dependency_package_ids: []
@@ -669,6 +685,7 @@ work_packages:
   - docs/implementation/p01-stateful-dependencies.md
   - docs/operations/runbooks/stateful-dependency-recovery.md
   - docs/implementation/p01-console-shared-state.md
+  - docs/implementation/p01-messaging.md
 - id: P01.06
   phase_id: P01
   title: Baseline operations
@@ -683,6 +700,9 @@ work_packages:
   - EV-P01-012
   - EV-P01-013
   - EV-P01-014
+  - EV-P01-015
+  - EV-P01-016
+  - EV-P01-018
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -709,6 +729,7 @@ work_packages:
   - docs/implementation/p01-stateful-dependencies.md
   - docs/operations/runbooks/stateful-dependency-recovery.md
   - docs/implementation/p01-console-shared-state.md
+  - docs/implementation/p01-messaging.md
 - id: P02.01
   phase_id: P02
   title: Authentication
@@ -1760,7 +1781,12 @@ requirements:
   - EV-P01-012
   - EV-P01-013
   - EV-P01-014
-  blocker_ids: []
+  - EV-P01-015
+  - EV-P01-016
+  - EV-P01-017
+  - EV-P01-018
+  blocker_ids:
+  - BL-P01-001
 - id: R03
   package_ids:
   - P02.01
@@ -2169,7 +2195,8 @@ requirements:
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-015
   blocker_ids: []
 - id: R16
   package_ids:
@@ -2604,6 +2631,8 @@ requirements:
   evidence_ids:
   - EV-P01-013
   - EV-P01-014
+  - EV-P01-016
+  - EV-P01-018
   blocker_ids: []
 - id: R30
   package_ids:
@@ -2640,6 +2669,8 @@ requirements:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-013
+  - EV-P01-016
+  - EV-P01-018
   blocker_ids: []
 - id: R31
   package_ids:
@@ -2690,7 +2721,10 @@ requirements:
   evidence_ids:
   - EV-P01-009
   - EV-P01-013
-  blocker_ids: []
+  - EV-P01-016
+  - EV-P01-018
+  blocker_ids:
+  - BL-P01-001
 - id: R32
   package_ids:
   - P00.05
@@ -2841,7 +2875,10 @@ requirements:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-009
-  blocker_ids: []
+  - EV-P01-015
+  - EV-P01-017
+  blocker_ids:
+  - BL-P01-001
 - id: R36
   package_ids:
   - P00.01
@@ -2911,9 +2948,14 @@ gates:
   - EV-P01-012
   - EV-P01-013
   - EV-P01-014
+  - EV-P01-015
+  - EV-P01-016
+  - EV-P01-017
+  - EV-P01-018
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
+  - BL-P01-001
 - id: G02
   phase_id: P02
   decision: NOT_REVIEWED
@@ -3895,6 +3937,152 @@ evidence:
     or operational/G01 acceptance. R15/R35/G01.03 receive groundwork only; no product messaging pass.
   valid_until: null
   invalidated_at: null
+- id: EV-P01-015
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/770e6384d80805ea246d0381237383a0143c08e2/verification/p01/messaging/run-37260022743/retrieval.json
+  sha256: 3982ede0078fd3bf6d73b474e90236c73fde64d03cbd46573ae7fa8be551235d
+  source_revision: 471b3d07fc5f0043de8827f280d25fd1b1df5ec1
+  artifact_revisions:
+    retained_artifact_commit: 770e6384d80805ea246d0381237383a0143c08e2
+    workflow_run_id: 37260022743
+    workflow_conclusion: success
+    report_sha256: 7d1df4f589a1cb16b4c00e3c7c45d13ed1f79ac327f4c3dd610011e03cab4835
+    source_verification_sha256: a0ca28fbce4ccbfb3917c481805ed72129e357f49dd7001e213d796f6b164ce7
+    implementation_record: docs/implementation/p01-messaging.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; independently built Catalogue and Planning images,
+    private TLS PostgreSQL 18.6 and RabbitMQ 4.3.6; synthetic separate service/tenant identities; no host-published
+    dependency ports.
+  scope: 35 real-dependency campaign checks and 16 shared PHP/Python envelope fixtures passed. Verified
+    186 command-log hashes and 74 immutable source bindings across the campaign and two owned image builds.
+    Atomic fact/outbox rollback, durable pending relay after uncertain publication, inbox/projection rollback,
+    crash-before-ack redelivery, exactly one logical projection, event-ID/digest binding, actor/tenant
+    denial, revision-gap quarantine, broker outage/recovery and revoked publisher denial are measured.
+    Cleanup is complete. The inbox owns its durable transaction; the separate Planning package run at
+    this source passed its outer-transaction guard tests.
+  campaign_ids: []
+  criterion_ids:
+  - G01.03
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T03:37:16Z'
+  observer: GitHub Actions — P01 transactional messaging
+  reviewer: Codex — retained archive, immutable source, command-log and result examination; accountable
+    G01 review remains pending
+  limitations: Internal reference fact only; no public command API, delegated business authority, native
+    effect, other service event adoption, HA or operational/G01 acceptance. No pruning or accepted production
+    retry/retention window. Exactly one logical effect is scoped to this retained local projection, not
+    universal exactly-once delivery.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-016
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/770e6384d80805ea246d0381237383a0143c08e2/verification/p01/local/run-37259472748/retrieval.json
+  sha256: f681025e730fe61662c11c3cc7db0a89c3ac7f1d55271842822191b47f7a1039
+  source_revision: c14ddbdb5c6deb71b59737948b512b8398af694e
+  artifact_revisions:
+    retained_artifact_commit: 770e6384d80805ea246d0381237383a0143c08e2
+    workflow_run_id: 37259472748
+    workflow_conclusion: success
+    report_sha256: 47bf8fd6d9d54900dc78c1dd04c44ed34b11ccba2d2b3039ff1604e7cddc3ce9
+    source_verification_sha256: 42a1f6169e73bb9fe35b6987436ff3928ebddcec4f498e256101d6ed4d6d83d3
+    implementation_record: docs/implementation/p01-console-shared-state.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; seven independently built applications in private
+    Compose networks with TLS PostgreSQL, owned runtime/migrator roles and synthetic credentials.
+  scope: 149 top-level installation/recovery checks passed. Verified 414 command-log hashes and 255 immutable
+    source bindings across the campaign and seven image builds. Actual Console PostgreSQL sessions/cache
+    defaults, encrypted session bytes, cross-process state, conflicting/foreign lock denial and alternating
+    tenant cache isolation are measured. Identical state survives database restart, Console restart and
+    restoration of the original key after a visibly failed invalid-key rollout. Seven observed database
+    outages generate seven allowlisted alerts received over verified HTTPS by a separate synthetic receiver
+    path with matching acknowledgement IDs. Existing database/identity/ingress denials remain effective;
+    cleanup completed.
+  campaign_ids: []
+  criterion_ids:
+  - G01.02
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T03:28:47Z'
+  observer: GitHub Actions — P01 isolated Compose integration
+  reviewer: Codex — retained archive, immutable source, command-log and result examination; accountable
+    G01 review remains pending
+  limitations: Synthetic anonymous sessions and receiver; no login/delegation qualification, key rotation,
+    scheduler workload, paging-provider or human acknowledgement, accepted outage objective, signed promotion
+    or operational/G01 acceptance. The older Planning source in this installation report is not evidence
+    for the later inbox guard.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-017
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/770e6384d80805ea246d0381237383a0143c08e2/verification/p01/contracts/run-37260680627/retrieval.json
+  sha256: 6bcbcc8f94321db1533fa33207940612183e778dea59a730bb8cd71b0981351c
+  source_revision: 72188a2dcf973ceee09eed05dfb79a6c53122ae2
+  artifact_revisions:
+    retained_artifact_commit: 770e6384d80805ea246d0381237383a0143c08e2
+    workflow_run_id: 37260680627
+    workflow_conclusion: success
+    report_sha256: 3c744f514134f5142d433a9dd84438086f3c4ed22c2a8ee1ffe123c886fe1a11
+    source_verification_sha256: 30503e2322d752a22d446f619e4885b778f8a826e204a687b2c18239c8da1cb9
+    implementation_record: docs/implementation/p01-http-contracts.md
+  environment: GitHub-hosted Ubuntu 24.04; Python 3.12.14, PHP 8.5.11, Node 24.19.0, OpenAPI Generator
+    7.25.0 and independently replayed tool locks.
+  scope: All 28 PHP/Python positive/negative wire fixtures agree; valid generated model round trips preserve
+    fields. PHP/Python/TypeScript client generation is byte-deterministic across two runs; PHP lint and
+    TypeScript compilation pass. The actual Git base/head comparison preserves two existing contract artifacts
+    and admits the new versioned health definition; negative controls reject deletion and in-place mutation.
+    Verified 24 command logs and 18 immutable source bindings. A separately retained retrospective examination
+    validates 34 actual Compose dependency-health responses from all seven applications against this schema.
+  campaign_ids: []
+  criterion_ids:
+  - G01.03
+  - G01.04
+  observed_at: '2026-10-05T03:45:53Z'
+  observer: GitHub Actions — P01 foundation contracts
+  reviewer: Codex — retained archive, immutable source, command-log and result examination; accountable
+    G01 review remains pending
+  limitations: Diagnostic endpoints only. Generated adapters are temporary conformance outputs, not full
+    validators or product authorization. Exact-byte version freezing is conservative compatibility feedback,
+    not general schema-language inclusion, trusted-base policy protection, required-check enforcement,
+    business API implementation or G01 acceptance. The provider examination reuses the exact earlier source-bound
+    Compose responses; it is not a new live run.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-018
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/1f467775a5740d51a0cc3155fd83566e0cacb1a0/verification/p01/kubernetes/run-37260680483/retrieval.json
+  sha256: c2c6cffe7b4991e3ead31f28a4bda8fc86fc971bfc5d0f31b12585bdc410955e
+  source_revision: 72188a2dcf973ceee09eed05dfb79a6c53122ae2
+  artifact_revisions:
+    retained_artifact_commit: 1f467775a5740d51a0cc3155fd83566e0cacb1a0
+    workflow_run_id: 37260680483
+    workflow_conclusion: success
+    report_sha256: 563921725b2564db2e7f5352c47f69cdb6088616aeaab9508b97d22bbd5eceab
+    source_verification_sha256: e6e8c3db1fd5d182de06acbe532464c4032970095499b5f70e2992df5ce4057f
+    implementation_record: docs/implementation/p01-console-shared-state.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; disposable kind v0.33.0/Kubernetes v1.36.4 with
+    pinned Cilium 1.20.2, seven independently built applications, private TLS PostgreSQL and separate
+    controlled migrations; synthetic credentials and no native endpoints.
+  scope: All 166 top-level installation, identity, Cilium and recovery checks passed. Verified 802 command-log
+    hashes and 252 immutable source bindings across the campaign and seven image builds. The same owner
+    session/cache migration and actual built Console are measured from separate processes. Encrypted session
+    and tenant-scoped cache/locks persist across PostgreSQL PVC restart, replacement of the Console Pod,
+    and rollback of a deliberately broken template. Failed rollout times out and container exit 42 is
+    independently observed before Deployment-history undo. Existing foundation records compare byte-for-byte
+    after restart and rollback; all generated runtime and cluster resources are cleaned up.
+  campaign_ids: []
+  criterion_ids:
+  - G01.02
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T03:54:58Z'
+  observer: GitHub Actions — P01 isolated Kubernetes integration
+  reviewer: Codex — immutable source, raw command, state and failed-rollout observations; accountable
+    G01 review remains pending
+  limitations: Disposable diagnostic foundation, anonymous synthetic sessions and same existing encryption
+    key. No business login/delegation, key rotation, production multi-site cluster, HA, Kubernetes whole-store
+    restore, operated alert route, signed promotion, native effect, accepted RTO/RPO or operational/G01
+    acceptance. The failed rollout is a controlled process exit, not a registry/signature-admission experiment.
+  valid_until: null
+  invalidated_at: null
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -3952,5 +4140,28 @@ blockers:
     Preserve both complete captures and their source bindings. Complete remaining P01 dependency/operations
     integration; obtain actual application recovery objectives before P08 and native facts/authority before
     G04/G07/G08.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P01-001
+  scope_ids:
+  - P01
+  - P01.04
+  - R02
+  - R31
+  - R35
+  - G01
+  owner_role: Repository administrator and accountable platform/security review owners; account mappings
+    not supplied
+  description: At the 2026-10-05 follow-up the active branch still reports protected:false and repository
+    rulesets remain empty. Available connector capabilities have no protection/ruleset mutation operation.
+    Context/security/platform review roles have no verified GitHub-account mapping; no account or independent
+    approval is invented.
+  unblock_condition: Use an authorized administration capability to enforce the reviewed branch/check
+    policy; supply and verify actual review-role accounts, exact-revision approval requirements and scoped
+    bypass identities. Execute missing/failed/stale check and insufficient-role denial cases.
+  next_action: Bind the observed stable checks, including Foundation contracts, to the approved reporting
+    application and enforce current required reviews. Prepare and review the complete CODEOWNERS/rules
+    configuration once actual account mappings and an administration path are available. Keep trusted
+    signing/promotion blocked until the separately carried registry/signer/trust inputs are supplied.
   state: OPEN
   resolution_evidence_ids: []

@@ -182,10 +182,23 @@ bytes and the immutable source tree; cleanup completed.
 
 These are separate synthetic dependency probes. They add no product messaging,
 Kubernetes dependency-installation, whole-store recovery or operated adoption claim.
-Shared Console sessions/cache, service-owned versioned contracts/outbox/inbox, actual
-alert receipt, remaining deployment recovery and admission/promotion trust remain open.
-G01 is still unreviewed.
+The separate resumed increment below now supplies shared Console state, owner
+messaging, synthetic alert receipt and failed-deployment observations. Their results
+do not expand the earlier dependency-only evidence. Admission/promotion trust and
+accountable G01 review remain open.
 
 The [Console shared-state increment](p01-console-shared-state.md) now supplies owner
 migrations and database-backed session/cache configuration. Its new observations
 are separate from the historical runtime counts above.
+
+## Resumed foundation evidence
+
+EV-P01-015 adds the 35-check service-owned PostgreSQL/RabbitMQ messaging reference;
+EV-P01-017 adds locked diagnostic client generation and base/head contract freezing.
+EV-P01-016 retains 149 Compose checks, including shared encrypted Console sessions,
+tenant cache/locks, seven HTTPS alert receipts and invalid-key recovery. EV-P01-018
+retains 166 Kubernetes checks with that same shared state, replacement-Pod persistence
+and failed-template rollback. Source/artifact identities and exact measured limits
+are in the [messaging](p01-messaging.md), [HTTP](p01-http-contracts.md) and
+[shared-state](p01-console-shared-state.md) records. These results replace no historical
+source binding and confer no operated acceptance or native authority.

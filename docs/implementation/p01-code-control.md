@@ -22,6 +22,7 @@ Image selection intersects affected component IDs with [the image registry](../.
 | [Context policy](../../.github/workflows/architecture-policy.yml) | `Architecture registry and documentation` | Registry, supported source checks, architecture/documentation tests and document/status validation must complete successfully |
 | [Foundation packages](../../.github/workflows/p01-foundations.yml) | `Foundation checks` | Selection must succeed; every selected language matrix must succeed; a matrix may be skipped only when its selection is empty |
 | [Foundation images](../../.github/workflows/p01-images.yml) | `Foundation images` | Selection must succeed; the selected image matrix must succeed; a skipped matrix is accepted only for an empty selection |
+| [Foundation contracts](../../.github/workflows/p01-contracts.yml) | `Foundation contracts` | Existing base-version artifacts remain unchanged; locked generation, cross-language fixtures and compilation succeed |
 
 The hosted check-runs response for source `7aced8f2cba673a500c060116eb431627f727aeb` confirmed the exact names `Foundation checks` and `Architecture registry and documentation`, both successful, reported by GitHub Actions (`app.id=15368`, slug `github-actions`). [Package run 37238841029](https://github.com/awalker0878/multi-tenant/actions/runs/37238841029) selected no package work and accepted the intentionally skipped Python/PHP matrices through the stable aggregate. This proves the documentation-only result path, not a fresh execution of the skipped package suites. The nine-image aggregate correctly failed run `37239193485` when Console failed. The Console-only correction in run `37239487917` passed its selected image and aggregate at source `d0a7cefb23352ffc112638178bb225d20bf12368`; see the [image evidence](p01-laravel-images.md).
 
@@ -50,7 +51,7 @@ not a blanket source exclusion or proof of evidence authenticity.
 
 The architecture tests exercise the repository's stated structural/Python-AST/PHP-precheck mechanisms; their count does not establish complete language analysis or runtime isolation. Service-owned PHP analyzers, Python quality, frontend checks and image executions have their own source-bound results. The recorded counts above must not be added as disjoint suites because the documentation total includes the architecture suite.
 
-Current impact analysis reads changed paths from both revisions but uses the current candidate/owner mapping. It does not construct and compare complete base/head public-contract, network, shared-package and transitive consumer graphs. Public-contract and shared-package changes select all candidates conservatively until explicit consumer graphs exist. Semantic authorization, tenancy, migration and native-effect changes still need review to identify the full affected critical suite. Complete consumer-contract compatibility, exception expiry and exclusion-change enforcement remain P01.03/P01.04 work.
+Current impact analysis reads changed paths from both revisions but uses the current candidate/owner mapping. It does not construct and compare complete base/head public-contract, network, shared-package and transitive consumer graphs. Public-contract and shared-package changes select all candidates conservatively until explicit consumer graphs exist. Semantic authorization, tenancy, migration and native-effect changes still need review to identify the full affected critical suite. The [foundation contract increment](p01-http-contracts.md) now compares actual base/head contract artifacts conservatively: published versions cannot change or disappear. Full consumer-graph compatibility, exception expiry and exclusion-change enforcement remain P01.03/P01.04 work.
 
 The check implementation executes from the checked-out change. No trusted-base or separately governed enforcement workflow has yet been demonstrated. A change to the selector, analyzer or workflow therefore requires independent policy review; running the changed workflow cannot prove that its own weakening was authorized. There is no implemented account/role review-policy evaluator, latest-reviewed-revision validation, CODEOWNERS enforcement or signed artifact admission in this increment.
 
@@ -80,3 +81,15 @@ Complete these P01.04 actions through an available repository administration pat
 6. Complete base/head dependency and contract-consumer impact analysis, exclusion/exception controls, secret/dependency/image checking, SBOMs, signed immutable artifacts and release-manifest verification. Demonstrate rejection of unsigned, altered or mismatched artifacts before claiming G01.04 promotion control.
 
 Record the effective settings, source revisions and successful denial tests in the G01 evidence register after they are actually observed. Until then, P01.04 remains in progress and this record makes no enforced-merge, protected-branch, trusted-release or complete source-analysis claim.
+
+## Follow-up settings observation — 2026-10-05
+
+After source `72188a2dcf973ceee09eed05dfb79a6c53122ae2`, the connector's branch
+collection still reported `protected: false` and its ruleset collection still
+returned `[]`. Hosted run `37260680627` confirmed successful check name
+`Foundation contracts`; EV-P01-017 retains its generation and base/head evidence.
+No settings were changed. BL-P01-001 records the unavailable settings-mutation
+capability and missing actual reviewer-account mapping with its owner and unblock
+condition. The carried registry/signer/trust inputs remain under BL-P00-001.
+SBOM/provenance production, scanning, verified promotion and trusted-base policy
+execution are still engineering work; ordinary successful CI is not admission.

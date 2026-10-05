@@ -34,3 +34,9 @@ campaign. It is not an on-call operator acknowledgement, paging-provider integra
 or operational acceptance. Supply the actual receiving route, identities and response
 ownership before operated alert qualification. Full P10 recovery, HA and customer
 RPO/RTO remain outside this bounded rehearsal.
+
+The measured executions are EV-P01-016 (Compose run `37259472748`, 149 top-level
+checks) and EV-P01-018 (Kubernetes run `37260680483`, 166 top-level checks).
+Their [shared-state record](../../implementation/p01-console-shared-state.md) links
+retained reports, source bindings and recovery observations. The Kubernetes run
+also replaces the Console Pod and checks the original session/cache after rollback.

@@ -31,9 +31,14 @@ schema-language inclusion, reviewed compatibility windows or protected admission
 The checker itself still needs the independent policy protection recorded in
 [code controls](p01-code-control.md).
 
-Local replay passed all 28 PHP/Python fixtures, model round trips, TypeScript
-compilation and deterministic generation. Local snapshot testing cannot perform
-the Git base comparison; the hosted report records that separate check. Actual
-provider HTTP behavior belongs to the source-bound Compose/Kubernetes reports.
+EV-P01-017 retains [hosted run 37260680627](../../verification/p01/contracts/run-37260680627/retrieval.json)
+at `72188a2dcf973ceee09eed05dfb79a6c53122ae2`. All 28 PHP/Python fixtures, model
+round trips, TypeScript compilation and deterministic generation passed. The actual
+base/head comparison preserved the two existing contracts and admitted the new
+diagnostic artifact. Examination verified 24 command logs and 18 immutable source
+bindings. A separate retained examination validates 34 actual dependency-health
+responses from all seven applications in Compose run `37259472748`; it does not
+claim another live provider execution. Local snapshot testing does not exercise
+Git base comparison; the hosted check supplies that result.
 Business command/problem/digest protocols are implemented with their receiving
 feature packages; this diagnostic contract does not silently settle those designs.

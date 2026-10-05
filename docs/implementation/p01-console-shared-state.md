@@ -24,8 +24,16 @@ unimplemented until an actual owner task is introduced.
 The Compose campaign invokes the built Console from separate processes, records
 both tenants, rejects a conflicting lock and a foreign lock release, checks encrypted
 session bytes, and rechecks the same state after database and Console restarts.
-Results will be registered only after hosted execution. Existing database-role and
-cross-service denials still apply; no additional database network access is granted.
+EV-P01-016 retains [run 37259472748](../../verification/p01/local/run-37259472748/retrieval.json)
+at `c14ddbdb5c6deb71b59737948b512b8398af694e`: all 149 top-level checks passed.
+Examination verified 414 command-log hashes and 255 immutable source bindings.
+The original session and both tenant caches survive database and Console restart,
+then invalid-key failure and rollback to the original key. Seven actual dependency
+outages produce seven separately received and acknowledged HTTPS alerts.
+Existing database-role and cross-service denials still apply; no additional database
+network access is granted. The Kubernetes campaign invokes the same adapter around
+database restart, a new Console Pod and failed-template rollback; its report is
+recorded separately from these Compose observations.
 
 The image-only HTML probe has no network or database by design. It first asserts
 the production database defaults, then explicitly uses array storage solely for
@@ -43,3 +51,15 @@ The first live probe stopped at Docker's archive-copy operation against the read
 container root. The adapter is now streamed through `exec` into the existing writable
 `/tmp` mount as the unprivileged runtime user; root filesystem restrictions remain
 unchanged. Run `37258992085` retains that failed attempt.
+
+## Measured Kubernetes follow-on
+
+EV-P01-018 retains [run 37260680483](../../verification/p01/kubernetes/run-37260680483/retrieval.json)
+at `72188a2dcf973ceee09eed05dfb79a6c53122ae2`. All 166 top-level checks passed;
+802 command-log hashes and 252 immutable source bindings were verified. The actual
+Console runs the same state probe before and after PostgreSQL restart, a replacement
+Console Pod, and failed-template recovery. Session encryption, tenant cache separation
+and lock denials pass. The deliberately broken revision exits 42 and fails rollout;
+Deployment-history rollback restores health and preserves both foundation records
+and shared state. Generated cluster/runtime resources are removed. This does not
+add a login, key-rotation, operated alert or signed-promotion claim.

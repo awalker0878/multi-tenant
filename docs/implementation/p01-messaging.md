@@ -46,10 +46,15 @@ No cross-service SQL access or credentials are shared by runtime clients.
 
 The local PHP/Python conformance check covers 16 shared fixtures and compares exact
 canonical hashes for accepted events. PHP static and architecture analysis and
-Python static analysis have been exercised locally; immutable hosted reports will
-be recorded after the real PostgreSQL/RabbitMQ campaign. These local observations
-are not a G01 pass. HTTP OpenAPI clients, full compatibility/admission enforcement,
-and other service event integrations remain distinct P01/P02+ work.
+Python static analysis have been exercised locally. EV-P01-015 retains hosted run
+`37260022743` at `471b3d07fc5f0043de8827f280d25fd1b1df5ec1`: all 35 real-dependency
+checks and all 16 shared fixtures pass. Examination verified 186 command-log hashes
+and 74 immutable source bindings across the campaign and its two image builds.
+The Planning package run at that same source also passed the two outer-transaction
+guard cases. These observations are not a G01 pass. The separate
+[HTTP increment](p01-http-contracts.md) adds diagnostic clients and conservative
+version freezing; protected admission and other service event integrations remain
+distinct P01/P02+ work.
 
 The hosted campaign is `scripts/p01/run_messaging.py`: it builds only the two owned
 images, installs TLS dependencies without host ports, runs the owner migrations,
@@ -68,3 +73,10 @@ php-amqplib requires `ext-sockets`, present on the package-test host but absent 
 the minimal FPM image. Catalogue now compiles sockets alongside PDO PostgreSQL;
 Composer platform verification remains enabled. Failed image artifact `11323877080`
 from run `37258781431` retains the exact dependency error.
+
+The [retained report](../../verification/p01/messaging/run-37260022743/retrieval.json)
+contains actual outcomes for every injected fault. Fact/outbox and inbox/projection
+failures roll back together; crash/restart and uncertain publication deliver one
+logical projection. Tenant/actor/identity binding, revision gaps and revoked
+publication fail as specified. Broker recovery resumes pending work and cleanup
+removes every generated container, volume and network.
