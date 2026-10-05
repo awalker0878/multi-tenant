@@ -28,8 +28,9 @@ settings and operated registry/signer/receiver identities remain separate inputs
   settings must require its actual reporting context before it enforces merges.
 - Exceptions require exact files/rules, a real allowed reviewer, source binding,
   compensating check/removal task and a bounded UTC expiry. Wildcards and attempts
-  to exempt native fencing are denied. Candidate-added exceptions cannot approve
-  their own use. No exceptions are currently active.
+  to exempt native fencing are denied. Candidate-added exceptions require actual security approval and cannot authorize
+  their own use; only previously admitted base records apply to changed files.
+  Expired unrelated records do not prevent a reviewed cleanup of the policy. No exceptions are currently active.
 - The artifact verifier binds OCI manifest/config/uncompressed-layer digests,
   independently supplied source/component/key/builder anchors, SBOMs, signed
   provenance and fresh scans. A bundled key cannot authorize itself. Missing,
@@ -50,8 +51,8 @@ The verifier accepts that no-log mode only for `p01-development`. It does not sa
 operated identity, transparency, revocation freshness, key recovery or custody.
 No repository source or candidate manifest is published to a public signing log.
 
-Local verification currently passes 16 review/impact/exception tests and 12 actual
-Cosign bundle tests, including positive transfer and explicit failure boundaries.
+Local verification passes 16 review/impact/exception tests, seven exact-check-source
+tests, four exclusion tests, two evidence-redaction tests and 12 actual Cosign bundle tests, including positive transfer and explicit failure boundaries.
 Fixture account IDs, scan records and images are synthetic and confer no real role,
 image-security result or product promotion. The image workflow now scans each existing built image and its exact owned source,
 including development/build dependencies, and retains CycloneDX SBOMs, redacted
@@ -83,3 +84,9 @@ scanned explicitly. The failed observation remains part of the qualification tra
 This implementation supplies control mechanisms and measured fixture denials. It
 is not G01 acceptance, enforced branch protection, independent SLSA-level assurance,
 production promotion, whole-release qualification or an operated trust decision.
+
+The receiving inputs and concrete settings candidate are in [the operating-input
+record](p01-operating-inputs.md). Analyzer configuration changes require platform
+and security roles; newly added inline suppressions require a prior exact-file,
+exact-source exception with a bounded expiry and required compensating check.
+Current exceptions remain empty.

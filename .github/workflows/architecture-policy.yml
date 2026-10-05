@@ -36,7 +36,18 @@ jobs:
         run: python -m unittest discover -s tests/documentation -p 'test_*.py' -v
       - name: Validate declared P00 inputs without requiring external readiness
         run: python scripts/validate_p00_inputs.py
+      - name: Validate carried P01 operating inputs without inventing acceptance
+        run: python scripts/p01/admission/operating_inputs.py
       - name: Check generated delivery views
         run: python scripts/render_delivery_views.py --check
       - name: Check documentation and delivery references
         run: python scripts/validate_docs.py
+      - name: Record the exact successfully tested checkout
+        run: python3 scripts/p01/record_check_source.py --name "Architecture registry and documentation"
+      - name: Retain exact check source
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: check-source-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p01-check-source/report.json
+          if-no-files-found: error
+          retention-days: 14

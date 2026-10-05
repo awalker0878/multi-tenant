@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import urllib.request
 
 
@@ -18,29 +19,41 @@ def main():
                                  headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN']})
     with urllib.request.urlopen(req, timeout=30) as response:
         pr = json.load(response)
-    if pr['head']['sha'] != request['expected_head'] or not pr['draft']:
+    if pr['head']['ref'] != 'work/p01-admission-denial-20261005' or not pr['draft'] or pr['base']['ref'] != 'greenfield/enterprise-microservices-plan':
         raise ValueError('fixture_identity_changed')
     output = Path(os.environ['RUNNER_TEMP']) / 'p01-admission-probe';output.mkdir()
     event = output / 'event.json'
     event.write_text(json.dumps({'repository': {'full_name': repo}, 'pull_request': pr}))
-    result = subprocess.run([sys.executable, str(root / 'scripts/p01/admission/check_pr.py'), '--output', str(output / 'evaluation')],
-                            env=os.environ | {'GITHUB_EVENT_PATH': str(event)}, capture_output=True, timeout=240)
+    # GitHub may still report the prior base immediately after a target push. Execute
+    # exactly the API-reported target base, never the proposed head or a moving ref.
+    base = pr['base']['sha']
+    with tempfile.TemporaryDirectory(prefix='p01-trusted-base-') as temporary:
+        trusted = Path(temporary) / 'checkout'
+        subprocess.run(['git', 'worktree', 'add', '--detach', str(trusted), base], cwd=root, check=True, capture_output=True)
+        try:
+            result = subprocess.run([sys.executable, str(trusted / 'scripts/p01/admission/check_pr.py'), '--output', str(output / 'evaluation')],
+                                    env=os.environ | {'GITHUB_EVENT_PATH': str(event)}, capture_output=True, timeout=240)
+        finally:
+            subprocess.run(['git', 'worktree', 'remove', '--force', str(trusted)], cwd=root, check=True, capture_output=True)
     event.unlink()  # Retain the sanitized evaluator snapshot, not arbitrary PR text.
     (output / 'evaluation.log').write_bytes(result.stdout + result.stderr)
     report = json.loads((output / 'evaluation/report.json').read_text())
-    base = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
+    probe_source = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
     head_script = subprocess.check_output(['git', 'show', pr['head']['sha'] + ':scripts/p01/admission/check_pr.py'], cwd=root)
     marker = b'CANDIDATE_ADMISSION_SCRIPT_EXECUTED'
     passed = (result.returncode == 1 and report['denial'] == 'review_roles_unconfigured'
               and report['source_revision'] == base == pr['base']['sha']
+              and hashlib.sha256(head_script).hexdigest() == request['expected_script_sha256']
               and marker in head_script and marker not in result.stdout + result.stderr)
     files = ['scripts/p01/admission/check_pr.py', 'scripts/p01/admission/policy.py',
              'scripts/p01/admission/probe_pr.py', '.github/workflows/p01-admission-probe.yml',
              'release/review-policy.json', 'release/exceptions.json', 'release/admission-probe.json']
-    summary = {'result': 'PASSED' if passed else 'FAILED', 'source_revision': base,
+    summary = {'result': 'PASSED' if passed else 'FAILED', 'source_revision': probe_source, 'evaluated_base': base,
                'head_revision': pr['head']['sha'], 'pull_request': pr['number'],
                'candidate_script_sha256': hashlib.sha256(head_script).hexdigest(),
                'source_sha256': {p: hashlib.sha256((root / p).read_bytes()).hexdigest() for p in files},
+               'evaluated_base_sha256': {p: hashlib.sha256(subprocess.check_output(['git', 'show', base + ':' + p], cwd=root)).hexdigest()
+                                         for p in ['scripts/p01/admission/check_pr.py', 'scripts/p01/admission/policy.py', 'release/review-policy.json']},
                'denial': report.get('denial'), 'candidate_marker_executed': marker in result.stdout + result.stderr,
                'limitations': 'Explicit read-only push probe; automatic default-branch hook and enforced check publication are not installed.'}
     (output / 'report.json').write_text(json.dumps(summary, indent=2) + '\n')

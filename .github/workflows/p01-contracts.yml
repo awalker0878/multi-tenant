@@ -60,3 +60,12 @@ jobs:
           path: ${{ runner.temp }}/p01-http-contracts/
           if-no-files-found: error
           retention-days: 14
+      - name: Record the exact successfully tested checkout
+        run: python3 scripts/p01/record_check_source.py --name "Foundation contracts"
+      - name: Retain exact check source
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: check-source-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p01-check-source/report.json
+          if-no-files-found: error
+          retention-days: 14

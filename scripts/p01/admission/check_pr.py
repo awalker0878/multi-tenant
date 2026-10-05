@@ -8,8 +8,12 @@ from pathlib import Path
 import re
 import subprocess
 import urllib.request
+import urllib.error
+from urllib.parse import urlparse
 
 from policy import Denied, affected, review, need
+from check_sources import validate_source
+from exclusions import check_added_suppressions
 
 
 def main():
@@ -44,6 +48,22 @@ def main():
             result.extend(rows)
             if len(rows)<100:return result
         raise Denied('api_pagination_limit')
+    def artifact_bytes(artifact_id):
+        # Do not forward the GitHub bearer token through its signed storage redirect.
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self,req,fp,code,msg,headers,newurl):return None
+        req=urllib.request.Request(f'https://api.github.com/repos/{repo}/actions/artifacts/{artifact_id}/zip',
+                                   headers={'Authorization':'Bearer '+os.environ['GH_TOKEN']})
+        try:
+            with urllib.request.build_opener(NoRedirect).open(req,timeout=30) as response:
+                raw=response.read(1024*1024+1)
+        except urllib.error.HTTPError as redirect:
+            need(redirect.code==302,'check_artifact_download_failed')
+            location=redirect.headers['Location'];parsed=urlparse(location)
+            need(parsed.scheme=='https' and parsed.hostname and not parsed.username and not parsed.password,'unsafe_artifact_redirect')
+            with urllib.request.urlopen(urllib.request.Request(location),timeout=30) as response:
+                raw=response.read(1024*1024+1)
+        need(len(raw)<=1024*1024,'oversized_check_artifact');return raw
     try:
         need(re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+',repo),'invalid_repository')
         number=int(pr['number']);prefix=f'repos/{repo}/pulls/{number}'
@@ -59,9 +79,36 @@ def main():
         base_graph=data(base,'architecture/contract-consumers.json',{});head_graph=data(head,'architecture/contract-consumers.json',{})
         impact=affected(paths,base_components,head_components,base_graph,head_graph)
         policy=data(base,'release/review-policy.json');exceptions=data(base,'release/exceptions.json')['exceptions']
-        # An exception added or expanded by the candidate cannot authorize itself.
-        need(data(head,'release/exceptions.json')==data(base,'release/exceptions.json'),'candidate_exception_change_requires_prior_policy_admission')
-        checks=pages(f'repos/{repo}/commits/{tested}/check-runs?filter=latest','check_runs')
+        # Proposed records are reviewed as policy changes; only previously admitted
+        # base records can authorize a suppression in this candidate.
+        proposed_exceptions=[e for e in data(head,'release/exceptions.json')['exceptions'] if e not in exceptions]
+        active_exceptions=[e for e in exceptions if any(p in paths for p in e['paths'])]
+        for path in paths:
+            if path.startswith(('apps/','services/','workers/','packages/')) and Path(path).suffix in {'.py','.php','.ts','.tsx','.js','.jsx','.vue'}:
+                def source_text(sha):
+                    size=subprocess.run(['git','cat-file','-s',sha+':'+path],cwd=root,capture_output=True,timeout=10)
+                    if size.returncode:return ''
+                    need(int(size.stdout)<=2*1024*1024,'oversized_analysis_input')
+                    return git('show',sha+':'+path).decode()
+                check_added_suppressions(path,source_text(base),source_text(head),active_exceptions,head)
+        checks=pages(f'repos/{repo}/commits/{head}/check-runs?filter=latest','check_runs')
+        verified_checks=[]
+        if policy['status']=='ACTIVE':
+            for name in policy['required_checks']:
+                matching=[c for c in checks if c['name']==name and c['app']['id']==policy['allowed_check_app_id'] and c['head_sha']==head]
+                need(matching,'missing_required_check:'+name);check=max(matching,key=lambda c:c['id'])
+                need(check['status']=='completed' and check['conclusion']=='success','required_check_not_success:'+name)
+                job=api(f"repos/{repo}/actions/jobs/{check['id']}");run=api(f"repos/{repo}/actions/runs/{job['run_id']}")
+                expected=policy['check_sources'][name]
+                artifact_name=f"check-source-{expected['job']}-{run['id']}-{run['run_attempt']}"
+                artifacts=pages(f"repos/{repo}/actions/runs/{run['id']}/artifacts",'artifacts')
+                matches=[a for a in artifacts if a['name']==artifact_name];need(len(matches)==1,'missing_check_source:'+name)
+                artifact=matches[0]
+                binding=validate_source(artifact_bytes(artifact['id']),artifact,run,job,expected,repository=repo,
+                                        name=name,head=head,base=base,tested=tested,number=number)
+                verified_checks.append({'id':check['id'],'name':name,'app_id':check['app']['id'],'head_sha':head,
+                                        'tested_sha':binding['source_revision'],'status':check['status'],'conclusion':check['conclusion'],
+                                        'artifact_id':artifact['id'],'artifact_digest':artifact['digest'],'workflow_run_id':run['id']})
         reviews=pages(prefix+'/reviews')
         permissions={}
         for account_id,account in policy['accounts'].items():
@@ -80,8 +127,9 @@ def main():
         after=api(prefix)
         snapshot={'repository':repo,'state':current['state'],'draft':current['draft'],'head_sha':head,'base_sha':base,
                   'tested_sha':tested,'tested_parents':parents,'head_after':after['head']['sha'],'base_after':after['base']['sha'],
-                  'author_id':current['user']['id'],'permissions':permissions,'exceptions':exceptions,'unresolved_threads':unresolved,
-                  'checks':[{'id':c['id'],'name':c['name'],'app_id':c['app']['id'],'head_sha':c['head_sha'],'status':c['status'],'conclusion':c['conclusion']} for c in checks],
+                  'author_id':current['user']['id'],'permissions':permissions,'exceptions':active_exceptions,
+                  'candidate_exceptions':proposed_exceptions,'unresolved_threads':unresolved,
+                  'checks':verified_checks,
                   'reviews':[{'id':r['id'],'user_id':r['user']['id'],'login':r['user']['login'],'state':r['state'],'commit_id':r['commit_id']} for r in reviews]}
         (args.output/'snapshot.json').write_text(json.dumps(snapshot,indent=2)+'\n');report['impact']=impact;report['changed_paths']=paths
         report.update(review(policy,snapshot,paths,impact))
