@@ -8,6 +8,7 @@ use App\Http\Middleware\PageResponseHeaders;
 use App\Http\Middleware\RedactIdentityCallback;
 use App\Http\Middleware\RequestTelemetry;
 use App\Http\Middleware\RequireConsoleHost;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
             require __DIR__.'/../routes/health.php';
         },
     )
+    ->withSchedule(function (Schedule $schedule): void {
+        if (is_string(config('notifications.host'))) {
+            $schedule->command('console:consume-notifications --limit=100')->everyMinute()->withoutOverlapping()->onOneServer();
+        }
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(RequestTelemetry::class);
         $middleware->web(prepend: [RequireConsoleHost::class], append: [RedactIdentityCallback::class, HandleInertiaRequests::class, PageResponseHeaders::class]);

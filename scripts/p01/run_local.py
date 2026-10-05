@@ -307,7 +307,8 @@ class Campaign(TelemetryCampaign):
         migration = (self.root/'deploy/dependencies/postgres/migrate.sql').read_text()
         for service in SERVICES:
             self.sql(service, f'\\set owner {service}_owner\n\\set runtime {service}_runtime\n'+migration, identity='migrator')
-        self.sql('console', (self.root/'apps/console/database/migrations/001_shared_state.sql').read_text(), identity='migrator')
+        for migration_file in sorted((self.root/'apps/console/database/migrations').glob('*.sql')):
+            self.sql('console', migration_file.read_text(), identity='migrator')
         self.command('install-applications', self.dc('up','-d'), timeout=180)
         # Retain process/port diagnostics before port discovery can fail. Never inspect secret-bearing config.
         for service in SERVICES:

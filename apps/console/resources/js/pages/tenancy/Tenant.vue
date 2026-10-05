@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import IdentityLayout from '../../shared/ui/IdentityLayout.vue';
 
@@ -8,11 +8,71 @@ type Entitlement = { vcpu: number; memory_mib: number; storage_gib: number; work
 const props = defineProps<{
   tenant: { id: string; name: string; state: string; revision: number }; membership: { role: string; site_id: string | null; environment: string | null };
   canAdminister: boolean; memberships: Member[]; quota: { revision: number; entitlement: Entitlement | null } | null; notice: string | null;
+  notificationCursor: string | null; notificationsAvailable: boolean;
 }>();
 const member = useForm({ revision: 0, subject: '', role: 'reader', state: 'active', site_id: null as string | null, environment: null as string | null, expires_at: null as string | null, command_key: crypto.randomUUID() });
 const quota = useForm({ revision: props.quota?.revision ?? 0, entitlement: props.quota?.entitlement ?? { vcpu: 0, memory_mib: 0, storage_gib: 0, workloads: 0 }, command_key: crypto.randomUUID() });
 const state = useForm({ revision: props.tenant.revision, state: 'suspended', command_key: crypto.randomUUID() });
 const errors = computed(() => [...Object.values(member.errors), ...Object.values(quota.errors), ...Object.values(state.errors)]);
+const changed = ref(false);
+const unavailable = ref(!props.notificationsAvailable);
+const dirty = computed(() => member.isDirty || quota.isDirty || state.isDirty);
+const viewedTenant = props.tenant.id;
+let active = true;
+let delay = 15_000;
+let timer: ReturnType<typeof setTimeout> | undefined;
+let request: AbortController | undefined;
+const schedule = () => {
+  clearTimeout(timer);
+  if (active && props.canAdminister && document.visibilityState === 'visible') timer = setTimeout(poll, delay);
+};
+const poll = async () => {
+  if (!active || props.tenant.id !== viewedTenant || document.visibilityState !== 'visible') return;
+  const controller = new AbortController();
+  request = controller;
+  const deadline = setTimeout(() => controller.abort(), 10_000);
+  try {
+    const response = await fetch('/tenants/' + viewedTenant + '/notification-status', {
+      credentials: 'same-origin', cache: 'no-store', redirect: 'manual', headers: { Accept: 'application/json' }, signal: controller.signal,
+    });
+    if (!active || props.tenant.id !== viewedTenant || document.visibilityState !== 'visible') return;
+    if (response.type === 'opaqueredirect' || [401, 403, 404].includes(response.status)) {
+      active = false;
+      window.location.assign('/account');
+      return;
+    }
+    if (!response.ok || !response.headers.get('Content-Type')?.includes('application/json')) throw new Error('unavailable');
+    const value: unknown = await response.json();
+    if (!active || props.tenant.id !== viewedTenant || document.visibilityState !== 'visible') return;
+    if (!value || typeof value !== 'object' || !('cursor' in value)
+        || !(value.cursor === null || (typeof value.cursor === 'string' && /^[0-9a-f-]{36}$/.test(value.cursor)))) throw new Error('unavailable');
+    changed.value ||= !props.notificationsAvailable || value.cursor !== props.notificationCursor;
+    unavailable.value = false;
+    delay = 15_000;
+  } catch {
+    if (active && props.tenant.id === viewedTenant && document.visibilityState === 'visible') {
+      unavailable.value = true;
+      delay = Math.min(delay * 2, 120_000);
+    }
+  } finally {
+    clearTimeout(deadline);
+    request = undefined;
+    schedule();
+  }
+};
+const visibility = () => {
+  clearTimeout(timer);
+  if (document.visibilityState === 'hidden') request?.abort();
+  else if (!request) schedule();
+};
+const refresh = () => window.location.assign('/tenants/' + viewedTenant);
+onMounted(() => { document.addEventListener('visibilitychange', visibility); schedule(); });
+onUnmounted(() => {
+  active = false;
+  clearTimeout(timer);
+  request?.abort();
+  document.removeEventListener('visibilitychange', visibility);
+});
 const edit = (value: Member) => {
   member.revision = value.revision; member.subject = value.subject; member.role = value.role; member.state = value.state;
   member.site_id = value.site_id; member.environment = value.environment; member.expires_at = value.expires_at; member.command_key = crypto.randomUUID();
@@ -26,6 +86,11 @@ const edit = (value: Member) => {
     <p v-if="notice" role="status" class="mt-4 text-sm text-teal-800">{{ notice }}</p>
     <div v-if="errors.length" role="alert" tabindex="-1"><p v-for="error in errors" :key="error">{{ error }}</p></div>
     <template v-if="canAdminister">
+      <div v-if="changed || unavailable" role="status" class="mt-5 rounded-lg border border-teal-700 bg-teal-50 p-4">
+        <p>{{ changed ? 'Tenant settings changed. Review the current values before saving.' : 'Change notifications are temporarily unavailable. You can refresh to review the current values.' }}</p>
+        <p v-if="dirty" class="mt-2 text-sm">Your unsaved edits are still here. Refreshing will discard them.</p>
+        <button type="button" @click="refresh">{{ dirty ? 'Discard edits and refresh' : 'Review current values' }}</button>
+      </div>
       <h2 class="mt-7 text-xl font-semibold">Memberships</h2>
       <ul class="mt-3 space-y-3">
         <li v-for="item in memberships" :key="item.id" class="rounded-lg border border-slate-200 p-3">

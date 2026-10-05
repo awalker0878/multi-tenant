@@ -51,6 +51,7 @@ COPY --from=dependencies /app/public/ ./public/
 COPY --from=dependencies /app/routes/ ./routes/
 COPY --from=dependencies /app/artisan /app/composer.json /app/composer.lock ./
 COPY --from=dependencies /app/resources/views/ ./resources/views/
+COPY --from=dependencies /app/resources/contracts/ ./resources/contracts/
 # Inertia validates server-side page existence before returning the compiled page.
 COPY --from=dependencies /app/resources/js/pages/ ./resources/js/pages/
 COPY --from=frontend /frontend/public/build/ ./public/build/

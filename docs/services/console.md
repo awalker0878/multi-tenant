@@ -20,6 +20,7 @@ The console owns browser sessions, navigation, composed page state and presentat
 | Presentation preference | User-owned theme/table/filter preferences; tenant-specific saved selections are reauthorized when loaded. |
 | Page composition | Disposable view of API results with each source's version, freshness and authorization outcome. |
 | Pending command presentation | Client retry key and response reference; the owning API remains authoritative for whether the command succeeded. |
+| Notification inbox and hint | Immutable event ID/wire digest receipts, encrypted quarantine and opaque tenant invalidation cursors; no domain or permission projection. |
 
 Session and cache storage are private to console. Page caching must include effective tenant and authorization scope; shared fragments cannot reveal one tenant's names to another. Do not place credentials, evidence artifacts or complete intent documents in analytics.
 
@@ -64,7 +65,7 @@ Map domain validation failures into the console's server-validated Inertia redir
 
 Reuse the command idempotency key after a connection failure, query the returned owning-service identifier and show an uncertain/pending response when status is unavailable. Do not invent a second job after an HTTP timeout. Native `outcome_unknown` is shown as held, with the recorded cause and allowed reconciliation action; cancellation is displayed as a request until the job confirms a safe stop.
 
-Console publishes no authoritative domain events. It may later consume versioned notification projections, but those notifications only prompt an authorized refresh. Broker or live-transport access from the browser requires a separately designed tenant subscription policy.
+Console publishes no authoritative domain events. The [P02 notification consumer](../implementation/p02-console-notifications.md) durably records five tenant-administration event routes and prompts an authorized refresh. It preserves unsaved edits and checks current owner authority on every poll. Installation identity and approval events are excluded. Broker or live-transport access from the browser requires a separately designed tenant subscription policy.
 
 Bound polling to active views, stop it on unmount and back off during failures. A future live channel must reauthorize on reconnect and recover gaps through the owning API; duplicated or older notifications cannot move a displayed revision backwards. Client cancellation of a request never proves that the server command was cancelled.
 

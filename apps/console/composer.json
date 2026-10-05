@@ -13,7 +13,9 @@
     "ext-tokenizer": "*",
     "inertiajs/inertia-laravel": "3.5.1",
     "laravel/framework": "13.34.0",
-    "php": "~8.5.0"
+    "opis/json-schema": "2.6.0",
+    "php": "~8.5.0",
+    "php-amqplib/php-amqplib": "3.7.5"
   },
   "require-dev": {
     "deptrac/deptrac": "4.7.2",

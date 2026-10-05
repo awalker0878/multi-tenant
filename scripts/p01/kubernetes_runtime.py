@@ -294,7 +294,7 @@ def prepare(root: Path, runtime: Path, images: Mapping[str, str], revision: str,
                               {entry["target"]: secret_dir / entry["source"] for entry in pg_source["secrets"]}))
         scripts = {name: (root / "deploy/dependencies/postgres" / name).read_text()
                    for name in ("entrypoint.sh", "initialize.sh", "migrate.sql")}
-        scripts["console.sql"] = (root / "apps/console/database/migrations/001_shared_state.sql").read_text()
+        scripts["console.sql"] = '\n'.join(path.read_text() for path in sorted((root / "apps/console/database/migrations").glob('*.sql')))
         resources.append(_object("ConfigMap", "postgres-scripts", namespace, data=scripts))
         resources.append(_object("PersistentVolumeClaim", "postgres-data", namespace,
                          spec={"accessModes": ["ReadWriteOnce"], "resources": {"requests": {"storage": "1Gi"}}}))

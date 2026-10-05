@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Application\Notifications\Contracts\NotificationHints;
 use App\Application\Tenancy\Contracts\TenantGateway;
 use App\Domain\Identity\IdentityFailure;
 use Illuminate\Http\RedirectResponse;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 final class TenantController
 {
@@ -26,8 +28,17 @@ final class TenantController
         ]);
     }
 
-    public function show(Request $request, string $tenant, TenantGateway $tenants): Response|RedirectResponse
+    public function show(Request $request, string $tenant, TenantGateway $tenants, NotificationHints $hints): Response|RedirectResponse
     {
+        // Capture before owner reads so a notification racing a read cannot become
+        // its unnoticed baseline. Nothing is exposed until current authorization.
+        $available = true;
+        $cursor = null;
+        try {
+            $cursor = $hints->current($tenant);
+        } catch (Throwable) {
+            $available = false;
+        }
         try {
             $token = (string) $request->session()->get('identity.token');
             $data = $tenants->read($token, $tenant);
@@ -46,6 +57,7 @@ final class TenantController
         return Inertia::render('tenancy/Tenant', [
             'tenant' => $data['tenant'], 'membership' => $data['membership'], 'canAdminister' => $admin,
             'memberships' => $members, 'quota' => $quota, 'notice' => $request->session()->get('tenant_notice'),
+            'notificationCursor' => $admin ? $cursor : null, 'notificationsAvailable' => $admin && $available,
         ]);
     }
 
