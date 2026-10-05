@@ -62,8 +62,8 @@ admission conditions. A returned JSON decision is not a transferable permit.
 
 Apply `003_tenancy.sql` and `004_approvals.sql` after the identity migrations with
 the controlled migrator. Runtime roles cannot delete tenants/memberships/grants,
-rewrite or delete audit/receipts, or rewrite immutable approval bindings. Outbox
-publication is pending; persisted rows alone are not evidence of transport delivery.
+rewrite or delete audit/receipts, or rewrite immutable approval bindings. [Outbox delivery](p02-governance-events.md) now uses routed broker confirmations
+and retryable database claims; hosted transport observations are recorded separately.
 Quarantined restore must reconcile revocations before opening admission. This
 increment adds no recovery bypass or support impersonation path.
 
@@ -85,9 +85,9 @@ reviewer may approve or reject; the requestor and named executors cannot do eith
 Approval re-fetches the authoritative immutable plan. An approved decision may be
 revoked; rejection and revocation do not require a functioning Planning service.
 Each transition compares revision and appends history. There is no break-glass
-transition. Expiry is immediately effective by time and recorded once when an
-authorized reader or validator accesses the record; background expiry publication
-is not implemented.
+transition. Expiry is immediately effective by time and recorded once by an authorized
+reader/validator or the bounded background sweeper. System expiry and its outbox
+event commit atomically; it needs no live user or available plan provider.
 
 Validation requires the exact plan/digest/action/scope, a named executor with current
 `operation.admit`, an unchanged authoritative plan, and unchanged requestor/reviewer
@@ -123,8 +123,7 @@ These results are separate from hosted PostgreSQL/browser observations, which mu
 be retained with their exact source/artifact bindings before evidence is claimed.
 
 Remaining P02 integration: service-to-service actor delegation and owning-service
-admission; approved support/break-glass contracts and implementation; durable outbox
-delivery/background expiry; deployed recovery/revocation epochs; full browser and
+admission; approved support/break-glass contracts and implementation; real consumer integration and receiving of outbox/expiry; deployed recovery/revocation epochs; full browser and
 accessibility qualification. Lists are currently bounded to 200 rows (audit 100)
 without pagination. No native effect, real provider interoperability, complete
 operational acceptance or completed phase is inferred.

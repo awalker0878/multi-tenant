@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Application\Approvals\Actions\ExpireApprovals;
 use App\Application\Approvals\Contracts\ImmutablePlanSource;
 use App\Domain\Tenancy\GovernanceLedger;
 use App\Infrastructure\Approvals\PlanningPlanSource;
+use App\Infrastructure\Messaging\GovernanceEventEncoder;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\SyntheticPlanSource;
 
@@ -142,4 +145,53 @@ it('does not fall back to a synthetic plan source in the deployed adapter', func
     app()->bind(ImmutablePlanSource::class, PlanningPlanSource::class);
     tenantCommand($this, $this->path, $this->input, $this->author)->assertStatus(503);
     expect(DB::table('app.approvals')->count())->toBe(0);
+});
+
+it('records background expiry once without a live session or available plan provider', function (): void {
+    $this->input['expires_at'] = now()->addMinute()->toIso8601String();
+    $id = approvePlan($this);
+    DB::table('app.federated_sessions')->update(['revoked_at' => now()]);
+    $this->source->unavailable = true;
+    $this->travel(2)->minutes();
+    $this->artisan('governance:expire-approvals --limit=1')->expectsOutput('{"expired":1}')->assertSuccessful();
+    expect(app(ExpireApprovals::class)->handle())->toBe(0);
+    $row = DB::table('app.governance_audit')->where('event', 'governance.approval.expired')->sole();
+    expect($row->actor_id)->toBeNull()->and($row->resource_id)->toBe($id)->and($row->revision)->toBe(3);
+    $wire = app(GovernanceEventEncoder::class)->encode(DB::table('app.governance_outbox')->where('id', $row->id)->sole());
+    expect(json_decode($wire, true)['actor_kind'])->toBe('system');
+});
+
+it('preserves the v1 audit UUID contract without attributing system expiry to a user', function (): void {
+    $this->input['expires_at'] = now()->addMinute()->toIso8601String();
+    approvePlan($this);
+    $this->travel(2)->minutes();
+    app(ExpireApprovals::class)->handle();
+    $audit = $this->withHeader('X-Console-Session', $this->token)->getJson('/v1/tenants/'.$this->tenant.'/audit')->assertOk()->json('audit');
+    $expired = array_values(array_filter($audit, fn (array $row): bool => $row['event'] === 'governance.approval.expired'))[0];
+    expect($expired['actor_id'])->toBe('00000000-0000-0000-0000-000000000000')
+        ->and(json_decode($expired['payload_json'], true)['actor_id'])->toBeNull()
+        ->and(DB::table('app.federated_actors')->where('id', $expired['actor_id'])->exists())->toBeFalse();
+});
+
+it('expires bounded batches at the exact deadline and leaves terminal decisions intact', function (): void {
+    $deadline = now()->addMinute()->startOfSecond();
+    $this->input['expires_at'] = $deadline->toIso8601String();
+    requestApproval($this);
+    approvePlan($this);
+    $id = requestApproval($this);
+    tenantCommand($this, $this->path.'/'.$id.'/reject', ['revision' => 1, 'reason' => 'Terminal'], $this->reviewer)->assertOk();
+    $this->travelTo($deadline);
+    $expiry = app(ExpireApprovals::class);
+    expect($expiry->handle(1))->toBe(1)->and($expiry->handle(1))->toBe(1)->and($expiry->handle(1))->toBe(0)
+        ->and(DB::table('app.approvals')->where('id', $id)->value('state'))->toBe('rejected');
+});
+
+it('rolls expiry back if its durable outbox cannot be written', function (): void {
+    $this->input['expires_at'] = now()->addMinute()->toIso8601String();
+    $id = approvePlan($this);
+    $this->travel(2)->minutes();
+    DB::statement('DROP TABLE app.governance_outbox');
+    expect(fn () => app(ExpireApprovals::class)->handle())->toThrow(QueryException::class)
+        ->and(DB::table('app.approvals')->where('id', $id)->value('state'))->toBe('approved')
+        ->and(DB::table('app.governance_audit')->where('event', 'governance.approval.expired')->count())->toBe(0);
 });

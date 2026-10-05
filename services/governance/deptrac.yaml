@@ -33,13 +33,16 @@ deptrac:
       collectors:
         - type: classLike
           value: '^(Inertia\\|Illuminate\\(Http|Routing|Console|Foundation\\Http)\\|Illuminate\\Support\\Facades\\(Http|Request|Response|Route|Redirect|URL)$|Symfony\\Component\\(HttpFoundation|HttpKernel|Routing|HttpClient|Console)\\|Psr\\Http\\).*'
+    - name: MessagingVendors
+      collectors:
+        - {type: classLike, value: '^(Opis|PhpAmqpLib)\\.*'}
     - name: Jwt
       collectors:
         - {type: classLike, value: '^Firebase\\JWT\\.*'}
   ruleset:
     Domain: [Framework]
     Application: [Domain, Framework]
-    Infrastructure: [Domain, Application, Framework, Transport, PublishedContracts, Jwt]
+    Infrastructure: [Domain, Application, Framework, Transport, PublishedContracts, Jwt, MessagingVendors]
     Delivery: [Domain, Application, Framework, Transport]
     Composition: [Domain, Application, Infrastructure, Delivery, Framework, Transport, PublishedContracts]
     PublishedContracts: []
@@ -47,3 +50,4 @@ deptrac:
     Framework: []
     Transport: []
     Jwt: []
+    MessagingVendors: []

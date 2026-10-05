@@ -26,11 +26,15 @@ workflow's actual source and outcome. All nine affected workflow families pass,
 including package/image, Compose, Kubernetes, messaging, the P02 campaign and the
 corrected contract replay. These remain development observations.
 
-**Next concrete work:** implement and qualify Governance outbox delivery and
-background approval expiry against explicit event contracts, then service actor
-delegation and owning-service admission. Complete the approved support-access/
-break-glass contract, restore/revocation reconciliation, and the broader
-multi-tab/late-response/accessibility campaign. The real immutable plan producer
+**Current executable increment:** [Governance event delivery and background
+expiry](docs/implementation/p02-governance-events.md) are implemented with explicit
+schema/AsyncAPI contracts, bounded scheduled commands, confirmation/retry/quarantine
+handling and system-attributed expiry. Local feature/static checks pass; retain the
+hosted PostgreSQL/TLS-broker campaign before claiming integrated qualification.
+
+**Next concrete work:** service actor delegation and owning-service admission;
+approved support-access/break-glass contract; restore/revocation reconciliation;
+and the broader multi-tab/late-response/accessibility campaign. The real immutable plan producer
 belongs to P05.04; P02 injects synthetic plans only in tests and its production
 adapter fails closed without the owner. Follow the
 [G02 engineering assessment](docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)

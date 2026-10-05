@@ -35,6 +35,14 @@ function initializeIdentityFixture(object $test): void
         if (DB::getDriverName() === 'sqlite') {
             $sql = str_replace('identity_sessions_expiry ON app.identity_sessions', 'app.identity_sessions_expiry ON identity_sessions', $sql);
             $sql = str_replace('REFERENCES app.', 'REFERENCES ', $sql);
+            // SQLite cannot DROP NOT NULL; materialize the post-005 audit shape.
+            if (basename($migration) === '003_tenancy.sql') {
+                $sql = preg_replace('/(CREATE TABLE IF NOT EXISTS app\.governance_audit \(.*?actor_id uuid) NOT NULL/s', '$1', $sql);
+            }
+            $sql = str_replace('ALTER TABLE app.governance_audit ALTER COLUMN actor_id DROP NOT NULL;', '', $sql);
+            $sql = str_replace('ADD COLUMN IF NOT EXISTS', 'ADD COLUMN', $sql);
+            $sql = str_replace('governance_outbox_pending ON app.governance_outbox', 'app.governance_outbox_pending ON governance_outbox', $sql);
+            $sql = str_replace('approvals_expiry ON app.approvals', 'app.approvals_expiry ON approvals', $sql);
         }
         DB::unprepared($sql);
     }

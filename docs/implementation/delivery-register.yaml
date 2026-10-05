@@ -827,6 +827,7 @@ work_packages:
   - EV-P02-003
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-governance-events.md
   - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/phases/p02.md
   - docs/engineering/coverage.md
@@ -848,6 +849,7 @@ work_packages:
   - EV-P02-003
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-governance-events.md
   - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/phases/p02.md
   - docs/engineering/coverage.md
@@ -870,6 +872,7 @@ work_packages:
   - EV-P02-003
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-governance-events.md
   - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/phases/p02.md
   - docs/engineering/coverage.md

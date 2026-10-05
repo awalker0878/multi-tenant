@@ -7,11 +7,11 @@ namespace App\Application\Approvals\Actions;
 use App\Application\Approvals\Contracts\ImmutablePlanSource;
 use App\Application\Identity\Data\FederatedIdentity;
 use App\Application\Tenancy\Actions\AuthorizeTenant;
+use App\Domain\Approvals\ApprovalExpiry;
 use App\Domain\Approvals\BoundPlan;
 use App\Domain\Identity\BootstrapAdministrator;
 use App\Domain\Identity\IdentityDenied;
 use App\Domain\Tenancy\GovernanceLedger;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 final class InspectApproval
@@ -33,12 +33,7 @@ final class InspectApproval
             }
             $plan = BoundPlan::fromArray(json_decode($approval->binding_json, true, 32, JSON_THROW_ON_ERROR));
             $this->authority->handle($actor, $tenant, $binding === null ? 'plan.read' : 'operation.admit', $plan->scope());
-            if (in_array($approval->state, ['requested', 'approved'], true) && (Carbon::parse($approval->expires_at)->isPast() || $plan->binding['valid_until'] <= now()->getTimestamp())) {
-                $approval->state = 'expired';
-                $approval->revision++;
-                DB::table('app.approvals')->where('id', $id)->where('tenant_id', $tenant)->update(['state' => 'expired', 'revision' => $approval->revision]);
-                GovernanceLedger::record($tenant, $actor->subject, 'governance.approval.expired', $id, $approval->revision, ['plan_digest' => $plan->digest]);
-            }
+            ApprovalExpiry::apply($approval);
             $projection = ['id' => $id, 'state' => $approval->state, 'revision' => $approval->revision, 'binding' => $plan->toArray(),
                 'requester_id' => $approval->requester_id, 'decided_by' => $approval->decided_by, 'expires_at' => $approval->expires_at];
             if ($binding === null) {

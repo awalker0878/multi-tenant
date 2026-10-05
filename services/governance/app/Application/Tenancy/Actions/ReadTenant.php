@@ -38,7 +38,13 @@ final class ReadTenant
                 'memberships' => ['memberships' => DB::table('app.tenant_memberships as m')->join('app.federated_actors as a', 'a.id', '=', 'm.actor_id')->where('m.tenant_id', $tenant)->orderBy('m.id')->limit(200)->get(['m.*', 'a.subject'])->all()],
                 'grants' => ['grants' => DB::table('app.delegated_grants')->where('tenant_id', $tenant)->orderBy('id')->limit(200)->get()->all()],
                 'quota' => $this->quota($tenant),
-                'audit' => ['audit' => DB::table('app.governance_audit')->where('tenant_id', $tenant)->orderByDesc('occurred_at')->orderBy('id')->limit(100)->get()->all()],
+                'audit' => ['audit' => DB::table('app.governance_audit')->where('tenant_id', $tenant)->orderByDesc('occurred_at')->orderBy('id')->limit(100)->get()->map(function (\stdClass $entry): \stdClass {
+                    // Preserve the published v1 UUID wire type. Nil is a system
+                    // sentinel, never an authenticatable federated identity.
+                    $entry->actor_id ??= '00000000-0000-0000-0000-000000000000';
+
+                    return $entry;
+                })->all()],
             };
         });
     }

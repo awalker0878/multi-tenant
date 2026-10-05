@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 final class GovernanceLedger
 {
     /** @param array<string, mixed> $facts */
-    public static function record(string $tenant, string $actor, string $event, string $resource, int $revision, array $facts): void
+    public static function record(string $tenant, ?string $actor, string $event, string $resource, int $revision, array $facts): void
     {
         $id = (string) Str::uuid();
         $payload = json_encode(['event_id' => $id, 'tenant_id' => $tenant, 'actor_id' => $actor, 'resource_id' => $resource,

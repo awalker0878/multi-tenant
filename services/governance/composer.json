@@ -4,7 +4,6 @@
   "type": "project",
   "license": "proprietary",
   "require": {
-    "php": "~8.5.0",
     "ext-ctype": "*",
     "ext-curl": "*",
     "ext-fileinfo": "*",
@@ -12,9 +11,13 @@
     "ext-openssl": "*",
     "ext-pdo": "*",
     "ext-pdo_pgsql": "*",
+    "ext-sockets": "*",
     "ext-tokenizer": "*",
     "firebase/php-jwt": "7.2.1",
-    "laravel/framework": "13.34.0"
+    "laravel/framework": "13.34.0",
+    "opis/json-schema": "2.6.0",
+    "php": "~8.5.0",
+    "php-amqplib/php-amqplib": "3.7.5"
   },
   "require-dev": {
     "deptrac/deptrac": "4.7.2",
