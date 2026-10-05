@@ -8,12 +8,14 @@ The [package replay](../implementation/p01-laravel-foundations.md) and [image me
 
 Own who may act for a tenant, the resources/actions they may affect and the conditions under which an exact plan is approved. Keep the actor, delegating service and deciding authority attributable throughout a workflow.
 
-Governance is not a password directory, inventory owner, execution engine or evidence qualification authority. Approval permits a defined plan/action/scope under conditions; it does not establish native support, reserve capacity or prove the job executed.
+Governance owns the single installation bootstrap administrator and external identity connections; it does not provide a general-purpose password directory, inventory, execution engine or evidence qualification authority. Approval permits a defined plan/action/scope under conditions; it does not establish native support, reserve capacity or prove the job executed.
 
 ## Owned aggregates and invariants
 
 | Aggregate | Rule |
 | --- | --- |
+| Bootstrap administrator | Installation-local identity, password hash, mandatory-change state and retirement at verified OIDC activation; scoped grants never bypass policy. |
+| Identity connection | Revisioned external OIDC settings, secret references, claim mappings and tested activation state; administered through the console and Governance APIs. |
 | Tenant | Stable boundary with administrative state, membership and allocation policy. Tenant closure cannot erase retained operational records. |
 | Membership / grant | Subject, tenant, permitted action/resource scopes, delegation restrictions, effective/expiry times and revision. No implied authority from a matching name. |
 | Authorization decision | Attributable decision and applicable policy/grant versions; validity is explicitly bounded and never inferred from an event alone. |
@@ -40,7 +42,13 @@ Authorization denial is distinguished from unavailable authority internally; ext
 
 ## Bootstrap and authenticated scopes
 
-Initial federation, service trust and bootstrap administrator identity come from a reviewed deployment configuration and controlled bootstrap procedure. Use an explicit one-time operation, not a hard-coded account or universal secret. Verify bootstrap identity through the configured trust root, create the first administrative grant, audit it and disable/restrict further bootstrap use.
+The [ADR-009 identity baseline](../decisions/adr-009-identity-delegation-and-authorization.md) uses console-managed external OIDC and one installation-local bootstrap administrator. A controlled deployment operation creates that identity and its scoped administrative grant exactly once, generates a cryptographically random temporary password, displays it once to the authorized installer and stores only its hash with mandatory-change state. Deployment retries and replicas cannot recreate the identity or reset its password.
+
+Governance authenticates the local account and enforces the mandatory first-login password change across all protected interfaces. Until the change succeeds, only password change and logout are permitted. Reject reuse of the temporary password, rotate session authority and audit the change without credential values. Once changed, the administrator can use authorized console setup functions; normal tenant and separation-of-duties rules still apply.
+
+Governance owns the OIDC connection settings, claim mappings, activation state and scoped secret references. The console presents create/edit/test/activate operations through authenticated owner APIs. Provider settings are application data, not deployment configuration. Secret input is write-only and goes to protected server-side custody; responses expose status/reference metadata only. Workload/service trust remains independently provisioned.
+
+Keep local setup available until a tested OIDC connection proves that an explicitly granted federated administrator can sign in. Atomically activate federation, disable local authentication and revoke all local sessions/delegation. A failed setup test leaves the changed-password account usable; an OIDC outage after activation cannot re-enable it. Persist bootstrap/activation state and reconcile retirement on restore before reopening access. Follow [identity and trust](../operations/identity-and-trust.md) for the complete lifecycle.
 
 Before catalogue integrated acceptance, create the isolated fixture tenant and the minimum application-author/reviewer/operator grants. Real production assignments require the actual tenant administration process. Governance validates service audiences and delegated subject chains; no caller may mint itself an approval role.
 

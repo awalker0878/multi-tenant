@@ -58,7 +58,7 @@ A bounded context owns business meaning and invariants; a capability module grou
 | `services/assurance/` | Laravel/PHP | Evidence metadata, custody policy, qualification decisions, acceptance records and supported-capability publications |
 | `workers/` | Separately deployed Python pools | Scoped discovery, infrastructure, guest, shared-service and data-movement activities |
 
-Laravel assurance is a proposed baseline drawn from the latest source architecture. Earlier suggestions of Python assurance are superseded for planning purposes; P00 confirms language ownership before scaffolding. Authentication is federated to an identity provider; governance owns application authorization rather than a new password directory.
+Laravel assurance is a proposed baseline drawn from the latest source architecture. Earlier suggestions of Python assurance are superseded for planning purposes; P00 confirms language ownership before scaffolding. Authentication uses external OIDC configured through the console. Before OIDC activation, deployment creates one local administrator with a random password displayed to the installer and a mandatory first-login password change. Governance owns the bootstrap identity, OIDC connection records and application authorization; verified federated administrator activation retires local login. See [ADR-009](../decisions/adr-009-identity-delegation-and-authorization.md).
 
 Workers belong to the context whose activities they execute. Discovery pools implement inventory collection. Privileged execution pools operate under lifecycle authority and its operation ledger. Separate deployment does not create a second owner of approvals, jobs or native-operation state.
 

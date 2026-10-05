@@ -8,6 +8,8 @@ Each record has one authoritative writer. Cross-context references are IDs and v
 
 | Entity | Authoritative owner | Meaning and required identity |
 | --- | --- | --- |
+| Bootstrap administrator | Governance | One installation-local identity with password hash, mandatory first-login change, scoped grants and retirement at verified external OIDC activation; no plaintext password record |
+| Identity connection | Governance | Revisioned external OIDC provider/client settings, claim mappings, secret references and tested activation state; configured through the console |
 | Tenant | Governance | Administrative and authorization allocation with memberships, entitlements and delegated scope; `tenant_id` |
 | Environment | Catalogue | Tenant-owned deployment context such as test or production; `environment_id`, `tenant_id`; does not itself prove network isolation |
 | Application | Catalogue | Tenant-owned business grouping with accountable service owner and acceptance requirements; `application_id`, `tenant_id` |

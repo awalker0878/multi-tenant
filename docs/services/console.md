@@ -16,7 +16,7 @@ The console owns browser sessions, navigation, composed page state and presentat
 
 | Record | Rule |
 | --- | --- |
-| Browser session | Bound to trusted federated identity, server-side lifecycle and CSRF protection; configured expiry and logout behavior. |
+| Browser session | Bound to the local bootstrap identity during setup or a verified external OIDC identity after activation; server-side password-change restriction, lifecycle, CSRF and expiry/logout controls. |
 | Presentation preference | User-owned theme/table/filter preferences; tenant-specific saved selections are reauthorized when loaded. |
 | Page composition | Disposable view of API results with each source's version, freshness and authorization outcome. |
 | Pending command presentation | Client retry key and response reference; the owning API remains authoritative for whether the command succeeded. |
@@ -31,6 +31,8 @@ Browser routes are presentation routes, not a second public domain API. Exact ro
 
 | Browser task | Owning API interaction |
 | --- | --- |
+| Initial login and mandatory password change | Governance authenticates the deployment-created local administrator and enforces change before any other protected function. |
+| Administration → Identity provider | Governance persists external OIDC settings and mappings, protects secret input, tests the connection and activates verified federated administration. |
 | `/tenants/{tenant_id}/applications` | Catalogue list/create with current authorized tenant selection. |
 | `/tenants/{tenant_id}/applications/{id}` | Catalogue current revision/history; conditional edit retains the fetched ETag. |
 | `/tenants/{tenant_id}/assessments/{id}` | Planning assessment result/status and input freshness. |
@@ -42,7 +44,13 @@ Server-side handlers call the service-relative `/v1/tenants/{tenant_id}` contrac
 
 ## Authentication and authorization
 
-The identity provider authenticates users; governance evaluates tenant membership, resource scope, action and separation of duties. Console can hide unavailable actions for usability, while receiving APIs independently authorize every request. User-controlled tenant IDs, hidden fields or enabled buttons prove nothing.
+Before OIDC activation, Governance authenticates the installation-local administrator; after activation, the external identity provider authenticates users. Governance evaluates tenant membership, resource scope, action and separation of duties in both cases. Console can hide unavailable actions for usability, while receiving APIs independently authorize every request. User-controlled tenant IDs, hidden fields or enabled buttons prove nothing.
+
+On first login with the random password displayed during deployment, show the mandatory password-change screen. Server-side state denies every other protected console/API action until a different password is saved; hiding navigation is insufficient. Do not put either password in Inertia props, remembered forms, browser history, logs or audit payloads. Rotate session/CSRF state after the change and reject the temporary password thereafter.
+
+The changed-password administrator configures external OIDC in Administration → Identity provider. The form collects provider/client details and mappings through Governance's authorized API; client secrets are write-only and never returned in settings or validation responses. Display the callback destination needed for external client registration. Provider settings are persisted application data; setup requires no OIDC environment variables, manifest values or configuration-file editing.
+
+Keep setup access until a tested provider login establishes a federated identity with an explicit administrative grant. Successful activation disables the local account and invalidates its sessions and delegated authority. Invalid settings keep setup available; after activation, provider outages show the defined failure state without reopening local login. See [ADR-009](../decisions/adr-009-identity-delegation-and-authorization.md).
 
 Validate issuer, audience and expiry through the selected federation design; renew only through the approved session flow. Preserve the effective actor and console service identity when delegating. Expiry during a form submission must not turn into an anonymous retry or new command identity. Logout clears local session state according to the chosen provider contract.
 
@@ -62,9 +70,9 @@ Bound polling to active views, stop it on unmount and back off during failures. 
 
 ## Dependencies and degraded behavior
 
-Federated identity, session storage and service APIs are dependencies. A failed page subsection must show its source and unavailable/stale state; it cannot turn a partial view into a fabricated healthy summary. Governance failure disables new privileged commands. Planning failure can leave catalogue browsing available where authorized; lifecycle failure must not imply jobs stopped.
+Session storage and service APIs are dependencies in every mode; external OIDC is required for federated login after activation. Before configuration, the protected local setup journey remains available without an external provider. A failed page subsection must show its source and unavailable/stale state; it cannot turn a partial view into a fabricated healthy summary. Governance failure disables new privileged commands. Planning failure can leave catalogue browsing available where authorized; lifecycle failure must not imply jobs stopped.
 
-Bootstrap is P01 deployment plus P02 identity/governance establishment, then P03 real catalogue interaction. Development fixtures are explicitly synthetic. No production tenant, grants or workload resources are created as a side effect of starting the console.
+Bootstrap is P01 deployment plus P02 identity/governance establishment, then P03 real catalogue interaction. The explicit deployment bootstrap operation creates the local administrator and its setup grant. Starting/restarting console replicas creates no identities, grants, tenants or workload resources. Development fixtures remain explicitly synthetic.
 
 ## Deployment and operation
 

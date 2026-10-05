@@ -36,6 +36,8 @@ The console should make each task understandable through clear requirements, dif
 
 ## How it is organized
 
+Identity setup uses a deployment-created local administrator with a random password displayed to the installer and a mandatory password change at first login. Administrators configure external OIDC through the console; verified federated administrator activation disables local login. Provider settings are application data, not deployment configuration. This P02 design is specified in [ADR-009](docs/decisions/adr-009-identity-delegation-and-authorization.md).
+
 The implementation separates Laravel/PHP product services from Python infrastructure intelligence and execution. The console uses **Laravel 13, Inertia 3, Vue 3, TypeScript, Tailwind CSS 4 and Vite 8**. Exact candidate pins and image inputs are recorded in the P00 compatibility reports; operated adoption and complete service dependencies remain open; the [source checks](docs/reference/sources-and-reset.md) record the candidate baseline.
 
 | Area | Responsibility |

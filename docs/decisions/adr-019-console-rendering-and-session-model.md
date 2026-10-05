@@ -34,6 +34,7 @@ Refinement and validation: Browser/session/accessibility constraints before P02.
 
 - The browser displays authoritative operation state and the age of its observation; navigation or disconnect does not cancel backend work.
 - Session expiry, permission changes and failed refreshes need explicit user states and must not leave controls deceptively enabled.
+- [ADR-009](adr-009-identity-delegation-and-authorization.md) defines local bootstrap login, mandatory first-login password change and console-managed OIDC. The server session carries the enforced setup restriction; verified OIDC activation revokes local sessions. Passwords and client secrets never become page props or remembered state.
 - Page presenters allowlist disclosed data across initial HTML, shared/deferred props, prefetch and history. History encryption and context clearing supplement server authorization; secrets never become browser props.
 - Tenant/context changes clear cached and remembered data, dispose of subscriptions/polling, and reject stale in-flight responses. Explicit tenant/resource scope avoids cross-tab session-selection ambiguity.
 - Type checks, production builds, real browser security tests and WCAG 2.2 AA assessment are separate evidence obligations. The accessibility target is not a current conformance claim.
