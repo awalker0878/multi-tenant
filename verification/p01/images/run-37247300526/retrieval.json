@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "run_id": 37247300526,
+  "source_revision": "c9c202786437601c0f000bdf29d7e1e401e773ee",
+  "workflow": {
+    "id": 37247300526,
+    "name": "P01 bootstrap images",
+    "head_sha": "c9c202786437601c0f000bdf29d7e1e401e773ee",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "created_at": "2026-10-05T00:22:53Z",
+    "updated_at": "2026-10-05T00:24:06Z",
+    "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37247300526"
+  },
+  "result": "VERIFIED",
+  "retention_scope": "All nine workflow component artifacts.",
+  "components": [
+    {
+      "component": "inventory",
+      "result": "PASSED",
+      "failure": null,
+      "artifact_id": 11319736792,
+      "archive_sha256": "48b2a1d4f4b13adcda64ab1039b688c4a41d2a49f33291cf457410755cd81266",
+      "report_sha256": "9a2db7dfbd682038a1baa3659da6b51b5bf0677c3fb7a71443375d8ab391ef4b",
+      "retrieval_sha256": "2f4e9f775baa410a14dedd974f0b9e3d3e41670369444a232838b2748d7e36ae",
+      "command_log_hashes_verified": 20,
+      "artifact_hashes_verified": 0,
+      "source_bindings_verified_against_commit": 25,
+      "commands": 10,
+      "retained_files": 21,
+      "image": {
+        "id": "sha256:dc7537dd973b13f268ecc3f225f4146b6def533b409e233314d493e2318d1f42",
+        "tag": "p01-inventory:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "size": 146074337,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      }
+    },
+    {
+      "component": "console",
+      "result": "PASSED",
+      "failure": null,
+      "artifact_id": 11319682057,
+      "archive_sha256": "887cd651206165a1c2fc21a6fa8d234e362ea8f4e02b27cf6394d09a5690c0cc",
+      "report_sha256": "6cff924768d4baea4a219e96bcca0dce389918a8b9f51fcab17aaab570f4b36b",
+      "retrieval_sha256": "dddc4f447b4766cf97188b92920b771f6fac8e537c8399d44b93c100aebda4cf",
+      "command_log_hashes_verified": 18,
+      "artifact_hashes_verified": 0,
+      "source_bindings_verified_against_commit": 50,
+      "commands": 9,
+      "retained_files": 19,
+      "image": {
+        "id": "sha256:43036cc760cf7214f043eae93fda2b90265e60db1263729b280d19fb2d6c9ece",
+        "tag": "p01-console:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "size": 552648734,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      }
+    },
+    {
+      "component": "planning",
+      "result": "PASSED",
+      "failure": null,
+      "artifact_id": 11319657133,
+      "archive_sha256": "5a5ba3050d9322bb919258db34bcbca541fecde90885d4fab3c6d6ad1b82a4d4",
+      "report_sha256": "5800e8a5d9948e014c95862707d764da8396c1f09777e467978710326f748e89",
+      "retrieval_sha256": "486d7891d914bff76a4a4801c6a35a296ca5c48b87c753dad74ef42fbe99a714",
+      "command_log_hashes_verified": 20,
+      "artifact_hashes_verified": 0,
+      "source_bindings_verified_against_commit": 25,
+      "commands": 10,
+      "retained_files": 21,
+      "image": {
+        "id": "sha256:cc3d4351c8e8c1c8c33d765f1b577621bf564b43230b0305938639f6edcc391e",
+        "tag": "p01-planning:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "size": 146074292,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      }
+    },
+    {
+      "component": "assurance",
+      "result": "PASSED",
+      "failure": null,
+      "artifact_id": 11319561512,
+      "archive_sha256": "e3e0b556d8906d615b6a0b344d00954c56d21d8f4aa31243f1c2b4edf28065ab",
+      "report_sha256": "b51cc4f10f1bb073f56f0b6312965f5ff6d36b413be7d8212d969a0c27f99e77",
+      "retrieval_sha256": "773c8ee9432cc0a6627130161b62be2cfc1e0f1d0f7c0346b3af4060a96afe67",
+      "command_log_hashes_verified": 18,
+      "artifact_hashes_verified": 0,
+      "source_bindings_verified_against_commit": 34,
+      "commands": 9,
+      "retained_files": 19,
+      "image": {
+        "id": "sha256:e4838f610a918335013d8ff76b64e2f62a52bb723622a899c5516f4e14b64f2d",
+        "tag": "p01-assurance:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "size": 552206461,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      }
+    },
+    {
+      "component": "lifecycle",
+      "result": "PASSED",
+      "failure": null,
+      "artifact_id": 11319467774,
+      "archive_sha256": "594f7ea3107cc73c9f66df43743d6f6d30b7f6e7ed233a5413dbebc3cd08dacd",
+      "report_sha256": "4f10a85c48aefadebe165204299d02b789c72eb57060fa3a0652ad80f867dd5e",
+      "retrieval_sha256": "0c860f09c4f69757637ad849ba318b005715936507ca0e42fa4629365e01f82c",
+      "command_log_hashes_verified": 20,
+      "artifact_hashes_verified": 0,
+      "source_bindings_verified_against_commit": 25,
+      "commands": 10,
+      "retained_files": 21,
+      "image": {
+        "id": "sha256:f88183724cedc273be126e49fc3fd866c2b2b0986b7ba98e64a0ed650bd2ab75",
+        "tag": "p01-lifecycle:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "size": 146074336,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      }
+    },
+    {
+      "component": "governance",
+      "result": "PASSED",
+      "failure": null,
+      "artifact_id": 11319422963,
+      "archive_sha256": "0e949ce1e92c139b0305d463ac15e7d5d5274d02d897432b39f66bca327386e4",
+      "report_sha256": "908d1be3bed14857fa77333a8760f6affc221d6fd3290bfbcd798e374aac19e0",
+      "retrieval_sha256": "c0fc42ecb0f8068eb01a7776a4a0b61fd418688b740b6fb8a227d89c7656afe4",
+      "command_log_hashes_verified": 18,
+      "artifact_hashes_verified": 0,
+      "source_bindings_verified_against_commit": 34,
+      "commands": 9,
+      "retained_files": 19,
+      "image": {
+        "id": "sha256:4ea73e5e469e75dd33838958555de469f1b4a50b32937a33532135d7058a731d",
+        "tag": "p01-governance:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "size": 552206470,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      }
+    },
+    {
+      "component": "inventory-workers",
+      "result": "PASSED",
+      "failure": null,
+      "artifact_id": 11319402904,
+      "archive_sha256": "64ec62dd4b26c804d4d9787feb84a7f3f364ea2b0f1cb1d6cf4f3ec50bed452f",
+      "report_sha256": "37cd91d8ab6a5956c98f6f48f3c806ea2184b24fb5c0a4c6ed018a79897d483a",
+      "retrieval_sha256": "bd02eadae11273ac5495c9bf58ab579934729a86f2657f9ddf220017cbb25e7b",
+      "command_log_hashes_verified": 20,
+      "artifact_hashes_verified": 0,
+      "source_bindings_verified_against_commit": 19,
+      "commands": 10,
+      "retained_files": 21,
+      "image": {
+        "id": "sha256:a81a8f88a74e3ab1fd897d2dee00b8f3dab2e8be8120b405aaf224ba7ec2a26f",
+        "tag": "p01-inventory-workers:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "size": 124377077,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      }
+    },
+    {
+      "component": "lifecycle-workers",
+      "result": "PASSED",
+      "failure": null,
+      "artifact_id": 11319402888,
+      "archive_sha256": "496353833f27091aa8288a067cc9d53bd8c09e22eb4c7c3169686e7d540a83ed",
+      "report_sha256": "07d5ce80642db6280d1e9a3def0abeb2bdc187842c9eb775f260a17e074a4743",
+      "retrieval_sha256": "6dda119672a746746be99b26e9c8a3341fe991ce70e6e64f3931a2bba2d60c27",
+      "command_log_hashes_verified": 20,
+      "artifact_hashes_verified": 0,
+      "source_bindings_verified_against_commit": 19,
+      "commands": 10,
+      "retained_files": 21,
+      "image": {
+        "id": "sha256:7c8864f84982b49eb9649b3e7f67e4400b761affeb24fd15852637bfa0a7cce3",
+        "tag": "p01-lifecycle-workers:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "size": 124377119,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      }
+    },
+    {
+      "component": "catalogue",
+      "result": "PASSED",
+      "failure": null,
+      "artifact_id": 11319028914,
+      "archive_sha256": "f23c02e7c34f6bc33ae1187f9d8cce9fbb8e0261a71750d2556d34b15074ab4d",
+      "report_sha256": "1fdb339e106eabfd505939539c9d14318d952f09133310e56954f06e562054f6",
+      "retrieval_sha256": "8e89a8c303f884df4853e19c874f68085dfa6bde857f996077696ba244a0fb1c",
+      "command_log_hashes_verified": 18,
+      "artifact_hashes_verified": 0,
+      "source_bindings_verified_against_commit": 34,
+      "commands": 9,
+      "retained_files": 19,
+      "image": {
+        "id": "sha256:69ac940d40bd36a8e9b965423d75cafd75568cd57028faf737c1259d2e921a90",
+        "tag": "p01-catalogue:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "size": 552206461,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      }
+    }
+  ],
+  "source_verification_sha256": "83777413c5042de7f2023f5c5913fb54bb30e26c35e8bee753be8d13e4c72339",
+  "unique_source_bindings_verified": 198,
+  "command_count": 86,
+  "command_log_hashes_verified": 172,
+  "artifact_hashes_verified": 0,
+  "scope_limitations": "Source-bound development verification only. Package/image outcomes do not establish integrated deployment, operating acceptance, native qualifications or a passed gate. Image IDs identify local image configurations, not published registry manifests."
+}

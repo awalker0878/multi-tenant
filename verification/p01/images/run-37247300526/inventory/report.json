@@ -1,0 +1,491 @@
+{
+  "schema_version": 1,
+  "result": "PASSED",
+  "component": "inventory",
+  "scope": "P01 isolated development image build and process probes; no operating deployment or native work",
+  "source_revision": "c9c202786437601c0f000bdf29d7e1e401e773ee",
+  "started_at": "2026-10-05T00:23:12.025680+00:00",
+  "source_sha256": {
+    ".github/workflows/p01-images.yml": "0776d380e416d599d5fc49ac93c032eec7bd8d5afea91aec91f3a092d6d6b29a",
+    "deploy/build/components.json": "7b50205d5f714836368ab7e67f696678218d156b6608370a86956d525ca54901",
+    "deploy/build/inputs.lock.json": "2423a82d62c4f556f93ce675fad865e8b96c987bc1edd2955895b99bd813dc4c",
+    "scripts/p01/candidates.json": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+    "scripts/p01/check_jobs.py": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+    "scripts/p01/python_lock.py": "05b4074482edb8899c95da980b4886975a9ce36adb19c2894bd4e42b40d76769",
+    "scripts/p01/run_images.py": "7898d827e081ee477ff99ad154bd289d571350a4483aa5b74d64e8bdbde72c8b",
+    "scripts/p01/select_components.py": "37575f2fb29659ae7d72d477c9b09f1d981571386ef20ccd0ce4d039b5cd79d7",
+    "services/inventory/.dockerignore": "59e9a97d2a5cf9b6df4160b1c1b558f281a7c6335efb3fe00e446442b5ee407b",
+    "services/inventory/.python-version": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "services/inventory/Dockerfile": "153930374f95dce509145e4e2e08df0883da8b2603017afa6e033a582e218ab9",
+    "services/inventory/README.md": "e2a414e9a6c4b59e1fc7f1a9326a7f099fbd4c8773545e0ee7cd1d450af3ca70",
+    "services/inventory/pyproject.toml": "7f6acdb398000373cfa3090a4eb32ccede0f6b4d075174d7a5f740c10e36eb28",
+    "services/inventory/src/inventory/__init__.py": "48dc688246bed4a4af13e0d6a3c1941d8b1a8c487697899f815da060e09bdb45",
+    "services/inventory/src/inventory/application/__init__.py": "1f5ae340d751c791e5b1bea85bdeaa0fa9cbb7a2900d7f3473f42e0c2f48047f",
+    "services/inventory/src/inventory/application/foundation.py": "f3774527b6898bf92837c1607552c20f3791981e3f5fc518abf4090ed1e2dc3c",
+    "services/inventory/src/inventory/bootstrap/__init__.py": "15204b8de8a3c1bb5b8cf98dbac3cb4aeb645ccd3232b95d8200bf6f0ffab514",
+    "services/inventory/src/inventory/bootstrap/health.py": "3df3dde2077420ff55cd92ca95db7589ccd691d009d695bd38c791806e532fd0",
+    "services/inventory/src/inventory/bootstrap/server.py": "6aba63d022fe32db6723f08dc2938733f1026cfb75190d670b8b0b0d20636cbf",
+    "services/inventory/src/inventory/infrastructure/__init__.py": "ec32a7399e0c702770c6372d86b55a54ec146fe993eaff22ce17546839b06eaa",
+    "services/inventory/src/inventory/infrastructure/foundation.py": "3da357be9b1c77dd92682e2e9d5946a3b484062bfc0cae4fad3b44521b5ea97f",
+    "services/inventory/src/inventory/interfaces/__init__.py": "3d684dafd93a5ade8f4ca71353baaca811a3dad78187e43068e0cadcf5c8b543",
+    "services/inventory/src/inventory/interfaces/health.py": "6a5a44ba3e2ca71f8df60653e60cdc707ddb63547b1939b0e883cc02cc8fca64",
+    "services/inventory/src/inventory/interfaces/http.py": "2923b984f7459d4ad671f526fc99e341d183b3c163c00317f281d1aad34d581c",
+    "services/inventory/uv.lock": "01f55e3fc91af83220401738453ffc1c0f2a73b06434ed9f90c7b3f9007a8592"
+  },
+  "image_inputs": {
+    "schema_version": 1,
+    "scope": "P01 development image inputs; no release trust or operating qualification",
+    "platform": "linux/amd64",
+    "python_version": "3.12.14",
+    "uv_version": "0.12.19",
+    "provenance": {
+      "source_commit": "d988cfe5d09e32a22da93c9c1b4816878fe4c495",
+      "source_path": "spikes/compatibility/images/inputs.lock.json",
+      "source_sha256": "9298a430b975ab50d7cf4ccd89f627194bacc205682f61b92ad1f8f3db65d935",
+      "review": "Accepted G00 development baseline; exact observed P00 child manifests copied here so product builds do not load spike files."
+    },
+    "images": {
+      "python": {
+        "candidate": "docker.io/library/python:3.12.14-slim-bookworm",
+        "index_digest": "sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e",
+        "digest": "sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a",
+        "reference": "docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a"
+      },
+      "uv": {
+        "candidate": "ghcr.io/astral-sh/uv:0.12.19",
+        "index_digest": "sha256:04d046b13e60d6bcec73cbc5e1cad25d680dea90c8573340950a0ac2d1aef424",
+        "digest": "sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3",
+        "reference": "ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3"
+      },
+      "php": {
+        "candidate": "docker.io/library/php:8.5.11-fpm-bookworm",
+        "index_digest": "sha256:53eab56a8f43f51a92119f6c29b3448af98eec288ff17f92829354a4b4c9ca05",
+        "digest": "sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3",
+        "reference": "docker.io/library/php@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3"
+      },
+      "composer": {
+        "candidate": "docker.io/library/composer:2.10.3",
+        "index_digest": "sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac",
+        "digest": "sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d",
+        "reference": "docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d"
+      },
+      "node": {
+        "candidate": "docker.io/library/node:24.19.0-bookworm-slim",
+        "index_digest": "sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df",
+        "digest": "sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+        "reference": "docker.io/library/node@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174"
+      }
+    },
+    "php_version": "8.5.11",
+    "composer_version": "2.10.3",
+    "node_version": "v24.19.0",
+    "debian_snapshot": "20261004T000000Z"
+  },
+  "commands": [
+    {
+      "name": "source-revision",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/home/runner/work/multi-tenant/multi-tenant",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.002,
+      "stdout": {
+        "path": "01-source-revision.stdout.log",
+        "sha256": "9b66f98ceee698e43fd681494759b440f5de52ad7546f4d1576a81634ea21785",
+        "bytes": 41
+      },
+      "stderr": {
+        "path": "01-source-revision.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "source-clean",
+      "argv": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all",
+        "--",
+        ".github/workflows/p01-images.yml",
+        "deploy/build/components.json",
+        "deploy/build/inputs.lock.json",
+        "scripts/p01/candidates.json",
+        "scripts/p01/check_jobs.py",
+        "scripts/p01/python_lock.py",
+        "scripts/p01/run_images.py",
+        "scripts/p01/select_components.py",
+        "services/inventory/.dockerignore",
+        "services/inventory/.python-version",
+        "services/inventory/Dockerfile",
+        "services/inventory/README.md",
+        "services/inventory/pyproject.toml",
+        "services/inventory/src/inventory/__init__.py",
+        "services/inventory/src/inventory/application/__init__.py",
+        "services/inventory/src/inventory/application/foundation.py",
+        "services/inventory/src/inventory/bootstrap/__init__.py",
+        "services/inventory/src/inventory/bootstrap/health.py",
+        "services/inventory/src/inventory/bootstrap/server.py",
+        "services/inventory/src/inventory/infrastructure/__init__.py",
+        "services/inventory/src/inventory/infrastructure/foundation.py",
+        "services/inventory/src/inventory/interfaces/__init__.py",
+        "services/inventory/src/inventory/interfaces/health.py",
+        "services/inventory/src/inventory/interfaces/http.py",
+        "services/inventory/uv.lock"
+      ],
+      "cwd": "/home/runner/work/multi-tenant/multi-tenant",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.11,
+      "stdout": {
+        "path": "02-source-clean.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "02-source-clean.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "docker-version",
+      "argv": [
+        "docker",
+        "version"
+      ],
+      "cwd": "/home/runner/work/multi-tenant/multi-tenant",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.084,
+      "stdout": {
+        "path": "03-docker-version.stdout.log",
+        "sha256": "58d5180149fd3334dbb3ff73de521946336e4052a1b769cb475f72486c934b1b",
+        "bytes": 769
+      },
+      "stderr": {
+        "path": "03-docker-version.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "buildx-version",
+      "argv": [
+        "docker",
+        "buildx",
+        "version"
+      ],
+      "cwd": "/home/runner/work/multi-tenant/multi-tenant",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.193,
+      "stdout": {
+        "path": "04-buildx-version.stdout.log",
+        "sha256": "d6a1fdd95fd9b2615b359b42e82829b1cad6bb22202cff355e55be8242e8c395",
+        "bytes": 74
+      },
+      "stderr": {
+        "path": "04-buildx-version.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "build",
+      "argv": [
+        "docker",
+        "buildx",
+        "build",
+        "--load",
+        "--pull",
+        "--platform",
+        "linux/amd64",
+        "--provenance=false",
+        "--progress=plain",
+        "--target",
+        "runtime",
+        "--build-arg",
+        "PYTHON_BASE=docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a",
+        "--build-arg",
+        "UV_BASE=ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3",
+        "--build-arg",
+        "SOURCE_REVISION=c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "--file",
+        "/tmp/p01-inventory-ofw9dv90/Dockerfile",
+        "--tag",
+        "p01-inventory:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "/tmp/p01-inventory-ofw9dv90"
+      ],
+      "cwd": "/tmp/p01-inventory-ofw9dv90",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 7.787,
+      "stdout": {
+        "path": "05-build.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "05-build.stderr.log",
+        "sha256": "ad360bf3bac5dd4beb33a4754528184fd59cdc7a4252c52ae3baea5d579415a0",
+        "bytes": 13870
+      }
+    },
+    {
+      "name": "image-inspect",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "p01-inventory:c9c202786437601c0f000bdf29d7e1e401e773ee"
+      ],
+      "cwd": "/home/runner/work/_temp/p01-image-inventory",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.014,
+      "stdout": {
+        "path": "06-image-inspect.stdout.log",
+        "sha256": "3b12d707a5cb1048310f683b995ca319c413f378c707194668f3b4b1d10acb87",
+        "bytes": 3633
+      },
+      "stderr": {
+        "path": "06-image-inspect.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "liveness",
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--read-only",
+        "--network",
+        "none",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--pids-limit",
+        "64",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "p01-inventory:c9c202786437601c0f000bdf29d7e1e401e773ee"
+      ],
+      "cwd": "/home/runner/work/_temp/p01-image-inventory",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.329,
+      "stdout": {
+        "path": "07-liveness.stdout.log",
+        "sha256": "d34316a97e3753ce9fc1831753383464f3c8d4972af4a0a69a1f22d24878f679",
+        "bytes": 119
+      },
+      "stderr": {
+        "path": "07-liveness.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "readiness",
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--read-only",
+        "--network",
+        "none",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--pids-limit",
+        "64",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "p01-inventory:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "readiness"
+      ],
+      "cwd": "/home/runner/work/_temp/p01-image-inventory",
+      "expected_exit": 1,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.289,
+      "stdout": {
+        "path": "08-readiness.stdout.log",
+        "sha256": "8be501294ed526663c6e0aae9e1e77a206bb2cc8e17c885f12d87a320a8bbcb4",
+        "bytes": 175
+      },
+      "stderr": {
+        "path": "08-readiness.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "rejected-override",
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--read-only",
+        "--network",
+        "none",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--pids-limit",
+        "64",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "p01-inventory:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "readiness",
+        "--force"
+      ],
+      "cwd": "/home/runner/work/_temp/p01-image-inventory",
+      "expected_exit": 2,
+      "exit_code": 2,
+      "timed_out": false,
+      "elapsed_seconds": 0.266,
+      "stdout": {
+        "path": "09-rejected-override.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "09-rejected-override.stderr.log",
+        "sha256": "28189b062024dc2c28324b8ba9b709ffd9fc6fe864e10181926db84f602de32f",
+        "bytes": 107
+      }
+    },
+    {
+      "name": "runtime-isolation",
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--read-only",
+        "--network",
+        "none",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--pids-limit",
+        "64",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--entrypoint",
+        "/opt/venv/bin/python",
+        "p01-inventory:c9c202786437601c0f000bdf29d7e1e401e773ee",
+        "-I",
+        "-c",
+        "import importlib, importlib.metadata, json, os, pathlib, re, sys\nmodule = importlib.import_module('inventory')\nroot = pathlib.Path('/opt/venv')\nstatus = dict(line.split(':', 1) for line in pathlib.Path('/proc/self/status').read_text().splitlines() if ':' in line)\nmount = next(line.split() for line in pathlib.Path('/proc/self/mountinfo').read_text().splitlines() if line.split()[4] == '/')\nresult = {\n 'python_version': '.'.join(map(str, sys.version_info[:3])),\n 'uid': os.getuid(), 'gid': os.getgid(),\n 'capabilities_effective': int(status['CapEff'].strip(), 16),\n 'no_new_privileges': int(status['NoNewPrivs'].strip()),\n 'root_read_only': 'ro' in mount[5].split(','),\n 'network_interfaces': sorted(p.name for p in pathlib.Path('/sys/class/net').iterdir()),\n 'module_file': module.__file__,\n 'installed_distributions': sorted((re.sub(r'[-_.]+', '-', d.metadata['Name']).lower(), d.version) for d in importlib.metadata.distributions()),\n 'application_source_absent': not pathlib.Path('/app/src').exists() and not pathlib.Path('/build').exists(),\n}\nassert result['uid'] == result['gid'] == 10001\nassert result['capabilities_effective'] == 0 and result['no_new_privileges'] == 1\nassert result['root_read_only'] and result['network_interfaces'] == ['lo']\nassert pathlib.Path(module.__file__).is_relative_to(root)\nassert result['installed_distributions'] == [('click', '8.5.0'), ('h11', '0.16.0'), ('product-inventory', '0.1.0.dev0'), ('psycopg', '3.3.6'), ('psycopg-binary', '3.3.6'), ('typing-extensions', '4.16.0'), ('uvicorn', '0.53.0')]\nassert result['application_source_absent']\nprint(json.dumps(result, sort_keys=True))\n"
+      ],
+      "cwd": "/home/runner/work/_temp/p01-image-inventory",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.454,
+      "stdout": {
+        "path": "10-runtime-isolation.stdout.log",
+        "sha256": "12bb939474fa14bdd00e54fbba88366ccc5feed2e553256bdfc9e5c8122f0935",
+        "bytes": 491
+      },
+      "stderr": {
+        "path": "10-runtime-isolation.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "used_base_images": {
+    "python": {
+      "candidate": "docker.io/library/python:3.12.14-slim-bookworm",
+      "index_digest": "sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e",
+      "digest": "sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a",
+      "reference": "docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a"
+    },
+    "uv": {
+      "candidate": "ghcr.io/astral-sh/uv:0.12.19",
+      "index_digest": "sha256:04d046b13e60d6bcec73cbc5e1cad25d680dea90c8573340950a0ac2d1aef424",
+      "digest": "sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3",
+      "reference": "ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3"
+    }
+  },
+  "image": {
+    "id": "sha256:dc7537dd973b13f268ecc3f225f4146b6def533b409e233314d493e2318d1f42",
+    "tag": "p01-inventory:c9c202786437601c0f000bdf29d7e1e401e773ee",
+    "size": 146074337,
+    "platform": "linux/amd64",
+    "identity_kind": "local_image_configuration_digest"
+  },
+  "runtime": {
+    "application_source_absent": true,
+    "capabilities_effective": 0,
+    "gid": 10001,
+    "installed_distributions": [
+      [
+        "click",
+        "8.5.0"
+      ],
+      [
+        "h11",
+        "0.16.0"
+      ],
+      [
+        "product-inventory",
+        "0.1.0.dev0"
+      ],
+      [
+        "psycopg",
+        "3.3.6"
+      ],
+      [
+        "psycopg-binary",
+        "3.3.6"
+      ],
+      [
+        "typing-extensions",
+        "4.16.0"
+      ],
+      [
+        "uvicorn",
+        "0.53.0"
+      ]
+    ],
+    "module_file": "/opt/venv/lib/python3.12/site-packages/inventory/__init__.py",
+    "network_interfaces": [
+      "lo"
+    ],
+    "no_new_privileges": 1,
+    "python_version": "3.12.14",
+    "root_read_only": true,
+    "uid": 10001
+  },
+  "completed_at": "2026-10-05T00:23:21.565551+00:00"
+}
