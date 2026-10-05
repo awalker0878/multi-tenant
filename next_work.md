@@ -7,8 +7,12 @@ Active branch: `greenfield/enterprise-microservices-plan`. The requesting user a
 The [local bootstrap increment](docs/implementation/p02-local-bootstrap.md) implements
 one deployment-created administrator, protected random-password display, first-login
 password change, durable session authority and the Console sign-in/setup journey.
-Direct API and browser controls are tested separately from deployment qualification.
-P02 remains IN_PROGRESS; external OIDC is not yet configured by the setup screen.
+The retained EV-P02-001 campaign passes 32 PostgreSQL/HTTP/browser checks, with
+165 matching source bindings. Full local suites pass 46 Governance and 60 Console
+tests. Direct API and browser controls retain their bounded deployment scope.
+P02 remains IN_PROGRESS; external OIDC is not yet configured by the setup screen. The
+[regression snapshot](verification/p02/regression-runs.json) records all ten affected
+workflows passing, including the nine package/image jobs and both runtime campaigns.
 
 **Next concrete work:** complete console-managed external OIDC settings and secret
 custody, provider/token validation, verified federated administrator testing and

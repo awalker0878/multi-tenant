@@ -115,7 +115,8 @@ phases:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P02-001
   blocker_ids: []
 - id: P03
   title: Application catalogue and workspace
@@ -796,7 +797,8 @@ work_packages:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P02-001
   blocker_ids: []
   doc_refs:
   - docs/implementation/p02-local-bootstrap.md
@@ -873,7 +875,8 @@ work_packages:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P02-001
   blocker_ids: []
   doc_refs:
   - docs/implementation/p02-local-bootstrap.md
@@ -1887,11 +1890,12 @@ requirements:
   - G02
   - G06
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P02-001
   blocker_ids: []
 - id: R04
   package_ids:
@@ -2804,6 +2808,7 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-001
   - EV-P01-009
   - EV-P01-013
   - EV-P01-016
@@ -3084,7 +3089,8 @@ gates:
   decision: NOT_REVIEWED
   reviewer: null
   reviewed_at: null
-  evidence_ids: []
+  evidence_ids:
+  - EV-P02-001
   blocker_ids: []
 - id: G03
   phase_id: P03
@@ -4625,6 +4631,39 @@ evidence:
     decision is inferred.
   valid_until: null
   invalidated_at: null
+- id: EV-P02-001
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/583f14e48968b930ed1eb68c95294c9a26ccb2ed/verification/p02/identity/run-37324210957/report.json
+  sha256: d7906626fe7ff03ad663893e4c4ad65d5b4b4b3b9c890a13ee24540bdc10ab95
+  source_revision: 007cb7e4fe63ac3a851793682258ffe1d7fb6a57
+  artifact_revisions:
+    retained_artifact_commit: 583f14e48968b930ed1eb68c95294c9a26ccb2ed
+    github_artifact_zip_sha256: 3e247185d9a9b7677babacea22e1b445662944f55e0248a091fc3c1da6c619a8
+  environment: GitHub Actions Ubuntu 24.04; PHP 8.5.11, Node 24.19.0, PostgreSQL 18.6 pinned child image;
+    verified database TLS and mounted credentials; compiled Chromium console over isolated loopback HTTP.
+  scope: 'Partial P02.01/P02.05 bootstrap increment: 32 passing campaign checks, nine PostgreSQL feature
+    tests (82 assertions), one real browser journey with no skips/retries/failures, six retained artifact
+    hash checks and 165 matching source bindings. Concurrent terminal bootstrap displays one credential;
+    replay preserves it; runtime role denials, mandatory password change, session revocation, HTTP contract
+    and credential-log exclusion pass.'
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T14:24:08.733032+00:00'
+  observer: GitHub Actions run 37324210957, job 111810670270; retrieved by Codex
+  reviewer: 'Codex: exact source/artifact and outcome review only; independent IAM/security/SRE receiving
+    acceptance remains pending'
+  limitations: Local bootstrap slice only. External OIDC configuration, token verification and handover,
+    tenancy/delegation, approvals, outbox delivery, supported-runtime bootstrap/restore and production
+    ingress/workload TLS qualification remain incomplete. Retired-state seed tests do not qualify federation.
+    Initial stopped run 37323186027 is retained unchanged. No G01/G02 pass, promotion or operational acceptance;
+    changed inputs require requalification.
+  valid_until: null
+  invalidated_at: null
+
 blockers:
 - id: BL-P00-001
   scope_ids:

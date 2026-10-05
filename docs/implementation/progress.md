@@ -12,7 +12,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: PASSED | 11 / 2 |
 | P01 | Delivery and runtime foundation | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 31 / 4 |
-| P02 | Identity, tenancy and governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 0 / 0 |
+| P02 | Identity, tenancy and governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 1 / 0 |
 | P03 | Application catalogue and workspace | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
 | P04 | Site commissioning and inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 0 / 0 |
 | P05 | Capabilities and immutable plans | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G05: NOT_REVIEWED | 0 / 0 |
@@ -41,11 +41,11 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P01.04 | CI and supply chain | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 11 / 3 |
 | P01.05 | Runtime dependencies | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 12 / 1 |
 | P01.06 | Baseline operations | SRE/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 13 / 2 |
-| P02.01 | Authentication | Product/IAM | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P02.01 | Authentication | Product/IAM | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 0 |
 | P02.02 | Tenancy | Governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.03 | Authorization | Governance/security | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.04 | Approval lifecycle | Governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P02.05 | Console foundation | Console | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P02.05 | Console foundation | Console | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 0 |
 | P03.01 | Core aggregates | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P03.02 | Intent semantics | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P03.03 | Revision behavior | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **42**. Blocker records: **4**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **43**. Blocker records: **4**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -145,6 +145,7 @@ Evidence records: **42**. Blocker records: **4**. Planning inputs awaiting selec
 | EV-P01-029 | E2 | GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures; no native endpoints or operated promotion. | 36a14811b5afa23717566d5e8a08632e011f44a5 | Bounded synthetic development observations. Diagnostic buffering and operator collection are not durable audit/evidence custody, business-operation completion or operating receiver acceptance. Full image layers are not retained; development signatures do not establish operated signer/registry trust. No production sizing, accepted recovery objective, native effect, operating acceptance or G01 decision is inferred. |
 | EV-P01-030 | E2 | GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures; no native endpoints or operated promotion. | 36a14811b5afa23717566d5e8a08632e011f44a5 | Bounded synthetic development observations. Diagnostic buffering and operator collection are not durable audit/evidence custody, business-operation completion or operating receiver acceptance. Full image layers are not retained; development signatures do not establish operated signer/registry trust. No production sizing, accepted recovery objective, native effect, operating acceptance or G01 decision is inferred. |
 | EV-P01-031 | E2 | GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures; no native endpoints or operated promotion. | 36a14811b5afa23717566d5e8a08632e011f44a5 | Bounded synthetic development observations. Diagnostic buffering and operator collection are not durable audit/evidence custody, business-operation completion or operating receiver acceptance. Full image layers are not retained; development signatures do not establish operated signer/registry trust. No production sizing, accepted recovery objective, native effect, operating acceptance or G01 decision is inferred. |
+| EV-P02-001 | E2 | GitHub Actions Ubuntu 24.04; PHP 8.5.11, Node 24.19.0, PostgreSQL 18.6 pinned child image; verified database TLS and mounted credentials; compiled Chromium console over isolated loopback HTTP. | 007cb7e4fe63ac3a851793682258ffe1d7fb6a57 | Local bootstrap slice only. External OIDC configuration, token verification and handover, tenancy/delegation, approvals, outbox delivery, supported-runtime bootstrap/restore and production ingress/workload TLS qualification remain incomplete. Retired-state seed tests do not qualify federation. Initial stopped run 37323186027 is retained unchanged. No G01/G02 pass, promotion or operational acceptance; changed inputs require requalification. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
 | BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, P01, P01.02, P01.04, P01.05, P01.06, G01, R29, R30 | Requesting user for baseline decisions; actual integration, operating and records owners at their affected checkpoints | OPEN | Supply the concrete runtime, registry/signer, trust, operating or records input before the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward checkpoints; do not request baseline approval again. | Complete the exact OP01–OP07 receiving inputs in release/operating-inputs.json with actual identities and immutable evidence. Run operating_inputs.py --require-complete, then integrate and qualify the affected trust/runtime/operations path. Preserve the accepted G00 decision and later P08/P10/P11 receiving checkpoints. |

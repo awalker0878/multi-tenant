@@ -16,6 +16,15 @@ On initial deployment, a controlled, idempotent bootstrap operation creates one 
 
 The first successful login permits only password change and logout. Every protected API and console route enforces this server-side restriction until the administrator chooses a different password. Successful change invalidates the temporary password, rotates session/CSRF state and enables the scoped console administration needed to configure OIDC. The account is not a shared service/worker identity and does not bypass tenant policy or separation of duties.
 
+The local bootstrap implementation uses a ten-minute change-required session and
+a thirty-minute absolute setup-session lifetime. Governance retains opaque session
+hashes, checks current authority on each protected request and revokes all earlier
+local sessions when the password changes. Five failed credential attempts lock the
+account for sixty seconds across replicas. Minimal session introspection supplies
+the state required to enforce change/logout; it grants no additional function.
+See [the bootstrap increment](../implementation/p02-local-bootstrap.md) for the
+implemented password policy, deployment binding and measured scope.
+
 Saving provider settings does not complete setup. Test the connection, verify a federated identity and its explicit administrative grant, then activate OIDC and disable the local administrator atomically. Revoke local sessions and delegated authority at that transition. Invalid settings or a failed test leave local setup available after the required password change. Provider failure after activation never automatically restores local login.
 
 Restarts, additional replicas, upgrades and deployment retries must neither recreate the account nor regenerate, redisplay or reset its password. Preserve bootstrap completion and local-account retirement through backup/restore and reconcile their current state before reopening access. Lost-password recovery requires an explicit authenticated operating procedure; it is not a startup side effect.
@@ -35,7 +44,7 @@ Refinement and validation: provider scope, identity/delegation contracts, sessio
 
 - Select installation-wide versus tenant-specific providers and connection cardinality; define stable issuer/subject identity, accepted audiences, claim/group mapping and membership administration.
 - Select service identity issuance, delegation validation, revocation propagation and authority-freshness bounds.
-- Define session lifetime/logout, separation of duties, approval expiry and independently controlled emergency recovery after OIDC activation.
+- Define federated session/freshness and logout bounds, separation of duties, approval expiry and independently controlled emergency recovery after OIDC activation.
 - Bind protected deployment credential display and interrupted-bootstrap recovery to each supported installation runtime.
 
 ## Acceptance and validation

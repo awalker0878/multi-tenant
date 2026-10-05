@@ -76,8 +76,31 @@ transaction-failure cases, actual-route CSRF/Host tests, frontend checks, and a
 dedicated PostgreSQL/browser workflow. The latter uses the pinned disposable
 PostgreSQL image, two simultaneous deployment terminals, runtime role denials,
 migration replay, real HTTP contract validation and the compiled Console journey.
-Record observed runs and source bindings here and in the delivery register after
-execution; the presence of a workflow is not a passing result.
+[EV-P02-001](../../verification/p02/identity/run-37324210957/report.json) records
+32 passing checks at source `007cb7e4fe63ac3a851793682258ffe1d7fb6a57`:
+nine PostgreSQL feature tests (82 assertions), one compiled Chromium journey,
+verified database TLS, simultaneous terminal bootstrap, replay/role denials,
+API schemas, password/session transitions and credential-log exclusion. The browser
+run has no skips, retries or failures. The retrieved ZIP digest and all six retained
+artifact digests match; all 165 bound source files match the delivered application.
+The [retrieval record](../../verification/p02/identity/retrieval.json) identifies
+both immutable archives. The first run stopped before Console startup because
+its database fixture lacked Console's required TLS/mounted-password bindings;
+that failure remains [retained](../../verification/p02/identity/run-37323186027/report.json).
+
+Local full suites passed 46 Governance and 60 Console tests, both language-boundary
+and type checks, the frontend build/type checks, and 89 documentation/control tests.
+Hosted package/image replays use the subsequent packaging source
+`ebec6eeb9589ba2b184ba64ac57c69f43bee44c6`; the 165 identity campaign inputs remain
+unchanged. The migration explicitly revokes broad foundation default grants before
+assigning least privilege. New image input registration and canonical Console host
+bindings are included; existing P01 results are not reused for changed bytes.
+
+All ten [affected regression workflows](../../verification/p02/regression-runs.json)
+pass at `ebec6eeb9589ba2b184ba64ac57c69f43bee44c6`, including all nine independent
+package and image jobs, Compose, Kubernetes, HTTP contracts, messaging, stateful
+dependencies, Permit Desk recovery and documentation/policy checks. These results
+retain their development scopes and do not pass G01/G02 or authorize promotion.
 
 Next: persist one installation-wide external OIDC connection through Console
 administration, write-only secret custody, strict provider/token validation,
