@@ -29,7 +29,7 @@ def check(name, condition, observation=None):
         raise AssertionError(name)
 
 
-def denied(name, call, errors, codes=None, *, worm=False):
+def denied(name, call, errors, codes=None, *, worm=False, diagnostic=None):
     try:
         call()
     except errors as error:
@@ -41,6 +41,9 @@ def denied(name, call, errors, codes=None, *, worm=False):
         valid=codes is None or code in codes
         if worm:
             valid=valid and observation.get('http_status')==400 and observation.get('message','').startswith('Object is WORM protected and cannot be overwritten')
+        if diagnostic is not None:
+            observation.update(database_diagnostic=str(error),sqlstate=getattr(error,'sqlstate',None))
+            valid=valid and diagnostic in str(error)
         check(name,valid,observation)
     else:
         check(name, False, 'unexpected authorization')
@@ -288,10 +291,10 @@ def database():
         check('temporal-database-verified-tls',row[0] and row[1] in ('TLSv1.2','TLSv1.3'),row)
         check('temporal-schema-version-readable',bool(conn.execute('SELECT curr_version FROM schema_version').fetchone()[0]))
         for name,sql in [('runtime-ddl-denied','CREATE TABLE forbidden(id int)'),('runtime-ownership-escalation-denied','SET ROLE temporal_migrator')]:
-            denied(name,lambda q=sql:conn.execute(q),psycopg.errors.InsufficientPrivilege)
-    denied('wrong-private-database-denied',lambda:connect(db='temporal_visibility'),psycopg.OperationalError)
-    denied('invalid-database-secret-denied',lambda:connect(password='incorrect-synthetic-password'),psycopg.OperationalError)
-    denied('plaintext-database-connection-denied',lambda:connect(sslmode='disable'),psycopg.OperationalError)
+            denied(name,lambda q=sql:conn.execute(q),psycopg.errors.InsufficientPrivilege,diagnostic='permission denied for schema public' if name=='runtime-ddl-denied' else 'permission denied to set role "temporal_migrator"')
+    denied('wrong-private-database-denied',lambda:connect(db='temporal_visibility'),psycopg.OperationalError,diagnostic='database "temporal_visibility", SSL encryption')
+    denied('invalid-database-secret-denied',lambda:connect(password='incorrect-synthetic-password'),psycopg.OperationalError,diagnostic='password authentication failed for user "temporal_runtime"')
+    denied('plaintext-database-connection-denied',lambda:connect(sslmode='disable'),psycopg.OperationalError,diagnostic='no encryption')
     with connect('visibility','temporal_visibility') as conn:
         check('visibility-schema-version-readable',bool(conn.execute('SELECT curr_version FROM schema_version').fetchone()[0]))
         check('visibility-conversion-function-executable',conn.execute("SELECT convert_ts('2026-10-05T00:00:00Z')").fetchone()[0].isoformat()=='2026-10-05T00:00:00')
