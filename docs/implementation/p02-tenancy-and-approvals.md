@@ -138,8 +138,8 @@ be retained with their exact source/artifact bindings before evidence is claimed
 The [data-facing delegation and Catalogue guard](p02-service-delegation.md)
 implement the initial short-lived service contract. Remaining P02 integration:
 real owning-service resources and cross-service wire qualification; approved support/break-glass contracts and implementation; real consumer integration and receiving of outbox/expiry; deployed recovery/revocation epochs; full browser and
-accessibility qualification. Lists are currently bounded to 200 rows (audit 100)
-without pagination. No native effect, real provider interoperability, complete
+accessibility qualification. The [new directory APIs](p02-directory.md) page Console tenants and memberships.
+Published v1 lists keep their 200-row bound (audit 100). No native effect, real provider interoperability, complete
 operational acceptance or completed phase is inferred.
 
 ## Retained campaign

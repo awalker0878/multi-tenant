@@ -1,0 +1,350 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Governance tenant and membership directory",
+    "version": "1.0.0",
+    "description": "P02 current-authority keyset pagination. Live lists, not a snapshot or export. Inserts behind a cursor require restarting; revoked access is never preserved by a cursor. Published tenancy v1 endpoints keep their prior bounded behavior."
+  },
+  "security": [
+    {
+      "ConsoleWorkload": []
+    }
+  ],
+  "paths": {
+    "/v1/tenant-directory": {
+      "get": {
+        "operationId": "pageTenantDirectory",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            "description": "Omit for the first page. Forward the previous next_cursor unchanged."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Up to 50 rows in ascending immutable UUID order; Cache-Control: no-store, private. Current authority is checked on every request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDirectory"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope or role denied"
+          },
+          "404": {
+            "description": "Unknown tenant or no current membership"
+          },
+          "422": {
+            "description": "Malformed, expired or foreign continuation token"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/membership-directory": {
+      "get": {
+        "operationId": "pageMembershipDirectory",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            "description": "Omit for the first page. Forward the previous next_cursor unchanged."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Up to 50 rows in ascending immutable UUID order; Cache-Control: no-store, private. Current authority is checked on every request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipDirectory"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope or role denied"
+          },
+          "404": {
+            "description": "Unknown tenant or no current membership"
+          },
+          "422": {
+            "description": "Malformed, expired or foreign continuation token"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ConsoleWorkload": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Independent mounted Console workload identity; never a health credential."
+      }
+    },
+    "schemas": {
+      "TenantChoice": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "state",
+          "revision",
+          "role",
+          "site_id",
+          "environment"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "tenant_admin",
+              "author",
+              "reviewer",
+              "operator",
+              "reader"
+            ]
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "environment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Membership": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "tenant_id",
+          "actor_id",
+          "role",
+          "site_id",
+          "environment",
+          "state",
+          "expires_at",
+          "revision",
+          "subject"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "tenant_admin",
+              "author",
+              "reviewer",
+              "operator",
+              "reader"
+            ]
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "environment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "revoked"
+            ]
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "subject": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      },
+      "TenantDirectory": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tenants",
+          "next_cursor",
+          "installation_administrator"
+        ],
+        "properties": {
+          "tenants": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/TenantChoice"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048,
+            "description": "Opaque session- and scope-bound continuation, valid for at most 15 minutes; null ends the list. This value grants no authority."
+          },
+          "installation_administrator": {
+            "type": "boolean"
+          }
+        }
+      },
+      "MembershipDirectory": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "memberships",
+          "next_cursor"
+        ],
+        "properties": {
+          "memberships": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Membership"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048,
+            "description": "Opaque session- and scope-bound continuation, valid for at most 15 minutes; null ends the list. This value grants no authority."
+          }
+        }
+      }
+    }
+  }
+}

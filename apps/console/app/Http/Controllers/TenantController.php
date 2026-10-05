@@ -16,14 +16,23 @@ use Throwable;
 
 final class TenantController
 {
-    public function index(Request $request, TenantGateway $tenants): Response
+    public function index(Request $request, TenantGateway $tenants): Response|RedirectResponse
     {
-        $data = $tenants->read((string) $request->session()->get('identity.token'));
+        try {
+            $data = $tenants->directory((string) $request->session()->get('identity.token'), null, $this->cursor($request));
+        } catch (IdentityFailure $error) {
+            if ($error->status !== 422) {
+                throw $error;
+            }
+
+            return redirect('/account')->with('tenant_notice', 'This page link expired or changed. The list has restarted.');
+        }
         Inertia::clearHistory();
 
         return Inertia::render('identity/Account', [
             'tenants' => $data['tenants'] ?? [],
             'canCreate' => ($data['installation_administrator'] ?? false) === true,
+            'nextCursor' => $data['next_cursor'] ?? null, 'continued' => $request->has('cursor'),
             'notice' => $request->session()->get('tenant_notice'),
         ]);
     }
@@ -43,9 +52,13 @@ final class TenantController
             $token = (string) $request->session()->get('identity.token');
             $data = $tenants->read($token, $tenant);
             $admin = ($data['membership']['role'] ?? null) === 'tenant_admin' && ($data['membership']['site_id'] ?? null) === null && ($data['membership']['environment'] ?? null) === null;
-            $members = $admin ? $tenants->read($token, $tenant, 'memberships')['memberships'] : [];
+            $directory = $admin ? $tenants->directory($token, $tenant, $this->cursor($request)) : [];
+            $members = $directory['memberships'] ?? [];
             $quota = $admin ? $tenants->read($token, $tenant, 'quota') : null;
         } catch (IdentityFailure $error) {
+            if ($error->status === 422 && $request->has('cursor')) {
+                return redirect('/tenants/'.$tenant)->with('tenant_notice', 'This page link expired or changed. The list has restarted.');
+            }
             if (! in_array($error->status, [403, 404], true)) {
                 throw $error;
             }
@@ -57,8 +70,22 @@ final class TenantController
         return Inertia::render('tenancy/Tenant', [
             'tenant' => $data['tenant'], 'membership' => $data['membership'], 'canAdminister' => $admin,
             'memberships' => $members, 'quota' => $quota, 'notice' => $request->session()->get('tenant_notice'),
+            'nextCursor' => $directory['next_cursor'] ?? null, 'continued' => $admin && $request->has('cursor'),
             'notificationCursor' => $admin ? $cursor : null, 'notificationsAvailable' => $admin && $available,
         ]);
+    }
+
+    private function cursor(Request $request): ?string
+    {
+        if (! $request->has('cursor')) {
+            return null;
+        }
+        $value = $request->query('cursor');
+        if (! is_string($value) || $value === '' || strlen($value) > 2048) {
+            throw new IdentityFailure(422);
+        }
+
+        return $value;
     }
 
     public function create(Request $request, TenantGateway $tenants): RedirectResponse

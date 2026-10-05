@@ -123,7 +123,7 @@ def main() -> int:
         report['postgres'] = sql('SHOW server_version;').strip()
         report['node'] = run(['node', '--version']).strip()
         check('exact-php-runtime', report['php'] == '8.5.11')
-        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
+        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
         check('postgres-feature-suite', True)
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:
@@ -133,7 +133,7 @@ def main() -> int:
             report['notification_broker_image'] = broker.image
             check('console-packaged-governance-contract', (root / 'contracts/schemas/events/governance-change-v1.json').read_bytes() == (root / 'apps/console/resources/contracts/governance-change-v1.json').read_bytes())
             run(['php', 'vendor/bin/pest', 'tests/Feature/NotificationInboxTest.php', 'tests/Feature/NotificationContractTest.php',
-                 'tests/Feature/NotificationAccessTest.php', 'tests/Feature/NotificationBrokerTest.php', '--fail-on-warning', '--fail-on-risky', '--colors=never'],
+                 'tests/Feature/NotificationAccessTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/NotificationBrokerTest.php', '--fail-on-warning', '--fail-on-risky', '--colors=never'],
                 cwd=root / 'apps/console', env=os.environ | broker.environment, label='console-notification-features')
             check('console-postgres-and-tls-notification-features', True)
             provider = SyntheticOidc(private_path)

@@ -23,7 +23,7 @@ afterEach(function (): void {
 it('renders only current owner memberships and clears old tenant history', function (): void {
     Http::fake([
         'governance.example.test/identity/session' => Http::response($this->actor),
-        'governance.example.test/v1/tenants' => Http::response(['installation_administrator' => false, 'tenants' => [['id' => $this->tenant, 'name' => 'Tenant A', 'state' => 'active', 'revision' => 1, 'role' => 'reader']]]),
+        'governance.example.test/v1/tenant-directory' => Http::response(['installation_administrator' => false, 'tenants' => [['id' => $this->tenant, 'name' => 'Tenant A', 'state' => 'active', 'revision' => 1, 'role' => 'reader']]]),
     ]);
     $response = $this->get('/account')->assertOk()->assertInertia(fn (Assert $page): Assert => $page->component('identity/Account')->has('tenants', 1)->where('tenants.0.id', $this->tenant)->where('canCreate', false)->missing('session_token')->missing('selected_tenant'));
     $headers = ['X-Inertia' => 'true'];

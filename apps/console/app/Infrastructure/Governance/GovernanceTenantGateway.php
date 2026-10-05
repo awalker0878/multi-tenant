@@ -11,6 +11,19 @@ final class GovernanceTenantGateway implements TenantGateway
 {
     public function __construct(private readonly GovernanceClient $http) {}
 
+    public function directory(#[\SensitiveParameter] string $token, ?string $tenant = null, ?string $cursor = null): array
+    {
+        $path = $tenant === null ? '/v1/tenant-directory' : $this->path($tenant).'/membership-directory';
+        if ($cursor !== null) {
+            if ($cursor === '' || strlen($cursor) > 2048) {
+                throw new IdentityFailure(422);
+            }
+            $path .= '?'.http_build_query(['cursor' => $cursor], '', '&', PHP_QUERY_RFC3986);
+        }
+
+        return $this->http->send('GET', $path, $token);
+    }
+
     public function read(#[\SensitiveParameter] string $token, ?string $tenant = null, string $view = ''): array
     {
         if (! in_array($view, ['', 'memberships', 'grants', 'quota', 'audit'], true)) {

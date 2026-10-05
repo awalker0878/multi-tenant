@@ -44,6 +44,8 @@ function initializeIdentityFixture(object $test): void
             $sql = str_replace('governance_outbox_pending ON app.governance_outbox', 'app.governance_outbox_pending ON governance_outbox', $sql);
             $sql = str_replace('identity_outbox_pending ON app.identity_outbox', 'app.identity_outbox_pending ON identity_outbox', $sql);
             $sql = str_replace('approvals_expiry ON app.approvals', 'app.approvals_expiry ON approvals', $sql);
+            $sql = str_replace('membership_directory_position ON app.tenant_memberships', 'app.membership_directory_position ON tenant_memberships', $sql);
+            $sql = str_replace('actor_directory_position ON app.tenant_memberships', 'app.actor_directory_position ON tenant_memberships', $sql);
         }
         DB::unprepared($sql);
     }

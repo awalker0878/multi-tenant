@@ -852,6 +852,8 @@ work_packages:
   - EV-P02-006
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-directory.md
+  - docs/implementation/p02-browser-synchronization.md
   - docs/implementation/p02-console-notifications.md
   - docs/implementation/p02-governance-events.md
   - docs/implementation/p02-tenancy-and-approvals.md
@@ -883,6 +885,8 @@ work_packages:
   - EV-P02-006
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-directory.md
+  - docs/implementation/p02-browser-synchronization.md
   - docs/implementation/p02-console-notifications.md
   - docs/implementation/p02-identity-events.md
   - docs/implementation/p02-service-delegation.md
@@ -940,6 +944,8 @@ work_packages:
   - EV-P02-006
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-directory.md
+  - docs/implementation/p02-browser-synchronization.md
   - docs/implementation/p02-console-notifications.md
   - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/p02-local-bootstrap.md

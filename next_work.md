@@ -77,28 +77,33 @@ no platform check or package version is relaxed. The corrected Compose campaign
 unique source bindings. Its complete archive and the original failure are retained.
 This is separate from package replay, image-security admission and Kubernetes.
 
-**Immediate verification:** the remaining Firefox/WebKit jobs in consumer run
-`37371273531` were cancelled. WebKit at `b13996d` (run `37371858388`) exposed a
-quota-save test race; its original failure is retained. The concurrent
-[`9716803` synchronization correction](docs/implementation/p02-browser-synchronization.md)
-waits for the committed owner response before navigating. Retrieve all browser
-results at that corrected source and affected foundation package/image/Kubernetes
-campaigns. Retain exact source
-and original-byte evidence for every result. Package/image/Compose/Kubernetes
-workflows now use GitHub's bounded FIFO queue (`queue: max`, up to 100 pending)
-so a later push does not replace an earlier pending check. Verify the fresh full
-selection triggered by this workflow correction. The cancelled pre-job image run
-`37371858446` could not be retried through the failed-jobs endpoint; its corrected
-product source is included in the new full campaign. Documentation-only passes
-cannot replace changed-source builds. The old `7b24476` Chromium rerun
-is queued; GitHub rejects its WebKit retry while that workflow attempt is active.
-Retry WebKit after it finishes. The
-[notification workflow snapshot](verification/p02/console-notification-hosted-runs.json)
-records those boundaries; the later Compose pass has its own retained receipt.
+**Current implementation — paged directories and browser correction.**
+The [directory increment](docs/implementation/p02-directory.md) removes the Console
+200-entry truncation using current-authority, session-bound 50-row pages. Existing
+published APIs remain unchanged. The [quota-save campaign correction](docs/implementation/p02-browser-synchronization.md)
+waits for the returned server values before navigation; the original WebKit failure
+is retained. Local directory checks pass; hosted PostgreSQL and browser results
+must be retained against their actual source before claiming qualification.
+
+**Immediate verification:** inspect the corrected campaign at `9716803` (run
+`37373325859`) and the subsequent directory-source campaign, retaining each
+browser's original-byte result. Retrieve remaining consumer runs and affected
+foundation package/image/Kubernetes results. Retry cancelled required checks at
+their actual source; documentation-only passes cannot replace code-source tests.
+The remaining Firefox/WebKit jobs in consumer run `37371273531` were cancelled.
+Package/image/Compose/Kubernetes workflows now retain up to 100 pending runs with
+GitHub's bounded FIFO `queue: max`; inspect the full selection triggered by
+`6f0cc5a` rather than inferring a pass. The cancelled pre-job image run `37371858446`
+could not be retried through the failed-jobs endpoint; its corrected product source
+is included in that new campaign. The older `7b24476` Chromium rerun remains queued,
+and GitHub refuses the WebKit retry while that workflow attempt is active.
+The [notification workflow snapshot](verification/p02/console-notification-hosted-runs.json)
+retains earlier observations and the Compose pass has its own receipt.
 
 **Next concrete work:** finish notification restart/restore and browser-floor
-qualification, explicit owner-scoped installation consumers, and Console pagination
-for the currently bounded lists. Bind Catalogue's guard to owner resources
+qualification, explicit owner-scoped installation consumers, and the remaining
+manual accessibility campaign. Tenant and membership Console pagination is now
+implemented; grant/audit APIs retain their published v1 bounds. Bind Catalogue's guard to owner resources
 and qualify the Console-to-Catalogue-to-Governance wire path as P03 resources are
 implemented under their entry conditions. Resolve the approved support-access/break-glass contract
 and independent restore/revocation custody before those authority changes. Extend

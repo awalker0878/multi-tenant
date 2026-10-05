@@ -68,8 +68,9 @@ the original build failure is preserved. Current campaign states are in the
    cases to actual history-cache restores and manual assistive technology.
    Historical Firefox and the new consumer's Chromium journey have retained passing
    evidence. Retain each remaining engine/corrected-source result and qualify the
-   actual managed-browser floor. Current lists have explicit 200-row bounds (audit 100);
-   pagination is not yet implemented.
+   actual managed-browser floor. The [directory increment](../../implementation/p02-directory.md) now pages Console
+   tenants and memberships with live scope/session checks; its hosted qualification
+   must be recorded separately. Published grant/audit v1 lists remain bounded.
 5. Independent IAM/security, Governance, quality/product and SRE reviewers: review
    every G02 criterion with its measured boundary and record the receiving decision.
 

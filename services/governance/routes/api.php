@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DelegationController;
 use App\Http\Controllers\DependencyHealthController;
+use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\OidcController;
@@ -44,6 +45,10 @@ Route::prefix('v1/tenants')->middleware(AuthenticateConsole::class)->group(funct
     }
     Route::post('/{tenant}/authorization-decisions', [TenantController::class, 'decision'])->whereUuid('tenant');
 });
+
+Route::get('/v1/tenant-directory', DirectoryController::class)->middleware(AuthenticateConsole::class);
+Route::get('/v1/tenants/{tenant}/membership-directory', DirectoryController::class)
+    ->whereUuid('tenant')->middleware(AuthenticateConsole::class);
 
 Route::prefix('v1/tenants/{tenant}/approvals')->whereUuid('tenant')->middleware(AuthenticateConsole::class)->group(function (): void {
     Route::post('/', [ApprovalController::class, 'request']);

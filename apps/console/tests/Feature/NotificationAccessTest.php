@@ -86,7 +86,7 @@ it('preserves owner-backed administration while marking unavailable notification
             'tenant' => ['id' => $this->tenant, 'name' => 'Tenant A', 'state' => 'active', 'revision' => 1],
             'membership' => ['role' => 'tenant_admin', 'site_id' => null, 'environment' => null],
         ]),
-        'governance.example.test/v1/tenants/'.$this->tenant.'/memberships' => Http::response(['memberships' => []]),
+        'governance.example.test/v1/tenants/'.$this->tenant.'/membership-directory' => Http::response(['memberships' => []]),
         'governance.example.test/v1/tenants/'.$this->tenant.'/quota' => Http::response(['revision' => 0, 'entitlement' => null]),
     ]);
     $this->get('/tenants/'.$this->tenant)->assertOk()->assertInertia(fn (Assert $page): Assert => $page->component('tenancy/Tenant')

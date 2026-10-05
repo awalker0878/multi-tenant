@@ -9,6 +9,7 @@ const props = defineProps<{
   tenant: { id: string; name: string; state: string; revision: number }; membership: { role: string; site_id: string | null; environment: string | null };
   canAdminister: boolean; memberships: Member[]; quota: { revision: number; entitlement: Entitlement | null } | null; notice: string | null;
   notificationCursor: string | null; notificationsAvailable: boolean;
+  nextCursor: string | null; continued: boolean;
 }>();
 const member = useForm({ revision: 0, subject: '', role: 'reader', state: 'active', site_id: null as string | null, environment: null as string | null, expires_at: null as string | null, command_key: crypto.randomUUID() });
 const quota = useForm({ revision: props.quota?.revision ?? 0, entitlement: props.quota?.entitlement ?? { vcpu: 0, memory_mib: 0, storage_gib: 0, workloads: 0 }, command_key: crypto.randomUUID() });
@@ -99,6 +100,12 @@ const edit = (value: Member) => {
           <button type="button" @click="edit(item)">Edit membership</button>
         </li>
       </ul>
+      <p v-if="continued && !memberships.length" class="mt-3">No further memberships on this page.</p>
+      <nav v-if="continued || nextCursor" class="mt-5 flex flex-wrap gap-5" aria-label="Membership pages">
+        <p v-if="dirty" class="w-full text-sm">Changing pages will discard your unsaved edits.</p>
+        <Link v-if="continued" :href="'/tenants/' + tenant.id" class="text-teal-800 underline">{{ dirty ? 'Discard edits and open first membership page' : 'First membership page' }}</Link>
+        <Link v-if="nextCursor" :href="'/tenants/' + tenant.id + '?cursor=' + encodeURIComponent(nextCursor)" class="text-teal-800 underline">{{ dirty ? 'Discard edits and open next membership page' : 'Next membership page' }}</Link>
+      </nav>
       <form @submit.prevent="member.post('/tenants/' + tenant.id + '/memberships', { preserveState: false })">
         <label for="member-subject">Member subject</label><input id="member-subject" v-model="member.subject" required maxlength="255" />
         <label for="member-role">Role</label>
