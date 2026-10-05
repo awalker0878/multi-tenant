@@ -381,6 +381,17 @@ class KubernetesCampaign(Campaign):
             self.health(service, 200)
             actual = digest(self.sql(service, "SELECT tenant_id,record_id,payload FROM app.foundation_records ORDER BY tenant_id,record_id;"))
             self.check("restart-preserves-fixture-data", actual == baseline[service], {"service": service, "sha256": actual})
+        # Fail a new revision of only Console, retain the old ready replica, then
+        # restore the prior Deployment template using Kubernetes revision history.
+        broken = {"spec":{"template":{"spec":{"containers":[{"name":"console","command":["php","-r","exit(42);"],"args":[]}]}}}}
+        self.command("inject-failed-console-rollout", self.k("patch","deployment/console","--type=strategic","-p",json.dumps(broken)))
+        self.command("observe-failed-console-rollout", self.k("rollout","status","deployment/console","--timeout=35s"), expected=1, timeout=45)
+        failed_pods = json.loads(self.command("failed-console-pod-state", self.k("get","pods","-l","p01.role=app,p01.service=console","-o","json")))
+        self.check("failed-rollout-observed-exit-42", any(status.get("lastState",{}).get("terminated",{}).get("exitCode") == 42 or status.get("state",{}).get("terminated",{}).get("exitCode") == 42 for pod in failed_pods["items"] for status in pod.get("status",{}).get("containerStatuses",[])))
+        self.command("recover-console-rollout", self.k("rollout","undo","deployment/console"))
+        self.command("recovered-console-rollout", self.k("rollout","status","deployment/console","--timeout=120s"), timeout=140)
+        self.health("console", 200)
+        self.check("failed-rollout-preserves-database-records", digest(self.sql("console", "SELECT tenant_id,record_id,payload FROM app.foundation_records ORDER BY tenant_id,record_id;")) == baseline["console"])
         self.command("installed-pod-inventory", self.k("get", "pods", "-o", "json"))
         self.command("installed-network-policies", self.k("get", "networkpolicies", "-o", "json"))
         self.report["result"] = "PASS"

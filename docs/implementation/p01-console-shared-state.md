@@ -32,3 +32,9 @@ the production database defaults, then explicitly uses array storage solely for
 markup/assets. The first image check at `715c242` correctly failed when this test
 adapter still assumed file sessions. Package/browser checks passed; this probe
 correction does not change the deployed database requirement.
+
+The extended [foundation operations runbook](../operations/runbooks/foundation-operations.md)
+also measures an invalid Console configuration and restoration of its original key,
+plus Kubernetes failed-template rollback. HTTPS receipt/acknowledgement is exercised
+against a synthetic receiver when the real database outage is observed. External
+on-call routing and human acknowledgement remain separate operated inputs.

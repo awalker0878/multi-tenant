@@ -20,6 +20,7 @@ import urllib.parse
 import urllib.request
 
 from local_runtime import prepare
+from alert_delivery import deliver, fixture_receiver, observed_alert
 
 SERVICES = ('console', 'governance', 'catalogue', 'assurance', 'planning', 'inventory', 'lifecycle')
 
@@ -329,9 +330,15 @@ class Campaign:
         else:
             self.check('untrusted-ingress-ca-denied',False)
         self.command('stop-database',self.dc('stop','postgres'))
-        for service in SERVICES:
-            self.health(service,503,self.tokens[service],'dependency-loss-unavailable')
-            self.check('dependency-loss-keeps-process-live',self.request(service,'/health/live')[0] == 200,service)
+        with fixture_receiver(self.runtime/'secrets') as (endpoint, credential, receipts):
+            for service in SERVICES:
+                self.health(service,503,self.tokens[service],'dependency-loss-unavailable')
+                self.check('dependency-loss-keeps-process-live',self.request(service,'/health/live')[0] == 200,service)
+                alert = observed_alert(service, self.revision)
+                ack = deliver(endpoint, credential, self.runtime/'secrets/ca.crt', alert)
+                self.check('alert-received-and-acknowledged', receipts[-1] == alert and ack['acknowledged'], {'service':service,'event_id':alert['event_id'],'receiver':'synthetic HTTPS fixture'})
+            self.report['alert_receipts'] = receipts
+
         self.command('restart-database',self.dc('up','-d','--wait','--wait-timeout','120','postgres'),timeout=180)
         self.wait_health()
         for service in SERVICES:
@@ -341,6 +348,19 @@ class Campaign:
         self.command('restart-console-process',self.dc('restart','console'))
         self.wait_health()
         self.check_console_shared_state('after-console-restart')
+        keyfile = self.runtime/'secrets/console-app-key'
+        saved_key = keyfile.read_bytes()
+        try:
+            keyfile.chmod(0o600); keyfile.write_text('invalid-synthetic-key'); keyfile.chmod(0o444)
+            self.command('deploy-invalid-console-configuration',self.dc('restart','console'))
+            self.wait_health()
+            self.check('failed-console-configuration-visible',self.request('console','/')[0] == 500)
+        finally:
+            keyfile.chmod(0o600); keyfile.write_bytes(saved_key); keyfile.chmod(0o444)
+            self.command('restore-console-configuration',self.dc('restart','console'))
+        self.wait_health()
+        self.check_console_http()
+        self.check_console_shared_state('after-configuration-rollback')
         self.command('installed-inventory',self.dc('ps','--format','json'))
         self.report['result'] = 'PASS'
         self.report['limits'] = ['Synthetic data and diagnostic credentials only; no OIDC/delegated product authority.', 'Product readiness remains unavailable; workers consume no tasks and native endpoints are absent.', 'Database restart is measured; full application/configuration restore, broker/Temporal/evidence storage, Kubernetes and operating acceptance remain unmeasured.']
