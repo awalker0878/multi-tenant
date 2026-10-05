@@ -651,6 +651,7 @@ work_packages:
   - docs/implementation/p01-laravel-foundations.md
   - docs/implementation/p01-laravel-images.md
   - docs/implementation/p01-http-contracts.md
+  - docs/implementation/p01-artifact-admission.md
 - id: P01.05
   phase_id: P01
   title: Runtime dependencies
@@ -2913,7 +2914,7 @@ gates:
 - id: G00
   phase_id: P00
   decision: PASSED
-  reviewer: Requesting user — accountable G00 reviewer
+  reviewer: "Requesting user \u2014 accountable G00 reviewer"
   reviewed_at: '2026-10-04T21:23:57Z'
   evidence_ids:
   - EV-P00-001
@@ -3362,8 +3363,8 @@ evidence:
   artifact_revisions:
     retained_artifact_commit: 974f218a459c47a62c3615f9d8f985d3868bb7dc
   environment: Accountable reviewer decision in the current user conversation, recorded in the repository
-  scope: G00.01–G00.06 baseline approval and advancement to P01/G01, with explicit carry-forward of incomplete
-    application feasibility and actual integration/operating/native inputs
+  scope: "G00.01\u2013G00.06 baseline approval and advancement to P01/G01, with explicit carry-forward\
+    \ of incomplete application feasibility and actual integration/operating/native inputs"
   campaign_ids: []
   criterion_ids:
   - G00.01
@@ -3373,8 +3374,8 @@ evidence:
   - G00.05
   - G00.06
   observed_at: '2026-10-04T21:23:57Z'
-  observer: Codex — recorder of the user statement
-  reviewer: Requesting user — accountable G00 reviewer
+  observer: "Codex \u2014 recorder of the user statement"
+  reviewer: "Requesting user \u2014 accountable G00 reviewer"
   limitations: E0 baseline and advancement decision only. Does not make unperformed tests pass, complete
     all P00 task axes, supply missing installed facts or staffing, accept receiving-service obligations,
     qualify native outcomes or authorize unspecified native effects. Remaining full application/configuration
@@ -3399,8 +3400,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:32:08.469699+00:00'
-  observer: Codex — implementation and execution
-  reviewer: Codex — engineering verification of retained source, logs and wheel
+  observer: "Codex \u2014 implementation and execution"
+  reviewer: "Codex \u2014 engineering verification of retained source, logs and wheel"
   limitations: One bootstrap package only; process liveness is not dependency readiness, which exits unavailable.
     No product domain, persistent HTTP server, authorization, data/messaging integration, container image,
     other principal deployable, worker, native outcome or operating acceptance. Local cached replay does
@@ -3428,8 +3429,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:10.838206+00:00'
-  observer: Codex — implementation and local execution
-  reviewer: Codex — engineering verification of retained source, logs and wheel
+  observer: "Codex \u2014 implementation and local execution"
+  reviewer: "Codex \u2014 engineering verification of retained source, logs and wheel"
   limitations: Service package diagnostic only; native operations disabled. One-shot process liveness
     does not establish a persistent service or dependency readiness, which remains unavailable. No product
     domain, authority, persistence, messaging, provider or native outcome. No image or hosted-CI outcome
@@ -3458,8 +3459,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:23.801860+00:00'
-  observer: Codex — implementation and local execution
-  reviewer: Codex — engineering verification of retained source, logs and wheel
+  observer: "Codex \u2014 implementation and local execution"
+  reviewer: "Codex \u2014 engineering verification of retained source, logs and wheel"
   limitations: Service package diagnostic only; native operations disabled. One-shot process liveness
     does not establish a persistent service or dependency readiness, which remains unavailable. No product
     domain, authority, persistence, messaging, provider or native outcome. No image or hosted-CI outcome
@@ -3488,8 +3489,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:25.501848+00:00'
-  observer: Codex — implementation and local execution
-  reviewer: Codex — engineering verification of retained source, logs and wheel
+  observer: "Codex \u2014 implementation and local execution"
+  reviewer: "Codex \u2014 engineering verification of retained source, logs and wheel"
   limitations: Owned worker package diagnostic only; task consumption and native operations disabled.
     One-shot process liveness does not establish a persistent service or dependency readiness, which remains
     unavailable. No product domain, authority, persistence, messaging, provider or native outcome. No
@@ -3518,8 +3519,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:25.061136+00:00'
-  observer: Codex — implementation and local execution
-  reviewer: Codex — engineering verification of retained source, logs and wheel
+  observer: "Codex \u2014 implementation and local execution"
+  reviewer: "Codex \u2014 engineering verification of retained source, logs and wheel"
   limitations: Owned worker package diagnostic only; task consumption and native operations disabled.
     One-shot process liveness does not establish a persistent service or dependency readiness, which remains
     unavailable. No product domain, authority, persistence, messaging, provider or native outcome. No
@@ -3561,8 +3562,9 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:58:19.358892+00:00'
-  observer: Codex — authored workflow executed on GitHub-hosted runners
-  reviewer: Codex — engineering verification of exact source, archives, logs and observed container controls
+  observer: "Codex \u2014 authored workflow executed on GitHub-hosted runners"
+  reviewer: "Codex \u2014 engineering verification of exact source, archives, logs and observed container\
+    \ controls"
   limitations: Five Python bootstrap images only; no Laravel image represented. One-shot liveness is not
     persistent service readiness or task consumption. No database/broker/Temporal integration, tenant
     isolation, native platform or operating acceptance. Runner-local configuration digests are not published
@@ -3607,8 +3609,8 @@ evidence:
   - G01.01
   - G01.04
   observed_at: '2026-10-04T22:16:47.462672+00:00'
-  observer: GitHub Actions — owned package execution
-  reviewer: Codex — retained archive, source binding and artifact/log examination
+  observer: "GitHub Actions \u2014 owned package execution"
+  reviewer: "Codex \u2014 retained archive, source binding and artifact/log examination"
   limitations: Development package/process evidence only; public fixture page is not an authenticated
     product journey. Readiness remains unavailable. No integrated service topology, database roles, real
     messaging, deployment independence, operated mirror, signing, native qualification or operating acceptance.
@@ -3643,8 +3645,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T22:18:56.807458+00:00'
-  observer: GitHub Actions — isolated image builds and diagnostics
-  reviewer: Codex — archive, source binding and runtime/log examination
+  observer: "GitHub Actions \u2014 isolated image builds and diagnostics"
+  reviewer: "Codex \u2014 archive, source binding and runtime/log examination"
   limitations: Restricted image/process and in-process HTTP kernel measurements only. Image configuration
     IDs are not published registry manifest digests. No listening FastCGI/proxy deployment, browser hydration
     inside these images, independent service deployment, integrated dependency health, network/identity
@@ -3684,8 +3686,9 @@ evidence:
   criterion_ids:
   - G01.04
   observed_at: '2026-10-04T22:59:33Z'
-  observer: Codex — local controls and read-only repository observations; GitHub Actions — hosted checks
-  reviewer: Codex — engineering examination; no independent admission-policy acceptance claimed
+  observer: "Codex \u2014 local controls and read-only repository observations; GitHub Actions \u2014\
+    \ hosted checks"
+  reviewer: "Codex \u2014 engineering examination; no independent admission-policy acceptance claimed"
   limitations: These controls provide execution evidence and feedback, not enforced repository admission.
     No verified CODEOWNERS/reviewer-account mapping, distinct-role review, trusted-base enforcement, complete
     base/head consumer graph, branch protection mutation, secret/dependency/image-vulnerability assessment,
@@ -3722,8 +3725,8 @@ evidence:
   - G01.02
   - G01.05
   observed_at: '2026-10-04T23:45:17Z'
-  observer: GitHub Actions — private package and image campaigns
-  reviewer: Codex — archive digests, immutable source bindings, artifact and command-log examination
+  observer: "GitHub Actions \u2014 private package and image campaigns"
+  reviewer: "Codex \u2014 archive digests, immutable source bindings, artifact and command-log examination"
   limitations: Development package and image/process evidence. Does not establish a complete integrated
     installation, product readiness, tenant/OIDC authority, message processing, native behavior, production
     mirror/trust or signed promotion. Image IDs identify local configurations, not published registry
@@ -3764,8 +3767,8 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-04T23:58:01Z'
-  observer: GitHub Actions — isolated Compose installation and denial campaign
-  reviewer: Codex — immutable source/archive/configuration and command-log examination
+  observer: "GitHub Actions \u2014 isolated Compose installation and denial campaign"
+  reviewer: "Codex \u2014 immutable source/archive/configuration and command-log examination"
   limitations: Synthetic diagnostic credentials and two tenant-keyed database records only. Product readiness
     stays unavailable; no OIDC/delegated tenant authority, row-level isolation, full Permit Desk application/configuration
     fixture, broker/Temporal/evidence store, task consumption or native effects. Database restart is not
@@ -3805,16 +3808,16 @@ evidence:
   environment: GitHub-hosted Ubuntu 24.04 linux/amd64; isolated two-node kind v0.33.0/Kubernetes v1.36.4
     with locked Cilium 1.20.2 chart/image inputs; private synthetic namespace, credentials, TLS PostgreSQL
     PVC and seven exact-source application/proxy pairs
-  scope: Kubernetes passed 157 checks and 315 installation command outcomes plus seven embedded image
-    campaigns; retrieval verifies 762 command-log hashes and 200 unique source bindings. Actual Cilium
-    policy permits eight tested connections and denies fifteen tested connections. Seven migration Job
-    outputs identify owned database/migrator/schema version 1. Authenticated health, TLS and runtime database
-    authority checks pass. Governance login revocation/restoration is measured. During database outage
-    all seven direct probes fail within 2.129–2.286 seconds against a five-second bound; after PostgreSQL
-    recreation the seven services recover and fourteen raw before/after SQL outputs confirm identical
-    fixture data. Cleanup completes. At the same corrected source all nine package/image campaigns and
-    all 126 Compose checks pass, including real stalled-TLS regressions for four PHP services. Earlier
-    contract-assertion and PDO timeout failures remain retained separately.
+  scope: "Kubernetes passed 157 checks and 315 installation command outcomes plus seven embedded image\
+    \ campaigns; retrieval verifies 762 command-log hashes and 200 unique source bindings. Actual Cilium\
+    \ policy permits eight tested connections and denies fifteen tested connections. Seven migration Job\
+    \ outputs identify owned database/migrator/schema version 1. Authenticated health, TLS and runtime\
+    \ database authority checks pass. Governance login revocation/restoration is measured. During database\
+    \ outage all seven direct probes fail within 2.129\u20132.286 seconds against a five-second bound;\
+    \ after PostgreSQL recreation the seven services recover and fourteen raw before/after SQL outputs\
+    \ confirm identical fixture data. Cleanup completes. At the same corrected source all nine package/image\
+    \ campaigns and all 126 Compose checks pass, including real stalled-TLS regressions for four PHP services.\
+    \ Earlier contract-assertion and PDO timeout failures remain retained separately."
   campaign_ids: []
   criterion_ids:
   - G01.01
@@ -3822,9 +3825,9 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-05T00:29:48Z'
-  observer: GitHub Actions — isolated Kubernetes and corrective package/image/Compose campaigns
-  reviewer: Codex — archive, immutable source, log, migration identity, bounded-probe and actual before/after
-    fixture-output examination
+  observer: "GitHub Actions \u2014 isolated Kubernetes and corrective package/image/Compose campaigns"
+  reviewer: "Codex \u2014 archive, immutable source, log, migration identity, bounded-probe and actual\
+    \ before/after fixture-output examination"
   limitations: Synthetic foundation scope only. Product readiness remains unavailable; workers consume
     no tasks and native endpoints/effects are absent. Measured pod-network paths do not establish tenant
     authorization, full network-policy coverage or operated cluster security. Kubernetes outage observations
@@ -3870,9 +3873,9 @@ evidence:
   - G01.02
   - G01.06
   observed_at: '2026-10-05T00:53:40.505766+00:00'
-  observer: GitHub Actions — P01 Permit Desk application recovery campaign
-  reviewer: Codex — immutable source, capture bytes, raw command/denial logs, state comparison and cleanup
-    evidence examination
+  observer: "GitHub Actions \u2014 P01 Permit Desk application recovery campaign"
+  reviewer: "Codex \u2014 immutable source, capture bytes, raw command/denial logs, state comparison and\
+    \ cleanup evidence examination"
   limitations: Synthetic workload fixture, not a new control-plane service or product tenancy/identity
     qualification. Compose and same PostgreSQL patch only. Capture requires a readable quiesced source
     or target. No production concurrent crash-consistency, guest/native deployment, uncaptured lost-target
@@ -3927,9 +3930,9 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-05T02:18:30.785311+00:00'
-  observer: GitHub Actions — P01 isolated stateful dependency campaign
-  reviewer: Codex — immutable source, raw probe/command logs, exact database denial diagnostics, retained
-    bytes, workflow identity and cleanup examination
+  observer: "GitHub Actions \u2014 P01 isolated stateful dependency campaign"
+  reviewer: "Codex \u2014 immutable source, raw probe/command logs, exact database denial diagnostics,\
+    \ retained bytes, workflow identity and cleanup examination"
   limitations: Disposable single-node Compose support tooling with synthetic identities and one selected
     evidence object version. Product contracts/outbox/inbox and shared Console sessions/cache remain unimplemented.
     No whole-store/all-version recovery, production vendor/IAM or regulatory retention qualification,
@@ -3965,9 +3968,9 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-05T03:37:16Z'
-  observer: GitHub Actions — P01 transactional messaging
-  reviewer: Codex — retained archive, immutable source, command-log and result examination; accountable
-    G01 review remains pending
+  observer: "GitHub Actions \u2014 P01 transactional messaging"
+  reviewer: "Codex \u2014 retained archive, immutable source, command-log and result examination; accountable\
+    \ G01 review remains pending"
   limitations: Internal reference fact only; no public command API, delegated business authority, native
     effect, other service event adoption, HA or operational/G01 acceptance. No pruning or accepted production
     retry/retention window. Exactly one logical effect is scoped to this retained local projection, not
@@ -4002,9 +4005,9 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-05T03:28:47Z'
-  observer: GitHub Actions — P01 isolated Compose integration
-  reviewer: Codex — retained archive, immutable source, command-log and result examination; accountable
-    G01 review remains pending
+  observer: "GitHub Actions \u2014 P01 isolated Compose integration"
+  reviewer: "Codex \u2014 retained archive, immutable source, command-log and result examination; accountable\
+    \ G01 review remains pending"
   limitations: Synthetic anonymous sessions and receiver; no login/delegation qualification, key rotation,
     scheduler workload, paging-provider or human acknowledgement, accepted outage objective, signed promotion
     or operational/G01 acceptance. The older Planning source in this installation report is not evidence
@@ -4036,9 +4039,9 @@ evidence:
   - G01.03
   - G01.04
   observed_at: '2026-10-05T03:45:53Z'
-  observer: GitHub Actions — P01 foundation contracts
-  reviewer: Codex — retained archive, immutable source, command-log and result examination; accountable
-    G01 review remains pending
+  observer: "GitHub Actions \u2014 P01 foundation contracts"
+  reviewer: "Codex \u2014 retained archive, immutable source, command-log and result examination; accountable\
+    \ G01 review remains pending"
   limitations: Diagnostic endpoints only. Generated adapters are temporary conformance outputs, not full
     validators or product authorization. Exact-byte version freezing is conservative compatibility feedback,
     not general schema-language inclusion, trusted-base policy protection, required-check enforcement,
@@ -4074,9 +4077,9 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-05T03:54:58Z'
-  observer: GitHub Actions — P01 isolated Kubernetes integration
-  reviewer: Codex — immutable source, raw command, state and failed-rollout observations; accountable
-    G01 review remains pending
+  observer: "GitHub Actions \u2014 P01 isolated Kubernetes integration"
+  reviewer: "Codex \u2014 immutable source, raw command, state and failed-rollout observations; accountable\
+    \ G01 review remains pending"
   limitations: Disposable diagnostic foundation, anonymous synthetic sessions and same existing encryption
     key. No business login/delegation, key rotation, production multi-site cluster, HA, Kubernetes whole-store
     restore, operated alert route, signed promotion, native effect, accepted RTO/RPO or operational/G01
@@ -4111,9 +4114,9 @@ blockers:
   unblock_condition: Supply the concrete runtime, registry/signer, trust, operating or records input before
     the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward
     checkpoints; do not request baseline approval again.
-  next_action: Implement P01 from the approved DC01–DC10 baseline. Resolve required integration inputs
-    during P01.02/P01.04/P01.05/P01.06, retain application targets before P08 and records/service acceptance
-    at P10/P11, and record actual staffing dates only when supplied.
+  next_action: "Implement P01 from the approved DC01\u2013DC10 baseline. Resolve required integration\
+    \ inputs during P01.02/P01.04/P01.05/P01.06, retain application targets before P08 and records/service\
+    \ acceptance at P10/P11, and record actual staffing dates only when supplied."
   state: OPEN
   resolution_evidence_ids: []
 - id: BL-P00-002

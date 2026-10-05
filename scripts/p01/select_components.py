@@ -9,8 +9,10 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 
+from admission.policy import affected
 
-GLOBAL_PREFIXES = ("scripts/p01/", "deploy/build/", "architecture/", "contracts/", ".github/workflows/")
+
+GLOBAL_PREFIXES = ("scripts/p01/", "deploy/build/", "release/", "architecture/", "contracts/", ".github/workflows/")
 GLOBAL_FILES = {"scripts/validate_architecture.py", "tests/documentation/test_p01_selection.py"}
 OWNER_WORKERS = {"inventory": "inventory-workers", "lifecycle": "lifecycle-workers"}
 
@@ -70,7 +72,31 @@ def main() -> int:
     event = json.loads(args.event_path.read_text()) if args.event_path else {}
     paths, reason = changed_paths(event, args.event_name, args.workspace)
     selected, explanation = (sorted(components), reason) if paths is None else select(paths, components)
-    result = {"components": selected, "reason": explanation, "changed_paths": paths}
+    impact = None
+    if paths is not None:
+        base = event.get("before") if args.event_name == "push" else event["pull_request"]["base"]["sha"]
+        head = event.get("after") if args.event_name == "push" else event["pull_request"]["head"]["sha"]
+        if args.event_name == "pull_request":
+            base = subprocess.run(["git", "merge-base", base, head], cwd=args.workspace,
+                                  capture_output=True, text=True, check=True, timeout=30).stdout.strip()
+        def read_base(path, default=None):
+            observed = subprocess.run(["git", "show", base + ":" + path], cwd=args.workspace,
+                                      capture_output=True, text=True, timeout=30)
+            if observed.returncode:
+                if default is not None:
+                    return default
+                raise ValueError("Base ownership inventory is unavailable")
+            return json.loads(observed.stdout)
+        base_components = read_base("scripts/p01/candidates.json")["components"]
+        base_graph = read_base("architecture/contract-consumers.json", {})
+        graph_path = args.workspace / "architecture/contract-consumers.json"
+        head_graph = json.loads(graph_path.read_text()) if graph_path.exists() else {}
+        impact = affected(paths, base_components, components, base_graph, head_graph)
+        if impact["removed_components"]:
+            raise ValueError("Removing a required deployable requires an explicit foundation inventory decision")
+        selected = sorted(set(selected) | set(impact["components"]))
+        explanation += "; union of base/head ownership and transitive contract consumers"
+    result = {"components": selected, "reason": explanation, "changed_paths": paths, "impact": impact}
     for language in ("python", "php"):
         result[language] = [name for name in selected if components[name]["language"] == language]
     image_manifest = args.workspace / "deploy/build/components.json"

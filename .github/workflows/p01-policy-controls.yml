@@ -1,0 +1,32 @@
+name: P01 policy controls
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  controls:
+    name: Foundation policy controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Download exact reviewed signing/scanner candidates
+        run: python3 scripts/p01/artifacts/tools.py --output "$RUNNER_TEMP/p01-tools"
+      - name: Measure admission and real cryptographic negative controls
+        run: >-
+          python3 scripts/p01/run_policy_controls.py
+          --output "$RUNNER_TEMP/p01-policy-evidence"
+          --cosign "$RUNNER_TEMP/p01-tools/cosign"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p01-policy-controls-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-policy-evidence/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,31 @@
+name: P01 trusted-base admission
+on:
+  pull_request_target:
+    branches: [greenfield/enterprise-microservices-plan]
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+jobs:
+  admission:
+    name: Admission policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Evaluate candidate data using base policy only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/p01/admission/check_pr.py --output "$RUNNER_TEMP/p01-admission"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p01-admission-${{ github.run_id }}
+          path: ${{ runner.temp }}/p01-admission/
+          if-no-files-found: error
+          retention-days: 14
