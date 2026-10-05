@@ -1,0 +1,463 @@
+[Mon Oct  5 21:46:52 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8032) started
+[Mon Oct  5 21:46:52 2026] 127.0.0.1:38574 Accepted
+[Mon Oct 5 21:46:52 2026] 127.0.0.1:38574 [GET] URI: /health/live
+[Mon Oct  5 21:46:52 2026] 127.0.0.1:38574 Closing
+[Mon Oct  5 21:46:52 2026] 127.0.0.1:38586 Accepted
+[Mon Oct 5 21:46:52 2026] 127.0.0.1:38586 [POST] URI: /identity/local-sessions
+[Mon Oct  5 21:46:53 2026] 127.0.0.1:38586 Closing
+[Mon Oct  5 21:46:53 2026] 127.0.0.1:38602 Accepted
+[Mon Oct 5 21:46:53 2026] 127.0.0.1:38602 [GET] URI: /identity/session
+[Mon Oct  5 21:46:53 2026] 127.0.0.1:38602 Closing
+[Mon Oct  5 21:46:53 2026] 127.0.0.1:38604 Accepted
+[Mon Oct 5 21:46:53 2026] 127.0.0.1:38604 [GET] URI: /identity/setup
+[Mon Oct  5 21:46:53 2026] 127.0.0.1:38604 Closing
+[Mon Oct  5 21:47:01 2026] 127.0.0.1:55600 Accepted
+[Mon Oct 5 21:47:01 2026] 127.0.0.1:55600 [POST] URI: /identity/local-sessions
+[Mon Oct  5 21:47:02 2026] 127.0.0.1:55600 Closing
+[Mon Oct  5 21:47:02 2026] 127.0.0.1:55604 Accepted
+[Mon Oct 5 21:47:02 2026] 127.0.0.1:55604 [GET] URI: /identity/session
+[Mon Oct  5 21:47:02 2026] 127.0.0.1:55604 Closing
+[Mon Oct  5 21:47:02 2026] 127.0.0.1:55612 Accepted
+[Mon Oct 5 21:47:02 2026] 127.0.0.1:55612 [GET] URI: /identity/session
+[Mon Oct  5 21:47:02 2026] 127.0.0.1:55612 Closing
+[Mon Oct  5 21:47:02 2026] 127.0.0.1:55616 Accepted
+[Mon Oct 5 21:47:02 2026] 127.0.0.1:55616 [GET] URI: /identity/session
+[Mon Oct  5 21:47:02 2026] 127.0.0.1:55616 Closing
+[Mon Oct  5 21:47:04 2026] 127.0.0.1:55620 Accepted
+[Mon Oct 5 21:47:04 2026] 127.0.0.1:55620 [GET] URI: /identity/session
+[Mon Oct  5 21:47:04 2026] 127.0.0.1:55620 Closing
+[Mon Oct  5 21:47:04 2026] 127.0.0.1:55636 Accepted
+[Mon Oct 5 21:47:04 2026] 127.0.0.1:55636 [POST] URI: /identity/password
+[Mon Oct  5 21:47:05 2026] 127.0.0.1:55636 Closing
+[Mon Oct  5 21:47:05 2026] 127.0.0.1:53126 Accepted
+[Mon Oct 5 21:47:05 2026] 127.0.0.1:53126 [GET] URI: /identity/session
+[Mon Oct  5 21:47:05 2026] 127.0.0.1:53126 Closing
+[Mon Oct  5 21:47:05 2026] 127.0.0.1:53140 Accepted
+[Mon Oct 5 21:47:05 2026] 127.0.0.1:53140 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:05 2026] 127.0.0.1:53140 Closing
+[Mon Oct  5 21:47:05 2026] 127.0.0.1:53154 Accepted
+[Mon Oct 5 21:47:05 2026] 127.0.0.1:53154 [GET] URI: /identity/session
+[Mon Oct  5 21:47:05 2026] 127.0.0.1:53154 Closing
+[Mon Oct  5 21:47:05 2026] 127.0.0.1:53166 Accepted
+[Mon Oct 5 21:47:05 2026] 127.0.0.1:53166 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:05 2026] 127.0.0.1:53166 Closing
+[Mon Oct  5 21:47:06 2026] 127.0.0.1:53174 Accepted
+[Mon Oct 5 21:47:06 2026] 127.0.0.1:53174 [GET] URI: /identity/session
+[Mon Oct  5 21:47:06 2026] 127.0.0.1:53174 Closing
+[Mon Oct  5 21:47:06 2026] 127.0.0.1:53180 Accepted
+[Mon Oct 5 21:47:06 2026] 127.0.0.1:53180 [POST] URI: /identity/logout
+[Mon Oct  5 21:47:06 2026] 127.0.0.1:53180 Closing
+[Mon Oct  5 21:47:07 2026] 127.0.0.1:53190 Accepted
+[Mon Oct 5 21:47:07 2026] 127.0.0.1:53190 [POST] URI: /identity/local-sessions
+[Mon Oct  5 21:47:07 2026] 127.0.0.1:53190 Closing
+[Mon Oct  5 21:47:08 2026] 127.0.0.1:53202 Accepted
+[Mon Oct 5 21:47:08 2026] 127.0.0.1:53202 [POST] URI: /identity/local-sessions
+[Mon Oct  5 21:47:08 2026] 127.0.0.1:53202 Closing
+[Mon Oct  5 21:47:08 2026] 127.0.0.1:53216 Accepted
+[Mon Oct 5 21:47:08 2026] 127.0.0.1:53216 [GET] URI: /identity/session
+[Mon Oct  5 21:47:08 2026] 127.0.0.1:53216 Closing
+[Mon Oct  5 21:47:08 2026] 127.0.0.1:53222 Accepted
+[Mon Oct 5 21:47:08 2026] 127.0.0.1:53222 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:08 2026] 127.0.0.1:53222 Closing
+[Mon Oct  5 21:47:09 2026] 127.0.0.1:53236 Accepted
+[Mon Oct 5 21:47:09 2026] 127.0.0.1:53236 [POST] URI: /identity/local-sessions
+[Mon Oct  5 21:47:10 2026] 127.0.0.1:53236 Closing
+[Mon Oct  5 21:47:10 2026] 127.0.0.1:53248 Accepted
+[Mon Oct 5 21:47:10 2026] 127.0.0.1:53248 [GET] URI: /identity/session
+[Mon Oct  5 21:47:10 2026] 127.0.0.1:53248 Closing
+[Mon Oct  5 21:47:10 2026] 127.0.0.1:53254 Accepted
+[Mon Oct 5 21:47:10 2026] 127.0.0.1:53254 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:10 2026] 127.0.0.1:53254 Closing
+[Mon Oct  5 21:47:10 2026] 127.0.0.1:53262 Accepted
+[Mon Oct 5 21:47:10 2026] 127.0.0.1:53262 [GET] URI: /identity/session
+[Mon Oct  5 21:47:10 2026] 127.0.0.1:53262 Closing
+[Mon Oct  5 21:47:10 2026] 127.0.0.1:53276 Accepted
+[Mon Oct 5 21:47:10 2026] 127.0.0.1:53276 [PUT] URI: /identity/oidc
+[Mon Oct  5 21:47:10 2026] 127.0.0.1:53276 Closing
+[Mon Oct  5 21:47:11 2026] 127.0.0.1:53292 Accepted
+[Mon Oct 5 21:47:11 2026] 127.0.0.1:53292 [GET] URI: /identity/session
+[Mon Oct  5 21:47:11 2026] 127.0.0.1:53292 Closing
+[Mon Oct  5 21:47:11 2026] 127.0.0.1:53296 Accepted
+[Mon Oct 5 21:47:11 2026] 127.0.0.1:53296 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:11 2026] 127.0.0.1:53296 Closing
+[Mon Oct  5 21:47:11 2026] 127.0.0.1:53302 Accepted
+[Mon Oct 5 21:47:11 2026] 127.0.0.1:53302 [GET] URI: /identity/session
+[Mon Oct  5 21:47:11 2026] 127.0.0.1:53302 Closing
+[Mon Oct  5 21:47:11 2026] 127.0.0.1:53304 Accepted
+[Mon Oct 5 21:47:11 2026] 127.0.0.1:53304 [POST] URI: /identity/oidc/flows
+[Mon Oct  5 21:47:11 2026] 127.0.0.1:53304 Closing
+[Mon Oct  5 21:47:12 2026] 127.0.0.1:53316 Accepted
+[Mon Oct 5 21:47:12 2026] 127.0.0.1:53316 [POST] URI: /identity/oidc/callback
+[Mon Oct  5 21:47:12 2026] 127.0.0.1:53316 Closing
+[Mon Oct  5 21:47:12 2026] 127.0.0.1:53322 Accepted
+[Mon Oct 5 21:47:12 2026] 127.0.0.1:53322 [GET] URI: /identity/session
+[Mon Oct  5 21:47:12 2026] 127.0.0.1:53322 Closing
+[Mon Oct  5 21:47:12 2026] 127.0.0.1:53338 Accepted
+[Mon Oct 5 21:47:12 2026] 127.0.0.1:53338 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:12 2026] 127.0.0.1:53338 Closing
+[Mon Oct  5 21:47:12 2026] 127.0.0.1:53352 Accepted
+[Mon Oct 5 21:47:12 2026] 127.0.0.1:53352 [GET] URI: /identity/session
+[Mon Oct  5 21:47:12 2026] 127.0.0.1:53352 Closing
+[Mon Oct  5 21:47:12 2026] 127.0.0.1:53360 Accepted
+[Mon Oct 5 21:47:12 2026] 127.0.0.1:53360 [POST] URI: /identity/oidc/flows
+[Mon Oct  5 21:47:13 2026] 127.0.0.1:53360 Closing
+[Mon Oct  5 21:47:13 2026] 127.0.0.1:53364 Accepted
+[Mon Oct 5 21:47:13 2026] 127.0.0.1:53364 [POST] URI: /identity/oidc/callback
+[Mon Oct  5 21:47:13 2026] 127.0.0.1:53364 Closing
+[Mon Oct  5 21:47:13 2026] 127.0.0.1:53376 Accepted
+[Mon Oct 5 21:47:13 2026] 127.0.0.1:53376 [GET] URI: /identity/session
+[Mon Oct  5 21:47:13 2026] 127.0.0.1:53376 Closing
+[Mon Oct  5 21:47:13 2026] 127.0.0.1:53386 Accepted
+[Mon Oct 5 21:47:13 2026] 127.0.0.1:53386 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:13 2026] 127.0.0.1:53386 Closing
+[Mon Oct  5 21:47:14 2026] 127.0.0.1:53392 Accepted
+[Mon Oct 5 21:47:14 2026] 127.0.0.1:53392 [GET] URI: /identity/session
+[Mon Oct  5 21:47:14 2026] 127.0.0.1:53392 Closing
+[Mon Oct  5 21:47:14 2026] 127.0.0.1:53408 Accepted
+[Mon Oct 5 21:47:14 2026] 127.0.0.1:53408 [POST] URI: /identity/oidc/activation
+[Mon Oct  5 21:47:14 2026] 127.0.0.1:53408 Closing
+[Mon Oct  5 21:47:14 2026] 127.0.0.1:53422 Accepted
+[Mon Oct 5 21:47:14 2026] 127.0.0.1:53422 [GET] URI: /identity/session
+[Mon Oct  5 21:47:14 2026] 127.0.0.1:53422 Closing
+[Mon Oct  5 21:47:14 2026] 127.0.0.1:53428 Accepted
+[Mon Oct 5 21:47:14 2026] 127.0.0.1:53428 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:14 2026] 127.0.0.1:53428 Closing
+[Mon Oct  5 21:47:15 2026] 127.0.0.1:33458 Accepted
+[Mon Oct 5 21:47:15 2026] 127.0.0.1:33458 [GET] URI: /identity/session
+[Mon Oct  5 21:47:15 2026] 127.0.0.1:33458 Closing
+[Mon Oct  5 21:47:15 2026] 127.0.0.1:33460 Accepted
+[Mon Oct 5 21:47:15 2026] 127.0.0.1:33460 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:15 2026] 127.0.0.1:33460 Closing
+[Mon Oct  5 21:47:16 2026] 127.0.0.1:33472 Accepted
+[Mon Oct 5 21:47:16 2026] 127.0.0.1:33472 [GET] URI: /identity/session
+[Mon Oct  5 21:47:16 2026] 127.0.0.1:33472 Closing
+[Mon Oct  5 21:47:16 2026] 127.0.0.1:33478 Accepted
+[Mon Oct 5 21:47:16 2026] 127.0.0.1:33478 [PUT] URI: /identity/oidc
+[Mon Oct  5 21:47:16 2026] 127.0.0.1:33478 Closing
+[Mon Oct  5 21:47:16 2026] 127.0.0.1:33484 Accepted
+[Mon Oct 5 21:47:16 2026] 127.0.0.1:33484 [GET] URI: /identity/session
+[Mon Oct  5 21:47:16 2026] 127.0.0.1:33484 Closing
+[Mon Oct  5 21:47:16 2026] 127.0.0.1:33486 Accepted
+[Mon Oct 5 21:47:16 2026] 127.0.0.1:33486 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:16 2026] 127.0.0.1:33486 Closing
+[Mon Oct  5 21:47:30 2026] 127.0.0.1:45622 Accepted
+[Mon Oct 5 21:47:30 2026] 127.0.0.1:45622 [GET] URI: /identity/session
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45622 Closing
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45638 Accepted
+[Mon Oct 5 21:47:31 2026] 127.0.0.1:45638 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45638 Closing
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45646 Accepted
+[Mon Oct 5 21:47:31 2026] 127.0.0.1:45646 [GET] URI: /identity/session
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45646 Closing
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45652 Accepted
+[Mon Oct 5 21:47:31 2026] 127.0.0.1:45652 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45652 Closing
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45656 Accepted
+[Mon Oct 5 21:47:31 2026] 127.0.0.1:45656 [GET] URI: /identity/session
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45656 Closing
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45658 Accepted
+[Mon Oct 5 21:47:31 2026] 127.0.0.1:45658 [GET] URI: /v1/tenant-directory
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45658 Closing
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45672 Accepted
+[Mon Oct 5 21:47:31 2026] 127.0.0.1:45672 [GET] URI: /identity/session
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45672 Closing
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45676 Accepted
+[Mon Oct 5 21:47:31 2026] 127.0.0.1:45676 [GET] URI: /identity/oidc
+[Mon Oct  5 21:47:31 2026] 127.0.0.1:45676 Closing
+[Mon Oct  5 21:47:32 2026] 127.0.0.1:45684 Accepted
+[Mon Oct 5 21:47:32 2026] 127.0.0.1:45684 [GET] URI: /identity/session
+[Mon Oct  5 21:47:32 2026] 127.0.0.1:45684 Closing
+[Mon Oct  5 21:47:32 2026] 127.0.0.1:45690 Accepted
+[Mon Oct 5 21:47:32 2026] 127.0.0.1:45690 [POST] URI: /v1/tenants
+[Mon Oct  5 21:47:32 2026] 127.0.0.1:45690 Closing
+[Mon Oct  5 21:47:32 2026] 127.0.0.1:45704 Accepted
+[Mon Oct 5 21:47:32 2026] 127.0.0.1:45704 [GET] URI: /identity/session
+[Mon Oct  5 21:47:32 2026] 127.0.0.1:45704 Closing
+[Mon Oct  5 21:47:32 2026] 127.0.0.1:45708 Accepted
+[Mon Oct 5 21:47:32 2026] 127.0.0.1:45708 [GET] URI: /v1/tenant-directory
+[Mon Oct  5 21:47:32 2026] 127.0.0.1:45708 Closing
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45716 Accepted
+[Mon Oct 5 21:47:33 2026] 127.0.0.1:45716 [GET] URI: /identity/session
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45716 Closing
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45722 Accepted
+[Mon Oct 5 21:47:33 2026] 127.0.0.1:45722 [POST] URI: /v1/tenants
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45722 Closing
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45736 Accepted
+[Mon Oct 5 21:47:33 2026] 127.0.0.1:45736 [GET] URI: /identity/session
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45736 Closing
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45748 Accepted
+[Mon Oct 5 21:47:33 2026] 127.0.0.1:45748 [GET] URI: /v1/tenant-directory
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45748 Closing
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45764 Accepted
+[Mon Oct 5 21:47:33 2026] 127.0.0.1:45764 [GET] URI: /identity/session
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45764 Closing
+[Mon Oct  5 21:47:33 2026] 127.0.0.1:45772 Accepted
+[Mon Oct 5 21:47:33 2026] 127.0.0.1:45772 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:34 2026] 127.0.0.1:45772 Closing
+[Mon Oct  5 21:47:34 2026] 127.0.0.1:45776 Accepted
+[Mon Oct 5 21:47:34 2026] 127.0.0.1:45776 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/membership-directory
+[Mon Oct  5 21:47:34 2026] 127.0.0.1:45776 Closing
+[Mon Oct  5 21:47:34 2026] 127.0.0.1:45792 Accepted
+[Mon Oct 5 21:47:34 2026] 127.0.0.1:45792 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:34 2026] 127.0.0.1:45792 Closing
+[Mon Oct  5 21:47:34 2026] 127.0.0.1:45794 Accepted
+[Mon Oct 5 21:47:34 2026] 127.0.0.1:45794 [GET] URI: /identity/session
+[Mon Oct  5 21:47:34 2026] 127.0.0.1:45794 Closing
+[Mon Oct  5 21:47:34 2026] 127.0.0.1:45810 Accepted
+[Mon Oct 5 21:47:34 2026] 127.0.0.1:45810 [POST] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/memberships
+[Mon Oct  5 21:47:34 2026] 127.0.0.1:45810 Closing
+[Mon Oct  5 21:47:34 2026] 127.0.0.1:45818 Accepted
+[Mon Oct 5 21:47:34 2026] 127.0.0.1:45818 [GET] URI: /identity/session
+[Mon Oct  5 21:47:35 2026] 127.0.0.1:45818 Closing
+[Mon Oct  5 21:47:35 2026] 127.0.0.1:38724 Accepted
+[Mon Oct 5 21:47:35 2026] 127.0.0.1:38724 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:35 2026] 127.0.0.1:38724 Closing
+[Mon Oct  5 21:47:35 2026] 127.0.0.1:38730 Accepted
+[Mon Oct 5 21:47:35 2026] 127.0.0.1:38730 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/membership-directory
+[Mon Oct  5 21:47:35 2026] 127.0.0.1:38730 Closing
+[Mon Oct  5 21:47:35 2026] 127.0.0.1:38740 Accepted
+[Mon Oct 5 21:47:35 2026] 127.0.0.1:38740 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:35 2026] 127.0.0.1:38740 Closing
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38744 Accepted
+[Mon Oct 5 21:47:36 2026] 127.0.0.1:38744 [GET] URI: /identity/session
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38744 Closing
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38754 Accepted
+[Mon Oct 5 21:47:36 2026] 127.0.0.1:38754 [POST] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38754 Closing
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38760 Accepted
+[Mon Oct 5 21:47:36 2026] 127.0.0.1:38760 [GET] URI: /identity/session
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38760 Closing
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38764 Accepted
+[Mon Oct 5 21:47:36 2026] 127.0.0.1:38764 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38764 Closing
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38774 Accepted
+[Mon Oct 5 21:47:36 2026] 127.0.0.1:38774 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/membership-directory
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38774 Closing
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38782 Accepted
+[Mon Oct 5 21:47:36 2026] 127.0.0.1:38782 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38782 Closing
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38792 Accepted
+[Mon Oct 5 21:47:36 2026] 127.0.0.1:38792 [GET] URI: /identity/session
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38792 Closing
+[Mon Oct  5 21:47:36 2026] 127.0.0.1:38808 Accepted
+[Mon Oct 5 21:47:36 2026] 127.0.0.1:38808 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:37 2026] 127.0.0.1:38808 Closing
+[Mon Oct  5 21:47:37 2026] 127.0.0.1:38818 Accepted
+[Mon Oct 5 21:47:37 2026] 127.0.0.1:38818 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/membership-directory
+[Mon Oct  5 21:47:37 2026] 127.0.0.1:38818 Closing
+[Mon Oct  5 21:47:37 2026] 127.0.0.1:38832 Accepted
+[Mon Oct 5 21:47:37 2026] 127.0.0.1:38832 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:37 2026] 127.0.0.1:38832 Closing
+[Mon Oct  5 21:47:37 2026] 127.0.0.1:38842 Accepted
+[Mon Oct 5 21:47:37 2026] 127.0.0.1:38842 [GET] URI: /identity/session
+[Mon Oct  5 21:47:37 2026] 127.0.0.1:38842 Closing
+[Mon Oct  5 21:47:37 2026] 127.0.0.1:38844 Accepted
+[Mon Oct 5 21:47:37 2026] 127.0.0.1:38844 [GET] URI: /v1/tenant-directory
+[Mon Oct  5 21:47:37 2026] 127.0.0.1:38844 Closing
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38860 Accepted
+[Mon Oct 5 21:47:38 2026] 127.0.0.1:38860 [GET] URI: /identity/session
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38860 Closing
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38864 Accepted
+[Mon Oct 5 21:47:38 2026] 127.0.0.1:38864 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38864 Closing
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38880 Accepted
+[Mon Oct 5 21:47:38 2026] 127.0.0.1:38880 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/membership-directory
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38880 Closing
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38882 Accepted
+[Mon Oct 5 21:47:38 2026] 127.0.0.1:38882 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38882 Closing
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38892 Accepted
+[Mon Oct 5 21:47:38 2026] 127.0.0.1:38892 [GET] URI: /identity/session
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38892 Closing
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38894 Accepted
+[Mon Oct 5 21:47:38 2026] 127.0.0.1:38894 [GET] URI: /v1/tenants/a895f1c4-aaa4-418b-bf55-b188cf1a8490
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38894 Closing
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38908 Accepted
+[Mon Oct 5 21:47:38 2026] 127.0.0.1:38908 [GET] URI: /v1/tenants/a895f1c4-aaa4-418b-bf55-b188cf1a8490/membership-directory
+[Mon Oct  5 21:47:38 2026] 127.0.0.1:38908 Closing
+[Mon Oct  5 21:47:39 2026] 127.0.0.1:38914 Accepted
+[Mon Oct 5 21:47:39 2026] 127.0.0.1:38914 [GET] URI: /v1/tenants/a895f1c4-aaa4-418b-bf55-b188cf1a8490/quota
+[Mon Oct  5 21:47:39 2026] 127.0.0.1:38914 Closing
+[Mon Oct  5 21:47:39 2026] 127.0.0.1:38920 Accepted
+[Mon Oct 5 21:47:39 2026] 127.0.0.1:38920 [GET] URI: /identity/session
+[Mon Oct  5 21:47:39 2026] 127.0.0.1:38920 Closing
+[Mon Oct  5 21:47:39 2026] 127.0.0.1:38934 Accepted
+[Mon Oct 5 21:47:39 2026] 127.0.0.1:38934 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:39 2026] 127.0.0.1:38934 Closing
+[Mon Oct  5 21:47:39 2026] 127.0.0.1:38950 Accepted
+[Mon Oct 5 21:47:39 2026] 127.0.0.1:38950 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/membership-directory
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:38950 Closing
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:38956 Accepted
+[Mon Oct 5 21:47:40 2026] 127.0.0.1:38956 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:38956 Closing
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:38970 Accepted
+[Mon Oct 5 21:47:40 2026] 127.0.0.1:38970 [GET] URI: /identity/session
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:38970 Closing
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:38984 Accepted
+[Mon Oct 5 21:47:40 2026] 127.0.0.1:38984 [GET] URI: /v1/tenants/a895f1c4-aaa4-418b-bf55-b188cf1a8490
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:38984 Closing
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:38992 Accepted
+[Mon Oct 5 21:47:40 2026] 127.0.0.1:38992 [GET] URI: /v1/tenants/a895f1c4-aaa4-418b-bf55-b188cf1a8490/membership-directory
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:38992 Closing
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:39008 Accepted
+[Mon Oct 5 21:47:40 2026] 127.0.0.1:39008 [GET] URI: /v1/tenants/a895f1c4-aaa4-418b-bf55-b188cf1a8490/quota
+[Mon Oct  5 21:47:40 2026] 127.0.0.1:39008 Closing
+[Mon Oct  5 21:47:41 2026] 127.0.0.1:39014 Accepted
+[Mon Oct 5 21:47:41 2026] 127.0.0.1:39014 [GET] URI: /identity/session
+[Mon Oct  5 21:47:41 2026] 127.0.0.1:39014 Closing
+[Mon Oct  5 21:47:41 2026] 127.0.0.1:39026 Accepted
+[Mon Oct 5 21:47:41 2026] 127.0.0.1:39026 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:41 2026] 127.0.0.1:39026 Closing
+[Mon Oct  5 21:47:41 2026] 127.0.0.1:39036 Accepted
+[Mon Oct 5 21:47:41 2026] 127.0.0.1:39036 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/membership-directory
+[Mon Oct  5 21:47:41 2026] 127.0.0.1:39036 Closing
+[Mon Oct  5 21:47:41 2026] 127.0.0.1:39046 Accepted
+[Mon Oct 5 21:47:41 2026] 127.0.0.1:39046 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:41 2026] 127.0.0.1:39046 Closing
+[Mon Oct  5 21:47:42 2026] 127.0.0.1:39058 Accepted
+[Mon Oct 5 21:47:42 2026] 127.0.0.1:39058 [GET] URI: /identity/session
+[Mon Oct  5 21:47:42 2026] 127.0.0.1:39058 Closing
+[Mon Oct  5 21:47:42 2026] 127.0.0.1:39062 Accepted
+[Mon Oct 5 21:47:42 2026] 127.0.0.1:39062 [POST] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:42 2026] 127.0.0.1:39062 Closing
+[Mon Oct  5 21:47:42 2026] 127.0.0.1:39066 Accepted
+[Mon Oct 5 21:47:42 2026] 127.0.0.1:39066 [GET] URI: /identity/session
+[Mon Oct  5 21:47:42 2026] 127.0.0.1:39066 Closing
+[Mon Oct  5 21:47:42 2026] 127.0.0.1:39076 Accepted
+[Mon Oct 5 21:47:42 2026] 127.0.0.1:39076 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:42 2026] 127.0.0.1:39076 Closing
+[Mon Oct  5 21:47:42 2026] 127.0.0.1:39082 Accepted
+[Mon Oct 5 21:47:42 2026] 127.0.0.1:39082 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/membership-directory
+[Mon Oct  5 21:47:43 2026] 127.0.0.1:39082 Closing
+[Mon Oct  5 21:47:43 2026] 127.0.0.1:39090 Accepted
+[Mon Oct 5 21:47:43 2026] 127.0.0.1:39090 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:43 2026] 127.0.0.1:39090 Closing
+[Mon Oct  5 21:47:55 2026] 127.0.0.1:47704 Accepted
+[Mon Oct 5 21:47:55 2026] 127.0.0.1:47704 [GET] URI: /identity/session
+[Mon Oct  5 21:47:55 2026] 127.0.0.1:47704 Closing
+[Mon Oct  5 21:47:55 2026] 127.0.0.1:47718 Accepted
+[Mon Oct 5 21:47:55 2026] 127.0.0.1:47718 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:55 2026] 127.0.0.1:47718 Closing
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47728 Accepted
+[Mon Oct 5 21:47:56 2026] 127.0.0.1:47728 [GET] URI: /identity/session
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47728 Closing
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47732 Accepted
+[Mon Oct 5 21:47:56 2026] 127.0.0.1:47732 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47732 Closing
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47738 Accepted
+[Mon Oct 5 21:47:56 2026] 127.0.0.1:47738 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/membership-directory
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47738 Closing
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47746 Accepted
+[Mon Oct 5 21:47:56 2026] 127.0.0.1:47746 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47746 Closing
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47760 Accepted
+[Mon Oct 5 21:47:56 2026] 127.0.0.1:47760 [GET] URI: /identity/session
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47760 Closing
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47772 Accepted
+[Mon Oct 5 21:47:56 2026] 127.0.0.1:47772 [GET] URI: /v1/tenants/a895f1c4-aaa4-418b-bf55-b188cf1a8490
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47772 Closing
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47780 Accepted
+[Mon Oct 5 21:47:56 2026] 127.0.0.1:47780 [GET] URI: /v1/tenants/a895f1c4-aaa4-418b-bf55-b188cf1a8490/membership-directory
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47780 Closing
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47796 Accepted
+[Mon Oct 5 21:47:56 2026] 127.0.0.1:47796 [GET] URI: /v1/tenants/a895f1c4-aaa4-418b-bf55-b188cf1a8490/quota
+[Mon Oct  5 21:47:56 2026] 127.0.0.1:47796 Closing
+[Mon Oct  5 21:47:57 2026] 127.0.0.1:47810 Accepted
+[Mon Oct 5 21:47:57 2026] 127.0.0.1:47810 [POST] URI: /identity/oidc/flows
+[Mon Oct  5 21:47:58 2026] 127.0.0.1:47810 Closing
+[Mon Oct  5 21:47:58 2026] 127.0.0.1:47814 Accepted
+[Mon Oct 5 21:47:58 2026] 127.0.0.1:47814 [POST] URI: /identity/oidc/callback
+[Mon Oct  5 21:47:58 2026] 127.0.0.1:47814 Closing
+[Mon Oct  5 21:47:58 2026] 127.0.0.1:47818 Accepted
+[Mon Oct 5 21:47:58 2026] 127.0.0.1:47818 [GET] URI: /identity/session
+[Mon Oct  5 21:47:58 2026] 127.0.0.1:47818 Closing
+[Mon Oct  5 21:47:58 2026] 127.0.0.1:47826 Accepted
+[Mon Oct 5 21:47:58 2026] 127.0.0.1:47826 [GET] URI: /v1/tenant-directory
+[Mon Oct  5 21:47:58 2026] 127.0.0.1:47826 Closing
+[Mon Oct  5 21:47:58 2026] 127.0.0.1:47836 Accepted
+[Mon Oct 5 21:47:58 2026] 127.0.0.1:47836 [GET] URI: /identity/session
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47836 Closing
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47838 Accepted
+[Mon Oct 5 21:47:59 2026] 127.0.0.1:47838 [GET] URI: /v1/tenants/a895f1c4-aaa4-418b-bf55-b188cf1a8490
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47838 Closing
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47846 Accepted
+[Mon Oct 5 21:47:59 2026] 127.0.0.1:47846 [GET] URI: /identity/session
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47846 Closing
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47854 Accepted
+[Mon Oct 5 21:47:59 2026] 127.0.0.1:47854 [GET] URI: /v1/tenant-directory
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47854 Closing
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47860 Accepted
+[Mon Oct 5 21:47:59 2026] 127.0.0.1:47860 [GET] URI: /identity/session
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47860 Closing
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47862 Accepted
+[Mon Oct 5 21:47:59 2026] 127.0.0.1:47862 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47862 Closing
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47864 Accepted
+[Mon Oct 5 21:47:59 2026] 127.0.0.1:47864 [GET] URI: /identity/session
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47864 Closing
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47878 Accepted
+[Mon Oct 5 21:47:59 2026] 127.0.0.1:47878 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:47:59 2026] 127.0.0.1:47878 Closing
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47892 Accepted
+[Mon Oct 5 21:48:00 2026] 127.0.0.1:47892 [GET] URI: /identity/session
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47892 Closing
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47904 Accepted
+[Mon Oct 5 21:48:00 2026] 127.0.0.1:47904 [POST] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/memberships
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47904 Closing
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47910 Accepted
+[Mon Oct 5 21:48:00 2026] 127.0.0.1:47910 [GET] URI: /identity/session
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47910 Closing
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47920 Accepted
+[Mon Oct 5 21:48:00 2026] 127.0.0.1:47920 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47920 Closing
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47932 Accepted
+[Mon Oct 5 21:48:00 2026] 127.0.0.1:47932 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/membership-directory
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47932 Closing
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47942 Accepted
+[Mon Oct 5 21:48:00 2026] 127.0.0.1:47942 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d/quota
+[Mon Oct  5 21:48:00 2026] 127.0.0.1:47942 Closing
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47948 Accepted
+[Mon Oct 5 21:48:01 2026] 127.0.0.1:47948 [GET] URI: /identity/session
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47948 Closing
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47954 Accepted
+[Mon Oct 5 21:48:01 2026] 127.0.0.1:47954 [GET] URI: /identity/oidc
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47954 Closing
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47958 Accepted
+[Mon Oct 5 21:48:01 2026] 127.0.0.1:47958 [GET] URI: /identity/session
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47958 Closing
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47960 Accepted
+[Mon Oct 5 21:48:01 2026] 127.0.0.1:47960 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47960 Closing
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47966 Accepted
+[Mon Oct 5 21:48:01 2026] 127.0.0.1:47966 [GET] URI: /identity/session
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47966 Closing
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47982 Accepted
+[Mon Oct 5 21:48:01 2026] 127.0.0.1:47982 [GET] URI: /v1/tenants/4df84efc-c0a6-494e-a42f-2e3203d27c8d
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47982 Closing
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47984 Accepted
+[Mon Oct 5 21:48:01 2026] 127.0.0.1:47984 [GET] URI: /identity/session
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:47984 Closing
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:48000 Accepted
+[Mon Oct 5 21:48:01 2026] 127.0.0.1:48000 [GET] URI: /v1/tenant-directory
+[Mon Oct  5 21:48:01 2026] 127.0.0.1:48000 Closing
+[Mon Oct  5 21:48:02 2026] 127.0.0.1:48002 Accepted
+[Mon Oct 5 21:48:02 2026] 127.0.0.1:48002 [GET] URI: /identity/session
+[Mon Oct  5 21:48:02 2026] 127.0.0.1:48002 Closing
+[Mon Oct  5 21:48:02 2026] 127.0.0.1:48014 Accepted
+[Mon Oct 5 21:48:02 2026] 127.0.0.1:48014 [POST] URI: /identity/logout
+[Mon Oct  5 21:48:02 2026] 127.0.0.1:48014 Closing
+[Mon Oct  5 21:48:03 2026] 127.0.0.1:48020 Accepted
+[Mon Oct 5 21:48:03 2026] 127.0.0.1:48020 [POST] URI: /identity/local-sessions
+[Mon Oct  5 21:48:03 2026] 127.0.0.1:48020 Closing
+[Mon Oct  5 21:48:03 2026] 127.0.0.1:48030 Accepted
+[Mon Oct 5 21:48:03 2026] 127.0.0.1:48030 [POST] URI: /identity/oidc/flows
+[Mon Oct  5 21:48:03 2026] 127.0.0.1:48030 Closing
+[Mon Oct  5 21:48:03 2026] 127.0.0.1:48040 Accepted
+[Mon Oct 5 21:48:03 2026] 127.0.0.1:48040 [POST] URI: /identity/oidc/callback
+[Mon Oct  5 21:48:04 2026] 127.0.0.1:48040 Closing
+[Mon Oct  5 21:48:04 2026] 127.0.0.1:48042 Accepted
+[Mon Oct 5 21:48:04 2026] 127.0.0.1:48042 [GET] URI: /identity/session
+[Mon Oct  5 21:48:04 2026] 127.0.0.1:48042 Closing
+[Mon Oct  5 21:48:04 2026] 127.0.0.1:48054 Accepted
+[Mon Oct 5 21:48:04 2026] 127.0.0.1:48054 [GET] URI: /identity/oidc
+[Mon Oct  5 21:48:04 2026] 127.0.0.1:48054 Closing

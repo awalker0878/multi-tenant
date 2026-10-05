@@ -1,0 +1,176 @@
+
+   PASS  Tests\Feature\DependencyHealthTest
+  ✓ unknown or malformed health identities never reach a dependency wit… 0.09s  
+  ✓ unknown or malformed health identities never reach a dependency wit… 0.01s  
+  ✓ unknown or malformed health identities never reach a dependency wit… 0.01s  
+  ✓ unknown or malformed health identities never reach a dependency wit… 0.01s  
+  ✓ unknown or malformed health identities never reach a dependency wit… 0.01s  
+  ✓ unknown or malformed health identities never reach a dependency wit… 0.01s  
+  ✓ an absent or malformed mounted identity denies even the formerly va… 0.01s  
+  ✓ an absent or malformed mounted identity denies even the formerly va… 0.01s  
+  ✓ an absent or malformed mounted identity denies even the formerly va… 0.01s  
+  ✓ an absent or malformed mounted identity denies even the formerly va… 0.01s  
+  ✓ authenticated dependency failure is sanitized and never changes pro… 0.01s  
+  ✓ successful foundation checks grant only dependency readiness and no… 0.01s  
+  ✓ replacing a credential file revokes the old token without restartin… 0.01s  
+  ✓ credential paths cannot use a stream wrapper                         0.01s  
+  ✓ mounted application key wins and an unavailable file never falls back to the environment key
+  ✓ a TCP peer that never answers TLS negotiation fails within the conn… 2.01s  
+
+   PASS  Tests\Feature\DirectoryTest
+  ✓ it forwards only an encoded cursor and renders the next owner-provi… 0.08s  
+  ✓ it renders continued membership pages only after current tenant aut… 0.02s  
+  ✓ it restarts invalid or expired page links without rendering remembe… 0.01s  
+  ✓ it does not downgrade owner unavailability to an empty successful t… 0.01s  
+  ✓ it denies guessed and revoked tenant continuations before retrievin… 0.01s  
+
+   PASS  Tests\Feature\FoundationTest
+  ✓ it serves the public foundation page with only its declared page pr… 0.02s  
+  ✓ it supports Inertia navigation without adding an authenticated iden… 0.01s  
+  ✓ it sets a private non-cacheable response and secure cookie for the…  0.01s  
+  ✓ it requires a fresh page when the browser supplies an obsolete asse… 0.01s  
+  ✓ it exposes no registration or workload endpoints in the foundation with ('/register')
+  ✓ it exposes no registration or workload endpoints in the foundation with ('/workloads')
+
+   PASS  Tests\Feature\HealthTest
+  ✓ liveness reports only a running process with no configured authorit… 0.02s  
+  ✓ readiness remains closed until the console dependencies are implemented
+  ✓ health endpoints reject writes with ('/health/live')
+  ✓ health endpoints reject writes with ('/health/ready')
+  ✓ business authority routes are absent and expose no exception diagnostics with ('/v1/tenants')
+  ✓ business authority routes are absent and expose no exception diagnostics with ('/v1/authorization-decisions')
+  ✓ business authority routes are absent and expose no exception diagnostics with ('/v1/approvals')
+  ✓ a caller cannot configure readiness or start a browser session through health input
+  ✓ unimplemented browser pages return an ordinary not-found response    0.01s  
+
+   PASS  Tests\Feature\InstallationNotificationTest
+  ✓ it retains installation receipts in the shared immutable ID namespa… 0.03s  
+  ✓ it retains login receipts without changing the settings hint         0.01s  
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.01s  
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.01s  
+  ✓ it rejects tenant substitution and untrusted identity event envelopes with (['federated', null], [])
+  ✓ it rejects tenant substitution and untrusted identity event envelopes with ([2], [])
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.01s  
+  ✓ it rejects tenant substitution and untrusted identity event envelopes with ([], ['governance.quota.changed.v1'])
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.01s  
+  ✓ it rejects tenant substitution and untrusted identity event envelopes with (['never-project'], [])
+  ✓ it rolls back an installation receipt when its hint cannot commit    0.01s  
+  ✓ it checks current installation ownership before revealing a hint wi… 0.01s  
+  ✓ it checks current installation ownership before revealing a hint wi… 0.01s  
+  ✓ it checks current installation ownership before revealing a hint wi… 0.01s  
+  ✓ it checks current installation ownership before revealing a hint wi… 0.01s  
+  ✓ it packages the identity schema without editing its published bytes  0.01s  
+
+   PASS  Tests\Feature\LocalIdentityTest
+  ✓ it renders an accessible sign-in page without making an identity ca… 0.03s  
+  ✓ it replaces the anonymous session and CSRF state and keeps the owne… 0.01s  
+  ✓ it rechecks owner authority on each protected page and blocks setup… 0.01s  
+  ✓ it rotates session and CSRF again after changing the password and d… 0.01s  
+  ✓ it does not flash passwords after a rejected change and never expos… 0.01s  
+  ✓ it invalidates revoked sessions and never trusts a forged browser i… 0.01s  
+  ✓ it fails closed on an unavailable owner while retaining the session… 0.01s  
+  ✓ it revokes owner authority before clearing the browser session on l… 0.01s  
+  ✓ it enforces real CSRF middleware before any login password or logou… 0.01s  
+  ✓ it enforces real CSRF middleware before any login password or logou… 0.01s  
+  ✓ it enforces real CSRF middleware before any login password or logou… 0.01s  
+  ✓ it accepts the matching CSRF token on the real login route           0.01s  
+  ✓ it rejects hostile hosts and ignores untrusted proxy host headers    0.01s  
+  ✓ it refuses insecure nonloopback service addresses and absent worklo… 0.01s  
+
+   PASS  Tests\Feature\NotificationAccessTest
+  ✓ it rechecks current owner authority on every poll and returns only…  0.04s  
+  ✓ it denies readers and scoped administrators before the hint lookup…  0.01s  
+  ✓ it denies readers and scoped administrators before the hint lookup…  0.01s  
+  ✓ it denies readers and scoped administrators before the hint lookup…  0.01s  
+  ✓ it does not expose a hint when the owner or session authority is un… 0.01s  
+  ✓ it does not expose a hint when the owner or session authority is un… 0.01s  
+  ✓ it does not expose a hint when the owner or session authority is un… 0.01s  
+  ✓ it does not expose a hint when the owner or session authority is un… 0.01s  
+  ✓ it reports hint storage outages without exposing database details    0.01s  
+  ✓ it preserves owner-backed administration while marking unavailable…  0.01s  
+
+   WARN  Tests\Feature\NotificationBrokerTest
+  - it consumes verified TLS messages into PostgreSQL and handles duplicate and conflicting redeliveries → Requires the isolated verified-TLS broker campaign.
+  - it redelivers the same bytes after the consumer closes between commit and acknowledgement → Requires the isolated verified-TLS broker campaign.
+  - it retains oversized bytes at the broker instead of acknowledging a truncated quarantine → Requires the isolated verified-TLS broker campaign.
+  - it rejects an untrusted broker certificate → Requires the isolated verified-TLS broker campaign.
+  - it does not grant Console queue configuration or reads of another service queue with ('configure') → Requires the isolated verified-TLS broker campaign.
+  - it does not grant Console queue configuration or reads of another service queue with ('read') → Requires the isolated verified-TLS broker campaign.
+  - it delivers installation settings through the same verified broker without a tenant hint → Requires the isolated verified-TLS broker campaign.
+
+   PASS  Tests\Feature\NotificationContractTest
+  ✓ it accepts the five tenant administration routes without projecting… 0.01s  
+  ✓ it accepts the five tenant administration routes without projecting authority with ('governance.membership.changed')
+  ✓ it accepts the five tenant administration routes without projecting authority with ('governance.grant.changed')
+  ✓ it accepts the five tenant administration routes without projecting authority with ('governance.grant.revoked')
+  ✓ it accepts the five tenant administration routes without projecting authority with ('governance.quota.changed')
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with (['governance.approval.approved'], [])
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with (['identity.session.created'], [])
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with (['external-private-subject'], [])
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with ([2], [])
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with (['permission'], [])
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with (['invalid'], [])
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with ([], ['other-service'])
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with ([], ['550e8400-e29b-41d4-a716-446655440099'])
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with ([], ['governance.quota.changed.v2'])
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with ([], ['text/plain'])
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with ([], ['{bad'])
+  ✓ it fails before a connection when broker custody is missing
+
+   PASS  Tests\Feature\NotificationInboxTest
+  ✓ it commits minimal immutable receipts and hints before acknowledgem… 0.02s  
+  ✓ it recovers a commit followed by an uncertain broker acknowledgemen… 0.01s  
+  ✓ it rolls back the receipt and leaves delivery unacknowledged when t… 0.01s  
+  ✓ it refuses to acknowledge inside an outer transaction
+  ✓ it quarantines conflicting bytes without replacing a receipt or ano… 0.01s  
+  ✓ it stores bounded poison envelopes encrypted and acknowledges only after quarantine commits
+  ✓ it never acknowledges truncated or oversized payloads with ([true])
+  ✓ it never acknowledges truncated or oversized payloads with (['xxxxxxxxxxxxxxxxxxxxxxxxxxxxx…xxxxxx']) #1
+  ✓ it never acknowledges truncated or oversized payloads with (['xxxxxxxxxxxxxxxxxxxxxxxxxxxxx…xxxxxx']) #2
+  ✓ it keeps reordered events as generic hints and isolates tenants      0.01s  
+  ✓ it bounds command work and redacts operational errors while closing… 0.04s  
+
+   PASS  Tests\Feature\OidcTest
+  ✓ it projects only permitted settings and keeps proof and secrets out… 0.01s  
+  ✓ it never flashes a client secret and does not accept a browser-supp… 0.01s  
+  ✓ it consumes its browser binding and stores successful verification…  0.01s  
+  ✓ it requires the server-held proof then rotates the entire session o… 0.01s  
+  ✓ it preserves local access on failed callback and never reflects pro… 0.01s  
+  ✓ it requires real CSRF on provider settings test activation and sign… 0.01s  
+  ✓ it requires real CSRF on provider settings test activation and sign… 0.01s  
+  ✓ it requires real CSRF on provider settings test activation and sign… 0.01s  
+  ✓ it requires real CSRF on provider settings test activation and sign… 0.01s  
+
+   PASS  Tests\Feature\RequestForgeryTest
+  ✓ it rejects a browser mutation without its session request-forgery t… 0.01s  
+  ✓ it accepts a matching session token through the same web middleware  0.01s  
+
+   PASS  Tests\Feature\TelemetryTest
+  ✓ diagnostic buffer is bounded and stale acknowledgement preserves ne… 0.01s  
+  ✓ lock contention and oversized records are explicit without overwriting accepted data
+  ✓ unavailable buffer preserves liveness and reports missing collectio… 0.01s  
+  ✓ request signals redact arbitrary inputs and correlate without grant… 0.01s  
+  ✓ malformed or zero correlation is replaced and never echoed with ('malformed')
+  ✓ malformed or zero correlation is replaced and never echoed with ('00-00000000000000000000000000…ccc-01')
+  ✓ malformed or zero correlation is replaced and never echoed with ('00-bbbbbbbbbbbbbbbbbbbbbbbbbb…000-01')
+
+   PASS  Tests\Feature\TenancyTest
+  ✓ it renders only current owner memberships and clears old tenant his… 0.01s  
+  ✓ it never fetches administration projections for a scoped reader or…  0.01s  
+  ✓ it removes a revoked or guessed tenant from the journey without ren… 0.01s  
+  ✓ it keeps command identity stable and sends only approved membership… 0.01s  
+  ✓ it requires the real CSRF middleware on all tenant writes with ('')  0.01s  
+  ✓ it requires the real CSRF middleware on all tenant writes with ('me… 0.01s  
+  ✓ it requires the real CSRF middleware on all tenant writes with ('qu… 0.01s  
+  ✓ it requires the real CSRF middleware on all tenant writes with ('st… 0.01s  
+
+   PASS  Tests\Architecture\FoundationTest
+  ✓ service autoload exposes only its own application and tests
+  ✓ the actual bootstrap classes are loaded from the service source
+  ✓ implemented application classes use strict types                     0.10s  
+  ✓ implemented application classes are final
+  ✓ delivery does not reference sibling service source                   0.02s  
+
+  Tests:    7 skipped, 135 passed (596 assertions)
+  Duration: 3.41s
+

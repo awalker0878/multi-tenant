@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "campaign_result": "FAIL",
+  "source_revision": "a2c522458c9f61966f794096c435c95464f6b427",
+  "run_id": 37376902098,
+  "archive_sha256": "2c5e2b504061af31681bf1b54fd8d7ca2a05b3a83b89b4fa61b1bbb96de5e0db",
+  "archive_digest_verified": true,
+  "reason": "Isolated package test attempted to read the repository-level contract outside its owned package."
+}
