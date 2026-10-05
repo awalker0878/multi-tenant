@@ -24,8 +24,8 @@ def main():
             'source_revision': report['source_revision'], 'groups': {}, 'packages': {}}
     with tempfile.TemporaryDirectory(prefix='p01-apk-resolution-') as temporary:
         work = Path(temporary)
-        for group, requested in [('build', '$PHPIZE_DEPS postgresql-dev linux-headers'),
-                                 ('runtime', 'libpq'), ('composer', 'unzip')]:
+        for group, requested in [('build', '$PHPIZE_DEPS postgresql-dev linux-headers openssl'),
+                                 ('runtime', 'libpq openssl'), ('composer', 'unzip')]:
             target = work / group; target.mkdir(); target.chmod(0o777)
             command = ('apk fetch --no-cache --recursive --url ' + requested + ' > /packages/urls.txt\n'
                        'apk fetch --no-cache --recursive --output /packages ' + requested + '\n'
@@ -52,6 +52,13 @@ def main():
                 require(path.name not in lock['packages'] or lock['packages'][path.name] == item,
                         'package_changed_during_resolution')
                 lock['packages'][path.name] = item
+            installed = subprocess.run(['docker', 'run', '--rm', '--network', 'none', '--platform', 'linux/amd64',
+                                        '--mount', f'type=bind,src={target},dst=/packages,readonly',
+                                        '--entrypoint', 'sh', selected['reference'], '-eu', '-c',
+                                        'apk add --no-network --repositories-file /dev/null /packages/*.apk'],
+                                       capture_output=True, timeout=180)
+            (args.observation / ('apk-' + group + '-offline-install.log')).write_bytes(installed.stdout + installed.stderr)
+            require(installed.returncode == 0, 'apk_offline_install_failed:' + group)
         require(len([p for p in lock['packages'].values() if p['name'] == 'libpq']) == 1, 'ambiguous_runtime_libpq')
     lock['resolver_sha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     (args.observation / 'alpine-packages.lock.json').write_bytes(encode(lock))
