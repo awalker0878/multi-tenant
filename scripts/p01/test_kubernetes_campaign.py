@@ -52,6 +52,23 @@ class KubernetesCampaignTest(unittest.TestCase):
         with patch.object(self.campaign, "exec", return_value=b'{"outcome":"timeout"}'):
             self.campaign.network_check("planning", "10.0.0.2", 8443, False)
 
+    def test_health_contracts_preserve_each_owned_language_envelope(self):
+        for service in ("console", "planning"):
+            body = {"service": service, "status": "ready", "scope": "foundation_dependencies"}
+            if service == "planning":
+                body["native_operations_enabled"] = False
+            response = {"status": 200, "body": json.dumps(body), "cache_control": "no-store, private"}
+            with self.subTest(service=service), patch.object(self.campaign, "http", return_value=response):
+                self.campaign.health(service, 200)
+                body["native_operations_enabled"] = True
+                response["body"] = json.dumps(body)
+                with self.assertRaisesRegex(RuntimeError, "dependency-http-contract"):
+                    self.campaign.health(service, 200)
+        response = {"status": 200, "body": '{"service":"planning","status":"ready","scope":"foundation_dependencies"}', "cache_control": "no-store"}
+        with patch.object(self.campaign, "http", return_value=response):
+            with self.assertRaisesRegex(RuntimeError, "dependency-http-contract"):
+                self.campaign.health("planning", 200)
+
     def test_cleanup_still_deletes_owned_cluster_after_log_failure(self):
         self.campaign.cluster_attempted = True
         calls = []

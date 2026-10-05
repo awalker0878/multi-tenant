@@ -3,9 +3,7 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor
-import hashlib
 import json
-import os
 from pathlib import Path
 import re
 import secrets
@@ -13,7 +11,6 @@ import shutil
 import subprocess
 import sys
 import tarfile
-import time
 import urllib.request
 
 from kubernetes_runtime import prepare
@@ -228,7 +225,12 @@ class KubernetesCampaign(Campaign):
     def health(self, service: str, status: int, identity: str | None = "valid") -> None:
         result = self.http(service, "/health/dependencies", identity=identity)
         body = json.loads(result.get("body", "{}"))
-        self.check("dependency-http-contract", result.get("status") == status and body.get("scope") == "foundation_dependencies" and body.get("native_operations_enabled") is False and "no-store" in result.get("cache_control", ""), {"service": service, "identity": identity, "response": result})
+        expected = {"service": service, "status": {200: "ready", 401: "unauthorized", 503: "not_ready"}[status], "scope": "foundation_dependencies"}
+        if service not in PHP_SERVICES:
+            expected["native_operations_enabled"] = False
+        if status == 503:
+            expected["reason"] = "dependency_unavailable" if service in PHP_SERVICES else "dependencies_unavailable"
+        self.check("dependency-http-contract", result.get("status") == status and body == expected and "no-store" in result.get("cache_control", ""), {"service": service, "identity": identity, "response": result})
 
     def make_probes(self, imports: dict) -> None:
         resources = []
@@ -290,6 +292,11 @@ class KubernetesCampaign(Campaign):
         for filename in ("resources.json", "migrations.json", "namespace.json", "kind.json", "image-imports.json", "fixture.json"):
             shutil.copyfile(self.runtime / filename, self.output / filename)
         imports = json.loads((self.runtime / "image-imports.json").read_text())
+        node_reference = candidates["node"]["reference"]
+        self.command("pull-pinned-kind-node", ["docker", "pull", "--platform", "linux/amd64", node_reference], timeout=180)
+        node_digests = json.loads(self.command("kind-node-registry-identities", ["docker", "image", "inspect", "--format", "{{json .RepoDigests}}", node_reference]))
+        self.check("kind-node-registry-digest-matches", any(value.endswith("@" + node_reference.split("@", 1)[1]) for value in node_digests))
+        self.report["kind_node_repo_digests"] = node_digests
         self.cluster_attempted = True
         self.command("create-isolated-kind", [str(self.tools / "kind"), "create", "cluster", "--name", self.cluster,
                      "--config", str(self.runtime / "kind.json"), "--kubeconfig", str(self.kubeconfig), "--wait", "0s"], timeout=240)
@@ -386,6 +393,11 @@ class KubernetesCampaign(Campaign):
                     self.command("container-logs-" + service, self.k("logs", "deployment/" + service, "--all-containers=true", "--tail=200"), expected=None, timeout=20)
                 except Exception:
                     self.report.setdefault("log_capture_failures", []).append(service)
+            for service in SERVICES:
+                try:
+                    self.command("migration-logs-" + service, self.k("logs", "job/" + service + "-migrator", "-c", "migrate", "--tail=100"), expected=None, timeout=20)
+                except Exception:
+                    self.report.setdefault("log_capture_failures", []).append(service + "-migrator")
             if not keep:
                 try:
                     self.command("delete-owned-kind-cluster", [str(self.tools / "kind"), "delete", "cluster", "--name", self.cluster], timeout=180)
