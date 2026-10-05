@@ -4,6 +4,19 @@ P01.04; R02/R31/R35; platform/security reviewers. The current increment implemen
 receiving-side validation and conservative review predicates. Actual repository
 settings and operated registry/signer/receiver identities remain separate inputs.
 
+## Current remediated candidate set
+
+EV-P01-024 supersedes the earlier image hold with run 37272826276 at
+`b7705eef994c50863d87b4d8f9ff272f9397ca37`. All nine candidates pass development admission with
+zero blocking findings. Eighteen CycloneDX image/source SBOMs, nine development
+signatures, 63 expected denials and nine unchanged-byte transfers remain bound
+to the exact artifacts. Retrieval independently rechecked 206 build logs and
+231 source bindings. See [the remediation record](p01-image-remediation.md).
+
+The [complete manifest](../../release/p01-candidate-set.json) now has zero held
+components and status REQUIRES_INDEPENDENT_QUALIFICATION. It does not authorize
+product promotion or supply actual repository/operating acceptance.
+
 ## Implemented boundaries
 
 - The versioned consumer registry describes implemented Catalogue-to-Planning facts
@@ -108,7 +121,7 @@ product behavior. No scanner ignore file or risk waiver is applied.
 
 Two findings have published fixes: libpcre2-8-0 `10.42-1+deb12u2` and tzdata
 `2026c-0+deb12u1`. Both packages are available in the already selected signed
-20261004 Debian snapshot. All nine runtime builds now request those exact versions.
+20261004 Debian snapshot. Those nine Bookworm runtime builds requested those exact versions.
 The PHP runtime additionally removes unused linux-libc-dev headers during existing
 build-tool cleanup. Corrected run 37265822363 at source
 `41bbcaec3be5ec0f2abdd534bab2041e46a74e90` rebuilt and probed all nine images,
@@ -117,7 +130,7 @@ All nine owned-source scans have zero blocking findings. The four PHP candidates
 each retain 80 blocking package/advisory matches (36 distinct advisory IDs); the
 five Python candidates each retain 63 matches (23 distinct IDs). None of those
 remaining matches has a scanner-provided fixed version. The observations do not
-establish exploitability or authorize a waiver. Every image stays HELD.
+establish exploitability or authorize a waiver. Every image in that historical run remained HELD.
 
 The corrected campaign measured 81 expected denials, nine development signatures
 and nine unchanged-byte transfers into quarantine. Retrieval reverified all nine
@@ -128,14 +141,14 @@ recorded separately from that failed candidate decision.
 ## Complete candidate evidence set
 
 [The generated manifest](../../release/p01-candidate-set.json) composes all seven
-applications and both selected workers from the corrected run. It binds each
+applications and both selected workers from the remediated run 37272826276. It binds each
 source path, revision, lock, image/config digest, build report, SBOM, provenance,
 development signature and negative-case report. The generator rejects missing
-components, a changed registry, mixed sources, altered retained bytes and a claim
+components, changed component identities, mixed sources, altered retained bytes and a claim
 that a held candidate was admitted. It is a historical development evidence set,
 not a deployable product release; full image layers are not retained here.
 
-Regenerate with `python3 scripts/p01/artifacts/release_set.py --run-path verification/p01/artifact-trust/run-37265822363 --output release/p01-candidate-set.json`.
+Regenerate with `python3 scripts/p01/artifacts/release_set.py --run-path verification/p01/artifact-trust/run-37272826276 --output release/p01-candidate-set.json`.
 Normal CI uses `--check` to reject stale generated content. Historical freshness is
 evaluated at the original observation time; later promotion needs new scans and
 independent full-artifact/trust verification.

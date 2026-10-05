@@ -1,75 +1,67 @@
 # G01 engineering assessment — 2026-10-05
 
 Scope: the six P01 foundation packages on `greenfield/enterprise-microservices-plan`.
-Examiner: Codex. This records technical evidence and remaining conditions. It is
-not an accountable G01 decision. The user's existing G00 approval remains accepted.
+Examiner: Codex. This is a technical evidence examination, not an accountable G01
+decision. The user's recorded G00 approval remains accepted.
 
-**G01 is not ready to pass.** The register records P01 work as IN_PROGRESS and
-verification as FAILED because mandatory real-image admission fails. G01 remains
-NOT_REVIEWED. No native writes, operated promotion or new gate approval occurred.
+**Image admission is now passing.** BL-P01-002 is resolved for the nine remediated
+development candidates at `b7705eef994c50863d87b4d8f9ff272f9397ca37`. P01 work and verification
+remain IN_PROGRESS and G01 remains NOT_REVIEWED because repository enforcement,
+actual operating inputs, remaining signal integration and independent receiving
+reviews are incomplete. No operated promotion or native effect occurred.
 
 ## Criterion examination
 
 | Criterion | Measured foundation evidence | Remaining condition |
 | --- | --- | --- |
-| G01.01 — Independent builds | Private locks and isolated package/image builds for seven applications and two workers; affected-owner selection, all package checks and contract checks pass at the resumed source. The complete candidate set binds source, locks and image identities. | Accountable service/engineering review; image security eligibility is separately held under G01.04. Future changed images need affected requalification. |
-| G01.02 — Isolated installation | EV-P01-016/018 retain 149 Compose and 166 Kubernetes checks; scoped authenticated diagnostics, dependency failure, restricted paths and synthetic identity are measured. Permit Desk and stateful-dependency records retain their separate installation scope. | Review actual OP01 environment/BOM/network inputs before adopting an operated runtime; do not treat diagnostic readiness as completed product behavior. |
-| G01.03 — Contracts and messaging | EV-P01-015/017 retain 35 real messaging checks, 16 event fixtures and 28 HTTP fixtures, deterministic clients, version freezing, rollback, deduplication and crash/restart observations. | Independent architecture/quality review; business API semantics and future capabilities remain with their owning feature packages. |
-| G01.04 — CI and artifact trust | EV-P01-019–023 retain policy/exclusion/impact controls, actual target-base non-execution, real scans, SBOMs, provenance, signatures and exact-artifact denials. The expanded 59-test suite and repository secret scan pass. | FAILED candidate admission: every image remains held. Actual review accounts, default-branch hook/reporting/protection activation and OP02 operated registry/signer/trust integration remain absent. |
-| G01.05 — Stateful identities | Context runtime/migrator separation, denied foreign/admin access, TLS, revoked identities and persistent dependency state are measured in EV-P01-014/016/018. | OP03 actual secret/PKI/evidence custody and key/retention ownership; accountable security and database review. Disposable credentials are not operated identity integration. |
-| G01.06 — Recovery and operations | Complete synthetic Permit Desk restores, selected retained object recovery, persistent Console sessions/cache, failed-deployment recovery and seven synthetic HTTPS alert receipts are retained. | Actual OP05 receiving route/response acknowledgement, OP06 retained inventory/key recovery and receiving review. Reconcile remaining correlated signal/resource measurement coverage and OP07 support obligations. Synthetic acknowledgements are not human or service acceptance. |
+| G01.01 — Independent builds | All seven applications and both selected workers pass isolated builds, package checks and image probes; EV-P01-024 binds current source, locks and image identities. | Accountable service/engineering review; requalify changed artifacts. |
+| G01.02 — Isolated installation | EV-P01-025/026 retain 179 Compose and 196 Kubernetes checks on the Alpine replacements, with authenticated diagnostics and isolation/recovery denials. | Actual OP01 runtime/BOM/network/resource inputs and receiving review; diagnostic readiness is not product readiness. |
+| G01.03 — Contracts and messaging | EV-P01-027 requalifies 35 real PostgreSQL/RabbitMQ checks, 16 event fixtures and 28 HTTP fixtures; earlier detailed records preserve atomic rollback, deduplication and crash/restart scope. | Independent architecture/quality review; business API semantics remain with feature packages. |
+| G01.04 — CI and artifact trust | Nine current images pass admission, with 18 CycloneDX SBOMs, development signatures, exact-artifact denials and immutable copies. All 59 policy tests and the 9,806-file repository secret scan pass. | BL-P01-001: verified review accounts, default-branch hook, independent reporter and actual protection. OP02 operated registry/signer/trust integration. |
+| G01.05 — Stateful identities | Remediated runtime campaigns and EV-P01-027 preserve database/runtime/migrator separation, TLS, revoked identities and persistent dependency state. | OP03 actual secret/PKI/evidence custody, key/retention ownership and accountable security/database review. |
+| G01.06 — Recovery and operations | Complete synthetic Permit Desk recovery, selected-object restore, shared-state persistence and failed-deployment recovery are requalified. Both environments now retain 30 resource samples across all 15 containers with zero observed OOM kills. | Correlated application signals and collection-failure coverage; actual OP05 receiver/response review, OP06 retained inventory/key recovery, OP07 support obligations and independent receiving acceptance. |
 
-## Artifact findings and evidence integrity
+## Remediation and evidence integrity
 
-The corrected image campaign at `41bbcaec3be5ec0f2abdd534bab2041e46a74e90`
-contains the exact fixed libpcre2/tzdata packages and removes unused PHP kernel
-headers. Each of four PHP images still has 80 blocking package/advisory matches
-(36 distinct advisory IDs); each of five Python images has 63 (23 distinct IDs).
-No fixed version is reported for those remaining matches. These are scanner
-observations requiring triage, not exploitability determinations. No exception is
-active. BL-P01-002 owns the explicit remediation/requalification work.
+The retained Bookworm failures remain historical evidence: four PHP images had
+80 blocking matches each and five Python images had 63. The replacement study
+measured zero blocking findings in the exact official Alpine 3.24.2 bases at the
+same PHP/Python versions. Full PHP rebuilds exposed an incomplete OpenSSL upgrade
+closure; the corrected lock includes the matching executable and libraries.
+All 76 APK artifacts are pinned by URL/version/size/hash and each group was
+installed into the exact base with networking disabled before adoption.
 
-All nine image control campaigns pass their negative cases while keeping the
-candidates HELD. There are 81 denial observations and nine byte-identical copies
-into quarantine. This is not a successful product promotion. New run 37269433149
-at `48a998c8b4517f5d27933973d9d4b04677b48e49` again reports PASSED_CONTROLS/HELD
-for all nine images, with no campaign errors. Its
-[observed job summaries](../../../verification/p01/artifact-trust/run-37269433149/workflow-observation.json)
-keep that distinction explicit.
+EV-P01-024 retains run 37272826276: every candidate is ADMITTED_DEVELOPMENT with
+zero blocking findings. Its 18 CycloneDX image/source SBOMs remain hash-bound in
+the signed manifests. Nine signatures, 63 expected denials and nine unchanged-byte
+development transfers pass; retrieval independently rechecked 206 raw build logs
+and 231 source bindings. Complete image layers are not retained and ephemeral
+development keys are not an operated trust root. Later admission needs fresh
+scans and independent full-artifact verification.
 
-The [retention repair](../../implementation/p01-evidence-retention.md) restores
-18 original build logs through verified Git blobs. Their original SHA-256 values
-were never changed. The continuous checker verifies declared retained inventories;
-it establishes byte consistency, not independent authorization or authenticity.
+EV-P01-025/026 retain complete runtime archives and exact report copies; source
+bindings and declared log hashes were rechecked before retention. Samples are
+point-in-time synthetic measurements, not capacity or recovery objectives.
+Compose's effective limits are explicitly unlimited; that observation does not
+approve an operating budget. Replacement containers reset cumulative counters.
 
-EV-P01-023 retains run 37269433140: 59 control tests, a successful detector positive
-control, and zero secret findings across all 9,766 tracked files. Both downloaded
-archive hashes and every source binding were independently compared with the
-immutable Git tree. The original redacted report remains in its verified ZIP.
-Heuristic scan coverage does not prove secret absence or examine Git history.
-
-The [resumed workflow summary](../../../verification/p01/policy-controls/resumed-workflow-summary.json)
-at source `48a998c8b4517f5d27933973d9d4b04677b48e49` records successful package,
-contract, policy, documentation, Compose, Kubernetes and Permit Desk workflows.
-The image workflow is the single failed workflow, for the explicit nine-candidate
-security hold described above. All workflows completed; none remains running in
-this source-bound validation set.
+EV-P01-027 retains the requalified contract, messaging, dependency, Permit Desk,
+policy and repository-scan archives. Secret detection remains heuristic and does
+not inspect Git history. All declared source hashes were compared with exact
+Git blob bytes at the recorded revision.
 
 ## Concrete receiving package
 
-- [Complete held candidate set](../../../release/p01-candidate-set.json): all nine
-  image/source/lock/SBOM/provenance/signature bindings and denial observations.
-- [OP01–OP07](../../../release/operating-inputs.json): actual inputs, accountable
-  roles and immutable evidence fields; all seven remain UNKNOWN. Run
-  `python3 scripts/p01/admission/operating_inputs.py --require-complete` to observe
-  the current failed readiness result. A schema-valid record is not authorization.
-- [Admission activation record](../../implementation/p01-operating-inputs.md):
-  verified account mapping, independent exact-PR reporter, default-branch hook,
-  CODEOWNERS and effective settings/denial observations still required. The
-  [latest settings observation](../../../verification/p01/admission/resumed-settings-observation.json)
-  remains `protected: false` with rulesets `[]`. The available connector exposes
-  no settings-mutation operation; administrator account permission does not add one.
+- [Current candidate set](../../../release/p01-candidate-set.json): zero held
+  components; REQUIRES_INDEPENDENT_QUALIFICATION; promotion is not authorized.
+- [Remediation record](../../implementation/p01-image-remediation.md) and
+  [resource observations](../../implementation/p01-resource-observation.md).
+- [OP01–OP07](../../../release/operating-inputs.json): all seven remain UNKNOWN;
+  `python3 scripts/p01/admission/operating_inputs.py --require-complete` returns
+  HELD and exits 1. Schema validity does not supply actual inputs or acceptance.
+- [Fresh repository settings](../../../verification/p01/admission/remediation-settings-observation.json):
+  unprotected branch and empty rulesets. The current connector supplies no
+  settings-mutation operation; account permission does not add that capability.
 
-Resolve the stated failed/missing conditions and record receiving reviews before
-changing G01's decision. An accountable decision to change scope or carry work
-forward must be recorded explicitly; this examination makes no such decision.
+Complete the remaining controls and independent reviews before changing G01's
+decision. This technical examination makes no scope waiver or gate decision.

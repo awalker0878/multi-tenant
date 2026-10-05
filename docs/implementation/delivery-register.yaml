@@ -57,7 +57,7 @@ phases:
   gate_id: G01
   status:
     work: IN_PROGRESS
-    verification: FAILED
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
@@ -84,6 +84,10 @@ phases:
   - EV-P01-021
   - EV-P01-022
   - EV-P01-023
+  - EV-P01-024
+  - EV-P01-025
+  - EV-P01-026
+  - EV-P01-027
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -528,6 +532,7 @@ work_packages:
   - EV-P01-010
   - EV-P01-011
   - EV-P01-012
+  - EV-P01-024
   blocker_ids: []
   dependency_package_ids: []
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
@@ -554,6 +559,7 @@ work_packages:
   - docs/implementation/p01-console-foundation.md
   - docs/implementation/p01-code-control.md
   - docs/implementation/p01-runtime-integration.md
+  - docs/implementation/p01-image-remediation.md
 - id: P01.02
   phase_id: P01
   title: Local and integration runtime
@@ -571,6 +577,8 @@ work_packages:
   - EV-P01-014
   - EV-P01-016
   - EV-P01-018
+  - EV-P01-025
+  - EV-P01-026
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -594,6 +602,7 @@ work_packages:
   - docs/implementation/p01-stateful-dependencies.md
   - docs/operations/runbooks/stateful-dependency-recovery.md
   - docs/implementation/p01-console-shared-state.md
+  - docs/implementation/p01-image-remediation.md
 - id: P01.03
   phase_id: P01
   title: Contracts and messaging
@@ -606,6 +615,7 @@ work_packages:
   evidence_ids:
   - EV-P01-015
   - EV-P01-017
+  - EV-P01-027
   blocker_ids: []
   dependency_package_ids:
   - P01.05
@@ -622,13 +632,14 @@ work_packages:
   - docs/contracts/README.md
   - docs/implementation/p01-messaging.md
   - docs/implementation/p01-http-contracts.md
+  - docs/implementation/p01-image-remediation.md
 - id: P01.04
   phase_id: P01
   title: CI and supply chain
   owner_role: SRE
   status:
     work: IN_PROGRESS
-    verification: FAILED
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
@@ -639,6 +650,8 @@ work_packages:
   - EV-P01-021
   - EV-P01-022
   - EV-P01-023
+  - EV-P01-024
+  - EV-P01-027
   blocker_ids:
   - BL-P00-001
   - BL-P01-001
@@ -664,6 +677,7 @@ work_packages:
   - docs/implementation/p01-laravel-images.md
   - docs/implementation/p01-http-contracts.md
   - docs/implementation/p01-artifact-admission.md
+  - docs/implementation/p01-image-remediation.md
 - id: P01.05
   phase_id: P01
   title: Runtime dependencies
@@ -681,6 +695,9 @@ work_packages:
   - EV-P01-015
   - EV-P01-016
   - EV-P01-018
+  - EV-P01-025
+  - EV-P01-026
+  - EV-P01-027
   blocker_ids:
   - BL-P00-001
   dependency_package_ids: []
@@ -699,6 +716,7 @@ work_packages:
   - docs/operations/runbooks/stateful-dependency-recovery.md
   - docs/implementation/p01-console-shared-state.md
   - docs/implementation/p01-messaging.md
+  - docs/implementation/p01-image-remediation.md
 - id: P01.06
   phase_id: P01
   title: Baseline operations
@@ -716,6 +734,9 @@ work_packages:
   - EV-P01-015
   - EV-P01-016
   - EV-P01-018
+  - EV-P01-025
+  - EV-P01-026
+  - EV-P01-027
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -743,6 +764,7 @@ work_packages:
   - docs/operations/runbooks/stateful-dependency-recovery.md
   - docs/implementation/p01-console-shared-state.md
   - docs/implementation/p01-messaging.md
+  - docs/implementation/p01-resource-observation.md
 - id: P02.01
   phase_id: P02
   title: Authentication
@@ -2988,6 +3010,10 @@ gates:
   - EV-P01-021
   - EV-P01-022
   - EV-P01-023
+  - EV-P01-024
+  - EV-P01-025
+  - EV-P01-026
+  - EV-P01-027
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -4265,6 +4291,132 @@ evidence:
     acceptance.
   valid_until: null
   invalidated_at: null
+- id: EV-P01-024
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/870e73c0cc7f89fb6eda32b6371a053456b35016/verification/p01/artifact-trust/run-37272826276/retrieval.json
+  sha256: d392193cff5f88fb2faf505c9f0a80b53ff04dd52f1a174ee7d10f1336b71fc0
+  source_revision: b7705eef994c50863d87b4d8f9ff272f9397ca37
+  artifact_revisions:
+    retained_artifact_commit: 870e73c0cc7f89fb6eda32b6371a053456b35016
+    workflow_run_id: 37272826276
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-image-remediation.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures;
+    no native endpoints or operated promotion.
+  scope: All nine Alpine replacement images build and pass process isolation and mandatory security admission
+    with zero blocking findings. Eighteen nonempty CycloneDX image/source SBOMs remain bound into signed
+    manifests. Nine development signatures, 63 expected denials and nine unchanged-byte development transfers
+    pass. Retrieval reverified 206 raw build logs, 231 unique immutable source bindings and all nine signatures.
+    Pinned package closure includes matching OpenSSL executable/libraries and is installed offline after
+    checksum/signature verification. Earlier failed Bookworm and incomplete-closure evidence remains retained.
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  - G01.04
+  observed_at: '2026-10-05T06:33:36Z'
+  observer: GitHub Actions; connector retrieval and exact-byte/source examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Historical synthetic foundation observations. Full image layers are not retained; development
+    signatures do not establish operated signer/registry trust. No production sizing, accepted recovery
+    objective, native effect, operating acceptance or G01 decision is inferred.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-025
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/870e73c0cc7f89fb6eda32b6371a053456b35016/verification/p01/local/run-37272826323/retrieval.json
+  sha256: ca05199b01f3224ab8782a8d09d5782fdb17d28c54f8181257744e21ad918a08
+  source_revision: b7705eef994c50863d87b4d8f9ff272f9397ca37
+  artifact_revisions:
+    retained_artifact_commit: 870e73c0cc7f89fb6eda32b6371a053456b35016
+    workflow_run_id: 37272826323
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-resource-observation.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures;
+    no native endpoints or operated promotion.
+  scope: 179 Compose checks pass on the remediated application images. Existing TLS/identity/tenant isolation,
+    encrypted shared state, restart and failed-configuration recovery remain measured. Thirty cgroup-v2
+    resource samples cover all 15 application/proxy/database containers across healthy and recovery stages
+    with zero observed OOM kills. Effective Compose limits are explicitly unlimited; these samples do
+    not approve that operating configuration. Seven synthetic HTTPS alert receipts/acknowledgements remain
+    measured. Verified 504 command logs and 299 source bindings; cleanup completed.
+  campaign_ids: []
+  criterion_ids:
+  - G01.02
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T06:35:35Z'
+  observer: GitHub Actions; connector retrieval and exact-byte/source examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Historical synthetic foundation observations. Full image layers are not retained; development
+    signatures do not establish operated signer/registry trust. No production sizing, accepted recovery
+    objective, native effect, operating acceptance or G01 decision is inferred.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-026
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/35d393449fe0157b65058b2ec363c81e16a6e9e9/verification/p01/kubernetes/run-37272826200/retrieval.json
+  sha256: d525c7545d4a2d36697465da0c09e140657c111d2b7aa28adb10f1a2671c4c86
+  source_revision: b7705eef994c50863d87b4d8f9ff272f9397ca37
+  artifact_revisions:
+    retained_artifact_commit: 35d393449fe0157b65058b2ec363c81e16a6e9e9
+    workflow_run_id: 37272826200
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-resource-observation.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures;
+    no native endpoints or operated promotion.
+  scope: 196 Kubernetes checks pass on the remediated application images, including existing Cilium default-deny/identity
+    checks, persistence, replacement-Pod state and failed-rollout recovery. Thirty cgroup-v2 resource
+    samples cover all 15 containers across healthy and recovery stages with zero observed OOM kills; effective
+    limits are retained. Complete original campaign ZIP and exact report copy retained, with source/log
+    verification and cleanup.
+  campaign_ids: []
+  criterion_ids:
+  - G01.02
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T06:48:33Z'
+  observer: GitHub Actions; connector retrieval and exact-byte/source examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Historical synthetic foundation observations. Full image layers are not retained; development
+    signatures do not establish operated signer/registry trust. No production sizing, accepted recovery
+    objective, native effect, operating acceptance or G01 decision is inferred.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-027
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/870e73c0cc7f89fb6eda32b6371a053456b35016/verification/p01/requalification/b7705eef994c50863d87b4d8f9ff272f9397ca37/retrieval.json
+  sha256: e58d57b5b0d2f506b1b68728a0d7505e1f7827391a7f7b1944937426873d7c34
+  source_revision: b7705eef994c50863d87b4d8f9ff272f9397ca37
+  artifact_revisions:
+    retained_artifact_commit: 870e73c0cc7f89fb6eda32b6371a053456b35016
+    workflow_run_id: 37272826260
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-image-remediation.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures;
+    no native endpoints or operated promotion.
+  scope: Requalification at the same source passes 35 real messaging checks and 16 event fixtures, 28
+    HTTP contract fixtures, 40 stateful-dependency checks, 79 Permit Desk recovery checks and 59 policy-control
+    tests. Positive-controlled repository secret scan reports zero findings across 9,806 exact tracked
+    files. All declared source bindings and command-log hashes were rechecked; seven complete original
+    archives retain detailed reports.
+  campaign_ids: []
+  criterion_ids:
+  - G01.03
+  - G01.04
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T06:36:08Z'
+  observer: GitHub Actions; connector retrieval and exact-byte/source examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Historical synthetic foundation observations. Full image layers are not retained; development
+    signatures do not establish operated signer/registry trust. No production sizing, accepted recovery
+    objective, native effect, operating acceptance or G01 decision is inferred.
+  valid_until: null
+  invalidated_at: null
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -4357,15 +4509,21 @@ blockers:
   - R35
   - G01
   owner_role: Platform image maintainers and security reviewers; actual assignments remain OP02/OP04 inputs
-  description: 'All nine real foundation image candidates fail security admission after available fixed-package
-    remediation. Remaining blocking matches have no fixed versions in the retained scanner observations:
-    80 matches per PHP image and 63 per Python image. No ignore file or risk waiver is applied.'
+  description: The earlier Bookworm candidate admission failure is resolved for the nine pinned Alpine
+    development replacements. Fresh exact-image scans report zero blocking findings, all nine admission
+    campaigns pass, and affected package, contract, messaging, Compose, Kubernetes, dependency and recovery
+    campaigns pass. Original failed observations remain retained; no waiver or severity/exclusion change
+    was applied.
   unblock_condition: Deliver pinned remediated or replacement image inputs and rerun affected build, dependency,
     contract/runtime and security campaigns; alternatively record a separately authorized exact-artifact
     risk disposition through an implemented reviewed policy. Never convert unavailable fixes into an automatic
     exception.
-  next_action: Use release/p01-candidate-set.json and EV-P01-022 to triage actual package/advisory identities,
-    assess updated/minimal runtime candidates, and retain fresh full-artifact evidence. Then integrate
-    the actual OP02 signer/registry/trust path and repeat source/target denial and immutable-copy checks.
-  state: OPEN
-  resolution_evidence_ids: []
+  next_action: Keep the remediated source/image/package locks and evidence bindings. Rebuild/rescan changed
+    candidates and obtain actual OP02 operated registry/signer/trust inputs plus independent receiving
+    review before any product promotion.
+  state: RESOLVED
+  resolution_evidence_ids:
+  - EV-P01-024
+  - EV-P01-025
+  - EV-P01-026
+  - EV-P01-027

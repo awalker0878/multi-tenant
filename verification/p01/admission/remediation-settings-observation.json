@@ -1,0 +1,15 @@
+{
+  "repository": "awalker0878/multi-tenant",
+  "branch": "greenfield/enterprise-microservices-plan",
+  "observed_at": "2026-10-05T06:44:28.258Z",
+  "source_revision": "870e73c0cc7f89fb6eda32b6371a053456b35016",
+  "branch_observation": {
+    "name": "greenfield/enterprise-microservices-plan",
+    "commit": {
+      "sha": "870e73c0cc7f89fb6eda32b6371a053456b35016",
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/commits/870e73c0cc7f89fb6eda32b6371a053456b35016"
+    },
+    "protected": false
+  },
+  "rulesets": []
+}

@@ -21,7 +21,7 @@ The five Python service/worker image results are also retained in the nine-image
 
 ## Build and runtime observations
 
-Each Laravel image uses an isolated owned build context, its private Composer lock, immutable PHP/Composer base manifests and the selected Debian package snapshot. Console additionally replays its npm lock with the pinned Node image and builds its frontend. Build logs bind actual dependencies; runtime probes observed PHP 8.5.11 and Laravel 13.34.0. The [build input lock](../../deploy/build/inputs.lock.json) records exact image references.
+The historical runs below used isolated owned contexts, private Composer locks, immutable PHP/Composer bases and a Debian package snapshot. Current P01 runtime images use the requalified Alpine inputs in the [remediation record](p01-image-remediation.md). Console additionally replays its npm lock with the pinned Node image and builds its frontend. Build logs bind actual dependencies; runtime probes observed PHP 8.5.11 and Laravel 13.34.0. The [build input lock](../../deploy/build/inputs.lock.json) records exact image references.
 
 Successful PHP checks include FPM configuration validation, HTTP-kernel liveness 200 and intentionally unavailable readiness 503. Containers ran as UID/GID 10001 with a read-only root, loopback-only networking, zero effective capabilities and no-new-privileges. Writable application paths use bounded temporary mounts. The probes reject baked deployment configuration and leaked Composer, Node, tests or node_modules; retained output records PHP extensions, Composer runtime packages and operating-system packages.
 

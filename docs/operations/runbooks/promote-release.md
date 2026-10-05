@@ -17,11 +17,11 @@ Apply the authoritative [gates](../../implementation/gates.md) to the destinatio
 
 ## Verification before transfer
 
-The current P01 [candidate set](../../../release/p01-candidate-set.json) is HELD
-and cannot enter this procedure as an approved release. Its development
-signatures and successful quarantine copies do not override image findings,
-missing operated trust or repository review. See the
-[G01 assessment](../../qualification/gate-reviews/g01-engineering-assessment-2026-10-05.md).
+The current P01 [candidate set](../../../release/p01-candidate-set.json) has zero
+held components after development-image remediation, but its status is
+REQUIRES_INDEPENDENT_QUALIFICATION and promotion is not authorized. Development
+signatures and immutable copies do not supply operated trust or repository
+review. See the [G01 assessment](../../qualification/gate-reviews/g01-engineering-assessment-2026-10-05.md).
 
 1. Fetch the exact candidate manifest from the approved source and verify its authenticity against independently configured trust policy. Reject absent, untrusted or revoked signatures.
 2. Resolve every referenced artifact by digest. Compare signed provenance, source/build revision, dependency lock and SBOM references. A matching tag/name is not a content check.
