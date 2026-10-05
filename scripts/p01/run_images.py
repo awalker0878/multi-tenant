@@ -60,7 +60,7 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
     if component["language"] == "python":
         require(bool(re.fullmatch(r"[a-z][a-z0-9_]*", component["module"])), "Invalid module")
         require(component["target"] == "runtime", "Unexpected Python target")
-        expected_inputs.update({".python-version", "pyproject.toml", "uv.lock", "README.md", "src"})
+        expected_inputs.update({".python-version", "pyproject.toml", "uv.lock", "README.md", "src", "build/snapshot.sh"})
     else:
         require(component["target"] == "php-runtime", "Unexpected PHP target")
         expected_inputs.update({"composer.json", "composer.lock", "artisan", "app", "bootstrap/app.php",
@@ -113,6 +113,10 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
         require(lock["debian_snapshot"] == "20261004T000000Z", "Unmeasured Debian snapshot")
         bases = ("php", "composer", "node") if component["id"] == "console" else ("php", "composer")
     dockerfile = (root / "Dockerfile").read_text()
+    require(lock["runtime_debian_packages"] == {"libpcre2-8-0": "10.42-1+deb12u2", "tzdata": "2026c-0+deb12u1"},
+            "Unmeasured runtime OS remediation set")
+    for package, version in lock["runtime_debian_packages"].items():
+        require(package + "=" + version in dockerfile, "Runtime remediation differs from input lock")
     for key in bases:
         require(f"ARG {key.upper()}_BASE={lock['images'][key]['reference']}\n" in dockerfile,
                 f"Standalone {key} base differs from input lock")
@@ -282,7 +286,7 @@ def main() -> int:
             build_arguments = [value for key in bases for value in (
                 "--build-arg", f"{key.upper()}_BASE={lock['images'][key]['reference']}"
             )]
-            if component["language"] == "php":
+            if "debian_snapshot" in lock:
                 build_arguments += ["--build-arg", f"DEBIAN_SNAPSHOT={lock['debian_snapshot']}"]
             report["used_base_images"] = {key: lock["images"][key] for key in bases}
             recorder.run("build", [
@@ -312,6 +316,14 @@ def main() -> int:
                            "platform": lock["platform"], "identity_kind": "local_image_configuration_digest"}
         docker = ["docker", "run", "--rm", "--read-only", "--network", "none", "--cap-drop", "ALL",
                   "--security-opt", "no-new-privileges", "--pids-limit", "64", "--memory", "256m", "--cpus", "1"]
+        corrected = recorder.run("runtime-os-remediation", [*docker, "--entrypoint", "dpkg-query", image,
+                                  "-W", "-f", "${Package}=${Version}\n", *sorted(lock["runtime_debian_packages"])], cwd=output)
+        require(set(corrected.decode().splitlines()) == {f"{p}={v}" for p, v in lock["runtime_debian_packages"].items()},
+                "Installed runtime remediation differs from reviewed versions")
+        report["runtime_os_remediation"] = lock["runtime_debian_packages"]
+        if component["language"] == "php":
+            recorder.run("unused-linux-headers-absent", [*docker, "--entrypoint", "/usr/bin/test", image,
+                         "!", "-d", "/usr/include/linux"], cwd=output)
         if component["language"] == "python":
             inventory = run_python_probes(recorder, docker, image, output, component, lock)
         else:

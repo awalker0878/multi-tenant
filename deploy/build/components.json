@@ -18,7 +18,8 @@
         "pyproject.toml",
         "uv.lock",
         "README.md",
-        "src"
+        "src",
+        "build/snapshot.sh"
       ],
       "probe_base": {
         "service": "planning",
@@ -52,7 +53,8 @@
         "pyproject.toml",
         "uv.lock",
         "README.md",
-        "src"
+        "src",
+        "build/snapshot.sh"
       ],
       "probe_base": {
         "service": "inventory",
@@ -84,7 +86,8 @@
         "pyproject.toml",
         "uv.lock",
         "README.md",
-        "src"
+        "src",
+        "build/snapshot.sh"
       ],
       "probe_base": {
         "service": "lifecycle",
@@ -116,7 +119,8 @@
         "pyproject.toml",
         "uv.lock",
         "README.md",
-        "src"
+        "src",
+        "build/snapshot.sh"
       ],
       "probe_base": {
         "service": "inventory",
@@ -147,7 +151,8 @@
         "pyproject.toml",
         "uv.lock",
         "README.md",
-        "src"
+        "src",
+        "build/snapshot.sh"
       ],
       "probe_base": {
         "service": "lifecycle",

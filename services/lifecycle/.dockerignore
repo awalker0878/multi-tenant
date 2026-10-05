@@ -5,6 +5,8 @@
 !pyproject.toml
 !uv.lock
 !README.md
+!build/
+!build/snapshot.sh
 !src/
 !src/**
 **/__pycache__/

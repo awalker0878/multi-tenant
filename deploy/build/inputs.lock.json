@@ -45,5 +45,9 @@
   "php_version": "8.5.11",
   "composer_version": "2.10.3",
   "node_version": "v24.19.0",
-  "debian_snapshot": "20261004T000000Z"
+  "debian_snapshot": "20261004T000000Z",
+  "runtime_debian_packages": {
+    "libpcre2-8-0": "10.42-1+deb12u2",
+    "tzdata": "2026c-0+deb12u1"
+  }
 }

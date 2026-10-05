@@ -90,3 +90,20 @@ record](p01-operating-inputs.md). Analyzer configuration changes require platfor
 and security roles; newly added inline suppressions require a prior exact-file,
 exact-source exception with a bounded expiry and required compensating check.
 Current exceptions remain empty.
+
+## Initial real-image findings and correction
+
+Run 37264699751 completed all nine real-image control campaigns at source
+`4d4b12d1e1b4e5db880d5b0722b7ad6715160d69`. Each candidate was correctly held.
+The nine exact owned-source scans, including development dependencies, had zero
+blocking findings. The four PHP images had 259 blocking package/advisory matches
+each (215 distinct advisory IDs); the five Python images had 65 each (25 distinct
+IDs). These are scanner observations requiring triage, not claims of exploitable
+product behavior. No scanner ignore file or risk waiver is applied.
+
+Two findings have published fixes: libpcre2-8-0 `10.42-1+deb12u2` and tzdata
+`2026c-0+deb12u1`. Both packages are available in the already selected signed
+20261004 Debian snapshot. All nine runtime builds now request those exact versions.
+The PHP runtime additionally removes unused linux-libc-dev headers during existing
+build-tool cleanup. The corrected images must be rebuilt, probed and rescanned;
+remaining upstream findings continue to hold promotion.
