@@ -111,11 +111,11 @@ Use local fakes only for development. Tests requiring database semantics must us
 
 | Work package | Deliverable and owner |
 | --- | --- |
-| P02.01 Authentication | Product/IAM: OIDC federation, secure browser sessions, CSRF/session expiry, logout, service workload identities, issuer/audience validation and certificate rotation |
+| P02.01 Authentication | Product/IAM: deployment-created local administrator with random displayed password and mandatory first-login change; console-managed external OIDC and verified handover retiring local access; secure sessions, CSRF/logout, workload identities, issuer/audience validation and rotation |
 | P02.02 Tenancy | Governance: tenants, memberships, delegated grants, scoped roles, environment/site restrictions, quotas and immutable audit events |
 | P02.03 Authorization | Governance/security: deny-by-default policy, tenant membership resolution, actor delegation, approval separation of duties and privileged support access rules |
 | P02.04 Approval lifecycle | Governance: approvals bound to plan digest/action/scope/expiry, revocation, expiry, change windows and break-glass approval/evidence process |
-| P02.05 Console foundation | Console: navigation, tenant selection, access-denied flows, account/session pages and accessible reusable components |
+| P02.05 Console foundation | Console: first-login password change, OIDC configuration/test/activation, navigation, tenant selection, denied/session flows and accessible reusable components |
 
 Tenant identifiers in a browser header or URL are selectors, never credentials. Every owning API validates the actor and requested tenant independently of the console. Test direct API access, guessed object IDs, search, exports, event subscriptions, logs and evidence URLs. If database row-level security is chosen, prove runtime roles cannot bypass it; it supplements application authorization.
 
@@ -287,7 +287,7 @@ The [deployment model](../operations/deployment-model.md) owns environment, depe
 | D03 Domain services | Run controlled migrations; deploy governance/catalogue/inventory/planning/lifecycle/assurance and console | Per-service health, authentication and compatible contracts |
 | D04 Observability | Connect telemetry, dashboards, audit sink, alert routing and synthetic journeys | Correlated request-to-operation trace with secret redaction |
 | D05 Site trust | Enroll workers, bind task queues/endpoints/scopes, install approved artifacts and secret references | Read-only handshake, revocation and partition behavior |
-| D06 Safe initial data | Bootstrap minimum administrator through controlled process; install reviewed profiles/policies; onboard first tenant | No baked-in credentials; approval and isolation checks |
+| D06 Safe initial data | Deployment generates/displays one random local-administrator password; first login requires change; console configures/tests OIDC and verified activation retires local access; install profiles/policies and onboard first tenant | No supplied default password or OIDC deployment settings; change/handover, approval and isolation checks |
 | D07 Read-only acceptance | Discover actual target/source, validate freshness, produce a plan and inspect evidence | No native writes; operator acceptance of readiness |
 | D08 Native enablement | Grant the exact tested operations within the change window and admitted plan | P06/P07 controls, emergency stop and recoverability |
 | D09 Pilot activation | Execute approved pilot, verify service and observe against SLO | Application/security/service-owner acceptance |

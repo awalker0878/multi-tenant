@@ -71,6 +71,23 @@ previous FAILED roll-up is cleared by retained remediation/requalification,
 not by ignoring the mandatory image check. Keep the accepted G00 decision and
 completed foundation campaigns; do not restart P00 or ask for G00 approval again.
 
+## P02 identity baseline
+
+[ADR-009](docs/decisions/adr-009-identity-delegation-and-authorization.md) defines
+console-managed external OIDC and a deployment-created local administrator.
+Initial deployment generates a random temporary password and displays it once
+to the authorized installer. First login requires a different password before
+any other protected function. The administrator configures and tests OIDC
+through the console; verified federated administrator activation disables local
+login and revokes its sessions. Provider values are application settings, not
+deployment configuration. Retries, restarts and provider outages cannot recreate
+the account or reopen local login after activation.
+
+Implement through P02.01/P02.05 and qualify Q01.17–Q01.20 at G02. The identity
+baseline is accepted design; P02 implementation remains NOT_STARTED and no G01
+advancement is inferred. Workload trust, custody and repository admission retain
+their distinct receiving inputs.
+
 ## Carried inputs and checkpoint ownership
 
 The user's reviewer identity, G00 approval, baseline decision scope, migration direction/method and later checkpoints are recorded with immutable provenance in the [input record](docs/qualification/feasibility/input-record.md). Do not request that baseline approval again. Remaining unknown integration and native fields describe actual inputs still needed, not a reason to stop independent foundation work.

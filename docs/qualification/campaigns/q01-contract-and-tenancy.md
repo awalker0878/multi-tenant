@@ -16,6 +16,8 @@ Use the [contract conventions](../../contracts/README.md), [examples](../../cont
 4. Prepare request/event fixtures with exact field types, canonical payload digests, revisions and idempotency keys for both PHP and Python.
 5. Capture database state, outbox/inbox counts and role grants through approved observation access before each fault case.
 
+For P02 identity tests, prepare a clean installation with no external OIDC deployment settings, an authorized installer display channel and a test OIDC provider configured only through the console. Capture lifecycle metadata without recording passwords, client secrets or tokens. Include concurrent bootstrap, interrupted display and pre/post-activation restore fixtures.
+
 For P02 approval tests, use synthetic immutable plan fixtures conforming to the agreed P00/P01 interface. P05 producer implementation is not a prerequisite for verifying the approval contract; rerun the binding cases against actual compiled plans when that producer is available.
 
 ## Case matrix
@@ -38,6 +40,10 @@ For P02 approval tests, use synthetic immutable plan fixtures conforming to the 
 | Q01.14 | Send nested/extra input and unauthorized resource relationships; trigger both JSON API and Inertia form errors | Only permitted fields mutate or serialize; API errors remain stable and Inertia uses safe scoped error bags | Request/response schemas, persistence checks and browser validation results |
 | Q01.15 | Crash after a domain/outbox commit but before publication; revoke the initiating actor before delivery | Relay recovers committed audit/projection/custody facts under valid consumer authority; new commands and protected downloads remain denied | Commit/publish/revocation timeline, consumer records and denial observations |
 | Q01.16 | Grow one tenant's data and relationship skew; exercise list/detail/export and stale-revision UI tasks | Query count/time, page/payload and memory stay within reviewed budgets; lazy-loading regressions fail checks and accessibility remains usable | Query plans, measured budgets and keyboard/assistive-technology task review |
+| Q01.17 | Deploy without OIDC configuration; repeat and race bootstrap operations, restart replicas and inspect display/custody boundaries | One local administrator; random temporary password displayed once only to the installer; stored hash and required-change state; no credential in shared/retained logs or artifacts and no retry regeneration | Redacted installer events, state counts and protected secret-exposure inspection |
+| Q01.18 | Log in with the temporary password; bypass the change screen through routes/APIs; submit the same password; then change it and retry the temporary credential | Only change/logout allowed until a different password is saved; direct API bypass denied, session/CSRF authority rotated, temporary password rejected and restriction survives restart | Browser/API denials, state transitions and redacted session observations |
+| Q01.19 | Configure/test OIDC through console; attempt unauthorized edits, invalid discovery/redirect targets, wrong issuer/audience and login without an administrative grant | No file/deployment-value changes; Governance persists authorized settings/secret references only; invalid tests preserve changed-password local setup and secret values are never returned | Authorized/denied setup API observations, configuration revisions and safe response inspection |
+| Q01.20 | Activate after verified federated administrator login; reuse local credentials/sessions, remove the IdP, retry deployment and restore older bootstrap state | Atomic activation/retirement revokes local access; IdP loss does not reopen it; retries create no administrator; restore reconciliation holds stale credentials; interrupted setup cannot duplicate grants | Activation/revocation timeline, outage/retry/restore denials and retained state/audit observations |
 
 ## Execution and observations
 
