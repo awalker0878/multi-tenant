@@ -156,3 +156,19 @@ in the separate hosted campaign), 50 Catalogue and 76 Console cases. The latest
 Console type, boundary and compiled-build checks also pass.
 The [G02 engineering assessment](../qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
 separates these observations from remaining integration and receiving work.
+
+## Independent browser engine campaigns
+
+The P02 identity workflow runs the existing two compiled browser journeys in
+separate Chromium, Firefox and WebKit jobs. Each has its own fresh PostgreSQL
+service, deployment credential, Console/Governance processes and synthetic HTTPS
+OIDC provider. Federation activation in one job cannot pre-initialize another.
+Each job retains engine-labelled evidence, the exact source, engine identity and
+zero-skip/zero-retry checks; one engine failure cannot cancel the other observations.
+
+This extends measurement of first-login change, OIDC handover, tenant navigation,
+controlled delayed responses, quota persistence, revoked access and same-session
+tab sign-out. A configured matrix is not a passing result. Retain and inspect each
+engine report before claiming interoperability. Playwright engine builds do not
+establish a managed enterprise browser floor, real back/forward-cache eligibility
+or manual assistive-technology acceptance; those remain their receiving tasks.

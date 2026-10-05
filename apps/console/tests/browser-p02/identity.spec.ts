@@ -1,6 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 
+test.beforeEach(async ({ browser, browserName }, testInfo) => {
+  testInfo.annotations.push(
+    { type: 'browser-engine', description: browserName },
+    { type: 'browser-version', description: browser.version() },
+  );
+});
+
 test('deployment credential requires a change, survives reload and cannot be reused', async ({ page }) => {
   const path = process.env.P02_BOOTSTRAP_FILE;
   if (!path) throw new Error('The isolated P02 runner must supply its private credential fixture.');

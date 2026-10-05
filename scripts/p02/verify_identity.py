@@ -36,16 +36,19 @@ def main() -> int:
     args = parser.parse_args()
     if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('P02_TEST_POSTGRES') != '1':
         parser.error('Requires the disposable P02 GitHub Actions PostgreSQL service.')
+    browser = os.environ.get('P02_BROWSER_ENGINE', 'chromium')
+    if browser not in {'chromium', 'firefox', 'webkit'}:
+        parser.error('Unsupported P02 browser engine.')
     root = Path(__file__).resolve().parents[2]
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     report = {'schema_version': 1, 'result': 'RUNNING', 'scope': 'P02 identity, tenancy and plan-bound approval increments',
               'source_sha': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
-              'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'observed_at': dt.datetime.now(dt.UTC).isoformat(),
+              'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'browser_engine': browser, 'observed_at': dt.datetime.now(dt.UTC).isoformat(),
               'checks': [], 'source_sha256': {}, 'limitations': ['Synthetic HTTPS OIDC peer; no operated-provider interoperability or DNS rotation qualification', 'Synthetic immutable plan authority; no real planning producer or native admission', 'No operated deployment or G01/G02 acceptance', 'Verified PostgreSQL TLS; loopback HTTP between applications; production ingress/workload TLS topology remains unqualified']}
     tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=root).decode().split('\0')
     for name in tracked:
-        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', '.github/workflows/p02-identity', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-')):
+        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', '.github/workflows/p02-identity', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-', 'contracts/schemas/events/identity-', 'contracts/asyncapi/identity.')):
             report['source_sha256'][name] = hashlib.sha256((root / name).read_bytes()).hexdigest()
     private_values = [os.environ['P02_TEST_PASSWORD']]
     processes: list[subprocess.Popen] = []
@@ -242,7 +245,10 @@ def main() -> int:
                 for name in ['governance', 'console']:
                     (output / f'{name}-http.log').write_text(redact((private_path / f'{name}.log').read_text()))
             browser_report = root / 'apps/console/test-results/p02-browser.json'
-            stats = json.loads(browser_report.read_text())['stats']
+            browser_result = json.loads(browser_report.read_text())
+            projects = browser_result['config']['projects']
+            check('requested-browser-engine-ran', len(projects) == 1 and projects[0]['name'] == browser)
+            stats = browser_result['stats']
             report['browser_stats'] = stats
             (output / 'browser.json').write_text(redact(browser_report.read_text()))
             check('browser-no-skips-retries-or-failures', stats['expected'] == 2 and all(stats[key] == 0 for key in ['unexpected', 'flaky', 'skipped']))

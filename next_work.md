@@ -46,7 +46,9 @@ Implementation and limits are in [event delivery](docs/implementation/p02-govern
 
 **Current increment:** the distinct [identity outbox delivery](docs/implementation/p02-identity-events.md)
 is implemented; retain the exact-source PostgreSQL/TLS broker and identity
-qualification before registering its evidence.
+qualification before registering its evidence. The Console workflow now qualifies
+the same journeys independently in Chromium, Firefox and WebKit; inspect and retain
+each engine result before claiming measured interoperability.
 
 **Next concrete work:** integrate actual notification consumers with explicit
 owner scope, durable inboxes and reconciliation APIs. Bind Catalogue's guard to owner resources

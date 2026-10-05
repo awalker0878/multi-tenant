@@ -13,9 +13,15 @@ permissions:
 
 jobs:
   identity:
-    name: P02 identity, tenancy and approval PostgreSQL and browser
+    name: P02 identity, tenancy and approval (${{ matrix.browser }})
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      P02_BROWSER_ENGINE: ${{ matrix.browser }}
     services:
       postgres:
         image: postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d
@@ -53,7 +59,7 @@ jobs:
           npm ci --prefix apps/console --ignore-scripts --no-audit --no-fund
           npm run build --prefix apps/console
           cd apps/console
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps "${P02_BROWSER_ENGINE}"
       - name: Exercise PostgreSQL, real deployment terminals and the compiled browser journey
         env:
           P02_TEST_POSTGRES: '1'
@@ -64,7 +70,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: p02-identity-${{ github.run_id }}-${{ github.run_attempt }}
+          name: p02-identity-${{ matrix.browser }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/p02-identity/
           if-no-files-found: error
           retention-days: 14
