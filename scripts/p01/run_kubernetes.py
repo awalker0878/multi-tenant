@@ -233,6 +233,15 @@ class KubernetesCampaign(Campaign):
             expected["reason"] = "dependency_unavailable" if service in PHP_SERVICES else "dependencies_unavailable"
         self.check("dependency-http-contract", result.get("status") == status and body == expected and "no-store" in result.get("cache_control", ""), {"service": service, "identity": identity, "response": result})
 
+    def check_console_shared_state(self, stage: str) -> None:
+        self.exec("console", ["sh", "-ec", "cat > /tmp/shared-state.php"],
+                  data=(self.root / "scripts/p01/console_shared_state.php").read_bytes())
+        raw = self.exec("console", ["php", "/tmp/shared-state.php"],
+                        data=json.dumps({"stage": stage}).encode())
+        observed = json.loads(raw)
+        self.check("console-shared-state-" + stage,
+                   observed["result"] == "PASS" and all(x["passed"] for x in observed["checks"]), observed)
+
     def make_probes(self, imports: dict) -> None:
         resources = []
         for service in SERVICES:
@@ -354,6 +363,8 @@ class KubernetesCampaign(Campaign):
             self.sql(service, "SELECT 1;", sslmode="disable", expected=2)
             self.sql(service, "SELECT 1;", bad_password=True, expected=2)
         self.report["fixture_data_sha256"] = baseline
+        self.check_console_shared_state("write")
+        self.check_console_shared_state("second-process")
         pg_ip = self.pod_ip("postgres", "postgres")
         for service in SERVICES:
             foreign = "catalogue" if service != "catalogue" else "governance"
@@ -381,6 +392,11 @@ class KubernetesCampaign(Campaign):
             self.health(service, 200)
             actual = digest(self.sql(service, "SELECT tenant_id,record_id,payload FROM app.foundation_records ORDER BY tenant_id,record_id;"))
             self.check("restart-preserves-fixture-data", actual == baseline[service], {"service": service, "sha256": actual})
+        self.check_console_shared_state("after-database-restart")
+        self.command("restart-console-pod", self.k("rollout", "restart", "deployment/console"))
+        self.command("restarted-console-ready", self.k("rollout", "status", "deployment/console", "--timeout=120s"), timeout=140)
+        self.health("console", 200)
+        self.check_console_shared_state("after-console-restart")
         # Fail a new revision of only Console, retain the old ready replica, then
         # restore the prior Deployment template using Kubernetes revision history.
         broken = {"spec":{"template":{"spec":{"containers":[{"name":"console","command":["php","-r","exit(42);"],"args":[]}]}}}}
@@ -392,6 +408,7 @@ class KubernetesCampaign(Campaign):
         self.command("recovered-console-rollout", self.k("rollout","status","deployment/console","--timeout=120s"), timeout=140)
         self.health("console", 200)
         self.check("failed-rollout-preserves-database-records", digest(self.sql("console", "SELECT tenant_id,record_id,payload FROM app.foundation_records ORDER BY tenant_id,record_id;")) == baseline["console"])
+        self.check_console_shared_state("after-configuration-rollback")
         self.command("installed-pod-inventory", self.k("get", "pods", "-o", "json"))
         self.command("installed-network-policies", self.k("get", "networkpolicies", "-o", "json"))
         self.report["result"] = "PASS"
