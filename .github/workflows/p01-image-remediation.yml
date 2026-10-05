@@ -1,0 +1,28 @@
+name: P01 image remediation observation
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths:
+      - deploy/build/remediation-candidates.json
+      - scripts/p01/artifacts/observe_remediation.py
+      - .github/workflows/p01-image-remediation.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Resolve and scan unchanged-version official image alternatives
+        run: python3 scripts/p01/artifacts/observe_remediation.py --output "$RUNNER_TEMP/p01-remediation"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p01-remediation-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-remediation/
+          if-no-files-found: error
+          retention-days: 14
