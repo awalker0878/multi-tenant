@@ -74,6 +74,7 @@ phases:
   - EV-P01-011
   - EV-P01-012
   - EV-P01-013
+  - EV-P01-014
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -556,6 +557,7 @@ work_packages:
   - EV-P01-011
   - EV-P01-012
   - EV-P01-013
+  - EV-P01-014
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -576,6 +578,8 @@ work_packages:
   - docs/implementation/p01-runtime-integration.md
   - docs/implementation/p01-permit-desk-recovery.md
   - docs/operations/runbooks/permit-desk-recovery.md
+  - docs/implementation/p01-stateful-dependencies.md
+  - docs/operations/runbooks/stateful-dependency-recovery.md
 - id: P01.03
   phase_id: P01
   title: Contracts and messaging
@@ -645,6 +649,7 @@ work_packages:
   - EV-P01-010
   - EV-P01-011
   - EV-P01-012
+  - EV-P01-014
   blocker_ids:
   - BL-P00-001
   dependency_package_ids: []
@@ -659,6 +664,8 @@ work_packages:
   - docs/engineering/data-and-messaging.md
   - docs/operations/runbooks/upgrade.md
   - docs/implementation/p01-runtime-integration.md
+  - docs/implementation/p01-stateful-dependencies.md
+  - docs/operations/runbooks/stateful-dependency-recovery.md
 - id: P01.06
   phase_id: P01
   title: Baseline operations
@@ -672,6 +679,7 @@ work_packages:
   - EV-P01-011
   - EV-P01-012
   - EV-P01-013
+  - EV-P01-014
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -695,6 +703,8 @@ work_packages:
   - docs/implementation/p01-runtime-integration.md
   - docs/implementation/p01-permit-desk-recovery.md
   - docs/operations/runbooks/permit-desk-recovery.md
+  - docs/implementation/p01-stateful-dependencies.md
+  - docs/operations/runbooks/stateful-dependency-recovery.md
 - id: P02.01
   phase_id: P02
   title: Authentication
@@ -1745,6 +1755,7 @@ requirements:
   - EV-P01-011
   - EV-P01-012
   - EV-P01-013
+  - EV-P01-014
   blocker_ids: []
 - id: R03
   package_ids:
@@ -2588,6 +2599,7 @@ requirements:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-013
+  - EV-P01-014
   blocker_ids: []
 - id: R30
   package_ids:
@@ -2894,6 +2906,7 @@ gates:
   - EV-P01-011
   - EV-P01-012
   - EV-P01-013
+  - EV-P01-014
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -3819,6 +3832,63 @@ evidence:
     or target. No production concurrent crash-consistency, guest/native deployment, uncaptured lost-target
     data recovery, Kubernetes fixture restore, protected evidence-store restore, external alert acknowledgement,
     signed promotion or operational/G01 acceptance. Observed timings are not accepted RTO/RPO.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-014
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/eb062d9372430fa6d8b3af94eac995969e1621e0/verification/p01/stateful/run-37254627255/retrieval.json
+  sha256: 2af0d1bf41a9239899c844a987173cedc0459cbce599133a8225afa5eafa8c26
+  source_revision: 72706e029b06345caa88608099c3137431ba1d10
+  artifact_revisions:
+    retained_artifact_commit: eb062d9372430fa6d8b3af94eac995969e1621e0
+    workflow_run_id: 37254627255
+    workflow_conclusion: success
+    artifact_archive_sha256: ba261e879199b4b98381e059a91e501f57e6e8ddc0c2109c0747bf7b5e2914fd
+    report_sha256: e2138059654bce62e1fdd3bae8d1be1ad11ba1be614553baeb6e97005e86a152
+    source_verification_sha256: 0db1c2a9d47e7e7632c6592dba153dea8cd1057df1d1e030b89c2e750b496a67
+    input_evidence_commit: 0ab20b97dd3ac60e10d1d890de27c4033b5a2c43
+    failed_runtime_evidence_commit: 04c35a16250bb7cf7a899d6d0a2ebad31c9c6db7
+    probe_image_configuration_id: sha256:de98fc99c53cf7e9f48260d6cb246d7555f9853bdac3a1595bc7370ddef960a2
+    object_store_image_configuration_id: sha256:1e7101d0ddb8930c7c236396b396c4b28217e9f3d4921abfdf6dc79f2c5a8f4a
+    object_client_image_configuration_id: sha256:ef46ff0e7e5d27fa76fe083d9dbbc9669deb4ecee312ddd09c4dcd46db3bea90
+    capture_uri: https://github.com/awalker0878/multi-tenant/blob/eb062d9372430fa6d8b3af94eac995969e1621e0/verification/p01/stateful/run-37254627255/evidence-capture.json
+    capture_sha256: a2a2b715edd1f94f4d13a488b104cda3987e831781e3faac2cd179b7d89a7c55
+    evidence_bytes_sha256: f24d45a5b34c6d3e308d574c56588bc8be58f5d747565f6c3701725afed46ef4
+    evidence_source_version: d824e6b8-563a-47fe-a1e2-31f51e533a76
+    evidence_restored_version: 0cdbbd62-3a90-4475-94f4-619c8e0df0ca
+    workflow_execution_id: 01a109da-6e00-7c3b-b19e-e517e2092743
+    implementation_record: docs/implementation/p01-stateful-dependencies.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; disposable single-node Compose dependencies with
+    no host-published ports; RabbitMQ 4.3.6, Temporal server/admin-tools 1.32.0, TLS PostgreSQL 18.6,
+    two independently credentialed source-built MinIO stores, pinned Go 1.27.1 and hash-locked probe clients.
+    Private synthetic CA/JWT/passwords and separate internal networks; no native endpoints.
+  scope: All 40 campaign checks, 73 live probe assertions and 67 bounded command outcomes passed with
+    complete cleanup and no withheld outputs. Verified 134 command-log hashes and 48 immutable source
+    bindings. Actual TLS/private PostgreSQL roles and five precise SQL denials, broker publish/consume/vhost
+    separation, Temporal namespace JWT rejection and inaccessible internal listeners, and S3 prefix/version
+    authority are measured. A confirmed unacknowledged durable broker message survives restart with identical
+    bytes and redelivery flag, then acknowledgement removes it. The same waiting Temporal workflow/run
+    survives worker/server/database restart, completes and appears in private visibility storage. Broker
+    deletion and S3 user disablement remain effective after restart; issuer-key withdrawal is checked
+    after Temporal restart. A selected 77-byte retained object version survives a newer PUT and restart,
+    restores to an independent empty store with identical digest/bytes, original identity metadata and
+    equal-or-longer retention, and survives another restart. Administrator version deletion/retention-shortening
+    denials preserve bytes/deadline in both stores. Dependency outages are classified separately from
+    authorization denials.
+  campaign_ids: []
+  criterion_ids:
+  - G01.02
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T02:18:30.785311+00:00'
+  observer: GitHub Actions — P01 isolated stateful dependency campaign
+  reviewer: Codex — immutable source, raw probe/command logs, exact database denial diagnostics, retained
+    bytes, workflow identity and cleanup examination
+  limitations: Disposable single-node Compose support tooling with synthetic identities and one selected
+    evidence object version. Product contracts/outbox/inbox and shared Console sessions/cache remain unimplemented.
+    No whole-store/all-version recovery, production vendor/IAM or regulatory retention qualification,
+    hot JWT revocation SLA, HA, external alert receipt, signed promotion, native platform effects, RPO/RTO
+    or operational/G01 acceptance. R15/R35/G01.03 receive groundwork only; no product messaging pass.
   valid_until: null
   invalidated_at: null
 blockers:

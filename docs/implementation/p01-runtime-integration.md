@@ -166,5 +166,22 @@ deployment recovery and operated trust/admission still require their own work an
 into fresh Compose installations, full logical/file equality, tenant/role denials,
 a post-restore write and failed-configuration recovery. This adds the previously
 missing application fixture; it does not change the scope of earlier foundation
-restart observations or add a Kubernetes fixture-restore claim. Remaining dependency,
-evidence-store, alert, trust and operating/G01 work stays open.
+restart observations or add a Kubernetes fixture-restore claim. Its dependency,
+evidence-store, alert and trust limitations remain part of that record.
+
+## Stateful dependency and selected-object recovery follow-on
+
+[The stateful dependency record](p01-stateful-dependencies.md) retains EV-P01-014:
+40 campaign checks and 73 live probe assertions pass for pinned RabbitMQ, Temporal
+with private PostgreSQL, and two source-built S3 fixtures. The record measures scoped
+identity denials, broker redelivery, restart-persistent credential revocation, completion
+of the same workflow execution and restoration of a selected retained object version
+to a fresh store with identical bytes, original identity metadata and preserved retention.
+The 134 command-log hashes and 48 source bindings have been verified against retained
+bytes and the immutable source tree; cleanup completed.
+
+These are separate synthetic dependency probes. They add no product messaging,
+Kubernetes dependency-installation, whole-store recovery or operated adoption claim.
+Shared Console sessions/cache, service-owned versioned contracts/outbox/inbox, actual
+alert receipt, remaining deployment recovery and admission/promotion trust remain open.
+G01 is still unreviewed.
