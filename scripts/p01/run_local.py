@@ -191,7 +191,7 @@ class Campaign:
 
     def check_console_shared_state(self, stage):
         # Copy a disposable invocation adapter; product images contain only owner code.
-        self.command('console-copy-shared-state-probe', self.dc('cp', str(self.root/'scripts/p01/console_shared_state.php'), 'console:/tmp/shared-state.php'))
+        self.command('console-copy-shared-state-probe', self.dc('exec','-T','console','sh','-ec','cat > /tmp/shared-state.php'), data=(self.root/'scripts/p01/console_shared_state.php').read_bytes())
         raw = self.command('console-shared-state-'+stage, self.dc('exec','-T','console','php','/tmp/shared-state.php'), data=json.dumps({'stage':stage}).encode())
         report = json.loads(raw)
         self.check('console-shared-state-'+stage, report['result']=='PASS' and all(x['passed'] for x in report['checks']), report)

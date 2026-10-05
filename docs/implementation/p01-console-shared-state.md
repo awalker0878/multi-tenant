@@ -38,3 +38,8 @@ also measures an invalid Console configuration and restoration of its original k
 plus Kubernetes failed-template rollback. HTTPS receipt/acknowledgement is exercised
 against a synthetic receiver when the real database outage is observed. External
 on-call routing and human acknowledgement remain separate operated inputs.
+
+The first live probe stopped at Docker's archive-copy operation against the read-only
+container root. The adapter is now streamed through `exec` into the existing writable
+`/tmp` mount as the unprivileged runtime user; root filesystem restrictions remain
+unchanged. Run `37258992085` retains that failed attempt.
