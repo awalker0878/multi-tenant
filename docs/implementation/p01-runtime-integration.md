@@ -158,3 +158,13 @@ and the P01.06 recovery package remain in progress; G01 remains unreviewed. Addi
 network paths, Kubernetes schema/secret fault cases, the complete Permit Desk fixture,
 broker/Temporal/evidence-store behavior, backup restoration, alert delivery, independent
 deployment recovery and operated trust/admission still require their own work and evidence.
+
+## Complete Permit Desk application recovery follow-on
+
+[The dedicated fixture record](p01-permit-desk-recovery.md) now retains EV-P01-013:
+79 passing application/configuration recovery checks, two actual backup restores
+into fresh Compose installations, full logical/file equality, tenant/role denials,
+a post-restore write and failed-configuration recovery. This adds the previously
+missing application fixture; it does not change the scope of earlier foundation
+restart observations or add a Kubernetes fixture-restore claim. Remaining dependency,
+evidence-store, alert, trust and operating/G01 work stays open.

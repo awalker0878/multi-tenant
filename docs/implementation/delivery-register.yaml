@@ -1,4 +1,3 @@
-# Canonical delivery state. Edit this file; regenerate progress.md and traceability.md.
 schema_version: 1
 baseline_date: '2026-10-04'
 branch: greenfield/enterprise-microservices-plan
@@ -74,6 +73,7 @@ phases:
   - EV-P01-010
   - EV-P01-011
   - EV-P01-012
+  - EV-P01-013
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -555,6 +555,7 @@ work_packages:
   - EV-P01-010
   - EV-P01-011
   - EV-P01-012
+  - EV-P01-013
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -573,6 +574,8 @@ work_packages:
   - docs/operations/deployment-model.md
   - docs/operations/runbooks/install.md
   - docs/implementation/p01-runtime-integration.md
+  - docs/implementation/p01-permit-desk-recovery.md
+  - docs/operations/runbooks/permit-desk-recovery.md
 - id: P01.03
   phase_id: P01
   title: Contracts and messaging
@@ -668,6 +671,7 @@ work_packages:
   evidence_ids:
   - EV-P01-011
   - EV-P01-012
+  - EV-P01-013
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -689,6 +693,8 @@ work_packages:
   - docs/operations/observability.md
   - docs/engineering/testing-and-ci.md
   - docs/implementation/p01-runtime-integration.md
+  - docs/implementation/p01-permit-desk-recovery.md
+  - docs/operations/runbooks/permit-desk-recovery.md
 - id: P02.01
   phase_id: P02
   title: Authentication
@@ -1738,6 +1744,7 @@ requirements:
   - EV-P01-010
   - EV-P01-011
   - EV-P01-012
+  - EV-P01-013
   blocker_ids: []
 - id: R03
   package_ids:
@@ -2579,7 +2586,8 @@ requirements:
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-013
   blocker_ids: []
 - id: R30
   package_ids:
@@ -2614,7 +2622,8 @@ requirements:
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-013
   blocker_ids: []
 - id: R31
   package_ids:
@@ -2664,6 +2673,7 @@ requirements:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-009
+  - EV-P01-013
   blocker_ids: []
 - id: R32
   package_ids:
@@ -2883,6 +2893,7 @@ gates:
   - EV-P01-010
   - EV-P01-011
   - EV-P01-012
+  - EV-P01-013
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -3765,6 +3776,51 @@ evidence:
     outstanding. G01 remains unreviewed.
   valid_until: null
   invalidated_at: null
+- id: EV-P01-013
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/27282f61d80bdcbddfbdc5094038a39706151833/verification/p01/permit-desk/run-37249201881/retrieval.json
+  sha256: c3b8c8e905cd91c74b84e09807aafe7e5c27cd7e834b0dbd515eb0c1e66ac1b0
+  source_revision: 2c562dd70214b162c21269017062b243161d1141
+  artifact_revisions:
+    retained_artifact_commit: 27282f61d80bdcbddfbdc5094038a39706151833
+    workflow_run_id: 37249201881
+    workflow_conclusion: success
+    report_sha256: 54b5ed09463b15769662f65188ad1dd709bc45f51f4c75715e015701de71f94c
+    application_image_configuration_id: sha256:fdde91ba1d8ff973523608249f1637eada084f06d394ac2e8de0cf57eabdf2e6
+    initial_capture_uri: https://github.com/awalker0878/multi-tenant/blob/27282f61d80bdcbddfbdc5094038a39706151833/verification/p01/permit-desk/run-37249201881/source-bundle.json
+    initial_capture_sha256: b0ff16ade2a0769bb963e8dbe21f7be8d7d68acce128dc8d8c2d435829d2abe9
+    post_write_capture_uri: https://github.com/awalker0878/multi-tenant/blob/27282f61d80bdcbddfbdc5094038a39706151833/verification/p01/permit-desk/run-37249201881/target-bundle.json
+    post_write_capture_sha256: 1d2d34f89e5946c3929578d542862779adba2a95ba68999bd3ba76df4379cf59
+    implementation_record: docs/implementation/p01-permit-desk-recovery.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; three unique disposable Compose installations;
+    owned CPython 3.12.14 image and hash-locked Psycopg 3.3.6 closure; TLS PostgreSQL 18.6; synthetic
+    tenant credentials, separate database/attachment volumes and no native endpoints.
+  scope: All 79 checks and 88 bounded command outcomes passed with complete cleanup. Six expected SQL
+    denials have their intended permission/login diagnostics. Verified 176 command-log hashes, 36 source
+    bindings against immutable Git tree entries, and both complete database/attachment capture envelopes.
+    Four permits/attachments across two tenants are created/read via authenticated HTTPS; anonymous, foreign-tenant,
+    reader mutation, forged authority and duplicate-write denials preserve state. Stopped application
+    and revoked runtime login establish the single-writer capture boundary. Six invalid captures allocate
+    no destination. Real pg_restore into fresh databases plus empty attachment storage preserves all logical
+    rows, ownership, timestamps, attachment bytes/digests/lengths/modes and configuration. Restored application
+    rejects the old source credential. The target accepts a known write, survives invalid configuration
+    rollout/recovery and database outage/restart, then its five-record capture restores into a third installation;
+    the new recovery writer succeeds while original source remains stale and fenced.
+  campaign_ids: []
+  criterion_ids:
+  - G01.02
+  - G01.06
+  observed_at: '2026-10-05T00:53:40.505766+00:00'
+  observer: GitHub Actions — P01 Permit Desk application recovery campaign
+  reviewer: Codex — immutable source, capture bytes, raw command/denial logs, state comparison and cleanup
+    evidence examination
+  limitations: Synthetic workload fixture, not a new control-plane service or product tenancy/identity
+    qualification. Compose and same PostgreSQL patch only. Capture requires a readable quiesced source
+    or target. No production concurrent crash-consistency, guest/native deployment, uncaptured lost-target
+    data recovery, Kubernetes fixture restore, protected evidence-store restore, external alert acknowledgement,
+    signed promotion or operational/G01 acceptance. Observed timings are not accepted RTO/RPO.
+  valid_until: null
+  invalidated_at: null
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -3809,16 +3865,18 @@ blockers:
   - G01
   owner_role: Platform, application and qualification owners; named assignments not supplied
   description: The reviewer approved G00 advancement with complete application/configuration and candidate-topology
-    feasibility carried into P01.02/P01.06. Existing PostgreSQL/attachment consistency and both fixture
-    recovery boundaries retain E2 evidence. Missing native installation facts and scoped campaign authority
-    remain due at G04/G07/G08; no native claim is inferred.
+    feasibility carried into P01.02/P01.06. EV-P01-013 now measures the complete synthetic Permit Desk
+    Compose application/configuration and two backup restores, complementing the retained P00 recovery
+    boundaries and measured seven-service Compose/Kubernetes topology. Accountable review, application
+    recovery objectives and missing native installation facts/scoped authority remain due at their checkpoints;
+    no native claim is inferred.
   unblock_condition: Supply and review the candidate/application profile, complete reproducible fixture
     and application recovery bounds; execute the uncovered bounded G00.04 checks. Before any native calls/effects,
     additionally supply verified installation/resource facts and current permitted campaign scope through
     the approved access mechanism.
-  next_action: Complete the approved synthetic Permit Desk deployment/configuration fixture and pinned
-    candidate topology with P01 installation and recovery work. Preserve passing state-recovery evidence
-    and add only uncovered application checks. Obtain actual native facts and authority before the relevant
-    native campaign.
+  next_action: Review EV-P01-013 and the complete fixture inventory for the carried application scope.
+    Preserve both complete captures and their source bindings. Complete remaining P01 dependency/operations
+    integration; obtain actual application recovery objectives before P08 and native facts/authority before
+    G04/G07/G08.
   state: OPEN
   resolution_evidence_ids: []
