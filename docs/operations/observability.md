@@ -53,6 +53,11 @@ Discovery age, job completion duration and cutover outage are different measures
 
 ## Collection failure and validation
 
+The P01 Compose/Kubernetes campaigns now implement [baseline resource observations](../implementation/p01-resource-observation.md)
+at healthy and recovery checkpoints, retaining effective kernel limits and
+explicit unlimited settings. Their synthetic measurements supply evidence for
+resource review; they do not establish production sizing or accepted objectives.
+
 Configure bounded local buffering/backpressure and a reviewed mandatory-audit policy. A disconnected worker may retain permitted observations, but buffer space does not extend authority lifetime. Lost mandatory evidence holds the dependent outcome; telemetry failure must not silently discard required accountability or trigger unreviewed replay.
 
 Exercise one correlated operator journey through actual deployed services and an operation attempt. Inspect redaction at every sink, tenant-reader denial, alert delivery and acknowledgement, recovery notification, missing-telemetry detection and collector/backlog exhaustion. Record observed routing times, exact revisions and limits. Repeat affected checks when identity, exporters, retention, routes or signal semantics change.

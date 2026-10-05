@@ -17,6 +17,7 @@ import urllib.request
 from kubernetes_runtime import prepare
 from local_runtime import PHP_SERVICES, SERVICES
 from run_local import Campaign, digest
+from resource_observation import PROBE as RESOURCE_PROBE
 
 
 NETWORK_PROBE = """import json,socket,sys
@@ -233,6 +234,9 @@ class KubernetesCampaign(Campaign):
             expected["reason"] = "dependency_unavailable" if service in PHP_SERVICES else "dependencies_unavailable"
         self.check("dependency-http-contract", result.get("status") == status and body == expected and "no-store" in result.get("cache_control", ""), {"service": service, "identity": identity, "response": result})
 
+    def resource_read(self, service: str) -> bytes:
+        return self.exec(service, ['sh', '-ec', RESOURCE_PROBE], timeout=15)
+
     def check_console_shared_state(self, stage: str) -> None:
         self.exec("console", ["sh", "-ec", "cat > /tmp/shared-state.php"],
                   data=(self.root / "scripts/p01/console_shared_state.php").read_bytes())
@@ -344,6 +348,7 @@ class KubernetesCampaign(Campaign):
             self.command("application-ready", self.k("rollout", "status", "deployment/" + service, "--timeout=180s"), timeout=200)
             self.command("proxy-ready", self.k("rollout", "status", "deployment/" + service + "-proxy", "--timeout=120s"), timeout=140)
         self.make_probes(imports)
+        self.measure_resources('healthy-foundation')
         baseline = {}
         for service in SERVICES:
             self.health(service, 200)
@@ -409,6 +414,7 @@ class KubernetesCampaign(Campaign):
         self.health("console", 200)
         self.check("failed-rollout-preserves-database-records", digest(self.sql("console", "SELECT tenant_id,record_id,payload FROM app.foundation_records ORDER BY tenant_id,record_id;")) == baseline["console"])
         self.check_console_shared_state("after-configuration-rollback")
+        self.measure_resources('after-recovery')
         self.command("installed-pod-inventory", self.k("get", "pods", "-o", "json"))
         self.command("installed-network-policies", self.k("get", "networkpolicies", "-o", "json"))
         self.report["result"] = "PASS"

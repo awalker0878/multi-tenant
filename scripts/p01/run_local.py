@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 import hashlib
 from html.parser import HTMLParser
 from http.cookies import SimpleCookie
@@ -21,6 +22,7 @@ import urllib.request
 
 from local_runtime import prepare
 from alert_delivery import deliver, fixture_receiver, observed_alert
+from resource_observation import PROBE as RESOURCE_PROBE, parse as parse_resources
 
 SERVICES = ('console', 'governance', 'catalogue', 'assurance', 'planning', 'inventory', 'lifecycle')
 
@@ -142,6 +144,22 @@ class Campaign:
         observed, body, headers = self.request(service, '/health/dependencies', token)
         payload = json.loads(body)
         self.check(name, observed == status and payload.get('scope') == 'foundation_dependencies', {'service': service, 'http_status': observed, 'body': payload, 'cache_control': headers.get('Cache-Control')})
+
+    def resource_read(self, service: str) -> bytes:
+        return self.command('resource-' + service, self.dc('exec', '-T', service, 'sh', '-ec', RESOURCE_PROBE), timeout=15)
+
+    def measure_resources(self, stage: str):
+        samples = []
+        for service in (*SERVICES, 'postgres', *(s + '-proxy' for s in SERVICES)):
+            sample = parse_resources(self.resource_read(service))
+            sample.update(component=service, observed_at=datetime.now(timezone.utc).isoformat())
+            samples.append(sample)
+            self.check('resource-counters-observed', sample['memory_events']['oom_kill'] == 0,
+                       {'stage': stage, **sample})
+        self.report.setdefault('resource_observations', []).append({
+            'stage': stage, 'source_revision': self.revision, 'samples': samples,
+            'scope': 'Point-in-time synthetic workload; cumulative counters since each container started; null limits mean unlimited. No capacity or SLO conclusion.'})
+        self.save()
 
     def check_console_http(self):
         """Measure HTTPS HTML, session flags and static delivery, never browser behavior."""
@@ -288,6 +306,7 @@ class Campaign:
         self.check_console_http()
         self.check_console_shared_state("write")
         self.check_console_shared_state("second-process")
+        self.measure_resources('healthy-foundation')
         initial_data = {}
         for service in SERVICES:
             self.health(service, 401, None, 'missing-health-identity-denied')
@@ -361,6 +380,7 @@ class Campaign:
         self.wait_health()
         self.check_console_http()
         self.check_console_shared_state('after-configuration-rollback')
+        self.measure_resources('after-recovery')
         self.command('installed-inventory',self.dc('ps','--format','json'))
         self.report['result'] = 'PASS'
         self.report['limits'] = ['Synthetic data and diagnostic credentials only; no OIDC/delegated product authority.', 'Product readiness remains unavailable; workers consume no tasks and native endpoints are absent.', 'Database restart is measured; full application/configuration restore, broker/Temporal/evidence storage, Kubernetes and operating acceptance remain unmeasured.']
