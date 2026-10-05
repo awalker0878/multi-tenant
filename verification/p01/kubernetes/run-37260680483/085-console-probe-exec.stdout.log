@@ -1,0 +1,1 @@
+{"status": 401, "body": "{\"service\":\"console\",\"status\":\"unauthorized\",\"scope\":\"foundation_dependencies\"}", "cache_control": "no-store, private"}
