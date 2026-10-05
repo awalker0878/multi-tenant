@@ -1,0 +1,242 @@
+catalogue-1  | 
+catalogue-1  |    INFO  Configuration cached successfully.  
+catalogue-1  | 
+catalogue-1  | [04-Oct-2026 23:57:35] NOTICE: [pool www] 'user' directive is ignored when FPM is not running as root
+catalogue-1  | [04-Oct-2026 23:57:35] NOTICE: [pool www] 'group' directive is ignored when FPM is not running as root
+catalogue-1  | [04-Oct-2026 23:57:35] NOTICE: fpm is running, pid 7
+catalogue-1  | [04-Oct-2026 23:57:35] NOTICE: ready to handle connections
+catalogue-1  | 192.168.48.3 -  04/Oct/2026:23:57:38 +0000 "GET /index.php" 200
+catalogue-1  | 192.168.48.3 -  04/Oct/2026:23:57:41 +0000 "GET /index.php" 401
+catalogue-1  | 192.168.48.3 -  04/Oct/2026:23:57:41 +0000 "GET /index.php" 401
+catalogue-1  | 192.168.48.3 -  04/Oct/2026:23:57:41 +0000 "GET /index.php" 200
+catalogue-1  | 192.168.48.3 -  04/Oct/2026:23:57:41 +0000 "GET /index.php" 200
+catalogue-1  | 192.168.48.3 -  04/Oct/2026:23:57:41 +0000 "GET /index.php" 503
+catalogue-1  | 192.168.48.3 -  04/Oct/2026:23:57:50 +0000 "GET /index.php" 503
+catalogue-1  | 192.168.48.3 -  04/Oct/2026:23:57:50 +0000 "GET /index.php" 200
+catalogue-1  | 192.168.48.3 -  04/Oct/2026:23:57:53 +0000 "GET /index.php" 200
+governance-1  | 
+governance-1  |    INFO  Configuration cached successfully.  
+governance-1  | 
+governance-1  | [04-Oct-2026 23:57:35] NOTICE: [pool www] 'user' directive is ignored when FPM is not running as root
+governance-1  | [04-Oct-2026 23:57:35] NOTICE: [pool www] 'group' directive is ignored when FPM is not running as root
+governance-1  | [04-Oct-2026 23:57:35] NOTICE: fpm is running, pid 6
+governance-1  | [04-Oct-2026 23:57:35] NOTICE: ready to handle connections
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:38 +0000 "GET /index.php" 200
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:40 +0000 "GET /index.php" 401
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:40 +0000 "GET /index.php" 401
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:40 +0000 "GET /index.php" 200
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:40 +0000 "GET /index.php" 200
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:40 +0000 "GET /index.php" 503
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:49 +0000 "GET /index.php" 401
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:49 +0000 "GET /index.php" 200
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:49 +0000 "GET /index.php" 503
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:49 +0000 "GET /index.php" 200
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:50 +0000 "GET /index.php" 503
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:50 +0000 "GET /index.php" 200
+governance-1  | 192.168.64.3 -  04/Oct/2026:23:57:53 +0000 "GET /index.php" 200
+lifecycle-1   | INFO:     Started server process [8]
+lifecycle-1   | INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+planning-1    | INFO:     Started server process [6]
+planning-1    | INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+inventory-1   | INFO:     Started server process [6]
+inventory-1   | INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+postgres-1    | The files belonging to this database system will be owned by user "postgres".
+assurance-1   | 
+assurance-1   |    INFO  Configuration cached successfully.  
+assurance-1   | 
+assurance-1   | [04-Oct-2026 23:57:35] NOTICE: [pool www] 'user' directive is ignored when FPM is not running as root
+assurance-1   | [04-Oct-2026 23:57:35] NOTICE: [pool www] 'group' directive is ignored when FPM is not running as root
+assurance-1   | [04-Oct-2026 23:57:35] NOTICE: fpm is running, pid 7
+assurance-1   | [04-Oct-2026 23:57:35] NOTICE: ready to handle connections
+assurance-1   | 192.168.96.3 -  04/Oct/2026:23:57:38 +0000 "GET /index.php" 200
+assurance-1   | 192.168.96.3 -  04/Oct/2026:23:57:43 +0000 "GET /index.php" 401
+assurance-1   | 192.168.96.3 -  04/Oct/2026:23:57:43 +0000 "GET /index.php" 401
+assurance-1   | 192.168.96.3 -  04/Oct/2026:23:57:43 +0000 "GET /index.php" 200
+assurance-1   | 192.168.96.3 -  04/Oct/2026:23:57:43 +0000 "GET /index.php" 200
+assurance-1   | 192.168.96.3 -  04/Oct/2026:23:57:43 +0000 "GET /index.php" 503
+postgres-1    | This user must also own the server process.
+assurance-1   | 192.168.96.3 -  04/Oct/2026:23:57:50 +0000 "GET /index.php" 503
+postgres-1    | 
+postgres-1    | The database cluster will be initialized with locale "en_US.utf8".
+postgres-1    | The default database encoding has accordingly been set to "UTF8".
+postgres-1    | The default text search configuration will be set to "english".
+postgres-1    | 
+postgres-1    | Data page checksums are enabled.
+postgres-1    | 
+postgres-1    | fixing permissions on existing directory /var/lib/postgresql/18/docker ... ok
+assurance-1   | 192.168.96.3 -  04/Oct/2026:23:57:50 +0000 "GET /index.php" 200
+postgres-1    | creating subdirectories ... ok
+postgres-1    | selecting dynamic shared memory implementation ... posix
+assurance-1   | 192.168.96.3 -  04/Oct/2026:23:57:53 +0000 "GET /index.php" 200
+postgres-1    | selecting default "max_connections" ... 100
+postgres-1    | selecting default "shared_buffers" ... 128MB
+postgres-1    | selecting default time zone ... Etc/UTC
+postgres-1    | creating configuration files ... ok
+postgres-1    | running bootstrap script ... ok
+postgres-1    | performing post-bootstrap initialization ... ok
+postgres-1    | syncing data to disk ... ok
+postgres-1    | 
+postgres-1    | Success. You can now start the database server using:
+postgres-1    | 
+postgres-1    |     pg_ctl -D /var/lib/postgresql/18/docker -l logfile start
+postgres-1    | 
+postgres-1    | waiting for server to start....2026-10-04 23:57:30.640 UTC [63] LOG:  starting PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+postgres-1    | 2026-10-04 23:57:30.640 UTC [63] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1    | 2026-10-04 23:57:30.644 UTC [69] LOG:  database system was shut down at 2026-10-04 23:57:30 UTC
+postgres-1    | 2026-10-04 23:57:30.647 UTC [63] LOG:  database system is ready to accept connections
+postgres-1    |  done
+postgres-1    | server started
+postgres-1    | 
+postgres-1    | /usr/local/bin/docker-entrypoint.sh: sourcing /docker-entrypoint-initdb.d/10-private-identities.sh
+postgres-1    | Bootstrapped private database and identities: console
+postgres-1    | Bootstrapped private database and identities: governance
+postgres-1    | Bootstrapped private database and identities: catalogue
+postgres-1    | Bootstrapped private database and identities: inventory
+postgres-1    | Bootstrapped private database and identities: planning
+postgres-1    | Bootstrapped private database and identities: lifecycle
+postgres-1    | Bootstrapped private database and identities: assurance
+postgres-1    | 
+postgres-1    | 2026-10-04 23:57:31.556 UTC [63] LOG:  received fast shutdown request
+postgres-1    | waiting for server to shut down....2026-10-04 23:57:31.557 UTC [63] LOG:  aborting any active transactions
+postgres-1    | 2026-10-04 23:57:31.559 UTC [63] LOG:  background worker "logical replication launcher" (PID 72) exited with exit code 1
+postgres-1    | 2026-10-04 23:57:31.560 UTC [67] LOG:  shutting down
+postgres-1    | 2026-10-04 23:57:31.560 UTC [67] LOG:  checkpoint starting: shutdown immediate
+postgres-1    | 2026-10-04 23:57:31.742 UTC [67] LOG:  checkpoint complete: wrote 6608 buffers (40.3%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 2 recycled; write=0.169 s, sync=0.012 s, total=0.183 s; sync files=2106, longest=0.002 s, average=0.001 s; distance=30407 kB, estimate=30407 kB; lsn=0/350B310, redo lsn=0/350B310
+postgres-1    | 2026-10-04 23:57:31.764 UTC [63] LOG:  database system is shut down
+postgres-1    |  done
+postgres-1    | server stopped
+postgres-1    | 
+console-1     | 
+postgres-1    | PostgreSQL init process complete; ready for start up.
+console-1     |    INFO  Configuration cached successfully.  
+console-1     | 
+console-1     | [04-Oct-2026 23:57:35] NOTICE: [pool www] 'user' directive is ignored when FPM is not running as root
+console-1     | [04-Oct-2026 23:57:35] NOTICE: [pool www] 'group' directive is ignored when FPM is not running as root
+console-1     | [04-Oct-2026 23:57:35] NOTICE: fpm is running, pid 8
+console-1     | [04-Oct-2026 23:57:35] NOTICE: ready to handle connections
+console-1     | 172.31.0.3 -  04/Oct/2026:23:57:38 +0000 "GET /index.php" 200
+console-1     | 172.31.0.3 -  04/Oct/2026:23:57:38 +0000 "GET /index.php" 200
+console-1     | 172.31.0.3 -  04/Oct/2026:23:57:38 +0000 "GET /index.php" 401
+console-1     | 172.31.0.3 -  04/Oct/2026:23:57:38 +0000 "GET /index.php" 401
+console-1     | 172.31.0.3 -  04/Oct/2026:23:57:38 +0000 "GET /index.php" 200
+console-1     | 172.31.0.3 -  04/Oct/2026:23:57:38 +0000 "GET /index.php" 200
+console-1     | 172.31.0.3 -  04/Oct/2026:23:57:38 +0000 "GET /index.php" 503
+console-1     | 172.31.0.3 -  04/Oct/2026:23:57:50 +0000 "GET /index.php" 503
+console-1     | 172.31.0.3 -  04/Oct/2026:23:57:50 +0000 "GET /index.php" 200
+console-1     | 172.31.0.3 -  04/Oct/2026:23:57:53 +0000 "GET /index.php" 200
+postgres-1    | 
+postgres-1    | 2026-10-04 23:57:31.885 UTC [7] LOG:  starting PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+postgres-1    | 2026-10-04 23:57:31.886 UTC [7] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1    | 2026-10-04 23:57:31.886 UTC [7] LOG:  listening on IPv6 address "::", port 5432
+postgres-1    | 2026-10-04 23:57:31.886 UTC [7] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1    | 2026-10-04 23:57:31.891 UTC [125] LOG:  database system was shut down at 2026-10-04 23:57:31 UTC
+postgres-1    | 2026-10-04 23:57:31.895 UTC [7] LOG:  database system is ready to accept connections
+postgres-1    | 2026-10-04 23:57:32.026 UTC [135] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:32.028 UTC [136] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
+postgres-1    | 2026-10-04 23:57:34.126 UTC [200] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:34.130 UTC [201] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
+postgres-1    | 2026-10-04 23:57:36.286 UTC [207] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:36.291 UTC [208] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
+postgres-1    | 2026-10-04 23:57:38.370 UTC [219] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:38.372 UTC [220] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
+postgres-1    | 2026-10-04 23:57:39.466 UTC [249] ERROR:  permission denied for schema app at character 14
+postgres-1    | 2026-10-04 23:57:39.466 UTC [249] STATEMENT:  CREATE TABLE app.forbidden(id integer);
+postgres-1    | 2026-10-04 23:57:39.642 UTC [257] ERROR:  permission denied for table foundation_schema
+postgres-1    | 2026-10-04 23:57:39.642 UTC [257] STATEMENT:  UPDATE app.foundation_schema SET version=2;
+postgres-1    | 2026-10-04 23:57:39.819 UTC [265] ERROR:  permission denied to set role "console_owner"
+postgres-1    | 2026-10-04 23:57:39.819 UTC [265] STATEMENT:  SET ROLE console_owner;
+postgres-1    | 2026-10-04 23:57:39.992 UTC [273] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "console_runtime", database "catalogue", SSL encryption
+postgres-1    | 2026-10-04 23:57:40.156 UTC [281] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "console_runtime", database "console", no encryption
+postgres-1    | 2026-10-04 23:57:40.328 UTC [288] FATAL:  password authentication failed for user "console_runtime"
+postgres-1    | 2026-10-04 23:57:40.328 UTC [288] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 5: "hostssl console console_runtime,console_migrator 0.0.0.0/0 scram-sha-256"
+postgres-1    | 2026-10-04 23:57:40.450 UTC [296] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:40.453 UTC [297] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
+postgres-1    | 2026-10-04 23:57:40.938 UTC [321] ERROR:  permission denied for schema app at character 14
+postgres-1    | 2026-10-04 23:57:40.938 UTC [321] STATEMENT:  CREATE TABLE app.forbidden(id integer);
+postgres-1    | 2026-10-04 23:57:41.112 UTC [329] ERROR:  permission denied for table foundation_schema
+postgres-1    | 2026-10-04 23:57:41.112 UTC [329] STATEMENT:  UPDATE app.foundation_schema SET version=2;
+postgres-1    | 2026-10-04 23:57:41.295 UTC [337] ERROR:  permission denied to set role "governance_owner"
+postgres-1    | 2026-10-04 23:57:41.295 UTC [337] STATEMENT:  SET ROLE governance_owner;
+postgres-1    | 2026-10-04 23:57:41.462 UTC [345] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "governance_runtime", database "catalogue", SSL encryption
+postgres-1    | 2026-10-04 23:57:41.625 UTC [353] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "governance_runtime", database "governance", no encryption
+postgres-1    | 2026-10-04 23:57:41.798 UTC [360] FATAL:  password authentication failed for user "governance_runtime"
+postgres-1    | 2026-10-04 23:57:41.798 UTC [360] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 7: "hostssl governance governance_runtime,governance_migrator 0.0.0.0/0 scram-sha-256"
+postgres-1    | 2026-10-04 23:57:42.402 UTC [385] ERROR:  permission denied for schema app at character 14
+postgres-1    | 2026-10-04 23:57:42.402 UTC [385] STATEMENT:  CREATE TABLE app.forbidden(id integer);
+postgres-1    | 2026-10-04 23:57:42.540 UTC [398] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:42.542 UTC [399] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
+postgres-1    | 2026-10-04 23:57:42.594 UTC [401] ERROR:  permission denied for table foundation_schema
+postgres-1    | 2026-10-04 23:57:42.594 UTC [401] STATEMENT:  UPDATE app.foundation_schema SET version=2;
+postgres-1    | 2026-10-04 23:57:42.769 UTC [409] ERROR:  permission denied to set role "catalogue_owner"
+postgres-1    | 2026-10-04 23:57:42.769 UTC [409] STATEMENT:  SET ROLE catalogue_owner;
+postgres-1    | 2026-10-04 23:57:42.941 UTC [417] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "catalogue_runtime", database "governance", SSL encryption
+postgres-1    | 2026-10-04 23:57:43.111 UTC [425] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "catalogue_runtime", database "catalogue", no encryption
+postgres-1    | 2026-10-04 23:57:43.282 UTC [432] FATAL:  password authentication failed for user "catalogue_runtime"
+postgres-1    | 2026-10-04 23:57:43.282 UTC [432] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 9: "hostssl catalogue catalogue_runtime,catalogue_migrator 0.0.0.0/0 scram-sha-256"
+postgres-1    | 2026-10-04 23:57:43.880 UTC [457] ERROR:  permission denied for schema app at character 14
+postgres-1    | 2026-10-04 23:57:43.880 UTC [457] STATEMENT:  CREATE TABLE app.forbidden(id integer);
+postgres-1    | 2026-10-04 23:57:44.057 UTC [466] ERROR:  permission denied for table foundation_schema
+postgres-1    | 2026-10-04 23:57:44.057 UTC [466] STATEMENT:  UPDATE app.foundation_schema SET version=2;
+postgres-1    | 2026-10-04 23:57:44.231 UTC [475] ERROR:  permission denied to set role "assurance_owner"
+postgres-1    | 2026-10-04 23:57:44.231 UTC [475] STATEMENT:  SET ROLE assurance_owner;
+postgres-1    | 2026-10-04 23:57:44.397 UTC [483] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "assurance_runtime", database "catalogue", SSL encryption
+postgres-1    | 2026-10-04 23:57:44.567 UTC [497] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "assurance_runtime", database "assurance", no encryption
+postgres-1    | 2026-10-04 23:57:44.622 UTC [498] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:44.624 UTC [499] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
+postgres-1    | 2026-10-04 23:57:44.749 UTC [506] FATAL:  password authentication failed for user "assurance_runtime"
+postgres-1    | 2026-10-04 23:57:44.749 UTC [506] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 17: "hostssl assurance assurance_runtime,assurance_migrator 0.0.0.0/0 scram-sha-256"
+postgres-1    | 2026-10-04 23:57:45.341 UTC [531] ERROR:  permission denied for schema app at character 14
+postgres-1    | 2026-10-04 23:57:45.341 UTC [531] STATEMENT:  CREATE TABLE app.forbidden(id integer);
+postgres-1    | 2026-10-04 23:57:45.516 UTC [539] ERROR:  permission denied for table foundation_schema
+postgres-1    | 2026-10-04 23:57:45.516 UTC [539] STATEMENT:  UPDATE app.foundation_schema SET version=2;
+postgres-1    | 2026-10-04 23:57:45.692 UTC [547] ERROR:  permission denied to set role "planning_owner"
+postgres-1    | 2026-10-04 23:57:45.692 UTC [547] STATEMENT:  SET ROLE planning_owner;
+postgres-1    | 2026-10-04 23:57:45.859 UTC [555] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "planning_runtime", database "catalogue", SSL encryption
+postgres-1    | 2026-10-04 23:57:46.029 UTC [563] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "planning_runtime", database "planning", no encryption
+postgres-1    | 2026-10-04 23:57:46.204 UTC [570] FATAL:  password authentication failed for user "planning_runtime"
+postgres-1    | 2026-10-04 23:57:46.204 UTC [570] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 13: "hostssl planning planning_runtime,planning_migrator 0.0.0.0/0 scram-sha-256"
+postgres-1    | 2026-10-04 23:57:46.706 UTC [595] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:46.708 UTC [596] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
+postgres-1    | 2026-10-04 23:57:46.824 UTC [604] ERROR:  permission denied for schema app at character 14
+postgres-1    | 2026-10-04 23:57:46.824 UTC [604] STATEMENT:  CREATE TABLE app.forbidden(id integer);
+postgres-1    | 2026-10-04 23:57:47.001 UTC [612] ERROR:  permission denied for table foundation_schema
+postgres-1    | 2026-10-04 23:57:47.001 UTC [612] STATEMENT:  UPDATE app.foundation_schema SET version=2;
+postgres-1    | 2026-10-04 23:57:47.175 UTC [621] ERROR:  permission denied to set role "inventory_owner"
+postgres-1    | 2026-10-04 23:57:47.175 UTC [621] STATEMENT:  SET ROLE inventory_owner;
+postgres-1    | 2026-10-04 23:57:47.348 UTC [629] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "inventory_runtime", database "catalogue", SSL encryption
+postgres-1    | 2026-10-04 23:57:47.516 UTC [637] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "inventory_runtime", database "inventory", no encryption
+postgres-1    | 2026-10-04 23:57:47.690 UTC [644] FATAL:  password authentication failed for user "inventory_runtime"
+postgres-1    | 2026-10-04 23:57:47.690 UTC [644] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 11: "hostssl inventory inventory_runtime,inventory_migrator 0.0.0.0/0 scram-sha-256"
+postgres-1    | 2026-10-04 23:57:48.281 UTC [669] ERROR:  permission denied for schema app at character 14
+postgres-1    | 2026-10-04 23:57:48.281 UTC [669] STATEMENT:  CREATE TABLE app.forbidden(id integer);
+postgres-1    | 2026-10-04 23:57:48.455 UTC [677] ERROR:  permission denied for table foundation_schema
+postgres-1    | 2026-10-04 23:57:48.455 UTC [677] STATEMENT:  UPDATE app.foundation_schema SET version=2;
+postgres-1    | 2026-10-04 23:57:48.638 UTC [685] ERROR:  permission denied to set role "lifecycle_owner"
+postgres-1    | 2026-10-04 23:57:48.638 UTC [685] STATEMENT:  SET ROLE lifecycle_owner;
+postgres-1    | 2026-10-04 23:57:48.789 UTC [698] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:48.792 UTC [700] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
+postgres-1    | 2026-10-04 23:57:48.826 UTC [701] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "lifecycle_runtime", database "catalogue", SSL encryption
+postgres-1    | 2026-10-04 23:57:48.993 UTC [709] FATAL:  pg_hba.conf rejects connection for host "172.19.0.2", user "lifecycle_runtime", database "lifecycle", no encryption
+postgres-1    | 2026-10-04 23:57:49.163 UTC [717] FATAL:  password authentication failed for user "lifecycle_runtime"
+postgres-1    | 2026-10-04 23:57:49.163 UTC [717] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 15: "hostssl lifecycle lifecycle_runtime,lifecycle_migrator 0.0.0.0/0 scram-sha-256"
+postgres-1    | 2026-10-04 23:57:49.387 UTC [726] FATAL:  role "governance_runtime" is not permitted to log in
+postgres-1    | [FATAL tini (1)] Unexpected error when forwarding signal: 'Operation not permitted'
+postgres-1    | 
+postgres-1    | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres-1    | 
+postgres-1    | 2026-10-04 23:57:50.809 UTC [7] LOG:  starting PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+postgres-1    | 2026-10-04 23:57:50.809 UTC [7] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1    | 2026-10-04 23:57:50.809 UTC [7] LOG:  listening on IPv6 address "::", port 5432
+postgres-1    | 2026-10-04 23:57:50.809 UTC [7] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1    | 2026-10-04 23:57:50.814 UTC [44] LOG:  database system was interrupted; last known up at 2026-10-04 23:57:31 UTC
+postgres-1    | 2026-10-04 23:57:50.851 UTC [44] LOG:  database system was not properly shut down; automatic recovery in progress
+postgres-1    | 2026-10-04 23:57:50.854 UTC [44] LOG:  redo starts at 0/350B388
+postgres-1    | 2026-10-04 23:57:50.861 UTC [44] LOG:  invalid record length at 0/36D9948: expected at least 24, got 0
+postgres-1    | 2026-10-04 23:57:50.861 UTC [44] LOG:  redo done at 0/36D9920 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+postgres-1    | 2026-10-04 23:57:50.865 UTC [42] LOG:  checkpoint starting: end-of-recovery immediate wait
+postgres-1    | 2026-10-04 23:57:50.873 UTC [42] LOG:  checkpoint complete: wrote 363 buffers (2.2%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.007 s, sync=0.001 s, total=0.010 s; sync files=285, longest=0.001 s, average=0.001 s; distance=1849 kB, estimate=1849 kB; lsn=0/36D9948, redo lsn=0/36D9948
+postgres-1    | 2026-10-04 23:57:50.876 UTC [7] LOG:  database system is ready to accept connections
+postgres-1    | 2026-10-04 23:57:52.797 UTC [54] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:52.799 UTC [55] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
+postgres-1    | 2026-10-04 23:57:54.888 UTC [125] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", SSL encryption
+postgres-1    | 2026-10-04 23:57:54.891 UTC [126] FATAL:  pg_hba.conf rejects connection for host "127.0.0.1", user "postgres", database "postgres", no encryption
