@@ -5,6 +5,7 @@ on:
     paths:
       - deploy/build/remediation-candidates.json
       - scripts/p01/artifacts/observe_remediation.py
+      - scripts/p01/artifacts/resolve_alpine.py
       - .github/workflows/p01-image-remediation.yml
   workflow_dispatch:
 permissions:
@@ -19,6 +20,8 @@ jobs:
           persist-credentials: false
       - name: Resolve and scan unchanged-version official image alternatives
         run: python3 scripts/p01/artifacts/observe_remediation.py --output "$RUNNER_TEMP/p01-remediation"
+      - name: Resolve exact signed Alpine build packages
+        run: python3 scripts/p01/artifacts/resolve_alpine.py --observation "$RUNNER_TEMP/p01-remediation"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
