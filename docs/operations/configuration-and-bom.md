@@ -4,7 +4,7 @@ Owners: SRE and delivery for environment/release records; each context owner for
 
 ## Record boundaries
 
-Keep three records linked by immutable references: a release manifest identifies deployable artifacts; an environment BOM identifies what is installed; domain records describe tenant intent and authority through owner APIs. Deployment values must not become a second database of grants, approvals, workloads or qualification decisions.
+Keep three records linked by immutable references: a release manifest identifies deployable artifacts; an environment BOM identifies what is installed; domain records describe tenant intent and authority through owner APIs. Deployment values must not become a second database of grants, approvals, workloads, OIDC connections or qualification decisions. External OIDC provider/client settings and claim mappings are entered through the console and persisted by Governance. No OIDC provider values are required in environment variables, Helm values, deployment manifests or static configuration files.
 
 Repository configuration contains schemas, non-sensitive defaults and synthetic examples. Restricted environment records contain real endpoints, identities, network approvals, recovery locations and permitted secret references. Secrets and live Terraform state are not repository configuration. Separate a non-secret configuration digest from secret version/reference attestations so secret material is never hashed into published evidence accidentally.
 
@@ -21,6 +21,7 @@ Repository configuration contains schemas, non-sensitive defaults and synthetic 
 | Network flow | Initiator, receiver, exact protocol/port, identity, permitted data, trust root, timeout, budget, owner and evidence | Deny unused flows; exercise allowed and denied paths on the selected runtime |
 | Native tuple | Platform/API/backend/feature/entitlement versions; network/storage/guest profiles; site revision and owners | Compare against the exact support claim; a vendor label is insufficient |
 | Operations | Telemetry/alert routes, retention, maintenance mode, backup checkpoints, recovery and escalation owners | Routing, restore and safe restart exercised against this configuration |
+| Identity setup | Bootstrap lifecycle state; after activation, Governance OIDC connection ID/revision and protected secret reference | Local administrator requires first-login password change and retires at verified federation; BOM carries references, never passwords or provider configuration overrides |
 
 Represent references as stable identifiers with revisions, for example `environment-integration-a`, `site-lab-a` and `config-revision-17` in synthetic fixtures. Actual IDs are recorded by implementation schemas; these examples prescribe no executable API payload.
 
@@ -29,7 +30,7 @@ Represent references as stable identifiers with revisions, for example `environm
 1. Service schemas define required names, types, bounds and secure defaults. Reject unknown mandatory-option combinations and contradictory modes.
 2. Reviewed environment values select topology, budgets, dependencies and permitted operations. Record the exact rendered non-secret revision before deployment.
 3. Approved secret/key references resolve through the selected custody system at runtime. Missing/expired material fails readiness or the affected privileged action; no fallback administrator secret.
-4. Tenant intent and grants resolve from owning services under authorization. A manifest cannot override them.
+4. Tenant intent, grants and OIDC connection settings resolve from owning services under authorization. A manifest cannot override them. Initial deployment generates the local administrator password; no supplied default password or OIDC configuration is required. Password values are displayed once to the authorized installer and excluded from retained configuration and logs.
 5. Record the effective configuration identity in health/diagnostic output without returning secrets. Detect unmanaged drift against that identity.
 
 Choose one precedence order in implementation and test it for local, integration and operated deployments. Never let an undocumented environment variable silently override an approved endpoint, trust root or native-enable switch.
@@ -55,7 +56,7 @@ Do not automatically repair drift affecting native ownership, identity, or a run
 
 ## Restore and retirement
 
-Back up non-secret configuration, manifest/signature policy and protected secret/key references with their dependency order. Preserve decryption material under the custody plan for the whole required data-retention period. Restoring configuration does not restore current approval or resurrect valid execution leases.
+Back up non-secret configuration, manifest/signature policy and protected secret/key references with their dependency order. Include Governance-owned OIDC connection revisions, bootstrap account hashes/change state and local-account retirement in the protected application backup. Never export a bootstrap password; reconcile current retirement and revocation before enabling restored authentication. Preserve decryption material under the custody plan for the whole required data-retention period. Restoring configuration does not restore current approval or resurrect valid execution leases.
 
 Before removing a component, enumerate active workflows, object/data retention, replay consumers, identity/key dependencies and recovery obligations. Remove obsolete secret references and flows only after dependent work is completed or safely migrated. Record independent observations of retired access and retained recovery material.
 

@@ -39,6 +39,11 @@ receiving store, cadence, loss/retention budget, access policy or response owner
 
 Supply sanitized identities and immutable evidence references in the record;
 credentials and restricted addresses stay in the existing custody system.
+External human OIDC settings are managed through the console in P02, not supplied
+in deployment configuration or this receiving record. Deployment creates the
+local administrator with a random displayed password and mandatory first-login
+change; workload trust, secret/key custody and repository reviewer identities
+remain separate operating inputs. See [ADR-009](../decisions/adr-009-identity-delegation-and-authorization.md).
 
 | Record | Actual input still needed | Accountable owner |
 | --- | --- | --- |

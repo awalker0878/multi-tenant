@@ -44,7 +44,8 @@ P01 must produce a machine-readable environment BOM. The following is its minimu
 | PostgreSQL | Private context databases and separately owned workflow persistence as selected | Version, service/database roles, topology, backup mechanism, encryption, connection and storage limits | SRE, ADR-006/007 |
 | Temporal | Durable workflow history and task dispatch | Server/SDK compatibility, persistence/visibility backends, namespace isolation, retention and recovery configuration | SRE/lifecycle, ADR-007 |
 | Event transport | At-least-once domain events | Broker/version, HA, queue/topic policy, ordering, retention, replay/dead letters and principal scopes | SRE/architecture, ADR-008 |
-| Identity, secret and key services | Federated identity, workload authentication, secret delivery and signing/encryption custody | Provider/version, issuers/audiences, bootstrap, PKI chains, rotation/revocation and recovery dependencies | IAM/security, ADR-009/010 |
+| Workload identity, secret and key services | Workload authentication, secret delivery and signing/encryption custody | Provider/version, service audiences, PKI chains, rotation/revocation and recovery dependencies | IAM/security, ADR-009/010 |
+| Human authentication | Deployment-created local administrator until console-managed external OIDC activation | Random temporary password displayed once during deployment; mandatory first-login change; Governance connection revision and tested federated administrator before local retirement | Governance/IAM, ADR-009 |
 | Evidence object storage | Protected evidence bytes, integrity and retention | S3-compatible endpoint implementation/version, object permissions, retention/immutability mechanism, replication and restore behavior | Assurance/SRE, ADR-010 |
 | IaC state | Locked infrastructure state with one owner per field/resource | Tool/provider versions, backend, state encryption, lock/fencing semantics and recovery | Infrastructure, ADR-016 |
 | Telemetry and audit | Redacted correlated signals, alerting and protected accountability | Collector/exporter versions, sinks, retention, access, alert routing and dependency health | SRE/security, ADR-017 |
@@ -59,7 +60,7 @@ These are logical candidate flows, not firewall approvals. P01 converts selected
 
 | Initiator → receiver | Candidate protocol / purpose | Identity and scope | Data and failure behavior |
 | --- | --- | --- | --- |
-| Browser → console / IdP | HTTPS; OIDC redirects and authenticated sessions | Human principal; tenant/role evaluated by owning service | No native credentials; session/identity failure prevents new privileged commands |
+| Browser → console / IdP | HTTPS; local setup login/password change before activation, then OIDC redirects and authenticated sessions | Human principal; mandatory-change state and tenant/role evaluated by owning service | No native credentials; retired local login stays disabled during an IdP outage |
 | Console / context service → context API | HTTPS with authenticated service channel | Workload identity plus validated actor delegation; resource/action scope | Versioned commands/queries; fail closed at authorization boundaries |
 | Owning context → its PostgreSQL | PostgreSQL over TLS | Distinct runtime role and separately controlled migration role | Private data/outbox/inbox only; no cross-service table access |
 | Producers/consumers → broker | TLS-protected selected broker protocol; e.g. AMQP if that broker is selected | Separate publisher/consumer permissions per channel | Tenant-minimal event facts; durable retry/dead-letter and no direct native effect replay |
@@ -82,6 +83,7 @@ Task polling can make worker-initiated site connectivity practical; callback, gu
 | Application defaults and schemas | Owning service in repository | Typed validation; no deployable starts with unknown or invalid mandatory settings |
 | Environment topology/limits | SRE-managed deployment configuration | Reviewed non-secret revision; binds BOM, network register and measured resource limits |
 | Tenant intent and grants | Catalogue/governance APIs | Revisioned domain changes and authorization; never edited via deployment values |
+| External OIDC settings and bootstrap state | Console administration through Governance APIs; controlled deployment bootstrap | Provider/client details and mappings are application data; secrets use protected custody. Random initial password is displayed once, changed at first login and retired with local login after verified OIDC activation |
 | Native endpoint/worker enrolment | Inventory/site commissioning with IAM scope | Protected endpoint records and trust bootstrap; no implicit management ownership |
 | Profiles, policies and qualification | Planning/assurance | Version/digest binding; changed material inputs invalidate affected plans/claims |
 | Credentials and encryption/signing keys | Approved secret/key owner | Out-of-band bootstrap, scoped runtime fetch, rotation/revocation and tested recovery |

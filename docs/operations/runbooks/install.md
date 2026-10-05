@@ -9,6 +9,7 @@ Procedure ID: OPS-INSTALL. Owner: SRE; contributors: IAM/security, context owner
 - Confirm required infrastructure, failure domains, capacity, DNS/time/PKI, registry/mirrors, durable storage, backup targets and independent recovery access. The installation must not depend on broad native platform credentials.
 - Supply release-specific deployment bindings and health checks that were exercised with the selected runtime. They must identify the operation, artifact, identity and expected output; do not translate these steps into guessed commands.
 - Establish an installation evidence destination independent of components that are not yet running. Reconcile it into assurance once the service is available.
+- Provide an operator-only deployment display channel for the generated bootstrap username, temporary password and console URL. Exclude credentials from retained/shared deployment logs and evidence. External OIDC settings are entered through the console after first login; they are not installation configuration inputs.
 
 Keep new native admission disabled and mutating worker pools isolated throughout D01–D07. Readiness includes denied paths and safe failure, not just a successful connection.
 
@@ -32,10 +33,23 @@ remains unavailable until the product journey's required behavior is implemented
 | D03 Services | Run controlled migrations under the dedicated change identity; deploy governance, catalogue, inventory, planning, lifecycle, assurance and console using dependency/readiness order | Running digests match manifest; service auth and compatible contracts work; unavailable mandatory dependencies fail readiness or affected operations safely |
 | D04 Telemetry | Bind logs/metrics/traces/audit and alert routing; exercise a synthetic journey and test alert | Correlated redacted records reach permitted sinks; alert is delivered and acknowledged; missing collection is observable |
 | D05 Site trust | Register approved site/read-only pool identity and endpoint constraints through [commissioning](commissioning.md) | Handshake, trust denial, revocation and read-only scope demonstrated; registration alone enables no mutation |
-| D06 Initial records | Bootstrap explicitly verified administrator, disable/restrict bootstrap path, load reviewed profiles/policies and create authorized fixture/first-tenant records | Attributable grants and revisions; separate author/reviewer/operator behavior; no baked-in password or automatic qualified capability |
+| D06 Initial records | Run the one-time local-administrator bootstrap; display its random password during deployment, change it at first login, then configure/test OIDC through the console. Load reviewed profiles/policies and authorized fixture/first-tenant records | Password-change restriction enforced; temporary password rejected after change; verified federated administrator activation disables local login and sessions; grants remain attributable and scoped |
 | D07 Read-only acceptance | Discover permitted endpoints; inspect coverage/freshness; exercise application intent, assessment and plan review with required authority | Unknown or stale facts remain visible; denied tenant/native paths stay denied; no native mutation is dispatched |
 
 D03 service deployment order follows the selected readiness dependencies rather than a fabricated startup sequence. Services may start without downstream readiness, but no deployment may report an operable journey until its actual required dependencies pass. Domain operations still enforce their own failure rules.
+
+## Local administrator and console OIDC setup
+
+P02.01/P02.05 implement this product setup flow; the P01 diagnostic fixtures do not establish it. Follow [ADR-009](../../decisions/adr-009-identity-delegation-and-authorization.md) and [identity and trust](../identity-and-trust.md). Release bindings must supply the concrete bootstrap/display operations before this runbook is executable.
+
+1. After the required Governance and Console dependencies are available, execute the authorized deployment bootstrap once. Create a single installation-local administrator, generate a cryptographically random temporary password and atomically store only its hash and mandatory-password-change state. Concurrent replicas and deployment retries must converge on the same existing account.
+2. Display the username, temporary password and console URL once to the authorized installer during deployment. Keep the display out of retained/shared CI/deployment logs, container/application logs, telemetry, artifacts and evidence. Existing installations do not redisplay or regenerate a password.
+3. Sign in through the console. The first successful login must lead to password change; verify that direct navigation and protected API calls are denied until a different password is saved. Successful change invalidates the temporary password and rotates session/CSRF state.
+4. Open Administration → Identity provider. Enter external OIDC provider/client details and claim mappings; use the displayed callback destination for the external client registration. Save secrets through the protected write-only input. Governance persists the settings and secret references; do not edit environment variables, manifests, Helm values or configuration files.
+5. Test the connection and complete a verified external login for an identity with an explicit administrative grant. A malformed connection, failed login or missing administrative authority must leave local setup available after the password change.
+6. Activate the verified connection. Atomically disable the local administrator and revoke its sessions/delegated authority. Verify federated administration, local-login denial and denial of an already authenticated local session. Confirm that later IdP failure does not restore local login.
+
+Retain only redacted lifecycle and allow/deny observations. Deployment, restart, upgrade and restore are not password-reset operations. An interrupted display or lost bootstrap password requires the explicit authenticated recovery binding while local setup is still active; it must not create a second administrator or reopen a retired account.
 
 ## Laravel service acceptance at D03
 
@@ -68,7 +82,7 @@ D09 pilot activation follows qualified supported scope, approved tenant plan/cha
 | Worker unexpectedly gains native write access | Isolate/fence affected path, notify security/platform owner and reconcile any dispatched effect before continuing |
 | D07 discovery incomplete | Record unknown/stale scope and collector coverage; correct access/budget or limit accepted scope explicitly |
 
-If initial bootstrap partially succeeds, observe whether the intended administrative grant exists and whether the bootstrap mechanism remains usable. Reconcile the recorded operation; do not create a second unrestricted administrator simply because the response was lost.
+If bootstrap partially succeeds, inspect the persisted account, mandatory-change state, display receipt and activation/retirement state. Reconcile the recorded operation through the authenticated installer recovery binding; do not create another administrator, replay a password display or reset a changed password because a response was lost. An OIDC test failure preserves local setup, while an activated installation never automatically reopens it.
 
 ## Verification and handover
 
