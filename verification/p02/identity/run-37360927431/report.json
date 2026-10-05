@@ -1,0 +1,481 @@
+{
+  "schema_version": 1,
+  "result": "PASS",
+  "scope": "P02 identity, tenancy and plan-bound approval increments",
+  "source_sha": "512fd5c2580e5cd40bf0089662cff8d84718a877",
+  "run_id": "37360927431",
+  "run_attempt": "1",
+  "observed_at": "2026-10-05T19:07:16.339545+00:00",
+  "checks": [
+    {
+      "name": "openapi-specification-valid",
+      "passed": true
+    },
+    {
+      "name": "openapi-valid-governance-approvals-v1",
+      "passed": true
+    },
+    {
+      "name": "openapi-valid-governance-delegation-v1",
+      "passed": true
+    },
+    {
+      "name": "openapi-valid-governance-federation-v1",
+      "passed": true
+    },
+    {
+      "name": "openapi-valid-governance-local-identity-v1",
+      "passed": true
+    },
+    {
+      "name": "openapi-valid-governance-tenancy-v1",
+      "passed": true
+    },
+    {
+      "name": "exact-php-runtime",
+      "passed": true
+    },
+    {
+      "name": "postgres-feature-suite",
+      "passed": true
+    },
+    {
+      "name": "isolated-postgres-container-id",
+      "passed": true
+    },
+    {
+      "name": "postgres-verified-tls",
+      "passed": true
+    },
+    {
+      "name": "noninteractive-does-not-initialize",
+      "passed": true
+    },
+    {
+      "name": "interactive-bootstrap-command-success",
+      "passed": true
+    },
+    {
+      "name": "interactive-bootstrap-command-success",
+      "passed": true
+    },
+    {
+      "name": "concurrent-deployment-displays-exactly-one-credential",
+      "passed": true
+    },
+    {
+      "name": "one-bootstrap-event-and-outbox",
+      "passed": true
+    },
+    {
+      "name": "migration-replay-preserves-credential",
+      "passed": true
+    },
+    {
+      "name": "interactive-bootstrap-command-success",
+      "passed": true
+    },
+    {
+      "name": "fresh-process-retry-does-not-redisplay",
+      "passed": true
+    },
+    {
+      "name": "runtime-denied-sentinel-delete",
+      "passed": true
+    },
+    {
+      "name": "runtime-denied-audit-delete",
+      "passed": true
+    },
+    {
+      "name": "runtime-denied-audit-update",
+      "passed": true
+    },
+    {
+      "name": "runtime-denied-schema-create",
+      "passed": true
+    },
+    {
+      "name": "runtime-denied-governance-audit-update",
+      "passed": true
+    },
+    {
+      "name": "runtime-denied-governance-audit-delete",
+      "passed": true
+    },
+    {
+      "name": "runtime-denied-approval-binding-update",
+      "passed": true
+    },
+    {
+      "name": "runtime-denied-receipt-delete",
+      "passed": true
+    },
+    {
+      "name": "runtime-denied-outbox-payload-update",
+      "passed": true
+    },
+    {
+      "name": "runtime-denied-outbox-delete",
+      "passed": true
+    },
+    {
+      "name": "governance-http-started",
+      "passed": true
+    },
+    {
+      "name": "console-http-started",
+      "passed": true
+    },
+    {
+      "name": "wire-/identity/local-sessions-200",
+      "passed": true
+    },
+    {
+      "name": "wire-/identity/local-sessions-no-store",
+      "passed": true
+    },
+    {
+      "name": "wire-/identity/session-200",
+      "passed": true
+    },
+    {
+      "name": "wire-/identity/session-no-store",
+      "passed": true
+    },
+    {
+      "name": "wire-/identity/setup-403",
+      "passed": true
+    },
+    {
+      "name": "wire-/identity/setup-no-store",
+      "passed": true
+    },
+    {
+      "name": "browser-no-skips-retries-or-failures",
+      "passed": true
+    },
+    {
+      "name": "handover-retired-local-and-destroyed-password",
+      "passed": true
+    },
+    {
+      "name": "provider-https-pkce-exchanges",
+      "passed": true
+    },
+    {
+      "name": "tenant-audit-and-outbox-stay-paired",
+      "passed": true
+    },
+    {
+      "name": "two-independent-tenants-persisted",
+      "passed": true
+    },
+    {
+      "name": "reader-revocation-persisted",
+      "passed": true
+    },
+    {
+      "name": "wire-/identity/session-401",
+      "passed": true
+    },
+    {
+      "name": "wire-/identity/session-no-store",
+      "passed": true
+    },
+    {
+      "name": "audit-and-outbox-stay-paired",
+      "passed": true
+    },
+    {
+      "name": "governance-logs-exclude-credentials",
+      "passed": true
+    },
+    {
+      "name": "console-logs-exclude-credentials",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    ".github/workflows/p02-identity.yml": "f23c2464312c832bbad24bd31a61c25634a843fa30ccf9c718c042b0fc6a827d",
+    "apps/console/.dockerignore": "96ef707ce3a806240a07612afb0fe8c30118b66c1f539edb7ace74e003d1b246",
+    "apps/console/.env.example": "4c83d00056148be91879e6974140497967408146b8d0edeccad8573c12cebdb6",
+    "apps/console/.gitignore": "1cc745d8e39aba0df89510362790818d3d0d6e5f763475482a7ab7313850c08c",
+    "apps/console/Dockerfile": "e63774adf493ea26e6da2500c67194d4239063a6a0f9cfbce9c8949e9e6694cf",
+    "apps/console/README.md": "3698210f05e7dc1105ec7fe9c436a8ad6c84ec5e4ed7522694985c8177e2a580",
+    "apps/console/app/Application/Foundation/Actions/InspectDependencies.php": "019459639caec1e3d3fb397026215fe77777a3dd77c18efc41c5a1ca406ff74b",
+    "apps/console/app/Application/Foundation/Contracts/DependencyProbe.php": "b79f3e6ed6c6e08677d3c0b61f90fb382c98e96d26e807b3d119fd81a0990c66",
+    "apps/console/app/Application/Foundation/Contracts/HealthCredential.php": "7fdeb5b78e2eb9f676ab955a1f1451fd27eb2f861b2670657e3438a6babb8a93",
+    "apps/console/app/Application/Foundation/Contracts/SignalBuffer.php": "4a78c3f8413add9220d28b71112cfbc738863bed440b9a7545f72010050ac14b",
+    "apps/console/app/Application/Foundation/Data/DependencyStatus.php": "5b19fe2dee35b14359e8a4d4438185a4c77d51f25a82dc6aeb80f5a14ce465f3",
+    "apps/console/app/Application/Identity/Contracts/IdentityGateway.php": "8c63145e5d1125fc0be31cfcf61b7a6f3f11a6079da54fd51c2dd60de67b2624",
+    "apps/console/app/Application/Identity/Data/ConsoleActor.php": "047e4a89dfb0662691f492e9e5bb7c5c10cd8aee820d4ccb7268fac09ffa1bcf",
+    "apps/console/app/Application/Identity/Data/ConsoleSession.php": "57ad336cb398edd0078faf03bb6a3c22bcff40a289e966ec5ad7f07b101bdd11",
+    "apps/console/app/Application/Tenancy/Contracts/TenantGateway.php": "afca4f03746a9328833f47abf9acedd049ced2bd84e73f999f0277188b9d35b8",
+    "apps/console/app/Domain/Identity/IdentityFailure.php": "80a62ce7e6de8879927a6cde743fc8ee0f2f8db467be2fd4fed6ba3d58339532",
+    "apps/console/app/Http/Controllers/DependencyHealthController.php": "ee8fb3c0e8f6891749aa963ae12601bf84605be66f9aae092291aaf936998097",
+    "apps/console/app/Http/Controllers/FoundationController.php": "424bcdcf54b1132f7913fff6486d7aaab0bc358637da69cc68920541ca42d769",
+    "apps/console/app/Http/Controllers/HealthController.php": "a7dd34dea6aff50897bc3e087618c9df27aed516af6211de7766a91afe343ba6",
+    "apps/console/app/Http/Controllers/LocalIdentityController.php": "951b971159f856bae957d1789126882fbd1ab580b82c2ea7469b362b8424e967",
+    "apps/console/app/Http/Controllers/OidcController.php": "a79fa5f41ef6399a134c0904bf39e623490cbe249772f48007872837a4b0c211",
+    "apps/console/app/Http/Controllers/TenantController.php": "dd693abcac84de3efaac684415fc09ea8b459d32bc195289e8d53310ef9da2b2",
+    "apps/console/app/Http/Middleware/HandleInertiaRequests.php": "abd23bfa82d399043c4ff2efd4bd3ea893d056488db6d43668982d41d554d7f2",
+    "apps/console/app/Http/Middleware/PageResponseHeaders.php": "660b8b523fdbbd646880ad48436f1ceeabcb92db8f972a91a0f22652836d763d",
+    "apps/console/app/Http/Middleware/RedactIdentityCallback.php": "c0732b695aa00447c22350f3f3d1c1d6e485ce8aa359be74d7cc95e2abcd867c",
+    "apps/console/app/Http/Middleware/RequestTelemetry.php": "27908a4827a19054bf02ef4ef9c4d9cd532c08f2f7070c3035df2cee9693b267",
+    "apps/console/app/Http/Middleware/RequireConsoleHost.php": "1e042373603b9c9b4ed3750c284f7283e8240b69d6dd3f810db354d8dabdf5c8",
+    "apps/console/app/Http/Middleware/RequireIdentity.php": "bf1d8433776e4695d8a8f1519d07b13cb6bd03fdb32dfc1e09454eb841a56a78",
+    "apps/console/app/Infrastructure/Foundation/BoundedSignalBuffer.php": "ef39f2f0e618d55bba19a94ed246e9149ee3b494d949ea26a91e18e05b8137f3",
+    "apps/console/app/Infrastructure/Foundation/MountedHealthCredential.php": "3c0a622df2f954de62f6f2864a56157394bc1d4a63788a992fabc4df7b765d86",
+    "apps/console/app/Infrastructure/Foundation/MountedSecret.php": "2e395919fe9c8d42c78e4b28bdb04a5a38d69c7a0d4fa6e6715beabb42b61162",
+    "apps/console/app/Infrastructure/Foundation/PostgresDependencyProbe.php": "e8b8cf3577392336d86cc253d9843b9403c4f1e6493f8b22466ab57ed19b21d7",
+    "apps/console/app/Infrastructure/Governance/GovernanceClient.php": "fe4d02a798c97de4699f2c2f92a513e20cdebed2d6ec1ba24672626e2575311b",
+    "apps/console/app/Infrastructure/Governance/GovernanceTenantGateway.php": "f698f801432124bc0873b54d926eb84a552ab2f889f4ae32246e7fe4bbe36914",
+    "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php": "5dfa33e619b947cf62156eea61153b82e93551f47cdb86626e94ce216e8cd884",
+    "apps/console/app/Infrastructure/Session/TenantCache.php": "c2c175c694c3e8705df0ac6c47d74d69bb8c966115ad02a4e2677d5edade731d",
+    "apps/console/app/Providers/AppServiceProvider.php": "096dc182fc06eb18f36a3d9f6ab719459fce3033b65da069f1fd7acb65d78817",
+    "apps/console/artisan": "83c95e93ffda62b12bdfd605f5626762ee239fd61cf46ff56fd244dc828f609a",
+    "apps/console/bootstrap/app.php": "c12e2fa8774dd1aff8bdc51e7460c6098052b27b6b7029c2792e5c1964281510",
+    "apps/console/bootstrap/cache/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/bootstrap/providers.php": "2c593cbec5439e1288dcfe52e9f67b951736fb067ee7df206030583a1f28515f",
+    "apps/console/build/apk.lock.json": "14155c25ff67dd47b7b4168ce9c0caf8c32cfe5ed4b0b65f796ac4c6904a7259",
+    "apps/console/build/download-apks.php": "4392e9bd58ec1f42bda7a5341498fdaef79589208dc0a96a0a39d737a6d7fdb9",
+    "apps/console/composer.json": "d5ddf7bb6a28b5ec81c0742a7359104e49dc2cf441a6eedce768ae4963d62998",
+    "apps/console/composer.lock": "926d7cd6f70cea71f705e6233ee2c2a219f5824c5a08faeece99068d3f7fd913",
+    "apps/console/config/app.php": "c086bdb0eee8b1cf887489396b1db2eb60546932c2b4422eb6b4c81085ee208a",
+    "apps/console/config/cache.php": "d171b4ffc6c8ecb171107620f051bdee9cf6c665122e2393d5f77f9122463e0f",
+    "apps/console/config/database.php": "f0e8750f9236458390fc384c4e62045983fa78e3a8edadbfc7504fb9fe3764b7",
+    "apps/console/config/foundation.php": "0fc9a39a95f0a5cf307fc3cdcf7af0a728cb313ef9b82ab6ef5600de9b6efb6d",
+    "apps/console/config/identity.php": "b1978f77bd9d09d416aa0cee08f8701402028251524c8c8fd80f9719f3cf63be",
+    "apps/console/config/inertia.php": "c96484a0b44476835303ea6965a39e679dd475a992c13cf32605bcd7b8540719",
+    "apps/console/config/logging.php": "c154451dae662c1b268bd2820c29be58686319013c5f37590937a6a1d8ac2d74",
+    "apps/console/config/session.php": "9157dca9c144131fdefee3712d28e7e9d83884cc190c771d6d6976298e4bb526",
+    "apps/console/config/telemetry.php": "a8e3ca78ee997ac95a3fa02cb0f48868b547ce24862363ba58b0e132eaacf2fb",
+    "apps/console/config/view.php": "d218f409e17b4f64d6b58ba46c08127d62c3341b360baaff63102eadca96a13c",
+    "apps/console/database/migrations/001_shared_state.sql": "55e35fcb77a63db6bb2732dfc85a411cbc74e474a9033097f231692ec1e1d041",
+    "apps/console/deptrac.yaml": "7b392f21bfe40b6c827bbcf3aec69add078b1f571ad742e944cb3f0fe573343c",
+    "apps/console/package-lock.json": "5e626b04d3aeb7d54eb645806130b98c7a60d12b81a744cf886869cbd3b3cc8f",
+    "apps/console/package.json": "60a8fe17aa38ad6c8d2200926f68880413631c1108beebb3f6e3ff0499f2a5c2",
+    "apps/console/phpstan.neon": "040531182713abfa15e3063d5806473131d805007ef888e0fd54c2e09f05fd84",
+    "apps/console/phpunit.xml": "e4b575acafdf68c1f4d2baa28748557e972bd0f718a764557ed63d634507c290",
+    "apps/console/pint.json": "e54acf88cddb03d9f17392c062c70b8bdf5c8426391adecaed4c3105a21d4bdb",
+    "apps/console/playwright.config.ts": "f831cbfb1a62b6ec14b218a3da2591dafefd50130610496c48c6ce9a68b89d4e",
+    "apps/console/playwright.p02.config.ts": "a111e001d472133c48359bdb8da241e99cf8ed8b57020d7bc84465486c84f129",
+    "apps/console/public/index.php": "59caa93d7583ba8fbb335d7bf0c31f3c382a7cda6c6c6915fd844af840c09c13",
+    "apps/console/resources/css/app.css": "ed04d8ad7236e95057729066d34d1f1fc353f7bcc6abee710bf0bfc21a0c0d37",
+    "apps/console/resources/js/app.ts": "e8e3b4209dd38ab67f3bd6081b8b1fd5b95a36b34eb857983f2ce9312916cebb",
+    "apps/console/resources/js/app/bootstrap.ts": "41b33459be7723e6b29a4c6a7fec192aabcf7272a2f67889088a0eaa663a79ce",
+    "apps/console/resources/js/app/identity-lifecycle.ts": "a1dd434ebe5703d94ff05e099651d01713a81ed18fd1537b0de14cfa0b876beb",
+    "apps/console/resources/js/pages/Foundation.vue": "8be61901b6cf207f2cf0330a97c5ac4912790f5d45d278d46c32ec8139f0cc83",
+    "apps/console/resources/js/pages/identity/Account.vue": "409abf2abe86e67d7bd0f03040d5869bf24fe95febe5996e0b0bb439e7ddb8cb",
+    "apps/console/resources/js/pages/identity/Login.vue": "50be0237fc8014a579baf0e394332732be49427c2676408c9c48d32286aedcbc",
+    "apps/console/resources/js/pages/identity/Password.vue": "79945c0d73f57b81a0f74a2b9d1eec8d824faacac39a679cd690307992acd8df",
+    "apps/console/resources/js/pages/identity/Setup.vue": "eccedc26dacccfc91987e8949c234511336b664587dcfa33a9c85040ea2f1baa",
+    "apps/console/resources/js/pages/tenancy/Tenant.vue": "f728f895147f2ae9f45a85b30a080b635badb1ad52dafb4d849a67248dc9fd0d",
+    "apps/console/resources/js/shared/ui/IdentityLayout.vue": "b700ba826d7afe27d9d098ee003d792d3354d513955f83b8563edb3880b3b87c",
+    "apps/console/resources/views/app.blade.php": "135f549bdd66ce6712e9d9b7d75f9895948ab2f37222f2e068919716488ee41c",
+    "apps/console/routes/health.php": "bcf6f4d435274ad8b8d1244e8a998ebd30c3fd13caabac00bcd60eef48559421",
+    "apps/console/routes/web.php": "b2d942a6793b20b77acf29a1e3895c9fd8c3af756cc62490f353528ef310edd2",
+    "apps/console/storage/framework/cache/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/storage/framework/phpstan/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/storage/framework/sessions/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/storage/framework/views/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/storage/logs/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/tests/Architecture/FoundationTest.php": "b9d32981d522bd2e80fffedfbe981e992107a6ca7225337f1267e35206de29aa",
+    "apps/console/tests/Architecture/verify_quality_canaries.php": "9f2340f9af9ed2c30989e72e45908e3332134ae05eff99462281ed86d7504c60",
+    "apps/console/tests/Feature/DependencyHealthTest.php": "2bb0eb08f874b0ced644d7241e2ef3e6f3c211072b39af029a6df42c25d96c01",
+    "apps/console/tests/Feature/FoundationTest.php": "571d49cbd547b95bf1a09e3a1c39c04a735546b020361c2d83c1e83c186ea355",
+    "apps/console/tests/Feature/HealthTest.php": "9ecc370523fea55d77ddfd572c4b69f4fe319401c53042e4016e7c6674658649",
+    "apps/console/tests/Feature/LocalIdentityTest.php": "0d83ef80ac03022b990630121d717b9e0d1e87186aaeb61e611c308db39edffe",
+    "apps/console/tests/Feature/OidcTest.php": "fa4979e835d2deafc323a2e6030584fb4fa633ed34eb4dd3134f999b7d740ebd",
+    "apps/console/tests/Feature/RequestForgeryTest.php": "fe82c8a5ecd0b11329376f2cf4974cfe5e6a1a445946f0c60f5a3bca65778d4e",
+    "apps/console/tests/Feature/TelemetryTest.php": "ddf9bf45f2f563f1c5bab2494df1132a82aa557d57c87ac075e0d240b665de51",
+    "apps/console/tests/Feature/TenancyTest.php": "12e5101641f86ba56d28db743ce3deee183b55845d298e838e86eaa3f721cf07",
+    "apps/console/tests/Pest.php": "96349833b104dc5890a9f917834a82581c5ad679598cd0fbc0eb728fa14a2648",
+    "apps/console/tests/TestCase.php": "b402b9a2ae198746af82193620514620c4ca52f1fd67cdab3723457d5c19ca5f",
+    "apps/console/tests/architecture/frontend-boundaries.ts": "0633c837c0cb2426f86d7b2c954e16dc3a9f5bd088e4839bfa5d2c11712df35d",
+    "apps/console/tests/browser-p02/identity.spec.ts": "856d6115b4cec14305d8b750c1afd0c3325f01bd6de3d9d97b609368ba450783",
+    "apps/console/tests/browser/foundation.spec.ts": "9e7c07c8a4b2485c77fd0ee3a5774b175c0f86ddd65932fa00fdd0e42eedf41a",
+    "apps/console/tests/browser/identity.spec.ts": "87a60c24aff808807db724d7bf7459580a1856ae3bc4bf352295bd41305b9f45",
+    "apps/console/tsconfig.json": "9adad6963b95103691ff1c3336a824691f0e23780569772a9fdfa171e312ba92",
+    "apps/console/vite.config.ts": "df9065a949f3905c2e92c5671b0d9d592594546278114aaaf0d42e0e4b6a7318",
+    "contracts/openapi/governance-approvals-v1.json": "942f8b0a7a0fb56d4f44607d2aeb61673778d4c3f1c54457063cb78fde3bb689",
+    "contracts/openapi/governance-delegation-v1.json": "2e466b0d873439b3938d005295e33dc3551052bf0e2d2d66d788cd4466a5b94d",
+    "contracts/openapi/governance-federation-v1.json": "233a03ad6c3d38ac99a4978f24ae28e46eb3fde632586d0766772c7b3c99eb2d",
+    "contracts/openapi/governance-local-identity-v1.json": "79f17eb90e3c0fd335d7be95f4fd71666adf017d8c31254872ef64c1dfc7ad0e",
+    "contracts/openapi/governance-tenancy-v1.json": "39ba6e2e78f1575f84f765910ad48a07a8e73d606cb30d8d51788e8d07125d1d",
+    "contracts/openapi/planning-immutable-plan-v1.json": "68db8d73386ab4817dbe8810f6b2364aab7ffa8a96b5987371a4ac97dbd24b48",
+    "contracts/schemas/events/governance-change-v1.json": "470cb3b3472e19cfe919f67bdf5c7e23cc5442533eaf15fbef3c03c621ab9afa",
+    "scripts/p02/event_process.php": "123ccd6deead8445448cda92338fa160e3c616638554c7bf8dfe119e9bdc8be0",
+    "scripts/p02/synthetic_oidc.py": "f577398f2b8cc2121d913375308a5079a02bd54ea176550d0721c3070d400961",
+    "scripts/p02/verify_events.py": "219f2bed604ca1181a45f14b958ebfac843452824f2de50e603fdf482fdf2b72",
+    "scripts/p02/verify_identity.py": "f9510ee26bd1678c16059cc2254dd6153c76d724606c0a97b284841076062726",
+    "services/governance/.dockerignore": "bf2ad8135b53a1e9a686a09c17c219f0ea06caa48f5b88c9c0003be2a5821106",
+    "services/governance/.env.example": "7bf7eb9d2b53653e1df29d4b6f7b8e3fd4411f4648b7c8ca04514f78ed9bfb83",
+    "services/governance/.gitignore": "8b26495180f3143fc90b845284bc42f9153e42e17afd30567cadf938096f6f26",
+    "services/governance/Dockerfile": "88ceeb2344510e9d09d487e40d8e9031f6466f4df89bae618812f986b63a7d0e",
+    "services/governance/README.md": "b800c59ac7c7dec64583e7a8d7fc38a7b5a5b70e8f68db5d7e93de924bc87a46",
+    "services/governance/app/Application/Approvals/Actions/ExpireApprovals.php": "68fdeaebdb366adc429d053a3ae0b50e1a05f9b8f01a204c0efc382ef71f119b",
+    "services/governance/app/Application/Approvals/Actions/InspectApproval.php": "d6772a8b3a202976a9b64758d77b757633335eb4075675ae3c28df2bd74c7e6c",
+    "services/governance/app/Application/Approvals/Actions/ManageApproval.php": "8ec2fe33cb0affefac9466de70395afa3f2ca5d1268cd16a823fc2781afd0283",
+    "services/governance/app/Application/Approvals/Contracts/ImmutablePlanSource.php": "490ca568e3b36c531420c3ec9f3fc6e393092b24d52ef0a126216683ae64c940",
+    "services/governance/app/Application/Foundation/Actions/InspectDependencies.php": "019459639caec1e3d3fb397026215fe77777a3dd77c18efc41c5a1ca406ff74b",
+    "services/governance/app/Application/Foundation/Contracts/DependencyProbe.php": "b79f3e6ed6c6e08677d3c0b61f90fb382c98e96d26e807b3d119fd81a0990c66",
+    "services/governance/app/Application/Foundation/Contracts/HealthCredential.php": "7fdeb5b78e2eb9f676ab955a1f1451fd27eb2f861b2670657e3438a6babb8a93",
+    "services/governance/app/Application/Foundation/Contracts/SignalBuffer.php": "4a78c3f8413add9220d28b71112cfbc738863bed440b9a7545f72010050ac14b",
+    "services/governance/app/Application/Foundation/Data/DependencyStatus.php": "5b19fe2dee35b14359e8a4d4438185a4c77d51f25a82dc6aeb80f5a14ce465f3",
+    "services/governance/app/Application/Identity/Actions/ActivateOidcConnection.php": "3b389b7b0874fdf3715b60a2d72578499c2ee10a1ec9889bfb05b2a5866c23ee",
+    "services/governance/app/Application/Identity/Actions/BeginOidcLogin.php": "b6d954acd706724669f8a4087b2819e4b9feea124791bb5040fb3d3bc334f4ae",
+    "services/governance/app/Application/Identity/Actions/BootstrapAdministrator.php": "0ca53acba4041b820dec93ba52010aa76ea5eff94b2e5ffd055fe42ba1d6c8b2",
+    "services/governance/app/Application/Identity/Actions/ChangeLocalPassword.php": "f79d80cfcc074bff444d0c9f548003bf4415836f51c0341ea2d0a4001c3bede6",
+    "services/governance/app/Application/Identity/Actions/CompleteOidcLogin.php": "96d04d774c7eece4dde6798c1fdc202251674af4d2152094b4d73709106b2173",
+    "services/governance/app/Application/Identity/Actions/InspectActorDelegation.php": "f8cbfb8479ed6d08d7787335947f3ae4df2e67804302ef86e56eaf17263b05b5",
+    "services/governance/app/Application/Identity/Actions/IssueActorDelegation.php": "fc93572d63c55b655f28594f3f46d793a6bb56da8d40b4bd164465429efc91a0",
+    "services/governance/app/Application/Identity/Actions/IssueFederatedSession.php": "d11489c8c71d2482e8c684befeef2ca2c1e2364f2df5d7d5c63728b45c650d1b",
+    "services/governance/app/Application/Identity/Actions/IssueLocalSession.php": "04f17137c624600b58c92ccdcc71ae5cb6c80fa13be8a3fc6a5768e782caf3cf",
+    "services/governance/app/Application/Identity/Actions/LoginLocalAdministrator.php": "e469900dae4f4ea37c2b41880bf2bb34d14da8f23f6fe028d6290a1ada7c21a3",
+    "services/governance/app/Application/Identity/Actions/LogoutIdentitySession.php": "a4f1d297db331c51d67805c8be6deee6bcc243de857e376f0c67ff99658082eb",
+    "services/governance/app/Application/Identity/Actions/ResolveIdentitySession.php": "a99735e387f922d7ed7f3d62e77541c9d3c070a4eb9534552de99840ad8a8861",
+    "services/governance/app/Application/Identity/Actions/ResolveLocalSession.php": "c5fdd417437981bab9a0d3dcc0e417255e0af5743a198594a2fac5e4c7066c23",
+    "services/governance/app/Application/Identity/Actions/RevokeActorDelegation.php": "a228137fe0b8eecc89dd5eb23d8f3058daa063bda1e78bf59c77b138f9bcd391",
+    "services/governance/app/Application/Identity/Actions/SaveOidcConnection.php": "f1969b41ebe8f09dc4e9bfc1995fc33b0c7ca54857878f5123bc72dac5a57f5b",
+    "services/governance/app/Application/Identity/Contracts/ConsoleCredential.php": "1c8ef557d78d6b51584231ad351a2cfefee7bac0603c983ab42bf02d3cd26580",
+    "services/governance/app/Application/Identity/Contracts/DeploymentTerminal.php": "82d6e85566b2fac17c3270e0df88f8453e84c4e183f46b4a59830f1c00f3d235",
+    "services/governance/app/Application/Identity/Contracts/OidcHttpTransport.php": "357c46b68a5b7db983023847c133010e251473e7f5929a8e3c1e8c5ccf5cbe08",
+    "services/governance/app/Application/Identity/Contracts/OidcProvider.php": "33b847d8b570e1ab17c70b11852b5ce8add8b4d82a10ac7dad376206b2d56a5f",
+    "services/governance/app/Application/Identity/Contracts/ServiceCredentials.php": "477cd7792eeab3d4053b1d0f6cc8bbe78bbe60fb603c651236f910cfa0830574",
+    "services/governance/app/Application/Identity/Data/FederatedIdentity.php": "037863bfd6f5ad9d47f97f42fcc1de7fbb48406495a8816c6922c9ed354aaa75",
+    "services/governance/app/Application/Identity/Data/LocalIdentity.php": "ca009384d91410ffb5e5712316cb86b5fbb5b5f2ac04367f74de70682b156c93",
+    "services/governance/app/Application/Identity/Data/SessionCredentials.php": "9afed17110c3b494b9890b3ff594838434eb77e6bc99b578081ce5c2ba4f5d3c",
+    "services/governance/app/Application/Messaging/Actions/PublishGovernanceEvent.php": "3f6614425dbfe4fc2d1e81fc67c3540ded5257727fd4d662916ba6c1683bae85",
+    "services/governance/app/Application/Messaging/Contracts/ConfirmedPublisher.php": "9ed511a3aed383aad198e7b118a2935cf81acb74d091372dbfbd9b9c8346a411",
+    "services/governance/app/Application/Messaging/Contracts/EventEncoder.php": "868dc790482aa8848cd39b290023ebeff78f6622520f6f5b781f09313717d9c8",
+    "services/governance/app/Application/Tenancy/Actions/AuthorizeTenant.php": "1886775d81070b2c3cbf91a372129d75843b617d23ba3d3e54778dfd1e75685d",
+    "services/governance/app/Application/Tenancy/Actions/EvaluateTenantPermission.php": "a4c33a241a8a6f5e7c5894fad4a942751479d1ae3056e5f337f81b14367b91af",
+    "services/governance/app/Application/Tenancy/Actions/ExecuteGovernanceCommand.php": "f4b006ded214427cfd18df8a33692a3318ed4dd43588c1de2979a63e43655b99",
+    "services/governance/app/Application/Tenancy/Actions/ManageTenant.php": "c961012f408d7964b8295c9daf95b2a8cfa260333cf2f1b3846fc5815ce3258a",
+    "services/governance/app/Application/Tenancy/Actions/ReadTenant.php": "10d94fac39677e69498ff31a78eb7faf7433dc8261ba0ce422cfdac51813f863",
+    "services/governance/app/Console/Commands/BootstrapIdentity.php": "5be5842ff28deb144d854b298d2a8681d5928ef5dcd159f888a3ec2839b2ea6c",
+    "services/governance/app/Console/Commands/ExpireGovernanceApprovals.php": "279af91753e06683abf3d25b9924595344c4542a4a6d57a67f403419779c1e8c",
+    "services/governance/app/Console/Commands/PublishGovernanceOutbox.php": "8cc56e45bedc34f680f898b2fdb2be18e6bc2e5f8d7c0751714a2310fa929494",
+    "services/governance/app/Domain/Approvals/ApprovalExpiry.php": "e932a213fdb2b3cf826a44b2feaf7cda8fd42d7b37dbfe8341ea2e56057b4e9b",
+    "services/governance/app/Domain/Approvals/BoundPlan.php": "6b4506df6a202551025fcd48bd394e6d240ea0194e53bd9626d40277c6f4386e",
+    "services/governance/app/Domain/Identity/BootstrapAdministrator.php": "bb49b64b17155236493708c81e255b1614671b965af6b487b3a474324f1c4ff7",
+    "services/governance/app/Domain/Identity/DelegationPolicy.php": "f0177025648962c1b75b00e83248ac77dfbb361ac1dcf81c2eb9b986dca74b80",
+    "services/governance/app/Domain/Identity/IdentityDenied.php": "6ad9db5694fb917eb4e9bafb458a97f040043ef84fdd0cca9054b062ae10d1d7",
+    "services/governance/app/Domain/Identity/IdentityLedger.php": "84e84c41ee05fcc44fd42621f9bd5aea6d7e53314897ab1d9b2ef9baf63ac10d",
+    "services/governance/app/Domain/Identity/OidcConnection.php": "822188362a7e7a035ff8cd87507a3127af1ad0fd63ed1b6edbbdebe02c16b8e0",
+    "services/governance/app/Domain/Identity/OidcUrl.php": "4ed0647729c55abd303586dd0092ac2221c6cdc508fdc1a4403c5bc999525f3a",
+    "services/governance/app/Domain/Messaging/InvalidEvent.php": "4b7642d11171b95f96773afc8ac4727eee930e349948468fce8ebdf16fc6211e",
+    "services/governance/app/Domain/Tenancy/GovernanceLedger.php": "56c68ca349b089087bf67f7f140c0e80c5ba9c64e2224c6845678e393f57763e",
+    "services/governance/app/Domain/Tenancy/PermissionMatrix.php": "8ffdb470dc6f27382aa8f49de06e004a77bacfb84faa317a8f67be57b623610d",
+    "services/governance/app/Http/Controllers/ApprovalController.php": "d9a64a2610f4644d0d18e7bc73fe266cff21735f1bb6faf9f68def9d6d4c53b4",
+    "services/governance/app/Http/Controllers/DelegationController.php": "4fbe880464a2033c758e55c030c8d7cad6332b3eab74162fcb296540729ebdf9",
+    "services/governance/app/Http/Controllers/DependencyHealthController.php": "aab6062bb49e07df600613609f43d492b80f62622ab43608d3e3c92b4337ffeb",
+    "services/governance/app/Http/Controllers/HealthController.php": "8a211030f5dbc505518d02584ffc104a36ba534e73422a4ba811e3aaecdd6fab",
+    "services/governance/app/Http/Controllers/LocalIdentityController.php": "c87eba6d10d78296d4e2377ca160b973e01ce49fbff05909a60312635562ba7d",
+    "services/governance/app/Http/Controllers/OidcController.php": "f3f9f224aca941dac5a08b14ed2076724e06ca8e496ad54f4e41bbcb76240439",
+    "services/governance/app/Http/Controllers/TenantController.php": "e7974d0c6fe9f3b99cab3605086f7f38c09a3eab3ec56deb5c4b72d00c75c14e",
+    "services/governance/app/Http/Middleware/AuthenticateConsole.php": "c00897f7d12b3c8422d1e02786eb17c1d988b99ee2f2060ef07aa06adf7b5100",
+    "services/governance/app/Http/Middleware/AuthenticateService.php": "77b62d294671999fe6e4dc2bba8da51b9e6f42d8bdfa45b77a8493e17a25a1e7",
+    "services/governance/app/Http/Middleware/RequestTelemetry.php": "7f35c16beca5f4544471be419a6f6e686b6615eccdffb85ef43a85ce1e62a57b",
+    "services/governance/app/Http/Middleware/RequireIdentitySetup.php": "09d454506a334cf11388a20919ef02cdd4d4ca3682e11d51d460c638ca01a36d",
+    "services/governance/app/Infrastructure/Approvals/PlanningPlanSource.php": "f2bca5b41030903f06090e1c9aacd732929a275c9c09600a3bdea5ffc93db32e",
+    "services/governance/app/Infrastructure/Foundation/BoundedSignalBuffer.php": "ef39f2f0e618d55bba19a94ed246e9149ee3b494d949ea26a91e18e05b8137f3",
+    "services/governance/app/Infrastructure/Foundation/MountedHealthCredential.php": "3c0a622df2f954de62f6f2864a56157394bc1d4a63788a992fabc4df7b765d86",
+    "services/governance/app/Infrastructure/Foundation/MountedSecret.php": "2e395919fe9c8d42c78e4b28bdb04a5a38d69c7a0d4fa6e6715beabb42b61162",
+    "services/governance/app/Infrastructure/Foundation/PostgresDependencyProbe.php": "e8b8cf3577392336d86cc253d9843b9403c4f1e6493f8b22466ab57ed19b21d7",
+    "services/governance/app/Infrastructure/Identity/ExternalOidcProvider.php": "b40d0523cbe425765233c3d4ecd6d9179f1f2b424b199cd2c78c054f6b351269",
+    "services/governance/app/Infrastructure/Identity/InteractiveDeploymentTerminal.php": "67f4585d56f2c565df1451f46edad0609422ec952729371ac791cdc952cb2ce4",
+    "services/governance/app/Infrastructure/Identity/MountedConsoleCredential.php": "b926abd703c778a3cc799406a39452d04e4421ede335e75ee1b164eeaae53019",
+    "services/governance/app/Infrastructure/Identity/MountedServiceCredentials.php": "ad33b23d620ad8234b2949c9be12547229fb24ad90ebb75c874f12b4de18e0a0",
+    "services/governance/app/Infrastructure/Identity/OidcHttpClient.php": "2a9ffe27c18eede31f8a0b9f9f67c4e57b0b0d8ba5dcd82a46df3e36eb086306",
+    "services/governance/app/Infrastructure/Messaging/GovernanceEventEncoder.php": "2174bcf6f1eac5222b3eb640e91bd4dfb3048629ab0bd10460923380c1b29a91",
+    "services/governance/app/Infrastructure/Messaging/RabbitPublisher.php": "b7cec3a27e6b67233724a2892226d7978773c6fc088391142351ee5c906ccc78",
+    "services/governance/app/Providers/AppServiceProvider.php": "19a3b843895ec2e5034e8a3e7d795e05b4ec0c41afddba90f31888de37775351",
+    "services/governance/artisan": "83c95e93ffda62b12bdfd605f5626762ee239fd61cf46ff56fd244dc828f609a",
+    "services/governance/bootstrap/app.php": "85c49ffbfd9a1685dbeb19b61b22ee3ec5344e1500fbb4651d63cf920688fd2b",
+    "services/governance/bootstrap/cache/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "services/governance/bootstrap/providers.php": "a3848357a2e0cc535c8b200081cfe9d437821db79c01a58227e782e378e9f656",
+    "services/governance/build/apk.lock.json": "14155c25ff67dd47b7b4168ce9c0caf8c32cfe5ed4b0b65f796ac4c6904a7259",
+    "services/governance/build/download-apks.php": "4392e9bd58ec1f42bda7a5341498fdaef79589208dc0a96a0a39d737a6d7fdb9",
+    "services/governance/composer.json": "5bdd6973d2c4eaf76627bf896eb0b8bedfaf01b013287f8a91ea732e5ac9fb2e",
+    "services/governance/composer.lock": "79d17bbd18f9194833ab6853523a6a69c6bdc8e6b4980930382db804993425da",
+    "services/governance/config/app.php": "a12bb0798aa79d8ea181a83ef37559c65fe8f78ef9275f2226a575f192392c6a",
+    "services/governance/config/cache.php": "dd4ecb492fc5e827722c53ad92a0b8d1bed4efebf52bb5576a34941f97d80e10",
+    "services/governance/config/database.php": "d5da2e6c1d133cb44557969b54a9149bfc67aa5e68619730aeecf3ffb9da4df1",
+    "services/governance/config/foundation.php": "0fc9a39a95f0a5cf307fc3cdcf7af0a728cb313ef9b82ab6ef5600de9b6efb6d",
+    "services/governance/config/governance.php": "61c548eba7e6d1d6d1acd7ea760a3714c18be20beb405a4808b540be5641e505",
+    "services/governance/config/hashing.php": "09aa3216775d5fe8d6e525240c66e3fd0a667b7210cda2cab447dcd82df89dff",
+    "services/governance/config/identity.php": "77fc23fac24bc22e0c2dc39dcf02f15ca10ca7c222d43877af238b1a7b0a3b3e",
+    "services/governance/config/logging.php": "29eabe013cf03a79de0f56893816a7ec97b561536009f634607b957e0fd099f4",
+    "services/governance/config/messaging.php": "9ab9e44a32211fc74f9206dcd04130ebbd646679270542c852b9fd2a92bb1e30",
+    "services/governance/config/telemetry.php": "a8e3ca78ee997ac95a3fa02cb0f48868b547ce24862363ba58b0e132eaacf2fb",
+    "services/governance/database/migrations/001_identity.sql": "407dd5025f21b2a36bdacf55d8abbf475efdcd689d77678f8bc10d1b8f91662f",
+    "services/governance/database/migrations/002_federation.sql": "5a7f9ea11881175f3066771c6fea103bf6061c57176c3aa4141b21a669adf146",
+    "services/governance/database/migrations/003_tenancy.sql": "8d263028d7b98664c688761b1246abc913d56847e8b19ad1bab41574bb3b3b58",
+    "services/governance/database/migrations/004_approvals.sql": "2fe76e8272a588623ec3cc1eb26b52036df73f39c016e087f2c2f90f6880a40a",
+    "services/governance/database/migrations/005_event_delivery.sql": "f92d79d6edb59db4b291692cbbb4b525f14f627c8fcf07012937cc0f4ccdcabe",
+    "services/governance/database/migrations/006_actor_delegation.sql": "c8e54364d8091de26cbac0478c6437d64a8b4669b87bd18c74ae9ca2bc43a3bd",
+    "services/governance/deptrac.yaml": "1f9ddf03628d9751a10d7523d1c28125dea5e7cbc53e1ec1fcc265e7ba690d09",
+    "services/governance/phpstan.neon": "040531182713abfa15e3063d5806473131d805007ef888e0fd54c2e09f05fd84",
+    "services/governance/phpunit.xml": "1197e1d1b02d4ce7d9fb269e3b2b53542a8d2714ba1304a2ca16533e68c899fa",
+    "services/governance/pint.json": "e54acf88cddb03d9f17392c062c70b8bdf5c8426391adecaed4c3105a21d4bdb",
+    "services/governance/public/index.php": "59caa93d7583ba8fbb335d7bf0c31f3c382a7cda6c6c6915fd844af840c09c13",
+    "services/governance/resources/contracts/governance-change-v1.json": "470cb3b3472e19cfe919f67bdf5c7e23cc5442533eaf15fbef3c03c621ab9afa",
+    "services/governance/routes/api.php": "d4c96d540428e8e2d5ff36f20e2a0775178a1e3beb5c780ec90989797bfb8ace",
+    "services/governance/storage/framework/cache/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "services/governance/storage/framework/phpstan/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "services/governance/storage/framework/views/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "services/governance/storage/logs/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "services/governance/tests/Architecture/FoundationTest.php": "7ee5fd8d8f6b2d4c9bfb1f7c2e30426dd4dcf7c98b5e25c0a0abcba6835cb371",
+    "services/governance/tests/Architecture/verify_quality_canaries.php": "d239abcc4aca5b10b405a946a6f62c20a6b9cf99c4ac12fc54d98032bd1ef01e",
+    "services/governance/tests/Feature/ActorDelegationTest.php": "a719c5f1233ce49e06a013e5a1c3241972357992a43352ed399a0b599be219ad",
+    "services/governance/tests/Feature/ApprovalTest.php": "6f0a8c4efcb63a2eb996a362d8025e7bb3afef3567a603cfdc7bd5126990f0f1",
+    "services/governance/tests/Feature/DependencyHealthTest.php": "a682e4b88e4c14af02a2a9e0452987ae5c75d443e2e5c12601fd1df92d4002e6",
+    "services/governance/tests/Feature/GovernanceBrokerTest.php": "8b8f5bbb9d336408c2f852d3255c1bd44090fa86ec9ed91055d45ed96931c071",
+    "services/governance/tests/Feature/GovernanceOutboxTest.php": "4f5d3569838beea33ecccb6d84934db1c8b923ebf53c4633e17292a8139b82f2",
+    "services/governance/tests/Feature/HealthTest.php": "8da83ce5f36f536252766452adebb3bb5d11613cec9911f9db532b85253f08f3",
+    "services/governance/tests/Feature/LocalIdentityTest.php": "7884524766faafccc090f200c7e9f7c7d00e7ea82fb4a895ac0c6e4f0769851c",
+    "services/governance/tests/Feature/OidcIdentityTest.php": "9c53219ee0f8eae461ac96d7275e0766b07dfc137a5bc219c727ad905baaefa4",
+    "services/governance/tests/Feature/TelemetryTest.php": "ddf9bf45f2f563f1c5bab2494df1132a82aa557d57c87ac075e0d240b665de51",
+    "services/governance/tests/Feature/TenancyTest.php": "098a3accd5cbe063710d98891db74cd4136e72fe42123c304efc4dd4e7c278b6",
+    "services/governance/tests/Pest.php": "251199baf8339877942ce9b1e52ab57d0d775de23d8bc2b432b1dba5cb83a9e1",
+    "services/governance/tests/Support/IdentityFixture.php": "4e6cdbb7e6211ae8cb192be7e05ad9dc2a943885fa4956c4bab41fa4bd445e1d",
+    "services/governance/tests/Support/SyntheticOidcTransport.php": "e899021c3a77ccef285f32b1b236423844620272cbc839358887f7fd35195f51",
+    "services/governance/tests/Support/SyntheticPlanSource.php": "3817af9ca18e6de46ca391a2f654eaf7d91c986854af197585cc773be4d41fdd",
+    "services/governance/tests/TestCase.php": "9bf01af61ef8aafb5ae927f5bd42a7c74a1993e4fbcaea3c58c630c90f6e4dd9"
+  },
+  "limitations": [
+    "Synthetic HTTPS OIDC peer; no operated-provider interoperability or DNS rotation qualification",
+    "Synthetic immutable plan authority; no real planning producer or native admission",
+    "No operated deployment or G01/G02 acceptance",
+    "Verified PostgreSQL TLS; loopback HTTP between applications; production ingress/workload TLS topology remains unqualified"
+  ],
+  "php": "8.5.11",
+  "postgres": "18.6 (Debian 18.6-1.pgdg12+2)",
+  "node": "v24.19.0",
+  "browser_stats": {
+    "startTime": "2026-10-05T19:07:36.677Z",
+    "duration": 12779.419999999998,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "synthetic_provider": {
+    "discovery": 4,
+    "token": 4,
+    "jwks": 4,
+    "pkce_verified": 4
+  },
+  "completed_at": "2026-10-05T19:07:49.786631+00:00",
+  "artifact_sha256": {
+    "governance-http.log": "df71a030c75f5d96860f5467f193b8f6a706860eb680a04f1f33d62f3ff5133c",
+    "browser.json": "73a8fc404dcc0e1a7ef5a8e0cd687cc554dea62f5908163c1e0dbdff36412687",
+    "postgres-features.log": "f0606ea704b04bac4615e25cb815070a75cc5eb74279e516d2167294df2775bc",
+    "browser.log": "ff85fb5d141151391b5374c0c5e876136075cfd6edaaabb9808db34247e13ed0",
+    "noninteractive-denial.log": "350a8d53e709600769f9a42f98d128cb95e74590e18ff67a444bd8ce7a7ce5ce",
+    "console-http.log": "8133fd174b00a0cae3542489add7fe7d8432c483cf88dfdfe109744aedb42150"
+  }
+}

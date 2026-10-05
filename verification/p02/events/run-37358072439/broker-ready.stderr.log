@@ -1,0 +1,30 @@
+Error: unable to perform an operation on node 'rabbit@p02-broker'. Please see diagnostics information and suggestions below.
+
+Most common reasons for this are:
+
+ * Target node is unreachable (e.g. due to hostname resolution, TCP connection or firewall issues)
+ * CLI tool fails to authenticate with the server (e.g. due to CLI tool's Erlang cookie not matching that of the server)
+ * Target node is not running
+
+In addition to the diagnostics info below:
+
+ * See the CLI, clustering and networking guides on https://rabbitmq.com/documentation.html to learn more
+ * Consult server logs on node rabbit@p02-broker
+ * If target node is configured to use long node names, don't forget to use --longnames with CLI tools
+
+DIAGNOSTICS
+===========
+
+attempted to contact: ['rabbit@p02-broker']
+
+rabbit@p02-broker:
+  * connected to epmd (port 4369) on p02-broker
+  * epmd reports: node 'rabbit' not running at all
+                  no other nodes on p02-broker
+  * suggestion: start the node
+
+Current node details:
+ * node name: 'rabbitmqcli-520-rabbit@p02-broker'
+ * effective user's home directory: /var/lib/rabbitmq
+ * Erlang cookie hash: nhFgAo8xLtotdVY1Cq4h5Q==
+

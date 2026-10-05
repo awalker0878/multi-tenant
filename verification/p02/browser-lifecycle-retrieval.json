@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "source_sha": "512fd5c2580e5cd40bf0089662cff8d84718a877",
+  "retrieved_at": "2026-10-05T19:08:50.416633+00:00",
+  "observer": "Codex via GitHub connector; ZIP digest, retained artifact and exact-source hashes compared",
+  "result": "PASS",
+  "run_id": 37360927431,
+  "artifact_id": 11365819875,
+  "report_path": "verification/p02/identity/run-37360927431/report.json",
+  "report_sha256": "4f2daa789a5d63dfd3232230e37886fba63e5121218fca55dcdf4806f2154cd8",
+  "archive_sha256": "fdb055242f62b897ed823e79618ee6dad2f51553e51165df4ceca179821d2741",
+  "checks": 47,
+  "matched_source_bindings": 248,
+  "matched_artifact_hashes": 6,
+  "browser_stats": {
+    "startTime": "2026-10-05T19:07:36.677Z",
+    "duration": 12779.419999999998,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "console_package": {
+    "run_id": 37360927491,
+    "artifact_id": 11367225449,
+    "report_path": "verification/p02/packages/run-37360927491/console/report.json",
+    "report_sha256": "43a77978c470c1dee0825674a7a664fe237b8ab45ba68bba2345b5963aa350ac",
+    "archive_sha256": "73a800738cebb73feab16cba18fb397014a9d3f2cec9c9277adf21aae7b8575e",
+    "result": "PASS",
+    "checks": 20,
+    "commands": 23,
+    "matched_source_bindings": 187,
+    "matched_artifact_hashes": 53
+  }
+}

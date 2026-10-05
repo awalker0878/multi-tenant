@@ -16,3 +16,20 @@ bytes at `f3612f6d5669ec47f13020a7f1f1f1d64e333e5d` and accepts only the three n
 contract files. Its result does not relabel either failure. The [next contract run 37354292360](contracts/run-37354292360/report.json)
 conservatively compares with the previous push and also sees the restoration as a byte change
 relative to the rejected edit. The [unchanged-artifact regression at b1064b7](contracts/run-37354711828/report.json) passes the original unmodified check, along with generated-client and HTTP conformance replay. No failed run is treated as a passing gate.
+
+
+## Governance delivery qualification
+
+The initial `ab8570145870ed6d2c9d5c0a65a471f90e3315ab` runs are retained:
+[identity/relay run 37358072207](identity/run-37358072207/report.json) and
+[broker startup run 37358072439](events/run-37358072439/report.json).
+The first exposed a timestamp precision mismatch: PostgreSQL's fractional
+`available_at` default was compared with a Laravel seconds-only binding, making
+new events appear temporarily unavailable. The second called the broker CLI
+before its Erlang node finished starting. Neither is a passing campaign.
+
+`4afcee1d504b8dfb0725d3306f8c2c55eb1f6dce` retains microsecond precision in the
+relay eligibility comparison and waits for actual broker health/port readiness.
+No authorization rule, time limit or assertion was relaxed. Corrected campaigns
+37358891052 (identity/browser) and 37358890871 (PostgreSQL/TLS broker) pass;
+their measured source remains distinct from subsequent delegation work.
