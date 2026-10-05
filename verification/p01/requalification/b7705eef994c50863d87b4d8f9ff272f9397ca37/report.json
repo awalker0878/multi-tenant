@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "source_revision": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+  "source_tree_sha": "abe90ccc024f626f337305891e8fe79deb55014a",
+  "result": "VERIFIED",
+  "outcomes": [
+    {
+      "artifact": "p01-stateful",
+      "run_id": 37272826299,
+      "result": "PASS",
+      "report_sha256": "607b09e919585d225eab53577bc68fed85b309e85d046eabe0a4658434f42b39",
+      "verified_source_bindings": 94,
+      "verified_command_logs": 134,
+      "source_binding_inventory_sha256": "7f7a860906ea894a213af13c05d10fce7d52bf5eef3af5f522c0143f1ec04901",
+      "checks": 40,
+      "cleanup_complete": true
+    },
+    {
+      "artifact": "p01-contracts",
+      "run_id": 37272826201,
+      "result": "PASS",
+      "report_sha256": "bc0300673906290a79e4e9a84041e3e0ea3787792291ccaea821f35ee50471d7",
+      "verified_source_bindings": 0,
+      "verified_command_logs": 0,
+      "source_binding_inventory_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "fixtures": 16
+    },
+    {
+      "artifact": "p01-messaging",
+      "run_id": 37272826201,
+      "result": "PASS",
+      "report_sha256": "ef8184466fa12755bea3b48acb1ec5e20dbf097fcf66068ea696dfb8c05718c0",
+      "verified_source_bindings": 80,
+      "verified_command_logs": 194,
+      "source_binding_inventory_sha256": "c9fb156163440cad6f9573bc0c94621a7e21e0ecc5deaf8b14bf68accf22579f",
+      "checks": 35,
+      "cleanup_complete": true
+    },
+    {
+      "artifact": "p01-http-contracts",
+      "run_id": 37272826247,
+      "result": "PASS",
+      "report_sha256": "bcdc727bd27a8adbe253b81df9ab21afd48977f5319a10a684b7be3724ac4229",
+      "verified_source_bindings": 18,
+      "verified_command_logs": 24,
+      "source_binding_inventory_sha256": "5b9ad85f8181844002ce7a2bda364c6ef607b088ad3fd6cac70d2947926d12b6",
+      "fixtures": [
+        {
+          "id": "ProcessLive-valid",
+          "valid": true
+        },
+        {
+          "id": "ProcessLive-invalid-status",
+          "valid": false
+        },
+        {
+          "id": "ProcessLive-invalid-service",
+          "valid": false
+        },
+        {
+          "id": "ProcessLive-invalid-scope",
+          "valid": false
+        },
+        {
+          "id": "ProcessLive-invalid-extra",
+          "valid": false
+        },
+        {
+          "id": "ServiceNotReady-valid",
+          "valid": true
+        },
+        {
+          "id": "ServiceNotReady-invalid-status",
+          "valid": false
+        },
+        {
+          "id": "ServiceNotReady-invalid-service",
+          "valid": false
+        },
+        {
+          "id": "ServiceNotReady-invalid-scope",
+          "valid": false
+        },
+        {
+          "id": "ServiceNotReady-invalid-extra",
+          "valid": false
+        },
+        {
+          "id": "DependenciesReady-valid",
+          "valid": true
+        },
+        {
+          "id": "DependenciesReady-invalid-status",
+          "valid": false
+        },
+        {
+          "id": "DependenciesReady-invalid-service",
+          "valid": false
+        },
+        {
+          "id": "DependenciesReady-invalid-scope",
+          "valid": false
+        },
+        {
+          "id": "DependenciesReady-invalid-extra",
+          "valid": false
+        },
+        {
+          "id": "DependenciesReady-native-denied",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnauthorized-valid",
+          "valid": true
+        },
+        {
+          "id": "DependenciesUnauthorized-invalid-status",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnauthorized-invalid-service",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnauthorized-invalid-scope",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnauthorized-invalid-extra",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnauthorized-native-denied",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnavailable-valid",
+          "valid": true
+        },
+        {
+          "id": "DependenciesUnavailable-invalid-status",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnavailable-invalid-service",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnavailable-invalid-scope",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnavailable-invalid-extra",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnavailable-native-denied",
+          "valid": false
+        }
+      ]
+    },
+    {
+      "artifact": "p01-permit-desk",
+      "run_id": 37272826194,
+      "result": "PASS",
+      "report_sha256": "d7c5d3b12c03a30eba0fef6fc7918f718f7097ef5b04454b56f9f7d21e9b67a9",
+      "verified_source_bindings": 92,
+      "verified_command_logs": 176,
+      "source_binding_inventory_sha256": "eaf3a85f58e891ec2f19971e8e4289bee9fd2d97959ecb3f6b9175d880014226",
+      "checks": 79,
+      "cleanup_complete": true
+    },
+    {
+      "artifact": "p01-policy-controls",
+      "run_id": 37272826260,
+      "result": "PASSED",
+      "report_sha256": "23cdfa4e16915ee61fe36d1d70a42a9d50de10552a5a0e8e28aaa47c87a476f6",
+      "verified_source_bindings": 35,
+      "verified_command_logs": 7,
+      "source_binding_inventory_sha256": "0dbb3b5af155c533c434307742830d1d8c71696e7d3f28a5e0f327368b4a7435",
+      "tests": 59
+    },
+    {
+      "artifact": "p01-repository-secrets",
+      "run_id": 37272826260,
+      "result": "PASSED",
+      "report_sha256": "172be32b54da0382292237e8c258acb193cd5c44193ab9add64c07a61279fa14",
+      "verified_source_bindings": 9806,
+      "verified_command_logs": 0,
+      "source_binding_inventory_sha256": "e8bbad77d6a84650e35eeba4230ee879834fe181479bd4ec5648ca27a23cf26e",
+      "tracked_files": 9806,
+      "secrets": 0
+    }
+  ],
+  "source_verification": "All declared source hashes were compared with exact Git blob bytes at the stated tree. Detailed source SHA-256 inventories and reports remain inside the verified original archives."
+}

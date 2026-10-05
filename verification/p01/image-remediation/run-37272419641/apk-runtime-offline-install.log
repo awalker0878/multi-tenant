@@ -1,0 +1,7 @@
+(1/4) Upgrading libcrypto3 (3.5.8-r0 -> 3.5.9-r0)
+(2/4) Upgrading libssl3 (3.5.8-r0 -> 3.5.9-r0)
+(3/4) Installing libpq (18.6-r0)
+(4/4) Upgrading openssl (3.5.8-r0 -> 3.5.9-r0)
+Executing busybox-1.37.0-r31.trigger
+Executing ca-certificates-20260909-r0.trigger
+OK: 20.7 MiB in 42 packages

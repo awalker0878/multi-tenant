@@ -1,0 +1,69 @@
+{
+  "scope": "Development signatures only; no operated trust inferred",
+  "cosign_sha256": "4629c757b7618056f8ddd7e2625ae9fdd94c0372a65049520bc7d9df9efc7f71",
+  "signatures": [
+    {
+      "component": "assurance",
+      "result": "VERIFIED",
+      "release_sha256": "a4590078b5415a91c51a5f7f49229a9d3f2994f7c6bbce0848b3eb938e941af8",
+      "signature_sha256": "49fbfab9105253b6777188e6a026e31e36432f4798e7717a7ee315409025b309",
+      "key_sha256": "83c42249a0878fcb9917247f8be9131ddae5d5dd43a53f18bd19f1b2db6a3656"
+    },
+    {
+      "component": "catalogue",
+      "result": "VERIFIED",
+      "release_sha256": "1872670028d4a94083c60d5a41bfd9f12b0ba3e98a021a9eb46bd3bd466a0337",
+      "signature_sha256": "779ac694f631ccc832f5fd1bb0d72fef4f5958762bf1e27a04167d5df2e5e082",
+      "key_sha256": "ee9b0396b90efd8d9db60ccee815c8749bc6b791e785f6819eb0b856201471fd"
+    },
+    {
+      "component": "console",
+      "result": "VERIFIED",
+      "release_sha256": "cd911214a9f3c53d539202e76a443282330324dda04007402906faf30c6ef183",
+      "signature_sha256": "294a0b726429421fce4d84fdb9415fcd28defe993110d75668479d8bd373687f",
+      "key_sha256": "96dff4ff653de2e774d9eb77578b0f8d06c5d109a7e8ad99b84ae88e56ab2946"
+    },
+    {
+      "component": "governance",
+      "result": "VERIFIED",
+      "release_sha256": "91fb6328b5b3f4ba01c9a4dd7529160cbb7b311a7ab4c186aa68b52b8debf61f",
+      "signature_sha256": "4c92c67f5f4f65828bcc2b882d9f26f81059de57758c64a2fca72716e6a10cb1",
+      "key_sha256": "0c94c6c8431ce58fd8a34bde672f3096ddebe39daf2cc4a1a32c5e39d4dd2b32"
+    },
+    {
+      "component": "inventory",
+      "result": "VERIFIED",
+      "release_sha256": "9944dba6d8e4390614486833542470fd94f37fd439db78a2da9b57bcc4aef077",
+      "signature_sha256": "6e80cba1665db9e7b1139b0d5995d9bb5409bcf221e04b4af3e6f69262ef592d",
+      "key_sha256": "364f23979296985062954f0fbf7994a447f268afcc192ac1ef81bc415f835803"
+    },
+    {
+      "component": "inventory-workers",
+      "result": "VERIFIED",
+      "release_sha256": "763c4ce7855b3959981040cc973633d537781726567af6cdd7e8a829ad97fc90",
+      "signature_sha256": "e649c002cb1a1565da11a70eb5d1f4027ca16e0cf238a84cdd7c2ba2a5fb2864",
+      "key_sha256": "ac9cf7269dcde939188fbb63ebafdfe45484cd88421e56ad6ff719702220d4b6"
+    },
+    {
+      "component": "lifecycle",
+      "result": "VERIFIED",
+      "release_sha256": "359702a642322cdc58bfd3dfca8b27dba1fa5437b3e81fd3f93d193a42bc1824",
+      "signature_sha256": "adafd1882c1cf1ab2a3c9a8ffc226bbe56139119d4b98ab0bbc54df21b133849",
+      "key_sha256": "8cd90a33ae1061054c298d3bd4dac9bd22a7175b5fa45eb4fa3a8cf2fc28df8e"
+    },
+    {
+      "component": "lifecycle-workers",
+      "result": "VERIFIED",
+      "release_sha256": "9ce33983702f0365fc6a5971d48547af32bf9c347a67c50656cdd9d0fffd3777",
+      "signature_sha256": "60f3948c92fe53a087e2a642a8f7ed5a4eeea968d3d99d472392ac88d89e85e1",
+      "key_sha256": "92ac1dd2bb457eb63a82ef548a9279cbd5ed1034db499e6bfacfc579a9f52350"
+    },
+    {
+      "component": "planning",
+      "result": "VERIFIED",
+      "release_sha256": "300dad0f99bf4b8f5d7f4de60b742b9932855380165a474d3bb96ca4f6d82876",
+      "signature_sha256": "eb23d9b13d7b12a0c3f7f53e3e61626cb7b3e7ff847e03707798af34ba8fced9",
+      "key_sha256": "071abac99896564853ef7c68b4d1fa2d160b680a66d20d66fdf17a9523348269"
+    }
+  ]
+}
