@@ -66,3 +66,10 @@ bootstrap denial. Archives and raw table bytes never enter retained evidence.
 Only hashes, counts, redacted results and source identities are retained. Empty
 tables remain visibly empty; this does not infer exercised approval history,
 broker-store recovery, HA, accepted RTO/RPO or operating custody.
+
+The terminal approval-history fixture additionally produces one rejected and one
+revoked decision through real owner actions with distinct synthetic author/reviewer
+identities. A separate process observes both rows and five approval audit events;
+the campaign restores the complete fixture schema and compares every owned table.
+It does not substitute a test plan for the future P05 producer or resume restored
+authority. Results are counted only after the changed-source campaign executes.

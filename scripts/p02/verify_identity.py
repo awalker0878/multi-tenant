@@ -129,6 +129,20 @@ def main() -> int:
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:
             private_path = Path(private)
+            history = IdentityRecovery(os.environ['P02_POSTGRES_CONTAINER'], private_path, run, sql, check)
+            run(['php', 'vendor/bin/pest', 'tests/Feature/ApprovalTest.php', '--filter=retains nonempty terminal decision history',
+                 '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'],
+                cwd=root / 'services/governance', env=os.environ.copy(), label='approval-history-producer')
+            approval_before = history.fingerprint('p02_identity_test')
+            check('approval-history-persists-after-producer-process-exit', approval_before['approvals']['rows'] == 2
+                  and int(sql("SELECT count(*) FROM app.governance_audit WHERE event LIKE 'governance.approval.%';", 'p02_identity_test').strip()) == 5)
+            approval_archive = history.capture('p02_identity_test', 'approval-history')
+            history.restore('p02_identity_test', 'approval-history')
+            check('approval-history-complete-database-restore', history.fingerprint('p02_identity_test') == approval_before)
+            report['approval_history_recovery'] = {'source': 'real approval owner actions with synthetic immutable plan and OIDC fixtures',
+                'snapshot_sha256': approval_archive, 'table_fingerprints': approval_before,
+                'decision_states': ['rejected', 'revoked'], 'approval_events': 5,
+                'limits': ['No native effect or real P05 plan producer', 'Restored authority is not resumed']}
             broker = NotificationBroker(root, private_path, run, private_values)
             broker.start()
             report['notification_broker_image'] = broker.image

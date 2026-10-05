@@ -195,3 +195,15 @@ it('rolls expiry back if its durable outbox cannot be written', function (): voi
         ->and(DB::table('app.approvals')->where('id', $id)->value('state'))->toBe('approved')
         ->and(DB::table('app.governance_audit')->where('event', 'governance.approval.expired')->count())->toBe(0);
 });
+
+it('retains nonempty terminal decision history for recovery qualification', function (): void {
+    $rejected = requestApproval($this);
+    tenantCommand($this, $this->path.'/'.$rejected.'/reject', ['revision' => 1, 'reason' => 'Synthetic recovery rejection'], $this->reviewer)
+        ->assertOk()->assertJsonPath('state', 'rejected');
+    $revoked = approvePlan($this);
+    tenantCommand($this, $this->path.'/'.$revoked.'/revoke', ['revision' => 2, 'reason' => 'Synthetic recovery withdrawal'], $this->reviewer)
+        ->assertOk()->assertJsonPath('state', 'revoked');
+    expect(DB::table('app.approvals')->count())->toBe(2)
+        ->and(DB::table('app.governance_audit')->where('resource_id', $rejected)->count())->toBe(2)
+        ->and(DB::table('app.governance_audit')->where('resource_id', $revoked)->count())->toBe(3);
+});
