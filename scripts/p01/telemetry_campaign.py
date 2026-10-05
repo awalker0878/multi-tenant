@@ -5,7 +5,7 @@ import secrets
 import time
 
 from local_runtime import SERVICES, PHP_SERVICES
-from telemetry import control, export, freshness, records
+from telemetry import batch_is_accounted, control, export, freshness, records
 
 
 FILL_PROBE = '''import json,ssl,sys,time,urllib.request
@@ -28,7 +28,7 @@ print(json.dumps(samples))
 class TelemetryCampaign:
     telemetry_environment = 'p01-compose'
 
-    def telemetry_snapshot(self, service, stage, acknowledge=False):
+    def telemetry_snapshot(self, service, stage, acknowledge=False, attempt=0):
         raw = self.telemetry_exec(service, control(service, 'snapshot'))
         rows = records(raw, service, self.revision, self.telemetry_environment)
         # The canary covers query/header/cookie/tenant/baggage content. Actual
@@ -38,7 +38,8 @@ class TelemetryCampaign:
         self.check('telemetry-redacted-owned-bounded-snapshot',
                    all(value not in raw for value in secrets_to_check),
                    {'stage': stage, 'service': service, 'bytes': len(raw), 'records': len(rows)})
-        path = self.output / 'telemetry' / f'{stage}-{service}.jsonl'
+        suffix = '' if attempt == 0 else f'-retry-{attempt}'
+        path = self.output / 'telemetry' / f'{stage}-{service}{suffix}.jsonl'
         path.parent.mkdir(exist_ok=True)
         path.write_bytes(raw)
         identity = hashlib.sha256(raw).hexdigest()
@@ -47,7 +48,15 @@ class TelemetryCampaign:
              'records': len(rows), 'service': service, 'stage': stage})
         self.save()
         if acknowledge:
-            self.telemetry_exec(service, control(service, 'acknowledge', identity))
+            self.telemetry_exec(service, control(service, 'acknowledge', identity), expected=None)
+            command = self.report['commands'][-1]
+            if command['exit_code'] != 0:
+                error = (self.output / command['stderr']['path']).read_bytes()
+                if b'Diagnostic snapshot changed' not in error or attempt >= 2:
+                    raise RuntimeError('Diagnostic acknowledgement failed or remained concurrent')
+                # Retain every attempted snapshot. A real readiness probe can
+                # append between snapshot and ack; it must never be discarded.
+                return self.telemetry_snapshot(service, stage, acknowledge=True, attempt=attempt + 1)
         return raw, rows
 
     def measure_telemetry(self):
@@ -104,7 +113,7 @@ class TelemetryCampaign:
                         'last_state': samples[-1]['state']})
             raw, full_rows = self.telemetry_snapshot(service, 'collector-outage')
             self.check('telemetry-loss-is-explicit', samples[-1]['span_id'] not in {r['span_id'] for r in full_rows}
-                       and len(raw) <= 65536 and len(full_rows) < len(samples), {'service': service})
+                       and len(raw) <= 65536 and batch_is_accounted(samples, full_rows), {'service': service})
             # An unavailable filesystem is distinct from saturation. Preserve and
             # restore the real bounded data even if a response assertion fails.
             self.telemetry_exec(service, ['sh', '-ec', 'mv /tmp/product-telemetry /tmp/product-telemetry-saved; touch /tmp/product-telemetry'])
@@ -122,7 +131,9 @@ class TelemetryCampaign:
             self.check('telemetry-stale-ack-preserves-buffer', unchanged == raw, {'service': service})
             self.telemetry_exec(service, control(service, 'acknowledge', hashlib.sha256(raw).hexdigest()))
             _, empty_rows = self.telemetry_snapshot(service, 'after-ack')
-            self.check('telemetry-missing-is-not-healthy', freshness(empty_rows, time.time_ns() // 1000, 300000000) == 'MISSING', {'service': service})
+            missing = [row for row in empty_rows if row['span_id'] == unavailable.get('x-span-id')]
+            self.check('telemetry-missing-is-not-healthy', freshness(missing, time.time_ns() // 1000, 300000000) == 'MISSING',
+                       {'service': service, 'missing_span_id': unavailable.get('x-span-id'), 'other_observed_spans': len(empty_rows)})
             status, recovered = self.telemetry_request(service, '/health/live', headers, False)
             _, recovery_rows = self.telemetry_snapshot(service, 'collection-recovered', acknowledge=True)
             self.check('telemetry-collection-recovered', status == 200

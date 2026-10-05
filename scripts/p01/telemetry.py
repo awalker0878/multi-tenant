@@ -77,6 +77,14 @@ def freshness(rows: list[dict], now_us: int, maximum_age_us: int) -> str:
     return 'FRESH' if age <= maximum_age_us else 'STALE'
 
 
+def batch_is_accounted(samples: list[dict], rows: list[dict]) -> bool:
+    """Match exact request spans; concurrent readiness probes are separate traffic."""
+    requested = {sample['span_id'] for sample in samples}
+    buffered = {sample['span_id'] for sample in samples if sample['state'] == 'buffered'}
+    collected = {row['span_id'] for row in rows} & requested
+    return bool(buffered) and len(requested) == len(samples) and collected == buffered
+
+
 def export(rows: list[dict], directory: Path) -> dict:
     """Already validated records only; retain logs, spans and bounded metrics."""
     directory.mkdir(parents=True, exist_ok=False)

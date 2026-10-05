@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from telemetry import export, freshness, records
+from telemetry import batch_is_accounted, export, freshness, records
 
 
 class TelemetryTest(unittest.TestCase):
@@ -38,6 +38,13 @@ class TelemetryTest(unittest.TestCase):
         self.assertEqual(freshness([self.row], 1000001, 1000), 'FRESH')
         self.assertEqual(freshness([self.row], 1001001, 1000), 'STALE')
         self.assertEqual(freshness([self.row], -1000001, 1000), 'CLOCK_INVALID')
+
+    def test_concurrent_readiness_spans_cannot_hide_batch_loss_or_create_false_loss(self):
+        samples = [{'span_id': 'accepted', 'state': 'buffered'}, {'span_id': 'lost', 'state': 'full'}]
+        rows = [{'span_id': 'accepted'}, {'span_id': 'background-readiness'}]
+        self.assertTrue(batch_is_accounted(samples, rows))
+        self.assertFalse(batch_is_accounted(samples, rows + [{'span_id': 'lost'}]))
+        self.assertFalse(batch_is_accounted(samples, rows[1:]))
 
     def test_counts_spans_and_histograms_agree_without_identity_labels(self):
         rows = self.parse(self.row) + self.parse({**self.row, 'span_id': 'd' * 16, 'duration_us': 11000})
