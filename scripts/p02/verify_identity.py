@@ -25,6 +25,7 @@ import urllib.request
 import urllib.error
 
 from synthetic_oidc import SyntheticOidc
+from notification_fixture import NotificationBroker, NotificationPump
 
 from openapi_schema_validator import OAS31Validator
 from openapi_spec_validator import validate_spec
@@ -48,12 +49,14 @@ def main() -> int:
               'checks': [], 'source_sha256': {}, 'limitations': ['Synthetic HTTPS OIDC peer; no operated-provider interoperability or DNS rotation qualification', 'Synthetic immutable plan authority; no real planning producer or native admission', 'No operated deployment or G01/G02 acceptance', 'Verified PostgreSQL TLS; loopback HTTP between applications; production ingress/workload TLS topology remains unqualified']}
     tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=root).decode().split('\0')
     for name in tracked:
-        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', '.github/workflows/p02-identity', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-', 'contracts/schemas/events/identity-', 'contracts/asyncapi/identity.')):
+        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', '.github/workflows/p02-identity', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-', 'contracts/schemas/events/identity-', 'contracts/asyncapi/identity.', 'deploy/dependencies/stateful/')):
             report['source_sha256'][name] = hashlib.sha256((root / name).read_bytes()).hexdigest()
     private_values = [os.environ['P02_TEST_PASSWORD']]
     processes: list[subprocess.Popen] = []
     handles = []
     provider = None
+    broker = None
+    pump = None
 
     def redact(value: str) -> str:
         for secret in private_values + (provider.private_values if provider is not None else []):
@@ -125,6 +128,14 @@ def main() -> int:
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:
             private_path = Path(private)
+            broker = NotificationBroker(root, private_path, run, private_values)
+            broker.start()
+            report['notification_broker_image'] = broker.image
+            check('console-packaged-governance-contract', (root / 'contracts/schemas/events/governance-change-v1.json').read_bytes() == (root / 'apps/console/resources/contracts/governance-change-v1.json').read_bytes())
+            run(['php', 'vendor/bin/pest', 'tests/Feature/NotificationInboxTest.php', 'tests/Feature/NotificationContractTest.php',
+                 'tests/Feature/NotificationAccessTest.php', 'tests/Feature/NotificationBrokerTest.php', '--fail-on-warning', '--fail-on-risky', '--colors=never'],
+                cwd=root / 'apps/console', env=os.environ | broker.environment, label='console-notification-features')
+            check('console-postgres-and-tls-notification-features', True)
             provider = SyntheticOidc(private_path)
             provider.start()
             private_values.append(provider.client_secret)
@@ -170,11 +181,17 @@ def main() -> int:
                     sql(owned_migration.read_text(), name, f'{name}_migrator', migration_password)
                 key = 'base64:' + base64.b64encode(secrets.token_bytes(32)).decode()
                 private_values.append(key)
-                environments[name] = os.environ | {'APP_ENV': 'p02-verification', 'APP_DEBUG': 'false', 'APP_KEY': key,
+                environments[name] = os.environ | broker.environment | {'APP_ENV': 'p02-verification', 'APP_DEBUG': 'false', 'APP_KEY': key,
                     'APP_URL': f'http://127.0.0.1:{8032 if name == "governance" else 8031}',
                     'DB_HOST': '127.0.0.1', 'DB_PORT': '5432', 'DB_DATABASE': name, 'DB_USERNAME': f'{name}_runtime',
                     'DB_PASSWORD': runtime_password, 'DB_PASSWORD_FILE': str(password_file), 'DB_SSLMODE': 'verify-full', 'DB_SSLROOTCERT': str(certificate), 'CONSOLE_CREDENTIAL_FILE': str(credential_file),
                     'GOVERNANCE_URL': 'http://127.0.0.1:8032', 'SESSION_DRIVER': 'database', 'CACHE_STORE': 'database', 'SESSION_SECURE_COOKIE': 'false'}
+            for label, statement in [('inbox-update', "UPDATE app.notification_inbox SET event_type='forged';"),
+                                     ('inbox-delete', 'DELETE FROM app.notification_inbox;'),
+                                     ('quarantine-delete', 'DELETE FROM app.notification_quarantine;'),
+                                     ('quarantine-update', "UPDATE app.notification_quarantine SET reason='forged';")]:
+                denial = sql(statement, 'console', 'console_runtime', environments['console']['DB_PASSWORD'], expected=3)
+                check('console-runtime-denied-' + label, 'permission denied' in denial)
             gov = root / 'services/governance'
             # A redirected invocation must fail before changing the provisioned sentinel.
             run(['php', 'artisan', 'identity:bootstrap', '--console-url=http://127.0.0.1:8031'], cwd=gov, env=environments['governance'], expected=1, label='noninteractive-denial')
@@ -239,11 +256,18 @@ def main() -> int:
             wire('/identity/session', 'CurrentIdentity', token=initial_session)
             wire('/identity/setup', 'Error', expected=403, token=initial_session)
             browser_env = os.environ | {'P02_BOOTSTRAP_FILE': str(fixture), 'CONSOLE_BASE_URL': 'http://127.0.0.1:8031'}
+            pump = NotificationPump(root, environments)
+            pump.thread.start()
             try:
                 run(['npx', 'playwright', 'test', '--config=playwright.p02.config.ts'], cwd=root / 'apps/console', env=browser_env, label='browser')
             finally:
                 for name in ['governance', 'console']:
                     (output / f'{name}-http.log').write_text(redact((private_path / f'{name}.log').read_text()))
+            pump.close()
+            report['notification_delivery'] = {'cycles': pump.cycles, 'counts': pump.totals, 'error': pump.error}
+            check('real-owner-relay-and-console-consumer', pump.error is None and pump.totals['published'] >= 1 and pump.totals['recorded'] >= 1
+                  and pump.totals['retry'] == 0 and pump.totals['quarantined'] == 0)
+            check('console-inbox-is-not-a-domain-projection', sql('SELECT count(*) FROM app.notification_inbox;', 'console').strip() == str(pump.totals['recorded']))
             browser_report = root / 'apps/console/test-results/p02-browser.json'
             browser_result = json.loads(browser_report.read_text())
             projects = browser_result['config']['projects']
@@ -268,6 +292,10 @@ def main() -> int:
         report['result'] = 'FAIL'
         report['failure'] = redact(str(error))
     finally:
+        if pump is not None:
+            pump.close()
+        if broker is not None:
+            broker.close()
         if provider is not None:
             provider.close()
         for process in processes:

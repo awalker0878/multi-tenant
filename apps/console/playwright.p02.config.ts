@@ -11,8 +11,9 @@ export default defineConfig({
   forbidOnly: true,
   retries: 0,
   workers: 1,
-  timeout: 60_000,
-  globalTimeout: 150_000,
+  // Includes real 15-second notification polling through two application processes.
+  timeout: 90_000,
+  globalTimeout: 180_000,
   reporter: [['list'], ['json', { outputFile: 'test-results/p02-browser.json' }]],
   // The browser trusts only a disposable self-signed fixture here; Governance verifies its CA.
   // These tests handle ephemeral deployment credentials; no request/body traces.

@@ -127,6 +127,21 @@ test('console configuration verifies HTTPS federation and enforces tenant revoca
   await page.getByLabel('Member subject', { exact: true }).fill('unsaved-tenant-a-draft');
   await expect(sibling.getByLabel('Member subject', { exact: true })).toBeEmpty();
 
+  // The real owner outbox, TLS broker and Console inbox prompt an authorized
+  // refresh. A delivery must never replace another tab's unsaved form values.
+  await sibling.goto(tenantA);
+  await sibling.getByLabel('vCPU', { exact: true }).fill('24');
+  await sibling.getByRole('button', { name: 'Save quota', exact: true }).click();
+  await expect(sibling.getByLabel('vCPU', { exact: true })).toHaveValue('24');
+  await page.bringToFront();
+  await expect(page.getByText('Tenant settings changed. Review the current values before saving.', { exact: true })).toBeVisible({ timeout: 40_000 });
+  await expect(page.getByLabel('Member subject', { exact: true })).toHaveValue('unsaved-tenant-a-draft');
+  await expect(page.getByLabel('vCPU', { exact: true })).toHaveValue('12');
+  await page.getByRole('button', { name: 'Discard edits and refresh', exact: true }).click();
+  await expect(page.getByLabel('vCPU', { exact: true })).toHaveValue('24');
+  await expect(page.getByLabel('Member subject', { exact: true })).toBeEmpty();
+  await sibling.goto(tenantB!);
+
   const readerContext = await browser.newContext({ baseURL: process.env.CONSOLE_BASE_URL, ignoreHTTPSErrors: true });
   try {
     const reader = await readerContext.newPage();
@@ -144,10 +159,14 @@ test('console configuration verifies HTTPS federation and enforces tenant revoca
     await reader.goto(tenantA + '?role=tenant_admin');
     await expect(reader.getByRole('heading', { name: 'P02 Tenant A', exact: true })).toBeVisible();
     await expect(reader.getByRole('heading', { name: 'Memberships', exact: true })).toHaveCount(0);
+    const readerHint = await reader.request.get(tenantA + '/notification-status?role=tenant_admin');
+    expect(readerHint.status()).toBe(403);
     await page.getByRole('listitem').filter({ hasText: 'p02-reader' }).getByRole('button', { name: 'Edit membership' }).click();
     await page.getByLabel('Membership state', { exact: true }).selectOption('revoked');
     await page.getByRole('button', { name: 'Update membership', exact: true }).click();
     await expect(page.getByRole('listitem').filter({ hasText: 'p02-reader' })).toContainText('revoked');
+    const revokedHint = await reader.request.get(tenantA + '/notification-status');
+    expect(revokedHint.status()).toBe(404);
     await reader.reload();
     await expect(reader).toHaveURL(/\/account$/);
     await expect(reader.getByText('You have no current tenant memberships. Contact your tenant administrator.', { exact: true })).toBeVisible();
