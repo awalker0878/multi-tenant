@@ -12,6 +12,19 @@ The requested frontend stack now has measured dependencies from isolated compati
 
 ## Decision and scope
 
+P01 remediation amendment (2026-10-05): the nine product development images now
+select digest-pinned Alpine 3.24.2 PHP 8.5.11/Python 3.12.14 candidates because the
+retained Bookworm candidates fail mandatory image admission. Language/framework
+versions and private dependency locks remain unchanged. PHP additions use a
+signed APK closure with exact URL, version, size and SHA-256 bindings; installs
+are offline after byte verification. The [remediation record](../implementation/p01-image-remediation.md)
+owns the measured base comparison and required full-image/musl requalification.
+This supersedes the Bookworm selection below for those nine product runtime
+images; the P00 experiment and tool-only Node image retain their historical scope.
+Development adoption requires passing the affected campaigns and does not
+authorize operated deployment or product promotion. The existing G00 decision
+remains an approval of its recorded baseline, not of these new artifacts.
+
 Use the measured PHP 8.5.11/Laravel 13.34.0, Python 3.12.14, Node 24.19.0 and TypeScript 6.0.3 family, its measured quality tools and digest-pinned Debian Bookworm `linux/amd64` image inputs for the P01 development scaffold. The [image input lock](../../spikes/compatibility/images/inputs.lock.json), service-language lock candidates and retained P00 reports identify the actual measured inputs. Each new deployable must own and verify its complete lockfile and image definition; this decision does not turn the spike lockfiles into complete product-service dependency manifests.
 
 Operated provider and mirror selection, the complete service/operating bill of materials, update ownership and production support boundaries remain actual P01 inputs and evidence obligations. Their absence does not reopen the accepted development family or block independent scaffolding.

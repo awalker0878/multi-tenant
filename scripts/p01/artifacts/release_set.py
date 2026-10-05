@@ -22,10 +22,18 @@ def assemble(root: Path, run_path: str) -> dict:
     require(retrieval['result'] == 'VERIFIED', 'unverified_retrieval')
     source = retrieval['source_revision']
     require(re.fullmatch(r'[0-9a-f]{40}', source), 'invalid_source_revision')
-    registry_path = root / 'deploy/build/components.json'
+    current_registry_path = root / 'deploy/build/components.json'
+    registry_path = run / 'component-registry.json'
+    if not registry_path.exists():
+        registry_path = current_registry_path
     registry = json.loads(registry_path.read_bytes())['components']
     expected = {c['id']: c for c in registry}
     require(len(expected) == len(registry) and len(expected) > 0, 'ambiguous_component_registry')
+    current_registry = json.loads(current_registry_path.read_bytes())['components']
+    identity = lambda c: (c['id'], c['context'], c['language'], c['distribution'])
+    require(len(current_registry) == len(registry)
+            and {identity(c) for c in current_registry} == {identity(c) for c in registry},
+            'component_registry_changed')
     bindings_path = run / 'source-verification.json'
     require(digest(bindings_path) == retrieval['source_verification_sha256'], 'source_verification_mismatch')
     bindings = json.loads(bindings_path.read_bytes())['revisions']
@@ -33,6 +41,9 @@ def assemble(root: Path, run_path: str) -> dict:
     require(len(matching) == 1, 'source_binding_missing')
     source_hashes = {b['path']: b['sha256'] for b in matching[0]['bindings']}
     require(source_hashes.get('deploy/build/components.json') == digest(registry_path), 'component_registry_changed')
+    if registry_path != current_registry_path:
+        require(retrieval['retained_file_sha256'].get('component-registry.json') == digest(registry_path),
+                'unbound_historical_registry')
     observed = {p.parent.name: p for p in run.glob('*/report.json')}
     require(set(observed) == set(expected), 'incomplete_component_set')
     components = []

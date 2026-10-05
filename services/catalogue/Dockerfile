@@ -1,24 +1,25 @@
-ARG PHP_BASE=docker.io/library/php@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3
+ARG PHP_BASE=docker.io/library/php@sha256:aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005
 ARG COMPOSER_BASE=docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d
 FROM ${COMPOSER_BASE} AS composer-tool
 
 FROM ${PHP_BASE} AS php-base
-ARG DEBIAN_SNAPSHOT=20261004T000000Z
-COPY build/snapshot.sh /tmp/service-snapshot.sh
-RUN sh /tmp/service-snapshot.sh \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev libpcre2-8-0=10.42-1+deb12u2 tzdata=2026c-0+deb12u1 \
+COPY build/download-apks.php build/apk.lock.json /tmp/service-build/
+RUN : > /etc/apk/repositories \
+    && php /tmp/service-build/download-apks.php build \
+    && apk add --no-network --repositories-file /dev/null --virtual .phpize-deps /tmp/service-apks/*.apk \
     && docker-php-ext-install -j2 pdo_pgsql sockets \
-    && apt-mark manual libpq5 \
-    && apt-get purge -y --auto-remove libpq-dev linux-libc-dev $PHPIZE_DEPS \
-    && rm -rf /var/lib/apt/lists/* /tmp/service-snapshot.sh \
+    && apk add --no-network --repositories-file /dev/null libpq=18.6-r0 \
+    && apk del --no-network .phpize-deps \
+    && rm -rf /tmp/service-apks /tmp/service-build \
     && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 WORKDIR /app
 
 FROM php-base AS dependencies
 COPY --from=composer-tool /usr/bin/composer /usr/local/bin/composer
-RUN apt-get update && apt-get install -y --no-install-recommends unzip \
-    && rm -rf /var/lib/apt/lists/*
+COPY build/download-apks.php build/apk.lock.json /tmp/service-build/
+RUN php /tmp/service-build/download-apks.php composer \
+    && apk add --no-network --repositories-file /dev/null /tmp/service-apks/*.apk \
+    && rm -rf /tmp/service-apks /tmp/service-build
 COPY . ./
 ENV COMPOSER_ALLOW_SUPERUSER=1
 # Require a matching private lock; exact version pins are deliberate.

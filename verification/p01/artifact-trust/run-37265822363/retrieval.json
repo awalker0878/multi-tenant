@@ -825,6 +825,7 @@
     "planning/development-public-key.pem": "5afd9956d6ff3596639b43713a1173fca7397d87262dc72b9da8ad5db0272b92",
     "planning/receiving-anchor.json": "59b13540d8aecbee18b49a9a5488a4a01a5195f8d3b84326c11ca40792588d66",
     "planning/report.json": "27f3d2288e372fe62607e4f88f67565e25b670d79b8eb37fa760dae0d5e59a7d",
-    "source-verification.json": "8b0b47b63496b0c1b23d01673bd9b32922bcc4838677cf52e0415f8bf1b829da"
+    "source-verification.json": "8b0b47b63496b0c1b23d01673bd9b32922bcc4838677cf52e0415f8bf1b829da",
+    "component-registry.json": "cc0a2744bf6d3d3db2963f07f8f0d4d56af5d581e67d91b12ecf7f8e8e0cd793"
   }
 }

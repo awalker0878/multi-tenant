@@ -17,6 +17,7 @@ import tomllib
 from typing import Any
 
 from python_lock import production_inventory
+from alpine_inputs import validate_apks
 
 
 def sha256(path: Path) -> str:
@@ -60,11 +61,12 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
     if component["language"] == "python":
         require(bool(re.fullmatch(r"[a-z][a-z0-9_]*", component["module"])), "Invalid module")
         require(component["target"] == "runtime", "Unexpected Python target")
-        expected_inputs.update({".python-version", "pyproject.toml", "uv.lock", "README.md", "src", "build/snapshot.sh"})
+        expected_inputs.update({".python-version", "pyproject.toml", "uv.lock", "README.md", "src"})
     else:
         require(component["target"] == "php-runtime", "Unexpected PHP target")
         expected_inputs.update({"composer.json", "composer.lock", "artisan", "app", "bootstrap/app.php",
-                               "bootstrap/providers.php", "config", "public/index.php", "routes", "build/snapshot.sh"})
+                               "bootstrap/providers.php", "config", "public/index.php", "routes",
+                               "build/apk.lock.json", "build/download-apks.php"})
         if component["id"] == "console":
             expected_inputs.update({"resources", "package.json", "package-lock.json", "tsconfig.json", "vite.config.ts"})
         if component_id == "catalogue":
@@ -110,13 +112,19 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
         project = json.loads((root / "composer.json").read_text())
         require(project["name"] == component["distribution"], "Composer owner differs from registry")
         require(component["entrypoint"] == "/usr/local/bin/service-entrypoint", "Unexpected PHP entrypoint")
-        require(lock["debian_snapshot"] == "20261004T000000Z", "Unmeasured Debian snapshot")
         bases = ("php", "composer", "node") if component["id"] == "console" else ("php", "composer")
     dockerfile = (root / "Dockerfile").read_text()
-    require(lock["runtime_debian_packages"] == {"libpcre2-8-0": "10.42-1+deb12u2", "tzdata": "2026c-0+deb12u1"},
-            "Unmeasured runtime OS remediation set")
-    for package, version in lock["runtime_debian_packages"].items():
-        require(package + "=" + version in dockerfile, "Runtime remediation differs from input lock")
+    require({k: lock['runtime_os'][k] for k in ('distribution', 'release', 'libc')}
+            == {'distribution': 'alpine', 'release': '3.24.2', 'libc': 'musl'}, 'Unmeasured runtime OS')
+    apk_lock = workspace / 'deploy/build/alpine-packages.lock.json'
+    require(sha256(apk_lock) == lock['runtime_os']['apk_lock_sha256'], 'APK closure lock differs')
+    require(validate_apks(apk_lock, lock['images']['php']['reference'])
+            == lock['runtime_os']['php_runtime_packages'], 'Runtime package identity differs')
+    if component['language'] == 'php':
+        require((root / 'build/apk.lock.json').read_bytes() == apk_lock.read_bytes(),
+                'Owned APK closure differs from reviewed lock')
+        require('libpq=' + lock['runtime_os']['php_runtime_packages']['libpq'] in dockerfile,
+                'Runtime libpq differs from input lock')
     for key in bases:
         require(f"ARG {key.upper()}_BASE={lock['images'][key]['reference']}\n" in dockerfile,
                 f"Standalone {key} base differs from input lock")
@@ -224,7 +232,7 @@ def run_php_probes(
     expected_packages = {package["name"]: package["version"] for package in dependency_lock["packages"]}
     require(runtime["installed_packages"] == expected_packages, "Runtime dependencies differ from the production lock graph")
     recorder.run("operating-system-packages", [
-        *docker, image, "dpkg-query", "-W", "-f=${Package}\t${Version}\n"
+        *docker, image, "apk", "info", "-v"
     ], cwd=output)
     return runtime
 
@@ -248,7 +256,7 @@ def main() -> int:
     output.mkdir(parents=True, exist_ok=False)
     bound = sources + [workspace / path for path in (
         "scripts/p01/run_images.py", "deploy/build/components.json", "deploy/build/inputs.lock.json",
-        "scripts/p01/python_lock.py",
+        "scripts/p01/python_lock.py", "scripts/p01/alpine_inputs.py", "deploy/build/alpine-packages.lock.json",
         ".github/workflows/p01-images.yml", "scripts/p01/select_components.py",
         "scripts/p01/check_jobs.py", "scripts/p01/candidates.json",
     )]
@@ -286,8 +294,6 @@ def main() -> int:
             build_arguments = [value for key in bases for value in (
                 "--build-arg", f"{key.upper()}_BASE={lock['images'][key]['reference']}"
             )]
-            if "debian_snapshot" in lock:
-                build_arguments += ["--build-arg", f"DEBIAN_SNAPSHOT={lock['debian_snapshot']}"]
             report["used_base_images"] = {key: lock["images"][key] for key in bases}
             recorder.run("build", [
                 "docker", "buildx", "build", "--load", "--pull", "--platform", lock["platform"],
@@ -316,14 +322,18 @@ def main() -> int:
                            "platform": lock["platform"], "identity_kind": "local_image_configuration_digest"}
         docker = ["docker", "run", "--rm", "--read-only", "--network", "none", "--cap-drop", "ALL",
                   "--security-opt", "no-new-privileges", "--pids-limit", "64", "--memory", "256m", "--cpus", "1"]
-        corrected = recorder.run("runtime-os-remediation", [*docker, "--entrypoint", "dpkg-query", image,
-                                  "-W", "-f", "${Package}=${Version}\n", *sorted(lock["runtime_debian_packages"])], cwd=output)
-        require(set(corrected.decode().splitlines()) == {f"{p}={v}" for p, v in lock["runtime_debian_packages"].items()},
-                "Installed runtime remediation differs from reviewed versions")
-        report["runtime_os_remediation"] = lock["runtime_debian_packages"]
+        release = recorder.run('runtime-os-release', [*docker, '--entrypoint', '/bin/cat', image,
+                               '/etc/alpine-release'], cwd=output).decode().strip()
+        require(release == lock['runtime_os']['release'], 'Installed runtime OS differs from input lock')
+        report['runtime_os'] = {'distribution': 'alpine', 'release': release, 'libc': 'musl'}
         if component["language"] == "php":
-            recorder.run("unused-linux-headers-absent", [*docker, "--entrypoint", "/usr/bin/test", image,
-                         "!", "-d", "/usr/include/linux"], cwd=output)
+            installed = recorder.run('runtime-os-packages', [*docker, '--entrypoint', '/sbin/apk', image,
+                                     'info', '-v'], cwd=output).decode().splitlines()
+            require(all(p + '-' + v in installed for p, v in lock['runtime_os']['php_runtime_packages'].items()),
+                    'Runtime APK closure differs from reviewed versions')
+            report['runtime_os']['runtime_packages'] = lock['runtime_os']['php_runtime_packages']
+            recorder.run("unused-build-inputs-absent", [*docker, "--entrypoint", "/bin/sh", image, '-ec',
+                         'test ! -d /usr/include/linux; test ! -e /usr/bin/gcc; test ! -d /tmp/service-apks'], cwd=output)
         if component["language"] == "python":
             inventory = run_python_probes(recorder, docker, image, output, component, lock)
         else:

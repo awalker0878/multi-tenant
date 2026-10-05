@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "run_id": 37271464232,
+  "source_revision": "50b5362dad2ec3686fd9ce433978d081bd4e6c95",
+  "artifacts": [
+    {
+      "id": 11327684082,
+      "name": "p01-remediation-50b5362dad2ec3686fd9ce433978d081bd4e6c95",
+      "size_in_bytes": 36599,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11327684082",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11327684082/zip",
+      "expired": false,
+      "created_at": "2026-10-05T06:15:45Z",
+      "expires_at": "2026-10-19T06:15:44Z",
+      "updated_at": "2026-10-05T06:15:45Z",
+      "digest": "sha256:6bd264818290319ad2c841ab529d83a560455d67e23040ee0c9ef07dd72aa8a1",
+      "workflow_run": {
+        "id": 37271464232,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "50b5362dad2ec3686fd9ce433978d081bd4e6c95"
+      }
+    }
+  ],
+  "source_verification_sha256": "b4856ef5ee6b957bcb318b6cda76c13e386c9a081c1a4f7c536b65b05ba580c1",
+  "retained_file_sha256": {
+    "alpine-packages.lock.json": "f56bbc81a4200cf975eb73c764357609e49c30d81a120c5321e1517b1eed485a",
+    "apk-build.log": "7f657f4aa0668034e5b239f3fcd5c93ebd8a022bd814af80034fd3e4e5335e1f",
+    "apk-composer.log": "dfebb3efa051cc149398bd114a2bcdb69c89dced5a4b05c70474321852dbdc9f",
+    "apk-runtime.log": "d03457d8e49ee6d686a48abea202713e929878f5165b414d2def689ebbd2a0f3",
+    "php-alpine-index.json": "fa01fb1645cd0fc566a5f146b099adace33b906571f972f71f2182a7c12d1cd7",
+    "php-alpine-manifest.json": "aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005",
+    "php-trixie-index.json": "584e584083bada479f0ee733a3025722a68e366eb721e618d1b6a252e4ff45c5",
+    "php-trixie-manifest.json": "1c1a9137ab0a01339ffffa27256ab7fafe270a1429688aa9b51a221443f157fc",
+    "python-alpine-index.json": "4c47124a8391cb7a9f571164147d154777cf012a4ece5f86097130d7a4478111",
+    "python-alpine-manifest.json": "9b8dad7f66b5c7751df6cb7a64a07812e86bed85d0116efe82b3a11209f1440d",
+    "python-trixie-index.json": "f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+    "python-trixie-manifest.json": "44ff437bba879d4941b710a369a8f19266aea34b29002807f0c487fabc9eec9b",
+    "report.json": "7deabcf264bfb52391ec720c1a55ff70c0a26faf0c681f14c825defd10c93b72",
+    "source-verification.json": "b4856ef5ee6b957bcb318b6cda76c13e386c9a081c1a4f7c536b65b05ba580c1"
+  },
+  "limitations": [
+    "Downloaded ZIP digest verified against Actions artifact metadata. Extracted bytes retained; original archive and downloaded APK files not retained.",
+    "Base-image scans are observations only; full-image and runtime admission require separate campaigns."
+  ]
+}

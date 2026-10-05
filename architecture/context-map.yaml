@@ -24,7 +24,7 @@ services:
     root: apps/console
     composition_only: true
     context: {id: console, source_root: apps/console/app, namespace: 'App\'}
-    host_roots: [bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, resources, public, vite.config.ts, playwright.config.ts]
+    host_roots: [build/download-apks.php, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, resources, public, vite.config.ts, playwright.config.ts]
     allowed_packages: [php-contracts, php-technical, typescript-contracts, typescript-technical]
   - id: governance
     package_name: product/governance
@@ -32,7 +32,7 @@ services:
     language: php
     root: services/governance
     context: {id: governance, source_root: services/governance/app, namespace: 'App\'}
-    host_roots: [bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
+    host_roots: [build/download-apks.php, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
     allowed_packages: [php-contracts, php-technical]
   - id: catalogue
     package_name: product/catalogue
@@ -40,7 +40,7 @@ services:
     language: php
     root: services/catalogue
     context: {id: catalogue, source_root: services/catalogue/app, namespace: 'App\'}
-    host_roots: [bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
+    host_roots: [build/download-apks.php, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
     allowed_packages: [php-contracts, php-technical]
   - id: inventory
     package_name: product-inventory
@@ -72,7 +72,7 @@ services:
     language: php
     root: services/assurance
     context: {id: assurance, source_root: services/assurance/app, namespace: 'App\'}
-    host_roots: [bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
+    host_roots: [build/download-apks.php, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
     allowed_packages: [php-contracts, php-technical]
 workers:
   - id: inventory-workers

@@ -8,8 +8,21 @@ The first observation compares official Debian trixie and Alpine 3.24 images at
 the existing Python 3.12.14 and PHP 8.5.11 language versions. It resolves the exact
 linux/amd64 child manifests and scans those immutable references using the pinned
 Trivy tool and one recorded advisory database. Results are retained separately
-from product image and runtime qualification. The candidate list does not change
-the adopted build lock or product Dockerfiles.
+from product image and runtime qualification.
+
+Run 37271464232 at `50b5362dad2ec3686fd9ce433978d081bd4e6c95` measured zero
+blocking or secret findings in both Alpine 3.24.2 bases. Trixie still reports
+167 blocking matches for PHP and 53 for Python. The [retained report](../../verification/p01/image-remediation/run-37271464232/report.json)
+contains the exact manifest identities, scanner/database hashes and findings.
+
+The nine product Dockerfiles now select the two observed Alpine child manifests.
+PHP's [APK closure](../../deploy/build/alpine-packages.lock.json) fixes all 75
+artifacts by official URL, version, byte size and SHA-256, including four runtime
+packages. Each isolated PHP context owns an identical copy. Downloads are checked
+before an offline APK install verifies Alpine signatures. Build compilers, headers
+and downloaded archives are removed from runtime images. Python installs its
+locked wheel graph with binary-only dependencies on the pinned musl base.
+The input validator rejects altered, incomplete or ambiguous APK closures.
 
 Use these observations to select a replacement, record all package/build changes,
 then rebuild and exercise all affected package, image, Compose, Kubernetes,

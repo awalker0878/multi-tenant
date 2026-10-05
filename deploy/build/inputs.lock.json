@@ -8,14 +8,20 @@
     "source_commit": "d988cfe5d09e32a22da93c9c1b4816878fe4c495",
     "source_path": "spikes/compatibility/images/inputs.lock.json",
     "source_sha256": "9298a430b975ab50d7cf4ccd89f627194bacc205682f61b92ad1f8f3db65d935",
-    "review": "Accepted G00 development baseline; exact observed P00 child manifests copied here so product builds do not load spike files."
+    "review": "Accepted G00 development baseline; exact observed P00 child manifests copied here so product builds do not load spike files.",
+    "p01_remediation": {
+      "source_revision": "50b5362dad2ec3686fd9ce433978d081bd4e6c95",
+      "run_id": 37271464232,
+      "record": "verification/p01/image-remediation/run-37271464232/report.json",
+      "note": "Exact clear base candidates; full rebuilt-image/runtime results are required for development admission. No operated qualification implied."
+    }
   },
   "images": {
     "python": {
-      "candidate": "docker.io/library/python:3.12.14-slim-bookworm",
-      "index_digest": "sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e",
-      "digest": "sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a",
-      "reference": "docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a"
+      "candidate": "docker.io/library/python:3.12.14-alpine3.24",
+      "index_digest": "sha256:4c47124a8391cb7a9f571164147d154777cf012a4ece5f86097130d7a4478111",
+      "digest": "sha256:9b8dad7f66b5c7751df6cb7a64a07812e86bed85d0116efe82b3a11209f1440d",
+      "reference": "docker.io/library/python@sha256:9b8dad7f66b5c7751df6cb7a64a07812e86bed85d0116efe82b3a11209f1440d"
     },
     "uv": {
       "candidate": "ghcr.io/astral-sh/uv:0.12.19",
@@ -24,10 +30,10 @@
       "reference": "ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3"
     },
     "php": {
-      "candidate": "docker.io/library/php:8.5.11-fpm-bookworm",
-      "index_digest": "sha256:53eab56a8f43f51a92119f6c29b3448af98eec288ff17f92829354a4b4c9ca05",
-      "digest": "sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3",
-      "reference": "docker.io/library/php@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3"
+      "candidate": "docker.io/library/php:8.5.11-fpm-alpine3.24",
+      "index_digest": "sha256:fa01fb1645cd0fc566a5f146b099adace33b906571f972f71f2182a7c12d1cd7",
+      "digest": "sha256:aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005",
+      "reference": "docker.io/library/php@sha256:aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005"
     },
     "composer": {
       "candidate": "docker.io/library/composer:2.10.3",
@@ -45,9 +51,16 @@
   "php_version": "8.5.11",
   "composer_version": "2.10.3",
   "node_version": "v24.19.0",
-  "debian_snapshot": "20261004T000000Z",
-  "runtime_debian_packages": {
-    "libpcre2-8-0": "10.42-1+deb12u2",
-    "tzdata": "2026c-0+deb12u1"
+  "runtime_os": {
+    "distribution": "alpine",
+    "release": "3.24.2",
+    "libc": "musl",
+    "apk_lock_sha256": "f56bbc81a4200cf975eb73c764357609e49c30d81a120c5321e1517b1eed485a",
+    "php_runtime_packages": {
+      "libcrypto3": "3.5.9-r0",
+      "libpq": "18.6-r0",
+      "libssl3": "3.5.9-r0",
+      "musl": "1.2.6-r2"
+    }
   }
 }

@@ -18,7 +18,8 @@
         "pyproject.toml",
         "uv.lock",
         "README.md",
-        "src"
+        "src",
+        "build/snapshot.sh"
       ],
       "probe_base": {
         "service": "planning",
@@ -52,7 +53,8 @@
         "pyproject.toml",
         "uv.lock",
         "README.md",
-        "src"
+        "src",
+        "build/snapshot.sh"
       ],
       "probe_base": {
         "service": "inventory",
@@ -84,7 +86,8 @@
         "pyproject.toml",
         "uv.lock",
         "README.md",
-        "src"
+        "src",
+        "build/snapshot.sh"
       ],
       "probe_base": {
         "service": "lifecycle",
@@ -116,7 +119,8 @@
         "pyproject.toml",
         "uv.lock",
         "README.md",
-        "src"
+        "src",
+        "build/snapshot.sh"
       ],
       "probe_base": {
         "service": "inventory",
@@ -147,7 +151,8 @@
         "pyproject.toml",
         "uv.lock",
         "README.md",
-        "src"
+        "src",
+        "build/snapshot.sh"
       ],
       "probe_base": {
         "service": "lifecycle",
@@ -182,8 +187,7 @@
         "config",
         "public/index.php",
         "routes",
-        "build/apk.lock.json",
-        "build/download-apks.php"
+        "build/snapshot.sh"
       ]
     },
     {
@@ -206,9 +210,8 @@
         "config",
         "public/index.php",
         "routes",
-        "resources",
-        "build/apk.lock.json",
-        "build/download-apks.php"
+        "build/snapshot.sh",
+        "resources"
       ]
     },
     {
@@ -231,8 +234,7 @@
         "config",
         "public/index.php",
         "routes",
-        "build/apk.lock.json",
-        "build/download-apks.php"
+        "build/snapshot.sh"
       ]
     },
     {
@@ -255,13 +257,12 @@
         "config",
         "public/index.php",
         "routes",
+        "build/snapshot.sh",
         "resources",
         "package.json",
         "package-lock.json",
         "tsconfig.json",
-        "vite.config.ts",
-        "build/apk.lock.json",
-        "build/download-apks.php"
+        "vite.config.ts"
       ]
     }
   ]
