@@ -41,7 +41,9 @@ deployment bindings; external OIDC provider/client values do not.
 
 ## Deployment binding
 
-1. Run `services/governance/database/migrations/001_identity.sql` as
+1. Apply Governance migrations in numeric order, currently `001_identity.sql`,
+   `002_federation.sql`, `003_tenancy.sql` and `004_approvals.sql` under
+   `services/governance/database/migrations/`, as
    `governance_migrator`, with the existing `governance_owner`/`governance_runtime`
    database roles and `app` schema. Run Console's `001_shared_state.sql` under
    its separate migration identity. Application startup never runs either.
@@ -102,10 +104,9 @@ package and image jobs, Compose, Kubernetes, HTTP contracts, messaging, stateful
 dependencies, Permit Desk recovery and documentation/policy checks. These results
 retain their development scopes and do not pass G01/G02 or authorize promotion.
 
-Next: persist one installation-wide external OIDC connection through Console
-administration, write-only secret custody, strict provider/token validation,
-authorization-code/PKCE/state/nonce controls, tested explicit federated admin
-grant and atomic activation/retirement. A failed test must preserve local setup;
-activation must revoke all local authority, including during an IdP outage.
-The `retired` state already denies local login/session/rebootstrap, but setting
-that state in a test does not implement or qualify federated handover.
+The subsequent [federation increment](p02-federation.md) implements Console-managed
+connection settings, write-only secret custody, strict token validation and tested
+atomic handover. EV-P02-002/003 retain its distinct observations, including the
+compiled HTTPS/PKCE browser journey. The [tenant/approval increment](p02-tenancy-and-approvals.md)
+and [next-work queue](../../next_work.md) track the current continuation. Historical
+retired-state seed tests remain narrower than actual federation evidence.

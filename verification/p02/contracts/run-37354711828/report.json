@@ -1,0 +1,319 @@
+{
+  "result": "PASS",
+  "source_revision": "b1064b788970780ebab7f87a7bfb9018421e1ed8",
+  "commands": [
+    {
+      "name": "generator-version",
+      "exit_code": 0,
+      "log": "generator-version.log",
+      "sha256": "51587aac6244156fa9045620237e41443cdde69c47a5a3c3d10f8a1450878be2"
+    },
+    {
+      "name": "compatibility-negative-cases",
+      "exit_code": 0,
+      "log": "compatibility-negative-cases.log",
+      "sha256": "33060fd73862c5e1af97335504d5b45211fce6d229657f556d8deceeadc52ce4"
+    },
+    {
+      "name": "openapi-validation",
+      "exit_code": 0,
+      "log": "openapi-validation.log",
+      "sha256": "623a54b0746017d467101f1f77df7b5bdd964dae818465fd963cfe56941fc3bb"
+    },
+    {
+      "name": "generate-first-php",
+      "exit_code": 0,
+      "log": "generate-first-php.log",
+      "sha256": "2ca2ae07e3cdc2653ac63db233883d081b8c4bd2fd40a80c7b5aac4e3d648b29"
+    },
+    {
+      "name": "generate-first-python",
+      "exit_code": 0,
+      "log": "generate-first-python.log",
+      "sha256": "fc699c1760ffcc209276a617ce14d25b5b44ef7007b3129947045be6013b2adc"
+    },
+    {
+      "name": "generate-first-typescript-fetch",
+      "exit_code": 0,
+      "log": "generate-first-typescript-fetch.log",
+      "sha256": "5fd10d895a8d8ab482b74eb19237f8153a5c26c4543015bb76baa2e77332e70b"
+    },
+    {
+      "name": "generate-second-php",
+      "exit_code": 0,
+      "log": "generate-second-php.log",
+      "sha256": "7da669a222a6f337c7223086d23477e43d9faef63946014f45a9c038b83cb9a3"
+    },
+    {
+      "name": "generate-second-python",
+      "exit_code": 0,
+      "log": "generate-second-python.log",
+      "sha256": "aa91d74ac9a05ea066127abcdf5a6a82ddbbba5ab17847a1ec313e5ba118e72f"
+    },
+    {
+      "name": "generate-second-typescript-fetch",
+      "exit_code": 0,
+      "log": "generate-second-typescript-fetch.log",
+      "sha256": "354dcf686f4b12524bebe79775cea08caa273614f69cbe12f08e4865dd50c8a9"
+    },
+    {
+      "name": "php-lint-0",
+      "exit_code": 0,
+      "log": "php-lint-0.log",
+      "sha256": "6ab06923501fcb84a9433493aef31c314fcf7e13e7932ee76f059fd6432f3314"
+    },
+    {
+      "name": "php-lint-1",
+      "exit_code": 0,
+      "log": "php-lint-1.log",
+      "sha256": "812c1d258275e8c6fcc9fb3cf6f366368d6dbe8dbbfdf6676e536c1275d9783e"
+    },
+    {
+      "name": "php-lint-2",
+      "exit_code": 0,
+      "log": "php-lint-2.log",
+      "sha256": "112f5968543cefd9ad2db2dd177b9d8e03c3f83b67815fa811f0aeee5f56874f"
+    },
+    {
+      "name": "php-lint-3",
+      "exit_code": 0,
+      "log": "php-lint-3.log",
+      "sha256": "ffcca4f17327812b11cbb1289f61349b1a27c07f49b62474423f2d466738a7d9"
+    },
+    {
+      "name": "php-lint-4",
+      "exit_code": 0,
+      "log": "php-lint-4.log",
+      "sha256": "e0ca7454e14dbf46772a0a27c9d1b9faf68eeb20971683379c3d0dea678c815c"
+    },
+    {
+      "name": "php-lint-5",
+      "exit_code": 0,
+      "log": "php-lint-5.log",
+      "sha256": "28378e756e94c2600ef52f8bbac029efa3468cc7d297d76d0491266006997328"
+    },
+    {
+      "name": "php-lint-6",
+      "exit_code": 0,
+      "log": "php-lint-6.log",
+      "sha256": "62d4a0b56117169a58a19c2c1cf8f4e03c72cdbff7d4f488520d1a86711da1fa"
+    },
+    {
+      "name": "php-lint-7",
+      "exit_code": 0,
+      "log": "php-lint-7.log",
+      "sha256": "707f97e479c4746d9a91570628fcef476f06726af9b0492adbcb18d4ff673c71"
+    },
+    {
+      "name": "php-lint-8",
+      "exit_code": 0,
+      "log": "php-lint-8.log",
+      "sha256": "7cb6abcdef153a5c4178d79d7fcee37c57a14571e182191fa9d71e4f08c14d9c"
+    },
+    {
+      "name": "php-lint-9",
+      "exit_code": 0,
+      "log": "php-lint-9.log",
+      "sha256": "66c2c4610690dbcaa20862e4820e0f97cd6cdac9ebfc26a2df08b028111130c1"
+    },
+    {
+      "name": "php-lint-10",
+      "exit_code": 0,
+      "log": "php-lint-10.log",
+      "sha256": "bc2d19ddf34f8ce304da949758e6472855521e6d29a1f11417b73c9f9d978c51"
+    },
+    {
+      "name": "php-lint-11",
+      "exit_code": 0,
+      "log": "php-lint-11.log",
+      "sha256": "9176a5de803fc17475ed26f3df8c2df5dbb384f728ec20aeeef324ccab9ddc1f"
+    },
+    {
+      "name": "php-lint-12",
+      "exit_code": 0,
+      "log": "php-lint-12.log",
+      "sha256": "37ac473081458538b941d82424b6ae6ef0fdfce78bb4fd5758dfe03243bdc085"
+    },
+    {
+      "name": "php-wire-and-models",
+      "exit_code": 0,
+      "log": "php-wire-and-models.log",
+      "sha256": "44e2abe77530050d83d8a649cfd2a97358e39bdca48eacd70a3042bfd541b50a"
+    },
+    {
+      "name": "typescript-compile",
+      "exit_code": 0,
+      "log": "typescript-compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "fixtures": [
+    {
+      "id": "ProcessLive-valid",
+      "valid": true
+    },
+    {
+      "id": "ProcessLive-invalid-status",
+      "valid": false
+    },
+    {
+      "id": "ProcessLive-invalid-service",
+      "valid": false
+    },
+    {
+      "id": "ProcessLive-invalid-scope",
+      "valid": false
+    },
+    {
+      "id": "ProcessLive-invalid-extra",
+      "valid": false
+    },
+    {
+      "id": "ServiceNotReady-valid",
+      "valid": true
+    },
+    {
+      "id": "ServiceNotReady-invalid-status",
+      "valid": false
+    },
+    {
+      "id": "ServiceNotReady-invalid-service",
+      "valid": false
+    },
+    {
+      "id": "ServiceNotReady-invalid-scope",
+      "valid": false
+    },
+    {
+      "id": "ServiceNotReady-invalid-extra",
+      "valid": false
+    },
+    {
+      "id": "DependenciesReady-valid",
+      "valid": true
+    },
+    {
+      "id": "DependenciesReady-invalid-status",
+      "valid": false
+    },
+    {
+      "id": "DependenciesReady-invalid-service",
+      "valid": false
+    },
+    {
+      "id": "DependenciesReady-invalid-scope",
+      "valid": false
+    },
+    {
+      "id": "DependenciesReady-invalid-extra",
+      "valid": false
+    },
+    {
+      "id": "DependenciesReady-native-denied",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnauthorized-valid",
+      "valid": true
+    },
+    {
+      "id": "DependenciesUnauthorized-invalid-status",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnauthorized-invalid-service",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnauthorized-invalid-scope",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnauthorized-invalid-extra",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnauthorized-native-denied",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnavailable-valid",
+      "valid": true
+    },
+    {
+      "id": "DependenciesUnavailable-invalid-status",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnavailable-invalid-service",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnavailable-invalid-scope",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnavailable-invalid-extra",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnavailable-native-denied",
+      "valid": false
+    }
+  ],
+  "limits": [
+    "Foundation diagnostic contract only; business API conventions remain separate.",
+    "Generated clients are disposable private conformance outputs, not authorization or complete validators.",
+    "Exact-byte existing-version freeze is conservative compatibility feedback, not protected admission.",
+    "No current live provider or business API is exercised by this generation job."
+  ],
+  "input_sha256": {
+    "contracts/asyncapi/catalogue.yaml": "d11eab6a06d27b202011223a6b366b1ad8419a2af15eb8d764581bef794043ee",
+    "contracts/openapi/foundation-health-v1.json": "0ae446a089acaa24d549d11b860efa750d8758b67c70d9d82a056ebcd012977c",
+    "contracts/openapi/governance-approvals-v1.json": "942f8b0a7a0fb56d4f44607d2aeb61673778d4c3f1c54457063cb78fde3bb689",
+    "contracts/openapi/governance-federation-v1.json": "233a03ad6c3d38ac99a4978f24ae28e46eb3fde632586d0766772c7b3c99eb2d",
+    "contracts/openapi/governance-local-identity-v1.json": "79f17eb90e3c0fd335d7be95f4fd71666adf017d8c31254872ef64c1dfc7ad0e",
+    "contracts/openapi/governance-tenancy-v1.json": "39ba6e2e78f1575f84f765910ad48a07a8e73d606cb30d8d51788e8d07125d1d",
+    "contracts/openapi/planning-immutable-plan-v1.json": "68db8d73386ab4817dbe8810f6b2364aab7ffa8a96b5987371a4ac97dbd24b48",
+    "contracts/schemas/events/catalogue-foundation-recorded-v1.json": "933b1e3d02678ba7bd5ebb19aeffd6d08c42124ba3d1706bc1e0b039f5e1052f",
+    "scripts/p01/contracts/compatibility.py": "ea1176fbf8bff363fb4f1cef82fe674d62ab9155e1c21802287533ceee38fdde",
+    "scripts/p01/contracts/config-php.json": "12cb6d61d4661117692300d84fbc4c117ee5f252f06306813375523a9cadcf40",
+    "scripts/p01/contracts/config-python.json": "57fccb73fe13bb0c2c17b88db04c0892345a54f2845be6194e2721406caedf99",
+    "scripts/p01/contracts/config-typescript-fetch.json": "dfbc7aed787a9a529de03db50c9e7915dafe6fec71e0573457c8f7c78adb40cb",
+    "scripts/p01/contracts/package-lock.json": "b45c3b6ade5daf81de9b086060f6a631638e52d46a2083f34ab4e75094e76742",
+    "scripts/p01/contracts/package.json": "fbdb858ce3725ffc47879326382a88052d0304e26d492c706f9dce870fb43ae1",
+    "scripts/p01/contracts/pyproject.toml": "eff306f45a1d4d4dc1ecf21f36eba2daf20be160b938a87928af4e8e6655f315",
+    "scripts/p01/contracts/run.py": "b7b647933bdb5518e4bf9e2dd54330868f29cf5b5ec234e7beec25835b56df0a",
+    "scripts/p01/contracts/test_compatibility.py": "bf5b7e1a0437a564cf1fada63a81aed9abdd235cf3e8094bfd6d4588ec78f71d",
+    "scripts/p01/contracts/uv.lock": "6afd3e92a837772ab2edf0a61abb912d4e5d0917e2ebae03f0bbcbf21fe7951c",
+    "tests/contracts/conformance.py": "46e34326d298ab1da9bd2961106a32eb4393ec8a03c77c58e784c9da1cb592be",
+    "tests/contracts/fixtures.json": "4a934da040afe647284e9d8ab0fa9100709993dda29502133f3d3e4763a7ae3d",
+    "tests/contracts/health-fixtures.json": "2fd012b13404e0fe0451df8705dc7982850f86b79179f8407104a70180be190b",
+    "tests/contracts/health.php": "bc0eea420c79fba9b5ce907dac8d854b1c438ff1acf434e4aaa9dfe93a721d47",
+    "tests/contracts/php.php": "c4559cd63304d3f7e9116c66b8db72506a0db4966649068b7f835394ebffab48"
+  },
+  "tools": {
+    "openapi-generator-cli": "7.25.0",
+    "openapi-spec-validator": "0.9.0",
+    "pydantic": "2.13.5"
+  },
+  "generator_version": "7.25.0",
+  "compatibility": {
+    "base_revision": "6fd44860f61d66bf858c92b8099f29a97479758b",
+    "policy": "immutable-existing-contract-artifacts",
+    "baseline_sha256": {
+      "contracts/asyncapi/catalogue.yaml": "d11eab6a06d27b202011223a6b366b1ad8419a2af15eb8d764581bef794043ee",
+      "contracts/openapi/foundation-health-v1.json": "0ae446a089acaa24d549d11b860efa750d8758b67c70d9d82a056ebcd012977c",
+      "contracts/openapi/governance-approvals-v1.json": "942f8b0a7a0fb56d4f44607d2aeb61673778d4c3f1c54457063cb78fde3bb689",
+      "contracts/openapi/governance-federation-v1.json": "233a03ad6c3d38ac99a4978f24ae28e46eb3fde632586d0766772c7b3c99eb2d",
+      "contracts/openapi/governance-local-identity-v1.json": "79f17eb90e3c0fd335d7be95f4fd71666adf017d8c31254872ef64c1dfc7ad0e",
+      "contracts/openapi/governance-tenancy-v1.json": "39ba6e2e78f1575f84f765910ad48a07a8e73d606cb30d8d51788e8d07125d1d",
+      "contracts/openapi/planning-immutable-plan-v1.json": "68db8d73386ab4817dbe8810f6b2364aab7ffa8a96b5987371a4ac97dbd24b48",
+      "contracts/schemas/events/catalogue-foundation-recorded-v1.json": "933b1e3d02678ba7bd5ebb19aeffd6d08c42124ba3d1706bc1e0b039f5e1052f"
+    },
+    "added": [],
+    "conflicts": []
+  },
+  "deterministic_generation": true,
+  "cross_language": "PASS"
+}

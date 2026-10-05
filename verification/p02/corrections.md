@@ -15,5 +15,4 @@ are retained. The corrected comparison freezes the original accepted artifact
 bytes at `f3612f6d5669ec47f13020a7f1f1f1d64e333e5d` and accepts only the three new
 contract files. Its result does not relabel either failure. The [next contract run 37354292360](contracts/run-37354292360/report.json)
 conservatively compares with the previous push and also sees the restoration as a byte change
-relative to the rejected edit; the later unchanged-artifact regression is required
-separately. No failed run is treated as a passing gate.
+relative to the rejected edit. The [unchanged-artifact regression at b1064b7](contracts/run-37354711828/report.json) passes the original unmodified check, along with generated-client and HTTP conformance replay. No failed run is treated as a passing gate.

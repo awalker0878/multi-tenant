@@ -42,16 +42,16 @@ D03 service deployment order follows the selected readiness dependencies rather 
 
 The [P02 bootstrap binding](../../implementation/p02-local-bootstrap.md) defines
 the implemented migration, protected deployment command and first-login routes.
-External OIDC administration/activation below is the required full installation
-journey and remains the next implementation increment; do not infer that it is
-available from the local setup screen alone.
+The [federation increment](../../implementation/p02-federation.md) implements
+Console-managed OIDC administration, verification and activation. Its disposable
+HTTPS/browser evidence is separate from supported installation/restore qualification.
 
 P02.01/P02.05 implement this product setup flow; the P01 diagnostic fixtures do not establish it. Follow [ADR-009](../../decisions/adr-009-identity-delegation-and-authorization.md) and [identity and trust](../identity-and-trust.md). Release bindings must supply the concrete bootstrap/display operations before this runbook is executable.
 
 1. After the required Governance and Console dependencies are available, execute the authorized deployment bootstrap once. Create a single installation-local administrator, generate a cryptographically random temporary password and atomically store only its hash and mandatory-password-change state. Concurrent replicas and deployment retries must converge on the same existing account.
 2. Display the username, temporary password and console URL once to the authorized installer during deployment. Keep the display out of retained/shared CI/deployment logs, container/application logs, telemetry, artifacts and evidence. Existing installations do not redisplay or regenerate a password.
 3. Sign in through the console. The first successful login must lead to password change; verify that direct navigation and protected API calls are denied until a different password is saved. Successful change invalidates the temporary password and rotates session/CSRF state.
-4. Open Administration → Identity provider. Enter external OIDC provider/client details and claim mappings; use the displayed callback destination for the external client registration. Save secrets through the protected write-only input. Governance persists the settings and secret references; do not edit environment variables, manifests, Helm values or configuration files.
+4. Open the installation setup screen (`/setup`, linked as Identity provider after handover). Enter the issuer, client registration, exact administrator subject and any approved private provider networks; use the displayed callback destination for the external client registration. Save secrets through the protected write-only input. Governance persists the settings and secret references; do not edit environment variables, manifests, Helm values or configuration files.
 5. Test the connection and complete a verified external login for an identity with an explicit administrative grant. A malformed connection, failed login or missing administrative authority must leave local setup available after the password change.
 6. Activate the verified connection. Atomically disable the local administrator and revoke its sessions/delegated authority. Verify federated administration, local-login denial and denial of an already authenticated local session. Confirm that later IdP failure does not restore local login.
 
@@ -95,3 +95,22 @@ If bootstrap partially succeeds, inspect the persisted account, mandatory-change
 An independent operator verifies component/BOM identities, allowed and denied API/database/network access, fixture tenant isolation, evidence object integrity, safe restart and alert receipt. Check that native admission remains disabled unless separately enabled under D08 authority. Verify protected backup and trust recovery access from the intended recovery location.
 
 Record elapsed install/recovery times, configuration/secret reference revisions, migration receipts, dependency restore results, synthetic journey/alert evidence, remaining limitations and the exact stage achieved. Save actual commands/API bindings and redacted outputs with the exercise record. Do not report native provisioning, application migration or production readiness from these installation checks.
+
+## P02 Governance schema and identity entry
+
+Before serving P02 identity/tenant routes, the controlled Governance migrator applies
+all checked-in SQL migrations in numeric order: `001_identity.sql`,
+`002_federation.sql`, `003_tenancy.sql`, then `004_approvals.sql`. They live under
+`services/governance/database/migrations/`; runtime identities cannot perform this
+schema work. Preserve the deployment-created bootstrap sentinel and existing
+identity state on replay. Follow the [bootstrap procedure](../../implementation/p02-local-bootstrap.md)
+for protected one-time credential display and required password change, then the
+[Console federation procedure](../../implementation/p02-federation.md) for test and
+activation. OIDC registration values are entered in the Console, never these
+deployment inputs. Internal Planning connectivity has its own workload credential
+and trust; its unavailable owner keeps approval requests closed.
+
+The [tenant/approval increment](../../implementation/p02-tenancy-and-approvals.md)
+records new runtime role restrictions and recovery obligations. Disposable
+PostgreSQL/browser evidence does not qualify all supported deployment migrations,
+restore reconciliation, receiving inputs or promotion.

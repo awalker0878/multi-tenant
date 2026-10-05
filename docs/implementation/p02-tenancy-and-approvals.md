@@ -128,3 +128,13 @@ delivery/background expiry; deployed recovery/revocation epochs; full browser an
 accessibility qualification. Lists are currently bounded to 200 rows (audit 100)
 without pagination. No native effect, real provider interoperability, complete
 operational acceptance or completed phase is inferred.
+
+## Retained campaign
+
+EV-P02-003 records the passing 44-check campaign, 55 PostgreSQL feature cases
+(952 assertions), two compiled browser journeys and verified source/artifact
+hashes. The initial timing failure remains retained separately. The full local
+suites pass 91 Governance and 76 Console cases; types, dependency boundaries,
+formatter, compiled frontend and the five P02 OpenAPI specifications pass.
+The [G02 engineering assessment](../qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
+separates these observations from remaining integration and receiving work.

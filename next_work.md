@@ -4,30 +4,37 @@ Active branch: `greenfield/enterprise-microservices-plan`. The requesting user a
 
 ## P02 handoff
 
-The [local bootstrap increment](docs/implementation/p02-local-bootstrap.md) implements
-one deployment-created administrator, protected random-password display, first-login
-password change, durable session authority and the Console sign-in/setup journey.
-The retained EV-P02-001 campaign passes 32 PostgreSQL/HTTP/browser checks, with
-165 matching source bindings. Full local suites pass 46 Governance and 60 Console
-tests. Direct API and browser controls retain their bounded deployment scope.
-P02 remains IN_PROGRESS. Console-managed external OIDC and verified handover now have an implemented [federation increment](docs/implementation/p02-federation.md); its new source requires separate qualification. The
-[regression snapshot](verification/p02/regression-runs.json) records all ten affected
-workflows passing, including the nine package/image jobs and both runtime campaigns.
+Console-managed [OIDC setup and tested handover](docs/implementation/p02-federation.md),
+[tenant authority and plan-bound approvals](docs/implementation/p02-tenancy-and-approvals.md),
+and tenant membership/quota administration are implemented. P02.01–P02.05 remain
+IN_PROGRESS; receiving and the remaining integration scope are open.
 
-[Tenant authority and approvals](docs/implementation/p02-tenancy-and-approvals.md)
-now implement membership/grant lifecycle, revisioned quotas, explicit role/scope
-checks, independent plan-bound approval decisions and revocation-aware validation.
-The Console adds tenant selection and membership/quota administration. The local
-Governance suite passes 91 tests; hosted results for the changed source are pending.
+EV-P02-003 retains the passing campaign at
+`6fd44860f61d66bf858c92b8099f29a97479758b`: **44 checks, 55 PostgreSQL feature
+tests (952 assertions), two compiled browser journeys, six matching artifact
+hashes and 218 matching source bindings.** Four real HTTPS/PKCE exchanges use an
+explicitly synthetic provider; the browser completes configuration, failed test,
+verified handover, independent tenant choices and cross-browser revocation.
+Local full suites pass 91 Governance and 76 Console cases, plus static analysis,
+frontend build/boundaries and five OpenAPI specification checks. EV-P02-002 retains
+the preceding federation regression; EV-P02-001 remains the bootstrap baseline.
+The [correction record](verification/p02/corrections.md) preserves the initial
+browser timing and immutable-contract failures. The published v1 contract is
+restored byte-for-byte; no validation rule was weakened. The
+[regression snapshot](verification/p02/tenancy-regression-runs.json) keeps each
+workflow's actual source and outcome; Kubernetes replay is still running while
+the P02 campaign, package/image, Compose, messaging and corrected contract checks pass.
 
-**Next concrete work:** run and retain the expanded PostgreSQL/browser campaign,
-including a disposable HTTPS provider and cross-browser tenant revocation. Then
-implement service actor delegation, support-access/break-glass policy, outbox
-delivery/background expiry and recovery reconciliation against the owning
-contracts. The real immutable plan producer belongs to P05.04; P02 uses explicitly
-synthetic plans, with a fail-closed production adapter. Complete the broader
-late-response/accessibility campaign and independent G02 review before advancing
-through the gate. Provider values remain Console-managed application settings.
+**Next concrete work:** implement and qualify Governance outbox delivery and
+background approval expiry against explicit event contracts, then service actor
+delegation and owning-service admission. Complete the approved support-access/
+break-glass contract, restore/revocation reconciliation, and the broader
+multi-tab/late-response/accessibility campaign. The real immutable plan producer
+belongs to P05.04; P02 injects synthetic plans only in tests and its production
+adapter fails closed without the owner. Follow the
+[G02 engineering assessment](docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
+for criterion gaps and accountable reviewers. Provider values remain
+Console-managed application settings. No gate pass or promotion is inferred.
 
 ## Retained P01 handoff
 

@@ -1,6 +1,6 @@
 # Console service
 
-Status: P02 local administrator sign-in, mandatory password change and setup/session controls are implemented in the [bootstrap increment](../implementation/p02-local-bootstrap.md). External OIDC administration and tenant/product journeys remain planned. Runtime: Laravel 13, Inertia 3, Vue 3, TypeScript, Tailwind CSS 4 and Vite 8, with exact private locks recorded in P01 evidence. Source: `apps/console/`. Owner: product engineering.
+Status: P02 local administrator sign-in, mandatory password change and setup/session controls are implemented in the [bootstrap increment](../implementation/p02-local-bootstrap.md). Console-managed [OIDC setup and handover](../implementation/p02-federation.md) and [tenant membership/quota administration](../implementation/p02-tenancy-and-approvals.md) are implemented with bounded development evidence; catalogue/plan/execution journeys and complete accessibility/receiving qualification remain open. Runtime: Laravel 13, Inertia 3, Vue 3, TypeScript, Tailwind CSS 4 and Vite 8, with exact private locks recorded in P01 evidence. Source: `apps/console/`. Owner: product engineering.
 
 The [frontend engineering standard](../engineering/frontend.md) defines component structure, typed page contracts, browser data handling, session transitions, accessibility and verification. It includes primary-source compatibility research reviewed on 2026-10-04. Runtime and browser support require the exact BOM and qualification evidence; requested major versions alone do not demonstrate compatibility.
 

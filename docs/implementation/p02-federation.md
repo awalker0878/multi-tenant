@@ -91,3 +91,14 @@ Primary protocol references: [OIDC Core](https://openid.net/specs/openid-connect
 [Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html),
 [OAuth security BCP](https://www.rfc-editor.org/rfc/rfc9700.html), and the
 [locked JWT library](https://github.com/googleapis/php-jwt/tree/v7.2.1).
+
+## Retained qualification
+
+EV-P02-002 retains the earlier PostgreSQL adapter/compiled bootstrap regression.
+EV-P02-003 adds the actual compiled Console setup, wrong-administrator denial,
+HTTPS/PKCE token exchange and atomic handover against a disposable provider.
+Governance verifies the fixture certificate authority; only the disposable browser
+context accepts the self-signed certificate. Four exchanges and credential-log
+exclusion pass. This proves the exercised transport/flow, not operated-provider
+interoperability, DNS/key rotation, full restore, production topology or receiving
+acceptance. Exact reports and source bindings are in the delivery register.
