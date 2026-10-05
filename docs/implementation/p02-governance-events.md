@@ -81,7 +81,7 @@ source bindings and ten retained log hashes. EV-P02-005 includes its passing
 regression at the delegation source. The receiver is synthetic, not an implemented
 product consumer. Initial failures remain in the correction record.
 
-Identity-bootstrap events remain in their distinct identity outbox; this schema
+Installation identity events use [their distinct versioned outbox relay](p02-identity-events.md); this schema
 does not relabel them as tenant events. Actual consumer wiring, retention/replay
 budgets, alert receiving, whole-store recovery, HA and operating custody remain
 their named receiving and later-service inputs.

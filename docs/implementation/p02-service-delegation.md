@@ -38,8 +38,8 @@ The originating federated actor may explicitly revoke its own delegation, even
 after losing membership. Another actor cannot inspect or revoke it. Repeated
 revocation is idempotent. An immutable receipt and the existing identity
 audit/outbox commit together; raw credentials never enter them. The identity
-outbox remains distinct from the tenant-event relay and still needs its own
-versioned delivery integration.
+outbox uses [its own versioned delivery contract](p02-identity-events.md),
+separate from tenant facts and current authority.
 
 ## Workload custody and Catalogue boundary
 

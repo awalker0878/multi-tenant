@@ -93,3 +93,8 @@ Owned source root: `services/governance/app/`. Tenant membership/delegation, per
 Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). This service owns its own `App\` namespace. Organize business behavior in `app/Domain/<Capability>/` and use cases in `app/Application/<Capability>/Actions/`, with `handle()` as the Action entrypoint. Keep external adapters in `app/Infrastructure/` and controllers, requests, jobs, listeners, policies and providers in normal Laravel directories. Domain code cannot depend on Application or Infrastructure; Eloquent and Laravel facilities remain available under [ADR-024](../decisions/adr-024-pragmatic-laravel-domain-convention.md). Same-context capabilities may collaborate directly; repositories and DTOs require a concrete reason. Public API/event schemas define cross-service access, and internal models, use cases and migrations remain private.
 
 The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.
+
+Installation bootstrap, federation, session and delegation notifications use the
+[identity delivery contract and relay](../implementation/p02-identity-events.md).
+Their installation scope, immutable attribution and restricted consumer boundary
+are distinct from tenant change notifications.

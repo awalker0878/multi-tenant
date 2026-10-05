@@ -42,6 +42,7 @@ function initializeIdentityFixture(object $test): void
             $sql = str_replace('ALTER TABLE app.governance_audit ALTER COLUMN actor_id DROP NOT NULL;', '', $sql);
             $sql = str_replace('ADD COLUMN IF NOT EXISTS', 'ADD COLUMN', $sql);
             $sql = str_replace('governance_outbox_pending ON app.governance_outbox', 'app.governance_outbox_pending ON governance_outbox', $sql);
+            $sql = str_replace('identity_outbox_pending ON app.identity_outbox', 'app.identity_outbox_pending ON identity_outbox', $sql);
             $sql = str_replace('approvals_expiry ON app.approvals', 'app.approvals_expiry ON approvals', $sql);
         }
         DB::unprepared($sql);

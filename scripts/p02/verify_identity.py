@@ -117,7 +117,7 @@ def main() -> int:
         report['postgres'] = sql('SHOW server_version;').strip()
         report['node'] = run(['node', '--version']).strip()
         check('exact-php-runtime', report['php'] == '8.5.11')
-        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
+        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
         check('postgres-feature-suite', True)
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:
@@ -190,7 +190,7 @@ def main() -> int:
             check('fresh-process-retry-does-not-redisplay', 'Temporary password:' not in replay and 'already complete' in replay)
 
             runtime_password = environments['governance']['DB_PASSWORD']
-            for label, statement in [('sentinel-delete', 'DELETE FROM app.bootstrap_administrator;'), ('audit-delete', 'DELETE FROM app.identity_audit;'), ('audit-update', "UPDATE app.identity_audit SET event='forged';"), ('schema-create', 'CREATE TABLE app.forbidden (id int);'), ('governance-audit-update', "UPDATE app.governance_audit SET event='forged';"), ('governance-audit-delete', 'DELETE FROM app.governance_audit;'), ('approval-binding-update', "UPDATE app.approvals SET plan_digest='forged';"), ('receipt-delete', 'DELETE FROM app.governance_commands;'), ('outbox-payload-update', "UPDATE app.governance_outbox SET payload_json='forged';"), ('outbox-delete', 'DELETE FROM app.governance_outbox;')]:
+            for label, statement in [('sentinel-delete', 'DELETE FROM app.bootstrap_administrator;'), ('audit-delete', 'DELETE FROM app.identity_audit;'), ('audit-update', "UPDATE app.identity_audit SET event='forged';"), ('schema-create', 'CREATE TABLE app.forbidden (id int);'), ('governance-audit-update', "UPDATE app.governance_audit SET event='forged';"), ('governance-audit-delete', 'DELETE FROM app.governance_audit;'), ('approval-binding-update', "UPDATE app.approvals SET plan_digest='forged';"), ('receipt-delete', 'DELETE FROM app.governance_commands;'), ('outbox-payload-update', "UPDATE app.governance_outbox SET payload_json='forged';"), ('outbox-delete', 'DELETE FROM app.governance_outbox;'), ('identity-outbox-event-update', "UPDATE app.identity_outbox SET event='forged';"), ('identity-outbox-delete', 'DELETE FROM app.identity_outbox;')]:
                 denial = sql(statement, 'governance', 'governance_runtime', runtime_password, expected=3)
                 check('runtime-denied-' + label, 'permission denied' in denial)
             replacement = secrets.token_urlsafe(32)

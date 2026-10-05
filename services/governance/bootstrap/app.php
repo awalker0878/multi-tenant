@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Database claims provide cross-replica exclusion; no cache lock is authority.
         $schedule->command('governance:expire-approvals --limit=100')->everyMinute();
         $schedule->command('governance:publish-outbox --limit=10')->everyMinute();
+        $schedule->command('identity:publish-outbox --limit=10')->everyMinute();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(RequestTelemetry::class);

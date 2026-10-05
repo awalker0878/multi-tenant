@@ -7,12 +7,12 @@ namespace App\Application\Messaging\Actions;
 use App\Application\Messaging\Contracts\EventEncoder;
 use App\Domain\Messaging\Outbox;
 
-final class PublishGovernanceEvent
+final class PublishIdentityEvent
 {
     public function __construct(private readonly PublishOutboxEvent $relay, private readonly EventEncoder $encoder) {}
 
     public function handle(): string
     {
-        return $this->relay->handle(Outbox::Governance, $this->encoder);
+        return $this->relay->handle(Outbox::Identity, $this->encoder);
     }
 }

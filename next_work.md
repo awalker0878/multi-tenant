@@ -44,8 +44,12 @@ Implementation and limits are in [event delivery](docs/implementation/p02-govern
 [service delegation](docs/implementation/p02-service-delegation.md) and
 [tenant/browser behavior](docs/implementation/p02-tenancy-and-approvals.md).
 
-**Next concrete work:** version and deliver the distinct identity outbox, then
-integrate actual notification consumers. Bind Catalogue's guard to owner resources
+**Current increment:** the distinct [identity outbox delivery](docs/implementation/p02-identity-events.md)
+is implemented; retain the exact-source PostgreSQL/TLS broker and identity
+qualification before registering its evidence.
+
+**Next concrete work:** integrate actual notification consumers with explicit
+owner scope, durable inboxes and reconciliation APIs. Bind Catalogue's guard to owner resources
 and qualify the Console-to-Catalogue-to-Governance wire path as P03 resources are
 implemented under their entry conditions. Resolve the approved support-access/break-glass contract
 and independent restore/revocation custody before those authority changes. Extend

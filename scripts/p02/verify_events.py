@@ -20,7 +20,7 @@ def main():
     root = Path(__file__).resolve().parents[2]
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    report = {'schema_version': 1, 'result': 'RUNNING', 'scope': 'P02 Governance committed notifications; synthetic consumer, no authority or native effects',
+    report = {'schema_version': 1, 'result': 'RUNNING', 'scope': 'P02 Governance and installation identity committed notifications; synthetic consumers, no authority or native effects',
               'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip(),
               'started_at': dt.datetime.now(dt.timezone.utc).isoformat(), 'checks': [], 'commands': []}
     private_values = [os.environ.get('P02_TEST_PASSWORD', '')]
@@ -54,11 +54,12 @@ def main():
 
     try:
         check('disposable-postgres-only', os.environ.get('P02_TEST_POSTGRES') == '1')
-        paths = ['services/governance', 'contracts/schemas/events/governance-change-v1.json', 'contracts/asyncapi/governance.yaml', 'scripts/p02', '.github/workflows/p02-governance-events.yml']
+        paths = ['services/governance', 'contracts/schemas/events/governance-change-v1.json', 'contracts/asyncapi/governance.yaml', 'contracts/schemas/events/identity-change-v1.json', 'contracts/asyncapi/identity.yaml', 'scripts/p02', '.github/workflows/p02-governance-events.yml']
         tracked = subprocess.check_output(['git', 'ls-files', '--', *paths], cwd=root, text=True).splitlines()
         report['source_sha256'] = {p: hashlib.sha256((root / p).read_bytes()).hexdigest() for p in tracked}
         check('clean-campaign-source', not subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=all', '--', *paths], cwd=root).strip())
         check('packaged-schema-matches-public-contract', (root / paths[1]).read_bytes() == (root / 'services/governance/resources/contracts/governance-change-v1.json').read_bytes())
+        check('packaged-identity-schema-matches-public-contract', (root / 'contracts/schemas/events/identity-change-v1.json').read_bytes() == (root / 'services/governance/resources/contracts/identity-change-v1.json').read_bytes())
         with tempfile.TemporaryDirectory(prefix='p02-events-private-') as directory:
             private = Path(directory)
             for cert in ['broker', 'untrusted']:
@@ -73,10 +74,10 @@ def main():
                 users.append({'name': user, 'password_hash': base64.b64encode(salt + hashlib.sha256(salt + password.encode()).digest()).decode(), 'hashing_algorithm': 'rabbit_password_hashing_sha256', 'tags': []})
             definitions = {'users': users, 'vhosts': [{'name': 'product'}], 'permissions': [
                 {'user': 'governance', 'vhost': 'product', 'configure': '^$', 'write': '^governance.events$', 'read': '^$'},
-                {'user': 'p02-observer', 'vhost': 'product', 'configure': '^$', 'write': '^$', 'read': '^p02.governance$'}],
+                {'user': 'p02-observer', 'vhost': 'product', 'configure': '^$', 'write': '^$', 'read': '^p02\\.(governance|identity)$'}],
                 'exchanges': [{'name': 'governance.events', 'vhost': 'product', 'type': 'topic', 'durable': True, 'auto_delete': False, 'internal': False, 'arguments': {}}],
-                'queues': [{'name': 'p02.governance', 'vhost': 'product', 'durable': True, 'auto_delete': False, 'arguments': {'x-queue-type': 'quorum'}}],
-                'bindings': [{'source': 'governance.events', 'vhost': 'product', 'destination': 'p02.governance', 'destination_type': 'queue', 'routing_key': 'governance.#', 'arguments': {}}]}
+                'queues': [{'name': 'p02.' + family, 'vhost': 'product', 'durable': True, 'auto_delete': False, 'arguments': {'x-queue-type': 'quorum'}} for family in ['governance', 'identity']],
+                'bindings': [{'source': 'governance.events', 'vhost': 'product', 'destination': 'p02.' + family, 'destination_type': 'queue', 'routing_key': family + '.#', 'arguments': {}} for family in ['governance', 'identity']]}
             (private / 'definitions.json').write_text(json.dumps(definitions))
             (private / 'rabbitmq.conf').write_text('listeners.tcp = none\nlisteners.ssl.default = 5671\nssl_options.certfile = /config/broker.crt\nssl_options.keyfile = /config/broker.key\nssl_options.cacertfile = /config/broker.crt\nssl_options.verify = verify_none\nssl_options.fail_if_no_peer_cert = false\ndefinitions.import_backend = local_filesystem\ndefinitions.local.path = /config/definitions.json\n')
             for file in ['broker.crt', 'broker.key', 'definitions.json', 'rabbitmq.conf']:
@@ -105,6 +106,7 @@ def main():
                 'P02_OBSERVER_PASSWORD_FILE': str(private / 'p02-observer.password'), 'P02_UNTRUSTED_CA_FILE': str(private / 'untrusted.crt')}
             run('postgres-and-broker-features', ['php', 'services/governance/vendor/bin/pest', '--configuration=services/governance/phpunit.xml',
                 'services/governance/tests/Feature/GovernanceOutboxTest.php', 'services/governance/tests/Feature/GovernanceBrokerTest.php',
+                'services/governance/tests/Feature/IdentityOutboxTest.php', 'services/governance/tests/Feature/IdentityBrokerTest.php',
                 'services/governance/tests/Feature/ApprovalTest.php', '--fail-on-warning', '--fail-on-risky', '--colors=never'], env=environment)
             check('real-broker-and-postgres-tests-pass', True)
         report['result'] = 'PASS'
