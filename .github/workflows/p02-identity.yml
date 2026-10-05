@@ -58,6 +58,7 @@ jobs:
         env:
           P02_TEST_POSTGRES: '1'
           P02_TEST_PASSWORD: synthetic-p02-disposable-postgres
+          P02_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
         run: uv run --project scripts/p01/contracts --frozen python scripts/p02/verify_identity.py --output "$RUNNER_TEMP/p02-identity"
       - name: Retain redacted exact-source evidence
         if: always()

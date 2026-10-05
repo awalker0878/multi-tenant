@@ -40,7 +40,7 @@ def main() -> int:
     report = {'schema_version': 1, 'result': 'RUNNING', 'scope': 'P02 local bootstrap slice only',
               'source_sha': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
               'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'observed_at': dt.datetime.now(dt.UTC).isoformat(),
-              'checks': [], 'source_sha256': {}, 'limitations': ['No external OIDC handover', 'No operated deployment or G01/G02 acceptance', 'Loopback HTTP; production TLS topology remains unqualified']}
+              'checks': [], 'source_sha256': {}, 'limitations': ['No external OIDC handover', 'No operated deployment or G01/G02 acceptance', 'Verified PostgreSQL TLS; loopback HTTP between applications; production ingress/workload TLS topology remains unqualified']}
     tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=root).decode().split('\0')
     for name in tracked:
         if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', '.github/workflows/p02-identity', 'contracts/openapi/governance-local-identity')):
@@ -116,6 +116,27 @@ def main() -> int:
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:
             private_path = Path(private)
+            # Exercise the existing Console's verified-TLS and mounted-secret contract.
+            certificate, key_file = private_path / 'postgres.crt', private_path / 'postgres.key'
+            run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', str(key_file), '-out', str(certificate), '-days', '1', '-subj', '/CN=p02-disposable-postgres', '-addext', 'subjectAltName=IP:127.0.0.1,DNS:localhost'])
+            container = os.environ['P02_POSTGRES_CONTAINER']
+            check('isolated-postgres-container-id', re.fullmatch(r'[0-9a-f]{64}', container) is not None)
+            run(['docker', 'exec', container, 'mkdir', '-p', '/tmp/p02-tls'])
+            for path in [certificate, key_file]:
+                run(['docker', 'cp', str(path), container + ':/tmp/p02-tls/' + path.name])
+            run(['docker', 'exec', container, 'chown', '-R', 'postgres:postgres', '/tmp/p02-tls'])
+            run(['docker', 'exec', container, 'chmod', '0600', '/tmp/p02-tls/postgres.key'])
+            sql("ALTER SYSTEM SET ssl_cert_file='/tmp/p02-tls/postgres.crt'; ALTER SYSTEM SET ssl_key_file='/tmp/p02-tls/postgres.key'; ALTER SYSTEM SET ssl='on'; SELECT pg_reload_conf();")
+            pg_env.update(PGSSLMODE='verify-full', PGSSLROOTCERT=str(certificate))
+            deadline = time.monotonic() + 5
+            while True:
+                try:
+                    check('postgres-verified-tls', sql('SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid();').strip() == 't')
+                    break
+                except RuntimeError:
+                    if time.monotonic() > deadline:
+                        raise
+                    time.sleep(0.1)
             credential = secrets.token_hex(32)
             private_values.append(credential)
             credential_file = private_path / 'console-identity'
@@ -125,9 +146,13 @@ def main() -> int:
             for name, directory in [('governance', 'services/governance'), ('console', 'apps/console')]:
                 runtime_password, migration_password = secrets.token_hex(32), secrets.token_hex(32)
                 private_values.extend([runtime_password, migration_password])
-                sql(f"CREATE ROLE {name}_owner NOLOGIN; CREATE ROLE {name}_runtime LOGIN PASSWORD '{runtime_password}'; CREATE ROLE {name}_migrator LOGIN PASSWORD '{migration_password}'; GRANT {name}_owner TO {name}_migrator; CREATE DATABASE {name} OWNER {name}_owner;")
+                password_file = private_path / (name + '-db-password')
+                password_file.write_text(runtime_password)
+                password_file.chmod(0o600)
+                sql(f"CREATE ROLE {name}_owner NOLOGIN; CREATE ROLE {name}_runtime LOGIN NOINHERIT PASSWORD '{runtime_password}'; CREATE ROLE {name}_migrator LOGIN NOINHERIT PASSWORD '{migration_password}'; GRANT {name}_owner TO {name}_migrator WITH INHERIT FALSE, SET TRUE; CREATE DATABASE {name} OWNER {name}_owner;")
                 sql(f'REVOKE ALL ON DATABASE {name} FROM PUBLIC; GRANT CONNECT ON DATABASE {name} TO {name}_runtime, {name}_migrator;', name)
                 sql(f'REVOKE ALL ON SCHEMA public FROM PUBLIC; CREATE SCHEMA app AUTHORIZATION {name}_owner; GRANT USAGE ON SCHEMA app TO {name}_runtime;', name)
+                sql(f'ALTER DEFAULT PRIVILEGES FOR ROLE {name}_owner IN SCHEMA app GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {name}_runtime;', name)
                 migration = root / directory / 'database/migrations' / ('001_identity.sql' if name == 'governance' else '001_shared_state.sql')
                 sql(migration.read_text(), name, f'{name}_migrator', migration_password)
                 key = 'base64:' + base64.b64encode(secrets.token_bytes(32)).decode()
@@ -135,7 +160,7 @@ def main() -> int:
                 environments[name] = os.environ | {'APP_ENV': 'p02-verification', 'APP_DEBUG': 'false', 'APP_KEY': key,
                     'APP_URL': f'http://127.0.0.1:{8032 if name == "governance" else 8031}',
                     'DB_HOST': '127.0.0.1', 'DB_PORT': '5432', 'DB_DATABASE': name, 'DB_USERNAME': f'{name}_runtime',
-                    'DB_PASSWORD': runtime_password, 'DB_SSLMODE': 'disable', 'CONSOLE_CREDENTIAL_FILE': str(credential_file),
+                    'DB_PASSWORD': runtime_password, 'DB_PASSWORD_FILE': str(password_file), 'DB_SSLMODE': 'verify-full', 'DB_SSLROOTCERT': str(certificate), 'CONSOLE_CREDENTIAL_FILE': str(credential_file),
                     'GOVERNANCE_URL': 'http://127.0.0.1:8032', 'SESSION_DRIVER': 'database', 'CACHE_STORE': 'database', 'SESSION_SECURE_COOKIE': 'false'}
             gov = root / 'services/governance'
             # A redirected invocation must fail before changing the provisioned sentinel.
@@ -177,7 +202,9 @@ def main() -> int:
                         break
                     except OSError:
                         if process.poll() is not None or time.monotonic() > deadline:
-                            raise RuntimeError(name + ' did not start')
+                            log = (private_path / f'{name}.log').read_text()
+                            (output / f'{name}-http.log').write_text(redact(log))
+                            raise RuntimeError(name + ' did not start: ' + redact(log[-2000:]))
                         time.sleep(0.1)
             def wire(path: str, schema: str, expected: int = 200, body: dict | None = None, token: str = '') -> dict:
                 request = urllib.request.Request('http://127.0.0.1:8032' + path,

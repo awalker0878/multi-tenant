@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS app.identity_outbox (
     published_at timestamptz
 );
 -- The runtime can change the sentinel, but cannot delete/recreate it or erase audit.
+-- Foundation owner default privileges may have granted broader table access.
+REVOKE ALL ON app.bootstrap_administrator, app.identity_sessions, app.identity_audit, app.identity_outbox FROM governance_runtime;
 GRANT SELECT, UPDATE ON app.bootstrap_administrator TO governance_runtime;
 GRANT SELECT, INSERT, UPDATE ON app.identity_sessions TO governance_runtime;
 GRANT SELECT, INSERT ON app.identity_audit TO governance_runtime;

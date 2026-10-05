@@ -30,7 +30,7 @@ beforeEach(function (): void {
     }
     $sql = file_get_contents(database_path('migrations/001_identity.sql'));
     $sql = preg_replace('/^\\\\.*$/m', '', $sql);
-    $sql = preg_replace('/^(?:SET LOCAL ROLE|GRANT) [^;]+;\s*/m', '', $sql);
+    $sql = preg_replace('/^(?:SET LOCAL ROLE|GRANT|REVOKE) [^;]+;\s*/m', '', $sql);
     if (DB::getDriverName() === 'sqlite') {
         $sql = str_replace('identity_sessions_expiry ON app.identity_sessions', 'app.identity_sessions_expiry ON identity_sessions', $sql);
         $sql = str_replace('REFERENCES app.identity_audit', 'REFERENCES identity_audit', $sql);

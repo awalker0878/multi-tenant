@@ -113,7 +113,7 @@ it('accepts the matching CSRF token on the real login route', function (): void 
 it('rejects hostile hosts and ignores untrusted proxy host headers', function (): void {
     Http::fake();
     $this->get('https://attacker.example.test/login')->assertStatus(400);
-    $this->withHeader('X-Forwarded-Host', 'attacker.example.test')->get('http://localhost/login')->assertOk();
+    $this->withHeader('X-Forwarded-Host', 'attacker.example.test')->get(rtrim(config('app.url'), '/').'/login')->assertOk();
     Http::assertNothingSent();
 });
 

@@ -182,6 +182,7 @@
         "config",
         "public/index.php",
         "routes",
+        "database/migrations",
         "build/apk.lock.json",
         "build/download-apks.php"
       ]

@@ -221,7 +221,7 @@ def run_php_probes(
               "--env", f"P01_COMPONENT={component['id']}"]
     if component["id"] == "console":
         # Deliberately public synthetic fixture key; injected only into this disposable process.
-        docker += ["--env", "APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="]
+        docker += ["--env", "APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", "--env", "APP_URL=https://localhost"]
     recorder.run("fpm-configuration", [*docker, image, "php-fpm", "-t"], cwd=output)
     program = (workspace / "scripts/p01/php_image_probe.php").read_text().removeprefix("<?php\n")
     runtime = json.loads(recorder.run("kernel-and-runtime-isolation", [*docker, image, "php", "-r", program], cwd=output))
