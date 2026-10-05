@@ -1,0 +1,30 @@
+name: P01 isolated stateful dependencies
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: [scripts/p01/stateful/**, scripts/p01/run_stateful.py, scripts/p01/test_stateful.py, scripts/p01/run_local.py, scripts/p01/local_runtime.py, deploy/fixtures/stateful/**, deploy/dependencies/stateful/inputs.lock.json, deploy/dependencies/inputs.lock.json, .github/workflows/p01-stateful-integration.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: p01-stateful-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  stateful:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Validate private topology and input admission
+        run: python3 -m unittest discover -s scripts/p01 -p 'test_stateful.py' -v
+      - name: Install dependencies and exercise isolation, restart and restore
+        run: python3 scripts/p01/run_stateful.py --source-revision "$GITHUB_SHA" --output "$RUNNER_TEMP/p01-stateful"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p01-stateful-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-stateful/
+          if-no-files-found: error
+          retention-days: 14

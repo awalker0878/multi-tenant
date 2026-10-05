@@ -69,3 +69,21 @@ client image endpoints are unavailable to this unauthenticated CI runner. Build 
 client from its signed release tag commit `7394ce0dd2a80935aded936b09fa12cbb3cb8096`
 using the same verified Go toolchain and fixed source checksum as the server workflow.
 The fixture does not require private registry access or credentials.
+
+## Locked inputs and runnable campaign
+
+[Input observation 37251624593](https://github.com/awalker0878/multi-tenant/actions/runs/37251624593)
+passed at source `1ad067ec2d1dd3b1faf73a66ab7fa45b90e00307`. The committed
+[immutable lock](../../deploy/dependencies/stateful/inputs.lock.json) binds four
+platform image manifests, both source archives and the client wheel closure. The
+resolver runs the pinned uv binary inside the pinned Python image; the preceding
+standalone uv invocation lacked the operating-system utilities needed for resolution.
+
+The [private fixture](../../deploy/fixtures/stateful/README.md),
+[campaign](../../scripts/p01/run_stateful.py) and
+[integration workflow](../../.github/workflows/p01-stateful-integration.yml) install
+real dependencies with no host-published ports. Probes exercise scoped broker users,
+Temporal namespace JWT authorization and separate PostgreSQL roles, and retained S3
+versions restored to an empty second store. The probe clients are support tooling,
+not product integrations. Runtime results are pending execution and must be retained
+before any passing claim.

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "scope": "P01 isolated dependency experiments; not operated dependency adoption",
+  "platform": "linux/amd64",
+  "images": {
+    "rabbitmq": {
+      "candidate": "docker.io/library/rabbitmq:4.3.6-management",
+      "source": "https://www.rabbitmq.com/release-information",
+      "index_digest": "sha256:316ffd2a847e59112eee2c65f04bbd0989d93aaf1486c07b721f8d22d863b968",
+      "digest": "sha256:1d306c8f8c55cd3ed50271198f4094220e4caed9a8d04a14aca869339d3d3ca9",
+      "reference": "docker.io/library/rabbitmq@sha256:1d306c8f8c55cd3ed50271198f4094220e4caed9a8d04a14aca869339d3d3ca9"
+    },
+    "temporal": {
+      "candidate": "docker.io/temporalio/server:1.32.0",
+      "source": "https://github.com/temporalio/temporal/releases/tag/v1.32.0",
+      "purpose": "Server only; explicit schema administration runs in a separate one-shot identity",
+      "index_digest": "sha256:c3e752127759616bb1615e0f9ba0e21635aeb5fdeb922de4f371c350955f46ae",
+      "digest": "sha256:ca47d4de249b9cc28137628dba77ae5e75e8b313ebb5c801c64615c1c99cbb09",
+      "reference": "docker.io/temporalio/server@sha256:ca47d4de249b9cc28137628dba77ae5e75e8b313ebb5c801c64615c1c99cbb09"
+    },
+    "golang": {
+      "candidate": "docker.io/library/golang:1.27.1-bookworm",
+      "source": "https://go.dev/doc/devel/release#go1.27.1",
+      "purpose": "Build the security-fixed MinIO release from pinned source; never use the older prebuilt server image",
+      "index_digest": "sha256:69a7b9788769bec032d238959b61854e9ae87f57be9029ec04e9885fabf99195",
+      "digest": "sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc",
+      "reference": "docker.io/library/golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc"
+    },
+    "temporal_admin": {
+      "candidate": "docker.io/temporalio/admin-tools:1.32.0",
+      "source": "https://github.com/temporalio/temporal/releases/tag/v1.32.0",
+      "purpose": "One-shot PostgreSQL schema setup; never mounted into the server or consumer",
+      "index_digest": "sha256:a9f84fb9a374b2374fe2e67c8efc0468ff3f1c66c8a0b14597ec86e349e62bca",
+      "digest": "sha256:8bb84e24db4336de48031a66dbda25a7477d300736fe825893e467042135da1f",
+      "reference": "docker.io/temporalio/admin-tools@sha256:8bb84e24db4336de48031a66dbda25a7477d300736fe825893e467042135da1f"
+    }
+  },
+  "minio_source": {
+    "repository": "https://github.com/minio/minio",
+    "release": "RELEASE.2025-10-15T17-29-55Z",
+    "revision": "9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a",
+    "url": "https://codeload.github.com/minio/minio/tar.gz/9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a",
+    "source": "https://github.com/minio/minio/releases/tag/RELEASE.2025-10-15T17-29-55Z",
+    "sha256": "45521908307306e925c98d629e1c17d78c8b72b6ee242b1bfb1409f7d8ee5841",
+    "bytes": 24232282
+  },
+  "mc_source": {
+    "repository": "https://github.com/minio/mc",
+    "release": "RELEASE.2025-08-13T08-35-41Z",
+    "revision": "7394ce0dd2a80935aded936b09fa12cbb3cb8096",
+    "url": "https://codeload.github.com/minio/mc/tar.gz/7394ce0dd2a80935aded936b09fa12cbb3cb8096",
+    "source": "https://github.com/minio/mc/releases/tag/RELEASE.2025-08-13T08-35-41Z",
+    "sha256": "95cd293c7119f16921a6dc515a1fb74a2227f19fd994b9c8b770a154e802ac44",
+    "bytes": 564228
+  },
+  "source_revision": "1ad067ec2d1dd3b1faf73a66ab7fa45b90e00307",
+  "candidate_sha256": "34aea7773595a4aac78ced6e974947f2f8765ac91578c9bd33be6b7045c24e48",
+  "client_input_sha256": "337f840ef121d68a09c39a7e0f3cb6249e90a6a16716b7b56927b247f184f33a",
+  "client_lock_sha256": "8502a23321ac4444a5033774030d7ae3ccd1e4de21412c59bc2a1e316b90cdad"
+}
