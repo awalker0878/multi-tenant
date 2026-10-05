@@ -40,6 +40,15 @@ def denied(name, call, errors, codes=None):
         check(name, False, 'unexpected authorization')
 
 
+def closed_port(host, port):
+    try:
+        with socket.create_connection((host,port),timeout=2): pass
+    except ConnectionRefusedError:
+        check(f'{host}-{port}-not-client-accessible',True)
+    else:
+        check(f'{host}-{port}-not-client-accessible',False)
+
+
 def broker_connect(identity, password=None, vhost='p01', tls=True):
     import pika
     password_file = identity+'-password' if identity != 'foreign' else 'foreign-broker-password'
@@ -56,6 +65,7 @@ def broker(stage):
         denied('revoked-broker-user-denied', lambda: broker_connect('publisher'), errors.ProbableAuthenticationError)
         return {}
     if stage == 'broker-before':
+        for port in (15672,15692): closed_port('rabbit',port)
         for identity, password, vhost, name in [('publisher','incorrect-synthetic-password','p01','invalid-broker-secret-denied'), ('foreign',None,'p01','foreign-vhost-denied')]:
             denied(name, lambda i=identity,p=password,v=vhost: broker_connect(i,p,v), (errors.ProbableAuthenticationError, errors.ProbableAccessDeniedError))
         denied('plaintext-amqp-listener-disabled', lambda: broker_connect('publisher', tls=False), errors.AMQPConnectionError)
@@ -210,6 +220,7 @@ async def temporal(stage, state):
         return {}
     if stage=='temporal-before':
         await describe(client);check('namespace-authorized-read',True)
+        for port in (7234,7235,7236,7239): closed_port('temporal',port)
         for identity in ('missing','foreign','expired','wrong-audience'):
             await rejection(identity+'-jwt-denied',await temporal_connect(identity),{RPCStatusCode.PERMISSION_DENIED,RPCStatusCode.UNAUTHENTICATED})
         try:

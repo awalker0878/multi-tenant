@@ -114,6 +114,10 @@ class StatefulCampaign(Campaign):
         success=True
         if self.compose:
             try:
+                self.command('runtime-state',self.dc('ps','--all','--format','json'),expected=None)
+                containers=self.command('runtime-containers',self.dc('ps','-aq')).decode().split()
+                for identifier in containers:
+                    self.command('container-state',['docker','inspect','--format','{{json .State}}',identifier],expected=None)
                 self.command('runtime-logs',self.dc('logs','--no-color','--tail','80'),expected=None)
                 self.command('remove-owned-installation',self.dc('down','--volumes','--remove-orphans'),timeout=90)
                 self.check('no-remaining-containers',not self.command('removed-containers',self.dc('ps','-aq')).strip())
