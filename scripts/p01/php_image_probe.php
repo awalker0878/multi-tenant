@@ -81,6 +81,13 @@ $result = [
 ];
 
 if ($component === 'console') {
+    check($application->make('config')->get('session.driver') === 'database', 'Console default session store is not shared');
+    check($application->make('config')->get('cache.default') === 'database', 'Console default cache store is not shared');
+    // This no-network image probe measures markup/assets only. Actual database
+    // persistence is verified by the separate Compose/Kubernetes installation.
+    $application->make('config')->set('session.driver', 'array');
+    $application->make('config')->set('cache.default', 'array');
+    $result['console_html_storage_scope'] = 'explicit_in_memory_image_probe';
     $request = Illuminate\Http\Request::create('https://localhost/', 'GET');
     $response = $kernel->handle($request);
     check($response->getStatusCode() === 200, 'Console HTML failed: '.$response->getStatusCode());

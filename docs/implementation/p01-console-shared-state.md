@@ -26,3 +26,9 @@ both tenants, rejects a conflicting lock and a foreign lock release, checks encr
 session bytes, and rechecks the same state after database and Console restarts.
 Results will be registered only after hosted execution. Existing database-role and
 cross-service denials still apply; no additional database network access is granted.
+
+The image-only HTML probe has no network or database by design. It first asserts
+the production database defaults, then explicitly uses array storage solely for
+markup/assets. The first image check at `715c242` correctly failed when this test
+adapter still assumed file sessions. Package/browser checks passed; this probe
+correction does not change the deployed database requirement.
