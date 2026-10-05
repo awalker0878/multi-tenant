@@ -13,7 +13,7 @@
       "purpose": "Server only; explicit schema administration runs in a separate one-shot identity"
     },
     "mc": {
-      "candidate": "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z",
+      "candidate": "docker.io/minio/mc:RELEASE.2025-08-13T08-35-41Z",
       "source": "https://github.com/minio/mc/releases/tag/RELEASE.2025-08-13T08-35-41Z"
     },
     "golang": {

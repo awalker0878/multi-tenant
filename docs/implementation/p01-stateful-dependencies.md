@@ -56,3 +56,9 @@ exist. The upstream docker-builds project deprecates auto-setup. The corrected
 candidates use the supported server/admin-tools images separately. This failure is
 not an installation or authorization pass. Resolver commands now retain both output
 streams and exit status, including failed commands.
+
+Run [37250759053](https://github.com/awalker0878/multi-tenant/actions/runs/37250759053)
+resolved the supported Temporal server image, then the MinIO client Quay endpoint
+returned HTTP 401. The client candidate now uses the Docker Hub repository linked
+by the [upstream client guide](https://github.com/minio/mc#docker-container).
+No credentials were added and no registry authentication was bypassed.
