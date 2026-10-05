@@ -73,6 +73,7 @@ phases:
   - EV-P01-009
   - EV-P01-010
   - EV-P01-011
+  - EV-P01-012
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -514,6 +515,7 @@ work_packages:
   - EV-P01-008
   - EV-P01-010
   - EV-P01-011
+  - EV-P01-012
   blocker_ids: []
   dependency_package_ids: []
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
@@ -552,6 +554,7 @@ work_packages:
   evidence_ids:
   - EV-P01-010
   - EV-P01-011
+  - EV-P01-012
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -638,6 +641,7 @@ work_packages:
   evidence_ids:
   - EV-P01-010
   - EV-P01-011
+  - EV-P01-012
   blocker_ids:
   - BL-P00-001
   dependency_package_ids: []
@@ -663,6 +667,7 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-011
+  - EV-P01-012
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -1732,6 +1737,7 @@ requirements:
   - EV-P01-009
   - EV-P01-010
   - EV-P01-011
+  - EV-P01-012
   blocker_ids: []
 - id: R03
   package_ids:
@@ -2876,6 +2882,7 @@ gates:
   - EV-P01-009
   - EV-P01-010
   - EV-P01-011
+  - EV-P01-012
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -3695,6 +3702,67 @@ evidence:
     backup restoration. No alert receipt, failed-deployment recovery, operated deployment, signed promotion
     or independent gate acceptance. Kubernetes is a separate measured campaign. P01 packages and G01 remain
     open.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-012
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/08aab461490849f1e1f9c2874049c4d45796d75b/verification/p01/kubernetes/run-37247300531/retrieval.json
+  sha256: 3d20b5870354562f4c31230551bf7d2da73e21a38112e3e240421ba6be9455c0
+  source_revision: c9c202786437601c0f000bdf29d7e1e401e773ee
+  artifact_revisions:
+    retained_artifact_commit: 08aab461490849f1e1f9c2874049c4d45796d75b
+    workflow_run_id: 37247300531
+    workflow_conclusion: success
+    report_sha256: 5b408da22cc067f4a3ec95d6ae622ef74059dcd1507a6259b9cdce04957dafb8
+    migration_observations_uri: https://github.com/awalker0878/multi-tenant/blob/08aab461490849f1e1f9c2874049c4d45796d75b/verification/p01/kubernetes/run-37247300531/migration-observations.json
+    migration_observations_sha256: 99e27766259704ef0ebcb94f468c6811a2083e466c2bee7ea6c3e68a137130da
+    supporting_replay_artifact_commit: 60423fa2639a14026f59d5aaf75ce23011174fb3
+    package_workflow_run_id: 37247300537
+    package_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/60423fa2639a14026f59d5aaf75ce23011174fb3/verification/p01/packages/run-37247300537/retrieval.json
+    package_retrieval_sha256: 8518ef1ef29d4da137c97a558aaeec066b4ce96d044151b9eaeaf7819e4ccf68
+    image_workflow_run_id: 37247300526
+    image_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/60423fa2639a14026f59d5aaf75ce23011174fb3/verification/p01/images/run-37247300526/retrieval.json
+    image_retrieval_sha256: 0b78d0371681f597c91949764afabb09295e22003b4f2d089f9b081bbb67b4b4
+    compose_workflow_run_id: 37247300528
+    compose_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/60423fa2639a14026f59d5aaf75ce23011174fb3/verification/p01/local/run-37247300528/retrieval.json
+    compose_retrieval_sha256: be8300dbe742093915a89307f432d238b709ec779541ede8ad2682da603b5de8
+    earlier_contract_failure_run_id: 37245679773
+    earlier_contract_failure_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/2a024a7848bcc575213c0b98f3fa6b391e4b6300/verification/p01/kubernetes/run-37245679773/retrieval.json
+    earlier_timeout_failure_run_id: 37246349799
+    earlier_timeout_failure_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/5dec1016aa5737d7728f31094efcfbfcec3f3dd4/verification/p01/kubernetes/run-37246349799/retrieval.json
+    earlier_timeout_failure_retrieval_sha256: cb4f90441d7669810547bfce1367f378b9443e34af2158a8458664b172ee3088
+    implementation_record: docs/implementation/p01-runtime-integration.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; isolated two-node kind v0.33.0/Kubernetes v1.36.4
+    with locked Cilium 1.20.2 chart/image inputs; private synthetic namespace, credentials, TLS PostgreSQL
+    PVC and seven exact-source application/proxy pairs
+  scope: Kubernetes passed 157 checks and 315 installation command outcomes plus seven embedded image
+    campaigns; retrieval verifies 762 command-log hashes and 200 unique source bindings. Actual Cilium
+    policy permits eight tested connections and denies fifteen tested connections. Seven migration Job
+    outputs identify owned database/migrator/schema version 1. Authenticated health, TLS and runtime database
+    authority checks pass. Governance login revocation/restoration is measured. During database outage
+    all seven direct probes fail within 2.129–2.286 seconds against a five-second bound; after PostgreSQL
+    recreation the seven services recover and fourteen raw before/after SQL outputs confirm identical
+    fixture data. Cleanup completes. At the same corrected source all nine package/image campaigns and
+    all 126 Compose checks pass, including real stalled-TLS regressions for four PHP services. Earlier
+    contract-assertion and PDO timeout failures remain retained separately.
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  - G01.02
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T00:29:48Z'
+  observer: GitHub Actions — isolated Kubernetes and corrective package/image/Compose campaigns
+  reviewer: Codex — archive, immutable source, log, migration identity, bounded-probe and actual before/after
+    fixture-output examination
+  limitations: Synthetic foundation scope only. Product readiness remains unavailable; workers consume
+    no tasks and native endpoints/effects are absent. Measured pod-network paths do not establish tenant
+    authorization, full network-policy coverage or operated cluster security. Kubernetes outage observations
+    execute the actual probe directly because unready application Service endpoints are removed. Same-PVC
+    restart is not backup restoration. Full Permit Desk application/configuration fixture, additional
+    secret/schema/network faults, established-socket/DNS failure bounds, broker/Temporal/evidence store,
+    alert receipt, independent deployment recovery, signing/promotion and operating/gate acceptance remain
+    outstanding. G01 remains unreviewed.
   valid_until: null
   invalidated_at: null
 blockers:

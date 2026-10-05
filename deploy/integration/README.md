@@ -3,8 +3,9 @@
 P01.02/P01.05 candidate renderer for the same seven applications, nginx public-root
 proxies and PostgreSQL identities as the [local fixture](../local/README.md).
 Rendering or passing the static boundary tests is **not** installation evidence.
-The first campaign installed Cilium and the application foundations, then failed
-an application health-contract assertion; a passing campaign remains pending.
+The [runtime integration record](../../docs/implementation/p01-runtime-integration.md)
+retains the passing campaign at source `c9c202786437601c0f000bdf29d7e1e401e773ee`
+and both earlier failures. Each result is limited to its measured source and scope.
 This fixture does not select an operated Kubernetes distribution, CNI, PKI, storage
 or secret provider.
 
@@ -121,7 +122,7 @@ or trusted promotion evidence.
 | `images/<service>/` and build-runner logs | Per-image build/verification evidence when the campaign performs the builds |
 | Six non-secret generated JSON manifests | Namespace, resources, migrations, kind configuration, image-import map and rendered fixture scope |
 | `cilium-observed-lock.json` and chart-render logs | Actual archive/OCI identity and rendered image references |
-| Pod/policy inventories and bounded container logs | Installed resource/image observations and up to 200 lines per captured application, proxy and PostgreSQL deployment |
+| Pod/policy inventories and bounded container logs | Installed resource/image observations and bounded application, proxy, PostgreSQL and migrator Job logs |
 
 The runner does not copy `secrets.json`, mounted secrets, CA private key or its
 kubeconfig to the evidence directory. Diagnostic Pods mount only their owning
@@ -130,8 +131,8 @@ inside containers instead of being passed in recorded command arguments. The
 collector retains raw command output, so these exclusions are not a general-purpose
 log redactor; retained outputs still require review before publication.
 
-Normal completion and handled failures enter cleanup. Failure to collect a
-deployment's logs is recorded and does not prevent attempting deletion of the
+Normal completion and handled failures enter cleanup. Failure to collect
+deployment or migrator Job logs is recorded and does not prevent attempting deletion of the
 uniquely named owned kind cluster. Successful deletion records `cleanup_complete`
 and removes the private parent directory, including credentials and kubeconfig.
 If cluster deletion fails, the campaign changes the result to `FAIL`, records
@@ -206,10 +207,10 @@ operated identity custody, promotion admission or G01 pass is established here.
 
 ## Current campaign coverage and remaining integration work
 
-The implemented campaign attempts authenticated dependency health, anonymous and
+The implemented campaign measures authenticated dependency health, anonymous and
 invalid-token denial, process liveness, unavailable product readiness, wrong CA,
 foreign Host and protected-source-path checks for all seven applications. It
-attempts runtime DML rollback plus DDL, migration-metadata-write, owner-role,
+measures runtime DML rollback plus DDL, migration-metadata-write, owner-role,
 foreign-database, plaintext and bad-password denials. These SQL checks deliberately
 run over PostgreSQL's loopback interface to isolate authentication/authorization
 from the separate Cilium tests.
@@ -219,22 +220,20 @@ timing out against a foreign proxy and PostgreSQL, plus the Planning application
 allowed PostgreSQL connection and denied Governance application connection.
 Connection refusal or DNS failure does not count as a policy denial. Revoking the
 Governance runtime login must fail its direct dependency probe; restoring login
-must recover it. Scaling PostgreSQL down must fail every direct dependency probe
+must recover it. Every directly executed dependency probe must finish within five
+seconds; the retained passing run measures the database-outage probes in 2.129–2.286
+seconds. Scaling PostgreSQL down must fail every direct dependency probe
 while application processes remain live; restarting it must recover health and
 preserve the ordered fixture-data hashes on its existing PVC. Kubernetes removes
 unready application endpoints, so a proxy error during this outage is distinct
 from a directly observed application dependency response.
 
-A passing campaign result is pending after the first failed attempt. Even a
-passing result for this implemented scope leaves the following work separate:
-
-- Retain migrator Job output showing the authenticated session identity and applied
-  version. The current runner waits for Job completion but does not capture those
-  Job logs as its deployment-log cleanup step.
+The passing campaign and retained migrator identity/version observations cover the
+implemented scope. The following work remains separate:
 - Measure schema-version mismatch and missing secret/key behavior in Kubernetes,
   migration replay/backfill behavior and the additional network paths specified
   above: proxy-to-database, probe-to-direct-app and undesignated Pod-to-proxy.
-- Measure replay of the now-locked Cilium chart and complete the operated trust, DNS/PKI,
+- Complete the operated trust, DNS/PKI,
   storage, secret-custody and registry/provider inputs when that environment is
   selected. The fixture's Kubernetes ServiceAccount names are not product identity.
 - Complete broker/outbox/inbox semantics, Temporal and worker integration, protected

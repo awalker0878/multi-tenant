@@ -12,6 +12,16 @@ Procedure ID: OPS-INSTALL. Owner: SRE; contributors: IAM/security, context owner
 
 Keep new native admission disabled and mutating worker pools isolated throughout D01–D07. Readiness includes denied paths and safe failure, not just a successful connection.
 
+The disposable P01 foundation has concrete [Compose](../../../deploy/local/README.md)
+and [kind/Cilium](../../../deploy/integration/README.md) campaign bindings. Both use a
+clean source revision, seven owned application images, private synthetic credentials
+and their own isolated runtime. The [runtime integration record](../../implementation/p01-runtime-integration.md)
+binds actual results and limitations to immutable evidence. These campaigns exercise
+selected installation, identity and restart boundaries; they do not complete D01–D07,
+the full Permit Desk fixture, backup restoration or operated installation acceptance.
+Their authenticated dependency diagnostic is separate from product readiness, which
+remains unavailable until the product journey's required behavior is implemented.
+
 ## Installation sequence
 
 | Stage | Operator action | Expected observation and hold condition |

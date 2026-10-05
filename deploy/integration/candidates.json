@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "scope": "Synthetic isolated kind integration; first installation observed, complete policy campaign and operating qualification remain pending",
+  "scope": "Synthetic isolated kind integration inputs; measured campaign results are recorded separately and do not establish operating qualification",
   "platform": "linux/amd64",
   "kind": {
     "version": "v0.33.0",
@@ -37,7 +37,12 @@
     },
     "source": "https://docs.cilium.io/en/stable/installation/kind/",
     "compatibility_source": "https://docs.cilium.io/en/stable/network/kubernetes/compatibility/",
-    "documented_kubernetes_minors": ["1.33", "1.34", "1.35", "1.36"],
+    "documented_kubernetes_minors": [
+      "1.33",
+      "1.34",
+      "1.35",
+      "1.36"
+    ],
     "remaining": "Replay both measured chart identities, require immutable rendered images, and record installed CNI identities and measured denial behavior in a completed campaign"
   },
   "verified_sources_at": "2026-10-04"
