@@ -21,10 +21,11 @@ defineProps<{
     <section class="mt-12 rounded-2xl border border-slate-300 bg-white p-6 sm:p-8" aria-labelledby="status-heading">
       <h2 id="status-heading" class="text-xl font-semibold text-slate-950">Console foundation</h2>
       <p class="mt-3 max-w-2xl leading-7 text-slate-700">
-        This application is being built. Sign-in, tenant access and workload operations
-        are not available yet.
+        Administrators can sign in to begin installation setup. Tenant access and workload
+        operations are not available yet.
       </p>
       <p class="mt-5 text-sm font-medium text-teal-800">Development stage: {{ implementationState }}</p>
+      <a href="/login" class="mt-6 inline-block rounded-lg bg-teal-800 px-5 py-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-800">Administrator sign-in</a>
     </section>
   </main>
 </template>

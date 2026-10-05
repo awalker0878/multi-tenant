@@ -24,7 +24,7 @@ services:
     root: apps/console
     composition_only: true
     context: {id: console, source_root: apps/console/app, namespace: 'App\'}
-    host_roots: [build/download-apks.php, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, resources, public, vite.config.ts, playwright.config.ts]
+    host_roots: [build/download-apks.php, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, resources, public, vite.config.ts, playwright.config.ts, playwright.p02.config.ts]
     allowed_packages: [php-contracts, php-technical, typescript-contracts, typescript-technical]
   - id: governance
     package_name: product/governance

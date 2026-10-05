@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 
 beforeEach(function (): void {
-    // This route is registered only by the test. The product has no mutation API.
+    // This generic probe complements the actual identity-route CSRF tests.
     Route::middleware('web')->post('/_test/request-forgery', fn () => response()->noContent());
     // Laravel bypasses CSRF in its testing environment. Exercise its real branch.
     $this->app['env'] = 'csrf-check';

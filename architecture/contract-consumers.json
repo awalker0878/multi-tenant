@@ -2,13 +2,14 @@
   "schema_version": 1,
   "dependencies": {
     "catalogue": [], "planning": ["catalogue"], "inventory": [], "lifecycle": [],
-    "governance": [], "assurance": [], "console": [],
+    "governance": [], "assurance": [], "console": ["governance"],
     "inventory-workers": ["inventory"], "lifecycle-workers": ["lifecycle"]
   },
   "contracts": {
     "contracts/schemas/events/catalogue-foundation-recorded-v1.json": ["catalogue", "planning"],
     "contracts/asyncapi/catalogue.yaml": ["catalogue", "planning"],
-    "contracts/openapi/foundation-health-v1.json": ["console", "governance", "catalogue", "inventory", "planning", "lifecycle", "assurance"]
+    "contracts/openapi/foundation-health-v1.json": ["console", "governance", "catalogue", "inventory", "planning", "lifecycle", "assurance"],
+    "contracts/openapi/governance-local-identity-v1.json": ["governance", "console"]
   },
-  "scope": "Implemented foundation consumers only. The Planning projection consumes Catalogue reference facts. Diagnostics are owned by all seven applications; no business dependency or shared SQL authority is implied."
+  "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs. Diagnostics are owned by all seven applications. No shared SQL authority is implied."
 }

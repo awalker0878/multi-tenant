@@ -1,0 +1,34 @@
+import { readFileSync } from 'node:fs';
+import { expect, test } from '@playwright/test';
+
+test('deployment credential requires a change, survives reload and cannot be reused', async ({ page }) => {
+  const path = process.env.P02_BOOTSTRAP_FILE;
+  if (!path) throw new Error('The isolated P02 runner must supply its private credential fixture.');
+  const credential = JSON.parse(readFileSync(path, 'utf8')) as { temporary: string; replacement: string };
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/setup');
+  await expect(page).toHaveURL(/\/login$/);
+  await page.getByLabel('Password', { exact: true }).fill(credential.temporary);
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Change your password' })).toBeVisible();
+  await page.goto('/setup');
+  await expect(page).toHaveURL(/\/password$/);
+  await page.getByLabel('Current password', { exact: true }).fill(credential.temporary);
+  await page.getByLabel('New password', { exact: true }).fill(credential.replacement);
+  await page.getByLabel('Confirm new password', { exact: true }).fill(credential.replacement);
+  await page.getByRole('button', { name: 'Change password', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Installation setup' })).toBeVisible();
+  await page.reload();
+  await expect(page.getByText('Changed', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Sign out' }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await page.getByLabel('Password', { exact: true }).fill(credential.temporary);
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('could not be verified');
+  await expect(page.getByLabel('Password', { exact: true })).toBeEmpty();
+  await page.getByLabel('Password', { exact: true }).fill(credential.replacement);
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Installation setup' })).toBeVisible();
+  expect(errors).toEqual([]);
+});

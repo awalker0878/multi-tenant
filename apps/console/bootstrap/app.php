@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Domain\Identity\IdentityFailure;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PageResponseHeaders;
 use App\Http\Middleware\RequestTelemetry;
+use App\Http\Middleware\RequireConsoleHost;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -17,7 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(RequestTelemetry::class);
-        $middleware->web(append: [HandleInertiaRequests::class, PageResponseHeaders::class]);
+        $middleware->web(prepend: [RequireConsoleHost::class], append: [HandleInertiaRequests::class, PageResponseHeaders::class]);
     })
-    ->withExceptions()
+    ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->dontReport([IdentityFailure::class]);
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation']);
+        $exceptions->render(function (IdentityFailure $error) {
+            return response('Sign-in is temporarily unavailable. Please try again.', $error->status, ['Cache-Control' => 'no-store, private']);
+        });
+    })
     ->create();

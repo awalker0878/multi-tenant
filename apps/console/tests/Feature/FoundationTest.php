@@ -54,6 +54,6 @@ it('requires a fresh page when the browser supplies an obsolete asset version', 
         ->assertHeader('X-Inertia-Location', route('foundation'));
 });
 
-it('exposes no authentication or workload endpoints in the foundation', function (string $path): void {
+it('exposes no registration or workload endpoints in the foundation', function (string $path): void {
     $this->get($path, ['Accept' => 'application/json'])->assertNotFound();
-})->with(['/login', '/register', '/tenants', '/workloads']);
+})->with(['/register', '/tenants', '/workloads']);

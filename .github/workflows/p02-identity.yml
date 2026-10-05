@@ -1,0 +1,69 @@
+name: P02 identity
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: ['services/governance/**', 'apps/console/**', 'contracts/openapi/governance-local-identity-v1.json', 'scripts/p02/**', '.github/workflows/p02-identity.yml']
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  identity:
+    name: Bootstrap identity PostgreSQL and browser
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d
+        env:
+          POSTGRES_PASSWORD: synthetic-p02-disposable-postgres
+          POSTGRES_DB: p02_identity_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, mbstring, openssl, pdo, pdo_pgsql, pdo_sqlite, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24.19.0'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - name: Install the two independent locked applications
+        run: |
+          for component in services/governance apps/console; do
+            mkdir -p "$component/bootstrap/cache" "$component/storage/framework/"{cache,sessions,views} "$component/storage/logs"
+            touch "$component/.env"
+            composer install --working-dir="$component" --no-scripts --no-interaction --prefer-dist --no-progress
+          done
+          npm ci --prefix apps/console --ignore-scripts --no-audit --no-fund
+          npm run build --prefix apps/console
+          cd apps/console
+          npx playwright install --with-deps chromium
+      - name: Exercise PostgreSQL, real deployment terminals and the compiled browser journey
+        env:
+          P02_TEST_POSTGRES: '1'
+          P02_TEST_PASSWORD: synthetic-p02-disposable-postgres
+        run: uv run --project scripts/p01/contracts --frozen python scripts/p02/verify_identity.py --output "$RUNNER_TEMP/p02-identity"
+      - name: Retain redacted exact-source evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p02-identity-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p02-identity/
+          if-no-files-found: error
+          retention-days: 14
