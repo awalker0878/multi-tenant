@@ -8,7 +8,7 @@ RUN : > /etc/apk/repositories \
     && php /tmp/service-build/download-apks.php build \
     && apk add --no-network --repositories-file /dev/null --virtual .phpize-deps /tmp/service-apks/*.apk \
     && docker-php-ext-install -j2 pdo_pgsql sockets \
-    && apk add --no-network --repositories-file /dev/null libpq=18.6-r0 \
+    && apk add --no-network --repositories-file /dev/null libpq=18.6-r0 openssl=3.5.9-r0 \
     && apk del --no-network .phpize-deps \
     && rm -rf /tmp/service-apks /tmp/service-build \
     && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"

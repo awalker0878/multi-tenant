@@ -30,6 +30,6 @@ def validate_apks(path: Path, base_reference: str) -> dict:
             raise ValueError('APK artifact identity is invalid or ambiguous')
         identities.add(package['name'])
     runtime = {packages[n]['name']: packages[n]['version'] for n in groups['runtime']}
-    if set(runtime) != {'libpq', 'libcrypto3', 'libssl3', 'musl'}:
+    if set(runtime) != {'libpq', 'libcrypto3', 'libssl3', 'musl', 'openssl'}:
         raise ValueError('Unmeasured runtime APK closure')
     return runtime

@@ -10,9 +10,9 @@
     "source_sha256": "9298a430b975ab50d7cf4ccd89f627194bacc205682f61b92ad1f8f3db65d935",
     "review": "Accepted G00 development baseline; exact observed P00 child manifests copied here so product builds do not load spike files.",
     "p01_remediation": {
-      "source_revision": "50b5362dad2ec3686fd9ce433978d081bd4e6c95",
-      "run_id": 37271464232,
-      "record": "verification/p01/image-remediation/run-37271464232/report.json",
+      "source_revision": "5de3333a1343fe4a5a1e27450787a0993908083a",
+      "run_id": 37272419641,
+      "record": "verification/p01/image-remediation/run-37272419641/report.json",
       "note": "Exact clear base candidates; full rebuilt-image/runtime results are required for development admission. No operated qualification implied."
     }
   },
@@ -55,12 +55,13 @@
     "distribution": "alpine",
     "release": "3.24.2",
     "libc": "musl",
-    "apk_lock_sha256": "f56bbc81a4200cf975eb73c764357609e49c30d81a120c5321e1517b1eed485a",
+    "apk_lock_sha256": "14155c25ff67dd47b7b4168ce9c0caf8c32cfe5ed4b0b65f796ac4c6904a7259",
     "php_runtime_packages": {
       "libcrypto3": "3.5.9-r0",
       "libpq": "18.6-r0",
       "libssl3": "3.5.9-r0",
-      "musl": "1.2.6-r2"
+      "musl": "1.2.6-r2",
+      "openssl": "3.5.9-r0"
     }
   }
 }

@@ -20,7 +20,7 @@ class AlpineInputsTest(unittest.TestCase):
             return validate_apks(path, base or self.lock['base_reference'])
 
     def test_exact_runtime_closure(self):
-        self.assertEqual(set(self.check(self.lock)), {'musl', 'libpq', 'libcrypto3', 'libssl3'})
+        self.assertEqual(set(self.check(self.lock)), {'musl', 'libpq', 'libcrypto3', 'libssl3', 'openssl'})
 
     def test_wrong_base_or_platform(self):
         with self.assertRaises(ValueError):
