@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Application\Identity\Actions\BootstrapAdministrator;
 use App\Application\Identity\Contracts\OidcHttpTransport;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\Support\SyntheticOidcTransport;
 
@@ -55,6 +56,11 @@ function initializeIdentityFixture(object $test): void
     chmod($test->credentialFile, 0600);
     config(['identity.console_credential_file' => $test->credentialFile]);
     $test->withHeader('Authorization', 'Bearer '.$test->workload);
+    $test->admissionFile = tempnam(sys_get_temp_dir(), 'p02-admission-');
+    $test->admission = ['version' => 1, 'installation_id' => (string) Str::uuid(), 'epoch' => bin2hex(random_bytes(32)), 'state' => 'active', 'bootstrap_allowed' => true];
+    file_put_contents($test->admissionFile, json_encode($test->admission));
+    chmod($test->admissionFile, 0600);
+    config(['identity.admission_file' => $test->admissionFile]);
     $test->temporary = app(BootstrapAdministrator::class)->handle();
 }
 

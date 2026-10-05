@@ -130,8 +130,8 @@ it('continues delivery after federation retirement and session revocation withou
 it('denies invalid batch limits and keeps schemata byte-identical', function (): void {
     $this->artisan('identity:publish-outbox --limit=0')->assertExitCode(1);
     $this->artisan('identity:publish-outbox --limit=501')->assertExitCode(1);
-    expect(file_get_contents(resource_path('contracts/identity-change-v1.json')))
-        ->toBe(file_get_contents(base_path('../../contracts/schemas/events/identity-change-v1.json')));
+    expect(hash_file('sha256', resource_path('contracts/identity-change-v1.json')))
+        ->toBe('3e29ad64056f83e5738f09adb241bd9b4faeb00450101d27dba9b25d123946f4');
 });
 
 it('encodes every supported identity event using internal attribution only', function (string $event, string $actor): void {

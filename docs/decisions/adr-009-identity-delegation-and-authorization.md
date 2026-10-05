@@ -69,3 +69,8 @@ Provider scope, trust, revocation guarantees, administrative delegation or the c
 - [Governance](../services/governance.md) and [console](../services/console.md) — ownership and user behaviour.
 - [Identity and trust](../operations/identity-and-trust.md) and [installation](../operations/runbooks/install.md) — credential lifecycle and operating procedure.
 - [P02](../implementation/phases/p02.md) and [Q01](../qualification/campaigns/q01-contract-and-tenancy.md) — implementation and acceptance.
+
+The [identity recovery admission increment](../implementation/p02-identity-recovery.md) implements external
+generation checks and the no-automatic-rebind boundary. Current custody must be
+held and rotated before stale restore; actual independent custody and receiving
+acceptance remain required.

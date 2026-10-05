@@ -131,3 +131,9 @@ Apply the ordered migration before starting the extended consumer. The deployed
 queue must include the exact identity bindings; no wildcard or extra broker
 privilege is required. Source-bound local/hosted observations must be retained
 before this new increment is described as qualified.
+
+The first installation-consumer campaign exposed a fixture defect: replaying only
+Governance migration 001 revoked the later outbox delivery-column grants. The
+corrected campaign replays the complete ordered migrations and retains the original
+failure. Isolated-package tests compare the frozen schema digest without reading
+outside their owned package; integration separately checks published/schema bytes.

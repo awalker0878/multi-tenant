@@ -10,8 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 final class ResolveLocalSession
 {
+    public function __construct(private readonly CheckIdentityAdmission $admission) {}
+
     public function handle(#[\SensitiveParameter] string $token, bool $requireSetup = false): LocalIdentity
     {
+        $this->admission->handle();
         if (! preg_match('/\A[0-9a-f]{64}\z/', $token)) {
             throw new IdentityDenied('invalid_session');
         }

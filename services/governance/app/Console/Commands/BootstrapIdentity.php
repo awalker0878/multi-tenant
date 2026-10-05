@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Application\Identity\Actions\BootstrapAdministrator;
 use App\Application\Identity\Contracts\DeploymentTerminal;
+use App\Domain\Identity\IdentityDenied;
 use Illuminate\Console\Command;
 
 final class BootstrapIdentity extends Command
@@ -30,7 +31,13 @@ final class BootstrapIdentity extends Command
 
             return self::FAILURE;
         }
-        $temporary = $bootstrap->handle();
+        try {
+            $temporary = $bootstrap->handle();
+        } catch (IdentityDenied) {
+            $this->error('Identity admission is held. Reconcile deployment custody before bootstrap.');
+
+            return self::FAILURE;
+        }
         if ($temporary === null) {
             $this->info('Bootstrap is already complete. No account or credential was changed.');
 

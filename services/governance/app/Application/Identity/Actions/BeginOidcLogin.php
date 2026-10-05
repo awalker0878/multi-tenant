@@ -13,11 +13,12 @@ use Illuminate\Support\Facades\DB;
 
 final class BeginOidcLogin
 {
-    public function __construct(private readonly ResolveIdentitySession $resolve, private readonly OidcProvider $provider) {}
+    public function __construct(private readonly ResolveIdentitySession $resolve, private readonly OidcProvider $provider, private readonly CheckIdentityAdmission $admission) {}
 
     /** @return array{authorization_url: string} */
     public function handle(string $purpose, #[\SensitiveParameter] string $browser, #[\SensitiveParameter] string $token = ''): array
     {
+        $this->admission->handle();
         $connection = DB::transaction(function () use ($purpose, $token): OidcConnection {
             BootstrapAdministrator::query()->lockForUpdate()->findOrFail(1);
             if ($purpose === 'setup') {

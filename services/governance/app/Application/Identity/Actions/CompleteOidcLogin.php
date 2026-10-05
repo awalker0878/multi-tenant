@@ -17,11 +17,12 @@ use Illuminate\Support\Str;
 
 final class CompleteOidcLogin
 {
-    public function __construct(private readonly ResolveIdentitySession $resolve, private readonly OidcProvider $provider, private readonly IssueFederatedSession $sessions) {}
+    public function __construct(private readonly ResolveIdentitySession $resolve, private readonly OidcProvider $provider, private readonly IssueFederatedSession $sessions, private readonly CheckIdentityAdmission $admission) {}
 
     /** @return SessionCredentials|array{verification_token: string, revision: int, subject: string} */
     public function handle(#[\SensitiveParameter] string $state, #[\SensitiveParameter] string $browser, #[\SensitiveParameter] string $code, #[\SensitiveParameter] string $token = ''): SessionCredentials|array
     {
+        $this->admission->handle();
         // Consume before remote I/O. An interrupted or failed exchange cannot be replayed.
         $flow = DB::transaction(function () use ($state, $browser, $token): \stdClass {
             BootstrapAdministrator::query()->lockForUpdate()->findOrFail(1);
@@ -30,6 +31,7 @@ final class CompleteOidcLogin
                 || ! hash_equals($flow->browser_hash, hash('sha256', $browser))) {
                 throw new IdentityDenied('invalid_oidc_flow');
             }
+            $this->admission->handle();
             $this->checkCurrent($flow, $token);
             DB::table('app.oidc_flows')->where('state_hash', $flow->state_hash)->update(['consumed_at' => now()]);
 
@@ -42,6 +44,7 @@ final class CompleteOidcLogin
         return DB::transaction(function () use ($flow, $connection, $verified, $token): SessionCredentials|array {
             BootstrapAdministrator::query()->lockForUpdate()->findOrFail(1);
             DB::table('app.oidc_installation')->where('id', 1)->lockForUpdate()->first();
+            $this->admission->handle();
             $this->checkCurrent($flow, $token);
             if ($verified['expires_at'] <= now()->getTimestamp() || ($flow->purpose === 'setup' && $verified['subject'] !== $connection->administrator_subject)) {
                 throw new IdentityDenied('administrator_not_verified', 403);

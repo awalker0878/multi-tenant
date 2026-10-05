@@ -15,13 +15,15 @@ use Illuminate\Support\Facades\DB;
 
 final class InspectActorDelegation
 {
-    public function __construct(private readonly AuthorizeTenant $authority, private readonly ServiceCredentials $credentials) {}
+    public function __construct(private readonly AuthorizeTenant $authority, private readonly ServiceCredentials $credentials, private readonly CheckIdentityAdmission $admission) {}
 
     /** @param array{site_id: ?string, environment: ?string, resource_id: ?string} $scope
      * @return array<string, mixed>
      */
     public function handle(string $audience, #[\SensitiveParameter] string $token, string $tenant, string $action, array $scope): array
     {
+        $this->admission->handle();
+
         return DB::transaction(function () use ($audience, $token, $tenant, $action, $scope): array {
             BootstrapAdministrator::query()->lockForUpdate()->findOrFail(1);
             if (! preg_match('/\A[0-9a-f]{64}\z/', $token)) {

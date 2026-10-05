@@ -103,6 +103,14 @@ inbox. Migration 003 and explicit identity routing extend the tenant consumer.
 The hosted campaign now covers the real identity relay, a second setup tab and
 secret clearing on explicit refresh. Retain the changed-source outcomes separately.
 
+**Current continuation — recovery admission.** Governance now checks an external
+installation/recovery generation at user and service admission. Missing, held or
+mismatched custody denies access; bootstrap cannot bind an initialized or restored
+installation automatically. [The recovery increment](docs/implementation/p02-identity-recovery.md)
+defines the mandatory external hold/rotation procedure and its limits. The hosted
+campaign adds process restart, complete application-schema restore and stale
+bootstrap quarantine. Retain actual results before treating these checks as passed.
+
 **Immediate verification:** retrieve Firefox/WebKit from directory run
 `37374667414`, then retain the affected foundation and event regressions.
 [The follow-up snapshot](verification/p02/directory-hosted-followup.json)

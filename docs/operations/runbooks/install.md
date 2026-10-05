@@ -114,3 +114,16 @@ The [tenant/approval increment](../../implementation/p02-tenancy-and-approvals.m
 records new runtime role restrictions and recovery obligations. Disposable
 PostgreSQL/browser evidence does not qualify all supported deployment migrations,
 restore reconciliation, receiving inputs or promotion.
+
+## P02 identity admission prerequisite
+
+Apply all Governance migrations in order, including 009. Provision the externally
+controlled descriptor and read-only mount defined in
+[identity recovery admission](../../implementation/p02-identity-recovery.md).
+Only a new empty installation receives explicit initial bootstrap permission;
+withdraw it after initial deployment. Never copy a descriptor from a database
+backup, reset its epoch on retry, or silently bind an existing installation.
+Before restore, hold admission, install a fresh recovery epoch and drain requests.
+Current retirement/revocation reconciliation and an accountable rebind procedure
+are required before restored authority may resume. Missing custody safely holds
+identity access while liveness and diagnostic investigation remain available.

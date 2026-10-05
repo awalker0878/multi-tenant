@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Application\Identity\Actions\CheckIdentityAdmission;
 use App\Application\Identity\Contracts\ConsoleCredential;
 use App\Domain\Identity\IdentityDenied;
 use Closure;
@@ -12,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class AuthenticateConsole
 {
-    public function __construct(private readonly ConsoleCredential $credential) {}
+    public function __construct(private readonly ConsoleCredential $credential, private readonly CheckIdentityAdmission $admission) {}
 
     /** @param Closure(Request): Response $next */
     public function handle(Request $request, Closure $next): Response
@@ -22,6 +23,7 @@ final class AuthenticateConsole
             || ! $this->credential->accepts($matches[1])) {
             throw new IdentityDenied('invalid_workload_identity');
         }
+        $this->admission->handle();
         $response = $next($request);
         $response->headers->set('Cache-Control', 'no-store, private');
 

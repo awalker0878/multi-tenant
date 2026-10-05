@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Application\Identity\Actions\CheckIdentityAdmission;
 use App\Application\Identity\Contracts\ServiceCredentials;
 use App\Domain\Identity\IdentityDenied;
 use Closure;
@@ -12,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class AuthenticateService
 {
-    public function __construct(private readonly ServiceCredentials $credentials) {}
+    public function __construct(private readonly ServiceCredentials $credentials, private readonly CheckIdentityAdmission $admission) {}
 
     /** @param Closure(Request): Response $next */
     public function handle(Request $request, Closure $next): Response
@@ -23,6 +24,7 @@ final class AuthenticateService
             throw new IdentityDenied('invalid_workload_identity');
         }
         $request->attributes->set('verified_service', $this->credentials->authenticate($matches[1]));
+        $this->admission->handle();
         $response = $next($request);
         $response->headers->set('Cache-Control', 'no-store, private');
 

@@ -13,10 +13,11 @@ use Illuminate\Support\Facades\Hash;
 
 final class LoginLocalAdministrator
 {
-    public function __construct(private readonly IssueLocalSession $sessions) {}
+    public function __construct(private readonly IssueLocalSession $sessions, private readonly CheckIdentityAdmission $admission) {}
 
     public function handle(string $username, #[\SensitiveParameter] string $password): SessionCredentials
     {
+        $this->admission->handle();
         // Return denials from the transaction so failed-attempt state is committed.
         $result = DB::transaction(function () use ($username, $password): SessionCredentials|IdentityDenied {
             $administrator = BootstrapAdministrator::query()->lockForUpdate()->findOrFail(1);

@@ -80,5 +80,5 @@ it('checks current installation ownership before revealing a hint', function (in
 
 it('packages the identity schema without editing its published bytes', function (): void {
     expect(hash_file('sha256', resource_path('contracts/identity-change-v1.json')))
-        ->toBe(hash_file('sha256', base_path('../../contracts/schemas/events/identity-change-v1.json')));
+        ->toBe('3e29ad64056f83e5738f09adb241bd9b4faeb00450101d27dba9b25d123946f4');
 });

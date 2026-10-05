@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return [
     // Workload trust is deployment-owned. OIDC provider settings are application data.
+    'admission_file' => env('GOVERNANCE_IDENTITY_ADMISSION_FILE'),
     'console_credential_file' => env('CONSOLE_CREDENTIAL_FILE'),
     'service_credentials' => [
         'catalogue' => env('CATALOGUE_GOVERNANCE_CREDENTIAL_FILE'),

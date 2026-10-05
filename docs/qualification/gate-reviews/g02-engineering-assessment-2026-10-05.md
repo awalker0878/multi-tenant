@@ -95,3 +95,13 @@ bindings at the same implementation revision. Firefox/WebKit remain queued in th
 EV-P02-014 retains the separate Firefox consumer pass at `b13996d`; the same-source
 WebKit failure remains, with the correction and later-source reruns tracked
 independently. These records do not pass G02 or replace actual receiving inputs.
+
+## Current recovery boundary
+
+The [identity admission increment](../../implementation/p02-identity-recovery.md)
+adds a required external generation check and stale-restore quarantine campaign.
+It does not supply actual independent custody or a recovery/rebind approval. The
+[installation consumer](../../implementation/p02-console-notifications.md) now
+covers installation identity notifications with current owner authorization.
+Changed-source hosted outcomes, correction history and source-bound evidence must
+be retained separately from the earlier three-browser directory results.

@@ -11,11 +11,14 @@ use Illuminate\Support\Facades\Hash;
 
 final class BootstrapAdministrator
 {
+    public function __construct(private readonly CheckIdentityAdmission $admission) {}
+
     // The only plaintext return is consumed by the protected deployment terminal.
     public function handle(): ?string
     {
         return DB::transaction(function (): ?string {
             $administrator = Administrator::query()->lockForUpdate()->findOrFail(1);
+            $this->admission->handle(initialize: true);
             if ($administrator->state !== 'uninitialized') {
                 return null;
             }

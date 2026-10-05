@@ -26,6 +26,7 @@ import urllib.error
 
 from synthetic_oidc import SyntheticOidc
 from notification_fixture import NotificationBroker, NotificationPump
+from recovery_fixture import IdentityRecovery
 
 from openapi_schema_validator import OAS31Validator
 from openapi_spec_validator import validate_spec
@@ -88,7 +89,7 @@ def main() -> int:
         os.close(slave)
         return process, master
 
-    def receive(pair: tuple[subprocess.Popen, int]) -> str:
+    def receive(pair: tuple[subprocess.Popen, int], expected: int = 0) -> str:
         process, master = pair
         result = b''
         deadline = time.monotonic() + 20
@@ -104,7 +105,7 @@ def main() -> int:
                     result += chunk
                 elif process.poll() is not None:
                     break
-            check('interactive-bootstrap-command-success', process.wait(timeout=2) == 0)
+            check('interactive-bootstrap-command-exit-' + str(expected), process.wait(timeout=2) == expected)
         finally:
             os.close(master)
             if process.poll() is None:
@@ -123,7 +124,7 @@ def main() -> int:
         report['postgres'] = sql('SHOW server_version;').strip()
         report['node'] = run(['node', '--version']).strip()
         check('exact-php-runtime', report['php'] == '8.5.11')
-        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
+        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/IdentityAdmissionTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
         check('postgres-feature-suite', True)
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:
@@ -166,6 +167,10 @@ def main() -> int:
             credential_file = private_path / 'console-identity'
             credential_file.write_text(credential)
             credential_file.chmod(0o600)
+            admission_file = private_path / 'identity-admission.json'
+            admission = {'version': 1, 'installation_id': '550e8400-e29b-41d4-a716-446655440099', 'epoch': secrets.token_hex(32), 'state': 'active', 'bootstrap_allowed': True}
+            admission_file.write_text(json.dumps(admission))
+            admission_file.chmod(0o600)
             environments = {}
             for name, directory in [('governance', 'services/governance'), ('console', 'apps/console')]:
                 runtime_password, migration_password = secrets.token_hex(32), secrets.token_hex(32)
@@ -183,6 +188,7 @@ def main() -> int:
                 key = 'base64:' + base64.b64encode(secrets.token_bytes(32)).decode()
                 private_values.append(key)
                 environments[name] = os.environ | broker.environment | {'APP_ENV': 'p02-verification', 'APP_DEBUG': 'false', 'APP_KEY': key,
+                    'GOVERNANCE_IDENTITY_ADMISSION_FILE': str(admission_file),
                     'APP_URL': f'http://127.0.0.1:{8032 if name == "governance" else 8031}',
                     'DB_HOST': '127.0.0.1', 'DB_PORT': '5432', 'DB_DATABASE': name, 'DB_USERNAME': f'{name}_runtime',
                     'DB_PASSWORD': runtime_password, 'DB_PASSWORD_FILE': str(password_file), 'DB_SSLMODE': 'verify-full', 'DB_SSLROOTCERT': str(certificate), 'CONSOLE_CREDENTIAL_FILE': str(credential_file),
@@ -205,7 +211,8 @@ def main() -> int:
             temporary = passwords[0]
             check('one-bootstrap-event-and-outbox', sql("SELECT (SELECT count(*) FROM app.identity_audit WHERE event='identity.bootstrap.created') || ':' || (SELECT count(*) FROM app.identity_outbox);", 'governance').strip() == '1:1')
             before = sql('SELECT password_hash FROM app.bootstrap_administrator;', 'governance').strip()
-            sql((gov / 'database/migrations/001_identity.sql').read_text(), 'governance')
+            for migration in sorted((gov / 'database/migrations').glob('*.sql')):
+                sql(migration.read_text(), 'governance')
             check('migration-replay-preserves-credential', sql('SELECT password_hash FROM app.bootstrap_administrator;', 'governance').strip() == before)
             replay = receive(terminal(environments['governance'], gov))
             check('fresh-process-retry-does-not-redisplay', 'Temporary password:' not in replay and 'already complete' in replay)
@@ -219,25 +226,34 @@ def main() -> int:
             fixture = private_path / 'bootstrap.json'
             fixture.write_text(json.dumps({'temporary': temporary, 'replacement': replacement, 'provider': provider.fixture()}))
             fixture.chmod(0o600)
-            for name, directory in [('governance', gov), ('console', root / 'apps/console')]:
-                port = 8032 if name == 'governance' else 8031
-                handle = (private_path / f'{name}.log').open('wb')
-                handles.append(handle)
-                router = directory / 'vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php'
-                process = subprocess.Popen(['php', '-d', 'curl.cainfo=' + str(provider.certificate), '-S', f'127.0.0.1:{port}', str(router)], cwd=directory / 'public', env=environments[name], stdout=handle, stderr=subprocess.STDOUT, start_new_session=True)
-                processes.append(process)
-                deadline = time.monotonic() + 20
-                while True:
-                    try:
-                        with urllib.request.urlopen(f'http://127.0.0.1:{port}/health/live', timeout=1) as response:
-                            check(name + '-http-started', response.status == 200)
-                        break
-                    except OSError:
-                        if process.poll() is not None or time.monotonic() > deadline:
-                            log = (private_path / f'{name}.log').read_text()
-                            (output / f'{name}-http.log').write_text(redact(log))
-                            raise RuntimeError(name + ' did not start: ' + redact(log[-2000:]))
-                        time.sleep(0.1)
+            def stop_applications():
+                for process in processes:
+                    if process.poll() is None:
+                        os.killpg(process.pid, signal.SIGTERM)
+                        process.wait(timeout=10)
+                processes.clear()
+
+            def start_applications():
+                for name, directory in [('governance', gov), ('console', root / 'apps/console')]:
+                    port = 8032 if name == 'governance' else 8031
+                    handle = (private_path / f'{name}.log').open('ab')
+                    handles.append(handle)
+                    router = directory / 'vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php'
+                    process = subprocess.Popen(['php', '-d', 'curl.cainfo=' + str(provider.certificate), '-S', f'127.0.0.1:{port}', str(router)], cwd=directory / 'public', env=environments[name], stdout=handle, stderr=subprocess.STDOUT, start_new_session=True)
+                    processes.append(process)
+                    deadline = time.monotonic() + 20
+                    while True:
+                        try:
+                            with urllib.request.urlopen(f'http://127.0.0.1:{port}/health/live', timeout=1) as response:
+                                check(name + '-http-started', response.status == 200)
+                            break
+                        except OSError:
+                            if process.poll() is not None or time.monotonic() > deadline:
+                                log = (private_path / f'{name}.log').read_text()
+                                (output / f'{name}-http.log').write_text(redact(log))
+                                raise RuntimeError(name + ' did not start: ' + redact(log[-2000:]))
+                            time.sleep(0.1)
+            start_applications()
             def wire(path: str, schema: str, expected: int = 200, body: dict | None = None, token: str = '') -> dict:
                 request = urllib.request.Request('http://127.0.0.1:8032' + path,
                     data=json.dumps(body).encode() if body is not None else None,
@@ -256,6 +272,8 @@ def main() -> int:
             private_values.append(initial_session)
             wire('/identity/session', 'CurrentIdentity', token=initial_session)
             wire('/identity/setup', 'Error', expected=403, token=initial_session)
+            recovery = IdentityRecovery(container, private_path, run, sql, check)
+            recovery.capture('governance', 'governance-before-activation')
             browser_env = os.environ | {'P02_BOOTSTRAP_FILE': str(fixture), 'CONSOLE_BASE_URL': 'http://127.0.0.1:8031'}
             pump = NotificationPump(root, environments)
             pump.thread.start()
@@ -287,6 +305,8 @@ def main() -> int:
             check('reader-revocation-persisted', sql("SELECT count(*) FROM app.tenant_memberships WHERE role='reader' AND state='revoked';", 'governance').strip() == '1')
             wire('/identity/session', 'Error', expected=401, token=initial_session)
             check('audit-and-outbox-stay-paired', sql('SELECT count(*) FROM app.identity_audit a FULL JOIN app.identity_outbox o USING (id) WHERE a.id IS NULL OR o.id IS NULL;', 'governance').strip() == '0')
+            report['recovery'] = recovery.qualify(stop_applications, start_applications, wire, admission, admission_file,
+                initial_session, temporary, lambda expected=0: receive(terminal(environments['governance'], gov), expected))
             for name in ['governance', 'console']:
                 log = (private_path / f'{name}.log').read_text()
                 check(name + '-logs-exclude-credentials', all(value not in log for value in private_values + provider.private_values))
