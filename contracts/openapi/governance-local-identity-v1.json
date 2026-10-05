@@ -474,7 +474,7 @@
             "additionalProperties": false,
             "properties": {
               "state": {
-                "enum": ["not_configured", "awaiting_verification", "active"]
+                "const": "not_configured"
               }
             }
           }

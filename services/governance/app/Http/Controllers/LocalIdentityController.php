@@ -11,7 +11,6 @@ use App\Application\Identity\Actions\ResolveIdentitySession;
 use App\Application\Identity\Data\SessionCredentials;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 final class LocalIdentityController
 {
@@ -46,10 +45,7 @@ final class LocalIdentityController
 
     public function setup(Request $request): JsonResponse
     {
-        $installation = DB::table('app.oidc_installation')->where('id', 1)->first();
-        $state = $installation?->active_revision !== null ? 'active' : (($installation->latest_revision ?? 0) > 0 ? 'awaiting_verification' : 'not_configured');
-
-        return response()->json(['identity' => $request->attributes->get('local_identity')->toArray(), 'oidc' => ['state' => $state]]);
+        return response()->json(['identity' => $request->attributes->get('local_identity')->toArray(), 'oidc' => ['state' => 'not_configured']]);
     }
 
     private function sessionResponse(SessionCredentials $session): JsonResponse

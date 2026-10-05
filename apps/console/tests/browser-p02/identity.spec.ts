@@ -76,6 +76,7 @@ test('console configuration verifies HTTPS federation and enforces tenant revoca
   }
   const tenantB = await page.getByRole('link', { name: 'P02 Tenant B', exact: true }).getAttribute('href');
   await page.getByRole('link', { name: 'P02 Tenant A', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'P02 Tenant A', exact: true })).toBeVisible();
   const tenantA = new URL(page.url()).pathname;
   await page.getByLabel('Member subject', { exact: true }).fill('p02-reader');
   await page.getByRole('button', { name: 'Add membership', exact: true }).click();
