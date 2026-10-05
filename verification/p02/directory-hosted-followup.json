@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-05T21:20:20.106Z",
+  "source_revision": "5c789a1ed2a79f50611dd512855385a00b759b76",
+  "campaigns": [
+    {
+      "run_id": 37374667398,
+      "name": "P01 isolated Kubernetes integration",
+      "status": "pending",
+      "conclusion": null,
+      "head_sha": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37374667398"
+    },
+    {
+      "run_id": 37374667414,
+      "name": "P02 identity",
+      "status": "queued",
+      "conclusion": null,
+      "head_sha": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37374667414"
+    },
+    {
+      "run_id": 37374667527,
+      "name": "P02 Governance events",
+      "status": "queued",
+      "conclusion": null,
+      "head_sha": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37374667527"
+    },
+    {
+      "run_id": 37374667509,
+      "name": "P01 foundation contracts",
+      "status": "queued",
+      "conclusion": null,
+      "head_sha": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37374667509"
+    },
+    {
+      "run_id": 37374667441,
+      "name": "P01 isolated Compose integration",
+      "status": "pending",
+      "conclusion": null,
+      "head_sha": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37374667441"
+    },
+    {
+      "run_id": 37374667626,
+      "name": "P01 transactional messaging",
+      "status": "queued",
+      "conclusion": null,
+      "head_sha": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37374667626"
+    },
+    {
+      "run_id": 37374667564,
+      "name": "P01 bootstrap images",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "head_sha": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37374667564"
+    },
+    {
+      "run_id": 37374667635,
+      "name": "P01 policy controls",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37374667635"
+    },
+    {
+      "run_id": 37374667583,
+      "name": "P01 foundation packages",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "head_sha": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37374667583"
+    },
+    {
+      "run_id": 37374667578,
+      "name": "Context policy",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "head_sha": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37374667578"
+    }
+  ],
+  "identity_job_results": [
+    {
+      "run_id": 37374667414,
+      "source_revision": "5c789a1ed2a79f50611dd512855385a00b759b76",
+      "jobs": [
+        {
+          "id": 111980125538,
+          "browser": "chromium",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 111980125875,
+          "browser": "firefox",
+          "status": "queued",
+          "conclusion": null
+        },
+        {
+          "id": 111980125893,
+          "browser": "webkit",
+          "status": "queued",
+          "conclusion": null
+        }
+      ]
+    },
+    {
+      "run_id": 37373325859,
+      "source_revision": "9716803fc525bd8e8892730e5544d8ea24b005d9",
+      "jobs": [
+        {
+          "id": 111975622389,
+          "browser": "firefox",
+          "status": "completed",
+          "conclusion": "cancelled"
+        },
+        {
+          "id": 111975622719,
+          "browser": "webkit",
+          "status": "completed",
+          "conclusion": "cancelled"
+        },
+        {
+          "id": 111975622844,
+          "browser": "chromium",
+          "status": "completed",
+          "conclusion": "cancelled"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Chromium succeeds at the newer directory source; no other browser result is inferred.",
+    "Package/image cancellations remain unqualified changed-source campaigns, even when local or earlier Compose results pass.",
+    "Original directory-hosted-runs.json observations and failed WebKit source remain unchanged."
+  ]
+}
