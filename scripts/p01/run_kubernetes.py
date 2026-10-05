@@ -18,6 +18,7 @@ from kubernetes_runtime import prepare
 from local_runtime import PHP_SERVICES, SERVICES
 from run_local import Campaign, digest
 from resource_observation import PROBE as RESOURCE_PROBE
+from telemetry_campaign import FILL_PROBE
 
 
 NETWORK_PROBE = """import json,socket,sys
@@ -35,6 +36,7 @@ print(json.dumps(result))
 HTTP_PROBE = """import json,pathlib,ssl,sys,urllib.request,urllib.error
 request=json.load(sys.stdin)
 headers={}
+headers.update(request.get('headers',{}))
 if request.get('identity')=='valid':
     headers['Authorization']='Bearer '+pathlib.Path('/run/secrets/health-token').read_text().strip()
 elif request.get('identity')=='invalid':
@@ -50,7 +52,8 @@ try:
         response=error
     with response:
         print(json.dumps({'status':response.status,'body':response.read(65536).decode(),
-            'cache_control':response.headers.get('Cache-Control','')}))
+            'cache_control':response.headers.get('Cache-Control',''),
+            'telemetry':{key:response.headers.get(key) for key in ('x-trace-id','x-span-id','x-telemetry-state')}}))
 except urllib.error.URLError as error:
     if isinstance(error.reason,ssl.SSLCertVerificationError):
         print(json.dumps({'tls_verification_failed':True}))
@@ -74,6 +77,7 @@ def image_identity(raw: bytes, image: str, service: str, revision: str) -> dict:
 
 
 class KubernetesCampaign(Campaign):
+    telemetry_environment = 'p01-kubernetes'
     def __init__(self, root: Path, output: Path, revision: str):
         super().__init__(root, output, revision)
         self.cluster = "p01-" + revision[:12] + "-" + secrets.token_hex(4)
@@ -220,9 +224,20 @@ class KubernetesCampaign(Campaign):
     def admin(self, sql: str) -> bytes:
         return self.exec("postgres", ["gosu", "postgres", "psql", "-X", "-qAt", "-v", "ON_ERROR_STOP=1", "-d", "postgres"], data=sql.encode())
 
-    def http(self, service: str, path: str, *, identity: str | None = None, trust: bool = True, host: str | None = None) -> dict:
-        data = json.dumps({"url": f"https://{service}-proxy:8443" + path, "identity": identity, "trust": trust, "host": host}).encode()
+    def http(self, service: str, path: str, *, identity: str | None = None, trust: bool = True, host: str | None = None, headers=None) -> dict:
+        data = json.dumps({"url": f"https://{service}-proxy:8443" + path, "identity": identity, "trust": trust, "host": host, "headers": headers or {}}).encode()
         return json.loads(self.exec(service, ["/opt/venv/bin/python", "-I", "-c", HTTP_PROBE], data=data, role="probe"))
+
+    def telemetry_exec(self, service, argv, expected=0):
+        return self.exec(service, argv, expected=expected, timeout=20)
+
+    def telemetry_request(self, service, path, headers, authenticated):
+        result = self.http(service, path, identity='valid' if authenticated else None, headers=headers)
+        return result['status'], result['telemetry']
+
+    def telemetry_fill(self, service):
+        data = json.dumps({'url': f'https://{service}-proxy:8443/health/live'}).encode()
+        return json.loads(self.exec(service, ['/opt/venv/bin/python', '-I', '-c', FILL_PROBE], data=data, role='probe', timeout=120))
 
     def health(self, service: str, status: int, identity: str | None = "valid") -> None:
         result = self.http(service, "/health/dependencies", identity=identity)
@@ -349,6 +364,7 @@ class KubernetesCampaign(Campaign):
             self.command("proxy-ready", self.k("rollout", "status", "deployment/" + service + "-proxy", "--timeout=120s"), timeout=140)
         self.make_probes(imports)
         self.measure_resources('healthy-foundation')
+        self.measure_telemetry()
         baseline = {}
         for service in SERVICES:
             self.health(service, 200)

@@ -6,11 +6,13 @@ from collections.abc import Sequence
 import uvicorn
 
 from lifecycle.infrastructure.foundation import database_ready
+from lifecycle.infrastructure.telemetry import BoundedSignalBuffer
 from lifecycle.interfaces.http import FoundationApp
+from lifecycle.interfaces.telemetry import RequestTelemetry
 
 
-def create_app() -> FoundationApp:
-    return FoundationApp(database_ready)
+def create_app() -> RequestTelemetry:
+    return RequestTelemetry(FoundationApp(database_ready), BoundedSignalBuffer().append)
 
 
 def main(argv: Sequence[str] | None = None) -> int:

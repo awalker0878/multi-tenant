@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PageResponseHeaders;
+use App\Http\Middleware\RequestTelemetry;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -15,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(RequestTelemetry::class);
         $middleware->web(append: [HandleInertiaRequests::class, PageResponseHeaders::class]);
     })
     ->withExceptions()

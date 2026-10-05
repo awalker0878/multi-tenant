@@ -22,6 +22,7 @@ import urllib.request
 
 from local_runtime import prepare
 from alert_delivery import deliver, fixture_receiver, observed_alert
+from telemetry_campaign import TelemetryCampaign
 from resource_observation import PROBE as RESOURCE_PROBE, parse as parse_resources
 
 SERVICES = ('console', 'governance', 'catalogue', 'assurance', 'planning', 'inventory', 'lifecycle')
@@ -72,7 +73,7 @@ class ConsoleMarkup(HTMLParser):
             self.page_script = False
 
 
-class Campaign:
+class Campaign(TelemetryCampaign):
     def __init__(self, root: Path, output: Path, revision: str):
         if output == root or output.is_relative_to(root):
             raise ValueError('Evidence output must be outside the source workspace')
@@ -124,8 +125,9 @@ class Campaign:
     def admin(self, sql: str, database: str = 'postgres') -> bytes:
         return self.command('administrator-sql', self.dc('exec', '-T', '--user', 'postgres', 'postgres', 'psql', '-X', '-qAt', '-v', 'ON_ERROR_STOP=1', '-d', database), data=sql.encode(), timeout=15)
 
-    def request(self, service: str, path: str, token: str | None = None, *, context=None, host: str | None = None, max_bytes: int = 65536):
+    def request(self, service: str, path: str, token: str | None = None, *, context=None, host: str | None = None, max_bytes: int = 65536, extra_headers=None):
         headers = {} if token is None else {'Authorization': 'Bearer '+token}
+        headers.update(extra_headers or {})
         if host is not None:
             headers['Host'] = host
         request = urllib.request.Request(f'https://localhost:{self.ports[service]}{path}', headers=headers)
@@ -147,6 +149,24 @@ class Campaign:
 
     def resource_read(self, service: str) -> bytes:
         return self.command('resource-' + service, self.dc('exec', '-T', service, 'sh', '-ec', RESOURCE_PROBE), timeout=15)
+
+    def telemetry_exec(self, service, argv, expected=0):
+        return self.command('telemetry-' + service, self.dc('exec', '-T', service, *argv), expected=expected, timeout=20)
+
+    def telemetry_request(self, service, path, headers, authenticated):
+        status, _, result = self.request(service, path, self.tokens[service] if authenticated else None, extra_headers=headers)
+        return status, {key: result.get(key) for key in ('x-trace-id', 'x-span-id', 'x-telemetry-state')}
+
+    def telemetry_fill(self, service):
+        samples = []
+        for _ in range(256):
+            start = time.monotonic()
+            status, headers = self.telemetry_request(service, '/health/live', {}, False)
+            samples.append({'status': status, 'state': headers.get('x-telemetry-state'),
+                            'span_id': headers.get('x-span-id'), 'elapsed_ms': round((time.monotonic() - start) * 1000, 3)})
+            if samples[-1]['state'] == 'full':
+                break
+        return samples
 
     def measure_resources(self, stage: str):
         samples = []
@@ -307,6 +327,7 @@ class Campaign:
         self.check_console_shared_state("write")
         self.check_console_shared_state("second-process")
         self.measure_resources('healthy-foundation')
+        self.measure_telemetry()
         initial_data = {}
         for service in SERVICES:
             self.health(service, 401, None, 'missing-health-identity-denied')

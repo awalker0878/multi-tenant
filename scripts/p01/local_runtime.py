@@ -196,7 +196,8 @@ def prepare(root: Path, runtime: Path, images: Mapping[str, str], revision: str)
             # applications remain confined to internal database/proxy networks.
             networks[f"ingress_{service}"] = {"internal": False, "driver": "bridge",
                                                "driver_opts": {"com.docker.network.bridge.enable_ip_masquerade": "false"}}
-            environment = {"APP_ENV": "production", "APP_DEBUG": "false", "DB_HOST": "postgres",
+            environment = {"TELEMETRY_ENABLED": "1", "TELEMETRY_ENVIRONMENT": "p01-compose",
+                           "SOURCE_REVISION": revision, "APP_ENV": "production", "APP_DEBUG": "false", "DB_HOST": "postgres",
                            "DB_PORT": "5432", "DB_DATABASE": service, "DB_USERNAME": f"{service}_runtime",
                            "DB_PASSWORD_FILE": "/run/secrets/db-password", "DB_SSLMODE": "verify-full",
                            "DB_SSLROOTCERT": "/run/secrets/ca.crt", "HEALTH_TOKEN_FILE": "/run/secrets/health-token"}
