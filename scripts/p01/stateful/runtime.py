@@ -29,7 +29,7 @@ def prepare(root: Path, directory: Path, images: dict):
     passwords = ['postgres-password', 'temporal-runtime-password', 'visibility-runtime-password', 'temporal-migrator-password', 'visibility-migrator-password', 'publisher-password', 'consumer-password', 'foreign-broker-password']
     passwords += [prefix+name+'-password' for prefix in ('', 'restore-') for name in ('root', 'assurance', 'foreign')]
     for name in passwords:
-        _write(private/name, secrets.token_urlsafe(32)+'\n')
+        _write(private/name, 'p01_'+secrets.token_urlsafe(32)+'\n')
     _openssl('req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', str(private/'ca.key'), '-out', str(private/'ca.crt'), '-days', '2', '-sha256', '-subj', '/CN=P01 stateful fixture CA', '-addext', 'basicConstraints=critical,CA:TRUE', '-addext', 'keyUsage=critical,keyCertSign,cRLSign')
     (private/'ca.key').chmod(0o400); (private/'ca.crt').chmod(0o444)
     for name in ('rabbit', 'temporal', 'postgres', 'evidence', 'evidence-restore'):
