@@ -18,6 +18,7 @@ permissions:
 
 concurrency:
   group: p01-foundations-${{ github.ref }}
+  queue: max
   cancel-in-progress: false
 
 jobs:

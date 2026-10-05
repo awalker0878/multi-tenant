@@ -12,6 +12,7 @@ permissions:
 
 concurrency:
   group: p01-images-${{ github.workflow }}-${{ github.ref }}
+  queue: max
   cancel-in-progress: false
 
 jobs:

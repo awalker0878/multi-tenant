@@ -63,3 +63,32 @@ passes 249 checks; all seven image build/process reports pass. The complete orig
 archive, 612 command-log hashes and 451 unique source bindings were verified.
 Image-security admission, independent package replay, Kubernetes and browser-engine
 results remain separately scoped; neither old failed workflow is relabelled.
+
+## Browser quota-save synchronization
+
+WebKit run `37371858388` at `b13996d` passed the bootstrap journey but failed
+the federation journey with a quota request network error. The test navigated
+before the submitted request had necessarily finished. The
+[original report](identity/run-37371858388/webkit/report.json) and downloaded
+archive retain that failure. Concurrent commit `9716803` waits for the actual
+redirected owner response, checks the returned quota and waits for form
+processing before navigation. No assertion, network-error check or browser is
+excluded; hosted correction results remain required. See the
+[synchronization record](../../docs/implementation/p02-browser-synchronization.md).
+
+## Pending build displacement
+
+GitHub's default concurrency queue preserves only one pending run even with
+`cancel-in-progress: false`. Later documentation pushes repeatedly replaced
+pending changed-source package/image runs. Image run `37371858446` was cancelled
+before creating any jobs; its failed-jobs retry was rejected with HTTP 403
+(`This workflow run cannot be retried`). This is distinct from a failed product
+test or an approval rejection.
+
+Package, image, Compose and Kubernetes workflows now opt into GitHub's documented
+[`queue: max` FIFO behavior](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#concurrency),
+which retains up to 100 pending runs while preserving one active run per group.
+The workflow-input change conservatively selects all candidates through the
+existing selector. Check names, required assertions, platform/security checks,
+failure aggregation and permissions stay in force. The new full campaign needs
+its own results; this configuration change is not a passing image admission.

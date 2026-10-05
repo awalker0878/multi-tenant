@@ -77,12 +77,20 @@ no platform check or package version is relaxed. The corrected Compose campaign
 unique source bindings. Its complete archive and the original failure are retained.
 This is separate from package replay, image-security admission and Kubernetes.
 
-**Immediate verification:** retrieve the Firefox/WebKit jobs in consumer run
-`37371273531`, all engines at corrected source `b13996d` (run `37371858388`),
-and affected foundation package/image/Kubernetes campaigns. Retain exact source
-and original-byte evidence for every result. Retry cancelled required code-source
-checks after documentation commits if GitHub supersedes their pending slot;
-documentation-only passes cannot replace them. The old `7b24476` Chromium rerun
+**Immediate verification:** the remaining Firefox/WebKit jobs in consumer run
+`37371273531` were cancelled. WebKit at `b13996d` (run `37371858388`) exposed a
+quota-save test race; its original failure is retained. The concurrent
+[`9716803` synchronization correction](docs/implementation/p02-browser-synchronization.md)
+waits for the committed owner response before navigating. Retrieve all browser
+results at that corrected source and affected foundation package/image/Kubernetes
+campaigns. Retain exact source
+and original-byte evidence for every result. Package/image/Compose/Kubernetes
+workflows now use GitHub's bounded FIFO queue (`queue: max`, up to 100 pending)
+so a later push does not replace an earlier pending check. Verify the fresh full
+selection triggered by this workflow correction. The cancelled pre-job image run
+`37371858446` could not be retried through the failed-jobs endpoint; its corrected
+product source is included in the new full campaign. Documentation-only passes
+cannot replace changed-source builds. The old `7b24476` Chromium rerun
 is queued; GitHub rejects its WebKit retry while that workflow attempt is active.
 Retry WebKit after it finishes. The
 [notification workflow snapshot](verification/p02/console-notification-hosted-runs.json)
