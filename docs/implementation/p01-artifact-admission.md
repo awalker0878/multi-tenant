@@ -17,6 +17,12 @@ settings and operated registry/signer/receiver identities remain separate inputs
   tested merge revision/parents. The checked-out base owns role/exception policy.
 - Role mappings start explicitly UNCONFIGURED. No CODEOWNERS account, review or
   approval is invented. The policy denies admission until mappings are verified.
+  The first real draft PR did not trigger this new workflow: GitHub evaluates
+  pull_request_target from the repository default branch, where this hook has not
+  been installed. A separate read-only push probe exercises the exact target-base
+  evaluator against that disposable PR; it is not an automatic admission hook.
+  Installation must also publish its decision against the actual PR revision
+  through the approved independent reporting identity before protection is enabled.
   An administrator must rerun admission after constituent checks/reviews finish;
   its initial event execution may correctly hold an incomplete PR. Protection
   settings must require its actual reporting context before it enforces merges.
@@ -56,6 +62,13 @@ A successful control exercise is recorded separately from candidate admission.
 Raw scanner output and private keys remain temporary. Only a clean development
 candidate is copied to a fresh destination and reverified; the image is never
 rebuilt during transfer. Real hosted results remain pending execution.
+
+The first hosted scan attempt (source `2e1be599cba89275c92396066f091779cd912539`,
+run 37264412362) held all nine candidates because the image scanner does not accept
+the filesystem-only development-dependency flag. No image-security pass was
+reported. The correction applies that flag only to source scans and disables
+implicit local scanner/ignore configuration; image configuration secrets are
+scanned explicitly. The failed observation remains part of the qualification trail.
 
 ## Primary interfaces
 

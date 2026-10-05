@@ -102,10 +102,13 @@ def main():
             scans = []
             for scope in ['image', 'source']:
                 command = [trivy, 'image' if scope == 'image' else 'fs', '--cache-dir', cache,
-                           '--skip-db-update', '--no-progress', '--include-dev-deps']
+                           '--skip-db-update', '--no-progress', '--config', '', '--ignorefile', '', '--secret-config', '']
+                # Dev/build dependency inclusion is a filesystem flag, not an image flag.
+                command += ['--include-dev-deps'] if scope == 'source' else []
                 target = ['--input', archive] if scope == 'image' else [source]
                 raw_scan = work / (scope + '-raw.json')
-                run(scope + '-scan', command + ['--scanners', 'vuln,secret', '--list-all-pkgs',
+                scan_options = ['--image-config-scanners', 'secret'] if scope == 'image' else []
+                run(scope + '-scan', command + scan_options + ['--scanners', 'vuln,secret', '--list-all-pkgs',
                     '--format', 'json', '--output', raw_scan] + target)
                 raw = json.loads(raw_scan.read_text())
                 require(raw['SchemaVersion'] == 2 and raw.get('Results'), 'missing_scan_results')

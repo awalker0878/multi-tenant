@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "status": "REQUESTED",
+  "pull_request": 58,
+  "expected_head": "bb7cbbef43437e2c19d656e9c4c5904b360f8ec8",
+  "scope": "Disposable read-only deployment experiment. Never merge the fixture."
+}
