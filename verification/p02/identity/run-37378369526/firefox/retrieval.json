@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "source_revision": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+  "run_id": 37378369526,
+  "artifact_id": 11373026042,
+  "archive_sha256": "4750411ec9a77c306fcfb5395ebc1a7b03ad530772ca208a2be0af304e5a970f",
+  "retrieved_at": "2026-10-05T21:54:41.776537+00:00",
+  "campaign_result": "PASS",
+  "matched_source_bindings": 302,
+  "verified_artifact_bindings": 10,
+  "retained_file_sha256": {
+    "notification-broker-ready.log": "334459dc7c11f121513f698791bde3abf223e2f550d91d7b5a46e69111b2cbf6",
+    "report.json": "572e7614fe957e5c59a9ca3e54d7f8ab1b225b07fc04156cf0d2691a6564c508",
+    "postgres-features.log": "2815c2c267038629ef67ac1028ab453d5d7f456a792a15f07788842ea0941ea0",
+    "noninteractive-denial.log": "350a8d53e709600769f9a42f98d128cb95e74590e18ff67a444bd8ce7a7ce5ce",
+    "approval-history-producer.log": "7ea661b33211a9e30249c32336500a34e173b6668f009afe2300396b8f50e8d4",
+    "governance-http.log": "8025c17177c935f501121d9ae5ae33a62dc4bc9ac7f1fafde577d30a81dc8289",
+    "console-notification-features.log": "59e8f3171d9ef18ad6676f2916da3c46a45c016e0c43580d9e55db5d71aa7c2c",
+    "browser.log": "d11915248ad556cd4ea44307f54e6be37ee9ce277995bc31b004c32f8d463e4c",
+    "notification-broker-start.log": "660a846abb9a0cc279f5b6fdf30ae3e55863f44cb9b12c8ed973f8ef4644a061",
+    "campaign.zip": "4750411ec9a77c306fcfb5395ebc1a7b03ad530772ca208a2be0af304e5a970f",
+    "console-http.log": "0d89464095eb9f2e2af1c630c8fdc173ee8a6059f4e24558ad92d6567489f1cc",
+    "browser.json": "f040d15b190e4d6f0bccfd07035645b1e3a7a5a401d75de4bdb396981d9e2cd7"
+  },
+  "scope": "firefox installation-consumer/recovery campaign; original archive, logs and source identities independently verified"
+}

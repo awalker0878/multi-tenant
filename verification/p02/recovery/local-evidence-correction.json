@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "disposition": "NOT_ACCEPTED_AS_COMPLETE_E1_EVIDENCE",
+  "observed_at": "2026-10-05T21:59:43.698271+00:00",
+  "original_report_sha256": "fa83b4f5cdc9ce6debde07ec74211efa9e5732431379f29a8f100a9623e5f7a9",
+  "original_source_revision": "3a5ef6e8c8d65dfcb12a8ab71c1734b76d1e79fc",
+  "reason": "The local recorder reused Console PHP type/boundary log names for frontend commands. Four original PHP stream hashes no longer match the overwritten files. The historical report is retained unchanged and is not registered as passing E1 evidence.",
+  "mismatches": [
+    {
+      "command": [
+        "composer",
+        "test:types"
+      ],
+      "stream": "stdout",
+      "path": "console-types.stdout.log",
+      "reported_sha256": "9dd3eeb023e498eff4ab6e14af3d76d6e6c7672da330c9e3edf35753590df0d7",
+      "retained_sha256": "766a240d14690488a21ffefd25cd11ca772d502a037bb823b233fb6721154c98"
+    },
+    {
+      "command": [
+        "composer",
+        "test:types"
+      ],
+      "stream": "stderr",
+      "path": "console-types.stderr.log",
+      "reported_sha256": "2a403263bf50c585ee1e641b69be39dd2ddc1f8d8828bd6dee1278e5f08dc3bb",
+      "retained_sha256": "7125f194612fcff2f454c05d848e7cb71facc1967b4d5017e25b34fdee3ba74f"
+    },
+    {
+      "command": [
+        "composer",
+        "test:architecture"
+      ],
+      "stream": "stdout",
+      "path": "console-boundaries.stdout.log",
+      "reported_sha256": "944bf10aca07ccb04a33629048ef5aac2cdff49c4dcdd83b601364306d439c4d",
+      "retained_sha256": "67440f5b497a616528f270d68c663209216be6be70ca809f8873cab252cb862d"
+    },
+    {
+      "command": [
+        "composer",
+        "test:architecture"
+      ],
+      "stream": "stderr",
+      "path": "console-boundaries.stderr.log",
+      "reported_sha256": "79a1e601ea1a5ddf5ea8353f3f46d9d953955340c66f2dc235510a2c455391df",
+      "retained_sha256": "7125f194612fcff2f454c05d848e7cb71facc1967b4d5017e25b34fdee3ba74f"
+    }
+  ],
+  "replacement_report": "verification/p02/recovery/local-final-20261005/report.json",
+  "correction": "Distinct console-frontend-* log names; rerun every command and verify all 24 stream hashes and all exact-commit source bindings."
+}
