@@ -34,8 +34,12 @@ retains three current identity archives with 337 source bindings and eleven arti
 hashes each, plus the current event archive with 198 source bindings and ten log
 hashes. Its [workflow observation](../../../verification/p02/support/hosted-observation.json)
 explicitly records the separately queued Kubernetes regression at that observation;
-it is not relabeled as passed. The final workflow outcome is separate from these
-already completed P02 campaigns.
+that historical snapshot is unchanged. The subsequent
+[final support regression receipt](../../../verification/p02/support/hosted-final.json)
+records all nine workflows successfully completed at `ad53968`, including Kubernetes.
+All 17 selected jobs passed; the unchanged Python package family was unselected
+and its matrix job is explicitly recorded as skipped. This metadata receipt
+complements the retained P02 campaign evidence without broadening G02 acceptance.
 
 EV-P02-001–015 retain earlier bootstrap, federation, tenant/approval, relay,
 delegation, Console consumer and directory increments at their original sources.
