@@ -66,7 +66,13 @@ def main():
         if len(archive) > 64*1024*1024:
             raise ValueError('Source archive exceeded bound')
         sources[name] = {**data[name], 'sha256': hashlib.sha256(archive).hexdigest(), 'bytes': len(archive)}
-    uv = json.loads((root/'deploy/build/inputs.lock.json').read_text())['images']['uv']['reference']
+    build_inputs = json.loads((root/'deploy/build/inputs.lock.json').read_text())['images']
+    resolver = args.output/'resolver'
+    resolver.mkdir()
+    (resolver/'Dockerfile').write_text('FROM '+build_inputs['python']['reference']+'\nCOPY --from='+build_inputs['uv']['reference']+' /uv /usr/local/bin/uv\nENTRYPOINT ["uv"]\n')
+    iid = args.output/'resolver-image-id.txt'
+    command(['docker', 'build', '--platform', 'linux/amd64', '--pull', '--iidfile', str(iid), str(resolver)])
+    uv = iid.read_text().strip()
     requirements = root/'scripts/p01/stateful/requirements.in'
     result = command(['docker', 'run', '--rm', '--platform', 'linux/amd64', '-v', str(requirements)+':/requirements.in:ro', '-v', str(args.output.resolve())+':/output', uv,
                       'pip', 'compile', '--python-version', '3.12', '--python-platform', 'x86_64-manylinux_2_28', '--generate-hashes', '--no-annotate', '--no-header', '--only-binary', ':all:', '/requirements.in', '-o', '/output/requirements.txt'])
