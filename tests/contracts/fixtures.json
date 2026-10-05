@@ -1,0 +1,274 @@
+[
+  {
+    "id": "valid",
+    "valid": true,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "schema_version-2",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 2,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "schema_version-1",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": "1",
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "tenant_id-../foreign",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "../foreign",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "revision-9007199254740993",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": 9007199254740993,
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "revision-0",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "0",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "revision-01",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "01",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "revision-1e2",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "1e2",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "payload_sha256-fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "source_revision-aaaaaaa",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "actor_id-None",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": null,
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "event_type-lifecycle.execute",
+    "valid": false,
+    "value": {
+      "event_type": "lifecycle.execute",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "occurred_at-2026-02-30T00:00:00Z",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-02-30T00:00:00Z"
+    }
+  },
+  {
+    "id": "unknown-field",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z",
+      "credential": "forbidden"
+    }
+  },
+  {
+    "id": "missing-actor",
+    "valid": false,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "record_id": "record_a",
+      "revision": "1",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  },
+  {
+    "id": "large-revision",
+    "valid": true,
+    "value": {
+      "event_type": "catalogue.foundation.recorded",
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174001",
+      "correlation_id": "123e4567-e89b-42d3-a456-426614174000",
+      "tenant_id": "tenant_a",
+      "actor_id": "actor_a",
+      "record_id": "record_a",
+      "revision": "9007199254740993",
+      "payload_sha256": "d1b0ca406dae534bb981b5629416cfa79c1b867001fca0a0406d7e6789827662",
+      "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "occurred_at": "2026-10-05T00:00:00Z"
+    }
+  }
+]

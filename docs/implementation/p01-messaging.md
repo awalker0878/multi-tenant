@@ -1,0 +1,48 @@
+# P01 transactional messaging foundation
+
+Owner: Catalogue producer and Planning consumer. Packages P01.03/P01.05/P01.06;
+requirements R02/R15/R35. This increment implements an internal reference fact,
+`catalogue.foundation.recorded` version 1. It does not add a Catalogue intent API,
+assessment, execution command, grant or native effect. G01 remains open.
+
+The authoritative JSON Schema and AsyncAPI channel live under `contracts/`.
+`generate.py` copies the schema into each independently built service and generates
+private scalar DTOs. Opis 2.6.0 and Python jsonschema 4.26.0 validate wire data before
+decoding; Python also checks the exact UTC calendar value. Unsupported versions,
+unknown fields, missing actor, malformed digest and numeric revisions fail. IDs
+and digests use bounded ASCII fields; revisions are decimal strings preserving
+values beyond JavaScript's exact integer range. Canonical envelope bytes sort the
+fixed scalar keys and omit whitespace. This is envelope canonicalization only,
+not a plan or business-command canonicalization algorithm.
+
+Catalogue's internal `RecordFoundationFact` accepts trusted tenant/actor context
+from its caller and rejects a different event binding or payload digest. The P01
+campaign supplies synthetic context; no authenticated public endpoint is exposed.
+Its private transaction writes the immutable fact and outbox together. Event IDs
+bind to the exact canonical envelope. An identical retry returns `duplicate`;
+changed content conflicts. A one-row `FOR UPDATE SKIP LOCKED` transaction is the
+relay claim. Broker publish uses TLS, mandatory routing, durable publication and
+publisher confirms; only then is the outbox marked published. A failed connection
+or crash releases the database lock and leaves the same event available.
+
+Planning validates the dedicated producer route, broker-verified `user_id`, schema
+and current consumer tenant scope. Inbox identity/digest and the local projection
+commit together. A duplicate has no second effect; changed content under an ID
+is rejected. Tenant/record head locks require the next revision. Gaps and stale
+unseen events are quarantined for owner reconciliation. The quorum queue bounds
+transient redelivery to five; malformed/denied messages go directly to the private
+quarantine queue. Neither receipt nor replay changes user or native authority.
+
+No automatic pruning is implemented: facts, inbox and outbox share their service's
+backup/recovery group. Production receipt-retention and replay windows remain an
+operating input. Consumer databases contain reference/digest projections only.
+No cross-service SQL access or credentials are shared by runtime clients.
+
+## Verification
+
+The local PHP/Python conformance check covers 16 shared fixtures and compares exact
+canonical hashes for accepted events. PHP static and architecture analysis and
+Python static analysis have been exercised locally; immutable hosted reports will
+be recorded after the real PostgreSQL/RabbitMQ campaign. These local observations
+are not a G01 pass. HTTP OpenAPI clients, full compatibility/admission enforcement,
+and other service event integrations remain distinct P01/P02+ work.

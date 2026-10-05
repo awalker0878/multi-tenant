@@ -1,0 +1,48 @@
+name: P01 transactional messaging
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: [contracts/**, tests/contracts/**, services/catalogue/**, services/planning/**, scripts/p01/messaging/**, scripts/p01/run_messaging.py, .github/workflows/p01-messaging.yml]
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: [contracts/**, tests/contracts/**, services/catalogue/**, services/planning/**, scripts/p01/messaging/**, scripts/p01/run_messaging.py, .github/workflows/p01-messaging.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  conformance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, fileinfo, mbstring, openssl, pdo, pdo_pgsql, tokenizer
+          coverage: none
+          tools: composer:2.10.3
+      - name: Replay private locks and check generated contracts
+        run: |
+          composer install --working-dir=services/catalogue --no-dev --no-plugins --no-scripts --no-interaction --no-progress
+          uv sync --project services/planning --frozen --no-default-groups
+          python scripts/p01/messaging/generate.py --check
+      - name: Compare actual language acceptance and canonical hashes
+        run: |
+          mkdir -p "$RUNNER_TEMP/p01-contracts"
+          services/planning/.venv/bin/python tests/contracts/conformance.py > "$RUNNER_TEMP/p01-contracts/conformance.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p01-contracts-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-contracts/
+          if-no-files-found: error
+          retention-days: 14

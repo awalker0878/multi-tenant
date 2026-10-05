@@ -30,7 +30,9 @@
       "runtime_mode": "asgi",
       "runtime_requirements": [
         "psycopg[binary]==3.3.6",
-        "uvicorn==0.53.0"
+        "uvicorn==0.53.0",
+        "jsonschema==4.26.0",
+        "pika==1.4.4"
       ],
       "runtime_entrypoint": "/opt/venv/bin/planning-serve"
     },
@@ -203,7 +205,8 @@
         "config",
         "public/index.php",
         "routes",
-        "build/snapshot.sh"
+        "build/snapshot.sh",
+        "resources"
       ]
     },
     {

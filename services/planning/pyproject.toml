@@ -8,7 +8,7 @@ version = "0.1.0.dev0"
 description = "Planning service bootstrap; assessment and plan compilation are not implemented"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
-dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0"]
+dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0", "jsonschema==4.26.0", "pika==1.4.4"]
 
 [project.scripts]
 planning-health = "planning.bootstrap.health:main"
@@ -38,3 +38,10 @@ files = ["src", "tests"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--strict-config --strict-markers"
+
+[tool.setuptools.package-data]
+"planning.infrastructure.messaging" = ["*.json"]
+
+[[tool.mypy.overrides]]
+module = ["jsonschema.*", "pika.*"]
+ignore_missing_imports = true

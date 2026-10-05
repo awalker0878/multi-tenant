@@ -79,3 +79,10 @@ Owned source root: `services/planning/src/planning/`. Capability/profile interpr
 Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). This Python service retains `domain/`, `application/`, `infrastructure/` and `interfaces/` with the documented dependency direction. Its capability modules may collaborate within the same owning context. Composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages. The pragmatic Laravel convention in ADR-024 applies to PHP services and does not relocate this Python source.
 
 The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.
+
+## P01 messaging increment
+
+The [transactional messaging foundation](../implementation/p01-messaging.md) adds a
+service-owned reference fact/outbox (Catalogue) and inbox/projection (Planning).
+It exposes no product API or authorization decision. See that record for the exact
+contract, retry, isolation and verification scope.

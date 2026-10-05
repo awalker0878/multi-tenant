@@ -19,6 +19,9 @@ deptrac:
     - name: Composition
       collectors:
         - {type: classLike, value: '^App\\Providers\\.*'}
+    - name: MessagingVendors
+      collectors:
+        - {type: classLike, value: '^(Opis|PhpAmqpLib)\\.*'}
     - name: PublishedContracts
       collectors:
         - {type: classLike, value: '^Product\\Contracts\\.*'}
@@ -36,9 +39,10 @@ deptrac:
   ruleset:
     Domain: [Framework]
     Application: [Domain, Framework]
-    Infrastructure: [Domain, Application, Framework, Transport, PublishedContracts]
+    Infrastructure: [Domain, Application, Framework, Transport, PublishedContracts, MessagingVendors]
     Delivery: [Domain, Application, Framework, Transport]
     Composition: [Domain, Application, Infrastructure, Delivery, Framework, Transport, PublishedContracts]
+    MessagingVendors: []
     PublishedContracts: []
     ForeignPrivate: []
     Framework: []

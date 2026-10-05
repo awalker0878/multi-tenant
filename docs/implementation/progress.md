@@ -37,7 +37,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P00.06 | Delivery decomposition | Leads | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P01.01 | Repository scaffolding | Engineering | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 11 / 0 |
 | P01.02 | Local and integration runtime | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 5 / 2 |
-| P01.03 | Contracts and messaging | Architecture | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P01.03 | Contracts and messaging | Architecture | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P01.04 | CI and supply chain | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 1 |
 | P01.05 | Runtime dependencies | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 1 |
 | P01.06 | Baseline operations | SRE/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 2 |

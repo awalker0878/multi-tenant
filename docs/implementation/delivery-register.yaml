@@ -585,8 +585,8 @@ work_packages:
   title: Contracts and messaging
   owner_role: Architecture
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
@@ -604,6 +604,7 @@ work_packages:
   - docs/engineering/laravel-conventions.md
   - docs/engineering/data-and-messaging.md
   - docs/contracts/README.md
+  - docs/implementation/p01-messaging.md
 - id: P01.04
   phase_id: P01
   title: CI and supply chain
