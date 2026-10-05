@@ -73,6 +73,7 @@ ssl_options.fail_if_no_peer_cert = false
 management.tcp.ip = 127.0.0.1
 prometheus.tcp.ip = 127.0.0.1
 definitions.import_backend = local_filesystem
+definitions.skip_if_unchanged = true
 definitions.local.path = /run/config/definitions.json
 ''')
     stores = {}
@@ -84,7 +85,7 @@ definitions.local.path = /run/config/definitions.json
         'clusterMetadata': {'enableGlobalNamespace': False, 'failoverVersionIncrement': 10, 'masterClusterName': 'active', 'currentClusterName': 'active', 'clusterInformation': {'active': {'enabled': True, 'initialFailoverVersion': 1, 'rpcName': 'frontend', 'rpcAddress': '127.0.0.1:7233'}}},
         'dynamicConfigClient': {'filepath': '/run/config/dynamic.yaml', 'pollInterval': '10s'}}
     _write(private/'temporal.yaml', json.dumps(temporal))
-    _write(config/'dynamic.yaml', 'system.enableInternalFrontend:\n  - value: true\n')
+    _write(config/'dynamic.yaml', '{}\n')
     for name, prefix in [('assurance', 't_demo'), ('foreign', 't_other')]:
         policy = {'Version': '2012-10-17', 'Statement': [{'Effect': 'Allow', 'Action': ['s3:GetObject', 's3:GetObjectVersion', 's3:GetObjectRetention', 's3:PutObject'], 'Resource': ['arn:aws:s3:::p01-evidence/'+prefix+'/*']}]}
         _write(config/(name+'-policy.json'), json.dumps(policy))

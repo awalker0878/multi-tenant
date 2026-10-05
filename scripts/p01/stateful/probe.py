@@ -29,13 +29,19 @@ def check(name, condition, observation=None):
         raise AssertionError(name)
 
 
-def denied(name, call, errors, codes=None):
+def denied(name, call, errors, codes=None, *, worm=False):
     try:
         call()
     except errors as error:
         code = getattr(error, 'reply_code', None)
-        if hasattr(error, 'response'): code = error.response['Error']['Code']
-        check(name, codes is None or code in codes, {'error_type': type(error).__name__, 'code': code})
+        observation={'error_type':type(error).__name__,'code':code}
+        if hasattr(error,'response'):
+            code=error.response['Error']['Code']
+            observation.update(code=code,message=error.response['Error'].get('Message'),http_status=error.response['ResponseMetadata']['HTTPStatusCode'])
+        valid=codes is None or code in codes
+        if worm:
+            valid=valid and observation.get('http_status')==400 and observation.get('message','').startswith('Object is WORM protected and cannot be overwritten')
+        check(name,valid,observation)
     else:
         check(name, False, 'unexpected authorization')
 
@@ -116,6 +122,8 @@ def s3_wait():
 
 def evidence(stage, state):
     from botocore.exceptions import ClientError, EndpointConnectionError, ConnectionClosedError, ConnectTimeoutError, ReadTimeoutError
+    if stage == 'evidence-ready':
+        s3_wait();check('evidence-server-authenticated-ready',True);return {}
     if stage == 'evidence-bootstrap':
         client = s3_wait()
         client.create_bucket(Bucket=BUCKET, ObjectLockEnabledForBucket=True)
@@ -125,8 +133,11 @@ def evidence(stage, state):
         return {}
     if stage == 'evidence-admin-denial':
         client = s3('root')
-        denied('root-cannot-delete-retained-version', lambda: client.delete_object(Bucket=BUCKET, Key=KEY, VersionId=state['version_id']), ClientError, {'AccessDenied'})
-        denied('root-cannot-shorten-compliance-retention', lambda: client.put_object_retention(Bucket=BUCKET, Key=KEY, VersionId=state['version_id'], Retention={'Mode':'COMPLIANCE', 'RetainUntilDate': datetime.now(timezone.utc)+timedelta(minutes=5)}), ClientError, {'AccessDenied'})
+        denied('root-cannot-delete-retained-version', lambda: client.delete_object(Bucket=BUCKET, Key=KEY, VersionId=state['version_id']), ClientError, {'InvalidRequest'}, worm=True)
+        denied('root-cannot-shorten-compliance-retention', lambda: client.put_object_retention(Bucket=BUCKET, Key=KEY, VersionId=state['version_id'], Retention={'Mode':'COMPLIANCE', 'RetainUntilDate': datetime.now(timezone.utc)+timedelta(minutes=5)}), ClientError, {'InvalidRequest'}, worm=True)
+        check('retention-denials-preserve-object',hashlib.sha256(client.get_object(Bucket=BUCKET,Key=KEY,VersionId=state['version_id'])['Body'].read()).hexdigest()==state['sha256'])
+        retained=client.get_object_retention(Bucket=BUCKET,Key=KEY,VersionId=state['version_id'])['Retention']
+        check('retention-denials-preserve-deadline',retained['Mode']==state['retention_mode'] and retained['RetainUntilDate']==datetime.fromisoformat(state['retain_until']))
         return {}
     client = s3()
     if stage == 'evidence-outage':

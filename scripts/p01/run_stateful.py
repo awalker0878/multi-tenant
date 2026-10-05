@@ -101,7 +101,13 @@ class StatefulCampaign(Campaign):
         self.report['restored_evidence']=restore
         self.command('revoke-broker-principal',self.dc('exec','-T','rabbit','rabbitmqctl','delete_user','publisher'))
         self.probe('broker-client','broker-revoked')
+        self.command('stop-revoked-broker',self.dc('stop','rabbit'))
+        self.command('restart-revoked-broker',self.dc('up','-d','--wait','--wait-timeout','160','rabbit'),timeout=200)
+        self.probe('broker-client','broker-revoked')
         self.command('revoke-evidence-principal',self.dc('run','--rm','--no-deps','-T','evidence-iam','revoke'))
+        self.probe('evidence-client','evidence-revoked')
+        self.command('restart-revoked-evidence',self.dc('restart','evidence'))
+        self.probe('evidence-admin','evidence-ready')
         self.probe('evidence-client','evidence-revoked')
         jwks=self.runtime/'config/jwks.json';jwks.chmod(0o644);jwks.write_text('{"keys":[]}');jwks.chmod(0o444)
         # Restart proves removal of trust applies deterministically, without claiming hot revocation latency.
