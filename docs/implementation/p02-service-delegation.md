@@ -77,7 +77,12 @@ There is no shared administrator, health-token or local-password fallback.
 Governance feature cases exercise exact scope and audience, wrong tenant, missing
 credentials, source-session expiry/logout, disabled actors, credential rotation,
 membership revocation/regrant, explicit revocation, forged authority fields and
-issuance rollback. The PostgreSQL identity campaign includes these cases.
+issuance rollback. EV-P02-005 retains the PostgreSQL identity campaign at
+`5bc32839ae7dedd186fca68e429e5effa723222d`: 80 feature cases (1,427 assertions),
+including thirteen delegation cases, with 247 matching source bindings and six
+retained artifact hashes. The hosted Catalogue package replay passes all 50
+feature cases (207 assertions), formatter, static analysis and dependency checks;
+its 153 source bindings and 34 artifact hashes match.
 
 Catalogue's HTTP-adapter/middleware cases use an explicit test-only owner route
 and fake Governance transport. They verify independent credentials, repeated

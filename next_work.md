@@ -9,49 +9,50 @@ Console-managed [OIDC setup and tested handover](docs/implementation/p02-federat
 and tenant membership/quota administration are implemented. P02.01–P02.05 remain
 IN_PROGRESS; receiving and the remaining integration scope are open.
 
-EV-P02-003 retains the passing campaign at
-`6fd44860f61d66bf858c92b8099f29a97479758b`: **44 checks, 55 PostgreSQL feature
-tests (952 assertions), two compiled browser journeys, six matching artifact
-hashes and 218 matching source bindings.** Four real HTTPS/PKCE exchanges use an
-explicitly synthetic provider; the browser completes configuration, failed test,
-verified handover, independent tenant choices and cross-browser revocation.
-Local full suites pass 91 Governance and 76 Console cases, plus static analysis,
-frontend build/boundaries and five OpenAPI specification checks. EV-P02-002 retains
-the preceding federation regression; EV-P02-001 remains the bootstrap baseline.
-The [correction record](verification/p02/corrections.md) preserves the initial
-browser timing and immutable-contract failures. The published v1 contract is
-restored byte-for-byte; no validation rule was weakened. The
-[regression snapshot](verification/p02/tenancy-regression-runs.json) keeps each
-workflow's actual source and outcome. All nine affected workflow families pass,
-including package/image, Compose, Kubernetes, messaging, the P02 campaign and the
-corrected contract replay. These remain development observations.
+The current retained increments are:
 
-**Current executable increment:** [Governance event delivery and background
-expiry](docs/implementation/p02-governance-events.md) are implemented with explicit
-schema/AsyncAPI contracts, bounded scheduled commands, confirmation/retry/quarantine
-handling and system-attributed expiry. The corrected PostgreSQL/TLS-broker and identity/browser campaigns pass at
-`4afcee1d504b8dfb0725d3306f8c2c55eb1f6dce`; exact-source reports and the two
-initial failures are retained separately.
+- **EV-P02-004 — Governance event delivery and background expiry.** Explicit
+  schema/AsyncAPI contracts, bounded scheduler commands, routed confirmations,
+  retry/quarantine and system-attributed expiry. The corrected PostgreSQL/TLS
+  broker campaign passes 32 tests (719 assertions), including competing relays,
+  process death after confirmation and duplicate delivery. Original timestamp
+  precision and broker-readiness failures remain retained with their correction.
+- **EV-P02-005 — Short-lived service actor delegation and Catalogue guard.**
+  Opaque sixty-second handles bind exact audience/action/scope and current
+  session/membership/grant/workload credentials. Logout, revocation/regrant,
+  suspension and credential rotation deny reuse. The hosted identity campaign
+  passes 80 PostgreSQL feature cases (1,427 assertions). Catalogue passes 50
+  boundary/package cases (207 assertions); its owner route and Governance
+  transport are explicit test fixtures, not deployed product integration.
+- **EV-P02-006 — Expanded compiled Console journey.** The latest 47-check
+  campaign at `512fd5c2580e5cd40bf0089662cff8d84718a877` passes two browser
+  journeys with four HTTPS/PKCE exchanges, six artifact hashes and 248 source
+  bindings. A controlled late tenant response cannot replace the newer page;
+  drafts stay separate between tabs and sign-out clears same-session tabs.
+  Protected back/forward-cache restores now reauthenticate; actual browser-cache
+  interoperability and manual assistive-technology qualification remain open.
 
-[Service actor delegation and the Catalogue guard](docs/implementation/p02-service-delegation.md)
-now implement the initial data-facing profile: opaque sixty-second handles, exact
-audience/action/scope, current session/membership/grant checks, credential rotation
-and explicit revocation. Catalogue has a private HTTPS client and registered
-owner middleware. Local guard tests use a synthetic protected resource; real
-Catalogue APIs and cross-service wire qualification remain P03 integration.
+EV-P02-001–003 retain the bootstrap, federation and tenancy/approval baselines.
+The [correction record](verification/p02/corrections.md) preserves historical
+failures without changing their outcomes. The published v1 contracts retain their
+original bytes; new behavior uses new contracts. No validation rule was weakened.
+The [regression snapshot](verification/p02/governance-delegation-regression-runs.json)
+records workflow source identities and actual outcomes, including any pending
+runs; the P02 campaign is separate from foundation runtime qualification.
 
-The Console also invalidates same-session tabs after successful sign-out and
-reauthenticates protected back/forward-cache restores. Its expanded compiled
-browser campaign controls a delayed tenant response and verifies independent tab
-drafts, current-page focus and cross-tab sign-out; retain the hosted result before
-claiming this campaign passes.
+Implementation and limits are in [event delivery](docs/implementation/p02-governance-events.md),
+[service delegation](docs/implementation/p02-service-delegation.md) and
+[tenant/browser behavior](docs/implementation/p02-tenancy-and-approvals.md).
 
-**Next concrete work:** qualify the expanded browser campaign and
-real cross-service wire path as owning resources are implemented; resolve and
-implement the approved support-access/break-glass contract; restore/revocation reconciliation;
-and the broader supported-browser/assistive-technology campaign. The real immutable plan producer
-belongs to P05.04; P02 injects synthetic plans only in tests and its production
-adapter fails closed without the owner. Follow the
+**Next concrete work:** version and deliver the distinct identity outbox, then
+integrate actual notification consumers. Bind Catalogue's guard to owner resources
+and qualify the Console-to-Catalogue-to-Governance wire path as P03 resources are
+implemented under their entry conditions. Resolve the approved support-access/break-glass contract
+and independent restore/revocation custody before those authority changes. Extend
+the browser campaign to the supported browser floor and manual accessibility.
+The real immutable plan producer belongs to P05.04; the native effect boundary
+belongs to P06.03. P02 uses synthetic plans only in tests and production fails
+closed without the owner. Follow the
 [G02 engineering assessment](docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
 for criterion gaps and accountable reviewers. Provider values remain
 Console-managed application settings. No gate pass or promotion is inferred.

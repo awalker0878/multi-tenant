@@ -144,10 +144,15 @@ operational acceptance or completed phase is inferred.
 
 ## Retained campaign
 
-EV-P02-003 records the passing 44-check campaign, 55 PostgreSQL feature cases
-(952 assertions), two compiled browser journeys and verified source/artifact
-hashes. The initial timing failure remains retained separately. The full local
-suites pass 91 Governance and 76 Console cases; types, dependency boundaries,
-formatter, compiled frontend and the five P02 OpenAPI specifications pass.
+EV-P02-003 retains the preceding tenancy/approval baseline. EV-P02-004/005 add
+confirmed event delivery, background expiry and bounded service delegation.
+EV-P02-006 retains the latest 47-check campaign: 80 PostgreSQL feature cases
+(1,427 assertions), two compiled browser journeys including controlled late
+responses and same-session tab sign-out, four HTTPS/PKCE exchanges, six artifact
+hashes and 248 source bindings. No browser case is skipped, retried or failing.
+Historical failures remain retained separately. At the delegation source the
+full local suites pass 116 Governance cases (three real-broker cases are exercised
+in the separate hosted campaign), 50 Catalogue and 76 Console cases. The latest
+Console type, boundary and compiled-build checks also pass.
 The [G02 engineering assessment](../qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
 separates these observations from remaining integration and receiving work.

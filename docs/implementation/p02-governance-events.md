@@ -75,8 +75,11 @@ terminal-state preservation, schema encoding and atomic rollback. The hosted
 `P02 Governance events` campaign adds real PostgreSQL row locks, competing relay
 processes, process death after real TLS broker confirmation, duplicate delivery
 and a synthetic durable inbox witness, mandatory-route rejection and untrusted-CA
-denial/recovery. Hosted observations must be retained before claiming them as
-passing evidence. The receiver is synthetic, not an implemented product consumer.
+denial/recovery. EV-P02-004 retains the corrected campaign at
+`4afcee1d504b8dfb0725d3306f8c2c55eb1f6dce`: 32 tests and 719 assertions, 132
+source bindings and ten retained log hashes. EV-P02-005 includes its passing
+regression at the delegation source. The receiver is synthetic, not an implemented
+product consumer. Initial failures remain in the correction record.
 
 Identity-bootstrap events remain in their distinct identity outbox; this schema
 does not relabel them as tenant events. Actual consumer wiring, retention/replay

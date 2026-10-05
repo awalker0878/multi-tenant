@@ -119,6 +119,9 @@ phases:
   - EV-P02-001
   - EV-P02-002
   - EV-P02-003
+  - EV-P02-004
+  - EV-P02-005
+  - EV-P02-006
   blocker_ids: []
 - id: P03
   title: Application catalogue and workspace
@@ -803,6 +806,8 @@ work_packages:
   - EV-P02-001
   - EV-P02-002
   - EV-P02-003
+  - EV-P02-005
+  - EV-P02-006
   blocker_ids: []
   doc_refs:
   - docs/implementation/p02-service-delegation.md
@@ -826,6 +831,8 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P02-003
+  - EV-P02-004
+  - EV-P02-006
   blocker_ids: []
   doc_refs:
   - docs/implementation/p02-governance-events.md
@@ -848,6 +855,9 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P02-003
+  - EV-P02-004
+  - EV-P02-005
+  - EV-P02-006
   blocker_ids: []
   doc_refs:
   - docs/implementation/p02-service-delegation.md
@@ -872,6 +882,7 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P02-003
+  - EV-P02-004
   blocker_ids: []
   doc_refs:
   - docs/implementation/p02-governance-events.md
@@ -895,6 +906,7 @@ work_packages:
   - EV-P02-001
   - EV-P02-002
   - EV-P02-003
+  - EV-P02-006
   blocker_ids: []
   doc_refs:
   - docs/implementation/p02-tenancy-and-approvals.md
@@ -1918,6 +1930,9 @@ requirements:
   - EV-P02-001
   - EV-P02-002
   - EV-P02-003
+  - EV-P02-004
+  - EV-P02-005
+  - EV-P02-006
   blocker_ids: []
 - id: R04
   package_ids:
@@ -1961,6 +1976,8 @@ requirements:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P02-003
+  - EV-P02-004
+  - EV-P02-005
   blocker_ids: []
 - id: R05
   package_ids:
@@ -3118,6 +3135,9 @@ gates:
   - EV-P02-001
   - EV-P02-002
   - EV-P02-003
+  - EV-P02-004
+  - EV-P02-005
+  - EV-P02-006
   blocker_ids: []
 - id: G03
   phase_id: P03
@@ -4755,6 +4775,100 @@ evidence:
     unimplemented. Loopback application HTTP, not production ingress/workload TLS. No full restore/revocation-epoch
     reconciliation, service delegation, support/break-glass workflow, outbox delivery, complete multi-tab/assistive-technology
     qualification, promotion or G01/G02 acceptance. Corrected failures remain retained under verification/p02/corrections.md.
+  valid_until: null
+  invalidated_at: null
+
+- id: EV-P02-004
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/20d6d330d2fa04afc544d54e25d5a66241bd3979/verification/p02/event-delivery-retrieval.json
+  sha256: 78f72d5a5d57198c8225a9784d1643fbf4acb010e1887cf8574beda3b80761cf
+  source_revision: 4afcee1d504b8dfb0725d3306f8c2c55eb1f6dce
+  artifact_revisions:
+    retained_artifact_commit: 20d6d330d2fa04afc544d54e25d5a66241bd3979
+    retrieval_record: verification/p02/event-delivery-retrieval.json
+  environment: Ubuntu 24.04 GitHub Actions; PHP 8.5.11; pinned PostgreSQL 18.6 and RabbitMQ; verified broker
+    TLS, disposable quorum queue and synthetic inbox. The separate identity regression also verifies database
+    TLS.
+  scope: 'Confirmed Governance notifications and background approval expiry: 32 PostgreSQL/broker cases (719
+    assertions), four orchestration checks, 132 matching source bindings and ten log hashes. Competing relays,
+    killed publisher after confirmation, stable duplicate bytes, mandatory-route denial, untrusted-CA recovery,
+    retry/quarantine and atomic system expiry. Identity regression passes 46 checks, 67 PostgreSQL cases (1188
+    assertions), two browser journeys, 236 source and six artifact hashes.'
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T18:59:47.982352+00:00'
+  observer: GitHub Actions; ZIP, retained-byte and exact-source verification by Codex
+  reviewer: 'Codex: implementation/source/artifact review only; independent IAM/security, quality and SRE receiving
+    pending'
+  limitations: Synthetic consumer and plans; no product consumer, identity-outbox delivery, operated custody,
+    HA, whole-store restore, native effect or receiving acceptance. Initial timestamp-precision and premature-readiness
+    failures remain retained.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P02-005
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/20d6d330d2fa04afc544d54e25d5a66241bd3979/verification/p02/delegation-retrieval.json
+  sha256: c034d2753f861f6e4dd16ecd0021ff0dfe2bfdacf017f87b554c9b340938fbc8
+  source_revision: 5bc32839ae7dedd186fca68e429e5effa723222d
+  artifact_revisions:
+    retained_artifact_commit: 20d6d330d2fa04afc544d54e25d5a66241bd3979
+    retrieval_record: verification/p02/delegation-retrieval.json
+  environment: Ubuntu 24.04 GitHub Actions; PHP 8.5.11, Composer 2.10.3, Node 24.19.0 and PostgreSQL 18.6 with
+    verified database TLS. Independently installed Catalogue uses fake Governance transport for its boundary
+    tests.
+  scope: Data-facing delegation binds current session, tenant, audience, action, scope and distinct workload
+    credentials. Identity campaign passes 47 checks and 80 PostgreSQL cases (1427 assertions), including thirteen
+    delegation cases; 247 source and six artifact hashes match. Catalogue passes 50 tests (207 assertions),
+    formatter/static/dependency checks and sixteen campaign checks; 153 source and 34 artifact hashes match.
+    Event regression passes 32 tests (719 assertions), 142 source and ten artifact hashes.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T19:07:40.377054+00:00'
+  observer: GitHub Actions; ZIP, retained-byte and exact-source verification by Codex
+  reviewer: 'Codex: implementation/source/artifact review only; independent IAM/security, quality and SRE receiving
+    pending'
+  limitations: Catalogue resource and Governance transport are fixtures; no deployed cross-service business
+    journey or Planning/Assurance client qualification. Administrative/native/support delegation is denied.
+    No independent restore epoch, exceptional-access approval, operated provider interoperability, whole-store
+    recovery, promotion or gate pass.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P02-006
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/20d6d330d2fa04afc544d54e25d5a66241bd3979/verification/p02/browser-lifecycle-retrieval.json
+  sha256: 40c98297b5c36f725a1d5368929ec6d1a6abdb752622551bad71253c3ac7598b
+  source_revision: 512fd5c2580e5cd40bf0089662cff8d84718a877
+  artifact_revisions:
+    retained_artifact_commit: 20d6d330d2fa04afc544d54e25d5a66241bd3979
+    retrieval_record: verification/p02/browser-lifecycle-retrieval.json
+  environment: Ubuntu 24.04 GitHub Actions; PHP 8.5.11, Node 24.19.0 and PostgreSQL 18.6 with verified TLS;
+    compiled Chromium Console; disposable synthetic HTTPS OIDC provider.
+  scope: Expanded campaign passes 47 checks, 80 PostgreSQL cases (1427 assertions) and two browser journeys
+    without skips/retries/failures. Controlled delayed old-tenant response preserves the newer page, quota
+    and focus; same-session tabs isolate unsaved drafts and both clear on sign-out. Four HTTPS/PKCE exchanges,
+    248 source and six artifact hashes match. Console package passes 76 cases (387 assertions), type/boundary/build/static/formatter
+    checks and twenty campaign checks; 187 source and 53 artifact hashes match.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T19:08:50.416633+00:00'
+  observer: GitHub Actions; ZIP, retained-byte and exact-source verification by Codex
+  reviewer: 'Codex: implementation/source/artifact review only; independent IAM/security, quality and SRE receiving
+    pending'
+  limitations: Synthetic provider and immutable plans; loopback application HTTP is not production workload
+    TLS. Cache-restore reauthentication is implemented but actual back/forward-cache interoperability, supported
+    browsers and manual assistive-technology acceptance remain open. Immediate tab clearing needs an available
+    browser signal channel. No native authority, whole-store recovery, promotion or gate decision.
   valid_until: null
   invalidated_at: null
 
