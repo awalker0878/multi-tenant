@@ -201,6 +201,8 @@ def prepare(root: Path, runtime: Path, images: Mapping[str, str], revision: str)
                            "DB_PORT": "5432", "DB_DATABASE": service, "DB_USERNAME": f"{service}_runtime",
                            "DB_PASSWORD_FILE": "/run/secrets/db-password", "DB_SSLMODE": "verify-full",
                            "DB_SSLROOTCERT": "/run/secrets/ca.crt", "HEALTH_TOKEN_FILE": "/run/secrets/health-token"}
+            if service == "console":
+                environment["APP_URL"] = "https://localhost"
             app = _base(images[service])
             app.update(user="10001:10001", networks=[f"db_{service}", f"web_{service}"],
                        environment=environment, depends_on={"postgres": {"condition": "service_started"}},

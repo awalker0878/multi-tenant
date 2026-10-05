@@ -229,6 +229,8 @@ def prepare(root: Path, runtime: Path, images: Mapping[str, str], revision: str,
                                   {"db-password": secret_dir / f"{service}-migrator-password", "ca.crt": secret_dir / "ca.crt"}))
             app = _container(service, image, "512Mi" if service in PHP_SERVICES else "256Mi")
             source["environment"]["TELEMETRY_ENVIRONMENT"] = "p01-kubernetes"
+            if service == "console":
+                source["environment"]["APP_URL"] = "https://console-proxy:8443"
             app["env"] = [{"name": key, "value": value} for key, value in source["environment"].items()]
             app["volumeMounts"] = [_mount("secrets", "/run/secrets", True), _mount("tmp", "/tmp")]
             app["readinessProbe"] = _readiness(service)

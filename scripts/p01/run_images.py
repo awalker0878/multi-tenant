@@ -71,6 +71,8 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
             expected_inputs.update({"resources", "package.json", "package-lock.json", "tsconfig.json", "vite.config.ts"})
         if component_id == "catalogue":
             expected_inputs.add("resources")
+        if component_id == "governance":
+            expected_inputs.add("database/migrations")
     require(set(component["inputs"]) == expected_inputs, "Unexpected context input list")
     root = workspace / context
     require(root.resolve() == root.absolute(), "Symlinked component root")
