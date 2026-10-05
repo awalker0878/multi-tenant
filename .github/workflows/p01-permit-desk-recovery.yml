@@ -1,0 +1,30 @@
+name: P01 Permit Desk application recovery
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: [scripts/p01/**, deploy/fixtures/permit-desk/**, deploy/dependencies/inputs.lock.json, .github/workflows/p01-permit-desk-recovery.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: p01-permit-desk-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  recovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Validate capture admission and attachment boundaries
+        run: python3 -m unittest discover -s scripts/p01 -p 'test_permit_desk.py' -v
+      - name: Rebuild application and restore both complete captures
+        run: python3 scripts/p01/run_permit_desk.py --source-revision "$GITHUB_SHA" --output "$RUNNER_TEMP/p01-permit-desk"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p01-permit-desk-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-permit-desk/
+          if-no-files-found: error
+          retention-days: 14

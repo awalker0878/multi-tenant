@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "fixture": "permit-desk-v1",
+  "native_writes": false,
+  "principals": {
+    "writer_a": {"tenant": "t_demo", "role": "writer"},
+    "reader_a": {"tenant": "t_demo", "role": "reader"},
+    "writer_b": {"tenant": "t_other", "role": "writer"}
+  },
+  "database": {"host": "postgres", "name": "permit_desk", "user": "pd_runtime"}
+}
