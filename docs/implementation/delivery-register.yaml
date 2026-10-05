@@ -88,6 +88,10 @@ phases:
   - EV-P01-025
   - EV-P01-026
   - EV-P01-027
+  - EV-P01-028
+  - EV-P01-029
+  - EV-P01-030
+  - EV-P01-031
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -533,6 +537,7 @@ work_packages:
   - EV-P01-011
   - EV-P01-012
   - EV-P01-024
+  - EV-P01-028
   blocker_ids: []
   dependency_package_ids: []
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
@@ -560,6 +565,7 @@ work_packages:
   - docs/implementation/p01-code-control.md
   - docs/implementation/p01-runtime-integration.md
   - docs/implementation/p01-image-remediation.md
+  - docs/implementation/p01-telemetry.md
 - id: P01.02
   phase_id: P01
   title: Local and integration runtime
@@ -579,6 +585,9 @@ work_packages:
   - EV-P01-018
   - EV-P01-025
   - EV-P01-026
+  - EV-P01-029
+  - EV-P01-030
+  - EV-P01-031
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -603,6 +612,7 @@ work_packages:
   - docs/operations/runbooks/stateful-dependency-recovery.md
   - docs/implementation/p01-console-shared-state.md
   - docs/implementation/p01-image-remediation.md
+  - docs/implementation/p01-telemetry.md
 - id: P01.03
   phase_id: P01
   title: Contracts and messaging
@@ -616,6 +626,7 @@ work_packages:
   - EV-P01-015
   - EV-P01-017
   - EV-P01-027
+  - EV-P01-031
   blocker_ids: []
   dependency_package_ids:
   - P01.05
@@ -633,6 +644,7 @@ work_packages:
   - docs/implementation/p01-messaging.md
   - docs/implementation/p01-http-contracts.md
   - docs/implementation/p01-image-remediation.md
+  - docs/implementation/p01-telemetry.md
 - id: P01.04
   phase_id: P01
   title: CI and supply chain
@@ -652,6 +664,8 @@ work_packages:
   - EV-P01-023
   - EV-P01-024
   - EV-P01-027
+  - EV-P01-028
+  - EV-P01-031
   blocker_ids:
   - BL-P00-001
   - BL-P01-001
@@ -678,6 +692,7 @@ work_packages:
   - docs/implementation/p01-http-contracts.md
   - docs/implementation/p01-artifact-admission.md
   - docs/implementation/p01-image-remediation.md
+  - docs/implementation/p01-telemetry.md
 - id: P01.05
   phase_id: P01
   title: Runtime dependencies
@@ -698,6 +713,8 @@ work_packages:
   - EV-P01-025
   - EV-P01-026
   - EV-P01-027
+  - EV-P01-029
+  - EV-P01-030
   blocker_ids:
   - BL-P00-001
   dependency_package_ids: []
@@ -717,6 +734,7 @@ work_packages:
   - docs/implementation/p01-console-shared-state.md
   - docs/implementation/p01-messaging.md
   - docs/implementation/p01-image-remediation.md
+  - docs/implementation/p01-telemetry.md
 - id: P01.06
   phase_id: P01
   title: Baseline operations
@@ -737,6 +755,9 @@ work_packages:
   - EV-P01-025
   - EV-P01-026
   - EV-P01-027
+  - EV-P01-029
+  - EV-P01-030
+  - EV-P01-031
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -765,6 +786,7 @@ work_packages:
   - docs/implementation/p01-console-shared-state.md
   - docs/implementation/p01-messaging.md
   - docs/implementation/p01-resource-observation.md
+  - docs/implementation/p01-telemetry.md
 - id: P02.01
   phase_id: P02
   title: Authentication
@@ -1798,7 +1820,7 @@ requirements:
   - G10
   status:
     work: IN_PROGRESS
-    verification: FAILED
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
@@ -1825,6 +1847,14 @@ requirements:
   - EV-P01-021
   - EV-P01-022
   - EV-P01-023
+  - EV-P01-024
+  - EV-P01-025
+  - EV-P01-026
+  - EV-P01-027
+  - EV-P01-028
+  - EV-P01-029
+  - EV-P01-030
+  - EV-P01-031
   blocker_ids:
   - BL-P01-001
   - BL-P01-002
@@ -2665,8 +2695,8 @@ requirements:
   - G07
   - G10
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
@@ -2674,7 +2704,14 @@ requirements:
   - EV-P01-014
   - EV-P01-016
   - EV-P01-018
-  blocker_ids: []
+  - EV-P01-025
+  - EV-P01-026
+  - EV-P01-027
+  - EV-P01-029
+  - EV-P01-030
+  - EV-P01-031
+  blocker_ids:
+  - BL-P00-001
 - id: R30
   package_ids:
   - P01.06
@@ -2704,15 +2741,20 @@ requirements:
   - G07
   - G10
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-013
   - EV-P01-016
   - EV-P01-018
-  blocker_ids: []
+  - EV-P01-025
+  - EV-P01-026
+  - EV-P01-029
+  - EV-P01-030
+  blocker_ids:
+  - BL-P00-001
 - id: R31
   package_ids:
   - P01.04
@@ -2756,7 +2798,7 @@ requirements:
   - G10
   status:
     work: IN_PROGRESS
-    verification: FAILED
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
@@ -2769,6 +2811,14 @@ requirements:
   - EV-P01-021
   - EV-P01-022
   - EV-P01-023
+  - EV-P01-024
+  - EV-P01-025
+  - EV-P01-026
+  - EV-P01-027
+  - EV-P01-028
+  - EV-P01-029
+  - EV-P01-030
+  - EV-P01-031
   blocker_ids:
   - BL-P01-001
   - BL-P01-002
@@ -2917,7 +2967,7 @@ requirements:
   - G11
   status:
     work: IN_PROGRESS
-    verification: FAILED
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
@@ -2929,6 +2979,10 @@ requirements:
   - EV-P01-021
   - EV-P01-022
   - EV-P01-023
+  - EV-P01-024
+  - EV-P01-027
+  - EV-P01-028
+  - EV-P01-031
   blocker_ids:
   - BL-P01-001
   - BL-P01-002
@@ -3014,6 +3068,10 @@ gates:
   - EV-P01-025
   - EV-P01-026
   - EV-P01-027
+  - EV-P01-028
+  - EV-P01-029
+  - EV-P01-030
+  - EV-P01-031
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -4417,6 +4475,154 @@ evidence:
     objective, native effect, operating acceptance or G01 decision is inferred.
   valid_until: null
   invalidated_at: null
+- id: EV-P01-028
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/61a972cba5eba4e09bb5f806f6d67d1af29c6373/verification/p01/artifact-trust/run-37278732015/retrieval.json
+  sha256: 73bd8277cf89d00a006130dae6f9dad5e79d8b9f2deb2304dc93fa55a03a3628
+  source_revision: 36a14811b5afa23717566d5e8a08632e011f44a5
+  artifact_revisions:
+    retained_artifact_commit: 61a972cba5eba4e09bb5f806f6d67d1af29c6373
+    workflow_run_id: 37278732015
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-telemetry.md
+    package_workflow_run_id: 37278731972
+    package_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/61a972cba5eba4e09bb5f806f6d67d1af29c6373/verification/p01/telemetry/packages/36a14811b5afa23717566d5e8a08632e011f44a5/retrieval.json
+    package_retrieval_sha256: df658306b956e6d5591e8c8bdf887d98c32bdcca2b7aae2d81cdb0d587fe7d0d
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures;
+    no native endpoints or operated promotion.
+  scope: All nine telemetry-source images pass development admission with zero blocking findings, 18 CycloneDX
+    image/source SBOMs, nine development signatures, 63 expected denials and nine unchanged-byte development
+    transfers. Retrieval verifies 206 build logs and 253 unique source bindings. All nine isolated package
+    reports pass at the same source, with 346 logs, 388 declared artifacts and 412 unique source bindings.
+    Original image failures remain retained.
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  - G01.04
+  observed_at: '2026-10-05T07:39:03Z'
+  observer: GitHub Actions; connector retrieval and exact-byte/source examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Bounded synthetic development observations. Diagnostic buffering and operator collection
+    are not durable audit/evidence custody, business-operation completion or operating receiver acceptance.
+    Full image layers are not retained; development signatures do not establish operated signer/registry
+    trust. No production sizing, accepted recovery objective, native effect, operating acceptance or G01
+    decision is inferred.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-029
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/61a972cba5eba4e09bb5f806f6d67d1af29c6373/verification/p01/local/run-37278731868/retrieval.json
+  sha256: 78343f402aad76abc2aae09e4b742ae590844c4b6b0304b7ec7d73590fc670bf
+  source_revision: 36a14811b5afa23717566d5e8a08632e011f44a5
+  artifact_revisions:
+    retained_artifact_commit: 61a972cba5eba4e09bb5f806f6d67d1af29c6373
+    workflow_run_id: 37278731868
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-telemetry.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures;
+    no native endpoints or operated promotion.
+  scope: 249 Compose checks pass, including 70 telemetry checks across the seven deployed HTTP applications.
+    The collected journey retains 21 records/spans and 21 bounded metric series. Seven authorized diagnostic
+    spans match the common caller trace; denial responses are also retained, including malformed-trace
+    requests that start fresh traces. Twenty-two snapshots and three signal exports cover correlation,
+    redaction, public-read denial, actual PHP/Python buffer exhaustion, unavailable filesystem, stale
+    acknowledgement preservation, explicit missing samples and resumed collection. Existing identity,
+    shared-state, restart, failed-deployment recovery and synthetic alert checks remain passing. Thirty
+    resource samples cover 15 containers; effective Compose limits remain unlimited. All 610 command logs
+    and 324 source bindings were verified; cleanup completed.
+  campaign_ids: []
+  criterion_ids:
+  - G01.02
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T07:39:56Z'
+  observer: GitHub Actions; connector retrieval and exact-byte/source examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Bounded synthetic development observations. Diagnostic buffering and operator collection
+    are not durable audit/evidence custody, business-operation completion or operating receiver acceptance.
+    Full image layers are not retained; development signatures do not establish operated signer/registry
+    trust. No production sizing, accepted recovery objective, native effect, operating acceptance or G01
+    decision is inferred.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-030
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/61a972cba5eba4e09bb5f806f6d67d1af29c6373/verification/p01/kubernetes/run-37278731990/retrieval.json
+  sha256: bb3961d5d84a0ccbd1c2b9ba27dca49361f5fbca9fcee504b8d62fbc7211fb8f
+  source_revision: 36a14811b5afa23717566d5e8a08632e011f44a5
+  artifact_revisions:
+    retained_artifact_commit: 61a972cba5eba4e09bb5f806f6d67d1af29c6373
+    workflow_run_id: 37278731990
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-telemetry.md
+    retained_failure_records:
+    - verification/p01/telemetry/initial-kubernetes-failure/retrieval.json
+    - verification/p01/telemetry/concurrent-probe-failure/retrieval.json
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures;
+    no native endpoints or operated promotion.
+  scope: 266 Kubernetes checks pass, including 70 telemetry checks, Cilium isolation and existing state/deployment
+    recovery. Twenty-two snapshots and three signal exports retain correlation, redaction, public-read
+    denial, real buffer exhaustion, unavailable filesystem, stale acknowledgement preservation, missing
+    samples and resumed collection. The collected journey contains 30 records/spans including concurrent
+    readiness probes, with 21 metric series; seven authorized diagnostic spans match the common caller
+    trace, and denial responses are also retained. Thirty resource samples cover 15 containers. All 1052
+    command logs and 310 source bindings were verified; cleanup completed. Both earlier Kubernetes telemetry
+    failures remain unchanged and separately retained.
+  campaign_ids: []
+  criterion_ids:
+  - G01.02
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T07:46:12Z'
+  observer: GitHub Actions; connector retrieval and exact-byte/source examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Bounded synthetic development observations. Diagnostic buffering and operator collection
+    are not durable audit/evidence custody, business-operation completion or operating receiver acceptance.
+    Full image layers are not retained; development signatures do not establish operated signer/registry
+    trust. No production sizing, accepted recovery objective, native effect, operating acceptance or G01
+    decision is inferred.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-031
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/61a972cba5eba4e09bb5f806f6d67d1af29c6373/verification/p01/requalification/36a14811b5afa23717566d5e8a08632e011f44a5/retrieval.json
+  sha256: ef47d5be221b351ff5d14221988fb6eeaf20024e1299e6fa7b787166f5f7a611
+  source_revision: 36a14811b5afa23717566d5e8a08632e011f44a5
+  artifact_revisions:
+    retained_artifact_commit: 61a972cba5eba4e09bb5f806f6d67d1af29c6373
+    workflow_run_id: 37278731953
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-telemetry.md
+    http_workflow_run_id: 37278731866
+    permit_desk_workflow_run_id: 37278731970
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned isolated synthetic development fixtures;
+    no native endpoints or operated promotion.
+  scope: Affected requalification at the telemetry source passes 28 HTTP fixtures, all 79 complete synthetic
+    Permit Desk recovery checks and 59 policy-control tests. The positive-controlled repository secret
+    scan reports zero findings across 10187 tracked files. Original archives and exact report/source/log
+    bindings remain retained. The 35 messaging checks, 16 event fixtures and 40 stateful-dependency checks
+    are distinct EV-P01-027 observations at b7705eef994c50863d87b4d8f9ff272f9397ca37; this record does
+    not relabel them as rerun.
+  campaign_ids: []
+  criterion_ids:
+  - G01.02
+  - G01.03
+  - G01.04
+  - G01.06
+  observed_at: '2026-10-05T07:38:12Z'
+  observer: GitHub Actions; connector retrieval and exact-byte/source examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Bounded synthetic development observations. Diagnostic buffering and operator collection
+    are not durable audit/evidence custody, business-operation completion or operating receiver acceptance.
+    Full image layers are not retained; development signatures do not establish operated signer/registry
+    trust. No production sizing, accepted recovery objective, native effect, operating acceptance or G01
+    decision is inferred.
+  valid_until: null
+  invalidated_at: null
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -4437,6 +4643,8 @@ blockers:
   - P01.05
   - P01.06
   - G01
+  - R29
+  - R30
   owner_role: Requesting user for baseline decisions; actual integration, operating and records owners
     at their affected checkpoints
   description: The requesting user approved the G00 development baseline and advancement to P01. Remaining
@@ -4471,10 +4679,10 @@ blockers:
     and application recovery bounds; execute the uncovered bounded G00.04 checks. Before any native calls/effects,
     additionally supply verified installation/resource facts and current permitted campaign scope through
     the approved access mechanism.
-  next_action: Review EV-P01-013 and the complete fixture inventory for the carried application scope.
-    Preserve both complete captures and their source bindings. Complete remaining P01 dependency/operations
-    integration; obtain actual application recovery objectives before P08 and native facts/authority before
-    G04/G07/G08.
+  next_action: Review the complete Permit Desk inventory and EV-P01-013/027/031 recovery evidence, the
+    measured dependency integrations and EV-P01-029/030 operations groundwork. Complete actual operating
+    inputs and independent receiving reviews. Obtain application recovery objectives before P08 and native
+    facts/authority before G04/G07/G08; preserve both complete captures and their source bindings.
   state: OPEN
   resolution_evidence_ids: []
 - id: BL-P01-001
