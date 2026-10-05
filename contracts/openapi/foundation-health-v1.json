@@ -1,0 +1,381 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "P01 foundation health",
+    "version": "1.0.0",
+    "description": "Implemented foundation diagnostic transport for the seven independently hosted applications. Versioned contract artifact; existing diagnostic routes have no version prefix. No business API or native-effect authority."
+  },
+  "servers": [
+    {
+      "url": "https://unconfigured.invalid",
+      "description": "Explicitly configure the owning private origin and verified TLS."
+    }
+  ],
+  "paths": {
+    "/health/live": {
+      "get": {
+        "operationId": "inspectProcess",
+        "security": [],
+        "description": "Read-only foundation diagnostics. This endpoint never enables native operations.",
+        "responses": {
+          "200": {
+            "description": "ProcessLive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessLive"
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Contains no-store."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "inspectServiceReadiness",
+        "security": [],
+        "description": "Read-only foundation diagnostics. This endpoint never enables native operations.",
+        "responses": {
+          "503": {
+            "description": "ServiceNotReady",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceNotReady"
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Contains no-store."
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "10"
+                  ]
+                },
+                "description": "Wait at least ten seconds; callers still bound total attempts."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/dependencies": {
+      "get": {
+        "operationId": "inspectFoundationDependencies",
+        "security": [
+          {
+            "healthBearer": []
+          }
+        ],
+        "description": "Read-only foundation diagnostics. This endpoint never enables native operations.",
+        "responses": {
+          "200": {
+            "description": "DependenciesReady",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DependenciesReady"
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Contains no-store."
+              }
+            }
+          },
+          "401": {
+            "description": "DependenciesUnauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DependenciesUnauthorized"
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Contains no-store."
+              },
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer challenge; no credential material."
+              }
+            }
+          },
+          "503": {
+            "description": "DependenciesUnavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DependenciesUnavailable"
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Contains no-store."
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "10"
+                  ]
+                },
+                "description": "Wait at least ten seconds; callers still bound total attempts."
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "healthBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Service-specific mounted health token; does not grant business access."
+      }
+    },
+    "schemas": {
+      "ProcessLive": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "service",
+          "status",
+          "scope"
+        ],
+        "properties": {
+          "service": {
+            "type": "string",
+            "enum": [
+              "console",
+              "governance",
+              "catalogue",
+              "assurance",
+              "inventory",
+              "planning",
+              "lifecycle"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "alive"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "process"
+            ]
+          }
+        }
+      },
+      "ServiceNotReady": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "service",
+          "status",
+          "scope",
+          "reason"
+        ],
+        "properties": {
+          "service": {
+            "type": "string",
+            "enum": [
+              "console",
+              "governance",
+              "catalogue",
+              "assurance",
+              "inventory",
+              "planning",
+              "lifecycle"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "not_ready"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "service"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "foundation_only"
+            ]
+          }
+        }
+      },
+      "DependenciesReady": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "service",
+          "status",
+          "scope"
+        ],
+        "properties": {
+          "service": {
+            "type": "string",
+            "enum": [
+              "console",
+              "governance",
+              "catalogue",
+              "assurance",
+              "inventory",
+              "planning",
+              "lifecycle"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "foundation_dependencies"
+            ]
+          },
+          "native_operations_enabled": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          }
+        }
+      },
+      "DependenciesUnauthorized": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "service",
+          "status",
+          "scope"
+        ],
+        "properties": {
+          "service": {
+            "type": "string",
+            "enum": [
+              "console",
+              "governance",
+              "catalogue",
+              "assurance",
+              "inventory",
+              "planning",
+              "lifecycle"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "unauthorized"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "foundation_dependencies"
+            ]
+          },
+          "native_operations_enabled": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          }
+        }
+      },
+      "DependenciesUnavailable": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "service",
+          "status",
+          "scope",
+          "reason"
+        ],
+        "properties": {
+          "service": {
+            "type": "string",
+            "enum": [
+              "console",
+              "governance",
+              "catalogue",
+              "assurance",
+              "inventory",
+              "planning",
+              "lifecycle"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "not_ready"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "foundation_dependencies"
+            ]
+          },
+          "native_operations_enabled": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "dependency_unavailable",
+              "dependencies_unavailable",
+              "health_authentication_unavailable"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

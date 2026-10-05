@@ -80,3 +80,10 @@ are implemented for the [P01 messaging reference](../implementation/p01-messagin
 Private generated DTOs follow schema validation; `generate.py --check` rejects
 drift. The 16 shared fixtures compare PHP/Python acceptance and canonical digests.
 The preceding business APIs remain proposed; this reference does not publish them.
+
+The [foundation HTTP contract](../../contracts/openapi/foundation-health-v1.json)
+now describes the existing diagnostic routes. Its [implementation record](../implementation/p01-http-contracts.md)
+documents locked client generation, PHP/Python fixture interpretation and the
+conservative base/head rule that rejects mutation or deletion of published
+contract artifacts. The rule requires a new artifact for a new version; it does
+not turn proposed business APIs into implemented endpoints.

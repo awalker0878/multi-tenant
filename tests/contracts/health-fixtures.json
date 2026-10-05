@@ -1,0 +1,301 @@
+[
+  {
+    "id": "ProcessLive-valid",
+    "schema": "ProcessLive",
+    "valid": true,
+    "value": {
+      "service": "console",
+      "status": "alive",
+      "scope": "process"
+    }
+  },
+  {
+    "id": "ProcessLive-invalid-status",
+    "schema": "ProcessLive",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "unsupported",
+      "scope": "process"
+    }
+  },
+  {
+    "id": "ProcessLive-invalid-service",
+    "schema": "ProcessLive",
+    "valid": false,
+    "value": {
+      "service": "unregistered",
+      "status": "alive",
+      "scope": "process"
+    }
+  },
+  {
+    "id": "ProcessLive-invalid-scope",
+    "schema": "ProcessLive",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "alive",
+      "scope": null
+    }
+  },
+  {
+    "id": "ProcessLive-invalid-extra",
+    "schema": "ProcessLive",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "alive",
+      "scope": "process",
+      "extra": "secret"
+    }
+  },
+  {
+    "id": "ServiceNotReady-valid",
+    "schema": "ServiceNotReady",
+    "valid": true,
+    "value": {
+      "service": "console",
+      "status": "not_ready",
+      "scope": "service",
+      "reason": "foundation_only"
+    }
+  },
+  {
+    "id": "ServiceNotReady-invalid-status",
+    "schema": "ServiceNotReady",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "unsupported",
+      "scope": "service",
+      "reason": "foundation_only"
+    }
+  },
+  {
+    "id": "ServiceNotReady-invalid-service",
+    "schema": "ServiceNotReady",
+    "valid": false,
+    "value": {
+      "service": "unregistered",
+      "status": "not_ready",
+      "scope": "service",
+      "reason": "foundation_only"
+    }
+  },
+  {
+    "id": "ServiceNotReady-invalid-scope",
+    "schema": "ServiceNotReady",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "not_ready",
+      "scope": null,
+      "reason": "foundation_only"
+    }
+  },
+  {
+    "id": "ServiceNotReady-invalid-extra",
+    "schema": "ServiceNotReady",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "not_ready",
+      "scope": "service",
+      "reason": "foundation_only",
+      "extra": "secret"
+    }
+  },
+  {
+    "id": "DependenciesReady-valid",
+    "schema": "DependenciesReady",
+    "valid": true,
+    "value": {
+      "service": "console",
+      "status": "ready",
+      "scope": "foundation_dependencies"
+    }
+  },
+  {
+    "id": "DependenciesReady-invalid-status",
+    "schema": "DependenciesReady",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "unsupported",
+      "scope": "foundation_dependencies"
+    }
+  },
+  {
+    "id": "DependenciesReady-invalid-service",
+    "schema": "DependenciesReady",
+    "valid": false,
+    "value": {
+      "service": "unregistered",
+      "status": "ready",
+      "scope": "foundation_dependencies"
+    }
+  },
+  {
+    "id": "DependenciesReady-invalid-scope",
+    "schema": "DependenciesReady",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "ready",
+      "scope": null
+    }
+  },
+  {
+    "id": "DependenciesReady-invalid-extra",
+    "schema": "DependenciesReady",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "ready",
+      "scope": "foundation_dependencies",
+      "extra": "secret"
+    }
+  },
+  {
+    "id": "DependenciesReady-native-denied",
+    "schema": "DependenciesReady",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "ready",
+      "scope": "foundation_dependencies",
+      "native_operations_enabled": true
+    }
+  },
+  {
+    "id": "DependenciesUnauthorized-valid",
+    "schema": "DependenciesUnauthorized",
+    "valid": true,
+    "value": {
+      "service": "console",
+      "status": "unauthorized",
+      "scope": "foundation_dependencies"
+    }
+  },
+  {
+    "id": "DependenciesUnauthorized-invalid-status",
+    "schema": "DependenciesUnauthorized",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "unsupported",
+      "scope": "foundation_dependencies"
+    }
+  },
+  {
+    "id": "DependenciesUnauthorized-invalid-service",
+    "schema": "DependenciesUnauthorized",
+    "valid": false,
+    "value": {
+      "service": "unregistered",
+      "status": "unauthorized",
+      "scope": "foundation_dependencies"
+    }
+  },
+  {
+    "id": "DependenciesUnauthorized-invalid-scope",
+    "schema": "DependenciesUnauthorized",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "unauthorized",
+      "scope": null
+    }
+  },
+  {
+    "id": "DependenciesUnauthorized-invalid-extra",
+    "schema": "DependenciesUnauthorized",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "unauthorized",
+      "scope": "foundation_dependencies",
+      "extra": "secret"
+    }
+  },
+  {
+    "id": "DependenciesUnauthorized-native-denied",
+    "schema": "DependenciesUnauthorized",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "unauthorized",
+      "scope": "foundation_dependencies",
+      "native_operations_enabled": true
+    }
+  },
+  {
+    "id": "DependenciesUnavailable-valid",
+    "schema": "DependenciesUnavailable",
+    "valid": true,
+    "value": {
+      "service": "console",
+      "status": "not_ready",
+      "scope": "foundation_dependencies",
+      "reason": "dependency_unavailable"
+    }
+  },
+  {
+    "id": "DependenciesUnavailable-invalid-status",
+    "schema": "DependenciesUnavailable",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "unsupported",
+      "scope": "foundation_dependencies",
+      "reason": "dependency_unavailable"
+    }
+  },
+  {
+    "id": "DependenciesUnavailable-invalid-service",
+    "schema": "DependenciesUnavailable",
+    "valid": false,
+    "value": {
+      "service": "unregistered",
+      "status": "not_ready",
+      "scope": "foundation_dependencies",
+      "reason": "dependency_unavailable"
+    }
+  },
+  {
+    "id": "DependenciesUnavailable-invalid-scope",
+    "schema": "DependenciesUnavailable",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "not_ready",
+      "scope": null,
+      "reason": "dependency_unavailable"
+    }
+  },
+  {
+    "id": "DependenciesUnavailable-invalid-extra",
+    "schema": "DependenciesUnavailable",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "not_ready",
+      "scope": "foundation_dependencies",
+      "reason": "dependency_unavailable",
+      "extra": "secret"
+    }
+  },
+  {
+    "id": "DependenciesUnavailable-native-denied",
+    "schema": "DependenciesUnavailable",
+    "valid": false,
+    "value": {
+      "service": "console",
+      "status": "not_ready",
+      "scope": "foundation_dependencies",
+      "reason": "dependency_unavailable",
+      "native_operations_enabled": true
+    }
+  }
+]
