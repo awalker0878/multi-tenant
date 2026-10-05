@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › tests/browser-p02/identity.spec.ts:4:1 › deployment credential requires a change, survives reload and cannot be reused (4.3s)
+
+  1 passed (5.7s)

@@ -1,0 +1,20 @@
+{
+  "base_revision": "f3612f6d5669ec47f13020a7f1f1f1d64e333e5d",
+  "policy": "immutable-existing-contract-artifacts",
+  "baseline_sha256": {
+    "contracts/asyncapi/catalogue.yaml": "d11eab6a06d27b202011223a6b366b1ad8419a2af15eb8d764581bef794043ee",
+    "contracts/openapi/foundation-health-v1.json": "0ae446a089acaa24d549d11b860efa750d8758b67c70d9d82a056ebcd012977c",
+    "contracts/openapi/governance-federation-v1.json": "233a03ad6c3d38ac99a4978f24ae28e46eb3fde632586d0766772c7b3c99eb2d",
+    "contracts/openapi/governance-local-identity-v1.json": "79f17eb90e3c0fd335d7be95f4fd71666adf017d8c31254872ef64c1dfc7ad0e",
+    "contracts/schemas/events/catalogue-foundation-recorded-v1.json": "933b1e3d02678ba7bd5ebb19aeffd6d08c42124ba3d1706bc1e0b039f5e1052f"
+  },
+  "added": [
+    "contracts/openapi/governance-approvals-v1.json",
+    "contracts/openapi/governance-tenancy-v1.json",
+    "contracts/openapi/planning-immutable-plan-v1.json"
+  ],
+  "conflicts": [],
+  "source_revision": "6fd44860f61d66bf858c92b8099f29a97479758b",
+  "observed_at": "2026-10-05T18:14:58.228260+00:00",
+  "result": "PASS"
+}

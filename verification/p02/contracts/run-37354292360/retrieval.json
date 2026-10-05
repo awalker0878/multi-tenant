@@ -1,0 +1,11 @@
+{
+  "source_revision": "6fd44860f61d66bf858c92b8099f29a97479758b",
+  "github_artifact_zip_sha256": "bf0245cc574344c8a34ef5288fe16e17960a4088a1373c321e47b432db451063",
+  "report_sha256": "fda348de2988d90ed92270ccdeea517c4cd5783ebb1d8731fb68ea30ad6624e8",
+  "artifact_hashes_verified": 2,
+  "source_bindings_verified": 23,
+  "verified_at": "2026-10-05T18:16:09.848499+00:00",
+  "observer": "Codex via GitHub connector and local SHA-256 comparison",
+  "result": "MATCH",
+  "campaign_result": "FAIL"
+}
