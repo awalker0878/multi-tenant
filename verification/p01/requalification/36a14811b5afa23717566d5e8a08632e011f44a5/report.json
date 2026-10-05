@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "source_revision": "36a14811b5afa23717566d5e8a08632e011f44a5",
+  "source_tree_sha": "e2f6da34961af968084d535bb5a3e418f532f2f4",
+  "result": "VERIFIED",
+  "outcomes": [
+    {
+      "artifact": "p01-http-contracts",
+      "run_id": 37278731866,
+      "result": "PASS",
+      "report_sha256": "7908f76a701bcb79b4cbc8420b290b8b892b8d93701c701dc4e7c88210220227",
+      "verified_source_bindings": 18,
+      "verified_command_logs": 24,
+      "source_binding_inventory_sha256": "5b9ad85f8181844002ce7a2bda364c6ef607b088ad3fd6cac70d2947926d12b6",
+      "fixtures": [
+        {
+          "id": "ProcessLive-valid",
+          "valid": true
+        },
+        {
+          "id": "ProcessLive-invalid-status",
+          "valid": false
+        },
+        {
+          "id": "ProcessLive-invalid-service",
+          "valid": false
+        },
+        {
+          "id": "ProcessLive-invalid-scope",
+          "valid": false
+        },
+        {
+          "id": "ProcessLive-invalid-extra",
+          "valid": false
+        },
+        {
+          "id": "ServiceNotReady-valid",
+          "valid": true
+        },
+        {
+          "id": "ServiceNotReady-invalid-status",
+          "valid": false
+        },
+        {
+          "id": "ServiceNotReady-invalid-service",
+          "valid": false
+        },
+        {
+          "id": "ServiceNotReady-invalid-scope",
+          "valid": false
+        },
+        {
+          "id": "ServiceNotReady-invalid-extra",
+          "valid": false
+        },
+        {
+          "id": "DependenciesReady-valid",
+          "valid": true
+        },
+        {
+          "id": "DependenciesReady-invalid-status",
+          "valid": false
+        },
+        {
+          "id": "DependenciesReady-invalid-service",
+          "valid": false
+        },
+        {
+          "id": "DependenciesReady-invalid-scope",
+          "valid": false
+        },
+        {
+          "id": "DependenciesReady-invalid-extra",
+          "valid": false
+        },
+        {
+          "id": "DependenciesReady-native-denied",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnauthorized-valid",
+          "valid": true
+        },
+        {
+          "id": "DependenciesUnauthorized-invalid-status",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnauthorized-invalid-service",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnauthorized-invalid-scope",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnauthorized-invalid-extra",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnauthorized-native-denied",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnavailable-valid",
+          "valid": true
+        },
+        {
+          "id": "DependenciesUnavailable-invalid-status",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnavailable-invalid-service",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnavailable-invalid-scope",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnavailable-invalid-extra",
+          "valid": false
+        },
+        {
+          "id": "DependenciesUnavailable-native-denied",
+          "valid": false
+        }
+      ]
+    },
+    {
+      "artifact": "p01-permit-desk",
+      "run_id": 37278731970,
+      "result": "PASS",
+      "report_sha256": "5d1b478a5c34219a43892135ecee2c61961c7856a89b624d9b35602455bca924",
+      "verified_source_bindings": 95,
+      "verified_command_logs": 176,
+      "source_binding_inventory_sha256": "c3e807192d6acc8ccfc924f4c15af67a16763605a7f53e01137e1c5c5ca17398",
+      "checks": 79,
+      "cleanup_complete": true
+    },
+    {
+      "artifact": "p01-repository-secrets",
+      "run_id": 37278731953,
+      "result": "PASSED",
+      "report_sha256": "0eed7f6bc87a3fb068ba278f5856abe75f5102fcb073705240240c3c01c15731",
+      "verified_source_bindings": 10187,
+      "verified_command_logs": 0,
+      "source_binding_inventory_sha256": "87d19ec9c16435912d37592f7403325ad82e058c9682427644dc2643826f4713",
+      "tracked_files": 10187,
+      "secrets": 0
+    },
+    {
+      "artifact": "p01-policy-controls",
+      "run_id": 37278731953,
+      "result": "PASSED",
+      "report_sha256": "a32bcaf66a9bba6f52b7b4b0847cfd827bf8ddbf123a2f79dd3535b3bbd84f43",
+      "verified_source_bindings": 35,
+      "verified_command_logs": 7,
+      "source_binding_inventory_sha256": "7f0a1acb93ef5fb7f449c38c5a220827d518dcf6d5d11be16eeee814d04fce46",
+      "tests": 59
+    }
+  ],
+  "source_verification": "All declared source hashes were compared with exact Git blob bytes at the stated tree. Detailed source SHA-256 inventories and reports remain inside the verified original archives."
+}

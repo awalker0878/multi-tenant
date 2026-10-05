@@ -1,0 +1,4988 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.7.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:56d455b6-03bc-47e6-a7c5-84ea20407b3e",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-10-05T07:38:03+00:00",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "manufacturer": {
+            "name": "Aqua Security Software Ltd."
+          },
+          "group": "aquasecurity",
+          "name": "trivy",
+          "version": "0.75.0"
+        }
+      ]
+    },
+    "component": {
+      "bom-ref": "03d148fe-0dbc-40d6-a2fb-2c321ee20308",
+      "type": "container",
+      "name": "/tmp/p01-private-artifact-ndf4kzyh/image.tar",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:04d950f6a174554338b34cc3a63fdb43c204c91a21dcb8ba558c9a28bd4e9d96"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:0638497e28fbf72d460f27f2e8374b1655c9950e7f74e5de5b5b39f17144241a"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:34485dd96663f24521931d3a910e61d501250545710a62dbb661a7d2810bac6c"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:364fe0d010bd8ba6e31e0b9708413c686a0709a11103f77826a6d8c70f1114f7"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:3b223733175e42016635eb0e3d289707be3900cf9f6c03904277a97ade845f94"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:3e9ad28155f6fadf965089a1b96b3e8f6750492610c98f9127faa8df19c39184"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:41630fc05345313fc7cb8020d89992531d0113d11e1eacb364209eecff3dea18"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:56cb26d4b7de2fbd02bb278bc0f8a2829ee0f8ef2a0d8c2957851474aac85e2a"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:6c59d62e3b8e700266ba1032318d64177c46aecc417142547638cfeb2097a742"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:717901ba14ca0606b521337e11a0c43ddc92ddd01fde43233fc0b467afd3cf2d"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:9300080927dd9e59a5b76239edc461444835b9bc903d07d170203da898efeae8"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:9b5f19a8c599a1b97fa7906778d71f5f56016f55bbd0b59f8c6c44c2d82eb426"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:bc2bb3673e643763fe7a76850bfedda6a50c17754f92f7244a5028a8063a3311"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:ca06906c4449115d381dad9366c40fe468ead15b7ad0d506680c9347882adf69"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:d130d6221d4d2a36479232caa9e8745f7feb95e0e250c44fdfeba258d1f343f1"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:e234269b45e8523d44168c64151dfc735d90c95832bd7e6a546a17d8e0c0c030"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:e7e9b55a081b67c49c31b1ce99003174a9f74cd625a41533a9bf17cb4b38e6b0"
+        },
+        {
+          "name": "aquasecurity:trivy:DiffID",
+          "value": "sha256:ff0f432672d662ce0d16c3d2189b27c6e691c8205ed22e3810edd323f03107ed"
+        },
+        {
+          "name": "aquasecurity:trivy:ImageID",
+          "value": "sha256:947c24121c0176b38a5f75cb5e9e6bdb652a7f8b5930c713eedb42981fd763c0"
+        },
+        {
+          "name": "aquasecurity:trivy:Labels:io.product.component",
+          "value": "governance"
+        },
+        {
+          "name": "aquasecurity:trivy:Labels:org.opencontainers.image.revision",
+          "value": "36a14811b5afa23717566d5e8a08632e011f44a5"
+        },
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        },
+        {
+          "name": "aquasecurity:trivy:Size",
+          "value": "146741248"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "989d40ba-5119-4cc5-8c30-9240900728a9",
+      "type": "application",
+      "name": "app/vendor/composer/installed.json",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:Class",
+          "value": "lang-pkgs"
+        },
+        {
+          "name": "aquasecurity:trivy:Type",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "ab50260a-c0f9-4a08-a00d-4a7dd83e4beb",
+      "type": "operating-system",
+      "name": "alpine",
+      "version": "3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:Class",
+          "value": "os-pkgs"
+        },
+        {
+          "name": "aquasecurity:trivy:Type",
+          "value": "alpine"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/acl-libs@2.3.2-r1?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "acl-libs",
+      "version": "2.3.2-r1",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "8ca52f792c379ef59a091f5ea6b0bca6157c6aa0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-2.1-or-later"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/acl-libs@2.3.2-r1?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "acl-libs@2.3.2-r1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "acl"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "2.3.2-r1"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/alpine-baselayout-data@3.7.2-r1?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "alpine-baselayout-data",
+      "version": "3.7.2-r1",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "c6f9bded17d844b6f1b0bb5766d2c35c0d5c8508"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/alpine-baselayout-data@3.7.2-r1?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "alpine-baselayout-data@3.7.2-r1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "alpine-baselayout"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "3.7.2-r1"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/alpine-baselayout@3.7.2-r1?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "alpine-baselayout",
+      "version": "3.7.2-r1",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "f0fcfdc2f4da058af6473bc45c4eab62916225b2"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/alpine-baselayout@3.7.2-r1?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "alpine-baselayout@3.7.2-r1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "alpine-baselayout"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "3.7.2-r1"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/alpine-keys@2.6-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "alpine-keys",
+      "version": "2.6-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "d8d6b80e53c059a77e4915da78ba964f3ffea240"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/alpine-keys@2.6-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "alpine-keys@2.6-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "alpine-keys"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "2.6-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/alpine-release@3.24.2-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "alpine-release",
+      "version": "3.24.2-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "6fd1be469ca235e9c62f1b73fa3e5bffafdeb6b5"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/alpine-release@3.24.2-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "alpine-release@3.24.2-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "alpine-base"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "3.24.2-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/apk-tools@3.0.8-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "apk-tools",
+      "version": "3.0.8-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "786130a8f2d3ac69fc316118757b7e8151b8b8c3"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/apk-tools@3.0.8-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "apk-tools@3.0.8-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "apk-tools"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "3.0.8-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/argon2-libs@20190702-r5?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Corey Oliver <coreyjonoliver@gmail.com>"
+      },
+      "name": "argon2-libs",
+      "version": "20190702-r5",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "de7c31b35f6df74e77195220bf96b9865479819a"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "CC0-1.0"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/argon2-libs@20190702-r5?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "argon2-libs@20190702-r5"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "argon2"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "20190702-r5"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/brotli-libs@1.2.0-r1?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "prspkt <prspkt@protonmail.com>"
+      },
+      "name": "brotli-libs",
+      "version": "1.2.0-r1",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "82f881516c045f06f22d7dc0a83cc64ca554ef10"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/brotli-libs@1.2.0-r1?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "brotli-libs@1.2.0-r1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "brotli"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.2.0-r1"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/busybox-binsh@1.37.0-r31?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Sören Tempel <soeren+alpine@soeren-tempel.net>"
+      },
+      "name": "busybox-binsh",
+      "version": "1.37.0-r31",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "5cbd14acc6f1804c5bac6c77dc2c492f010b0fc7"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/busybox-binsh@1.37.0-r31?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "busybox-binsh@1.37.0-r31"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "busybox"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.37.0-r31"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/busybox@1.37.0-r31?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Sören Tempel <soeren+alpine@soeren-tempel.net>"
+      },
+      "name": "busybox",
+      "version": "1.37.0-r31",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "b5405ebc02f7dd8be95b6265c54b243d5456ab8f"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/busybox@1.37.0-r31?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "busybox@1.37.0-r31"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "busybox"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.37.0-r31"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/c-ares@1.34.8-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Carlo Landmeter <clandmeter@alpinelinux.org>"
+      },
+      "name": "c-ares",
+      "version": "1.34.8-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "640a28ff6245f701d464fba53a05b1bc657c37a7"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/c-ares@1.34.8-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "c-ares@1.34.8-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "c-ares"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.34.8-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/ca-certificates-bundle@20260909-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "ca-certificates-bundle",
+      "version": "20260909-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "791237cee877988893a354b5f6c9c44f35d4edb9"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MPL-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/ca-certificates-bundle@20260909-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "ca-certificates-bundle@20260909-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "ca-certificates"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "20260909-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/ca-certificates@20260909-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "ca-certificates",
+      "version": "20260909-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "5fca7df9ec42a2490de8b105f8d44937e83fe2e2"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MPL-2.0"
+          }
+        },
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/ca-certificates@20260909-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "ca-certificates@20260909-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "ca-certificates"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "20260909-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/curl@8.22.0-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Achill Gilgenast <achill@achill.org>"
+      },
+      "name": "curl",
+      "version": "8.22.0-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "cfbb78b38d8f69e33129b7e98863f1759878010d"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "curl"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/curl@8.22.0-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "curl@8.22.0-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "curl"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "8.22.0-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/gnu-libiconv-libs@1.18-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "gnu-libiconv-libs",
+      "version": "1.18-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "ef0ce31165820d8a101b29b371449bd01c27ed12"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-2.1-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/gnu-libiconv-libs@1.18-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "gnu-libiconv-libs@1.18-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "gnu-libiconv"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.18-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libapk@3.0.8-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "libapk",
+      "version": "3.0.8-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "b93ce9573c1d0db3eea7ce32841ad0857abc4a54"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libapk@3.0.8-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libapk@3.0.8-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "apk-tools"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "3.0.8-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "libcrypto3",
+      "version": "3.5.9-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "1c0dee9734cf22fc97cdd181913bbd710e6dfb08"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:9b5f19a8c599a1b97fa7906778d71f5f56016f55bbd0b59f8c6c44c2d82eb426"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libcrypto3@3.5.9-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "openssl"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "3.5.9-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libcurl@8.22.0-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Achill Gilgenast <achill@achill.org>"
+      },
+      "name": "libcurl",
+      "version": "8.22.0-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "7816006b6af2270ab6e7e85f74adb94c16bdc48b"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "curl"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libcurl@8.22.0-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libcurl@8.22.0-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "curl"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "8.22.0-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libgcc@15.2.0-r5?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Ariadne Conill <ariadne@dereferenced.org>"
+      },
+      "name": "libgcc",
+      "version": "15.2.0-r5",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "379c156c53e0cc140e87c79c0a3dd22b6ee51552"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-or-later"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.1-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libgcc@15.2.0-r5?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libgcc@15.2.0-r5"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "gcc"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "15.2.0-r5"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libidn2@2.3.8-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "libidn2",
+      "version": "2.3.8-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "5800d14ce89e16148f4ccc2df74235ce7aedf800"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-or-later"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libidn2@2.3.8-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libidn2@2.3.8-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "libidn2"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "2.3.8-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libncursesw@6.6_p20260516-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Milan P. Stanić <mps@arvanta.net>"
+      },
+      "name": "libncursesw",
+      "version": "6.6_p20260516-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "9f318e6e324d6827274829194cf6ac6afbaded12"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "X-11"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libncursesw@6.6_p20260516-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libncursesw@6.6_p20260516-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "ncurses"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "6.6_p20260516-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libpq@18.6-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Jakub Jirutka <jakub@jirutka.cz>"
+      },
+      "name": "libpq",
+      "version": "18.6-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "a977e227d8432c5e1787063eba526877beb578be"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "PostgreSQL"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libpq@18.6-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:9b5f19a8c599a1b97fa7906778d71f5f56016f55bbd0b59f8c6c44c2d82eb426"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libpq@18.6-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "postgresql18"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "18.6-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libpsl@0.21.5-r3?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "libpsl",
+      "version": "0.21.5-r3",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "a551ddd5d6cb3913e1a1f47b02f21ae068b5e90a"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libpsl@0.21.5-r3?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libpsl@0.21.5-r3"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "libpsl"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "0.21.5-r3"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libsodium@1.0.22-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Daniel Néri <dne+alpine@mayonnaise.net>"
+      },
+      "name": "libsodium",
+      "version": "1.0.22-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "e5bfa7b8c7e0639f44d57d4aaac2621e46523aad"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libsodium@1.0.22-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libsodium@1.0.22-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "libsodium"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.0.22-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "libssl3",
+      "version": "3.5.9-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "20c4c90ea9d20a9dd3a04deadf2c6c4f64233643"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:9b5f19a8c599a1b97fa7906778d71f5f56016f55bbd0b59f8c6c44c2d82eb426"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libssl3@3.5.9-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "openssl"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "3.5.9-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libunistring@1.4.2-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "libunistring",
+      "version": "1.4.2-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "f509c801d070f8ea9f7400d5093c888ff1fee02e"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-or-later"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libunistring@1.4.2-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libunistring@1.4.2-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "libunistring"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.4.2-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/libxml2@2.13.9-r2?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Carlo Landmeter <clandmeter@alpinelinux.org>"
+      },
+      "name": "libxml2",
+      "version": "2.13.9-r2",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "c2c2cb44647ddc8c82ae78c8aca9bd4ad5a736da"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/libxml2@2.13.9-r2?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "libxml2@2.13.9-r2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "libxml2"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "2.13.9-r2"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/musl-utils@1.2.6-r2?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "musl-utils",
+      "version": "1.2.6-r2",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "75ada3c48d63ec5d87c42fdf934a3fdd11298dc5"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        },
+        {
+          "license": {
+            "id": "BSD-2-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/musl-utils@1.2.6-r2?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "musl-utils@1.2.6-r2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "musl"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.2.6-r2"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "musl",
+      "version": "1.2.6-r2",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "0f7e5827e4e1a73631beda27b78431a8ba240e05"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "musl@1.2.6-r2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "musl"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.2.6-r2"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/ncurses-terminfo-base@6.6_p20260516-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Milan P. Stanić <mps@arvanta.net>"
+      },
+      "name": "ncurses-terminfo-base",
+      "version": "6.6_p20260516-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "9d551d828e9c8ee52c5801c1d6046828ebf15752"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "X-11"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/ncurses-terminfo-base@6.6_p20260516-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "ncurses-terminfo-base@6.6_p20260516-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "ncurses"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "6.6_p20260516-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/nghttp2-libs@1.70.0-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Francesco Colista <fcolista@alpinelinux.org>"
+      },
+      "name": "nghttp2-libs",
+      "version": "1.70.0-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "63bd319b9af1c3d3c730c96b04a889964696f367"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/nghttp2-libs@1.70.0-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:9b5f19a8c599a1b97fa7906778d71f5f56016f55bbd0b59f8c6c44c2d82eb426"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "nghttp2-libs@1.70.0-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "nghttp2"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.70.0-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/oniguruma@6.9.10-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Francesco Colista <fcolista@alpinelinux.org>"
+      },
+      "name": "oniguruma",
+      "version": "6.9.10-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "a1a67fc3afbdabdef527ab9b7d84cf8426a40152"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-2-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/oniguruma@6.9.10-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "oniguruma@6.9.10-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "oniguruma"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "6.9.10-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/openssl@3.5.9-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "openssl",
+      "version": "3.5.9-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "ea94f01feeb149a85f4402f5f713a25e90f77011"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/openssl@3.5.9-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:9b5f19a8c599a1b97fa7906778d71f5f56016f55bbd0b59f8c6c44c2d82eb426"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "openssl@3.5.9-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "openssl"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "3.5.9-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/readline@8.3.3-r1?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "qaqland <qaq@qaq.land>"
+      },
+      "name": "readline",
+      "version": "8.3.3-r1",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "945b16e378bc00e44d89d4de8124bba7647fdf4d"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-3.0-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/readline@8.3.3-r1?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "readline@8.3.3-r1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "readline"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "8.3.3-r1"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/scanelf@1.3.9-r1?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "scanelf",
+      "version": "1.3.9-r1",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "013f903d0ba219673aebbdd04f74bb5ed82b01f0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/scanelf@1.3.9-r1?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "scanelf@1.3.9-r1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "pax-utils"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.3.9-r1"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/sqlite-libs@3.53.4-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Jingyun Hua <huajingyun@loongson.cn>"
+      },
+      "name": "sqlite-libs",
+      "version": "3.53.4-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "f7630ceb37c232b6609861aeab6cdb9cd120e6fa"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "blessing"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/sqlite-libs@3.53.4-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:bb9d2a2a22ecd56cb3de0f277e7e2c8bf43cb5dbdf6e31b5fa14a43d90956aa2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "sqlite-libs@3.53.4-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "sqlite"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "3.53.4-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/ssl_client@1.37.0-r31?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Sören Tempel <soeren+alpine@soeren-tempel.net>"
+      },
+      "name": "ssl_client",
+      "version": "1.37.0-r31",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "c220f4a5125a313af733e98def94132bb1e9d40d"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/ssl_client@1.37.0-r31?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "ssl_client@1.37.0-r31"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "busybox"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.37.0-r31"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/tar@1.35-r5?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "qaqland <qaq@qaq.land>"
+      },
+      "name": "tar",
+      "version": "1.35-r5",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "b25069b76c13a88eb42e621d60bf0637f1585ed6"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-3.0-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/tar@1.35-r5?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "tar@1.35-r5"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "tar"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.35-r5"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/xz-libs@5.8.4-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "xz-libs",
+      "version": "5.8.4-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "8501065b1862821630174c663b45974462c296e1"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-or-later"
+          }
+        },
+        {
+          "license": {
+            "id": "0BSD"
+          }
+        },
+        {
+          "license": {
+            "name": "Public-Domain"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.1-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/xz-libs@5.8.4-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "xz-libs@5.8.4-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "xz"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "5.8.4-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/xz@5.8.4-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "xz",
+      "version": "5.8.4-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "6fa572af08b46511f4fb5210e7696e2f53be0fcb"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-2.0-or-later"
+          }
+        },
+        {
+          "license": {
+            "id": "0BSD"
+          }
+        },
+        {
+          "license": {
+            "name": "Public-Domain"
+          }
+        },
+        {
+          "license": {
+            "id": "LGPL-2.1-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/xz@5.8.4-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "xz@5.8.4-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "xz"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "5.8.4-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/zlib@1.3.2-r0?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "zlib",
+      "version": "1.3.2-r0",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "dd4c3d102acaef2a71a1495951d55fabc8680613"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Zlib"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/zlib@1.3.2-r0?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "zlib@1.3.2-r0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "zlib"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.3.2-r0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/zstd-libs@1.5.7-r2?arch=x86_64&distro=3.24.2",
+      "type": "library",
+      "supplier": {
+        "name": "Natanael Copa <ncopa@alpinelinux.org>"
+      },
+      "name": "zstd-libs",
+      "version": "1.5.7-r2",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "9569ce3a97c4109e8e53ddde9f3e1bd272613540"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0-or-later"
+          }
+        }
+      ],
+      "purl": "pkg:apk/alpine/zstd-libs@1.5.7-r2?arch=x86_64&distro=3.24.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:1c2f060f7a595b33c6bab0d3363f650e06358b6d7467509146e75f7b75eeed16"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "zstd-libs@1.5.7-r2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "alpine"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcName",
+          "value": "zstd"
+        },
+        {
+          "name": "aquasecurity:trivy:SrcVersion",
+          "value": "1.5.7-r2"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/brick/math@1.0.0",
+      "type": "library",
+      "name": "brick/math",
+      "version": "1.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/brick/math@1.0.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "brick/math@1.0.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/carbonphp/carbon-doctrine-types@3.2.1",
+      "type": "library",
+      "name": "carbonphp/carbon-doctrine-types",
+      "version": "3.2.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/carbonphp/carbon-doctrine-types@3.2.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "carbonphp/carbon-doctrine-types@3.2.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/dflydev/dot-access-data@v3.0.3",
+      "type": "library",
+      "name": "dflydev/dot-access-data",
+      "version": "v3.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/dflydev/dot-access-data@v3.0.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "dflydev/dot-access-data@v3.0.3"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/doctrine/inflector@2.1.0",
+      "type": "library",
+      "name": "doctrine/inflector",
+      "version": "2.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/doctrine/inflector@2.1.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "doctrine/inflector@2.1.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/doctrine/lexer@3.0.3",
+      "type": "library",
+      "name": "doctrine/lexer",
+      "version": "3.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/doctrine/lexer@3.0.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "doctrine/lexer@3.0.3"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/dragonmantank/cron-expression@v3.6.0",
+      "type": "library",
+      "name": "dragonmantank/cron-expression",
+      "version": "v3.6.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/dragonmantank/cron-expression@v3.6.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "dragonmantank/cron-expression@v3.6.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/egulias/email-validator@4.0.4",
+      "type": "library",
+      "name": "egulias/email-validator",
+      "version": "4.0.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/egulias/email-validator@4.0.4",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "egulias/email-validator@4.0.4"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/fruitcake/php-cors@v1.4.0",
+      "type": "library",
+      "name": "fruitcake/php-cors",
+      "version": "v1.4.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/fruitcake/php-cors@v1.4.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "fruitcake/php-cors@v1.4.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/graham-campbell/result-type@v1.2.0",
+      "type": "library",
+      "name": "graham-campbell/result-type",
+      "version": "v1.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/graham-campbell/result-type@v1.2.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "graham-campbell/result-type@v1.2.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/guzzlehttp/guzzle@8.2.0",
+      "type": "library",
+      "name": "guzzlehttp/guzzle",
+      "version": "8.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/guzzlehttp/guzzle@8.2.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "guzzlehttp/guzzle@8.2.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/guzzlehttp/promises@3.0.2",
+      "type": "library",
+      "name": "guzzlehttp/promises",
+      "version": "3.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/guzzlehttp/promises@3.0.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "guzzlehttp/promises@3.0.2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/guzzlehttp/psr7@3.1.0",
+      "type": "library",
+      "name": "guzzlehttp/psr7",
+      "version": "3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/guzzlehttp/psr7@3.1.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "guzzlehttp/psr7@3.1.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/guzzlehttp/uri-template@v2.0.1",
+      "type": "library",
+      "name": "guzzlehttp/uri-template",
+      "version": "v2.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/guzzlehttp/uri-template@v2.0.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "guzzlehttp/uri-template@v2.0.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/laravel/framework@v13.34.0",
+      "type": "library",
+      "name": "laravel/framework",
+      "version": "v13.34.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/laravel/framework@v13.34.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "laravel/framework@v13.34.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/laravel/prompts@v0.3.24",
+      "type": "library",
+      "name": "laravel/prompts",
+      "version": "v0.3.24",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/laravel/prompts@v0.3.24",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "laravel/prompts@v0.3.24"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/laravel/serializable-closure@v2.1.0",
+      "type": "library",
+      "name": "laravel/serializable-closure",
+      "version": "v2.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/laravel/serializable-closure@v2.1.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "laravel/serializable-closure@v2.1.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/league/commonmark@2.10.3",
+      "type": "library",
+      "name": "league/commonmark",
+      "version": "2.10.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:composer/league/commonmark@2.10.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "league/commonmark@2.10.3"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/league/config@v1.2.0",
+      "type": "library",
+      "name": "league/config",
+      "version": "v1.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:composer/league/config@v1.2.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "league/config@v1.2.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/league/flysystem-local@3.35.3",
+      "type": "library",
+      "name": "league/flysystem-local",
+      "version": "3.35.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/league/flysystem-local@3.35.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "league/flysystem-local@3.35.3"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/league/flysystem@3.36.0",
+      "type": "library",
+      "name": "league/flysystem",
+      "version": "3.36.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/league/flysystem@3.36.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "league/flysystem@3.36.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/league/mime-type-detection@1.17.0",
+      "type": "library",
+      "name": "league/mime-type-detection",
+      "version": "1.17.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/league/mime-type-detection@1.17.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "league/mime-type-detection@1.17.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/league/uri-interfaces@7.8.1",
+      "type": "library",
+      "name": "league/uri-interfaces",
+      "version": "7.8.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/league/uri-interfaces@7.8.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "league/uri-interfaces@7.8.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/league/uri@7.8.1",
+      "type": "library",
+      "name": "league/uri",
+      "version": "7.8.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/league/uri@7.8.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "league/uri@7.8.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/monolog/monolog@3.12.1",
+      "type": "library",
+      "name": "monolog/monolog",
+      "version": "3.12.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/monolog/monolog@3.12.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "monolog/monolog@3.12.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/nesbot/carbon@3.14.2",
+      "type": "library",
+      "name": "nesbot/carbon",
+      "version": "3.14.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/nesbot/carbon@3.14.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "nesbot/carbon@3.14.2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/nette/schema@v1.3.6",
+      "type": "library",
+      "name": "nette/schema",
+      "version": "v1.3.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-3.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:composer/nette/schema@v1.3.6",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "nette/schema@v1.3.6"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/nette/utils@v4.1.5",
+      "type": "library",
+      "name": "nette/utils",
+      "version": "v4.1.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-2.0-only"
+          }
+        },
+        {
+          "license": {
+            "id": "GPL-3.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:composer/nette/utils@v4.1.5",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "nette/utils@v4.1.5"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/nunomaduro/termwind@v2.4.0",
+      "type": "library",
+      "name": "nunomaduro/termwind",
+      "version": "v2.4.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/nunomaduro/termwind@v2.4.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "nunomaduro/termwind@v2.4.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/phpoption/phpoption@1.10.0",
+      "type": "library",
+      "name": "phpoption/phpoption",
+      "version": "1.10.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:composer/phpoption/phpoption@1.10.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "phpoption/phpoption@1.10.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/psr/clock@1.0.0",
+      "type": "library",
+      "name": "psr/clock",
+      "version": "1.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/psr/clock@1.0.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "psr/clock@1.0.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/psr/container@2.0.2",
+      "type": "library",
+      "name": "psr/container",
+      "version": "2.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/psr/container@2.0.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "psr/container@2.0.2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/psr/event-dispatcher@1.0.0",
+      "type": "library",
+      "name": "psr/event-dispatcher",
+      "version": "1.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/psr/event-dispatcher@1.0.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "psr/event-dispatcher@1.0.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/psr/http-client@1.0.3",
+      "type": "library",
+      "name": "psr/http-client",
+      "version": "1.0.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/psr/http-client@1.0.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "psr/http-client@1.0.3"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/psr/http-factory@1.1.0",
+      "type": "library",
+      "name": "psr/http-factory",
+      "version": "1.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/psr/http-factory@1.1.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "psr/http-factory@1.1.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/psr/http-message@2.0",
+      "type": "library",
+      "name": "psr/http-message",
+      "version": "2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/psr/http-message@2.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "psr/http-message@2.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/psr/log@3.0.2",
+      "type": "library",
+      "name": "psr/log",
+      "version": "3.0.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/psr/log@3.0.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "psr/log@3.0.2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/psr/simple-cache@3.0.0",
+      "type": "library",
+      "name": "psr/simple-cache",
+      "version": "3.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/psr/simple-cache@3.0.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "psr/simple-cache@3.0.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/ramsey/collection@2.1.1",
+      "type": "library",
+      "name": "ramsey/collection",
+      "version": "2.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/ramsey/collection@2.1.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "ramsey/collection@2.1.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/ramsey/uuid@4.9.4",
+      "type": "library",
+      "name": "ramsey/uuid",
+      "version": "4.9.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/ramsey/uuid@4.9.4",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "ramsey/uuid@4.9.4"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/clock@v8.1.0",
+      "type": "library",
+      "name": "symfony/clock",
+      "version": "v8.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/clock@v8.1.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/clock@v8.1.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/console@v8.1.8",
+      "type": "library",
+      "name": "symfony/console",
+      "version": "v8.1.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/console@v8.1.8",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/console@v8.1.8"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/css-selector@v8.1.6",
+      "type": "library",
+      "name": "symfony/css-selector",
+      "version": "v8.1.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/css-selector@v8.1.6",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/css-selector@v8.1.6"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+      "type": "library",
+      "name": "symfony/deprecation-contracts",
+      "version": "v3.7.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/deprecation-contracts@v3.7.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/error-handler@v8.1.8",
+      "type": "library",
+      "name": "symfony/error-handler",
+      "version": "v8.1.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/error-handler@v8.1.8",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/error-handler@v8.1.8"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/event-dispatcher-contracts@v3.7.1",
+      "type": "library",
+      "name": "symfony/event-dispatcher-contracts",
+      "version": "v3.7.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/event-dispatcher-contracts@v3.7.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/event-dispatcher-contracts@v3.7.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/event-dispatcher@v8.1.5",
+      "type": "library",
+      "name": "symfony/event-dispatcher",
+      "version": "v8.1.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/event-dispatcher@v8.1.5",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/event-dispatcher@v8.1.5"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/finder@v8.1.8",
+      "type": "library",
+      "name": "symfony/finder",
+      "version": "v8.1.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/finder@v8.1.8",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/finder@v8.1.8"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/http-foundation@v8.1.8",
+      "type": "library",
+      "name": "symfony/http-foundation",
+      "version": "v8.1.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/http-foundation@v8.1.8",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/http-foundation@v8.1.8"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/http-kernel@v8.1.8",
+      "type": "library",
+      "name": "symfony/http-kernel",
+      "version": "v8.1.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/http-kernel@v8.1.8",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/http-kernel@v8.1.8"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/mailer@v8.1.7",
+      "type": "library",
+      "name": "symfony/mailer",
+      "version": "v8.1.7",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/mailer@v8.1.7",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/mailer@v8.1.7"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/mime@v8.1.7",
+      "type": "library",
+      "name": "symfony/mime",
+      "version": "v8.1.7",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/mime@v8.1.7",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/mime@v8.1.7"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-ctype@v1.37.0",
+      "type": "library",
+      "name": "symfony/polyfill-ctype",
+      "version": "v1.37.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-ctype@v1.37.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-ctype@v1.37.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-intl-grapheme@v1.43.0",
+      "type": "library",
+      "name": "symfony/polyfill-intl-grapheme",
+      "version": "v1.43.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-intl-grapheme@v1.43.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-intl-grapheme@v1.43.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-intl-idn@v1.43.0",
+      "type": "library",
+      "name": "symfony/polyfill-intl-idn",
+      "version": "v1.43.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-intl-idn@v1.43.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-intl-idn@v1.43.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-intl-normalizer@v1.43.0",
+      "type": "library",
+      "name": "symfony/polyfill-intl-normalizer",
+      "version": "v1.43.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-intl-normalizer@v1.43.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-intl-normalizer@v1.43.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-mbstring@v1.43.0",
+      "type": "library",
+      "name": "symfony/polyfill-mbstring",
+      "version": "v1.43.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-mbstring@v1.43.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-mbstring@v1.43.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-php80@v1.43.0",
+      "type": "library",
+      "name": "symfony/polyfill-php80",
+      "version": "v1.43.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-php80@v1.43.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-php80@v1.43.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-php82@v1.43.0",
+      "type": "library",
+      "name": "symfony/polyfill-php82",
+      "version": "v1.43.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-php82@v1.43.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-php82@v1.43.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-php84@v1.43.0",
+      "type": "library",
+      "name": "symfony/polyfill-php84",
+      "version": "v1.43.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-php84@v1.43.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-php84@v1.43.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-php85@v1.43.0",
+      "type": "library",
+      "name": "symfony/polyfill-php85",
+      "version": "v1.43.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-php85@v1.43.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-php85@v1.43.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-php86@v1.43.0",
+      "type": "library",
+      "name": "symfony/polyfill-php86",
+      "version": "v1.43.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-php86@v1.43.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-php86@v1.43.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/polyfill-uuid@v1.43.0",
+      "type": "library",
+      "name": "symfony/polyfill-uuid",
+      "version": "v1.43.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/polyfill-uuid@v1.43.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/polyfill-uuid@v1.43.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/process@v8.1.7",
+      "type": "library",
+      "name": "symfony/process",
+      "version": "v8.1.7",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/process@v8.1.7",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/process@v8.1.7"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/routing@v8.1.8",
+      "type": "library",
+      "name": "symfony/routing",
+      "version": "v8.1.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/routing@v8.1.8",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/routing@v8.1.8"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/service-contracts@v3.7.3",
+      "type": "library",
+      "name": "symfony/service-contracts",
+      "version": "v3.7.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/service-contracts@v3.7.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/service-contracts@v3.7.3"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/string@v8.1.7",
+      "type": "library",
+      "name": "symfony/string",
+      "version": "v8.1.7",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/string@v8.1.7",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/string@v8.1.7"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/translation-contracts@v3.7.1",
+      "type": "library",
+      "name": "symfony/translation-contracts",
+      "version": "v3.7.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/translation-contracts@v3.7.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/translation-contracts@v3.7.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/translation@v8.1.5",
+      "type": "library",
+      "name": "symfony/translation",
+      "version": "v8.1.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/translation@v8.1.5",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/translation@v8.1.5"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/uid@v8.1.8",
+      "type": "library",
+      "name": "symfony/uid",
+      "version": "v8.1.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/uid@v8.1.8",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/uid@v8.1.8"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/symfony/var-dumper@v8.1.7",
+      "type": "library",
+      "name": "symfony/var-dumper",
+      "version": "v8.1.7",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/symfony/var-dumper@v8.1.7",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "symfony/var-dumper@v8.1.7"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/tijsverkoyen/css-to-inline-styles@v2.4.0",
+      "type": "library",
+      "name": "tijsverkoyen/css-to-inline-styles",
+      "version": "v2.4.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:composer/tijsverkoyen/css-to-inline-styles@v2.4.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "tijsverkoyen/css-to-inline-styles@v2.4.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/vlucas/phpdotenv@v5.7.0",
+      "type": "library",
+      "name": "vlucas/phpdotenv",
+      "version": "v5.7.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:composer/vlucas/phpdotenv@v5.7.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "vlucas/phpdotenv@v5.7.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:composer/voku/portable-ascii@2.1.1",
+      "type": "library",
+      "name": "voku/portable-ascii",
+      "version": "2.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:composer/voku/portable-ascii@2.1.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:LayerDiffID",
+          "value": "sha256:91fa50d55826e6d26a503c03ea93ebba04ab282136dce0537479113798bcde4c"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "voku/portable-ascii@2.1.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "composer-vendor"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "03d148fe-0dbc-40d6-a2fb-2c321ee20308",
+      "dependsOn": [
+        "989d40ba-5119-4cc5-8c30-9240900728a9",
+        "ab50260a-c0f9-4a08-a00d-4a7dd83e4beb"
+      ]
+    },
+    {
+      "ref": "989d40ba-5119-4cc5-8c30-9240900728a9",
+      "dependsOn": [
+        "pkg:composer/laravel/framework@v13.34.0"
+      ]
+    },
+    {
+      "ref": "ab50260a-c0f9-4a08-a00d-4a7dd83e4beb",
+      "dependsOn": [
+        "pkg:apk/alpine/alpine-baselayout@3.7.2-r1?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/alpine-release@3.24.2-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/apk-tools@3.0.8-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/argon2-libs@20190702-r5?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/ca-certificates@20260909-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/curl@8.22.0-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/gnu-libiconv-libs@1.18-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libgcc@15.2.0-r5?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libpq@18.6-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libsodium@1.0.22-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libxml2@2.13.9-r2?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl-utils@1.2.6-r2?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/oniguruma@6.9.10-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/openssl@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/readline@8.3.3-r1?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/sqlite-libs@3.53.4-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/ssl_client@1.37.0-r31?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/tar@1.35-r5?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/xz@5.8.4-r0?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/acl-libs@2.3.2-r1?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/alpine-baselayout-data@3.7.2-r1?arch=x86_64&distro=3.24.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/alpine-baselayout@3.7.2-r1?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/alpine-baselayout-data@3.7.2-r1?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/busybox-binsh@1.37.0-r31?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/alpine-keys@2.6-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/alpine-release@3.24.2-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/alpine-keys@2.6-r0?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/apk-tools@3.0.8-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/ca-certificates-bundle@20260909-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libapk@3.0.8-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/zlib@1.3.2-r0?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/argon2-libs@20190702-r5?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/brotli-libs@1.2.0-r1?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/busybox-binsh@1.37.0-r31?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/busybox@1.37.0-r31?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/busybox@1.37.0-r31?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/c-ares@1.34.8-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/ca-certificates-bundle@20260909-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/ca-certificates@20260909-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/busybox-binsh@1.37.0-r31?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/curl@8.22.0-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/libcurl@8.22.0-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/zlib@1.3.2-r0?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/gnu-libiconv-libs@1.18-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libapk@3.0.8-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/zlib@1.3.2-r0?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libcurl@8.22.0-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/brotli-libs@1.2.0-r1?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/c-ares@1.34.8-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/ca-certificates-bundle@20260909-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libidn2@2.3.8-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libpsl@0.21.5-r3?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/nghttp2-libs@1.70.0-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/zlib@1.3.2-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/zstd-libs@1.5.7-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libgcc@15.2.0-r5?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libidn2@2.3.8-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/libunistring@1.4.2-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libncursesw@6.6_p20260516-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/ncurses-terminfo-base@6.6_p20260516-r0?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libpq@18.6-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libpsl@0.21.5-r3?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/libidn2@2.3.8-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libunistring@1.4.2-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libsodium@1.0.22-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libunistring@1.4.2-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/libxml2@2.13.9-r2?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/xz-libs@5.8.4-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/zlib@1.3.2-r0?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/musl-utils@1.2.6-r2?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/scanelf@1.3.9-r1?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/ncurses-terminfo-base@6.6_p20260516-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/nghttp2-libs@1.70.0-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/oniguruma@6.9.10-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/openssl@3.5.9-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/readline@8.3.3-r1?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/libncursesw@6.6_p20260516-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/scanelf@1.3.9-r1?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/sqlite-libs@3.53.4-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/ssl_client@1.37.0-r31?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/tar@1.35-r5?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/acl-libs@2.3.2-r1?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/xz-libs@5.8.4-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/xz@5.8.4-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2",
+        "pkg:apk/alpine/xz-libs@5.8.4-r0?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/zlib@1.3.2-r0?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:apk/alpine/zstd-libs@1.5.7-r2?arch=x86_64&distro=3.24.2",
+      "dependsOn": [
+        "pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.2"
+      ]
+    },
+    {
+      "ref": "pkg:composer/brick/math@1.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/carbonphp/carbon-doctrine-types@3.2.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/dflydev/dot-access-data@v3.0.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/doctrine/inflector@2.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/doctrine/lexer@3.0.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/dragonmantank/cron-expression@v3.6.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/egulias/email-validator@4.0.4",
+      "dependsOn": [
+        "pkg:composer/doctrine/lexer@3.0.3",
+        "pkg:composer/symfony/polyfill-intl-idn@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/fruitcake/php-cors@v1.4.0",
+      "dependsOn": [
+        "pkg:composer/symfony/http-foundation@v8.1.8"
+      ]
+    },
+    {
+      "ref": "pkg:composer/graham-campbell/result-type@v1.2.0",
+      "dependsOn": [
+        "pkg:composer/phpoption/phpoption@1.10.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/guzzlehttp/guzzle@8.2.0",
+      "dependsOn": [
+        "pkg:composer/guzzlehttp/promises@3.0.2",
+        "pkg:composer/guzzlehttp/psr7@3.1.0",
+        "pkg:composer/psr/http-client@1.0.3",
+        "pkg:composer/psr/http-factory@1.1.0",
+        "pkg:composer/symfony/polyfill-php80@v1.43.0",
+        "pkg:composer/symfony/polyfill-php82@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/guzzlehttp/promises@3.0.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/guzzlehttp/psr7@3.1.0",
+      "dependsOn": [
+        "pkg:composer/psr/http-factory@1.1.0",
+        "pkg:composer/psr/http-message@2.0",
+        "pkg:composer/symfony/polyfill-php80@v1.43.0",
+        "pkg:composer/symfony/polyfill-php82@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/guzzlehttp/uri-template@v2.0.1",
+      "dependsOn": [
+        "pkg:composer/symfony/polyfill-php80@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/laravel/framework@v13.34.0",
+      "dependsOn": [
+        "pkg:composer/brick/math@1.0.0",
+        "pkg:composer/doctrine/inflector@2.1.0",
+        "pkg:composer/dragonmantank/cron-expression@v3.6.0",
+        "pkg:composer/egulias/email-validator@4.0.4",
+        "pkg:composer/fruitcake/php-cors@v1.4.0",
+        "pkg:composer/guzzlehttp/guzzle@8.2.0",
+        "pkg:composer/guzzlehttp/promises@3.0.2",
+        "pkg:composer/guzzlehttp/psr7@3.1.0",
+        "pkg:composer/guzzlehttp/uri-template@v2.0.1",
+        "pkg:composer/laravel/prompts@v0.3.24",
+        "pkg:composer/laravel/serializable-closure@v2.1.0",
+        "pkg:composer/league/commonmark@2.10.3",
+        "pkg:composer/league/flysystem-local@3.35.3",
+        "pkg:composer/league/flysystem@3.36.0",
+        "pkg:composer/league/uri@7.8.1",
+        "pkg:composer/monolog/monolog@3.12.1",
+        "pkg:composer/nesbot/carbon@3.14.2",
+        "pkg:composer/nunomaduro/termwind@v2.4.0",
+        "pkg:composer/psr/container@2.0.2",
+        "pkg:composer/psr/http-message@2.0",
+        "pkg:composer/psr/log@3.0.2",
+        "pkg:composer/psr/simple-cache@3.0.0",
+        "pkg:composer/ramsey/uuid@4.9.4",
+        "pkg:composer/symfony/console@v8.1.8",
+        "pkg:composer/symfony/error-handler@v8.1.8",
+        "pkg:composer/symfony/finder@v8.1.8",
+        "pkg:composer/symfony/http-foundation@v8.1.8",
+        "pkg:composer/symfony/http-kernel@v8.1.8",
+        "pkg:composer/symfony/mailer@v8.1.7",
+        "pkg:composer/symfony/mime@v8.1.7",
+        "pkg:composer/symfony/polyfill-php84@v1.43.0",
+        "pkg:composer/symfony/polyfill-php85@v1.43.0",
+        "pkg:composer/symfony/polyfill-php86@v1.43.0",
+        "pkg:composer/symfony/process@v8.1.7",
+        "pkg:composer/symfony/routing@v8.1.8",
+        "pkg:composer/symfony/uid@v8.1.8",
+        "pkg:composer/symfony/var-dumper@v8.1.7",
+        "pkg:composer/tijsverkoyen/css-to-inline-styles@v2.4.0",
+        "pkg:composer/vlucas/phpdotenv@v5.7.0",
+        "pkg:composer/voku/portable-ascii@2.1.1"
+      ]
+    },
+    {
+      "ref": "pkg:composer/laravel/prompts@v0.3.24",
+      "dependsOn": [
+        "pkg:composer/symfony/console@v8.1.8"
+      ]
+    },
+    {
+      "ref": "pkg:composer/laravel/serializable-closure@v2.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/league/commonmark@2.10.3",
+      "dependsOn": [
+        "pkg:composer/league/config@v1.2.0",
+        "pkg:composer/psr/event-dispatcher@1.0.0",
+        "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+        "pkg:composer/symfony/polyfill-php80@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/league/config@v1.2.0",
+      "dependsOn": [
+        "pkg:composer/dflydev/dot-access-data@v3.0.3",
+        "pkg:composer/nette/schema@v1.3.6"
+      ]
+    },
+    {
+      "ref": "pkg:composer/league/flysystem-local@3.35.3",
+      "dependsOn": [
+        "pkg:composer/league/flysystem@3.36.0",
+        "pkg:composer/league/mime-type-detection@1.17.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/league/flysystem@3.36.0",
+      "dependsOn": [
+        "pkg:composer/league/flysystem-local@3.35.3",
+        "pkg:composer/league/mime-type-detection@1.17.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/league/mime-type-detection@1.17.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/league/uri-interfaces@7.8.1",
+      "dependsOn": [
+        "pkg:composer/psr/http-message@2.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/league/uri@7.8.1",
+      "dependsOn": [
+        "pkg:composer/league/uri-interfaces@7.8.1",
+        "pkg:composer/psr/http-factory@1.1.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/monolog/monolog@3.12.1",
+      "dependsOn": [
+        "pkg:composer/psr/log@3.0.2"
+      ]
+    },
+    {
+      "ref": "pkg:composer/nesbot/carbon@3.14.2",
+      "dependsOn": [
+        "pkg:composer/carbonphp/carbon-doctrine-types@3.2.1",
+        "pkg:composer/psr/clock@1.0.0",
+        "pkg:composer/symfony/clock@v8.1.0",
+        "pkg:composer/symfony/polyfill-mbstring@v1.43.0",
+        "pkg:composer/symfony/translation@v8.1.5"
+      ]
+    },
+    {
+      "ref": "pkg:composer/nette/schema@v1.3.6",
+      "dependsOn": [
+        "pkg:composer/nette/utils@v4.1.5"
+      ]
+    },
+    {
+      "ref": "pkg:composer/nette/utils@v4.1.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/nunomaduro/termwind@v2.4.0",
+      "dependsOn": [
+        "pkg:composer/symfony/console@v8.1.8"
+      ]
+    },
+    {
+      "ref": "pkg:composer/phpoption/phpoption@1.10.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/psr/clock@1.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/psr/container@2.0.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/psr/event-dispatcher@1.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/psr/http-client@1.0.3",
+      "dependsOn": [
+        "pkg:composer/psr/http-message@2.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/psr/http-factory@1.1.0",
+      "dependsOn": [
+        "pkg:composer/psr/http-message@2.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/psr/http-message@2.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/psr/log@3.0.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/psr/simple-cache@3.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/ramsey/collection@2.1.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/ramsey/uuid@4.9.4",
+      "dependsOn": [
+        "pkg:composer/brick/math@1.0.0",
+        "pkg:composer/ramsey/collection@2.1.1"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/clock@v8.1.0",
+      "dependsOn": [
+        "pkg:composer/psr/clock@1.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/console@v8.1.8",
+      "dependsOn": [
+        "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+        "pkg:composer/symfony/polyfill-mbstring@v1.43.0",
+        "pkg:composer/symfony/polyfill-php85@v1.43.0",
+        "pkg:composer/symfony/service-contracts@v3.7.3",
+        "pkg:composer/symfony/string@v8.1.7"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/css-selector@v8.1.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/error-handler@v8.1.8",
+      "dependsOn": [
+        "pkg:composer/psr/log@3.0.2",
+        "pkg:composer/symfony/polyfill-php85@v1.43.0",
+        "pkg:composer/symfony/var-dumper@v8.1.7"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/event-dispatcher-contracts@v3.7.1",
+      "dependsOn": [
+        "pkg:composer/psr/event-dispatcher@1.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/event-dispatcher@v8.1.5",
+      "dependsOn": [
+        "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+        "pkg:composer/symfony/event-dispatcher-contracts@v3.7.1"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/finder@v8.1.8",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/http-foundation@v8.1.8",
+      "dependsOn": [
+        "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+        "pkg:composer/symfony/polyfill-mbstring@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/http-kernel@v8.1.8",
+      "dependsOn": [
+        "pkg:composer/psr/log@3.0.2",
+        "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+        "pkg:composer/symfony/error-handler@v8.1.8",
+        "pkg:composer/symfony/event-dispatcher@v8.1.5",
+        "pkg:composer/symfony/http-foundation@v8.1.8",
+        "pkg:composer/symfony/polyfill-ctype@v1.37.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/mailer@v8.1.7",
+      "dependsOn": [
+        "pkg:composer/egulias/email-validator@4.0.4",
+        "pkg:composer/psr/event-dispatcher@1.0.0",
+        "pkg:composer/psr/log@3.0.2",
+        "pkg:composer/symfony/event-dispatcher@v8.1.5",
+        "pkg:composer/symfony/mime@v8.1.7",
+        "pkg:composer/symfony/service-contracts@v3.7.3"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/mime@v8.1.7",
+      "dependsOn": [
+        "pkg:composer/symfony/polyfill-intl-idn@v1.43.0",
+        "pkg:composer/symfony/polyfill-mbstring@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-ctype@v1.37.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-intl-grapheme@v1.43.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-intl-idn@v1.43.0",
+      "dependsOn": [
+        "pkg:composer/symfony/polyfill-intl-normalizer@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-intl-normalizer@v1.43.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-mbstring@v1.43.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-php80@v1.43.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-php82@v1.43.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-php84@v1.43.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-php85@v1.43.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-php86@v1.43.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-uuid@v1.43.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/process@v8.1.7",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/routing@v8.1.8",
+      "dependsOn": [
+        "pkg:composer/symfony/deprecation-contracts@v3.7.1"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/service-contracts@v3.7.3",
+      "dependsOn": [
+        "pkg:composer/psr/container@2.0.2",
+        "pkg:composer/symfony/deprecation-contracts@v3.7.1"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/string@v8.1.7",
+      "dependsOn": [
+        "pkg:composer/symfony/polyfill-ctype@v1.37.0",
+        "pkg:composer/symfony/polyfill-intl-grapheme@v1.43.0",
+        "pkg:composer/symfony/polyfill-intl-normalizer@v1.43.0",
+        "pkg:composer/symfony/polyfill-mbstring@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/translation-contracts@v3.7.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:composer/symfony/translation@v8.1.5",
+      "dependsOn": [
+        "pkg:composer/symfony/polyfill-mbstring@v1.43.0",
+        "pkg:composer/symfony/translation-contracts@v3.7.1"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/uid@v8.1.8",
+      "dependsOn": [
+        "pkg:composer/symfony/polyfill-uuid@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/symfony/var-dumper@v8.1.7",
+      "dependsOn": [
+        "pkg:composer/symfony/polyfill-mbstring@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/tijsverkoyen/css-to-inline-styles@v2.4.0",
+      "dependsOn": [
+        "pkg:composer/symfony/css-selector@v8.1.6"
+      ]
+    },
+    {
+      "ref": "pkg:composer/vlucas/phpdotenv@v5.7.0",
+      "dependsOn": [
+        "pkg:composer/graham-campbell/result-type@v1.2.0",
+        "pkg:composer/phpoption/phpoption@1.10.0",
+        "pkg:composer/symfony/polyfill-ctype@v1.37.0",
+        "pkg:composer/symfony/polyfill-mbstring@v1.43.0",
+        "pkg:composer/symfony/polyfill-php80@v1.43.0"
+      ]
+    },
+    {
+      "ref": "pkg:composer/voku/portable-ascii@2.1.1",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-05T07:29:24.765Z",
+  "repository": "awalker0878/multi-tenant",
+  "branch": "greenfield/enterprise-microservices-plan",
+  "source_revision": "5502f1f1e6a01110cb8c16b22a147dd9552f7681",
+  "protected": false,
+  "rulesets": [],
+  "capability_limit": "Available GitHub connector exposes GET-only branch-protection/ruleset reads and no settings mutation. No administrator identity, verified reviewer assignment, independent reporting authority or browser fallback has been supplied.",
+  "scope": "Read-only observation; not installed enforcement or an accountable acceptance."
+}

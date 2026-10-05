@@ -1,0 +1,148 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.53kB done
+#1 DONE 0.0s
+
+#2 [auth] library/python:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python@sha256:9b8dad7f66b5c7751df6cb7a64a07812e86bed85d0116efe82b3a11209f1440d
+#3 ...
+
+#4 [internal] load metadata for ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3
+#4 DONE 0.3s
+
+#3 [internal] load metadata for docker.io/library/python@sha256:9b8dad7f66b5c7751df6cb7a64a07812e86bed85d0116efe82b3a11209f1440d
+#3 DONE 0.4s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 206B done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 41.26kB done
+#6 DONE 0.0s
+
+#7 [uv-tool 1/1] FROM ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3
+#7 resolve ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3 done
+#7 sha256:54723a59ba9fe2be41df3ad59d75d4738b62774f60a8e988163ed08002fa4215 98B / 98B 0.1s done
+#7 sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3 669B / 669B done
+#7 sha256:de5ce60260f893ece94ee7b7e9bdc7d0cd51b33e74aabef1358342e642ca71e7 1.30kB / 1.30kB done
+#7 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 18.87MB / 23.52MB 0.1s
+#7 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 23.52MB / 23.52MB 0.1s done
+#7 extracting sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba
+#7 extracting sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 0.3s done
+#7 extracting sha256:54723a59ba9fe2be41df3ad59d75d4738b62774f60a8e988163ed08002fa4215 done
+#7 DONE 0.6s
+
+#8 [build 1/6] FROM docker.io/library/python@sha256:9b8dad7f66b5c7751df6cb7a64a07812e86bed85d0116efe82b3a11209f1440d
+#8 resolve docker.io/library/python@sha256:9b8dad7f66b5c7751df6cb7a64a07812e86bed85d0116efe82b3a11209f1440d done
+#8 sha256:dfd5c69ca31cfb36ae0002c3049cf2d7bf398b9bb1099035e8634e3510ee84da 416.26kB / 416.26kB 0.1s done
+#8 sha256:7abff04c4f315a5424ff8d34ad0c10700efc2fc32961841df78d2bfc17e1a353 13.77MB / 13.77MB 0.4s done
+#8 sha256:9b8dad7f66b5c7751df6cb7a64a07812e86bed85d0116efe82b3a11209f1440d 1.74kB / 1.74kB done
+#8 sha256:8614a50e05881ad79bcf2d4f82028b65a463c03d2d666d255a4332e3d2a0c0ba 5.43kB / 5.43kB done
+#8 extracting sha256:dfd5c69ca31cfb36ae0002c3049cf2d7bf398b9bb1099035e8634e3510ee84da 0.1s done
+#8 sha256:6eec1681053c5141288662af49733b23283c6aa149e2f077733bd515acdfa190 249B / 249B 0.2s done
+#8 extracting sha256:7abff04c4f315a5424ff8d34ad0c10700efc2fc32961841df78d2bfc17e1a353
+#8 extracting sha256:7abff04c4f315a5424ff8d34ad0c10700efc2fc32961841df78d2bfc17e1a353 0.6s done
+#8 extracting sha256:6eec1681053c5141288662af49733b23283c6aa149e2f077733bd515acdfa190
+#8 extracting sha256:6eec1681053c5141288662af49733b23283c6aa149e2f077733bd515acdfa190 done
+#8 DONE 3.8s
+
+#9 [runtime 2/3] WORKDIR /app
+#9 DONE 0.0s
+
+#10 [build 2/6] COPY --from=uv-tool /uv /usr/local/bin/uv
+#10 DONE 0.0s
+
+#11 [build 3/6] WORKDIR /build
+#11 DONE 0.0s
+
+#12 [build 4/6] COPY .python-version pyproject.toml uv.lock README.md ./
+#12 DONE 0.0s
+
+#13 [build 5/6] COPY src/ ./src/
+#13 DONE 0.0s
+
+#14 [build 6/6] RUN uv sync --locked --only-group build --no-install-project --no-managed-python     && uv build --offline --no-build-isolation --wheel     && uv venv --no-managed-python --python /usr/local/bin/python /opt/venv     && uv pip install --python /opt/venv/bin/python --offline --no-index --no-deps dist/*.whl
+#14 0.428 Using CPython 3.12.14 interpreter at: /usr/local/bin/python3.12
+#14 0.428 Creating virtual environment at: .venv
+#14 0.440 Resolved 16 packages in 10ms
+#14 0.534 Prepared 3 packages in 92ms
+#14 0.593 Installed 3 packages in 58ms
+#14 0.593  + packaging==26.3
+#14 0.593  + setuptools==84.0.0
+#14 0.593  + wheel==0.48.0
+#14 0.887 Building wheel...
+#14 2.131 running bdist_wheel
+#14 2.140 running build
+#14 2.140 running build_py
+#14 2.142 creating build/lib/lifecycle_worker
+#14 2.142 copying src/lifecycle_worker/__init__.py -> build/lib/lifecycle_worker
+#14 2.143 creating build/lib/lifecycle_worker/bootstrap
+#14 2.143 copying src/lifecycle_worker/bootstrap/health.py -> build/lib/lifecycle_worker/bootstrap
+#14 2.143 copying src/lifecycle_worker/bootstrap/__init__.py -> build/lib/lifecycle_worker/bootstrap
+#14 2.144 creating build/lib/lifecycle_worker/interfaces
+#14 2.144 copying src/lifecycle_worker/interfaces/health.py -> build/lib/lifecycle_worker/interfaces
+#14 2.144 copying src/lifecycle_worker/interfaces/__init__.py -> build/lib/lifecycle_worker/interfaces
+#14 2.145 running egg_info
+#14 2.147 creating src/product_lifecycle_worker.egg-info
+#14 2.148 writing src/product_lifecycle_worker.egg-info/PKG-INFO
+#14 2.149 writing dependency_links to src/product_lifecycle_worker.egg-info/dependency_links.txt
+#14 2.149 writing entry points to src/product_lifecycle_worker.egg-info/entry_points.txt
+#14 2.149 writing top-level names to src/product_lifecycle_worker.egg-info/top_level.txt
+#14 2.150 writing manifest file 'src/product_lifecycle_worker.egg-info/SOURCES.txt'
+#14 2.153 reading manifest file 'src/product_lifecycle_worker.egg-info/SOURCES.txt'
+#14 2.154 writing manifest file 'src/product_lifecycle_worker.egg-info/SOURCES.txt'
+#14 2.155 warning: build_py: byte-compiling is disabled, skipping.
+#14 2.155 
+#14 2.158 installing to build/bdist.linux-x86_64/wheel
+#14 2.158 running install
+#14 2.166 running install_lib
+#14 2.168 creating build/bdist.linux-x86_64/wheel
+#14 2.169 creating build/bdist.linux-x86_64/wheel/lifecycle_worker
+#14 2.169 creating build/bdist.linux-x86_64/wheel/lifecycle_worker/bootstrap
+#14 2.169 copying build/lib/lifecycle_worker/bootstrap/health.py -> build/bdist.linux-x86_64/wheel/./lifecycle_worker/bootstrap
+#14 2.170 copying build/lib/lifecycle_worker/bootstrap/__init__.py -> build/bdist.linux-x86_64/wheel/./lifecycle_worker/bootstrap
+#14 2.170 creating build/bdist.linux-x86_64/wheel/lifecycle_worker/interfaces
+#14 2.170 copying build/lib/lifecycle_worker/interfaces/health.py -> build/bdist.linux-x86_64/wheel/./lifecycle_worker/interfaces
+#14 2.171 copying build/lib/lifecycle_worker/interfaces/__init__.py -> build/bdist.linux-x86_64/wheel/./lifecycle_worker/interfaces
+#14 2.171 copying build/lib/lifecycle_worker/__init__.py -> build/bdist.linux-x86_64/wheel/./lifecycle_worker
+#14 2.171 warning: install_lib: byte-compiling is disabled, skipping.
+#14 2.171 
+#14 2.172 running install_egg_info
+#14 2.173 Copying src/product_lifecycle_worker.egg-info to build/bdist.linux-x86_64/wheel/./product_lifecycle_worker-0.1.0.dev0-py3.12.egg-info
+#14 2.175 running install_scripts
+#14 2.176 creating build/bdist.linux-x86_64/wheel/product_lifecycle_worker-0.1.0.dev0.dist-info/WHEEL
+#14 2.177 creating '/build/dist/.tmp-ceu70mor/product_lifecycle_worker-0.1.0.dev0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+#14 2.177 adding 'lifecycle_worker/__init__.py'
+#14 2.178 adding 'lifecycle_worker/bootstrap/__init__.py'
+#14 2.178 adding 'lifecycle_worker/bootstrap/health.py'
+#14 2.179 adding 'lifecycle_worker/interfaces/__init__.py'
+#14 2.179 adding 'lifecycle_worker/interfaces/health.py'
+#14 2.180 adding 'product_lifecycle_worker-0.1.0.dev0.dist-info/METADATA'
+#14 2.180 adding 'product_lifecycle_worker-0.1.0.dev0.dist-info/WHEEL'
+#14 2.181 adding 'product_lifecycle_worker-0.1.0.dev0.dist-info/entry_points.txt'
+#14 2.181 adding 'product_lifecycle_worker-0.1.0.dev0.dist-info/top_level.txt'
+#14 2.182 adding 'product_lifecycle_worker-0.1.0.dev0.dist-info/RECORD'
+#14 2.182 removing build/bdist.linux-x86_64/wheel
+#14 2.214 Successfully built dist/product_lifecycle_worker-0.1.0.dev0-py3-none-any.whl
+#14 2.494 Using CPython 3.12.14 interpreter at: /usr/local/bin/python
+#14 2.494 Creating virtual environment at: /opt/venv
+#14 2.784 Using Python 3.12.14 environment at: /opt/venv
+#14 2.786 Resolved 1 package in 1ms
+#14 2.790 Prepared 1 package in 3ms
+#14 2.794 Installed 1 package in 3ms
+#14 2.794  + product-lifecycle-worker==0.1.0.dev0 (from file:///build/dist/product_lifecycle_worker-0.1.0.dev0-py3-none-any.whl)
+#14 DONE 2.8s
+
+#15 [runtime 3/3] COPY --from=build /opt/venv/ /opt/venv/
+#15 DONE 0.0s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 0.2s done
+#16 writing image sha256:861bdb90c0cd349b2f6f2eba73306fe216df9862a6bd50d0d9e42ebac820c4e8 done
+#16 naming to docker.io/library/p01-lifecycle-workers:36a14811b5afa23717566d5e8a08632e011f44a5 done
+#16 DONE 0.3s

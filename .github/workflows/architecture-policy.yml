@@ -45,7 +45,7 @@ jobs:
       - name: Reconcile the complete P01 candidate evidence set
         run: >-
           python scripts/p01/artifacts/release_set.py
-          --run-path verification/p01/artifact-trust/run-37272826276
+          --run-path verification/p01/artifact-trust/run-37278732015
           --check release/p01-candidate-set.json
       - name: Check generated delivery views
         run: python scripts/render_delivery_views.py --check
