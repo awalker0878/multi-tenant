@@ -3,6 +3,7 @@
 import hashlib
 
 import psycopg
+from psycopg.pq import TransactionStatus
 
 from planning.infrastructure.messaging.codec import canonical, decode
 
@@ -12,6 +13,11 @@ class Inbox:
         self.database = database
 
     def accept(self, wire: bytes, producer: str, tenants: frozenset[str]) -> str:
+        if (
+            not self.database.autocommit
+            or self.database.info.transaction_status != TransactionStatus.IDLE
+        ):
+            raise RuntimeError("inbox_requires_idle_autocommit_connection")
         event = decode(wire)
         if producer != "catalogue" or event.tenant_id not in tenants:
             raise ValueError("event_scope_denied")

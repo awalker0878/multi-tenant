@@ -33,6 +33,10 @@ unseen events are quarantined for owner reconciliation. The quorum queue bounds
 transient redelivery to five; malformed/denied messages go directly to the private
 quarantine queue. Neither receipt nor replay changes user or native authority.
 
+The inbox requires an idle autocommit connection before it starts its owned
+transaction. An outer transaction is rejected before decoding or SQL: a savepoint
+must never let the consumer acknowledge an event before the durable commit.
+
 No automatic pruning is implemented: facts, inbox and outbox share their service's
 backup/recovery group. Production receipt-retention and replay windows remain an
 operating input. Consumer databases contain reference/digest projections only.
