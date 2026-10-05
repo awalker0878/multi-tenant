@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "repository": "awalker0878/multi-tenant",
+  "observed_at": "2026-10-05T04:53:12.116Z",
+  "observer": "Codex through GitHub connector",
+  "source_revision": "2e1be599cba89275c92396066f091779cd912539",
+  "observations": {
+    "branch": {
+      "name": "greenfield/enterprise-microservices-plan",
+      "protected": false
+    },
+    "rulesets": [],
+    "repository": {
+      "id": 1374801496,
+      "visibility": "public",
+      "default_branch": "main",
+      "connector_permissions": {
+        "admin": true,
+        "maintain": true,
+        "push": true,
+        "triage": true,
+        "pull": true
+      }
+    }
+  },
+  "sources": [
+    "https://api.github.com/repos/awalker0878/multi-tenant/branches?per_page=100",
+    "https://api.github.com/repos/awalker0878/multi-tenant/rulesets",
+    "https://api.github.com/repos/awalker0878/multi-tenant"
+  ],
+  "capability_inventory": {
+    "repository_settings_mutation": false,
+    "workflow_dispatch": false
+  },
+  "limitations": "Read-only observed API state; no verified role mapping, settings activation, required-check enforcement or operating trust is inferred."
+}

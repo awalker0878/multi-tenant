@@ -16,10 +16,10 @@ ARG DEBIAN_SNAPSHOT=20261004T000000Z
 COPY build/snapshot.sh /tmp/service-snapshot.sh
 RUN sh /tmp/service-snapshot.sh \
     && apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev \
+    && apt-get install -y --no-install-recommends libpq-dev libpcre2-8-0=10.42-1+deb12u2 tzdata=2026c-0+deb12u1 \
     && docker-php-ext-install -j2 pdo_pgsql \
     && apt-mark manual libpq5 \
-    && apt-get purge -y --auto-remove libpq-dev $PHPIZE_DEPS \
+    && apt-get purge -y --auto-remove libpq-dev linux-libc-dev $PHPIZE_DEPS \
     && rm -rf /var/lib/apt/lists/* /tmp/service-snapshot.sh \
     && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 WORKDIR /app

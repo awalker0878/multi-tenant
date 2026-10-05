@@ -19,7 +19,7 @@ class PolicyTests(unittest.TestCase):
                          'tested_parents': ['b'*40, 'a'*40], 'head_after': 'a'*40, 'base_after': 'b'*40,
                          'author_id': 10, 'unresolved_threads': 0, 'exceptions': [],
                          'permissions': {'11': 'write', '12': 'write'},
-                         'checks': [{'id': 1, 'name': 'quality', 'app_id': 15368, 'head_sha': 'c'*40,
+                         'checks': [{'id': 1, 'name': 'quality', 'app_id': 15368, 'head_sha': 'a'*40, 'tested_sha': 'c'*40,
                                      'status': 'completed', 'conclusion': 'success'}],
                          'reviews': [{'id': 1, 'user_id': 11, 'login': 'fixture-owner', 'state': 'APPROVED', 'commit_id': 'a'*40},
                                      {'id': 2, 'user_id': 12, 'login': 'fixture-security', 'state': 'APPROVED', 'commit_id': 'a'*40}]}
@@ -60,7 +60,7 @@ class PolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(Denied,'^changes_requested$'):self.run_review()
 
     def test_missing_wrong_app_stale_check_denied(self):
-        for key,value in [('app_id',99),('head_sha','d'*40),('name','lookalike')]:
+        for key,value in [('app_id',99),('head_sha','d'*40),('tested_sha','d'*40),('name','lookalike')]:
             original=self.snapshot['checks'][0][key];self.snapshot['checks'][0][key]=value
             with self.assertRaisesRegex(Denied,'^missing_required_check:quality$'):self.run_review()
             self.snapshot['checks'][0][key]=original

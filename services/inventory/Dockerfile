@@ -18,6 +18,12 @@ RUN uv sync --locked --only-group build --no-install-project --no-managed-python
     && uv pip check --python /opt/venv/bin/python
 
 FROM ${PYTHON_BASE} AS runtime
+ARG DEBIAN_SNAPSHOT=20261004T000000Z
+COPY build/snapshot.sh /tmp/service-snapshot.sh
+RUN sh /tmp/service-snapshot.sh \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends libpcre2-8-0=10.42-1+deb12u2 tzdata=2026c-0+deb12u1 \
+    && rm -rf /var/lib/apt/lists/* /tmp/service-snapshot.sh
 ARG SOURCE_REVISION=unrecorded
 LABEL io.product.component="inventory"
 LABEL org.opencontainers.image.title="product-inventory bootstrap" \

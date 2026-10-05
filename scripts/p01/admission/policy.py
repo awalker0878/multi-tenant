@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-import fnmatch
 from pathlib import PurePosixPath
 import re
 
@@ -42,7 +41,7 @@ def affected(paths, base_components, head_components, base_graph, head_graph):
                 unknown.append(path)
             selected.update(owners or ids)
         elif not (path.startswith(('docs/', 'verification/', 'spikes/', 'tests/')) or
-                  path in {'next_work.md', 'README.md', '.gitignore', 'requirements-docs.txt'}):
+                  path in {'next_work.md', 'README.md', 'CONTRIBUTING.md', '.gitignore', 'requirements-docs.txt'}):
             unknown.append(path); selected.update(ids)
         if path.startswith('tests/contracts/'):
             selected.update(ids)
@@ -61,6 +60,11 @@ def affected(paths, base_components, head_components, base_graph, head_graph):
 
 def required_roles(paths, impacted):
     roles = {name.removesuffix('-workers') for name in impacted}
+    if not roles:
+        roles.add('platform')
+    if any(PurePosixPath(p).name in {'phpstan.neon', 'deptrac.yaml', 'pint.json', 'pyproject.toml',
+                                    'tsconfig.json', 'eslint.config.js', '.dockerignore', '.gitignore'} for p in paths):
+        roles |= {'platform', 'security'}
     if any(p.startswith(('.github/', 'scripts/', 'release/', 'architecture/')) for p in paths):
         roles |= {'platform', 'security'}
     if any(p.startswith('contracts/') for p in paths):
@@ -102,12 +106,18 @@ def review(policy, snapshot, paths, impact, now=None):
     need(not impact['unknown_paths'] and not impact['removed_components'], 'unclassified_or_removed_component')
     need(snapshot['unresolved_threads'] == 0, 'unresolved_review_threads')
     check_exceptions(snapshot['exceptions'], policy['accounts'], now)
+    check_exceptions(snapshot.get('candidate_exceptions', []), policy['accounts'], now)
+    for exception in snapshot['exceptions']:
+        need(exception['source_revision'] == head, 'exception_wrong_source')
+        need(snapshot['permissions'].get(str(exception['approved_by'])) in {'admin', 'maintain', 'write'}, 'exception_reviewer_not_authorized')
     for check in policy['required_checks']:
         observed = [r for r in snapshot['checks'] if r['name'] == check and r['app_id'] == policy['allowed_check_app_id']
-                    and r['head_sha'] == tested]
+                    and r['head_sha'] == head and r.get('tested_sha') == tested]
         need(observed, 'missing_required_check:' + check)
         latest = max(observed, key=lambda item: item['id'])
         need(latest['status'] == 'completed' and latest['conclusion'] == 'success', 'required_check_not_success:' + check)
+    for exception in snapshot['exceptions']:
+        need(exception['compensating_check'] in policy['required_checks'], 'exception_compensating_check_not_required')
     latest = {}
     for r in sorted(snapshot['reviews'], key=lambda item: item['id']):
         # Comments do not dismiss an approval or a blocking change request.
@@ -122,6 +132,10 @@ def review(policy, snapshot, paths, impact, now=None):
             need(r['login'] == account['login'], 'reviewer_identity_changed')
             approved.add(account_id)
     roles = required_roles(paths, impact['components'])
+    for exception in snapshot.get('candidate_exceptions', []):
+        need(str(exception['approved_by']) in approved
+             and str(exception['approved_by']) in set(map(str, policy['roles'].get('security', []))),
+             'proposed_exception_requires_actual_security_approval')
     need(roles, 'review_scope_missing')
     for role in roles:
         need(set(map(str, policy['roles'].get(role, []))) & approved, 'missing_role_review:' + role)

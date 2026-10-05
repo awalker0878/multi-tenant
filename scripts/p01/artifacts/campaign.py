@@ -102,10 +102,13 @@ def main():
             scans = []
             for scope in ['image', 'source']:
                 command = [trivy, 'image' if scope == 'image' else 'fs', '--cache-dir', cache,
-                           '--skip-db-update', '--no-progress', '--include-dev-deps']
+                           '--skip-db-update', '--no-progress', '--config', '', '--ignorefile', '', '--secret-config', '']
+                # Dev/build dependency inclusion is a filesystem flag, not an image flag.
+                command += ['--include-dev-deps'] if scope == 'source' else []
                 target = ['--input', archive] if scope == 'image' else [source]
                 raw_scan = work / (scope + '-raw.json')
-                run(scope + '-scan', command + ['--scanners', 'vuln,secret', '--list-all-pkgs',
+                scan_options = ['--image-config-scanners', 'secret'] if scope == 'image' else []
+                run(scope + '-scan', command + scan_options + ['--scanners', 'vuln,secret', '--list-all-pkgs',
                     '--format', 'json', '--output', raw_scan] + target)
                 raw = json.loads(raw_scan.read_text())
                 require(raw['SchemaVersion'] == 2 and raw.get('Results'), 'missing_scan_results')
@@ -150,12 +153,18 @@ def main():
                       'component': built['component'], 'image_digest': image, 'builder_id': BUILDER}
             if findings:
                 denied('real-findings-hold-candidate', bundle, anchor, key, cosign, 'security_findings:')
+                target = work / 'receiving-quarantine';shutil.copytree(bundle, target)
+                require(inventory(bundle) == inventory(target), 'transfer_changed_bytes')
+                denied('quarantined-target-still-held', target, anchor, key, cosign, 'security_findings:')
+                report['transfer_integrity'] = 'VERIFIED_UNPROMOTED_COPY'
+                shutil.rmtree(target)
             else:
                 report['source_admission'] = verify(bundle, anchor, key, cosign)
                 target = work / 'receiving-store';shutil.copytree(bundle, target)
                 require(inventory(bundle) == inventory(target), 'transfer_changed_bytes')
                 report['target_admission'] = verify(target, anchor, key, cosign)
                 report['candidate_admission'] = 'ADMITTED_DEVELOPMENT'
+                report['transfer_integrity'] = 'VERIFIED_DEVELOPMENT_COPY'
                 shutil.rmtree(target)
             # Use the exact real image; restore bytes after each negative, never rebuild.
             signature = bundle / 'signature.sigstore.json'; saved = signature.read_bytes();signature.unlink()

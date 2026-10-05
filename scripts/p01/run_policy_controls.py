@@ -27,7 +27,8 @@ def main():
               'started_at': datetime.now(timezone.utc).isoformat(), 'result': 'FAILED', 'commands': []}
     try:
         for name, script in [('reviews', 'admission/test_policy.py'), ('bundles', 'artifacts/test_bundle.py'),
-                             ('redaction', 'artifacts/test_campaign.py')]:
+                             ('redaction', 'artifacts/test_campaign.py'), ('check-sources', 'admission/test_check_sources.py'),
+                             ('exclusions', 'admission/test_exclusions.py')]:
             argv = [sys.executable, str(root / 'scripts/p01' / script), '-v']
             result = subprocess.run(argv, env=os.environ | {'P01_COSIGN': args.cosign},
                                     capture_output=True, timeout=180)
