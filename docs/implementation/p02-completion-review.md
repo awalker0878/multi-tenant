@@ -10,32 +10,17 @@ These are concrete receiving inputs, not a request to reauthorize development.
 
 ## Exceptional support access — BL-P02-001
 
-P02.03 requires an explicit privileged support policy; P02.04 requires a
-break-glass audit contract. The current permission matrix denies unknown/support
-actions and supplies no impersonation, approval override or local-login recovery
-endpoint. Existing tenant grants cannot delegate administrative/support authority.
+The requesting owner approved the support/break-glass policy direction and its
+secure implementation on 2026-10-05. The [accepted policy version 1](p02-support-access.md)
+records that instruction, the initial exact-record diagnostic actions, distinct
+tenant/security approval, maximum one-hour lifetime, live authority checks,
+immutable audit and independent post-use review. Existing tenant permissions do
+not delegate support authority, and published v1 contracts remain unchanged.
 
-The following is a **policy proposal for IAM/security and Governance review**;
-it is not a published API, implemented elevation path or accepted E0 evidence.
-
-| Decision | Proposed contract for review |
-| --- | --- |
-| Request identity | A current federated subject requests access for a named, different-or-same executing subject; retain requester and executor separately. No shared support account or issuer-group-derived permission. |
-| Bound scope | One installation, tenant, explicit site/environment and resource set; an enumerated action list. No wildcard tenant, secret extraction, destructive native action, approval override or implicit resource expansion. Owners must name the initial supported action list before implementation. |
-| Approval | A current tenant owner and an independently assigned security approver both approve the immutable request digest. Neither approver may be requester or executor; tenant administration alone cannot appoint the security approver. Actual role-assignment authority must be supplied. |
-| Lifetime | Proposed maximum 60 minutes, bounded by every underlying session/grant. Expiry is effective at the exact deadline without a scheduler. No extension in place; a fresh request and approvals are required. |
-| Admission and revocation | The owning service checks current subject, both approvals, exact action/resource and current custody at every new admission. Revocation, changed scope or changed approver authority permanently invalidates this request. No cached permit or event confers access. |
-| Emergency boundary | Issuer/key/custody loss holds access. Emergency containment may stop admission through separately controlled infrastructure authority; it cannot mint tenant rights or revive a retired local account. Recovery/rebind remains a distinct approved operating procedure. |
-| Audit contract | Append `requested`, each attributable `approved` or `rejected`, `admitted`, `denied`, `revoked` and `expired` facts with immutable request digest, policy revision, incident reference, installation/tenant/scope/action, requester/executor/approver references, decision revision, correlation ID and timestamp. No credential, bearer handle, secret or workload payload. Mutation and audit/outbox commit atomically; delivery/revocation preserves committed facts. |
-| Review and custody | Independently review every exceptional use and its expiry/revocation. Supply the accountable reviewer, review deadline, retention/sovereignty policy and protected audit destination; this repository does not invent staffed coverage. |
-
-**Required owner decision:** approve or amend the action list, approver assignment,
-duration and audit/review custody. Then implement a new versioned owner contract,
-state machine and receiving surfaces; qualify two-tenant denial, self-approval,
-scope/digest change, expiry/revocation, outage and restored-history cases. Existing
-v1 contracts remain immutable. If exceptional access is intentionally excluded,
-that requires an explicit scope review of the phase cards; it is not silently
-treated as delivered by the deny-by-default behavior.
+The decision is now made; BL-P02-001 tracks completion and qualification of the
+implementation. Actual operator identities, audit custody/retention and independent
+receiving acceptance remain separate operating inputs. No policy approval is
+inferred for production resumption after recovery.
 
 ## Identity and recovery custody — BL-P02-002
 

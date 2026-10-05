@@ -59,7 +59,7 @@ final class ExternalOidcProvider implements OidcProvider
                 throw new IdentityDenied('invalid_id_token');
             }
             $jwks = $this->http->request($connection, $context['endpoints']['jwks_uri']);
-            $keys = $this->signingKeys($jwks);
+            $keys = self::signingKeys($jwks);
             $headers = new stdClass;
             $claims = (array) JWT::decode($jwt, JWK::parseKeySet(['keys' => $keys], 'RS256'), $headers);
             if ($headers === null || $headers->alg !== 'RS256' || isset($headers->crit) || isset($headers->jku) || isset($headers->x5u)
@@ -87,7 +87,12 @@ final class ExternalOidcProvider implements OidcProvider
                 throw new IdentityDenied('invalid_id_token');
             }
 
-            return ['subject' => $subject, 'expires_at' => $claims['exp']];
+            $signer = array_values(array_filter($keys, static fn (array $key): bool => $key['kid'] === ($headers->kid ?? null)));
+            if (count($signer) !== 1) {
+                throw new IdentityDenied('invalid_provider_keys');
+            }
+
+            return ['subject' => $subject, 'expires_at' => $claims['exp'], 'key_thumbprint' => self::thumbprint($signer[0])];
         } catch (IdentityDenied $error) {
             throw $error;
         } catch (Throwable) {
@@ -99,7 +104,7 @@ final class ExternalOidcProvider implements OidcProvider
     /** @param array<string, mixed> $jwks
      * @return list<array<string, mixed>>
      */
-    private function signingKeys(array $jwks): array
+    public static function signingKeys(array $jwks): array
     {
         $keys = $jwks['keys'] ?? null;
         if (! is_array($keys) || ! array_is_list($keys) || count($keys) > 50) {
@@ -125,5 +130,12 @@ final class ExternalOidcProvider implements OidcProvider
         }
 
         return $valid;
+    }
+
+    /** @param array<string, mixed> $key */
+    public static function thumbprint(array $key): string
+    {
+        // Bind the verified RSA material, not a provider-controlled key label.
+        return hash('sha256', json_encode(['e' => $key['e'], 'kty' => 'RSA', 'n' => $key['n']], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
     }
 }

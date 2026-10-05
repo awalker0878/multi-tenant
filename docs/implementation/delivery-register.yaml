@@ -5609,17 +5609,16 @@ blockers:
   - R04
   - R32
   - G02
-  owner_role: IAM/security and Governance; actual approver-assignment and review owners not supplied
-  description: P02.03 privileged support policy and P02.04 break-glass audit contract require a reviewed
-    action/scope/approval/expiry/custody decision. Current unknown/support actions are denied and no exceptional
-    elevation path exists. A concrete policy proposal is prepared in p02-completion-review.md; it is not
-    an accepted contract.
-  unblock_condition: Approve or amend the proposed initial action list, independent approver assignment,
-    lifetime and audit/review custody; implement and qualify the accepted versioned contract. An exclusion
-    requires explicit phase-scope review.
-  next_action: IAM/security and Governance review the exceptional-access decision table in docs/implementation/p02-completion-review.md.
-    Then implement the selected new contract and two-tenant/separation/expiry/revocation/recovery cases
-    without changing published v1 schemas.
+  owner_role: Governance implementation; requesting owner accepted the policy direction on 2026-10-05
+  description: The requesting owner approved the support/break-glass policy decision and secure implementation.
+    Accepted policy version 1 in p02-support-access.md selects exact membership/grant diagnostics,
+    independent tenant/security approval, bounded lifetime, live authority and immutable post-use review.
+    Implementation and hosted qualification remain in progress; actual audit custody and receiving
+    reviewers remain separate operating inputs.
+  unblock_condition: Implement and qualify the accepted versioned support contract, including independent
+    approvals, exact scope, expiry/revocation, durable audit/delivery and restored terminal history.
+  next_action: Complete the owner API and execute the PostgreSQL, TLS event and recovery campaigns;
+    retain exact-source evidence without changing published v1 contracts.
   state: OPEN
   resolution_evidence_ids: []
 - id: BL-P02-002

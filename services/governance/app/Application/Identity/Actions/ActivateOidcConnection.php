@@ -37,7 +37,7 @@ final class ActivateOidcConnection
             IdentityLedger::record('identity.oidc.activated', $verified->actor_id);
 
             // The tested proof is short lived; handover requires a fresh provider sign-in thereafter.
-            return $this->sessions->handle($verified->actor_id, $verified->connection_revision, Carbon::parse($verified->expires_at)->getTimestamp(), true);
+            return $this->sessions->handle($verified->actor_id, $verified->connection_revision, Carbon::parse($verified->expires_at)->getTimestamp(), true, $verified->provider_key_sha256);
         });
     }
 }

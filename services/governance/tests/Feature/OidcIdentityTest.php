@@ -59,6 +59,9 @@ it('uses real signed tokens, verifies PKCE and atomically retires every local se
     }
     $this->withHeader('X-Console-Session', $federated)->getJson('/identity/session')->assertOk()->assertJsonPath('identity.kind', 'federated');
     $this->getJson('/identity/oidc')->assertOk()->assertJsonPath('active_revision', 1);
+    $signer = DB::table('app.federated_sessions')->where('token_hash', hash('sha256', $federated))->value('provider_key_sha256');
+    expect($signer)->toMatch('/\A[0-9a-f]{64}\z/')
+        ->and(DB::table('app.oidc_verifications')->value('provider_key_sha256'))->toBe($signer);
     expect(Administrator::query()->findOrFail(1)->state)->toBe('retired')->and(app(BootstrapAdministrator::class)->handle())->toBeNull()
         ->and(DB::table('app.identity_sessions')->whereNull('revoked_at')->count())->toBe(0);
     $this->provider->unavailable = true;

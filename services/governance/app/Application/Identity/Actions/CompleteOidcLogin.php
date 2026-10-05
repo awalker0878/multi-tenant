@@ -60,12 +60,13 @@ final class CompleteOidcLogin
             if ($flow->purpose === 'login') {
                 IdentityLedger::record('identity.federated.login', $id);
 
-                return $this->sessions->handle($id, $connection->revision, $verified['expires_at'], $verified['subject'] === $connection->administrator_subject);
+                return $this->sessions->handle($id, $connection->revision, $verified['expires_at'], $verified['subject'] === $connection->administrator_subject, $verified['key_thumbprint']);
             }
             $proof = bin2hex(random_bytes(32));
             DB::table('app.oidc_verifications')->insert([
                 'proof_hash' => hash('sha256', $proof), 'initiator_hash' => $flow->initiator_hash,
                 'actor_id' => $id, 'connection_revision' => $connection->revision,
+                'provider_key_sha256' => $verified['key_thumbprint'],
                 'expires_at' => now()->addMinutes(5)->min(now()->setTimestamp($verified['expires_at'])),
             ]);
             IdentityLedger::record('identity.oidc.administrator_verified', $id);
