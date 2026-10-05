@@ -171,10 +171,10 @@ def evidence(stage, state):
     return {**state,'base64':base64.b64encode(body).decode()}
 
 
-async def temporal_connect(identity='lifecycle', namespace='lifecycle'):
+async def temporal_connect(identity='lifecycle', namespace='lifecycle', *, lazy=True):
     from temporalio.client import Client
     from temporalio.service import TLSConfig
-    return await Client.connect('temporal:7233',namespace=namespace,tls=TLSConfig(server_root_ca_cert=Path(CA).read_bytes(),domain='temporal'),rpc_metadata={} if identity=='missing' else {'authorization':'Bearer '+secret('jwt-'+identity)},lazy=True)
+    return await Client.connect('temporal:7233',namespace=namespace,tls=TLSConfig(server_root_ca_cert=Path(CA).read_bytes(),domain='temporal'),rpc_metadata={} if identity=='missing' else {'authorization':'Bearer '+secret('jwt-'+identity)},lazy=lazy)
 
 
 async def temporal(stage, state):
@@ -184,7 +184,7 @@ async def temporal(stage, state):
     from temporalio.worker import Worker
     from workflow import RestartWitness
     async def describe(client):
-        return await client.workflow_service.describe_namespace(DescribeNamespaceRequest(namespace='lifecycle'),rpc_timeout=timedelta(seconds=3))
+        return await client.workflow_service.describe_namespace(DescribeNamespaceRequest(namespace='lifecycle'),timeout=timedelta(seconds=3))
     async def rejection(name, client, codes):
         try: await describe(client)
         except RPCError as error: check(name,error.status in codes,{'status':error.status.name})
@@ -194,7 +194,7 @@ async def temporal(stage, state):
         deadline=time.monotonic()+100
         while True:
             try:
-                await client.workflow_service.register_namespace(RegisterNamespaceRequest(namespace='lifecycle',workflow_execution_retention_period=Duration(seconds=86400)),rpc_timeout=timedelta(seconds=4))
+                await client.workflow_service.register_namespace(RegisterNamespaceRequest(namespace='lifecycle',workflow_execution_retention_period=Duration(seconds=86400)),timeout=timedelta(seconds=4))
                 break
             except RPCError as error:
                 if error.status == RPCStatusCode.ALREADY_EXISTS: raise
@@ -224,14 +224,16 @@ async def temporal(stage, state):
         for identity in ('missing','foreign','expired','wrong-audience'):
             await rejection(identity+'-jwt-denied',await temporal_connect(identity),{RPCStatusCode.PERMISSION_DENIED,RPCStatusCode.UNAUTHENTICATED})
         try:
-            await client.workflow_service.register_namespace(RegisterNamespaceRequest(namespace='forbidden',workflow_execution_retention_period=Duration(seconds=86400)),rpc_timeout=timedelta(seconds=3))
+            await client.workflow_service.register_namespace(RegisterNamespaceRequest(namespace='forbidden',workflow_execution_retention_period=Duration(seconds=86400)),timeout=timedelta(seconds=3))
         except RPCError as error: check('worker-cannot-administer-namespaces',error.status==RPCStatusCode.PERMISSION_DENIED,{'status':error.status.name})
         else: check('worker-cannot-administer-namespaces',False)
+        client=await temporal_connect(lazy=False)
         async with Worker(client,task_queue='p01-restart',workflows=[RestartWitness]):
             handle=await client.start_workflow(RestartWitness.run,'synthetic durable marker',id='p01-restart-witness',task_queue='p01-restart',execution_timeout=timedelta(minutes=15))
             waiting=await asyncio.wait_for(handle.query(RestartWitness.waiting),30)
             check('workflow-reached-durable-wait',waiting)
             return {'workflow_id':handle.id,'run_id':handle.first_execution_run_id,'marker':'synthetic durable marker'}
+    client=await temporal_connect(lazy=False)
     async with Worker(client,task_queue='p01-restart',workflows=[RestartWitness]):
         handle=client.get_workflow_handle(state['workflow_id'],run_id=state['run_id'])
         check('restarted-workflow-still-waiting',await asyncio.wait_for(handle.query(RestartWitness.waiting),45))

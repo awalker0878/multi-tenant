@@ -82,7 +82,7 @@ definitions.local.path = /run/config/definitions.json
         'global': {'membership': {'maxJoinDuration': '30s', 'broadcastAddress': '127.0.0.1'}, 'tls': {'frontend': {'server': {'certFile': '/run/secrets/temporal.crt', 'keyFile': '/run/secrets/temporal.key', 'requireClientAuth': False}}}, 'authorization': {'authorizer': 'default', 'claimMapper': 'default', 'audience': 'p01-temporal', 'jwtKeyProvider': {'keySourceURIs': ['file:///run/config/jwks.json'], 'refreshInterval': '1s'}}},
         'services': {name: {'rpc': {'grpcPort': port, 'membershipPort': port-300, **({'bindOnIP': '0.0.0.0'} if name == 'frontend' else {'bindOnLocalHost': True})}} for name, port in [('frontend', 7233), ('history', 7234), ('matching', 7235), ('internal-frontend', 7236), ('worker', 7239)]},
         'clusterMetadata': {'enableGlobalNamespace': False, 'failoverVersionIncrement': 10, 'masterClusterName': 'active', 'currentClusterName': 'active', 'clusterInformation': {'active': {'enabled': True, 'initialFailoverVersion': 1, 'rpcName': 'frontend', 'rpcAddress': '127.0.0.1:7233'}}},
-        'dynamicConfigClient': {'filepath': '/run/config/dynamic.yaml', 'pollInterval': '1s'}}
+        'dynamicConfigClient': {'filepath': '/run/config/dynamic.yaml', 'pollInterval': '10s'}}
     _write(private/'temporal.yaml', json.dumps(temporal))
     _write(config/'dynamic.yaml', 'system.enableInternalFrontend:\n  - value: true\n')
     for name, prefix in [('assurance', 't_demo'), ('foreign', 't_other')]:
