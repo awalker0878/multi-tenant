@@ -52,3 +52,28 @@ custody descriptor together is outside the recovery fence's guarantee.
 See the [P02 completion review](p02-completion-review.md) for the remaining operating
 and receiving inputs. P02 and G02 remain governed by their delivery register and
 receiving review, not by this policy approval alone.
+
+
+## Implemented and qualified
+
+Source `fadb6548569bb2663172a4fcb5c176f510b45d94` implements the new
+[owner API](../../contracts/openapi/governance-support-v1.json), immutable persistence,
+current signer/authority admission, two-actor decisions and restricted event delivery.
+The corrected qualification source is `ad53968f4f3f4c9c1bc031a17f909be4ff6dabf2`.
+The presented Console workload credential is rechecked after remote trust verification
+and under the owner lock, preventing credential rotation from authorizing a stale
+in-flight request. Remote I/O never holds that shared database lock.
+
+EV-P02-020 records the decision, EV-P02-021 records 211 local Governance cases and
+strict quality checks, and EV-P02-022 records the three-engine PostgreSQL/restore
+and separate TLS broker campaigns. Each engine passes 116 checks, 177 Governance
+PostgreSQL cases and 66 Console PostgreSQL/TLS cases, plus both existing compiled
+browser journeys. The event campaign passes 74 cases. Read the
+[immutable qualification index](../../verification/p02/support/qualification-index.json)
+and [correction history](../../verification/p02/corrections.md) for exact source,
+archive/log hashes, original failure and fixture/operating limits.
+
+BL-P02-001 is resolved for this bounded implementation. Follow the
+[operations runbook](../operations/runbooks/support-access.md) and retain the actual
+custody/receiving obligations under BL-P02-002–004. No production review identity
+or audit-sink assignment is inferred from a passing campaign.
