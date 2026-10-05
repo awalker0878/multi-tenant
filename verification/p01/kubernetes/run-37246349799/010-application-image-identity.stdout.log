@@ -1,0 +1,1 @@
+"sha256:f73a9c800371151a4967be7ab0d52e697789303a5dc1789b1ce8a86043fee0ea" "linux" "amd64" {"io.product.component":"planning","org.opencontainers.image.revision":"5122e256fb49ba55ee797f02771e7b12c4109481","org.opencontainers.image.source":"https://github.com/awalker0878/multi-tenant","org.opencontainers.image.title":"product-planning bootstrap"}
