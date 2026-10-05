@@ -114,3 +114,55 @@ test('mounted application key wins and an unavailable file never falls back to t
         }
     }
 });
+
+test('a TCP peer that never answers TLS negotiation fails within the connection budget', function () {
+    // A real listening socket completes TCP but deliberately never answers libpq's SSL request.
+    // This catches PDO_PGSQL overriding a DSN connect_timeout with its 30-second default.
+    $listener = stream_socket_server('tcp://127.0.0.1:0', $socketError, $socketMessage);
+    expect(is_resource($listener))->toBeTrue();
+    $address = stream_socket_get_name($listener, false);
+    expect(is_string($address))->toBeTrue();
+    $port = substr($address, strrpos($address, ':') + 1);
+    $certificateFile = tempnam(sys_get_temp_dir(), 'probe-ca-');
+    $passwordFile = tempnam(sys_get_temp_dir(), 'probe-password-');
+    $peer = false;
+
+    try {
+        $key = openssl_pkey_new(['private_key_type' => OPENSSL_KEYTYPE_EC, 'curve_name' => 'prime256v1']);
+        $request = openssl_csr_new(['commonName' => 'Synthetic timeout CA'], $key, ['digest_alg' => 'sha256']);
+        $certificate = openssl_csr_sign($request, null, $key, 1, ['digest_alg' => 'sha256']);
+        expect(openssl_x509_export($certificate, $certificatePem))->toBeTrue();
+        file_put_contents($certificateFile, $certificatePem);
+        file_put_contents($passwordFile, bin2hex(random_bytes(32)));
+        config(['foundation.database' => [
+            'host' => '127.0.0.1',
+            'port' => $port,
+            'database' => 'console',
+            'username' => 'console_runtime',
+            'password_file' => $passwordFile,
+            'sslmode' => 'verify-full',
+            'sslrootcert' => $certificateFile,
+        ]]);
+        $started = hrtime(true);
+        $this->withToken($this->healthToken)->getJson('/health/dependencies')
+            ->assertStatus(503)->assertExactJson([
+                'service' => 'console',
+                'status' => 'not_ready',
+                'scope' => 'foundation_dependencies',
+                'reason' => 'dependency_unavailable',
+            ]);
+        $elapsed = (hrtime(true) - $started) / 1_000_000_000;
+        expect($elapsed)->toBeGreaterThanOrEqual(1.5)->toBeLessThan(5.0);
+        $peer = stream_socket_accept($listener, 1);
+        expect(is_resource($peer))->toBeTrue();
+        stream_set_timeout($peer, 1);
+        expect(fread($peer, 8))->toBe(pack('NN', 8, 80877103));
+    } finally {
+        if (is_resource($peer)) {
+            fclose($peer);
+        }
+        fclose($listener);
+        unlink($certificateFile);
+        unlink($passwordFile);
+    }
+});

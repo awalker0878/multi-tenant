@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import time
 import urllib.request
 
 from kubernetes_runtime import prepare
@@ -271,8 +272,11 @@ class KubernetesCampaign(Campaign):
     def readiness(self, service: str, ready: bool) -> None:
         deployment = next(item for item in self.resources["items"] if item["kind"] == "Deployment" and item["metadata"]["name"] == service)
         argv = deployment["spec"]["template"]["spec"]["containers"][0]["readinessProbe"]["exec"]["command"]
+        started = time.monotonic()
         self.exec(service, argv, expected=0 if ready else 1)
-        self.check("direct-application-dependency-readiness", True, {"service": service, "ready": ready})
+        elapsed = time.monotonic() - started
+        self.check("direct-application-dependency-readiness", elapsed < 5,
+                   {"service": service, "ready": ready, "elapsed_seconds": round(elapsed, 3), "budget_seconds": 5})
 
     def run(self, images_path: Path | None) -> None:
         self.check("full-source-revision", bool(re.fullmatch(r"[0-9a-f]{40}", self.revision)))

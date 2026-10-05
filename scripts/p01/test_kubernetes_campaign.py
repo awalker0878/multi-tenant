@@ -106,6 +106,17 @@ class KubernetesCampaignTest(unittest.TestCase):
         self.assertEqual(argv[:5], [str(self.campaign.tools / "kubectl"), "--kubeconfig", str(self.campaign.kubeconfig), "--namespace", self.campaign.namespace])
         self.assertEqual(self.campaign.k("get", "pods", namespace="kube-system")[4], "kube-system")
 
+    def test_expected_unavailable_exit_must_also_meet_readiness_deadline(self):
+        self.campaign.resources = {"items": [{"kind": "Deployment", "metadata": {"name": "console"},
+            "spec": {"template": {"spec": {"containers": [{"readinessProbe": {"exec": {"command": ["php", "readiness"]}}}]}}}}]}
+        with patch.object(self.campaign, "exec", return_value=b"") as execute:
+            with patch("run_kubernetes.time.monotonic", side_effect=[10.0, 12.2]):
+                self.campaign.readiness("console", False)
+            execute.assert_called_with("console", ["php", "readiness"], expected=1)
+            with patch("run_kubernetes.time.monotonic", side_effect=[10.0, 15.01]):
+                with self.assertRaisesRegex(RuntimeError, "direct-application-dependency-readiness"):
+                    self.campaign.readiness("console", False)
+
 
 if __name__ == "__main__":
     unittest.main()

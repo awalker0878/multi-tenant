@@ -37,14 +37,14 @@ final class PostgresDependencyProbe implements DependencyProbe
 
         try {
             // Fresh non-persistent sessions observe credential rotation and avoid pooled authority.
+            // PDO_PGSQL appends ATTR_TIMEOUT after the DSN, overriding any DSN connect_timeout.
+            // Server startup options apply read-only and statement limits before the first query.
             $connection = new PDO(
-                "pgsql:host={$host};port={$port};dbname={$database};sslmode=verify-full;sslrootcert={$certificate};connect_timeout=2",
+                "pgsql:host={$host};port={$port};dbname={$database};sslmode=verify-full;sslrootcert={$certificate};gssencmode=disable;options='-c statement_timeout=2000 -c default_transaction_read_only=on'",
                 $username,
                 $password,
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_PERSISTENT => false],
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_PERSISTENT => false, PDO::ATTR_TIMEOUT => 2],
             );
-            $connection->exec('SET statement_timeout = 2000');
-            $connection->exec('SET default_transaction_read_only = on');
             $statement = $connection->query('SELECT 1 AS probe, current_user AS identity, (SELECT count(*) FROM app.foundation_schema) AS schema_rows, (SELECT max(version) FROM app.foundation_schema) AS schema_version');
             $result = $statement === false ? false : $statement->fetch(PDO::FETCH_ASSOC);
 
