@@ -62,3 +62,10 @@ resolved the supported Temporal server image, then the MinIO client Quay endpoin
 returned HTTP 401. The client candidate now uses the Docker Hub repository linked
 by the [upstream client guide](https://github.com/minio/mc#docker-container).
 No credentials were added and no registry authentication was bypassed.
+
+Run [37250876554](https://github.com/awalker0878/multi-tenant/actions/runs/37250876554)
+also could not retrieve the public MinIO client image from Docker Hub. Both published
+client image endpoints are unavailable to this unauthenticated CI runner. Build the
+client from its signed release tag commit `7394ce0dd2a80935aded936b09fa12cbb3cb8096`
+using the same verified Go toolchain and fixed source checksum as the server workflow.
+The fixture does not require private registry access or credentials.
