@@ -171,76 +171,101 @@ def evidence(stage, state):
     return {**state,'base64':base64.b64encode(body).decode()}
 
 
-async def temporal_connect(identity='lifecycle', namespace='lifecycle', *, lazy=True):
+async def temporal_connect(identity='lifecycle', namespace='lifecycle'):
     from temporalio.client import Client
     from temporalio.service import TLSConfig
-    return await Client.connect('temporal:7233',namespace=namespace,tls=TLSConfig(server_root_ca_cert=Path(CA).read_bytes(),domain='temporal'),rpc_metadata={} if identity=='missing' else {'authorization':'Bearer '+secret('jwt-'+identity)},lazy=lazy)
+    # GetSystemInfo is an explicitly public health API in the default authorizer.
+    # Attach the test identity after negotiation so denials are measured on the
+    # protected namespace RPC, with the SDK's structured status available.
+    client=await asyncio.wait_for(Client.connect('temporal:7233',namespace=namespace,tls=TLSConfig(server_root_ca_cert=Path(CA).read_bytes(),domain='temporal')),5)
+    client.rpc_metadata={} if identity=='missing' else {'authorization':'Bearer '+secret('jwt-'+identity)}
+    return client
 
 
 async def temporal(stage, state):
-    from temporalio.api.workflowservice.v1 import RegisterNamespaceRequest, DescribeNamespaceRequest
+    from temporalio.api.workflowservice.v1 import RegisterNamespaceRequest, DescribeNamespaceRequest, ListWorkflowExecutionsRequest
     from google.protobuf.duration_pb2 import Duration
     from temporalio.service import RPCError, RPCStatusCode
     from temporalio.worker import Worker
     from workflow import RestartWitness
     async def describe(client):
         return await client.workflow_service.describe_namespace(DescribeNamespaceRequest(namespace='lifecycle'),timeout=timedelta(seconds=3))
+    def transport_failure(error):
+        detail=str(error).lower()
+        return isinstance(error,TimeoutError) or (detail.startswith('failed client connect:') and any(word in detail for word in ('transport error','connecterror','tcp connect','dns error','connection refused')))
     async def rejection(name, client, codes):
         try: await describe(client)
         except RPCError as error: check(name,error.status in codes,{'status':error.status.name})
         else: check(name,False)
-    if stage == 'temporal-bootstrap':
-        client=await temporal_connect('admin')
+    if stage=='temporal-outage':
+        try: client=await temporal_connect()
+        except (RuntimeError,TimeoutError) as error:
+            check('temporal-outage-visible',transport_failure(error),{'error_type':type(error).__name__,'phase':'connection','detail':str(error)})
+        else:
+            await rejection('temporal-outage-visible',client,{RPCStatusCode.UNAVAILABLE,RPCStatusCode.DEADLINE_EXCEEDED})
+        return {}
+    if stage=='temporal-bootstrap':
         deadline=time.monotonic()+100
         while True:
             try:
+                client=await temporal_connect('admin')
                 await client.workflow_service.register_namespace(RegisterNamespaceRequest(namespace='lifecycle',workflow_execution_retention_period=Duration(seconds=86400)),timeout=timedelta(seconds=4))
                 break
             except RPCError as error:
-                if error.status == RPCStatusCode.ALREADY_EXISTS: raise
-                if time.monotonic()>=deadline: raise
-                await asyncio.sleep(1)
+                if error.status==RPCStatusCode.ALREADY_EXISTS:raise
+                if time.monotonic()>=deadline:raise
+            except (RuntimeError,TimeoutError) as error:
+                if not transport_failure(error) or time.monotonic()>=deadline:raise
+            await asyncio.sleep(0.5)
         check('namespace-created-by-bootstrap-only',True)
         return {}
-    client=await temporal_connect()
     if stage in ('temporal-after','temporal-revoked'):
         deadline=time.monotonic()+90
         while True:
             try:
+                client=await temporal_connect()
                 await describe(client)
-                if stage=='temporal-after': break
+                if stage=='temporal-after':break
             except RPCError as error:
-                if stage=='temporal-revoked' and error.status in (RPCStatusCode.PERMISSION_DENIED,RPCStatusCode.UNAUTHENTICATED): break
-                if error.status not in (RPCStatusCode.UNAVAILABLE,RPCStatusCode.DEADLINE_EXCEEDED): raise
-            if time.monotonic()>=deadline: raise TimeoutError('Workflow restart did not reach expected state')
+                if stage=='temporal-revoked' and error.status in (RPCStatusCode.PERMISSION_DENIED,RPCStatusCode.UNAUTHENTICATED):break
+                if error.status not in (RPCStatusCode.UNAVAILABLE,RPCStatusCode.DEADLINE_EXCEEDED):raise
+            except (RuntimeError,TimeoutError) as error:
+                if not transport_failure(error):raise
+            if time.monotonic()>=deadline:raise TimeoutError('Workflow restart did not reach expected state')
             await asyncio.sleep(0.5)
-    if stage in ('temporal-outage','temporal-revoked'):
-        codes={RPCStatusCode.UNAVAILABLE, RPCStatusCode.DEADLINE_EXCEEDED} if stage=='temporal-outage' else {RPCStatusCode.PERMISSION_DENIED, RPCStatusCode.UNAUTHENTICATED}
-        await rejection(stage+'-visible', client, codes)
+    else:
+        client=await temporal_connect()
+    if stage=='temporal-revoked':
+        await rejection('temporal-revoked-visible',client,{RPCStatusCode.PERMISSION_DENIED,RPCStatusCode.UNAUTHENTICATED})
         return {}
     if stage=='temporal-before':
         await describe(client);check('namespace-authorized-read',True)
-        for port in (7234,7235,7236,7239): closed_port('temporal',port)
+        for port in (7234,7235,7236,7239):closed_port('temporal',port)
         for identity in ('missing','foreign','expired','wrong-audience'):
             await rejection(identity+'-jwt-denied',await temporal_connect(identity),{RPCStatusCode.PERMISSION_DENIED,RPCStatusCode.UNAUTHENTICATED})
         try:
             await client.workflow_service.register_namespace(RegisterNamespaceRequest(namespace='forbidden',workflow_execution_retention_period=Duration(seconds=86400)),timeout=timedelta(seconds=3))
-        except RPCError as error: check('worker-cannot-administer-namespaces',error.status==RPCStatusCode.PERMISSION_DENIED,{'status':error.status.name})
-        else: check('worker-cannot-administer-namespaces',False)
-        client=await temporal_connect(lazy=False)
+        except RPCError as error:check('worker-cannot-administer-namespaces',error.status==RPCStatusCode.PERMISSION_DENIED,{'status':error.status.name})
+        else:check('worker-cannot-administer-namespaces',False)
         async with Worker(client,task_queue='p01-restart',workflows=[RestartWitness]):
             handle=await client.start_workflow(RestartWitness.run,'synthetic durable marker',id='p01-restart-witness',task_queue='p01-restart',execution_timeout=timedelta(minutes=15))
-            waiting=await asyncio.wait_for(handle.query(RestartWitness.waiting),30)
-            check('workflow-reached-durable-wait',waiting)
+            check('workflow-reached-durable-wait',await asyncio.wait_for(handle.query(RestartWitness.waiting),30))
             return {'workflow_id':handle.id,'run_id':handle.first_execution_run_id,'marker':'synthetic durable marker'}
-    client=await temporal_connect(lazy=False)
     async with Worker(client,task_queue='p01-restart',workflows=[RestartWitness]):
         handle=client.get_workflow_handle(state['workflow_id'],run_id=state['run_id'])
         check('restarted-workflow-still-waiting',await asyncio.wait_for(handle.query(RestartWitness.waiting),45))
         await handle.signal(RestartWitness.release)
         result=await asyncio.wait_for(handle.result(),45)
         check('restarted-workflow-completes-same-execution',result==state['marker'],{'run_id':state['run_id'],'result':result})
-        return state
+    deadline=time.monotonic()+30
+    while True:
+        visible=await client.workflow_service.list_workflow_executions(ListWorkflowExecutionsRequest(namespace='lifecycle',query="WorkflowId = 'p01-restart-witness'",page_size=10),timeout=timedelta(seconds=3))
+        matches=[e for e in visible.executions if e.execution.run_id==state['run_id'] and e.status==2]
+        if matches:break  # WorkflowExecutionStatus.COMPLETED is protobuf value 2.
+        if time.monotonic()>=deadline:raise TimeoutError('Completed execution missing from visibility')
+        await asyncio.sleep(0.5)
+    check('completed-execution-in-private-visibility-store',len(matches)==1,{'run_id':matches[0].execution.run_id,'status':matches[0].status})
+    return state
 
 
 def database():
@@ -258,6 +283,8 @@ def database():
     denied('plaintext-database-connection-denied',lambda:connect(sslmode='disable'),psycopg.OperationalError)
     with connect('visibility','temporal_visibility') as conn:
         check('visibility-schema-version-readable',bool(conn.execute('SELECT curr_version FROM schema_version').fetchone()[0]))
+        check('visibility-conversion-function-executable',conn.execute("SELECT convert_ts('2026-10-05T00:00:00Z')").fetchone()[0].isoformat()=='2026-10-05T00:00:00')
+        check('visibility-function-not-public-or-foreign',not conn.execute("SELECT has_function_privilege('temporal_runtime','public.convert_ts(character varying)','EXECUTE')").fetchone()[0])
     return {}
 
 

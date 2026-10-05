@@ -67,6 +67,7 @@ class StatefulCampaign(Campaign):
         (self.output/'compose.json').write_text(json.dumps(rendered,indent=2)+'\n')
         self.command('database-and-broker-start',self.dc('up','-d','--wait','--wait-timeout','160','postgres','rabbit'),timeout=200)
         self.command('schema-setup',self.dc('run','--rm','--no-deps','-T','schema'),timeout=180)
+        self.admin('GRANT EXECUTE ON FUNCTION public.convert_ts(character varying) TO visibility_runtime;',database='temporal_visibility')
         self.probe('database-client','database')
         # Disable migrator login after setup and prove server runtime remains functional.
         self.admin('ALTER ROLE temporal_migrator NOLOGIN; ALTER ROLE visibility_migrator NOLOGIN;')
