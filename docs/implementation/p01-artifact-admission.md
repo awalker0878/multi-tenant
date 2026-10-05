@@ -60,9 +60,10 @@ findings, advisory database identity, source/lock hashes, provenance, signature 
 receiving-anchor observations. HIGH/CRITICAL/UNKNOWN vulnerabilities, any secret,
 incomplete scans or stale evidence hold the candidate and fail the image aggregate.
 A successful control exercise is recorded separately from candidate admission.
-Raw scanner output and private keys remain temporary. Only a clean development
-candidate is copied to a fresh destination and reverified; the image is never
-rebuilt during transfer. Real hosted results remain pending execution.
+Raw scanner output and private keys remain temporary. A clean development candidate is copied to a fresh destination and reverified.
+A held image may be copied only to the campaign quarantine: every byte must match
+and the receiving verifier must still deny it. The image is never rebuilt during
+transfer and a quarantine copy confers no deployment eligibility. Real hosted results remain pending execution.
 
 The first hosted scan attempt (source `2e1be599cba89275c92396066f091779cd912539`,
 run 37264412362) held all nine candidates because the image scanner does not accept
