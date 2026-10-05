@@ -102,7 +102,7 @@ phases:
   owner_role: Product engineering and IAM leads
   dependency_phase_ids:
   - P01
-  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
+  dependency_note: User-authorized P02 development on 2026-10-05; see p02-development-entry.md. G01 receiving review and operating conditions remain open.
   package_ids:
   - P02.01
   - P02.02
@@ -111,8 +111,8 @@ phases:
   - P02.05
   gate_id: G02
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
@@ -792,13 +792,14 @@ work_packages:
   title: Authentication
   owner_role: Product/IAM
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-local-bootstrap.md
   - docs/implementation/phases/p02.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
@@ -868,13 +869,14 @@ work_packages:
   title: Console foundation
   owner_role: Console
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-local-bootstrap.md
   - docs/implementation/phases/p02.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md

@@ -12,7 +12,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: PASSED | 11 / 2 |
 | P01 | Delivery and runtime foundation | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 31 / 4 |
-| P02 | Identity, tenancy and governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 0 / 0 |
+| P02 | Identity, tenancy and governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 0 / 0 |
 | P03 | Application catalogue and workspace | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
 | P04 | Site commissioning and inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 0 / 0 |
 | P05 | Capabilities and immutable plans | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G05: NOT_REVIEWED | 0 / 0 |
@@ -41,11 +41,11 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P01.04 | CI and supply chain | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 11 / 3 |
 | P01.05 | Runtime dependencies | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 12 / 1 |
 | P01.06 | Baseline operations | SRE/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 13 / 2 |
-| P02.01 | Authentication | Product/IAM | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P02.01 | Authentication | Product/IAM | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.02 | Tenancy | Governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.03 | Authorization | Governance/security | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.04 | Approval lifecycle | Governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P02.05 | Console foundation | Console | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P02.05 | Console foundation | Console | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P03.01 | Core aggregates | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P03.02 | Intent semantics | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P03.03 | Revision behavior | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |

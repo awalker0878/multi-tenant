@@ -40,6 +40,12 @@ D03 service deployment order follows the selected readiness dependencies rather 
 
 ## Local administrator and console OIDC setup
 
+The [P02 bootstrap binding](../../implementation/p02-local-bootstrap.md) defines
+the implemented migration, protected deployment command and first-login routes.
+External OIDC administration/activation below is the required full installation
+journey and remains the next implementation increment; do not infer that it is
+available from the local setup screen alone.
+
 P02.01/P02.05 implement this product setup flow; the P01 diagnostic fixtures do not establish it. Follow [ADR-009](../../decisions/adr-009-identity-delegation-and-authorization.md) and [identity and trust](../identity-and-trust.md). Release bindings must supply the concrete bootstrap/display operations before this runbook is executable.
 
 1. After the required Governance and Console dependencies are available, execute the authorized deployment bootstrap once. Create a single installation-local administrator, generate a cryptographically random temporary password and atomically store only its hash and mandatory-password-change state. Concurrent replicas and deployment retries must converge on the same existing account.

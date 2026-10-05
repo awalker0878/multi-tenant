@@ -1,8 +1,22 @@
-# Next work — P01 delivery and runtime foundation
+# Next work — P02 identity, tenancy and governance
 
-Active branch: `greenfield/enterprise-microservices-plan`. The requesting user approved advancement from G00 on 2026-10-04. The [accountable decision](docs/qualification/gate-reviews/g00-user-decision-2026-10-04.md) accepts the product, architecture and development baseline and explicitly carries remaining work to its receiving checkpoints. **P01 is the active phase; G01 is the next exit gate.** The [delivery register](docs/implementation/delivery-register.yaml) owns state; [progress](docs/implementation/progress.md) and [traceability](docs/implementation/traceability.md) are generated views.
+Active branch: `greenfield/enterprise-microservices-plan`. The requesting user authorized P02 development on 2026-10-05 in [the entry record](docs/implementation/p02-development-entry.md). **P02 is active; P02.01/P02.05 begin with local bootstrap and console sessions. G01 receiving review remains open and G02 is not passed.** The [delivery register](docs/implementation/delivery-register.yaml) owns state; progress and traceability are generated views.
 
-## Current handoff
+## P02 handoff
+
+The [local bootstrap increment](docs/implementation/p02-local-bootstrap.md) implements
+one deployment-created administrator, protected random-password display, first-login
+password change, durable session authority and the Console sign-in/setup journey.
+Direct API and browser controls are tested separately from deployment qualification.
+P02 remains IN_PROGRESS; external OIDC is not yet configured by the setup screen.
+
+**Next concrete work:** complete console-managed external OIDC settings and secret
+custody, provider/token validation, verified federated administrator testing and
+atomic handover/local-session retirement. Then implement P02.02 tenant membership
+and quota APIs, P02.03 scoped authorization, and P02.04 plan-bound approvals.
+Provider values remain application settings and never deployment configuration.
+
+## Retained P01 handoff
 
 **Correlated diagnostic telemetry is implemented and measured in both runtimes;
 image-security blocker BL-P01-002 remains resolved.** All nine pinned Alpine
@@ -42,7 +56,7 @@ retain the original failures, complete APK correction and passing results.
   No native effects, full-store recovery, accepted RTO/RPO or operating acceptance
   is inferred. Historical failures remain available and are not relabeled.
 
-**Next concrete actions:**
+**Open foundation receiving conditions:**
 
 1. Activate repository admission (BL-P01-001): obtain verified reviewer GitHub
    IDs/logins and the authorized administration/independent reporting path, then
@@ -64,9 +78,9 @@ retain the original failures, complete APK correction and passing results.
    and measured in the disposable Compose/Kubernetes environments.
 4. Complete independent criterion-by-criterion receiving reviews using
    [the refreshed G01 assessment](docs/qualification/gate-reviews/g01-engineering-assessment-2026-10-05.md).
-   Record an accountable decision before advancing the phase.
+   Record the accountable receiving decision; P02 development entry does not pass G01.
 
-**P01 work and verification are IN_PROGRESS; G01 remains NOT_REVIEWED.** The
+**P01 receiving work and verification remain IN_PROGRESS; G01 remains NOT_REVIEWED.** The
 previous FAILED roll-up is cleared by retained remediation/requalification,
 not by ignoring the mandatory image check. Keep the accepted G00 decision and
 completed foundation campaigns; do not restart P00 or ask for G00 approval again.
@@ -84,8 +98,8 @@ deployment configuration. Retries, restarts and provider outages cannot recreate
 the account or reopen local login after activation.
 
 Implement through P02.01/P02.05 and qualify Q01.17–Q01.20 at G02. The identity
-baseline is accepted design; P02 implementation remains NOT_STARTED and no G01
-advancement is inferred. Workload trust, custody and repository admission retain
+baseline is accepted design; P02.01/P02.05 implementation is IN_PROGRESS under
+the user-authorized development entry. No G01 pass is inferred. Workload trust, custody and repository admission retain
 their distinct receiving inputs.
 
 ## Carried inputs and checkpoint ownership
@@ -104,7 +118,7 @@ Historical `implementation/all-waves` source is pinned at `a2963d8d43e25f08d70fb
 
 ## Document each implementation increment
 
-Use the [engineering standards](docs/engineering/README.md) and [coverage map](docs/engineering/coverage.md) when refining P00/P01. P00.03 has measured framework/tool locks, candidate image builds and schema/client tooling. Production adoption, complete service dependencies, managed-browser requirements and the actual mirror/trust path still need operating decisions and evidence. P01 must implement the documented structure, ownership, static analysis, contract and runtime checks before feature expansion; the written standards are not a completed foundation.
+Use the [engineering standards](docs/engineering/README.md) and [coverage map](docs/engineering/coverage.md) when refining P02 and the carried foundation work. P00.03 has measured framework/tool locks, candidate image builds and schema/client tooling. Production adoption, complete service dependencies, managed-browser requirements and the actual mirror/trust path still need operating decisions and evidence. P01 must implement the documented structure, ownership, static analysis, contract and runtime checks before feature expansion; the written standards are not a completed foundation.
 
 Apply the [pragmatic Laravel convention](docs/decisions/adr-024-pragmatic-laravel-domain-convention.md) within the [owning microservice](docs/architecture/context-code-structure.md): capability-based `app/Domain/` and `app/Application/`, Eloquent model behavior, Actions with `handle()`, external adapters in `app/Infrastructure/`, and normal Laravel entrypoints. Capabilities do not automatically become microservices. P00.02 aligns [the context registry](architecture/context-map.yaml) with that accepted convention and settles the remaining service decisions. P00.03 has verified the candidate architecture tools against actual spike locks and intentional violations; P01 must map these rules to the complete registered product source. P01.01/P01.04 implement PHP/Python/frontend dependency checks and actual ownership/review protection. The current registry/fixture workflow has explicit analysis limits; a source-empty pass does not close those packages.
 
