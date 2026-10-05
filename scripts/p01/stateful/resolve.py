@@ -5,18 +5,40 @@ import json
 from pathlib import Path
 import subprocess
 import urllib.request
+import time
+
+
+OUTPUT = None
+COMMANDS = []
 
 
 def command(argv):
-    return subprocess.run(argv, capture_output=True, check=True, timeout=180).stdout
+    start = time.monotonic()
+    try:
+        result = subprocess.run(argv, capture_output=True, timeout=300)
+    except subprocess.TimeoutExpired as error:
+        result = subprocess.CompletedProcess(argv, 124, error.stdout or b'', (error.stderr or b'')+b'\nTimed out.\n')
+    entry = {'argv': argv, 'exit_code': result.returncode, 'seconds': round(time.monotonic()-start, 3)}
+    for stream in ('stdout', 'stderr'):
+        content = getattr(result, stream)
+        path = f'{len(COMMANDS)+1:02d}.{stream}.log'
+        (OUTPUT/path).write_bytes(content)
+        entry[stream] = {'path': path, 'sha256': hashlib.sha256(content).hexdigest(), 'bytes': len(content)}
+    COMMANDS.append(entry)
+    (OUTPUT/'commands.json').write_text(json.dumps(COMMANDS, indent=2)+'\n')
+    if result.returncode:
+        raise RuntimeError('Command failed; inspect retained streams and commands.json')
+    return result.stdout
 
 
 def main():
+    global OUTPUT
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[3]
     args.output.mkdir(parents=True, exist_ok=False)
+    OUTPUT = args.output
     candidate = root/'deploy/dependencies/stateful/candidates.json'
     data = json.loads(candidate.read_text())
     images = {}

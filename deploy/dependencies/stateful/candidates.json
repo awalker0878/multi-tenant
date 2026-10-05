@@ -3,10 +3,29 @@
   "scope": "P01 isolated dependency experiments; not operated dependency adoption",
   "platform": "linux/amd64",
   "images": {
-    "rabbitmq": {"candidate": "docker.io/library/rabbitmq:4.3.6-management", "source": "https://www.rabbitmq.com/release-information"},
-    "temporal": {"candidate": "docker.io/temporalio/auto-setup:1.32.0", "source": "https://github.com/temporalio/temporal/releases/tag/v1.32.0", "purpose": "Pinned server and schema tool; automatic setup entrypoint will not be used"},
-    "mc": {"candidate": "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z", "source": "https://github.com/minio/mc/releases/tag/RELEASE.2025-08-13T08-35-41Z"},
-    "golang": {"candidate": "docker.io/library/golang:1.27.1-bookworm", "source": "https://go.dev/doc/devel/release#go1.27.1", "purpose": "Build the security-fixed MinIO release from pinned source; never use the older prebuilt server image"}
+    "rabbitmq": {
+      "candidate": "docker.io/library/rabbitmq:4.3.6-management",
+      "source": "https://www.rabbitmq.com/release-information"
+    },
+    "temporal": {
+      "candidate": "docker.io/temporalio/server:1.32.0",
+      "source": "https://github.com/temporalio/temporal/releases/tag/v1.32.0",
+      "purpose": "Server only; explicit schema administration runs in a separate one-shot identity"
+    },
+    "mc": {
+      "candidate": "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z",
+      "source": "https://github.com/minio/mc/releases/tag/RELEASE.2025-08-13T08-35-41Z"
+    },
+    "golang": {
+      "candidate": "docker.io/library/golang:1.27.1-bookworm",
+      "source": "https://go.dev/doc/devel/release#go1.27.1",
+      "purpose": "Build the security-fixed MinIO release from pinned source; never use the older prebuilt server image"
+    },
+    "temporal_admin": {
+      "candidate": "docker.io/temporalio/admin-tools:1.32.0",
+      "source": "https://github.com/temporalio/temporal/releases/tag/v1.32.0",
+      "purpose": "One-shot PostgreSQL schema setup; never mounted into the server or consumer"
+    }
   },
   "minio_source": {
     "repository": "https://github.com/minio/minio",

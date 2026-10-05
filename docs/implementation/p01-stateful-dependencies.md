@@ -13,7 +13,7 @@ Checked 2026-10-05 against primary sources:
 | Dependency | Development candidate and basis |
 | --- | --- |
 | RabbitMQ | [4.3.6](https://www.rabbitmq.com/release-information), selected event transport; verified TLS, imported users/vhosts and explicit queue/exchange permissions |
-| Temporal | [1.32.0](https://github.com/temporalio/temporal/releases/tag/v1.32.0), using the auto-setup image only for its server/schema binaries; explicit private PostgreSQL schema setup and restricted runtime credentials replace its automatic bootstrap |
+| Temporal | [1.32.0](https://github.com/temporalio/temporal/releases/tag/v1.32.0), using separate supported server and admin-tools images; explicit private PostgreSQL schema setup and restricted runtime credentials |
 | Evidence storage | MinIO [security-fixed source release](https://github.com/minio/minio/releases/tag/RELEASE.2025-10-15T17-29-55Z), commit `9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a`; build from source because this release directs container users to build it rather than consume an older prebuilt image |
 | Build tool | Go [1.27.1](https://go.dev/doc/devel/release#go1.27.1); fixed image manifest and source archive hashes must be observed before the replay |
 | Clients | Pika 1.4.4, Temporal Python 1.34.0, Boto3 1.43.108, PyJWT 2.15.1, Psycopg 3.3.6 and JSON Schema 4.26.0; exact transitive wheel hashes are observed into a private integration-driver lock |
@@ -47,3 +47,12 @@ Console database and restricted runtime role; a separate Redis/Valkey deployment
 not required by the accepted architecture. Implement and measure shared-session
 persistence and isolation before claiming that P01 dependency requirement complete.
 Authentication/session revocation semantics remain P02 obligations.
+
+## Input discovery correction
+
+Run [37250318779](https://github.com/awalker0878/multi-tenant/actions/runs/37250318779)
+failed before installation: the proposed Temporal auto-setup 1.32.0 image does not
+exist. The upstream docker-builds project deprecates auto-setup. The corrected
+candidates use the supported server/admin-tools images separately. This failure is
+not an installation or authorization pass. Resolver commands now retain both output
+streams and exit status, including failed commands.
