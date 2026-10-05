@@ -42,6 +42,16 @@ final class RecordNotification
             }
             // This is an opaque invalidation hint, never a resource revision or grant.
             // Reordering can prompt another refresh; it cannot regress owner state.
+            if ($event->tenantId === null) {
+                // Login/session/delegation receipts are retained without noisy setup prompts.
+                if (in_array($event->type, ['identity.oidc.settings_saved', 'identity.oidc.activated'], true)) {
+                    DB::table('app.installation_notification_hint')->upsert([
+                        'id' => 1, 'cursor' => (string) Str::uuid(), 'updated_at' => now(),
+                    ], ['id'], ['cursor', 'updated_at']);
+                }
+
+                return 'recorded';
+            }
             DB::table('app.notification_hints')->upsert([
                 'tenant_id' => $event->tenantId, 'cursor' => (string) Str::uuid(), 'updated_at' => now(),
             ], ['tenant_id'], ['cursor', 'updated_at']);

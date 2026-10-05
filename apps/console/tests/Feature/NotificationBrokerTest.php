@@ -137,3 +137,14 @@ it('does not grant Console queue configuration or reads of another service queue
         $connection->close();
     }
 })->with(['configure', 'read']);
+
+it('delivers installation settings through the same verified broker without a tenant hint', function (): void {
+    $delivery = installationDelivery();
+    publishTenantNotification($delivery);
+    expect(app(ConsumeNotification::class)->handle())->toBe('recorded')
+        ->and(DB::table('app.notification_inbox')->whereNull('tenant_id')->count())->toBe(1)
+        ->and(DB::table('app.notification_hints')->count())->toBe(0)
+        ->and(DB::table('app.installation_notification_hint')->count())->toBe(1);
+    publishTenantNotification($delivery);
+    expect(app(ConsumeNotification::class)->handle())->toBe('duplicate');
+});

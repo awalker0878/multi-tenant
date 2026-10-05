@@ -7,8 +7,8 @@ criteria G02.01/G02.03/G02.04. Implementation and verification remain IN_PROGRES
 ## Consumer scope and custody
 
 Console now consumes five unchanged Governance v1 routes: tenant, membership,
-grant change, grant revocation and quota change. Installation identity and approval
-events are excluded. The [published schema](../../contracts/schemas/events/governance-change-v1.json)
+grant change, grant revocation and quota change. Installation identity has the bounded consumer described below; approval events
+remain excluded. The [published schema](../../contracts/schemas/events/governance-change-v1.json)
 is copied byte-for-byte into the independent Console image; Opis validates the
 body and the adapter verifies publisher, content type, routing key and message ID.
 Console imports no Governance source and reads no Governance database.
@@ -98,7 +98,36 @@ the exact corrected source. The original failed build remains in the
 image-security admission, Kubernetes and corrected-source browser campaigns remain
 distinct requirements; a Compose pass does not replace them.
 
-This increment does not deliver an installation-identity consumer, Catalogue
-resource guard integration, approval/plan UI, broker HA, full-store restore or an
+This increment does not deliver Catalogue resource guard integration, approval/plan
+UI, broker HA, full-store restore or an
 operated notification service. It does not pass G01/G02, approve retention, assign
 an operating receiver, or establish manual accessibility/support-floor acceptance.
+
+## Installation identity continuation
+
+P02.01/P02.03/P02.05 now consume the unchanged identity v1 schema in Console.
+Explicit bindings cover its twelve event types. The shared immutable inbox uses
+one event-ID namespace; installation receipts have a null tenant. A collision with
+a tenant receipt is quarantined, never overwritten. Console stores neither actor
+identities nor provider configuration from these messages. Only settings-saved and
+activation events change the separate installation hint. Login, password and
+session/delegation receipts do not produce repeated setup prompts.
+
+`GET /setup/notification-status` asks Governance for current setup authorization
+before reading the hint. Tenant administrators and ordinary federated members have
+no installation reach. Missing owner authority denies disclosure; unavailable hint
+storage returns a redacted 503. Mandatory password change still precedes access.
+
+The setup page takes its baseline before reading current settings. The shared
+bounded polling component preserves fields, including a typed write-only client
+secret, until explicit refresh; secrets remain excluded from remembered state and
+page props. Editing the private-network field also disables testing/activation
+until the draft is saved. The two-tab campaign exercises delivery, preserved drafts
+and keyboard refresh; automated browser coverage does not replace manual AT review.
+
+Migration 003 relaxes only the inbox tenant column and creates the singleton
+installation hint. Existing receipts and restricted history grants remain intact.
+Apply the ordered migration before starting the extended consumer. The deployed
+queue must include the exact identity bindings; no wildcard or extra broker
+privilege is required. Source-bound local/hosted observations must be retained
+before this new increment is described as qualified.

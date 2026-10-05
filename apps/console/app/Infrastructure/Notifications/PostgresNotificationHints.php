@@ -11,7 +11,9 @@ final class PostgresNotificationHints implements NotificationHints
 {
     public function current(string $tenant): ?string
     {
-        $cursor = DB::table('app.notification_hints')->where('tenant_id', $tenant)->value('cursor');
+        $cursor = $tenant === 'installation'
+            ? DB::table('app.installation_notification_hint')->where('id', 1)->value('cursor')
+            : DB::table('app.notification_hints')->where('tenant_id', $tenant)->value('cursor');
 
         return is_string($cursor) ? $cursor : null;
     }

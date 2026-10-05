@@ -2,7 +2,7 @@
 
 Owner: Engineering lead, with service, security, quality and SRE owners. Reviewed: 2026-10-04.
 
-These standards turn the product architecture into implementation and review rules for the seven principal applications and their worker pools. They apply to new work on this branch. Application enforcement and verification are delivered through the mapped work packages; the repository currently contains design documentation, not a verified Laravel application.
+These standards turn the product architecture into implementation and review rules for the seven principal applications and their worker pools. They apply to new work on this branch. Application enforcement and verification are delivered through the mapped work packages; the delivery register distinguishes implemented applications, retained qualification results and remaining receiving conditions.
 
 ## Choose the right guide
 

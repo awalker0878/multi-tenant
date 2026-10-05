@@ -1,16 +1,34 @@
 {
-  "vhosts": [{"name": "product"}],
+  "vhosts": [
+    {"name": "product"}
+  ],
   "permissions": [
     {"user": "governance", "vhost": "product", "configure": "^$", "write": "^governance.events$", "read": "^$"},
     {"user": "console", "vhost": "product", "configure": "^$", "write": "^$", "read": "^console\\.governance$"}
   ],
-  "exchanges": [{"name": "governance.events", "vhost": "product", "type": "topic", "durable": true, "auto_delete": false, "internal": false, "arguments": {}}],
-  "queues": [{"name": "console.governance", "vhost": "product", "durable": true, "auto_delete": false, "arguments": {"x-queue-type": "quorum", "x-delivery-limit": -1}}],
+  "exchanges": [
+    {"name": "governance.events", "vhost": "product", "type": "topic", "durable": true, "auto_delete": false, "internal": false, "arguments": {}}
+  ],
+  "queues": [
+    {"name": "console.governance", "vhost": "product", "durable": true, "auto_delete": false, "arguments": {"x-queue-type": "quorum", "x-delivery-limit": -1}}
+  ],
   "bindings": [
     {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "governance.tenant.changed.v1", "arguments": {}},
     {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "governance.membership.changed.v1", "arguments": {}},
     {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "governance.grant.changed.v1", "arguments": {}},
     {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "governance.grant.revoked.v1", "arguments": {}},
-    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "governance.quota.changed.v1", "arguments": {}}
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "governance.quota.changed.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.bootstrap.created.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.login.denied.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.login.succeeded.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.password.denied.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.password.changed.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.oidc.settings_saved.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.oidc.administrator_verified.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.oidc.activated.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.federated.login.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.session.revoked.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.delegation.issued.v1", "arguments": {}},
+    {"source": "governance.events", "vhost": "product", "destination": "console.governance", "destination_type": "queue", "routing_key": "identity.delegation.revoked.v1", "arguments": {}}
   ]
 }

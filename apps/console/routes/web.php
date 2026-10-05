@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\FoundationController;
+use App\Http\Controllers\InstallationNotificationController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OidcController;
@@ -20,6 +21,7 @@ Route::middleware(RequireIdentity::class)->group(function (): void {
     Route::get('/password', [LocalIdentityController::class, 'password'])->name('identity.password');
     Route::post('/password', [LocalIdentityController::class, 'updatePassword'])->name('identity.password.update');
     Route::get('/setup', [OidcController::class, 'settings'])->name('identity.setup');
+    Route::get('/setup/notification-status', InstallationNotificationController::class);
     Route::put('/setup', [OidcController::class, 'save']);
     Route::post('/setup/test', [OidcController::class, 'test']);
     Route::post('/setup/activate', [OidcController::class, 'activate']);

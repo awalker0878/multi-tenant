@@ -132,8 +132,9 @@ def main() -> int:
             broker.start()
             report['notification_broker_image'] = broker.image
             check('console-packaged-governance-contract', (root / 'contracts/schemas/events/governance-change-v1.json').read_bytes() == (root / 'apps/console/resources/contracts/governance-change-v1.json').read_bytes())
+            check('console-packaged-identity-contract', (root / 'contracts/schemas/events/identity-change-v1.json').read_bytes() == (root / 'apps/console/resources/contracts/identity-change-v1.json').read_bytes())
             run(['php', 'vendor/bin/pest', 'tests/Feature/NotificationInboxTest.php', 'tests/Feature/NotificationContractTest.php',
-                 'tests/Feature/NotificationAccessTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/NotificationBrokerTest.php', '--fail-on-warning', '--fail-on-risky', '--colors=never'],
+                 'tests/Feature/NotificationAccessTest.php', 'tests/Feature/InstallationNotificationTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/NotificationBrokerTest.php', '--fail-on-warning', '--fail-on-risky', '--colors=never'],
                 cwd=root / 'apps/console', env=os.environ | broker.environment, label='console-notification-features')
             check('console-postgres-and-tls-notification-features', True)
             provider = SyntheticOidc(private_path)
@@ -267,6 +268,8 @@ def main() -> int:
             report['notification_delivery'] = {'cycles': pump.cycles, 'counts': pump.totals, 'error': pump.error}
             check('real-owner-relay-and-console-consumer', pump.error is None and pump.totals['published'] >= 1 and pump.totals['recorded'] >= 1
                   and pump.totals['retry'] == 0 and pump.totals['quarantined'] == 0)
+            check('installation-identity-delivered-to-product-consumer', int(sql('SELECT count(*) FROM app.notification_inbox WHERE tenant_id IS NULL;', 'console').strip()) > 0
+                  and sql('SELECT count(*) FROM app.installation_notification_hint;', 'console').strip() == '1')
             check('console-inbox-is-not-a-domain-projection', sql('SELECT count(*) FROM app.notification_inbox;', 'console').strip() == str(pump.totals['recorded']))
             browser_report = root / 'apps/console/test-results/p02-browser.json'
             browser_result = json.loads(browser_report.read_text())

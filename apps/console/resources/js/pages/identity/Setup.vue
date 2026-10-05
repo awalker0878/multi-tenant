@@ -2,9 +2,11 @@
 import { computed, ref } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import IdentityLayout from '../../shared/ui/IdentityLayout.vue';
+import ChangeNotice from '../../shared/ui/ChangeNotice.vue';
 
 const props = defineProps<{
   settings: { issuer: string; client_id: string; administrator_subject: string; private_networks: string[]; secret_configured: boolean } | null;
+  notificationCursor: string | null; notificationsAvailable: boolean;
   revision: number; activeRevision: number | null; callbackUrl: string; verified: boolean; notice: string | null; federated: boolean;
 }>();
 const networks = ref(props.settings?.private_networks.join(', ') ?? '');
@@ -13,6 +15,7 @@ const form = useForm({
   client_secret: '', administrator_subject: props.settings?.administrator_subject ?? '', private_networks: [] as string[],
 });
 const request = useForm({});
+const dirty = computed(() => form.isDirty || networks.value !== (props.settings?.private_networks.join(', ') ?? ''));
 const errors = computed(() => Object.values(form.errors).concat(Object.values(request.errors)));
 const save = () => {
   form.private_networks = networks.value.split(',').map(value => value.trim()).filter(Boolean);
@@ -28,6 +31,8 @@ const save = () => {
     <div v-if="errors.length" role="alert" tabindex="-1"><p v-for="error in errors" :key="error">{{ error }}</p></div>
     <p class="mt-4 text-sm leading-6 text-slate-700">Register this callback URL with your provider:</p>
     <p class="mt-1 break-all rounded-lg bg-slate-100 p-3 text-sm">{{ callbackUrl }}</p>
+    <ChangeNotice endpoint="/setup/notification-status" refresh-url="/setup" authority-loss-url="/setup"
+      changed-message="Identity provider settings changed. Review the current values before saving." :notification-cursor="notificationCursor" :notifications-available="notificationsAvailable" :dirty="dirty" :enabled="true" />
     <form @submit.prevent="save">
       <label for="issuer">Issuer URL</label>
       <input id="issuer" v-model="form.issuer" type="url" required maxlength="2048" placeholder="https://identity.example.ca/realms/hosting" />
@@ -45,9 +50,9 @@ const save = () => {
       <button type="submit" :disabled="form.processing">Save provider settings</button>
     </form>
     <div v-if="settings" class="mt-5 border-t border-slate-200 pt-2">
-      <button type="button" :disabled="request.processing || form.isDirty" @click="request.post('/setup/test')">Test administrator sign-in</button>
+      <button type="button" :disabled="request.processing || dirty" @click="request.post('/setup/test')">Test administrator sign-in</button>
       <p class="mt-3 text-sm leading-6 text-slate-700">Sign in with the named federated administrator to verify the saved settings. Activation retires all local sessions. Updated settings leave active single sign-on available until verification succeeds.</p>
-      <button v-if="verified" type="button" :disabled="request.processing" @click="request.post('/setup/activate')">Activate single sign-on</button>
+      <button v-if="verified" type="button" :disabled="request.processing || dirty" @click="request.post('/setup/activate')">Activate single sign-on</button>
     </div>
     <nav class="mt-6 flex flex-wrap items-baseline justify-between gap-4" aria-label="Account">
       <Link v-if="!federated" href="/password" class="text-teal-800 underline">Change password</Link>

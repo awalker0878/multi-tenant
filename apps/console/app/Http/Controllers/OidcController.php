@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Application\Identity\Contracts\IdentityGateway;
 use App\Application\Identity\Data\ConsoleSession;
+use App\Application\Notifications\Contracts\NotificationHints;
 use App\Domain\Identity\IdentityFailure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,11 +14,24 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Throwable;
 
 final class OidcController
 {
-    public function settings(Request $request, IdentityGateway $identity): Response
+    public function settings(Request $request, IdentityGateway $identity, NotificationHints $hints): Response
     {
+        $actor = $request->attributes->get('local_actor');
+        if ($actor->federated && ! $actor->installationAdministrator) {
+            throw new IdentityFailure(403);
+        }
+        // Baseline first, then authoritative settings: a concurrent change prompts review.
+        $cursor = null;
+        $available = true;
+        try {
+            $cursor = $hints->current('installation');
+        } catch (Throwable) {
+            $available = false;
+        }
         $data = $identity->settings((string) $request->session()->get('identity.token'));
         // The owner returns an explicit settings projection. Never forward arbitrary upstream data.
         $settings = is_array($data['settings'] ?? null) ? array_intersect_key($data['settings'], array_flip([
@@ -25,6 +39,7 @@ final class OidcController
         ])) : null;
 
         return Inertia::render('identity/Setup', [
+            'notificationCursor' => $cursor, 'notificationsAvailable' => $available,
             'settings' => $settings, 'revision' => $data['revision'] ?? 0, 'activeRevision' => $data['active_revision'] ?? null,
             'callbackUrl' => rtrim((string) config('app.url'), '/').'/identity/callback',
             'verified' => $request->session()->get('oidc.proof_revision') === ($data['revision'] ?? null),

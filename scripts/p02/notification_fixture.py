@@ -83,6 +83,7 @@ class NotificationPump:
         try:
             while not self.stop.is_set():
                 for service, directory, command in [('governance', 'services/governance', 'governance:publish-outbox'),
+                                                     ('governance', 'services/governance', 'identity:publish-outbox'),
                                                      ('console', 'apps/console', 'console:consume-notifications')]:
                     completed = subprocess.run(['php', 'artisan', command, '--limit=100'], cwd=self.root / directory,
                                                env=self.environments[service], capture_output=True, text=True, timeout=20)

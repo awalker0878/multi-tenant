@@ -64,3 +64,14 @@ unqualified; retained development evidence does not close those conditions.
 Protocol references: [RabbitMQ acknowledgements](https://www.rabbitmq.com/docs/confirms),
 [access control](https://www.rabbitmq.com/docs/access-control) and
 [quorum poison-message handling](https://www.rabbitmq.com/docs/quorum-queues#poison-message-handling).
+
+## Installation settings notifications
+
+Apply Console migration 003 before enabling the extended bindings in
+`deploy/dependencies/stateful/console-notifications.json`. Run both Governance
+outbox commands and the existing Console consumer. The twelve explicit identity
+routes share the durable queue and immutable inbox; installation rows have no
+tenant ID. No additional configure, write or cross-queue read grant is needed.
+The two setup-change types invalidate the installation hint. An installation
+administrator can review current settings through the owner-authorized setup page;
+a notification cannot activate a provider, restore a password or confer a grant.

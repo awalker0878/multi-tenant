@@ -91,6 +91,20 @@ test('console configuration verifies HTTPS federation and enforces tenant revoca
   await expect(page.getByRole('status')).toContainText('Federated administrator verified');
   await page.getByRole('button', { name: 'Activate single sign-on' }).press('Enter');
   await expect(page.getByText('External single sign-on: Active', { exact: true })).toBeVisible();
+  const setupSibling = await page.context().newPage();
+  await setupSibling.goto('/setup');
+  await setupSibling.getByLabel('Client ID', { exact: true }).fill('unsaved-client-draft');
+  await setupSibling.getByLabel('Client secret', { exact: true }).fill('unsaved-secret-draft');
+  await page.getByRole('button', { name: 'Save provider settings', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Settings saved' })).toBeVisible();
+  await expect(setupSibling.getByText('Identity provider settings changed. Review the current values before saving.', { exact: true })).toBeVisible({ timeout: 30_000 });
+  await expect(setupSibling.getByLabel('Client ID', { exact: true })).toHaveValue('unsaved-client-draft');
+  await expect(setupSibling.getByLabel('Client secret', { exact: true })).toHaveValue('unsaved-secret-draft');
+  await setupSibling.getByRole('button', { name: 'Discard edits and refresh', exact: true }).press('Enter');
+  await expect(setupSibling.getByLabel('Client ID', { exact: true })).toHaveValue(fixture.provider.client_id);
+  await expect(setupSibling.getByLabel('Client secret', { exact: true })).toBeEmpty();
+  await setupSibling.close();
+
   await page.getByRole('link', { name: 'Your tenants' }).click();
   for (const name of ['P02 Tenant A', 'P02 Tenant B']) {
     await page.getByLabel('Tenant name', { exact: true }).fill(name);
@@ -179,6 +193,7 @@ test('console configuration verifies HTTPS federation and enforces tenant revoca
     await page.getByLabel('Membership state', { exact: true }).selectOption('revoked');
     await page.getByRole('button', { name: 'Update membership', exact: true }).click();
     await expect(page.getByRole('listitem').filter({ hasText: 'p02-reader' })).toContainText('revoked');
+    expect((await reader.request.get('/setup/notification-status')).status()).toBe(403);
     const revokedHint = await reader.request.get(tenantA + '/notification-status');
     expect(revokedHint.status()).toBe(404);
     await reader.reload();

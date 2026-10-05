@@ -97,6 +97,12 @@ deliveries. The original archive, nine artifact digests and 290 source bindings
 match. The earlier correction-only browser run `37373325859` was cancelled;
 its outcomes remain separate from this newer-source result.
 
+**Current continuation — installation identity consumer.** The setup page now has
+owner-authorized, draft-preserving notifications backed by the shared immutable
+inbox. Migration 003 and explicit identity routing extend the tenant consumer.
+The hosted campaign now covers the real identity relay, a second setup tab and
+secret clearing on explicit refresh. Retain the changed-source outcomes separately.
+
 **Immediate verification:** retrieve Firefox/WebKit from directory run
 `37374667414`, then retain the affected foundation and event regressions.
 [The follow-up snapshot](verification/p02/directory-hosted-followup.json)
@@ -108,7 +114,7 @@ substitute documentation-only checks. Preserve the bounded queue correction and
 original outcomes in [the corrections record](verification/p02/corrections.md).
 
 **Next concrete work:** finish notification restart/restore and browser-floor
-qualification, explicit owner-scoped installation consumers, and the remaining
+qualification, installation-consumer hosted qualification, and the remaining
 manual accessibility campaign. Tenant and membership Console pagination is now
 implemented; grant/audit APIs retain their published v1 bounds. Bind Catalogue's guard to owner resources
 and qualify the Console-to-Catalogue-to-Governance wire path as P03 resources are
