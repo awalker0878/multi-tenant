@@ -17,6 +17,9 @@
 !public/index.php
 !routes/
 !routes/**
+!database/
+!database/migrations/
+!database/migrations/**
 !resources/
 !resources/**
 !build/

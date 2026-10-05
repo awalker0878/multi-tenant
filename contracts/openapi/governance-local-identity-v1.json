@@ -1,0 +1,568 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Governance local installation identity",
+    "version": "1.0.0",
+    "description": "P02 bootstrap slice. Workload credentials and browser authority are separate. Provider values are configured as application settings in the external OIDC slice; none are deployment configuration."
+  },
+  "security": [
+    {
+      "ConsoleWorkload": [],
+      "ConsoleSession": []
+    }
+  ],
+  "paths": {
+    "/identity/local-sessions": {
+      "post": {
+        "operationId": "loginLocalAdministrator",
+        "description": "Authenticate the deployment-created account. A change-required session cannot access setup.",
+        "responses": {
+          "200": {
+            "description": "Success. Responses use Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ConsoleWorkload": []
+          }
+        ]
+      }
+    },
+    "/identity/session": {
+      "get": {
+        "operationId": "inspectLocalSession",
+        "description": "Read minimal current session authority. Does not grant tenant access.",
+        "responses": {
+          "200": {
+            "description": "Success. Responses use Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentIdentity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/identity/password": {
+      "post": {
+        "operationId": "changeLocalPassword",
+        "description": "Verify the current password, reject reuse, revoke all prior sessions and issue rotated authority atomically.",
+        "responses": {
+          "200": {
+            "description": "Success. Responses use Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/identity/logout": {
+      "post": {
+        "operationId": "logoutLocalSession",
+        "description": "Revoke this local session; idempotent.",
+        "responses": {
+          "200": {
+            "description": "Success. Responses use Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Logout"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/identity/setup": {
+      "get": {
+        "operationId": "readLocalSetup",
+        "description": "Require the password change and current setup permission. This first slice does not implement external OIDC configuration or activation.",
+        "responses": {
+          "200": {
+            "description": "Success. Responses use Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Setup"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ConsoleWorkload": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Independent mounted Console workload credential; not a health token."
+      },
+      "ConsoleSession": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Console-Session",
+        "description": "Opaque user authority retained only in the encrypted server-side console session."
+      }
+    },
+    "schemas": {
+      "LocalIdentity": {
+        "type": "object",
+        "required": [
+          "subject",
+          "password_change_required",
+          "permissions"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "subject": {
+            "const": "bootstrap-admin"
+          },
+          "password_change_required": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "identity.password.change",
+                "identity.logout",
+                "identity.setup"
+              ]
+            }
+          }
+        }
+      },
+      "Session": {
+        "type": "object",
+        "required": [
+          "session_token",
+          "expires_at",
+          "identity"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "session_token": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "Opaque, console-audience credential; server-side custody only. Persisted as SHA-256 in Governance."
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "identity": {
+            "$ref": "#/components/schemas/LocalIdentity"
+          }
+        }
+      },
+      "CurrentIdentity": {
+        "type": "object",
+        "required": [
+          "identity"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "identity": {
+            "$ref": "#/components/schemas/LocalIdentity"
+          }
+        }
+      },
+      "Setup": {
+        "type": "object",
+        "required": [
+          "identity",
+          "oidc"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "identity": {
+            "$ref": "#/components/schemas/LocalIdentity"
+          },
+          "oidc": {
+            "type": "object",
+            "required": [
+              "state"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "state": {
+                "const": "not_configured"
+              }
+            }
+          }
+        }
+      },
+      "Logout": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "const": "signed_out"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object"
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "error"
+            ]
+          },
+          {
+            "required": [
+              "message"
+            ]
+          }
+        ]
+      },
+      "Login": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "password": {
+            "type": "string",
+            "writeOnly": true,
+            "maxLength": 512
+          }
+        }
+      },
+      "PasswordChange": {
+        "type": "object",
+        "required": [
+          "current_password",
+          "password",
+          "password_confirmation"
+        ],
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "writeOnly": true,
+            "maxLength": 512
+          },
+          "password": {
+            "type": "string",
+            "writeOnly": true,
+            "minLength": 15,
+            "maxLength": 128
+          },
+          "password_confirmation": {
+            "type": "string",
+            "writeOnly": true,
+            "minLength": 15,
+            "maxLength": 128
+          }
+        }
+      }
+    }
+  }
+}
