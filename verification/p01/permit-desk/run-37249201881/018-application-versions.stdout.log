@@ -1,0 +1,2 @@
+3.12.14 (main, Sep 19 2026, 01:05:48) [GCC 12.2.0]
+{'psycopg': '3.3.6', 'psycopg-binary': '3.3.6', 'typing-extensions': '4.16.0'}

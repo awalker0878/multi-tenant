@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "run_id": 37249201881,
+  "source_revision": "2c562dd70214b162c21269017062b243161d1141",
+  "workflow": {
+    "id": 37249201881,
+    "name": "P01 Permit Desk application recovery",
+    "head_sha": "2c562dd70214b162c21269017062b243161d1141",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "created_at": "2026-10-05T00:52:47Z",
+    "updated_at": "2026-10-05T00:53:45Z",
+    "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37249201881"
+  },
+  "artifact": {
+    "id": 11320890326,
+    "name": "p01-permit-desk-2c562dd70214b162c21269017062b243161d1141",
+    "size_in_bytes": 78207,
+    "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11320890326",
+    "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11320890326/zip",
+    "expired": false,
+    "created_at": "2026-10-05T00:53:41Z",
+    "expires_at": "2026-10-19T00:53:40Z",
+    "updated_at": "2026-10-05T00:53:41Z",
+    "digest": "sha256:294879d6b3a0538f7082287ea97390d985df733ddfa72ba20f15830a4e62cfa8",
+    "workflow_run": {
+      "id": 37249201881,
+      "repository_id": 1374801496,
+      "head_repository_id": 1374801496,
+      "head_branch": "greenfield/enterprise-microservices-plan",
+      "head_sha": "2c562dd70214b162c21269017062b243161d1141"
+    }
+  },
+  "archive_sha256": "294879d6b3a0538f7082287ea97390d985df733ddfa72ba20f15830a4e62cfa8",
+  "archive_bytes": 78207,
+  "archive_checksum_verified": true,
+  "archive_size_verified": true,
+  "result": "VERIFIED",
+  "reported_result": "PASS",
+  "reported_cleanup_complete": true,
+  "report_sha256": "54b5ed09463b15769662f65188ad1dd709bc45f51f4c75715e015701de71f94c",
+  "checks_passed": 79,
+  "command_outcomes": 88,
+  "command_log_hashes_verified": 176,
+  "immutable_source_bindings_verified": 36,
+  "source_verification_sha256": "df65d4958f751eae8a5dd9707069dfe05ccd45760410ef4897ca8a5ea02dabdc",
+  "captures": [
+    {
+      "name": "source",
+      "sha256": "b0ff16ade2a0769bb963e8dbe21f7be8d7d68acce128dc8d8c2d435829d2abe9",
+      "permits": 4,
+      "attachments": 4,
+      "archive_bytes": 6677,
+      "archive_sha256": "1e52205d52f55a15436413a49658736ab63ca59deb84777c5653660fc2c322cb"
+    },
+    {
+      "name": "target",
+      "sha256": "1d2d34f89e5946c3929578d542862779adba2a95ba68999bd3ba76df4379cf59",
+      "permits": 5,
+      "attachments": 5,
+      "archive_bytes": 6770,
+      "archive_sha256": "1bf321c8ef24617d69ee01ca2b87b8dbb571d88f66acb3d1aa88482b5e40bdc3"
+    }
+  ],
+  "negative_command_diagnostics_verified": 6,
+  "reviewer": "Codex \u2014 immutable Git tree/source, raw logs, expected denial diagnostics, database archive bytes, attachment and logical state examination",
+  "limitations": [
+    "Synthetic single-writer HTTP application, disposable TLS and file-backed credentials; no production identity or guest deployment.",
+    "Complete app/configuration/database/attachment restore uses a readable quiesced source or target on the same PostgreSQL patch.",
+    "Compose only; no Kubernetes fixture restore, object-store recovery, external alert acknowledgement, promotion trust or native qualification.",
+    "Digests bind retained bytes; no capture signature or untrusted-archive safety claim. G01 and product readiness remain unaccepted."
+  ]
+}
