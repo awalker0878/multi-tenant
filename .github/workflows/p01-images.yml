@@ -37,7 +37,7 @@ jobs:
     needs: selection
     if: needs.selection.outputs.images != '[]'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
@@ -55,6 +55,21 @@ jobs:
           --component "$P01_COMPONENT"
           --output "$RUNNER_TEMP/p01-image-$P01_COMPONENT"
           --source-revision "$GITHUB_SHA"
+      - name: Scan and verify transfer of the same built image
+        env:
+          P01_COMPONENT: ${{ matrix.component }}
+        run: >-
+          python3 scripts/p01/artifacts/campaign.py
+          --build-report "$RUNNER_TEMP/p01-image-$P01_COMPONENT/report.json"
+          --output "$RUNNER_TEMP/p01-artifact-$P01_COMPONENT"
+      - name: Retain redacted artifact trust evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p01-artifact-${{ matrix.component }}-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-artifact-${{ matrix.component }}/
+          if-no-files-found: error
+          retention-days: 14
       - name: Retain source, input, image and execution evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

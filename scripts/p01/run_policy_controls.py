@@ -26,7 +26,8 @@ def main():
               'source_sha256': {str(p): sha(root / p) for p in sorted(set(paths))},
               'started_at': datetime.now(timezone.utc).isoformat(), 'result': 'FAILED', 'commands': []}
     try:
-        for name, script in [('reviews', 'admission/test_policy.py'), ('bundles', 'artifacts/test_bundle.py')]:
+        for name, script in [('reviews', 'admission/test_policy.py'), ('bundles', 'artifacts/test_bundle.py'),
+                             ('redaction', 'artifacts/test_campaign.py')]:
             argv = [sys.executable, str(root / 'scripts/p01' / script), '-v']
             result = subprocess.run(argv, env=os.environ | {'P01_COSIGN': args.cosign},
                                     capture_output=True, timeout=180)

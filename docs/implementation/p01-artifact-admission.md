@@ -47,8 +47,15 @@ No repository source or candidate manifest is published to a public signing log.
 Local verification currently passes 16 review/impact/exception tests and 12 actual
 Cosign bundle tests, including positive transfer and explicit failure boundaries.
 Fixture account IDs, scan records and images are synthetic and confer no real role,
-image-security result or product promotion. Hosted image scanning and source-bound
-campaign results will be added only after their execution.
+image-security result or product promotion. The image workflow now scans each existing built image and its exact owned source,
+including development/build dependencies, and retains CycloneDX SBOMs, redacted
+findings, advisory database identity, source/lock hashes, provenance, signature and
+receiving-anchor observations. HIGH/CRITICAL/UNKNOWN vulnerabilities, any secret,
+incomplete scans or stale evidence hold the candidate and fail the image aggregate.
+A successful control exercise is recorded separately from candidate admission.
+Raw scanner output and private keys remain temporary. Only a clean development
+candidate is copied to a fresh destination and reverified; the image is never
+rebuilt during transfer. Real hosted results remain pending execution.
 
 ## Primary interfaces
 

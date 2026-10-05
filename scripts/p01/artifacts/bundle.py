@@ -132,6 +132,7 @@ def evaluate_scans(scans: list[dict], now: datetime) -> list[str]:
                 0 <= (now - updated).total_seconds() <= 172800, 'stale_scan')
         for result in scan['results']:
             for finding in result.get('Vulnerabilities', []):
+                require(finding['Severity'] in {'LOW', 'MEDIUM', 'HIGH', 'CRITICAL', 'UNKNOWN'}, 'invalid_severity')
                 if finding['Severity'] in {'HIGH', 'CRITICAL', 'UNKNOWN'}:
                     findings.append(finding['VulnerabilityID'])
             for finding in result.get('Secrets', []):
