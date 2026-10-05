@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "source_sha": "283e6f4cf40fe91ce6d94bd258eb1f193dfd86e6",
+  "observer": "Codex via GitHub connector; original ZIP digest, retained bytes and committed source hashes compared",
+  "result": "PASS",
+  "run_id": 37371273531,
+  "run_attempt": 1,
+  "job_id": 111968738618,
+  "browser_engine": "chromium",
+  "artifact_id": 11369922274,
+  "archive_sha256": "86dbb762397a2fc731854996e556a90b73aec77a5f61045e1eeb390e9075a0b5",
+  "report_path": "verification/p02/identity/run-37371273531/chromium/report.json",
+  "report_sha256": "ad0c6d6d0eff93273b3157aba080e702339bd2c6199975442c41585251c99b1b",
+  "checks": 58,
+  "matched_source_bindings": 284,
+  "matched_artifact_hashes": 9
+}

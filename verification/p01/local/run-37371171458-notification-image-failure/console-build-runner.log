@@ -1,0 +1,6 @@
+source-revision: exit 0, expected 0
+source-clean: exit 0, expected 0
+docker-version: exit 0, expected 0
+buildx-version: exit 0, expected 0
+build: exit 1, expected 0
+ValueError: build: unexpected exit 1, timed_out=False; see retained logs

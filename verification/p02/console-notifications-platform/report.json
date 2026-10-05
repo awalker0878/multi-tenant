@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "result": "PASS",
+  "source_revision": "b13996d13db9b54736667a04be23c53f74269424",
+  "observed_at": "2026-10-05T20:48:02.616377+00:00",
+  "scope": "Local manifest/lock and PHP platform validation after explicitly adding required sockets; corrected image execution remains a separate hosted result",
+  "commands": [
+    {
+      "name": "composer-validate",
+      "exit_code": 0,
+      "path": "composer-validate.log",
+      "sha256": "43add299dc97ecbd90ec2dc456ef5a0bd824bb9abdae2a3d7cdb520e21f8e86d"
+    },
+    {
+      "name": "platform-requirements",
+      "exit_code": 0,
+      "path": "platform-requirements.log",
+      "sha256": "1924c41073a59d8e77538243dbdc2ee3a050c9dcd8363b0197d31552dec43dfc"
+    }
+  ],
+  "source_sha256": {
+    "apps/console/Dockerfile": "4a84b07a6e6614ca1099d74ec75cbd6c209e35506311ad99b7b0ea1594fd3193",
+    "apps/console/composer.json": "878bb78b930e6890a676229442f0835c99b3d2868cbd1d200768edaefa147e05",
+    "apps/console/composer.lock": "ee6c030db0f801c9bd008e10f07f969460d3040546421e9d9052239343b24a4a"
+  }
+}
