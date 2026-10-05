@@ -24,7 +24,7 @@ final class PublishGovernanceEvent
                 DB::statement("SET LOCAL idle_in_transaction_session_timeout = '30s'");
             }
             $row = DB::table('app.governance_outbox')->whereNull('published_at')->whereNull('quarantined_at')
-                ->where('available_at', '<=', now())->orderBy('occurred_at')->orderBy('id')
+                ->where('available_at', '<=', now()->format('Y-m-d H:i:s.u'))->orderBy('occurred_at')->orderBy('id')
                 ->lock(DB::getDriverName() === 'pgsql' ? 'FOR UPDATE SKIP LOCKED' : true)->first();
             if ($row === null) {
                 return 'idle';

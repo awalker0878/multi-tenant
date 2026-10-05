@@ -10,6 +10,7 @@ from pathlib import Path
 import secrets
 import subprocess
 import tempfile
+import time
 
 
 def main():
@@ -89,7 +90,16 @@ def main():
                 '-e', 'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=+S 2:2', '-e', 'RABBITMQ_CTL_ERL_ARGS=+S 2:2',
                 '--health-cmd', 'rabbitmq-diagnostics -q check_running', '--health-interval', '2s', '--health-retries', '45',
                 '-v', str(private / 'rabbitmq.conf') + ':/etc/rabbitmq/rabbitmq.conf:ro', *mounts, reference], timeout=180)
-            run('broker-ready', ['docker', 'exec', name, 'rabbitmqctl', 'await_startup'], timeout=100)
+            deadline = time.monotonic() + 90
+            while True:
+                state = json.loads(subprocess.check_output(['docker', 'inspect', '--format', '{{json .State}}', name]))
+                if state.get('Health', {}).get('Status') == 'healthy':
+                    break
+                if not state.get('Running') or time.monotonic() >= deadline:
+                    run('broker-startup-diagnostic', ['docker', 'logs', name])
+                    raise RuntimeError('broker_not_ready')
+                time.sleep(1)
+            run('broker-ready', ['docker', 'exec', name, 'rabbitmq-diagnostics', '-q', 'check_port_connectivity', '--address', '127.0.0.1'], timeout=20)
             environment = os.environ | {'P02_TEST_BROKER': '1', 'GOVERNANCE_BROKER_HOST': '127.0.0.1', 'GOVERNANCE_BROKER_PORT': '5679',
                 'GOVERNANCE_BROKER_PASSWORD_FILE': str(private / 'governance.password'), 'GOVERNANCE_BROKER_CA_FILE': str(private / 'broker.crt'),
                 'P02_OBSERVER_PASSWORD_FILE': str(private / 'p02-observer.password'), 'P02_UNTRUSTED_CA_FILE': str(private / 'untrusted.crt')}
