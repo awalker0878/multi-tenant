@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "workflow": {
+    "id": 37265584488,
+    "head_sha": "011465d805d9b23725df4b05b949e9dc8f4da827",
+    "head_branch": "greenfield/enterprise-microservices-plan",
+    "event": "push",
+    "conclusion": "success",
+    "status": "completed",
+    "run_attempt": 1,
+    "path": ".github/workflows/p01-admission-probe.yml",
+    "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37265584488",
+    "check_suite_id": 100934472529,
+    "created_at": "2026-10-05T04:55:47Z",
+    "updated_at": "2026-10-05T04:56:00Z"
+  },
+  "source_revision": "011465d805d9b23725df4b05b949e9dc8f4da827",
+  "result": "VERIFIED",
+  "retrieved_at": "2026-10-05T05:08:12.802713+00:00",
+  "archives": [
+    {
+      "id": 11325868660,
+      "name": "p01-admission-probe-011465d805d9b23725df4b05b949e9dc8f4da827",
+      "size_in_bytes": 2300,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11325868660",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11325868660/zip",
+      "expired": false,
+      "created_at": "2026-10-05T04:55:57Z",
+      "expires_at": "2026-10-19T04:55:56Z",
+      "updated_at": "2026-10-05T04:55:57Z",
+      "digest": "sha256:d0314ab8a41371e1fc4c51bec7d43c8010d9cc29475a3154276b9742aff659f9",
+      "workflow_run": {
+        "id": 37265584488,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "011465d805d9b23725df4b05b949e9dc8f4da827"
+      }
+    }
+  ],
+  "reports": [
+    {
+      "path": "report.json",
+      "sha256": "b5bb021e894947796e6571d11b365f072ac360efb4481605b6adc4f412b320e7",
+      "result": "PASSED"
+    }
+  ],
+  "source_verification_sha256": "ce0c9618cb7433e51534174d60da0228940ff1f361e42045a502bac57c4d7aa8",
+  "denial": "review_roles_unconfigured",
+  "evaluated_base": "2e1be599cba89275c92396066f091779cd912539",
+  "head_revision": "bb7cbbef43437e2c19d656e9c4c5904b360f8ec8",
+  "limitations": [
+    "Explicit read-only push probe, not an installed default-branch admission hook or merge protection. Actual role mapping remains UNCONFIGURED."
+  ],
+  "retained_file_sha256": {
+    "evaluation/report.json": "78212fdb23f1d15f556710ba0d7bee3daa16e1fd636601a4b90203289ae62b05",
+    "evaluation/snapshot.json": "153e3fc4a0068017e75af0f4fa23bd65a6712293bfbc0befe68b0de1fbc86cec",
+    "evaluation.log": "bf220c5cd227062a3dcee0a2df85754d29b034eaac52dc2c24445ea918500a3f",
+    "report.json": "b5bb021e894947796e6571d11b365f072ac360efb4481605b6adc4f412b320e7",
+    "source-verification.json": "ce0c9618cb7433e51534174d60da0228940ff1f361e42045a502bac57c4d7aa8"
+  }
+}

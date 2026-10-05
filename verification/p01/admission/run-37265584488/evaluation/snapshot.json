@@ -1,0 +1,20 @@
+{
+  "repository": "awalker0878/multi-tenant",
+  "state": "open",
+  "draft": true,
+  "head_sha": "bb7cbbef43437e2c19d656e9c4c5904b360f8ec8",
+  "base_sha": "2e1be599cba89275c92396066f091779cd912539",
+  "tested_sha": "11fda3d9a3a3c5493714b884054608d4de2fcff9",
+  "tested_parents": [
+    "2e1be599cba89275c92396066f091779cd912539",
+    "bb7cbbef43437e2c19d656e9c4c5904b360f8ec8"
+  ],
+  "head_after": "bb7cbbef43437e2c19d656e9c4c5904b360f8ec8",
+  "base_after": "2e1be599cba89275c92396066f091779cd912539",
+  "author_id": 52688461,
+  "permissions": {},
+  "exceptions": [],
+  "unresolved_threads": 0,
+  "checks": [],
+  "reviews": []
+}

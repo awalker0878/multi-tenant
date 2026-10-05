@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "result": "PASSED",
+  "name": "Architecture registry and documentation",
+  "source_revision": "d7e23f67ffe035185720536d1182a38560df8ada",
+  "event": "pull_request",
+  "run_id": 37265828759,
+  "run_attempt": 1,
+  "job": "architecture-and-docs",
+  "workflow_ref": "awalker0878/multi-tenant/.github/workflows/architecture-policy.yml@refs/pull/58/merge",
+  "recorded_at": "2026-10-05T04:59:45.428687+00:00",
+  "pull_request": {
+    "number": 58,
+    "head": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182",
+    "base": "41bbcaec3be5ec0f2abdd534bab2041e46a74e90"
+  }
+}

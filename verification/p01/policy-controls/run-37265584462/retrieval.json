@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "workflow": {
+    "id": 37265584462,
+    "head_sha": "011465d805d9b23725df4b05b949e9dc8f4da827",
+    "head_branch": "greenfield/enterprise-microservices-plan",
+    "event": "push",
+    "conclusion": "success",
+    "status": "completed",
+    "run_attempt": 1,
+    "path": ".github/workflows/p01-policy-controls.yml",
+    "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37265584462",
+    "check_suite_id": 100934472475,
+    "created_at": "2026-10-05T04:55:47Z",
+    "updated_at": "2026-10-05T04:56:01Z"
+  },
+  "source_revision": "011465d805d9b23725df4b05b949e9dc8f4da827",
+  "result": "VERIFIED",
+  "retrieved_at": "2026-10-05T05:08:12.800959+00:00",
+  "archives": [
+    {
+      "id": 11326327632,
+      "name": "p01-policy-controls-011465d805d9b23725df4b05b949e9dc8f4da827",
+      "size_in_bytes": 3993,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11326327632",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11326327632/zip",
+      "expired": false,
+      "created_at": "2026-10-05T04:55:58Z",
+      "expires_at": "2026-10-19T04:55:58Z",
+      "updated_at": "2026-10-05T04:55:58Z",
+      "digest": "sha256:7aa917e8e5b435102e5241750fafd8e3acb926c94672dd9c1487cd2ea501b7a7",
+      "workflow_run": {
+        "id": 37265584462,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "011465d805d9b23725df4b05b949e9dc8f4da827"
+      }
+    }
+  ],
+  "reports": [
+    {
+      "path": "report.json",
+      "sha256": "142c59f2dcf074adbaa533ae0bd1ea18083b21e5d3fda99837b6ca0d750ee90a",
+      "result": "PASSED"
+    }
+  ],
+  "source_verification_sha256": "8dd7f6e90207275d9816cdea0fb730556eb0dbac3a5ea7694c68873950467707",
+  "tests": 41,
+  "command_log_hashes_verified": 5,
+  "limitations": [
+    "Synthetic review identities, image bytes and scan findings; real Cosign cryptography. No actual role approval or operated signing."
+  ],
+  "retained_file_sha256": {
+    "bundles.log": "668b43d5e51a538eb7bf51c277468074dbd64289d975a7c14dc09ceef8b40af0",
+    "check-sources.log": "400042da813fa73792fd24d2dfba80f775a4996e24bf0d0cbead0cf51405eca2",
+    "exclusions.log": "01f614fd7293a95c49afb80d71dec01facf491a01787fe30cd51ea336d78d2e3",
+    "redaction.log": "da9a317c635f709d8c8aa5f921554eeea792b99c0ab1347d79e8c7b8f1e09c96",
+    "report.json": "142c59f2dcf074adbaa533ae0bd1ea18083b21e5d3fda99837b6ca0d750ee90a",
+    "reviews.log": "b3d65d6dacbff59235545c8545dc611c67b3b470800c864c8ce9d25e70f997b9",
+    "source-verification.json": "8dd7f6e90207275d9816cdea0fb730556eb0dbac3a5ea7694c68873950467707"
+  }
+}
