@@ -40,10 +40,16 @@ and explicit revocation. Catalogue has a private HTTPS client and registered
 owner middleware. Local guard tests use a synthetic protected resource; real
 Catalogue APIs and cross-service wire qualification remain P03 integration.
 
-**Next concrete work:** qualify the service-delegation PostgreSQL increment and
+The Console also invalidates same-session tabs after successful sign-out and
+reauthenticates protected back/forward-cache restores. Its expanded compiled
+browser campaign controls a delayed tenant response and verifies independent tab
+drafts, current-page focus and cross-tab sign-out; retain the hosted result before
+claiming this campaign passes.
+
+**Next concrete work:** qualify the expanded browser campaign and
 real cross-service wire path as owning resources are implemented; resolve and
 implement the approved support-access/break-glass contract; restore/revocation reconciliation;
-and the broader multi-tab/late-response/accessibility campaign. The real immutable plan producer
+and the broader supported-browser/assistive-technology campaign. The real immutable plan producer
 belongs to P05.04; P02 injects synthetic plans only in tests and its production
 adapter fails closed without the owner. Follow the
 [G02 engineering assessment](docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)

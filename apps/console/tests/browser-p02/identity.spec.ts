@@ -86,6 +86,40 @@ test('console configuration verifies HTTPS federation and enforces tenant revoca
   await page.reload();
   await expect(page.getByLabel('vCPU', { exact: true })).toHaveValue('12');
 
+  // Hold one complete old-tenant response until a newer navigation finishes.
+  await page.getByRole('link', { name: 'All your tenants' }).click();
+  let releaseOld!: () => void;
+  let oldReady!: () => void;
+  let oldFinished!: () => void;
+  const held = new Promise<void>(resolve => { releaseOld = resolve; });
+  const ready = new Promise<void>(resolve => { oldReady = resolve; });
+  const finished = new Promise<void>(resolve => { oldFinished = resolve; });
+  await page.route(`**${tenantA}`, async route => {
+    const response = await route.fetch();
+    oldReady();
+    await held;
+    try { await route.fulfill({ response }); }
+    finally { oldFinished(); }
+  });
+  await page.getByRole('link', { name: 'P02 Tenant A', exact: true }).click();
+  await ready;
+  await page.getByRole('link', { name: 'P02 Tenant B', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'P02 Tenant B', exact: true })).toBeVisible();
+  releaseOld();
+  await finished;
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await expect(page.getByRole('heading', { name: 'P02 Tenant B', exact: true })).toBeFocused();
+  await expect(page.getByLabel('vCPU', { exact: true })).toHaveValue('0');
+  await page.unroute(`**${tenantA}`);
+  await page.goto(tenantA);
+
+  const sibling = await page.context().newPage();
+  sibling.on('pageerror', error => errors.push(error.message));
+  await sibling.goto(tenantB!);
+  await expect(sibling.getByRole('heading', { name: 'P02 Tenant B', exact: true })).toBeVisible();
+  await page.getByLabel('Member subject', { exact: true }).fill('unsaved-tenant-a-draft');
+  await expect(sibling.getByLabel('Member subject', { exact: true })).toBeEmpty();
+
   const readerContext = await browser.newContext({ baseURL: process.env.CONSOLE_BASE_URL, ignoreHTTPSErrors: true });
   try {
     const reader = await readerContext.newPage();
@@ -114,6 +148,9 @@ test('console configuration verifies HTTPS federation and enforces tenant revoca
     await readerContext.close();
   }
   await page.getByRole('button', { name: 'Sign out' }).click();
+  await expect(sibling).toHaveURL(/\/login$/);
+  await expect(sibling.getByRole('heading', { name: 'P02 Tenant B', exact: true })).toHaveCount(0);
+  await sibling.close();
   await page.getByLabel('Password', { exact: true }).fill(fixture.replacement);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('could not be verified');

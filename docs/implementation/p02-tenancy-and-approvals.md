@@ -110,8 +110,21 @@ the current account page. Tenant administrators can create/change/revoke scoped
 memberships, change quotas and suspend/reactivate access. Every mutation passes
 real CSRF middleware and rechecks owner authority. Forms preserve command identity
 for retries; stale revisions produce a reload/review error. Secrets and user tokens
-remain outside page props. Keyboard navigation receives page/error focus; a full
-assistive-technology and multi-tab/late-response campaign remains open.
+remain outside page props. Keyboard navigation receives page/error focus.
+
+Successful sign-out broadcasts only an invalidation signal to same-origin tabs,
+with a storage-event fallback. Receiving tabs cancel requests, clear cached Inertia
+pages/history, hide the old view and load the login route. No actor, tenant or
+credential crosses the channel. A protected page restored from the browser's
+back/forward cache reloads through server authentication. If browser policy blocks
+both channels, current server checks still apply on the next request; immediate
+cross-tab clearing is not guaranteed in that configuration.
+
+The compiled browser campaign holds an old tenant response until a newer tenant
+navigation completes, checks that the selected page/focus/quota remain correct,
+checks independent unsaved forms in same-session tabs and signs out both tabs.
+Actual browser back/forward-cache interoperability, broader supported browsers
+and manual assistive-technology qualification remain open.
 
 The local suites cover two-tenant isolation, scoped role/grant decisions, expired
 and revoked authority, revision conflicts, idempotency, last-administrator

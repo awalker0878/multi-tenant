@@ -1,6 +1,7 @@
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h, type DefineComponent } from 'vue';
+import './identity-lifecycle';
 
 void createInertiaApp({
   resolve: name => resolvePageComponent<DefineComponent>(
