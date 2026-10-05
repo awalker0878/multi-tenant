@@ -38,6 +38,10 @@ jobs:
         run: python scripts/validate_p00_inputs.py
       - name: Validate carried P01 operating inputs without inventing acceptance
         run: python scripts/p01/admission/operating_inputs.py
+      - name: Check retained evidence without changing its original bytes
+        run: |
+          python scripts/p01/test_retained.py -q
+          python scripts/p01/verify_retained.py
       - name: Check generated delivery views
         run: python scripts/render_delivery_views.py --check
       - name: Check documentation and delivery references

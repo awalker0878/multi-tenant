@@ -172,53 +172,11 @@
 #12 2.503 Get:2 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 tzdata all 2026c-0+deb12u1 [304 kB]
 #12 2.595 debconf: delaying package configuration, since apt-utils is not installed
 #12 2.615 Fetched 566 kB in 0s (9714 kB/s)
-#12 2.630 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 6703 files and directories currently installed.)
+#12 2.630 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6703 files and directories currently installed.)
 #12 2.636 Preparing to unpack .../libpcre2-8-0_10.42-1+deb12u2_amd64.deb ...
 #12 2.639 Unpacking libpcre2-8-0:amd64 (10.42-1+deb12u2) over (10.42-1+deb12u1) ...
 #12 2.674 Setting up libpcre2-8-0:amd64 (10.42-1+deb12u2) ...
-#12 2.695 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 6703 files and directories currently installed.)
+#12 2.695 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6703 files and directories currently installed.)
 #12 2.701 Preparing to unpack .../tzdata_2026c-0+deb12u1_all.deb ...
 #12 2.814 Unpacking tzdata (2026c-0+deb12u1) over (2026b-0+deb12u1) ...
 #12 3.579 Setting up tzdata (2026c-0+deb12u1) ...

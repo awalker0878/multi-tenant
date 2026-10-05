@@ -157,28 +157,7 @@
 #11 1.989 Get:5 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 openssl amd64 3.0.22-1~deb12u1 [1442 kB]
 #11 2.063 debconf: delaying package configuration, since apt-utils is not installed
 #11 2.081 Fetched 6290 kB in 0s (21.8 MB/s)
-#11 2.105 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 13263 files and directories currently installed.)
+#11 2.105 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 13263 files and directories currently installed.)
 #11 2.112 Preparing to unpack .../libssl3_3.0.22-1~deb12u1_amd64.deb ...
 #11 2.115 Unpacking libssl3:amd64 (3.0.22-1~deb12u1) over (3.0.20-1~deb12u2) ...
 #11 2.233 Selecting previously unselected package libpq5:amd64.
@@ -521,28 +500,7 @@
 #11 10.80   perl-modules-5.36* pkg-config* pkgconf* pkgconf-bin* re2c*
 #11 10.91 0 upgraded, 0 newly installed, 50 to remove and 2 not upgraded.
 #11 10.91 After this operation, 320 MB disk space will be freed.
-#11 10.91 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 13458 files and directories currently installed.)
+#11 10.91 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 13458 files and directories currently installed.)
 #11 10.92 Removing autoconf (2.71-3) ...
 #11 10.93 Removing g++ (4:12.2.0-3) ...
 #11 10.94 Removing gcc (4:12.2.0-3) ...
@@ -594,28 +552,7 @@
 #11 11.81 Removing libtsan2:amd64 (12.2.0-14+deb12u1) ...
 #11 11.82 Removing libubsan1:amd64 (12.2.0-14+deb12u1) ...
 #11 11.84 Processing triggers for libc-bin (2.36-9+deb12u14) ...
-#11 11.87 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 8698 files and directories currently installed.)
+#11 11.87 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 8698 files and directories currently installed.)
 #11 11.88 Purging configuration files for binutils-common:amd64 (2.40-2) ...
 #11 11.88 Purging configuration files for libmagic1:amd64 (1:5.44-3) ...
 #11 11.88 Purging configuration files for dpkg-dev (1.21.23) ...
@@ -654,28 +591,7 @@
 #14 2.148 debconf: delaying package configuration, since apt-utils is not installed
 #14 2.165 Fetched 167 kB in 0s (1386 kB/s)
 #14 2.173 Selecting previously unselected package unzip.
-#14 2.173 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 8687 files and directories currently installed.)
+#14 2.173 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 8687 files and directories currently installed.)
 #14 2.179 Preparing to unpack .../unzip_6.0-28+deb12u1_amd64.deb ...
 #14 2.180 Unpacking unzip (6.0-28+deb12u1) ...
 #14 2.199 Setting up unzip (6.0-28+deb12u1) ...

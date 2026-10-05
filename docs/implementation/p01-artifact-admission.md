@@ -86,6 +86,9 @@ This implementation supplies control mechanisms and measured fixture denials. It
 is not G01 acceptance, enforced branch protection, independent SLSA-level assurance,
 production promotion, whole-release qualification or an operated trust decision.
 
+The [retained-byte correction](p01-evidence-retention.md) restores original build
+log bytes and adds a continuous digest check. Original report hashes remain intact.
+
 The receiving inputs and concrete settings candidate are in [the operating-input
 record](p01-operating-inputs.md). Analyzer configuration changes require platform
 and security roles; newly added inline suppressions require a prior exact-file,

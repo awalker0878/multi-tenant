@@ -147,53 +147,11 @@
 #11 2.429 Get:7 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 openssl amd64 3.0.22-1~deb12u1 [1442 kB]
 #11 2.523 debconf: delaying package configuration, since apt-utils is not installed
 #11 2.542 Fetched 6856 kB in 0s (46.3 MB/s)
-#11 2.553 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 13263 files and directories currently installed.)
+#11 2.553 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 13263 files and directories currently installed.)
 #11 2.562 Preparing to unpack .../libpcre2-8-0_10.42-1+deb12u2_amd64.deb ...
 #11 2.564 Unpacking libpcre2-8-0:amd64 (10.42-1+deb12u2) over (10.42-1+deb12u1) ...
 #11 2.596 Setting up libpcre2-8-0:amd64 (10.42-1+deb12u2) ...
-#11 2.616 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 13263 files and directories currently installed.)
+#11 2.616 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 13263 files and directories currently installed.)
 #11 2.623 Preparing to unpack .../0-tzdata_2026c-0+deb12u1_all.deb ...
 #11 2.716 Unpacking tzdata (2026c-0+deb12u1) over (2026b-0+deb12u1) ...
 #11 3.472 Preparing to unpack .../1-libssl3_3.0.22-1~deb12u1_amd64.deb ...
@@ -551,28 +509,7 @@
 #11 15.40   rpcsvc-proto*
 #11 15.52 0 upgraded, 0 newly installed, 60 to remove and 0 not upgraded.
 #11 15.52 After this operation, 342 MB disk space will be freed.
-#11 15.52 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 13458 files and directories currently installed.)
+#11 15.52 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 13458 files and directories currently installed.)
 #11 15.53 Removing autoconf (2.71-3) ...
 #11 15.54 Removing g++ (4:12.2.0-3) ...
 #11 15.55 Removing gcc (4:12.2.0-3) ...
@@ -634,28 +571,7 @@
 #11 16.65 Removing libtsan2:amd64 (12.2.0-14+deb12u1) ...
 #11 16.66 Removing libubsan1:amd64 (12.2.0-14+deb12u1) ...
 #11 16.68 Processing triggers for libc-bin (2.36-9+deb12u14) ...
-#11 16.70 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 6998 files and directories currently installed.)
+#11 16.70 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6998 files and directories currently installed.)
 #11 16.71 Purging configuration files for libtirpc-common (1.3.3+ds-1) ...
 #11 16.71 Purging configuration files for binutils-common:amd64 (2.40-2) ...
 #11 16.72 Purging configuration files for libmagic1:amd64 (1:5.44-3) ...
@@ -696,28 +612,7 @@
 #14 2.368 debconf: delaying package configuration, since apt-utils is not installed
 #14 2.385 Fetched 167 kB in 0s (1286 kB/s)
 #14 2.395 Selecting previously unselected package unzip.
-#14 2.395 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 6986 files and directories currently installed.)
+#14 2.395 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6986 files and directories currently installed.)
 #14 2.402 Preparing to unpack .../unzip_6.0-28+deb12u1_amd64.deb ...
 #14 2.403 Unpacking unzip (6.0-28+deb12u1) ...
 #14 2.427 Setting up unzip (6.0-28+deb12u1) ...
