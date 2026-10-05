@@ -1,0 +1,162 @@
+temporal-1  | {"level":"warn","ts":"2026-10-05T02:02:55.521Z","msg":"HTTP API port has not been set. Nexus HTTP endpoints will not be available. To enable Nexus, follow these instructions: https://github.com/temporalio/temporal/blob/main/docs/architecture/nexus.md#enabling-nexus.","service":"frontend","internal-frontend":true,"logging-call-at":"/home/runner/work/temporal/temporal/service/frontend/service.go:521"}
+temporal-1  | {"level":"warn","ts":"2026-10-05T02:02:55.529Z","msg":"HTTP API port has not been set. Nexus HTTP endpoints will not be available. To enable Nexus, follow these instructions: https://github.com/temporalio/temporal/blob/main/docs/architecture/nexus.md#enabling-nexus.","service":"frontend","logging-call-at":"/home/runner/work/temporal/temporal/service/frontend/service.go:521"}
+rabbit-1    | 2026-10-05 02:02:50.580825+00:00 [info] <0.209.0> Running boot step prevent_startup_if_node_was_reset defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.580889+00:00 [info] <0.209.0> Running boot step empty_db_check defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.580950+00:00 [info] <0.209.0> Will not seed default virtual host and user: have definitions to load...[0m
+rabbit-1    | 2026-10-05 02:02:50.580973+00:00 [info] <0.209.0> Running boot step rabbit_observer_cli defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581036+00:00 [info] <0.209.0> Running boot step rabbit_core_metrics_gc defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581118+00:00 [info] <0.209.0> Running boot step background_gc defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581226+00:00 [info] <0.209.0> Running boot step channel_interceptor_priorities_check defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581271+00:00 [info] <0.209.0> Running boot step rabbit_observer_cli_classic_queues defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581337+00:00 [info] <0.209.0> Running boot step rabbit_observer_cli_quorum_queues defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581377+00:00 [info] <0.209.0> Running boot step routing_ready defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581406+00:00 [info] <0.209.0> Running boot step pre_flight defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581440+00:00 [info] <0.209.0> Running boot step notify_cluster defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581479+00:00 [info] <0.209.0> Running boot step networking defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581512+00:00 [info] <0.209.0> Running boot step rabbit_quorum_queue_periodic_membership_reconciliation defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581609+00:00 [info] <0.209.0> Running boot step definition_import_worker_pool defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.581675+00:00 [info] <0.532.0> Starting worker pool 'definition_import_pool' with 4 processes in it[0m
+rabbit-1    | 2026-10-05 02:02:50.582001+00:00 [info] <0.209.0> Running boot step cluster_name defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.582063+00:00 [info] <0.209.0> Initialising internal cluster ID to 'rabbitmq-cluster-id-F_2yly4qjknEh9ZPYocOYw'[0m
+rabbit-1    | 2026-10-05 02:02:50.585717+00:00 [info] <0.209.0> Running boot step virtual_host_reconciliation defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.585852+00:00 [info] <0.209.0> Running boot step direct_client defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.585950+00:00 [info] <0.209.0> Running boot step logger_exchange defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.585998+00:00 [info] <0.209.0> Running boot step cluster_tags defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.586698+00:00 [info] <0.209.0> Running boot step queue_type_registrations defined by app rabbit[0m
+rabbit-1    | 2026-10-05 02:02:50.586732+00:00 [info] <0.209.0> Running boot step rabbit_management_load_definitions defined by app rabbitmq_management[0m
+rabbit-1    | 2026-10-05 02:02:50.586797+00:00 [info] <0.842.0> Resetting node maintenance status[0m
+rabbit-1    | [38;5;214m2026-10-05 02:02:50.592903+00:00 [warning] <0.859.0> Deprecated features: `management_metrics_collection`: Feature `management_metrics_collection` is deprecated.[0m
+rabbit-1    | [38;5;214m2026-10-05 02:02:50.592903+00:00 [warning] <0.859.0> By default, this feature can still be used for now.[0m
+rabbit-1    | [38;5;214m2026-10-05 02:02:50.592903+00:00 [warning] <0.859.0> Its use will not be permitted by default in a future minor RabbitMQ version and the feature will be removed from a future major RabbitMQ version; actual versions to be determined.[0m
+rabbit-1    | [38;5;214m2026-10-05 02:02:50.592903+00:00 [warning] <0.859.0> To continue using this feature when it is not permitted by default, set the following parameter in your configuration:[0m
+rabbit-1    | [38;5;214m2026-10-05 02:02:50.592903+00:00 [warning] <0.859.0>     "deprecated_features.permit.management_metrics_collection = true"[0m
+rabbit-1    | [38;5;214m2026-10-05 02:02:50.592903+00:00 [warning] <0.859.0> To test RabbitMQ as if the feature was removed, set this in your configuration:[0m
+rabbit-1    | [38;5;214m2026-10-05 02:02:50.592903+00:00 [warning] <0.859.0>     "deprecated_features.permit.management_metrics_collection = false"[0m
+rabbit-1    | 2026-10-05 02:02:50.614126+00:00 [info] <0.895.0> Management plugin: HTTP (non-TLS) listener started on port 15672[0m
+rabbit-1    | 2026-10-05 02:02:50.614232+00:00 [info] <0.923.0> Statistics database started.[0m
+rabbit-1    | 2026-10-05 02:02:50.614322+00:00 [info] <0.922.0> Starting worker pool 'management_worker_pool' with 3 processes in it[0m
+rabbit-1    | 2026-10-05 02:02:50.622652+00:00 [info] <0.934.0> Prometheus metrics: HTTP (non-TLS) listener started on port 15692[0m
+rabbit-1    | 2026-10-05 02:02:50.626624+00:00 [info] <0.842.0> Applying definitions from regular file at /run/config/definitions.json[0m
+rabbit-1    | 2026-10-05 02:02:50.626951+00:00 [info] <0.842.0> Applying definitions from file at '/run/config/definitions.json'[0m
+rabbit-1    | 2026-10-05 02:02:50.626987+00:00 [info] <0.842.0> Asked to import definitions. Acting user: rmq-internal[0m
+rabbit-1    | 2026-10-05 02:02:50.627075+00:00 [info] <0.842.0> Importing concurrently 3 users...[0m
+rabbit-1    | 2026-10-05 02:02:50.628204+00:00 [info] <0.837.0> Created user 'consumer'[0m
+rabbit-1    | 2026-10-05 02:02:50.628205+00:00 [info] <0.836.0> Created user 'publisher'[0m
+rabbit-1    | 2026-10-05 02:02:50.628280+00:00 [info] <0.838.0> Created user 'foreign'[0m
+rabbit-1    | 2026-10-05 02:02:50.628352+00:00 [info] <0.842.0> Importing concurrently 2 vhosts...[0m
+rabbit-1    | 2026-10-05 02:02:50.628863+00:00 [info] <0.837.0> Adding vhost 'foreign' (description: '', tags: [])[0m
+rabbit-1    | 2026-10-05 02:02:50.629170+00:00 [info] <0.836.0> Adding vhost 'p01' (description: '', tags: [])[0m
+rabbit-1    | 2026-10-05 02:02:50.636118+00:00 [info] <0.967.0> Making sure data directory '/var/lib/rabbitmq/mnesia/rabbit@rabbit/msg_stores/vhosts/669UOGK7U29PO5I9AKOUVSSAM' for vhost 'foreign' exists[0m
+rabbit-1    | 2026-10-05 02:02:50.636908+00:00 [info] <0.967.0> Setting segment_entry_count for vhost 'foreign' with 0 queues to '2048'[0m
+rabbit-1    | 2026-10-05 02:02:50.645972+00:00 [info] <0.967.0> Starting message stores for vhost 'foreign'[0m
+rabbit-1    | 2026-10-05 02:02:50.646931+00:00 [info] <0.967.0> Started message store of type transient for vhost 'foreign'[0m
+rabbit-1    | [38;5;214m2026-10-05 02:02:50.665985+00:00 [warning] <0.981.0> Message store "669UOGK7U29PO5I9AKOUVSSAM/msg_store_persistent": rebuilding indices from scratch[0m
+rabbit-1    | 2026-10-05 02:02:50.666638+00:00 [info] <0.967.0> Started message store of type persistent for vhost 'foreign'[0m
+rabbit-1    | 2026-10-05 02:02:50.666758+00:00 [info] <0.967.0> Recovering 0 queues of type rabbit_classic_queue took 26ms[0m
+rabbit-1    | 2026-10-05 02:02:50.666819+00:00 [info] <0.967.0> Recovering 0 queues of type rabbit_quorum_queue took 0ms[0m
+rabbit-1    | 2026-10-05 02:02:50.666911+00:00 [info] <0.967.0> Recovering 0 queues of type rabbit_stream_queue took 0ms[0m
+rabbit-1    | 2026-10-05 02:02:50.667231+00:00 [info] <0.997.0> Making sure data directory '/var/lib/rabbitmq/mnesia/rabbit@rabbit/msg_stores/vhosts/F1499R0KX35VZL6F40BLTYOPD' for vhost 'p01' exists[0m
+rabbit-1    | 2026-10-05 02:02:50.667747+00:00 [info] <0.997.0> Setting segment_entry_count for vhost 'p01' with 0 queues to '2048'[0m
+rabbit-1    | 2026-10-05 02:02:50.670571+00:00 [info] <0.997.0> Starting message stores for vhost 'p01'[0m
+rabbit-1    | 2026-10-05 02:02:50.671477+00:00 [info] <0.997.0> Started message store of type transient for vhost 'p01'[0m
+rabbit-1    | [38;5;214m2026-10-05 02:02:50.671978+00:00 [warning] <0.1008.0> Message store "F1499R0KX35VZL6F40BLTYOPD/msg_store_persistent": rebuilding indices from scratch[0m
+rabbit-1    | 2026-10-05 02:02:50.672602+00:00 [info] <0.997.0> Started message store of type persistent for vhost 'p01'[0m
+rabbit-1    | 2026-10-05 02:02:50.672679+00:00 [info] <0.997.0> Recovering 0 queues of type rabbit_classic_queue took 3ms[0m
+rabbit-1    | 2026-10-05 02:02:50.672708+00:00 [info] <0.997.0> Recovering 0 queues of type rabbit_quorum_queue took 0ms[0m
+rabbit-1    | 2026-10-05 02:02:50.672746+00:00 [info] <0.997.0> Recovering 0 queues of type rabbit_stream_queue took 0ms[0m
+rabbit-1    | 2026-10-05 02:02:50.672963+00:00 [info] <0.842.0> Importing concurrently 3 permissions...[0m
+rabbit-1    | 2026-10-05 02:02:50.685803+00:00 [info] <0.836.0> Successfully set permissions for user 'publisher' in virtual host 'p01' to '^$', '^events$', '^$'[0m
+rabbit-1    | 2026-10-05 02:02:50.846419+00:00 [info] <0.838.0> Successfully set permissions for user 'foreign' in virtual host 'foreign' to '^$', '^$', '^$'[0m
+rabbit-1    | 2026-10-05 02:02:50.868138+00:00 [info] <0.837.0> Successfully set permissions for user 'consumer' in virtual host 'p01' to '^$', '^$', '^deliveries$'[0m
+rabbit-1    | 2026-10-05 02:02:50.868305+00:00 [info] <0.842.0> Importing concurrently 1 exchanges...[0m
+rabbit-1    | 2026-10-05 02:02:50.870051+00:00 [info] <0.842.0> Importing concurrently 1 queues...[0m
+rabbit-1    | 2026-10-05 02:02:50.879625+00:00 [info] <0.842.0> Importing concurrently 1 bindings...[0m
+rabbit-1    | 2026-10-05 02:02:50.891175+00:00 [info] <0.842.0> Ready to start client connection listeners[0m
+rabbit-1    | 2026-10-05 02:02:51.019490+00:00 [info] <0.1060.0> started TLS (SSL) listener on [::]:5671[0m
+rabbit-1    |  completed with 4 plugins.
+rabbit-1    | 2026-10-05 02:02:51.112023+00:00 [info] <0.842.0> Server startup complete; 4 plugins started.[0m
+rabbit-1    | 2026-10-05 02:02:51.112023+00:00 [info] <0.842.0>  * rabbitmq_prometheus[0m
+rabbit-1    | 2026-10-05 02:02:51.112023+00:00 [info] <0.842.0>  * rabbitmq_management[0m
+rabbit-1    | 2026-10-05 02:02:51.112023+00:00 [info] <0.842.0>  * rabbitmq_management_agent[0m
+rabbit-1    | 2026-10-05 02:02:51.112023+00:00 [info] <0.842.0>  * rabbitmq_web_dispatch[0m
+rabbit-1    | 2026-10-05 02:02:51.189119+00:00 [info] <0.10.0> Time to start RabbitMQ: 3103 ms[0m
+postgres-1  | fixing permissions on existing directory /var/lib/postgresql/18/docker ... ok
+postgres-1  | creating subdirectories ... ok
+postgres-1  | selecting dynamic shared memory implementation ... posix
+postgres-1  | selecting default "max_connections" ... 100
+postgres-1  | selecting default "shared_buffers" ... 128MB
+postgres-1  | selecting default time zone ... Etc/UTC
+postgres-1  | creating configuration files ... ok
+postgres-1  | running bootstrap script ... ok
+postgres-1  | performing post-bootstrap initialization ... ok
+postgres-1  | syncing data to disk ... ok
+postgres-1  | 
+postgres-1  | Success. You can now start the database server using:
+postgres-1  | 
+postgres-1  |     pg_ctl -D /var/lib/postgresql/18/docker -l logfile start
+postgres-1  | 
+postgres-1  | waiting for server to start....2026-10-05 02:02:48.813 UTC [61] LOG:  starting PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+postgres-1  | 2026-10-05 02:02:48.813 UTC [61] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1  | 2026-10-05 02:02:48.818 UTC [67] LOG:  database system was shut down at 2026-10-05 02:02:48 UTC
+postgres-1  | 2026-10-05 02:02:48.821 UTC [61] LOG:  database system is ready to accept connections
+postgres-1  |  done
+postgres-1  | server started
+postgres-1  | 
+postgres-1  | /usr/local/bin/docker-entrypoint.sh: sourcing /docker-entrypoint-initdb.d/10-stateful.sh
+postgres-1  | 2026-10-05 02:02:48.964 UTC [84] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 02:02:48.964 UTC [84] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 02:02:48.964 UTC [84] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 
+postgres-1  | waiting for server to shut down....2026-10-05 02:02:49.213 UTC [61] LOG:  received fast shutdown request
+postgres-1  | 2026-10-05 02:02:49.214 UTC [61] LOG:  aborting any active transactions
+postgres-1  | 2026-10-05 02:02:49.217 UTC [61] LOG:  background worker "logical replication launcher" (PID 70) exited with exit code 1
+postgres-1  | 2026-10-05 02:02:49.218 UTC [65] LOG:  shutting down
+postgres-1  | 2026-10-05 02:02:49.218 UTC [65] LOG:  checkpoint starting: shutdown immediate
+postgres-1  | 2026-10-05 02:02:49.408 UTC [65] LOG:  checkpoint complete: wrote 1894 buffers (11.6%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.169 s, sync=0.020 s, total=0.190 s; sync files=608, longest=0.015 s, average=0.001 s; distance=8690 kB, estimate=8690 kB; lsn=0/1FD5E48, redo lsn=0/1FD5E48
+postgres-1  | 2026-10-05 02:02:49.422 UTC [61] LOG:  database system is shut down
+postgres-1  |  done
+postgres-1  | server stopped
+postgres-1  | 
+postgres-1  | PostgreSQL init process complete; ready for start up.
+postgres-1  | 
+postgres-1  | 2026-10-05 02:02:49.542 UTC [7] LOG:  starting PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+postgres-1  | 2026-10-05 02:02:49.542 UTC [7] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1  | 2026-10-05 02:02:49.543 UTC [7] LOG:  listening on IPv6 address "::", port 5432
+postgres-1  | 2026-10-05 02:02:49.543 UTC [7] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1  | 2026-10-05 02:02:49.548 UTC [101] LOG:  database system was shut down at 2026-10-05 02:02:49 UTC
+postgres-1  | 2026-10-05 02:02:49.648 UTC [7] LOG:  database system is ready to accept connections
+postgres-1  | 2026-10-05 02:02:50.037 UTC [112] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 02:02:50.037 UTC [112] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 02:02:50.037 UTC [112] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 02:02:51.113 UTC [120] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 02:02:51.113 UTC [120] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 02:02:51.113 UTC [120] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 02:02:52.172 UTC [128] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 02:02:52.172 UTC [128] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 02:02:52.172 UTC [128] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 02:02:53.237 UTC [140] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 02:02:53.237 UTC [140] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 02:02:53.237 UTC [140] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 02:02:54.087 UTC [148] ERROR:  permission denied for schema public at character 14
+postgres-1  | 2026-10-05 02:02:54.087 UTC [148] STATEMENT:  CREATE TABLE forbidden(id int)
+postgres-1  | 2026-10-05 02:02:54.087 UTC [148] ERROR:  permission denied to set role "temporal_migrator"
+postgres-1  | 2026-10-05 02:02:54.087 UTC [148] STATEMENT:  SET ROLE temporal_migrator
+postgres-1  | 2026-10-05 02:02:54.092 UTC [149] FATAL:  pg_hba.conf rejects connection for host "172.18.0.3", user "temporal_runtime", database "temporal_visibility", SSL encryption
+postgres-1  | 2026-10-05 02:02:54.100 UTC [150] FATAL:  password authentication failed for user "temporal_runtime"
+postgres-1  | 2026-10-05 02:02:54.100 UTC [150] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 4: "hostssl temporal temporal_runtime,temporal_migrator 0.0.0.0/0 scram-sha-256"
+postgres-1  | 2026-10-05 02:02:54.102 UTC [151] FATAL:  pg_hba.conf rejects connection for host "172.18.0.3", user "temporal_runtime", database "temporal", no encryption
+postgres-1  | 2026-10-05 02:02:54.305 UTC [160] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 02:02:54.305 UTC [160] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 02:02:54.305 UTC [160] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 02:02:55.632 UTC [203] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 02:02:55.632 UTC [203] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 02:02:55.632 UTC [203] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 02:02:56.706 UTC [214] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 02:02:56.706 UTC [214] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 02:02:56.706 UTC [214] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 02:02:57.780 UTC [222] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 02:02:57.780 UTC [222] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 02:02:57.780 UTC [222] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 02:02:58.858 UTC [230] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 02:02:58.859 UTC [230] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 02:02:58.859 UTC [230] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"

@@ -1,0 +1,15 @@
+{
+  "run_id": 37253200622,
+  "source_revision": "87bb5cae55057f98ed0fb8c56fd6cf3979bf7d25",
+  "artifact_id": 11321796544,
+  "archive_sha256": "793fc54d86629141eb064bad4dd3accf996051092c6fbf9058d4e42e037734ba",
+  "archive_bytes": 72618,
+  "archive_checksum_verified": true,
+  "reported_result": "FAIL",
+  "reported_cleanup_complete": true,
+  "report_sha256": "928ef6ada4753473a6f1f4f9bd0d2657cf0578ce0089c1e3d58bfd5a99ab70a1",
+  "command_log_hashes_verified": 84,
+  "immutable_source_bindings_verified": 48,
+  "failure_scope": "Workflow reached durable wait and initial authorization passed. Root object deletion returned InvalidRequest while the probe expected AccessDenied. No retention bypass was observed, but the specific rejection reason and recovery remained unverified.",
+  "reviewer": "Codex \u2014 raw commands, denial diagnostics, archive and immutable source integrity examination"
+}

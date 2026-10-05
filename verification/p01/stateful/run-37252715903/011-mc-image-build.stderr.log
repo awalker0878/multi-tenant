@@ -1,0 +1,155 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.01kB done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${GO_IMAGE} results in empty or invalid base image name (line 2)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [build 1/4] FROM docker.io/library/golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc
+#5 DONE 0.0s
+
+#6 [stage-1 1/4] FROM docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 564.37kB done
+#7 DONE 0.0s
+
+#8 [build 2/4] WORKDIR /source
+#8 CACHED
+
+#9 [build 3/4] COPY source.tar.gz /tmp/source.tar.gz
+#9 DONE 0.0s
+
+#10 [build 4/4] RUN echo "95cd293c7119f16921a6dc515a1fb74a2227f19fd994b9c8b770a154e802ac44  /tmp/source.tar.gz" | sha256sum -c - && tar -xzf /tmp/source.tar.gz --strip-components=1 && go build -mod=readonly -trimpath -o /out/mc . && go version -m /out/mc > /out/build-info.txt && sha256sum go.mod go.sum > /out/module-digests.txt
+#10 0.111 /tmp/source.tar.gz: OK
+#10 0.173 go: downloading github.com/minio/pkg/v3 v3.1.0
+#10 0.232 go: downloading github.com/charmbracelet/bubbles v0.20.0
+#10 0.423 go: downloading github.com/charmbracelet/bubbletea v1.3.4
+#10 0.423 go: downloading github.com/charmbracelet/lipgloss v1.0.0
+#10 0.445 go: downloading github.com/cheggaaa/pb v1.0.29
+#10 0.446 go: downloading github.com/dustin/go-humanize v1.0.1
+#10 0.452 go: downloading github.com/fatih/color v1.18.0
+#10 0.456 go: downloading github.com/golang-jwt/jwt/v4 v4.5.2
+#10 0.462 go: downloading github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
+#10 0.462 go: downloading github.com/google/uuid v1.6.0
+#10 0.467 go: downloading github.com/inconshreveable/mousetrap v1.1.0
+#10 0.473 go: downloading github.com/jedib0t/go-pretty/v6 v6.6.7
+#10 0.477 go: downloading github.com/klauspost/compress v1.18.0
+#10 1.358 go: downloading github.com/mattn/go-ieproxy v0.0.12
+#10 1.358 go: downloading github.com/mattn/go-isatty v0.0.20
+#10 1.358 go: downloading github.com/minio/cli v1.24.2
+#10 1.359 go: downloading github.com/minio/colorjson v1.0.8
+#10 1.369 go: downloading github.com/minio/filepath v1.0.0
+#10 1.375 go: downloading github.com/minio/madmin-go/v3 v3.0.107-0.20250415152934-4b504b82db63
+#10 1.382 go: downloading github.com/minio/minio-go/v7 v7.0.90
+#10 1.446 go: downloading github.com/minio/selfupdate v0.6.0
+#10 1.446 go: downloading github.com/mitchellh/go-homedir v1.1.0
+#10 1.446 go: downloading github.com/muesli/reflow v0.3.0
+#10 1.455 go: downloading github.com/muesli/termenv v0.16.0
+#10 1.463 go: downloading github.com/olekukonko/tablewriter v0.0.5
+#10 1.464 go: downloading github.com/pkg/xattr v0.4.10
+#10 1.464 go: downloading github.com/posener/complete v1.2.3
+#10 1.477 go: downloading github.com/prometheus/client_golang v1.21.1
+#10 1.490 go: downloading github.com/prometheus/procfs v0.16.0
+#10 1.528 go: downloading github.com/rjeczalik/notify v0.9.3
+#10 1.528 go: downloading github.com/shirou/gopsutil/v3 v3.24.5
+#10 1.592 go: downloading github.com/tidwall/gjson v1.18.0
+#10 1.602 go: downloading github.com/vbauerster/mpb/v8 v8.9.3
+#10 1.633 go: downloading golang.org/x/net v0.42.0
+#10 1.649 go: downloading golang.org/x/sys v0.34.0
+#10 1.650 go: downloading golang.org/x/term v0.33.0
+#10 1.650 go: downloading golang.org/x/text v0.27.0
+#10 1.664 go: downloading gopkg.in/yaml.v2 v2.4.0
+#10 1.830 go: downloading github.com/mattn/go-runewidth v0.0.16
+#10 1.846 go: downloading github.com/charmbracelet/x/ansi v0.8.0
+#10 1.885 go: downloading github.com/charmbracelet/x/term v0.2.1
+#10 1.895 go: downloading github.com/muesli/ansi v0.0.0-20230316100256-276c6243b2f6
+#10 1.913 go: downloading github.com/muesli/cancelreader v0.2.2
+#10 1.927 go: downloading golang.org/x/sync v0.16.0
+#10 1.939 go: downloading github.com/rivo/uniseg v0.4.7
+#10 1.945 go: downloading github.com/mattn/go-colorable v0.1.14
+#10 1.960 go: downloading github.com/rs/xid v1.6.0
+#10 1.975 go: downloading github.com/juju/ratelimit v1.0.2
+#10 1.986 go: downloading github.com/go-ini/ini v1.67.0
+#10 1.992 go: downloading github.com/goccy/go-json v0.10.5
+#10 2.006 go: downloading golang.org/x/crypto v0.40.0
+#10 2.037 go: downloading github.com/minio/crc64nvme v1.0.1
+#10 2.048 go: downloading github.com/minio/md5-simd v1.1.2
+#10 2.064 go: downloading github.com/lestrrat-go/jwx/v2 v2.1.4
+#10 2.159 go: downloading github.com/fatih/structs v1.1.0
+#10 2.170 go: downloading go.etcd.io/etcd/client/v3 v3.5.19
+#10 2.193 go: downloading gopkg.in/yaml.v3 v3.0.1
+#10 2.206 go: downloading github.com/prometheus/common v0.63.0
+#10 2.216 go: downloading github.com/prometheus/prom2json v1.4.2
+#10 2.227 go: downloading github.com/safchain/ethtool v0.5.10
+#10 2.243 go: downloading github.com/secure-io/sio-go v0.3.1
+#10 2.263 go: downloading github.com/tinylib/msgp v1.2.5
+#10 2.272 go: downloading github.com/cespare/xxhash/v2 v2.3.0
+#10 2.283 go: downloading aead.dev/minisign v0.3.0
+#10 2.299 go: downloading github.com/hashicorp/go-multierror v1.1.1
+#10 2.301 go: downloading github.com/aymanbagabas/go-osc52/v2 v2.0.1
+#10 2.316 go: downloading github.com/lucasb-eyer/go-colorful v1.2.0
+#10 2.318 go: downloading github.com/beorn7/perks v1.0.1
+#10 2.329 go: downloading github.com/prometheus/client_model v0.6.2
+#10 2.338 go: downloading google.golang.org/protobuf v1.36.6
+#10 2.415 go: downloading github.com/tidwall/match v1.1.1
+#10 2.415 go: downloading github.com/tidwall/pretty v1.2.1
+#10 2.424 go: downloading github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
+#10 2.425 go: downloading github.com/VividCortex/ewma v1.2.0
+#10 2.432 go: downloading github.com/tklauser/go-sysconf v0.3.15
+#10 2.469 go: downloading github.com/klauspost/cpuid/v2 v2.2.10
+#10 2.471 go: downloading github.com/lestrrat-go/option v1.0.1
+#10 2.480 go: downloading github.com/lestrrat-go/blackmagic v1.0.2
+#10 2.484 go: downloading github.com/lestrrat-go/httprc v1.0.6
+#10 2.491 go: downloading github.com/lestrrat-go/iter v1.0.2
+#10 2.499 go: downloading go.etcd.io/etcd/api/v3 v3.5.19
+#10 2.518 go: downloading go.etcd.io/etcd/client/pkg/v3 v3.5.19
+#10 2.549 go: downloading go.uber.org/zap v1.27.0
+#10 2.602 go: downloading google.golang.org/grpc v1.71.0
+#10 2.875 go: downloading github.com/matttproud/golang_protobuf_extensions v1.0.4
+#10 2.875 go: downloading github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+#10 2.875 go: downloading github.com/philhofer/fwd v1.1.3-0.20240916144458-20a13a1f6b7c
+#10 2.876 go: downloading github.com/hashicorp/errwrap v1.1.0
+#10 2.894 go: downloading github.com/tklauser/numcpus v0.10.0
+#10 2.896 go: downloading github.com/lestrrat-go/httpcc v1.0.1
+#10 2.897 go: downloading github.com/gogo/protobuf v1.3.2
+#10 2.899 go: downloading github.com/golang/protobuf v1.5.4
+#10 2.911 go: downloading github.com/coreos/go-semver v0.3.1
+#10 2.911 go: downloading google.golang.org/genproto/googleapis/api v0.0.0-20250311173030-29e43e6258d7
+#10 2.925 go: downloading github.com/coreos/go-systemd/v22 v22.5.0
+#10 2.944 go: downloading go.uber.org/multierr v1.11.0
+#10 2.962 go: downloading google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb
+#10 2.966 go: downloading github.com/prometheus/prometheus v0.303.0
+#10 DONE 44.9s
+
+#6 [stage-1 1/4] FROM docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#6 CACHED
+
+#11 [stage-1 2/4] COPY --from=build /out/ /usr/local/bin/
+#11 DONE 0.1s
+
+#12 [stage-1 3/4] COPY --from=build /source/LICENSE /usr/share/licenses/fixture/LICENSE
+#12 DONE 0.0s
+
+#13 [stage-1 4/4] RUN mkdir /data && chown 10001:10001 /data && chmod 0700 /data
+#13 DONE 0.1s
+
+#14 exporting to image
+#14 exporting layers
+#14 exporting layers 0.7s done
+#14 writing image sha256:5c87b5146039c40ff30450c35852ba99cdf20867291187b9d2c73a90d83927b4 done
+#14 DONE 0.7s
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG ${GO_IMAGE} results in empty or invalid base image name (line 2)

@@ -1,0 +1,1 @@
+{"stage": "evidence-bootstrap", "result": "PASS", "checks": [{"name": "bucket-versioning-enabled", "passed": true, "observation": null}, {"name": "default-compliance-retention-enabled", "passed": true, "observation": null}], "state": {}}

@@ -1,0 +1,1 @@
+{"stage": "temporal-bootstrap", "result": "PASS", "checks": [{"name": "namespace-created-by-bootstrap-only", "passed": true, "observation": null}], "state": {}}

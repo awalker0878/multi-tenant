@@ -1,0 +1,227 @@
+postgres-1  | The database cluster will be initialized with locale "en_US.utf8".
+postgres-1  | The default database encoding has accordingly been set to "UTF8".
+postgres-1  | The default text search configuration will be set to "english".
+postgres-1  | 
+postgres-1  | Data page checksums are enabled.
+postgres-1  | 
+postgres-1  | fixing permissions on existing directory /var/lib/postgresql/18/docker ... ok
+postgres-1  | creating subdirectories ... ok
+postgres-1  | selecting dynamic shared memory implementation ... posix
+postgres-1  | selecting default "max_connections" ... 100
+postgres-1  | selecting default "shared_buffers" ... 128MB
+postgres-1  | selecting default time zone ... Etc/UTC
+postgres-1  | creating configuration files ... ok
+postgres-1  | running bootstrap script ... ok
+postgres-1  | performing post-bootstrap initialization ... ok
+postgres-1  | syncing data to disk ... ok
+postgres-1  | 
+postgres-1  | Success. You can now start the database server using:
+postgres-1  | 
+postgres-1  |     pg_ctl -D /var/lib/postgresql/18/docker -l logfile start
+postgres-1  | 
+postgres-1  | waiting for server to start....2026-10-05 01:44:11.554 UTC [61] LOG:  starting PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+postgres-1  | 2026-10-05 01:44:11.554 UTC [61] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1  | 2026-10-05 01:44:11.558 UTC [67] LOG:  database system was shut down at 2026-10-05 01:44:11 UTC
+postgres-1  | 2026-10-05 01:44:11.562 UTC [61] LOG:  database system is ready to accept connections
+postgres-1  |  done
+postgres-1  | server started
+postgres-1  | 
+postgres-1  | /usr/local/bin/docker-entrypoint.sh: sourcing /docker-entrypoint-initdb.d/10-stateful.sh
+temporal-1  | [Fx] PROVIDE	fx.Lifecycle <= go.uber.org/fx.New.func1()
+temporal-1  | [Fx] PROVIDE	fx.Shutdowner <= go.uber.org/fx.(*App).shutdowner-fm()
+temporal-1  | [Fx] PROVIDE	fx.DotGraph <= go.uber.org/fx.(*App).dotGraph-fm()
+temporal-1  | [Fx] PROVIDE	*temporal.ServerImpl <= go.temporal.io/server/temporal.NewServerFxImpl()
+temporal-1  | [Fx] PROVIDE	*temporal.serverOptions <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	chan interface {} <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	temporal.synchronizationModeParams <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	*config.Config <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	*config.PProf <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	log.Config <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	resource.ServiceNames <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	resource.NamespaceLogger <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	resolver.ServiceResolver <= go.temporal.io/server/temporal.ServerOptionsProvider()
+postgres-1  | 2026-10-05 01:44:11.833 UTC [87] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+temporal-1  | [Fx] PROVIDE	client.AbstractDataStoreFactory <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	visibility.VisibilityStoreFactory <= go.temporal.io/server/temporal.ServerOptionsProvider()
+rabbit-1    | 2026-10-05 01:44:13.613990+00:00 [info] <0.209.0> Running boot step recovery defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614084+00:00 [info] <0.209.0> Running boot step prevent_startup_if_node_was_reset defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614136+00:00 [info] <0.209.0> Running boot step empty_db_check defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614215+00:00 [info] <0.209.0> Will not seed default virtual host and user: have definitions to load...[0m
+postgres-1  | 2026-10-05 01:44:11.834 UTC [87] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 01:44:11.834 UTC [87] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 
+postgres-1  | waiting for server to shut down...2026-10-05 01:44:11.969 UTC [61] LOG:  received fast shutdown request
+postgres-1  | 2026-10-05 01:44:11.970 UTC [61] LOG:  aborting any active transactions
+postgres-1  | .2026-10-05 01:44:11.975 UTC [61] LOG:  background worker "logical replication launcher" (PID 70) exited with exit code 1
+postgres-1  | 2026-10-05 01:44:11.976 UTC [65] LOG:  shutting down
+postgres-1  | 2026-10-05 01:44:11.976 UTC [65] LOG:  checkpoint starting: shutdown immediate
+postgres-1  | 2026-10-05 01:44:12.011 UTC [65] LOG:  checkpoint complete: wrote 1894 buffers (11.6%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.031 s, sync=0.003 s, total=0.035 s; sync files=608, longest=0.001 s, average=0.001 s; distance=8690 kB, estimate=8690 kB; lsn=0/1FD5E48, redo lsn=0/1FD5E48
+postgres-1  | 2026-10-05 01:44:12.029 UTC [61] LOG:  database system is shut down
+postgres-1  |  done
+postgres-1  | server stopped
+postgres-1  | 
+rabbit-1    | 2026-10-05 01:44:13.614251+00:00 [info] <0.209.0> Running boot step rabbit_observer_cli defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614317+00:00 [info] <0.209.0> Running boot step rabbit_core_metrics_gc defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614425+00:00 [info] <0.209.0> Running boot step background_gc defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614593+00:00 [info] <0.209.0> Running boot step channel_interceptor_priorities_check defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614664+00:00 [info] <0.209.0> Running boot step rabbit_observer_cli_classic_queues defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614742+00:00 [info] <0.209.0> Running boot step rabbit_observer_cli_quorum_queues defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614804+00:00 [info] <0.209.0> Running boot step routing_ready defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614837+00:00 [info] <0.209.0> Running boot step pre_flight defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614888+00:00 [info] <0.209.0> Running boot step notify_cluster defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614943+00:00 [info] <0.209.0> Running boot step networking defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.614980+00:00 [info] <0.209.0> Running boot step rabbit_quorum_queue_periodic_membership_reconciliation defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.615076+00:00 [info] <0.209.0> Running boot step definition_import_worker_pool defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.615128+00:00 [info] <0.532.0> Starting worker pool 'definition_import_pool' with 4 processes in it[0m
+rabbit-1    | 2026-10-05 01:44:13.615446+00:00 [info] <0.209.0> Running boot step cluster_name defined by app rabbit[0m
+postgres-1  | PostgreSQL init process complete; ready for start up.
+rabbit-1    | 2026-10-05 01:44:13.615517+00:00 [info] <0.209.0> Initialising internal cluster ID to 'rabbitmq-cluster-id-jcdUEaft33QlKlnmdOtBhw'[0m
+rabbit-1    | 2026-10-05 01:44:13.619082+00:00 [info] <0.209.0> Running boot step virtual_host_reconciliation defined by app rabbit[0m
+temporal-1  | [Fx] PROVIDE	provider.CustomHistoryArchiverFactory <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	provider.CustomVisibilityArchiverFactory <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	searchattribute.Mapper <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	[]grpc.UnaryServerInterceptor <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	[]grpc.StreamServerInterceptor <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	authorization.Authorizer <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	authorization.ClaimMapper <= go.temporal.io/server/temporal.ServerOptionsProvider()
+rabbit-1    | 2026-10-05 01:44:13.619226+00:00 [info] <0.209.0> Running boot step direct_client defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.619310+00:00 [info] <0.209.0> Running boot step logger_exchange defined by app rabbit[0m
+rabbit-1    | 2026-10-05 01:44:13.619372+00:00 [info] <0.209.0> Running boot step cluster_tags defined by app rabbit[0m
+temporal-1  | [Fx] PROVIDE	authorization.JWTAudienceMapper <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	auth.TokenProvider <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	map[primitives.ServiceName]static.Hosts <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	log.Logger <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	client.FactoryProvider <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	client.FactoryProviderFn <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	dynamicconfig.Client <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	encryption.TLSConfigProvider <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	client.Client <= go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] PROVIDE	metrics.Handler <= go.temporal.io/server/temporal.ServerOptionsProvider()
+rabbit-1    | 2026-10-05 01:44:13.619849+00:00 [info] <0.209.0> Running boot step queue_type_registrations defined by app rabbit[0m
+postgres-1  | 
+rabbit-1    | 2026-10-05 01:44:13.619891+00:00 [info] <0.209.0> Running boot step rabbit_management_load_definitions defined by app rabbitmq_management[0m
+temporal-1  | [Fx] PROVIDE	testhooks.TestHooks <= go.temporal.io/server/temporal.ServerOptionsProvider()
+rabbit-1    | 2026-10-05 01:44:13.619996+00:00 [info] <0.842.0> Resetting node maintenance status[0m
+temporal-1  | [Fx] PROVIDE	log.LoggerProvider <= go.temporal.io/server/temporal.ServerOptionsProvider()
+rabbit-1    | [38;5;214m2026-10-05 01:44:13.626241+00:00 [warning] <0.859.0> Deprecated features: `management_metrics_collection`: Feature `management_metrics_collection` is deprecated.[0m
+temporal-1  | [Fx] PROVIDE	archiver.ArchivalMetadata <= go.temporal.io/server/common/resource.ArchivalMetadataProvider()
+rabbit-1    | [38;5;214m2026-10-05 01:44:13.626241+00:00 [warning] <0.859.0> By default, this feature can still be used for now.[0m
+temporal-1  | [Fx] PROVIDE	tasks.TaskCategoryRegistry <= go.temporal.io/server/temporal.TaskCategoryRegistryProvider()
+temporal-1  | [Fx] PROVIDE	*temporal.ServicesMetadata[group = "services"] <= go.temporal.io/server/temporal.HistoryServiceProvider()
+temporal-1  | [Fx] PROVIDE	*temporal.ServicesMetadata[group = "services"] <= go.temporal.io/server/temporal.MatchingServiceProvider()
+temporal-1  | [Fx] PROVIDE	*temporal.ServicesMetadata[group = "services"] <= go.temporal.io/server/temporal.FrontendServiceProvider()
+temporal-1  | [Fx] PROVIDE	*temporal.ServicesMetadata[group = "services"] <= go.temporal.io/server/temporal.InternalFrontendServiceProvider()
+temporal-1  | [Fx] PROVIDE	*temporal.ServicesMetadata[group = "services"] <= go.temporal.io/server/temporal.WorkerServiceProvider()
+temporal-1  | [Fx] PROVIDE	*cluster.Config <= go.temporal.io/server/temporal.ApplyClusterMetadataConfigProvider()
+temporal-1  | [Fx] PROVIDE	config.Persistence <= go.temporal.io/server/temporal.ApplyClusterMetadataConfigProvider()
+temporal-1  | [Fx] PROVIDE	*dynamicconfig.Collection <= go.temporal.io/server/common/dynamicconfig.init.func1()
+temporal-1  | [Fx] PROVIDE	pingable.Pingable[group = "deadlockDetectorRoots"] <= fx.Annotate(go.temporal.io/server/common/dynamicconfig.init.func2(), fx.ResultTags(["group:\"deadlockDetectorRoots\""])
+temporal-1  | [Fx] PROVIDE	*pprof.PProfInitializerImpl <= go.temporal.io/server/common/pprof.NewInitializer()
+temporal-1  | [Fx] PROVIDE	[]trace.SpanExporter <= go.temporal.io/server/temporal.init.func1()
+temporal-1  | [Fx] PROVIDE	serialization.Serializer <= go.temporal.io/server/common/persistence/serialization.NewSerializer()
+temporal-1  | [Fx] SUPPLY	[]temporal.ServerOption
+temporal-1  | [Fx] PROVIDE	*chasm.Registry <= go.temporal.io/server/chasm.NewRegistry() from module "chasm"
+temporal-1  | [Fx] BEFORE RUN	supply: stub([]temporal.ServerOption)
+temporal-1  | [Fx] RUN	supply: stub([]temporal.ServerOption) in 7.06µs
+rabbit-1    | [38;5;214m2026-10-05 01:44:13.626241+00:00 [warning] <0.859.0> Its use will not be permitted by default in a future minor RabbitMQ version and the feature will be removed from a future major RabbitMQ version; actual versions to be determined.[0m
+rabbit-1    | [38;5;214m2026-10-05 01:44:13.626241+00:00 [warning] <0.859.0> To continue using this feature when it is not permitted by default, set the following parameter in your configuration:[0m
+rabbit-1    | [38;5;214m2026-10-05 01:44:13.626241+00:00 [warning] <0.859.0>     "deprecated_features.permit.management_metrics_collection = true"[0m
+temporal-1  | [Fx] BEFORE RUN	provide: go.temporal.io/server/temporal.ServerOptionsProvider()
+temporal-1  | [Fx] RUN	provide: go.temporal.io/server/temporal.ServerOptionsProvider() in 38.125478ms
+temporal-1  | [Fx] Error returned: received non-nil error from function "go.temporal.io/server/temporal".ServerOptionsProvider
+rabbit-1    | [38;5;214m2026-10-05 01:44:13.626241+00:00 [warning] <0.859.0> To test RabbitMQ as if the feature was removed, set this in your configuration:[0m
+temporal-1  | 	/home/runner/work/temporal/temporal/temporal/fx.go:177:
+rabbit-1    | [38;5;214m2026-10-05 01:44:13.626241+00:00 [warning] <0.859.0>     "deprecated_features.permit.management_metrics_collection = false"[0m
+temporal-1  | unable to create dynamic config client: unable to validate dynamic config: poll interval should be at least 5s
+rabbit-1    | 2026-10-05 01:44:13.647318+00:00 [info] <0.895.0> Management plugin: HTTP (non-TLS) listener started on port 15672[0m
+temporal-1  | [Fx] ERROR		Failed to initialize custom logger: could not build arguments for function "go.uber.org/fx".(*module).installEventLogger.func2
+rabbit-1    | 2026-10-05 01:44:13.647451+00:00 [info] <0.923.0> Statistics database started.[0m
+temporal-1  | 	/home/runner/go/pkg/mod/go.uber.org/fx@v1.24.0/module.go:307:
+rabbit-1    | 2026-10-05 01:44:13.647537+00:00 [info] <0.922.0> Starting worker pool 'management_worker_pool' with 3 processes in it[0m
+postgres-1  | 2026-10-05 01:44:12.107 UTC [7] LOG:  starting PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+rabbit-1    | 2026-10-05 01:44:13.656166+00:00 [info] <0.934.0> Prometheus metrics: HTTP (non-TLS) listener started on port 15692[0m
+postgres-1  | 2026-10-05 01:44:12.107 UTC [7] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+rabbit-1    | 2026-10-05 01:44:13.656685+00:00 [info] <0.842.0> Applying definitions from file at '/run/config/definitions.json'[0m
+postgres-1  | 2026-10-05 01:44:12.108 UTC [7] LOG:  listening on IPv6 address "::", port 5432
+rabbit-1    | 2026-10-05 01:44:13.656753+00:00 [info] <0.842.0> Asked to import definitions. Acting user: rmq-internal[0m
+postgres-1  | 2026-10-05 01:44:12.108 UTC [7] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+rabbit-1    | 2026-10-05 01:44:13.660501+00:00 [info] <0.842.0> Importing concurrently 3 users...[0m
+postgres-1  | 2026-10-05 01:44:12.113 UTC [101] LOG:  database system was shut down at 2026-10-05 01:44:12 UTC
+rabbit-1    | 2026-10-05 01:44:13.661337+00:00 [info] <0.836.0> Created user 'publisher'[0m
+postgres-1  | 2026-10-05 01:44:12.127 UTC [7] LOG:  database system is ready to accept connections
+rabbit-1    | 2026-10-05 01:44:13.661692+00:00 [info] <0.838.0> Created user 'foreign'[0m
+postgres-1  | 2026-10-05 01:44:12.910 UTC [112] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+rabbit-1    | 2026-10-05 01:44:13.661681+00:00 [info] <0.837.0> Created user 'consumer'[0m
+postgres-1  | 2026-10-05 01:44:12.910 UTC [112] FATAL:  Peer authentication failed for user "postgres"
+rabbit-1    | 2026-10-05 01:44:13.661794+00:00 [info] <0.842.0> Importing concurrently 2 vhosts...[0m
+postgres-1  | 2026-10-05 01:44:12.910 UTC [112] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+rabbit-1    | 2026-10-05 01:44:13.662333+00:00 [info] <0.836.0> Adding vhost 'p01' (description: '', tags: [])[0m
+postgres-1  | 2026-10-05 01:44:14.010 UTC [120] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+rabbit-1    | 2026-10-05 01:44:13.662759+00:00 [info] <0.837.0> Adding vhost 'foreign' (description: '', tags: [])[0m
+postgres-1  | 2026-10-05 01:44:14.010 UTC [120] FATAL:  Peer authentication failed for user "postgres"
+rabbit-1    | 2026-10-05 01:44:13.668227+00:00 [info] <0.967.0> Making sure data directory '/var/lib/rabbitmq/mnesia/rabbit@rabbit/msg_stores/vhosts/F1499R0KX35VZL6F40BLTYOPD' for vhost 'p01' exists[0m
+postgres-1  | 2026-10-05 01:44:14.010 UTC [120] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 01:44:15.080 UTC [128] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 01:44:15.080 UTC [128] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 01:44:15.080 UTC [128] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 01:44:16.158 UTC [140] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 01:44:16.158 UTC [140] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 01:44:16.158 UTC [140] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 01:44:16.833 UTC [141] ERROR:  permission denied for schema public at character 14
+postgres-1  | 2026-10-05 01:44:16.833 UTC [141] STATEMENT:  CREATE TABLE forbidden(id int)
+postgres-1  | 2026-10-05 01:44:16.833 UTC [141] ERROR:  permission denied to set role "temporal_migrator"
+postgres-1  | 2026-10-05 01:44:16.833 UTC [141] STATEMENT:  SET ROLE temporal_migrator
+postgres-1  | 2026-10-05 01:44:16.840 UTC [142] FATAL:  pg_hba.conf rejects connection for host "172.19.0.3", user "temporal_runtime", database "temporal_visibility", SSL encryption
+postgres-1  | 2026-10-05 01:44:16.848 UTC [143] FATAL:  password authentication failed for user "temporal_runtime"
+postgres-1  | 2026-10-05 01:44:16.848 UTC [143] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 4: "hostssl temporal temporal_runtime,temporal_migrator 0.0.0.0/0 scram-sha-256"
+postgres-1  | 2026-10-05 01:44:16.850 UTC [144] FATAL:  pg_hba.conf rejects connection for host "172.19.0.3", user "temporal_runtime", database "temporal", no encryption
+postgres-1  | 2026-10-05 01:44:17.240 UTC [160] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 01:44:17.240 UTC [160] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 01:44:17.240 UTC [160] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 01:44:18.345 UTC [177] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 01:44:18.345 UTC [177] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 01:44:18.345 UTC [177] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+postgres-1  | 2026-10-05 01:44:19.424 UTC [184] LOG:  provided user name (postgres) and authenticated user name (root) do not match
+postgres-1  | 2026-10-05 01:44:19.424 UTC [184] FATAL:  Peer authentication failed for user "postgres"
+postgres-1  | 2026-10-05 01:44:19.424 UTC [184] DETAIL:  Connection matched file "/tmp/pg-tls/pg_hba.conf" line 1: "local all postgres peer"
+temporal-1  | failed to build fxevent.Logger:
+temporal-1  | could not build arguments for function "go.temporal.io/server/temporal".init.func6
+temporal-1  | 	/home/runner/work/temporal/temporal/temporal/fx.go:1143:
+temporal-1  | failed to build log.Logger:
+temporal-1  | received non-nil error from function "go.temporal.io/server/temporal".ServerOptionsProvider
+temporal-1  | 	/home/runner/work/temporal/temporal/temporal/fx.go:177:
+temporal-1  | unable to create dynamic config client: unable to validate dynamic config: poll interval should be at least 5s
+temporal-1  | Unable to create server. Error: could not build arguments for function "go.uber.org/fx".(*module).installEventLogger.func2 (/home/runner/go/pkg/mod/go.uber.org/fx@v1.24.0/module.go:307): failed to build fxevent.Logger: could not build arguments for function "go.temporal.io/server/temporal".init.func6 (/home/runner/work/temporal/temporal/temporal/fx.go:1143): failed to build log.Logger: received non-nil error from function "go.temporal.io/server/temporal".ServerOptionsProvider (/home/runner/work/temporal/temporal/temporal/fx.go:177): unable to create dynamic config client: unable to validate dynamic config: poll interval should be at least 5s.
+rabbit-1    | 2026-10-05 01:44:13.669050+00:00 [info] <0.967.0> Setting segment_entry_count for vhost 'p01' with 0 queues to '2048'[0m
+rabbit-1    | 2026-10-05 01:44:13.678195+00:00 [info] <0.967.0> Starting message stores for vhost 'p01'[0m
+rabbit-1    | 2026-10-05 01:44:13.679187+00:00 [info] <0.967.0> Started message store of type transient for vhost 'p01'[0m
+rabbit-1    | [38;5;214m2026-10-05 01:44:13.700065+00:00 [warning] <0.981.0> Message store "F1499R0KX35VZL6F40BLTYOPD/msg_store_persistent": rebuilding indices from scratch[0m
+rabbit-1    | 2026-10-05 01:44:13.700762+00:00 [info] <0.967.0> Started message store of type persistent for vhost 'p01'[0m
+rabbit-1    | 2026-10-05 01:44:13.700878+00:00 [info] <0.967.0> Recovering 0 queues of type rabbit_classic_queue took 28ms[0m
+rabbit-1    | 2026-10-05 01:44:13.700948+00:00 [info] <0.967.0> Recovering 0 queues of type rabbit_quorum_queue took 0ms[0m
+rabbit-1    | 2026-10-05 01:44:13.701004+00:00 [info] <0.967.0> Recovering 0 queues of type rabbit_stream_queue took 0ms[0m
+rabbit-1    | 2026-10-05 01:44:13.701222+00:00 [info] <0.995.0> Making sure data directory '/var/lib/rabbitmq/mnesia/rabbit@rabbit/msg_stores/vhosts/669UOGK7U29PO5I9AKOUVSSAM' for vhost 'foreign' exists[0m
+rabbit-1    | 2026-10-05 01:44:13.701814+00:00 [info] <0.995.0> Setting segment_entry_count for vhost 'foreign' with 0 queues to '2048'[0m
+rabbit-1    | 2026-10-05 01:44:13.704088+00:00 [info] <0.995.0> Starting message stores for vhost 'foreign'[0m
+rabbit-1    | 2026-10-05 01:44:13.705075+00:00 [info] <0.995.0> Started message store of type transient for vhost 'foreign'[0m
+rabbit-1    | [38;5;214m2026-10-05 01:44:13.705574+00:00 [warning] <0.1008.0> Message store "669UOGK7U29PO5I9AKOUVSSAM/msg_store_persistent": rebuilding indices from scratch[0m
+rabbit-1    | 2026-10-05 01:44:13.706254+00:00 [info] <0.995.0> Started message store of type persistent for vhost 'foreign'[0m
+rabbit-1    | 2026-10-05 01:44:13.706337+00:00 [info] <0.995.0> Recovering 0 queues of type rabbit_classic_queue took 3ms[0m
+rabbit-1    | 2026-10-05 01:44:13.706366+00:00 [info] <0.995.0> Recovering 0 queues of type rabbit_quorum_queue took 0ms[0m
+rabbit-1    | 2026-10-05 01:44:13.706413+00:00 [info] <0.995.0> Recovering 0 queues of type rabbit_stream_queue took 0ms[0m
+rabbit-1    | 2026-10-05 01:44:13.706689+00:00 [info] <0.842.0> Importing concurrently 3 permissions...[0m
+rabbit-1    | 2026-10-05 01:44:13.718396+00:00 [info] <0.836.0> Successfully set permissions for user 'publisher' in virtual host 'p01' to '^$', '^events$', '^$'[0m
+rabbit-1    | 2026-10-05 01:44:13.894748+00:00 [info] <0.838.0> Successfully set permissions for user 'foreign' in virtual host 'foreign' to '^$', '^$', '^$'[0m
+rabbit-1    | 2026-10-05 01:44:13.928345+00:00 [info] <0.837.0> Successfully set permissions for user 'consumer' in virtual host 'p01' to '^$', '^$', '^deliveries$'[0m
+rabbit-1    | 2026-10-05 01:44:13.928700+00:00 [info] <0.842.0> Importing concurrently 1 exchanges...[0m
+rabbit-1    | 2026-10-05 01:44:13.931062+00:00 [info] <0.842.0> Importing concurrently 1 queues...[0m
+rabbit-1    | 2026-10-05 01:44:13.982333+00:00 [info] <0.842.0> Importing concurrently 1 bindings...[0m
+rabbit-1    | 2026-10-05 01:44:13.992820+00:00 [info] <0.842.0> Ready to start client connection listeners[0m
+rabbit-1    | 2026-10-05 01:44:14.116196+00:00 [info] <0.1060.0> started TLS (SSL) listener on [::]:5671[0m
+rabbit-1    |  completed with 4 plugins.
+rabbit-1    | 2026-10-05 01:44:14.212228+00:00 [info] <0.842.0> Server startup complete; 4 plugins started.[0m
+rabbit-1    | 2026-10-05 01:44:14.212228+00:00 [info] <0.842.0>  * rabbitmq_prometheus[0m
+rabbit-1    | 2026-10-05 01:44:14.212228+00:00 [info] <0.842.0>  * rabbitmq_management[0m
+rabbit-1    | 2026-10-05 01:44:14.212228+00:00 [info] <0.842.0>  * rabbitmq_management_agent[0m
+rabbit-1    | 2026-10-05 01:44:14.212228+00:00 [info] <0.842.0>  * rabbitmq_web_dispatch[0m
+rabbit-1    | 2026-10-05 01:44:14.258698+00:00 [info] <0.10.0> Time to start RabbitMQ: 3281 ms[0m
