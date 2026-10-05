@@ -58,6 +58,25 @@ at healthy and recovery checkpoints, retaining effective kernel limits and
 explicit unlimited settings. Their synthetic measurements supply evidence for
 resource review; they do not establish production sizing or accepted objectives.
 
+The [P01 correlated diagnostic implementation](../implementation/p01-telemetry.md)
+also passes 70 telemetry checks in each deployed environment at source
+`36a14811b5afa23717566d5e8a08632e011f44a5` (EV-P01-029/030). All seven applications
+emit bounded records with response trace/span identifiers. Operator collection
+retains 22 snapshots and three agreeing log/span/metric exports per campaign.
+Seven authorized diagnostic spans match the common caller trace; the retained
+population also includes denial responses and, on Kubernetes, concurrent
+readiness probes. Metrics count collected responses, not all traffic.
+
+Actual PHP and Python HTTP traffic exhausts each tested buffer while collection
+is stopped. The campaigns preserve bytes after a stale acknowledgment, report
+full/unavailable storage explicitly, detect a missing response span and prove
+resumed collection. Public reads are denied and private-input canaries are absent
+from all retained signal views. Collection requires operator container-exec
+authority; these checks do not implement tenant-readable telemetry or a remote
+operating receiver. OP03/OP05 must supply that integration's access, custody,
+collection cadence and accepted loss/retention policy. Synthetic HTTPS alert
+receipt/acknowledgment retains its separate boundary.
+
 Configure bounded local buffering/backpressure and a reviewed mandatory-audit policy. A disconnected worker may retain permitted observations, but buffer space does not extend authority lifetime. Lost mandatory evidence holds the dependent outcome; telemetry failure must not silently discard required accountability or trigger unreviewed replay.
 
-Exercise one correlated operator journey through actual deployed services and an operation attempt. Inspect redaction at every sink, tenant-reader denial, alert delivery and acknowledgement, recovery notification, missing-telemetry detection and collector/backlog exhaustion. Record observed routing times, exact revisions and limits. Repeat affected checks when identity, exporters, retention, routes or signal semantics change.
+For the selected operating receiver, repeat the correlated diagnostic journey and inspect redaction, reader authorization, alert delivery and acknowledgment, recovery notification, missing-telemetry detection and collector/backlog exhaustion. Record observed routing times, exact revisions and limits. Add workflow/native-attempt correlation only with the corresponding feature and authorized qualification scope; the P01 diagnostic fan-out does not supply that evidence. Repeat affected checks when identity, exporters, retention, routes or signal semantics change.

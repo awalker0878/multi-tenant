@@ -2,11 +2,18 @@
 
 P01.05, with receiving P01.02/P01.03/P01.06 work. Owners: SRE and the Catalogue,
 Planning, Lifecycle and Assurance service owners. Requirements R02/R15/R29/R35;
-criteria G01.02/G01.05/G01.06. R15/R35 and G01.03 receive groundwork only; product
-contracts and messaging remain unimplemented. The approved development baseline
-selects RabbitMQ and Temporal. EV-P01-014 now retains a passing installation,
+criteria G01.02/G01.05/G01.06. This dependency campaign supplies groundwork for
+R15/R35 and G01.03; the later [contracts and messaging increment](p01-messaging.md)
+owns its separate product-foundation evidence. The approved development baseline
+selects RabbitMQ and Temporal. EV-P01-014 retains a passing installation,
 identity-isolation, restart and selected-object recovery campaign. P01 remains in
 progress and G01 remains unreviewed.
+
+EV-P01-027 subsequently requalified all 40 stateful-dependency campaign checks at
+`b7705eef994c50863d87b4d8f9ff272f9397ca37`; its
+[verified retrieval record](../../verification/p01/requalification/b7705eef994c50863d87b4d8f9ff272f9397ca37/retrieval.json)
+binds the later artifacts and source. The original observations below retain their
+own revisions, identities and measured limits.
 
 ## Candidate inputs and source basis
 
@@ -45,13 +52,15 @@ cases. Private synthetic trust material is not operated issuer integration.
 
 ## Session and cache inventory
 
-The measured Console foundation uses a file session driver inside a disposable
-single replica. This is not shared-session readiness. The selected implementation
-path is service-owned PostgreSQL session/cache tables, using the existing private
-Console database and restricted runtime role; a separate Redis/Valkey deployment is
-not required by the accepted architecture. Implement and measure shared-session
-persistence and isolation before claiming that P01 dependency requirement complete.
-Authentication/session revocation semantics remain P02 obligations.
+The later [Console shared-state increment](p01-console-shared-state.md) implements
+service-owned PostgreSQL session/cache tables in the private Console database with
+its restricted runtime role. EV-P01-016/018 measure encrypted anonymous session
+persistence, tenant cache/lock isolation and recovery in Compose and Kubernetes;
+EV-P01-025/026 requalify those boundaries on the remediated images. A separate
+Redis/Valkey deployment is not required by the accepted architecture. The original
+file-session baseline and EV-P01-014 dependency probes do not supply this evidence.
+Authentication/session revocation semantics remain P02 obligations; scheduler
+behavior awaits an actual owner task.
 
 ## Input discovery correction
 
@@ -150,7 +159,12 @@ the distinct source, image, object-version and workflow-run identities in each r
 This is single-node Compose evidence for one selected object version and synthetic
 dependency clients. It establishes neither whole-store/all-version restoration nor
 production IAM, issuer latency, regulatory retention, HA, RPO/RTO or operated vendor
-adoption. No native platform activity occurred. Product versioned contracts and
-transactional outbox/inbox (P01.03), shared Console PostgreSQL sessions/cache, actual
-alert receipt, remaining deployment recovery, promotion trust and G01 review remain
-open. Earlier Compose/Kubernetes and Permit Desk records retain their original scopes.
+adoption. No native platform activity occurred. Later records separately establish
+[versioned contracts and transactional messaging](p01-messaging.md),
+[shared Console state, synthetic HTTPS alert receipt and deployment recovery](p01-console-shared-state.md),
+and [development artifact admission](p01-image-remediation.md). They do not extend
+EV-P01-014's measured boundary. The [telemetry record](p01-telemetry.md) owns correlated
+signals and collection-failure coverage. Actual secret/PKI/evidence custody,
+receiving-route acknowledgement, retention authority, repository enforcement and
+independent G01 review still require the [operating inputs](p01-operating-inputs.md).
+Earlier Compose/Kubernetes and Permit Desk records retain their original scopes.

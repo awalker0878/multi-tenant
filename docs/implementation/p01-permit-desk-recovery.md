@@ -12,6 +12,16 @@ outcomes passed; all three owned installations were removed. Seven focused local
 admission/integrity tests and the 65-test installer suite also pass. The canonical
 register records this bounded E2 result as EV-P01-013; G01 remains unreviewed.
 
+EV-P01-027 subsequently requalified all 79 Permit Desk recovery checks at
+`b7705eef994c50863d87b4d8f9ff272f9397ca37`. The
+[verified requalification record](../../verification/p01/requalification/b7705eef994c50863d87b4d8f9ff272f9397ca37/retrieval.json)
+retains its exact source, archive and command outputs. This later pass preserves the
+original fixture boundary; it does not add native or operated recovery qualification.
+
+EV-P01-031 retains a further 79-check pass at the later telemetry source, separately
+from the application diagnostic campaigns. The [canonical register](delivery-register.yaml)
+binds that source and retrieval record; the same fixture limitations still apply.
+
 ## Implemented campaign
 
 1. Build a separately owned, locked application image and install a new private
@@ -75,3 +85,10 @@ data recovery, external alert acknowledgement, Kubernetes fixture restore, objec
 storage restoration, signed promotion or operating acceptance. The separately
 retained P00 pre-write/source-return and post-write recovery results keep their
 original scope; this application campaign cannot silently extend those native claims.
+
+Separate increments now measure [selected retained-object restoration](p01-stateful-dependencies.md),
+[synthetic alert receipt and foundation deployment recovery](p01-console-shared-state.md),
+and [development artifact admission](p01-image-remediation.md). These results do not
+turn this Permit Desk campaign into whole-store recovery, an operated alert route
+or authorized promotion. The [operating input record](p01-operating-inputs.md) and
+independent receiving review own the remaining operational decisions.

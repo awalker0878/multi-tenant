@@ -38,8 +38,10 @@ source identity. Disabled instrumentation reports `disabled`.
 
 ## Bounded collection and recovery
 
-Each application owns a private mode-0700 `/tmp/product-telemetry` directory and
-a mode-0600 JSONL file. Every record is at most 1,024 bytes; the complete buffer
+Each application owns a private `/tmp/product-telemetry` directory with effective
+access mode 0700 and a mode-0600 JSONL file. Kubernetes `fsGroup` inheritance adds
+the setgid bit (observed directory mode 02700) without granting group access.
+Every record is at most 1,024 bytes; the complete buffer
 is at most 65,536 bytes. Nonblocking exclusive file locks serialize writers and
 the collector. Existing records are preserved when full; the response reports
 `full`, `contended` or `unavailable`. Successful local acceptance reports
@@ -80,9 +82,55 @@ rejects a stale acknowledgement, proves retained bytes unchanged, acknowledges
 the accepted snapshot, detects missing samples and observes resumed collection.
 Package tests also exercise lock contention and malformed/zero correlation.
 
-Hosted measurements and exact source/artifact bindings will be recorded here
-after the campaigns finish. Existing synthetic HTTPS alert delivery/acknowledgment
-remains a separate measured boundary. The real receiver, operational custody,
-review-role activation and accountable G01 decision are still required by
+## Retained hosted measurements
+
+Both campaigns pass at source
+[`36a14811b5afa23717566d5e8a08632e011f44a5`](https://github.com/awalker0878/multi-tenant/commit/36a14811b5afa23717566d5e8a08632e011f44a5).
+EV-P01-029/030 retain the complete archives, identical report copies and verified
+source/log bindings at evidence commit
+[`61a972cba5eba4e09bb5f806f6d67d1af29c6373`](https://github.com/awalker0878/multi-tenant/commit/61a972cba5eba4e09bb5f806f6d67d1af29c6373).
+
+| Observation | Compose | Kubernetes |
+| --- | --- | --- |
+| Retained report | [Run 37278731868](../../verification/p01/local/run-37278731868/report.json) | [Run 37278731990](../../verification/p01/kubernetes/run-37278731990/report.json) |
+| Passing campaign checks | 249, including 70 telemetry checks | 266, including 70 telemetry checks |
+| Retained telemetry | 22 snapshots and three signal export files | 22 snapshots and three signal export files |
+| Collected journey population | 21 records, 21 spans, 21 metric series | 30 records, 30 spans, 21 metric series |
+| Independently verified bindings | 324 source bindings; 610 command logs | 310 source bindings; 1,052 command logs |
+| Resource observations | 30 samples across 15 containers | 30 samples across 15 containers |
+| Cleanup | Complete | Complete |
+
+Seven authorized diagnostic spans match the common caller trace. The retained
+records also include seven public-reader denials on that trace and seven
+malformed-trace authentication denials on fresh traces; Kubernetes adds nine
+concurrent readiness records on other traces. The campaign matches each diagnostic
+response's trace/span to its collected record; it does not require an exclusive
+request population. All three exported views agree on
+the collected population, and each campaign reports FRESH at collection time.
+Both languages pass actual buffer exhaustion, explicit loss and unavailable
+storage, stale-acknowledgment preservation, missing-span detection and resumed
+collection. A changed snapshot is retained and recollected before any bounded
+acknowledgment retry; concurrent writes cannot authorize clearing unseen bytes.
+
+Two failed Kubernetes runs remain unmodified:
+
+- [Run 37277023414](../../verification/p01/telemetry/initial-kubernetes-failure/report.json),
+  source `6c2201c7ba3ec04eebac35d84c00d2632e4aafaf`, rejected the inherited setgid
+  bit despite private 0700 access. The correction checks effective access bits
+  and records the complete observed mode.
+- [Run 37277893777](../../verification/p01/telemetry/concurrent-probe-failure/report.json),
+  source `5502f1f1e6a01110cb8c16b22a147dd9552f7681`, failed an exact record-count
+  assertion when readiness probes appended concurrently. The final source uses
+  exact request/span membership and preserves the stale-acknowledgment boundary.
+
+EV-P01-028 also retains [all nine passing package results](../../verification/p01/telemetry/packages/36a14811b5afa23717566d5e8a08632e011f44a5/report.json)
+and [current artifact admission](../../verification/p01/artifact-trust/run-37278732015/retrieval.json).
+EV-P01-031 retains [affected HTTP, Permit Desk and policy requalification](../../verification/p01/requalification/36a14811b5afa23717566d5e8a08632e011f44a5/report.json).
+
+Existing synthetic HTTPS alert delivery/acknowledgment remains a separate measured
+boundary. These local buffers and retained exports do not establish an operating
+receiver, durable custody, a native attempt or an accepted loss/retention budget.
+The real receiver, operational custody, review-role activation and accountable
+G01 decision are still required by
 [the operating inputs](../../release/operating-inputs.json) and
 [the G01 assessment](../qualification/gate-reviews/g01-engineering-assessment-2026-10-05.md).

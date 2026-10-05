@@ -4,9 +4,10 @@ Active branch: `greenfield/enterprise-microservices-plan`. The requesting user a
 
 ## Current handoff
 
-**The image-security blocker BL-P01-002 is resolved for the development candidate
-set.** All nine pinned Alpine replacements pass exact-image admission at source
-`b7705eef994c50863d87b4d8f9ff272f9397ca37`. No finding was waived and no severity or scanner
+**Correlated diagnostic telemetry is implemented and measured in both runtimes;
+image-security blocker BL-P01-002 remains resolved.** All nine pinned Alpine
+candidates pass exact-image admission at source
+`36a14811b5afa23717566d5e8a08632e011f44a5`. No finding was waived and no severity or scanner
 exclusion was relaxed. The [candidate manifest](release/p01-candidate-set.json)
 now records zero held components and `REQUIRES_INDEPENDENT_QUALIFICATION`;
 `promotion_authorized` remains false. [EV-P01-024 and the remediation record](docs/implementation/p01-image-remediation.md)
@@ -14,20 +15,28 @@ retain the original failures, complete APK correction and passing results.
 
 - **Artifact trust:** all nine isolated builds pass, with 18 CycloneDX image/source
   SBOMs, nine verified development signatures, 63 expected denials and nine
-  unchanged-byte development transfers. Retrieval verified 206 build logs and
-  231 unique source bindings.
-- **Runtime and resources:** EV-P01-025/026 retain 179 Compose and 196 Kubernetes
-  checks on the replacements. Existing isolation, encrypted shared state,
-  restart and failed-deployment recovery pass. Each environment now records 30
+  unchanged-byte development transfers. EV-P01-028 verifies 206 build logs and
+  253 unique source bindings, plus all nine package passes with 346 command logs,
+  388 artifact files and 412 unique source bindings.
+- **Runtime, telemetry and resources:** EV-P01-029/030 retain 249 Compose and 266
+  Kubernetes checks, including 70 telemetry checks each. Existing isolation,
+  encrypted shared state, restart and failed-deployment recovery pass. Each
+  environment retains 22 telemetry snapshots and three signal exports, including
+  diagnostic correlation, public-reader denial, real buffer exhaustion, explicit
+  loss, stale-acknowledgment preservation and collection recovery. Seven authorized
+  diagnostic spans match the common caller trace; denial responses and concurrent
+  readiness probes remain in the collected population. See
+  [the telemetry record](docs/implementation/p01-telemetry.md). Each also records 30
   cgroup-v2 resource samples across all 15 containers before/after recovery,
   including effective limits and zero observed OOM kills. Compose's observed
   limits are unlimited; production budgets remain an OP01 decision. See
   [the resource record](docs/implementation/p01-resource-observation.md).
-- **Affected requalification:** EV-P01-027 retains 35 real messaging checks,
-  16 event fixtures, 28 HTTP fixtures, 40 stateful-dependency checks, 79 Permit
-  Desk recovery checks and 59 policy-control tests. All pass. The repository
-  secret scan reports zero findings across 9,806 tracked files. All principal
-  application/worker package checks also pass at the same source.
+- **Affected requalification:** EV-P01-031 retains 28 HTTP fixtures, 79 Permit
+  Desk recovery checks and 59 policy-control tests at the current source. All
+  pass; the repository secret scan reports zero findings across 10,187 tracked
+  files. EV-P01-027 retains 35 real messaging checks, 16 event fixtures and 40
+  stateful-dependency checks at `b7705eef994c50863d87b4d8f9ff272f9397ca37`; those
+  distinct campaign sources and measured boundaries remain unchanged.
 - **Evidence scope:** synthetic alert receipts, selected retained-object recovery
   and the complete Permit Desk fixture retain their separate measured boundaries.
   No native effects, full-store recovery, accepted RTO/RPO or operating acceptance
@@ -38,7 +47,7 @@ retain the original failures, complete APK correction and passing results.
 1. Activate repository admission (BL-P01-001): obtain verified reviewer GitHub
    IDs/logins and the authorized administration/independent reporting path, then
    install the trusted default-branch hook, role-based CODEOWNERS and required
-   exact-PR checks. The [fresh settings observation](verification/p01/admission/remediation-settings-observation.json)
+   exact-PR checks. The [fresh settings observation](verification/p01/admission/telemetry-settings-observation.json)
    still shows `protected: false` and no rulesets. The implemented policy and
    prepared settings body are not active enforcement.
 2. Complete actual [OP01–OP07 inputs](release/operating-inputs.json): runtime/BOM
@@ -47,10 +56,12 @@ retain the original failures, complete APK correction and passing results.
    retained inventory; support/accessibility ownership. The strict readiness
    command still returns HELD for all seven; development fixtures cannot supply
    these identities or decisions.
-3. Continue P01.06 with correlated application logs/traces/metrics and collection
-   failure coverage against the selected operating route. Resource-cost sampling
-   is now implemented and measured; actual receiving acknowledgement, custody
-   and operational review remain outstanding.
+3. Integrate and qualify the measured diagnostics with the actual operating
+   receiver once OP03/OP05 supply the route, access/custody owners, collection
+   cadence and accepted loss/retention policy. Confirm real receiving
+   acknowledgment and response ownership. Correlated application signals,
+   collection-failure recovery and resource sampling are already implemented
+   and measured in the disposable Compose/Kubernetes environments.
 4. Complete independent criterion-by-criterion receiving reviews using
    [the refreshed G01 assessment](docs/qualification/gate-reviews/g01-engineering-assessment-2026-10-05.md).
    Record an accountable decision before advancing the phase.

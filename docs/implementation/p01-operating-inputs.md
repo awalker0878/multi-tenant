@@ -12,11 +12,15 @@ approval and do not reopen the independent development baseline.
   administration permission. The repository API reports public visibility. No
   protection/ruleset mutation or workflow-dispatch operation is exposed by the
   connector. Account permission alone is not an available mutation capability.
-- Independent development image sources and locks are pinned. The artifact campaign
-  creates SBOMs, scan/database identities, source/lock provenance and real signatures,
-  then exercises receiving-side denial. Current base-image findings hold every
-  candidate. Fresh ephemeral signing keys and synthetic receivers establish no
-  operated signer, custody service, route owner or accountable acceptance.
+- Independent development image sources and locks are pinned. The original failed
+  image scans remain retained; [EV-P01-024 remediation](p01-image-remediation.md)
+  resolves BL-P01-002 for all nine replacement candidates. Their exact-image
+  admission passes with 18 CycloneDX SBOMs, scan/database identities, source/lock
+  provenance, verified development signatures and receiving-side denials. The
+  [candidate set](../../release/p01-candidate-set.json) has zero held components and
+  requires independent qualification; promotion is still unauthorized. Ephemeral
+  development keys and synthetic receivers establish no operated signer, custody
+  service, route owner or accountable acceptance.
 - GitHub check runs identify the PR head while the jobs check out a test merge.
   Stable jobs therefore retain an exact checkout record; admission validates its
   ZIP digest, workflow, job, attempt and base/head/test-merge binding. A head-only
@@ -25,6 +29,12 @@ approval and do not reopen the independent development baseline.
   not trigger it. The separate push probe checks target-base execution as a bounded
   experiment. It is not installed repository admission.
 
+The [later settings observation](../../verification/p01/admission/remediation-settings-observation.json)
+still records an unprotected branch and no rulesets. Runtime/resource observations
+and requalification in EV-P01-025–031 do not populate the actual operating fields.
+The measured [correlated telemetry increment](p01-telemetry.md) likewise cannot supply the
+receiving store, cadence, loss/retention budget, access policy or response owner.
+
 ## Remaining receiving inputs
 
 Supply sanitized identities and immutable evidence references in the record;
@@ -32,7 +42,7 @@ credentials and restricted addresses stay in the existing custody system.
 
 | Record | Actual input still needed | Accountable owner |
 | --- | --- | --- |
-| OP01 | Target runtime/dependency BOM, allowed traffic, mirrors, disconnection/freshness limits | SRE/platform |
+| OP01 | Target runtime/dependency BOM, resource budgets, allowed traffic, mirrors, disconnection/freshness limits | SRE/platform |
 | OP02 | Registry transfer path, signer/custody identity, independently delivered trust root, revocation and promotion owner | Platform/security |
 | OP03 | Secret, PKI and evidence services; rotation, retention, key recovery and access ownership | Security/IAM/records |
 | OP04 | Numeric GitHub IDs and logins for context/platform/architecture/security/SRE roles; independent reporting identity and installed settings | Repository administrator/review owners |
