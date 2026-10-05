@@ -1,5 +1,22 @@
 import { readFileSync } from 'node:fs';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+async function saveQuota(page: Page, vcpu: number): Promise<void> {
+  const tenantUrl = page.url();
+  await page.getByLabel('vCPU', { exact: true }).fill(String(vcpu));
+  // A filled input is already equal to the submitted value. Wait for the
+  // owner-backed redirect response and finished form before navigating away.
+  const saved = page.waitForResponse(response => response.url() === tenantUrl
+    && response.request().method() === 'GET'
+    && response.request().redirectedFrom()?.method() === 'POST');
+  await page.getByRole('button', { name: 'Save quota', exact: true }).click();
+  const response = await saved;
+  expect(response.status()).toBe(200);
+  const returned = await response.json();
+  expect(returned.props.quota.entitlement.vcpu).toBe(vcpu);
+  await expect(page.getByRole('button', { name: 'Save quota', exact: true })).toBeEnabled();
+  await expect(page.getByLabel('vCPU', { exact: true })).toHaveValue(String(vcpu));
+}
 
 test.beforeEach(async ({ browser, browserName }, testInfo) => {
   testInfo.annotations.push(
@@ -88,8 +105,7 @@ test('console configuration verifies HTTPS federation and enforces tenant revoca
   await page.getByLabel('Member subject', { exact: true }).fill('p02-reader');
   await page.getByRole('button', { name: 'Add membership', exact: true }).click();
   await expect(page.getByRole('listitem').filter({ hasText: 'p02-reader' })).toBeVisible();
-  await page.getByLabel('vCPU', { exact: true }).fill('12');
-  await page.getByRole('button', { name: 'Save quota', exact: true }).click();
+  await saveQuota(page, 12);
   await page.reload();
   await expect(page.getByLabel('vCPU', { exact: true })).toHaveValue('12');
 
@@ -130,9 +146,7 @@ test('console configuration verifies HTTPS federation and enforces tenant revoca
   // The real owner outbox, TLS broker and Console inbox prompt an authorized
   // refresh. A delivery must never replace another tab's unsaved form values.
   await sibling.goto(tenantA);
-  await sibling.getByLabel('vCPU', { exact: true }).fill('24');
-  await sibling.getByRole('button', { name: 'Save quota', exact: true }).click();
-  await expect(sibling.getByLabel('vCPU', { exact: true })).toHaveValue('24');
+  await saveQuota(sibling, 24);
   await page.bringToFront();
   await expect(page.getByText('Tenant settings changed. Review the current values before saving.', { exact: true })).toBeVisible({ timeout: 40_000 });
   await expect(page.getByLabel('Member subject', { exact: true })).toHaveValue('unsaved-tenant-a-draft');
