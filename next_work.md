@@ -59,19 +59,38 @@ discovery; six real-broker cases are explicitly skipped locally. Nine logs and
 exchanges, 259 source and six artifact hashes. Original ZIP bytes were verified
 before retention; neither result supplies a product consumer or receiving decision.
 
-**Immediate verification:** retrieve the Chromium and WebKit jobs in `P02 identity`
-run `37367427132` and the newer-source event regression `37367321499`; retain
-original bytes and exact-source bindings, including failures and corrections.
-The [hosted workflow snapshot](verification/p02/identity-delivery-hosted-runs.json)
-records Firefox/event success separately from queued/pending work and superseded
-cancellations. Inspect affected foundation campaigns and replay cancelled required
-checks against their actual changed source; documentation-only passes cannot replace
-those package/image checks. The previous Kubernetes run `37360927382` at
-`512fd5c2580e5cd40bf0089662cff8d84718a877` completed successfully; new affected
-foundation campaigns still need their own results.
+**EV-P02-010–012 — Console consumer and relay replay.** The
+[Console notification consumer](docs/implementation/p02-console-notifications.md)
+now records durable receipts/quarantine, acknowledges after commit and offers an
+owner-authorized refresh without replacing drafts. Local E1 passes 114 tests
+(520 assertions), thirteen logs and 134 source bindings. Chromium at `283e6f4`
+passes 58 checks, 105 Governance cases (1,542 assertions), 44 Console notification
+cases (163 assertions), two journeys and six real owner-to-Console deliveries;
+284 source and nine artifact hashes match. The older `7b24476` relay regression
+passes on rerun: 60 cases, 854 assertions, five checks and ten logs. Historical
+snapshots remain unchanged.
 
-**Next concrete work:** integrate actual notification consumers with explicit
-owner scope, durable inboxes and reconciliation APIs. Bind Catalogue's guard to owner resources
+**EV-P01-032 — Corrected image/runtime replay.** The first Console image build
+failed because AMQP requires `ext-sockets`. `b13996d` compiles and declares it;
+no platform check or package version is relaxed. The corrected Compose campaign
+`37371858448` passes 249 checks, all seven image builds, 612 log hashes and 451
+unique source bindings. Its complete archive and the original failure are retained.
+This is separate from package replay, image-security admission and Kubernetes.
+
+**Immediate verification:** retrieve the Firefox/WebKit jobs in consumer run
+`37371273531`, all engines at corrected source `b13996d` (run `37371858388`),
+and affected foundation package/image/Kubernetes campaigns. Retain exact source
+and original-byte evidence for every result. Retry cancelled required code-source
+checks after documentation commits if GitHub supersedes their pending slot;
+documentation-only passes cannot replace them. The old `7b24476` Chromium rerun
+is queued; GitHub rejects its WebKit retry while that workflow attempt is active.
+Retry WebKit after it finishes. The
+[notification workflow snapshot](verification/p02/console-notification-hosted-runs.json)
+records those boundaries; the later Compose pass has its own retained receipt.
+
+**Next concrete work:** finish notification restart/restore and browser-floor
+qualification, explicit owner-scoped installation consumers, and Console pagination
+for the currently bounded lists. Bind Catalogue's guard to owner resources
 and qualify the Console-to-Catalogue-to-Governance wire path as P03 resources are
 implemented under their entry conditions. Resolve the approved support-access/break-glass contract
 and independent restore/revocation custody before those authority changes. Extend

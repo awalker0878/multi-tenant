@@ -43,3 +43,23 @@ outcomes are unchanged. Catalogue/Console package artifacts use the existing
 `verification/p01/packages/run-<id>/<component>/` layout because they originate
 from the P01 package workflow. Its architecture check validates both report/source
 bindings; no source-registration exception was added for P02.
+
+## Console notification image platform requirement
+
+At `88e44414e4add9706435e49d869090cc1b5f81c5`, Compose run `37371171458`
+fails during the Console image's Composer platform validation: locked AMQP library
+3.7.5 requires `ext-sockets`, which the Console image did not compile. The
+[original failure](../p01/local/run-37371171458-notification-image-failure/retrieval.json)
+retains all downloaded reports/logs, 86 verified command logs and 388 unique source
+bindings. Installation did not begin. The same image failure on the subsequent
+`283e6f4` campaign remains a failed workflow, not a passing runtime observation.
+
+`b13996d13db9b54736667a04be23c53f74269424` compiles the sockets extension
+using existing pinned build inputs and explicitly declares it in Console's root
+manifest/lock. No dependency is updated and no platform requirement is ignored.
+The [local platform checks](console-notifications-platform/report.json) pass.
+The corrected [Compose run `37371858448`](../p01/local/run-37371858448/retrieval.json)
+passes 249 checks; all seven image build/process reports pass. The complete original
+archive, 612 command-log hashes and 451 unique source bindings were verified.
+Image-security admission, independent package replay, Kubernetes and browser-engine
+results remain separately scoped; neither old failed workflow is relabelled.

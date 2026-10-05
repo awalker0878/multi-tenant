@@ -86,7 +86,16 @@ exchanges, 259 source and six artifact hashes. Chromium/WebKit and the newer-sou
 broker regression remain queued at that observation. The identity campaign also checks runtime denial
 of immutable identity-outbox updates/deletion.
 
-The current receiving queues are synthetic witnesses. Product consumer ownership,
+EV-P02-011 retains the newer-source regression at `7b24476` after the cancelled job
+was rerun: attempt 2 of run `37367321499` passes the same 60 cases, 854 assertions,
+five checks, 153 source bindings and ten log hashes. The
+[retrieval record](../../verification/p02/events/run-37367321499-attempt-2/retrieval.json)
+binds the original archive and unchanged-source replay. Historical queue snapshots
+above remain unchanged.
+
+These relay-only campaigns use synthetic receiving witnesses. The separate
+[Console consumer](p02-console-notifications.md) now qualifies five tenant routes;
+it excludes installation identity events. Installation consumer ownership,
 reconciliation APIs, retention/replay budgets, real alert recipients, operated
 custody, HA, independent restore/revocation reconciliation and gate acceptance
 remain open. No authority or customer notification is created by this campaign.

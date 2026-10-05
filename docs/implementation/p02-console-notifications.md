@@ -1,8 +1,8 @@
 # P02 Console tenant notification consumer
 
 Owner: Console/product engineering with Governance/IAM as fact and authorization
-owner. Packages P02.02/P02.03/P02.05; requirements R03/R04/R14/R32;
-criteria G02.02/G02.03/G02.04. Implementation and verification remain IN_PROGRESS.
+owner. Packages P02.02/P02.03/P02.05; requirements R03/R04, with early support for R33;
+criteria G02.01/G02.03/G02.04. Implementation and verification remain IN_PROGRESS.
 
 ## Consumer scope and custody
 
@@ -75,6 +75,28 @@ the first must see the delivered hint while retaining its member draft and origi
 quota, then fetch the new quota on explicit refresh. Direct hint requests from a
 reader and a revoked member must be denied. Each browser engine retains separate
 source bindings, command logs and results.
+
+EV-P02-010 retains 114 passing local Console tests (520 assertions), thirteen
+command logs and 134 source bindings at `283e6f4`. Six broker cases are explicitly
+skipped locally. EV-P02-012 retains the Chromium campaign at that exact source:
+58 checks, 105 Governance cases (1,542 assertions), 44 Console notification cases
+(163 assertions), two journeys without skips/retries/failures, 284 source bindings
+and nine artifact hashes. Independent application processes published and recorded
+six notifications with no retries/quarantine. This is the measured product consumer;
+the OIDC peer and immutable plans remain synthetic. Other engines require their
+own results. See the [retained Chromium receipt](../../verification/p02/identity/run-37371273531/chromium/retrieval.json).
+
+The first Console image build failed because the newly locked AMQP library requires
+`ext-sockets`. `b13996d` compiles sockets in the image and declares the platform
+requirement explicitly, using the existing pinned build inputs. No package version
+or platform check was relaxed. EV-P01-032 retains the corrected seven-service
+Compose replay: 249 checks, 612 verified command logs and 451 unique source bindings,
+with all seven image build/process reports passing. The complete archive and
+[retrieval record](../../verification/p01/local/run-37371858448/retrieval.json) retain
+the exact corrected source. The original failed build remains in the
+[correction record](../../verification/p02/corrections.md). Separate package,
+image-security admission, Kubernetes and corrected-source browser campaigns remain
+distinct requirements; a Compose pass does not replace them.
 
 This increment does not deliver an installation-identity consumer, Catalogue
 resource guard integration, approval/plan UI, broker HA, full-store restore or an

@@ -61,6 +61,7 @@ phases:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P01-032
   - EV-P01-001
   - EV-P01-002
   - EV-P01-003
@@ -116,6 +117,9 @@ phases:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-010
+  - EV-P02-011
+  - EV-P02-012
   - EV-P02-008
   - EV-P02-009
   - EV-P02-007
@@ -585,6 +589,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P01-032
   - EV-P01-010
   - EV-P01-011
   - EV-P01-012
@@ -712,6 +717,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P01-032
   - EV-P01-010
   - EV-P01-011
   - EV-P01-012
@@ -754,6 +760,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P01-032
   - EV-P01-011
   - EV-P01-012
   - EV-P01-013
@@ -806,6 +813,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-011
   - EV-P02-008
   - EV-P02-009
   - EV-P02-007
@@ -837,11 +845,14 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-010
+  - EV-P02-012
   - EV-P02-003
   - EV-P02-004
   - EV-P02-006
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-console-notifications.md
   - docs/implementation/p02-governance-events.md
   - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/phases/p02.md
@@ -861,6 +872,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-010
+  - EV-P02-012
   - EV-P02-008
   - EV-P02-009
   - EV-P02-007
@@ -870,6 +883,7 @@ work_packages:
   - EV-P02-006
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-console-notifications.md
   - docs/implementation/p02-identity-events.md
   - docs/implementation/p02-service-delegation.md
   - docs/implementation/p02-governance-events.md
@@ -892,6 +906,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-011
   - EV-P02-008
   - EV-P02-003
   - EV-P02-004
@@ -915,6 +930,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-010
+  - EV-P02-012
   - EV-P02-009
   - EV-P02-007
   - EV-P02-001
@@ -923,6 +940,7 @@ work_packages:
   - EV-P02-006
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-console-notifications.md
   - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/p02-local-bootstrap.md
   - docs/implementation/p02-federation.md
@@ -1941,6 +1959,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-010
+  - EV-P02-012
   - EV-P02-008
   - EV-P02-009
   - EV-P02-007
@@ -1992,6 +2012,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-010
+  - EV-P02-012
   - EV-P02-008
   - EV-P02-009
   - EV-P02-007
@@ -3110,6 +3132,7 @@ gates:
   reviewer: null
   reviewed_at: null
   evidence_ids:
+  - EV-P01-032
   - EV-P01-001
   - EV-P01-002
   - EV-P01-003
@@ -3152,6 +3175,9 @@ gates:
   reviewer: null
   reviewed_at: null
   evidence_ids:
+  - EV-P02-010
+  - EV-P02-011
+  - EV-P02-012
   - EV-P02-008
   - EV-P02-009
   - EV-P02-007
@@ -4988,6 +5014,131 @@ evidence:
     their results are not inferred. Synthetic provider/plans and loopback application HTTP do not qualify
     operated provider/workload TLS topology, managed-browser floor, real back/forward-cache restores,
     manual accessibility, whole-store recovery, native effects or G02 acceptance.
+  valid_until: null
+  invalidated_at: null
+
+- id: EV-P02-010
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/f43943e2267876198d7222fb1cb21bb6455459f0/verification/p02/console-notifications-local/report.json
+  sha256: d92470f646111421a666c295b2b8e06d5a14becc49767e1641d5f070f98cb92e
+  source_revision: 283e6f4cf40fe91ce6d94bd258eb1f193dfd86e6
+  artifact_revisions:
+    retained_artifact_commit: f43943e2267876198d7222fb1cb21bb6455459f0
+    implementation_record: docs/implementation/p02-console-notifications.md
+    workflow_observation: verification/p02/console-notification-hosted-runs.json
+  environment: Local PHP 8.5.11, SQLite in-memory fixtures and NotificationSource double; independent
+    Console package.
+  scope: Console-owned notification receipts and encrypted quarantine, transactional hint updates, post-commit
+    acknowledgement, duplicate/conflict/reorder handling, current owner authorization and explicit draft-preserving
+    refresh. Local suite passes 114 tests (520 assertions); six real broker cases are explicitly skipped.
+    Thirteen command logs and 134 source bindings cover PHP types, dependency boundaries, positive/negative
+    canaries, formatter, Vue types/boundaries/build and three-engine discovery.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T20:42:18.291126+00:00'
+  observer: Codex through GitHub connector; original artifact/log bytes and exact committed source verified
+  reviewer: Codex engineering evidence review only; accountable independent receiving remains pending
+  limitations: E1 only; discovery is not browser execution. Original Console image lacks required sockets
+    at this source and its failure remains retained. The subsequent platform correction and hosted Chromium/runtime
+    evidence have distinct source identities. No operating acceptance or gate decision.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P02-011
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/f43943e2267876198d7222fb1cb21bb6455459f0/verification/p02/events/run-37367321499-attempt-2/retrieval.json
+  sha256: 36f9b94b3dcc89513b3c81252267908af0d0765c94db2ea5e77ab4431db2d034
+  source_revision: 7b24476c71a778dcf9a865b04c13aa35aa8b3992
+  artifact_revisions:
+    retained_artifact_commit: f43943e2267876198d7222fb1cb21bb6455459f0
+    workflow_run_id: 37367321499
+    workflow_run_attempt: 2
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p02-identity-events.md
+  environment: GitHub Actions Ubuntu 24.04; PHP 8.5.11; pinned PostgreSQL and verified TLS RabbitMQ with
+    synthetic receiving witnesses.
+  scope: Previously cancelled newer-source Governance and installation-identity relay regression was rerun.
+    Attempt 2 passes 60 PostgreSQL/TLS broker cases (854 assertions), five checks, 153 source bindings
+    and ten command-log hashes; archive digest verified before retention.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T20:39:44.330163+00:00'
+  observer: Codex through GitHub connector; original artifact/log bytes and exact committed source verified
+  reviewer: Codex engineering evidence review only; accountable independent receiving remains pending
+  limitations: Relay regression uses synthetic consumers; no Console consumer, other browser engine, operated
+    custody, whole-store recovery, promotion or gate result is inferred.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P02-012
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/f43943e2267876198d7222fb1cb21bb6455459f0/verification/p02/identity/run-37371273531/chromium/retrieval.json
+  sha256: 8b3b8de38b8781a27622e95407825f09d763f7d1e5fefd95a22bcf13e72d77d9
+  source_revision: 283e6f4cf40fe91ce6d94bd258eb1f193dfd86e6
+  artifact_revisions:
+    retained_artifact_commit: f43943e2267876198d7222fb1cb21bb6455459f0
+    workflow_run_id: 37371273531
+    workflow_job_id: 111968738618
+    workflow_job_conclusion: success
+    implementation_record: docs/implementation/p02-console-notifications.md
+  environment: GitHub Actions Ubuntu 24.04; PHP 8.5.11; verified PostgreSQL and broker TLS; compiled Chromium;
+    disposable synthetic HTTPS OIDC provider.
+  scope: Chromium passes 58 checks, 105 Governance feature cases (1542 assertions), 44 Console PostgreSQL/TLS
+    notification cases (163 assertions) and two compiled browser journeys without skips/retries/failures.
+    Real independent Governance relay and Console consumer processes publish/record six notifications
+    across nineteen pump cycles with zero retries/quarantine. Another tab changes quota; a delivered hint
+    preserves the first tab draft and original quota until explicit authorized refresh. Reader/revoked
+    hint requests are denied. All 284 source and nine artifact hashes match.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T20:48:38.155506+00:00'
+  observer: Codex through GitHub connector; original artifact/log bytes and exact committed source verified
+  reviewer: Codex engineering evidence review only; accountable independent receiving remains pending
+  limitations: Chromium only. Firefox/WebKit and corrected-image source campaigns retain their own results.
+    Synthetic provider/plans, single-node broker and loopback application HTTP do not qualify operated
+    topology, HA, full restore, managed-browser floor, manual accessibility, native effects or receiving
+    acceptance.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-032
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/545dd6d0f20ea709bb796526a834741d228d1baa/verification/p01/local/run-37371858448/retrieval.json
+  sha256: f2900e3295b7840a7d0aa71e2f82f84692ce051e96044f788e4b38ce087749a6
+  source_revision: b13996d13db9b54736667a04be23c53f74269424
+  artifact_revisions:
+    retained_artifact_commit: 545dd6d0f20ea709bb796526a834741d228d1baa
+    workflow_run_id: 37371858448
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p02-console-notifications.md
+    original_failure_record: verification/p01/local/run-37371171458-notification-image-failure/retrieval.json
+    local_platform_record: verification/p02/console-notifications-platform/report.json
+  environment: GitHub Actions Ubuntu 24.04 linux/amd64; seven independent pinned application images and
+    disposable Compose fixture.
+  scope: Corrected sockets-enabled Console image and all seven application images pass their build/process
+    probes; disposable Compose replay passes 249 installation, denial, shared-state, recovery, telemetry
+    and resource checks. Ordered Console migrations include the additive inbox/hint/quarantine schema.
+    Complete original archive retained; 612 command logs and 451 unique committed source bindings verified.
+    Original missing-extension build failure is unchanged.
+  campaign_ids: []
+  criterion_ids:
+  - G01.02
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-05T20:54:36.355576+00:00'
+  observer: Codex through GitHub connector; original artifact/log bytes and exact committed source verified
+  reviewer: Codex engineering evidence review only; accountable independent receiving remains pending
+  limitations: No complete image-security admission, independent package replay, Kubernetes pass, production
+    sizing, accepted recovery objective, broker HA or G01/G02 decision is inferred from this Compose campaign.
+    Operating identities and receiving reviews remain open.
   valid_until: null
   invalidated_at: null
 
