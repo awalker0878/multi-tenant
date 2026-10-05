@@ -1,0 +1,13 @@
+
+   INFO  Configuration cached successfully.  
+
+[05-Oct-2026 00:26:43] NOTICE: [pool www] 'user' directive is ignored when FPM is not running as root
+[05-Oct-2026 00:26:43] NOTICE: [pool www] 'group' directive is ignored when FPM is not running as root
+[05-Oct-2026 00:26:43] NOTICE: fpm is running, pid 1
+[05-Oct-2026 00:26:43] NOTICE: ready to handle connections
+10.244.1.210 -  05/Oct/2026:00:27:04 +0000 "GET /index.php" 200
+10.244.1.210 -  05/Oct/2026:00:27:05 +0000 "GET /index.php" 401
+10.244.1.210 -  05/Oct/2026:00:27:06 +0000 "GET /index.php" 401
+10.244.1.210 -  05/Oct/2026:00:27:07 +0000 "GET /index.php" 200
+10.244.1.210 -  05/Oct/2026:00:27:07 +0000 "GET /index.php" 503
+10.244.1.210 -  05/Oct/2026:00:29:20 +0000 "GET /index.php" 200

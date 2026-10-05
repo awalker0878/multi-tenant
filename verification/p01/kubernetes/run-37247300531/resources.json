@@ -1,0 +1,5021 @@
+{
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "console",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "console",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "console"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "app",
+              "p01.service": "console"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "sh",
+                  "-ec",
+                  "php artisan config:cache && exec php-fpm -F"
+                ],
+                "env": [
+                  {
+                    "name": "APP_DEBUG",
+                    "value": "false"
+                  },
+                  {
+                    "name": "APP_ENV",
+                    "value": "production"
+                  },
+                  {
+                    "name": "APP_KEY_FILE",
+                    "value": "/run/secrets/app-key"
+                  },
+                  {
+                    "name": "DB_DATABASE",
+                    "value": "console"
+                  },
+                  {
+                    "name": "DB_HOST",
+                    "value": "postgres"
+                  },
+                  {
+                    "name": "DB_PASSWORD_FILE",
+                    "value": "/run/secrets/db-password"
+                  },
+                  {
+                    "name": "DB_PORT",
+                    "value": "5432"
+                  },
+                  {
+                    "name": "DB_SSLMODE",
+                    "value": "verify-full"
+                  },
+                  {
+                    "name": "DB_SSLROOTCERT",
+                    "value": "/run/secrets/ca.crt"
+                  },
+                  {
+                    "name": "DB_USERNAME",
+                    "value": "console_runtime"
+                  },
+                  {
+                    "name": "HEALTH_TOKEN_FILE",
+                    "value": "/run/secrets/health-token"
+                  }
+                ],
+                "image": "p01.local/console:sha256-93bc5073567244b496cf4604cd7e231e157022bcfd9c7844c86456f9f7de19bb",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 9000
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "console",
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "php",
+                      "-r",
+                      "try { require '/app/vendor/autoload.php'; $app = require '/app/bootstrap/app.php';\n$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap();\n$token = trim((string) file_get_contents('/run/secrets/health-token'));\n$status = $app->make(App\\Application\\Foundation\\Actions\\InspectDependencies::class)->handle($token);\nexit($status === App\\Application\\Foundation\\Data\\DependencyStatus::Ready ? 0 : 1);\n} catch (Throwable) { exit(1); }"
+                    ]
+                  },
+                  "failureThreshold": 1,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 8
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "startupProbe": {
+                  "failureThreshold": 60,
+                  "periodSeconds": 2,
+                  "tcpSocket": {
+                    "port": 9000
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/app/storage",
+                    "name": "storage",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/app/bootstrap/cache",
+                    "name": "config-cache",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "console",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "console-runtime"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "storage"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "16Mi"
+                },
+                "name": "config-cache"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "console",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 9000,
+            "protocol": "TCP",
+            "targetPort": 9000
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "app",
+          "p01.service": "console"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "console-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "nginx.conf": "pid /tmp/nginx.pid;\nerror_log /dev/stderr warn;\nevents { worker_connections 128; }\nhttp {\n    include /etc/nginx/mime.types;\n    default_type application/octet-stream;\n    access_log off;\n    server_tokens off;\n    client_body_temp_path /tmp/client_body;\n    proxy_temp_path /tmp/proxy;\n    fastcgi_temp_path /tmp/fastcgi;\n    uwsgi_temp_path /tmp/uwsgi;\n    scgi_temp_path /tmp/scgi;\n    server {\n        listen 8443 ssl;\n        server_name console console-proxy console-proxy.p01-c9c202786437-601e9835 console-proxy.p01-c9c202786437-601e9835.svc console-proxy.p01-c9c202786437-601e9835.svc.cluster.local localhost 127.0.0.1;\n        if ($host !~ ^(console|console-proxy|console-proxy\\.p01-c9c202786437-601e9835|console-proxy\\.p01-c9c202786437-601e9835\\.svc|console-proxy\\.p01-c9c202786437-601e9835\\.svc\\.cluster\\.local|localhost|127\\.0\\.0\\.1)$) { return 421; }\n        ssl_certificate /run/secrets/tls.crt;\n        ssl_certificate_key /run/secrets/tls.key;\n        ssl_protocols TLSv1.2 TLSv1.3;\n        add_header X-Content-Type-Options nosniff always;\n        location ~ (^|/)\\. { return 404; }\n        location ~* ^/(app|bootstrap|config|database|resources|routes|storage|vendor)(/|$) { return 404; }\n        location ~* ^/(composer\\.(json|lock)|package(-lock)?\\.json|artisan|Dockerfile|pyproject\\.toml|uv\\.lock)(/|$) { return 404; }\n        root /srv/public;\n        index index.php;\n        location / { try_files $uri $uri/ /index.php?$query_string; }\n        location = /index.php {\n            include /etc/nginx/fastcgi_params;\n            fastcgi_param SCRIPT_FILENAME /app/public/index.php;\n            fastcgi_param DOCUMENT_ROOT /app/public;\n            fastcgi_param HTTPS on;\n            fastcgi_pass console:9000;\n        }\n        location ~* \\.php(?:/|$) { return 404; }\n    }\n}\n"
+      },
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "console-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "console-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "console"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "proxy",
+              "p01.service": "console"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "-g",
+                  "daemon off;"
+                ],
+                "command": [
+                  "/usr/sbin/nginx"
+                ],
+                "image": "p01.local/nginx:manifest-sha256-3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "console-proxy",
+                "readinessProbe": {
+                  "periodSeconds": 5,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/etc/nginx/nginx.conf",
+                    "name": "config",
+                    "readOnly": true,
+                    "subPath": "nginx.conf"
+                  },
+                  {
+                    "mountPath": "/srv/public",
+                    "name": "public",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "initContainers": [
+              {
+                "command": [
+                  "/bin/sh",
+                  "-ec",
+                  "cp -R /app/public/. /srv/public/"
+                ],
+                "image": "p01.local/console:sha256-93bc5073567244b496cf4604cd7e231e157022bcfd9c7844c86456f9f7de19bb",
+                "imagePullPolicy": "Never",
+                "name": "copy-public-assets",
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/srv/public",
+                    "name": "public",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "console-proxy",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "console-tls"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "configMap": {
+                  "name": "console-proxy"
+                },
+                "name": "config"
+              },
+              {
+                "emptyDir": {
+                  "sizeLimit": "64Mi"
+                },
+                "name": "public"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "console-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 8443,
+            "protocol": "TCP",
+            "targetPort": 8443
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "proxy",
+          "p01.service": "console"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "console-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "governance",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "governance",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "governance"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "app",
+              "p01.service": "governance"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "sh",
+                  "-ec",
+                  "php artisan config:cache && exec php-fpm -F"
+                ],
+                "env": [
+                  {
+                    "name": "APP_DEBUG",
+                    "value": "false"
+                  },
+                  {
+                    "name": "APP_ENV",
+                    "value": "production"
+                  },
+                  {
+                    "name": "APP_KEY_FILE",
+                    "value": "/run/secrets/app-key"
+                  },
+                  {
+                    "name": "DB_DATABASE",
+                    "value": "governance"
+                  },
+                  {
+                    "name": "DB_HOST",
+                    "value": "postgres"
+                  },
+                  {
+                    "name": "DB_PASSWORD_FILE",
+                    "value": "/run/secrets/db-password"
+                  },
+                  {
+                    "name": "DB_PORT",
+                    "value": "5432"
+                  },
+                  {
+                    "name": "DB_SSLMODE",
+                    "value": "verify-full"
+                  },
+                  {
+                    "name": "DB_SSLROOTCERT",
+                    "value": "/run/secrets/ca.crt"
+                  },
+                  {
+                    "name": "DB_USERNAME",
+                    "value": "governance_runtime"
+                  },
+                  {
+                    "name": "HEALTH_TOKEN_FILE",
+                    "value": "/run/secrets/health-token"
+                  }
+                ],
+                "image": "p01.local/governance:sha256-c7c60039d43bcedd2536f8d29964ebd4316362f279095bcc851379712a621f0d",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 9000
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "governance",
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "php",
+                      "-r",
+                      "try { require '/app/vendor/autoload.php'; $app = require '/app/bootstrap/app.php';\n$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap();\n$token = trim((string) file_get_contents('/run/secrets/health-token'));\n$status = $app->make(App\\Application\\Foundation\\Actions\\InspectDependencies::class)->handle($token);\nexit($status === App\\Application\\Foundation\\Data\\DependencyStatus::Ready ? 0 : 1);\n} catch (Throwable) { exit(1); }"
+                    ]
+                  },
+                  "failureThreshold": 1,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 8
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "startupProbe": {
+                  "failureThreshold": 60,
+                  "periodSeconds": 2,
+                  "tcpSocket": {
+                    "port": 9000
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/app/storage",
+                    "name": "storage",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/app/bootstrap/cache",
+                    "name": "config-cache",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "governance",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "governance-runtime"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "storage"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "16Mi"
+                },
+                "name": "config-cache"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "governance",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 9000,
+            "protocol": "TCP",
+            "targetPort": 9000
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "app",
+          "p01.service": "governance"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "governance-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "nginx.conf": "pid /tmp/nginx.pid;\nerror_log /dev/stderr warn;\nevents { worker_connections 128; }\nhttp {\n    include /etc/nginx/mime.types;\n    default_type application/octet-stream;\n    access_log off;\n    server_tokens off;\n    client_body_temp_path /tmp/client_body;\n    proxy_temp_path /tmp/proxy;\n    fastcgi_temp_path /tmp/fastcgi;\n    uwsgi_temp_path /tmp/uwsgi;\n    scgi_temp_path /tmp/scgi;\n    server {\n        listen 8443 ssl;\n        server_name governance governance-proxy governance-proxy.p01-c9c202786437-601e9835 governance-proxy.p01-c9c202786437-601e9835.svc governance-proxy.p01-c9c202786437-601e9835.svc.cluster.local localhost 127.0.0.1;\n        if ($host !~ ^(governance|governance-proxy|governance-proxy\\.p01-c9c202786437-601e9835|governance-proxy\\.p01-c9c202786437-601e9835\\.svc|governance-proxy\\.p01-c9c202786437-601e9835\\.svc\\.cluster\\.local|localhost|127\\.0\\.0\\.1)$) { return 421; }\n        ssl_certificate /run/secrets/tls.crt;\n        ssl_certificate_key /run/secrets/tls.key;\n        ssl_protocols TLSv1.2 TLSv1.3;\n        add_header X-Content-Type-Options nosniff always;\n        location ~ (^|/)\\. { return 404; }\n        location ~* ^/(app|bootstrap|config|database|resources|routes|storage|vendor)(/|$) { return 404; }\n        location ~* ^/(composer\\.(json|lock)|package(-lock)?\\.json|artisan|Dockerfile|pyproject\\.toml|uv\\.lock)(/|$) { return 404; }\n        root /srv/public;\n        index index.php;\n        location / { try_files $uri $uri/ /index.php?$query_string; }\n        location = /index.php {\n            include /etc/nginx/fastcgi_params;\n            fastcgi_param SCRIPT_FILENAME /app/public/index.php;\n            fastcgi_param DOCUMENT_ROOT /app/public;\n            fastcgi_param HTTPS on;\n            fastcgi_pass governance:9000;\n        }\n        location ~* \\.php(?:/|$) { return 404; }\n    }\n}\n"
+      },
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "governance-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "governance-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "governance"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "proxy",
+              "p01.service": "governance"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "-g",
+                  "daemon off;"
+                ],
+                "command": [
+                  "/usr/sbin/nginx"
+                ],
+                "image": "p01.local/nginx:manifest-sha256-3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "governance-proxy",
+                "readinessProbe": {
+                  "periodSeconds": 5,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/etc/nginx/nginx.conf",
+                    "name": "config",
+                    "readOnly": true,
+                    "subPath": "nginx.conf"
+                  },
+                  {
+                    "mountPath": "/srv/public",
+                    "name": "public",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "initContainers": [
+              {
+                "command": [
+                  "/bin/sh",
+                  "-ec",
+                  "cp -R /app/public/. /srv/public/"
+                ],
+                "image": "p01.local/governance:sha256-c7c60039d43bcedd2536f8d29964ebd4316362f279095bcc851379712a621f0d",
+                "imagePullPolicy": "Never",
+                "name": "copy-public-assets",
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/srv/public",
+                    "name": "public",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "governance-proxy",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "governance-tls"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "configMap": {
+                  "name": "governance-proxy"
+                },
+                "name": "config"
+              },
+              {
+                "emptyDir": {
+                  "sizeLimit": "64Mi"
+                },
+                "name": "public"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "governance-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 8443,
+            "protocol": "TCP",
+            "targetPort": 8443
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "proxy",
+          "p01.service": "governance"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "governance-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "catalogue",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "catalogue",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "catalogue"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "app",
+              "p01.service": "catalogue"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "sh",
+                  "-ec",
+                  "php artisan config:cache && exec php-fpm -F"
+                ],
+                "env": [
+                  {
+                    "name": "APP_DEBUG",
+                    "value": "false"
+                  },
+                  {
+                    "name": "APP_ENV",
+                    "value": "production"
+                  },
+                  {
+                    "name": "APP_KEY_FILE",
+                    "value": "/run/secrets/app-key"
+                  },
+                  {
+                    "name": "DB_DATABASE",
+                    "value": "catalogue"
+                  },
+                  {
+                    "name": "DB_HOST",
+                    "value": "postgres"
+                  },
+                  {
+                    "name": "DB_PASSWORD_FILE",
+                    "value": "/run/secrets/db-password"
+                  },
+                  {
+                    "name": "DB_PORT",
+                    "value": "5432"
+                  },
+                  {
+                    "name": "DB_SSLMODE",
+                    "value": "verify-full"
+                  },
+                  {
+                    "name": "DB_SSLROOTCERT",
+                    "value": "/run/secrets/ca.crt"
+                  },
+                  {
+                    "name": "DB_USERNAME",
+                    "value": "catalogue_runtime"
+                  },
+                  {
+                    "name": "HEALTH_TOKEN_FILE",
+                    "value": "/run/secrets/health-token"
+                  }
+                ],
+                "image": "p01.local/catalogue:sha256-f0771c22d75c568ac3a92a3ba2a0c829e0f6bf0b2a0262f5f8a32da1e25c1da4",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 9000
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "catalogue",
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "php",
+                      "-r",
+                      "try { require '/app/vendor/autoload.php'; $app = require '/app/bootstrap/app.php';\n$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap();\n$token = trim((string) file_get_contents('/run/secrets/health-token'));\n$status = $app->make(App\\Application\\Foundation\\Actions\\InspectDependencies::class)->handle($token);\nexit($status === App\\Application\\Foundation\\Data\\DependencyStatus::Ready ? 0 : 1);\n} catch (Throwable) { exit(1); }"
+                    ]
+                  },
+                  "failureThreshold": 1,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 8
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "startupProbe": {
+                  "failureThreshold": 60,
+                  "periodSeconds": 2,
+                  "tcpSocket": {
+                    "port": 9000
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/app/storage",
+                    "name": "storage",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/app/bootstrap/cache",
+                    "name": "config-cache",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "catalogue",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "catalogue-runtime"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "storage"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "16Mi"
+                },
+                "name": "config-cache"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "catalogue",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 9000,
+            "protocol": "TCP",
+            "targetPort": 9000
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "app",
+          "p01.service": "catalogue"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "catalogue-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "nginx.conf": "pid /tmp/nginx.pid;\nerror_log /dev/stderr warn;\nevents { worker_connections 128; }\nhttp {\n    include /etc/nginx/mime.types;\n    default_type application/octet-stream;\n    access_log off;\n    server_tokens off;\n    client_body_temp_path /tmp/client_body;\n    proxy_temp_path /tmp/proxy;\n    fastcgi_temp_path /tmp/fastcgi;\n    uwsgi_temp_path /tmp/uwsgi;\n    scgi_temp_path /tmp/scgi;\n    server {\n        listen 8443 ssl;\n        server_name catalogue catalogue-proxy catalogue-proxy.p01-c9c202786437-601e9835 catalogue-proxy.p01-c9c202786437-601e9835.svc catalogue-proxy.p01-c9c202786437-601e9835.svc.cluster.local localhost 127.0.0.1;\n        if ($host !~ ^(catalogue|catalogue-proxy|catalogue-proxy\\.p01-c9c202786437-601e9835|catalogue-proxy\\.p01-c9c202786437-601e9835\\.svc|catalogue-proxy\\.p01-c9c202786437-601e9835\\.svc\\.cluster\\.local|localhost|127\\.0\\.0\\.1)$) { return 421; }\n        ssl_certificate /run/secrets/tls.crt;\n        ssl_certificate_key /run/secrets/tls.key;\n        ssl_protocols TLSv1.2 TLSv1.3;\n        add_header X-Content-Type-Options nosniff always;\n        location ~ (^|/)\\. { return 404; }\n        location ~* ^/(app|bootstrap|config|database|resources|routes|storage|vendor)(/|$) { return 404; }\n        location ~* ^/(composer\\.(json|lock)|package(-lock)?\\.json|artisan|Dockerfile|pyproject\\.toml|uv\\.lock)(/|$) { return 404; }\n        root /srv/public;\n        index index.php;\n        location / { try_files $uri $uri/ /index.php?$query_string; }\n        location = /index.php {\n            include /etc/nginx/fastcgi_params;\n            fastcgi_param SCRIPT_FILENAME /app/public/index.php;\n            fastcgi_param DOCUMENT_ROOT /app/public;\n            fastcgi_param HTTPS on;\n            fastcgi_pass catalogue:9000;\n        }\n        location ~* \\.php(?:/|$) { return 404; }\n    }\n}\n"
+      },
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "catalogue-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "catalogue-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "catalogue"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "proxy",
+              "p01.service": "catalogue"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "-g",
+                  "daemon off;"
+                ],
+                "command": [
+                  "/usr/sbin/nginx"
+                ],
+                "image": "p01.local/nginx:manifest-sha256-3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "catalogue-proxy",
+                "readinessProbe": {
+                  "periodSeconds": 5,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/etc/nginx/nginx.conf",
+                    "name": "config",
+                    "readOnly": true,
+                    "subPath": "nginx.conf"
+                  },
+                  {
+                    "mountPath": "/srv/public",
+                    "name": "public",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "initContainers": [
+              {
+                "command": [
+                  "/bin/sh",
+                  "-ec",
+                  "cp -R /app/public/. /srv/public/"
+                ],
+                "image": "p01.local/catalogue:sha256-f0771c22d75c568ac3a92a3ba2a0c829e0f6bf0b2a0262f5f8a32da1e25c1da4",
+                "imagePullPolicy": "Never",
+                "name": "copy-public-assets",
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/srv/public",
+                    "name": "public",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "catalogue-proxy",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "catalogue-tls"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "configMap": {
+                  "name": "catalogue-proxy"
+                },
+                "name": "config"
+              },
+              {
+                "emptyDir": {
+                  "sizeLimit": "64Mi"
+                },
+                "name": "public"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "catalogue-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 8443,
+            "protocol": "TCP",
+            "targetPort": 8443
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "proxy",
+          "p01.service": "catalogue"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "catalogue-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "assurance",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "assurance",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "assurance"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "app",
+              "p01.service": "assurance"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "sh",
+                  "-ec",
+                  "php artisan config:cache && exec php-fpm -F"
+                ],
+                "env": [
+                  {
+                    "name": "APP_DEBUG",
+                    "value": "false"
+                  },
+                  {
+                    "name": "APP_ENV",
+                    "value": "production"
+                  },
+                  {
+                    "name": "APP_KEY_FILE",
+                    "value": "/run/secrets/app-key"
+                  },
+                  {
+                    "name": "DB_DATABASE",
+                    "value": "assurance"
+                  },
+                  {
+                    "name": "DB_HOST",
+                    "value": "postgres"
+                  },
+                  {
+                    "name": "DB_PASSWORD_FILE",
+                    "value": "/run/secrets/db-password"
+                  },
+                  {
+                    "name": "DB_PORT",
+                    "value": "5432"
+                  },
+                  {
+                    "name": "DB_SSLMODE",
+                    "value": "verify-full"
+                  },
+                  {
+                    "name": "DB_SSLROOTCERT",
+                    "value": "/run/secrets/ca.crt"
+                  },
+                  {
+                    "name": "DB_USERNAME",
+                    "value": "assurance_runtime"
+                  },
+                  {
+                    "name": "HEALTH_TOKEN_FILE",
+                    "value": "/run/secrets/health-token"
+                  }
+                ],
+                "image": "p01.local/assurance:sha256-14df9aa61fc7e9ea20f3fe9747268cb8e8b5ef8a2b4d03408a510ebf80f899df",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 9000
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "assurance",
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "php",
+                      "-r",
+                      "try { require '/app/vendor/autoload.php'; $app = require '/app/bootstrap/app.php';\n$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap();\n$token = trim((string) file_get_contents('/run/secrets/health-token'));\n$status = $app->make(App\\Application\\Foundation\\Actions\\InspectDependencies::class)->handle($token);\nexit($status === App\\Application\\Foundation\\Data\\DependencyStatus::Ready ? 0 : 1);\n} catch (Throwable) { exit(1); }"
+                    ]
+                  },
+                  "failureThreshold": 1,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 8
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "startupProbe": {
+                  "failureThreshold": 60,
+                  "periodSeconds": 2,
+                  "tcpSocket": {
+                    "port": 9000
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/app/storage",
+                    "name": "storage",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/app/bootstrap/cache",
+                    "name": "config-cache",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "assurance",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "assurance-runtime"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "storage"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "16Mi"
+                },
+                "name": "config-cache"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "assurance",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 9000,
+            "protocol": "TCP",
+            "targetPort": 9000
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "app",
+          "p01.service": "assurance"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "assurance-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "nginx.conf": "pid /tmp/nginx.pid;\nerror_log /dev/stderr warn;\nevents { worker_connections 128; }\nhttp {\n    include /etc/nginx/mime.types;\n    default_type application/octet-stream;\n    access_log off;\n    server_tokens off;\n    client_body_temp_path /tmp/client_body;\n    proxy_temp_path /tmp/proxy;\n    fastcgi_temp_path /tmp/fastcgi;\n    uwsgi_temp_path /tmp/uwsgi;\n    scgi_temp_path /tmp/scgi;\n    server {\n        listen 8443 ssl;\n        server_name assurance assurance-proxy assurance-proxy.p01-c9c202786437-601e9835 assurance-proxy.p01-c9c202786437-601e9835.svc assurance-proxy.p01-c9c202786437-601e9835.svc.cluster.local localhost 127.0.0.1;\n        if ($host !~ ^(assurance|assurance-proxy|assurance-proxy\\.p01-c9c202786437-601e9835|assurance-proxy\\.p01-c9c202786437-601e9835\\.svc|assurance-proxy\\.p01-c9c202786437-601e9835\\.svc\\.cluster\\.local|localhost|127\\.0\\.0\\.1)$) { return 421; }\n        ssl_certificate /run/secrets/tls.crt;\n        ssl_certificate_key /run/secrets/tls.key;\n        ssl_protocols TLSv1.2 TLSv1.3;\n        add_header X-Content-Type-Options nosniff always;\n        location ~ (^|/)\\. { return 404; }\n        location ~* ^/(app|bootstrap|config|database|resources|routes|storage|vendor)(/|$) { return 404; }\n        location ~* ^/(composer\\.(json|lock)|package(-lock)?\\.json|artisan|Dockerfile|pyproject\\.toml|uv\\.lock)(/|$) { return 404; }\n        root /srv/public;\n        index index.php;\n        location / { try_files $uri $uri/ /index.php?$query_string; }\n        location = /index.php {\n            include /etc/nginx/fastcgi_params;\n            fastcgi_param SCRIPT_FILENAME /app/public/index.php;\n            fastcgi_param DOCUMENT_ROOT /app/public;\n            fastcgi_param HTTPS on;\n            fastcgi_pass assurance:9000;\n        }\n        location ~* \\.php(?:/|$) { return 404; }\n    }\n}\n"
+      },
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "assurance-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "assurance-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "assurance"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "proxy",
+              "p01.service": "assurance"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "-g",
+                  "daemon off;"
+                ],
+                "command": [
+                  "/usr/sbin/nginx"
+                ],
+                "image": "p01.local/nginx:manifest-sha256-3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "assurance-proxy",
+                "readinessProbe": {
+                  "periodSeconds": 5,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/etc/nginx/nginx.conf",
+                    "name": "config",
+                    "readOnly": true,
+                    "subPath": "nginx.conf"
+                  },
+                  {
+                    "mountPath": "/srv/public",
+                    "name": "public",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "initContainers": [
+              {
+                "command": [
+                  "/bin/sh",
+                  "-ec",
+                  "cp -R /app/public/. /srv/public/"
+                ],
+                "image": "p01.local/assurance:sha256-14df9aa61fc7e9ea20f3fe9747268cb8e8b5ef8a2b4d03408a510ebf80f899df",
+                "imagePullPolicy": "Never",
+                "name": "copy-public-assets",
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/srv/public",
+                    "name": "public",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "assurance-proxy",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "assurance-tls"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "configMap": {
+                  "name": "assurance-proxy"
+                },
+                "name": "config"
+              },
+              {
+                "emptyDir": {
+                  "sizeLimit": "64Mi"
+                },
+                "name": "public"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "assurance-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 8443,
+            "protocol": "TCP",
+            "targetPort": 8443
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "proxy",
+          "p01.service": "assurance"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "assurance-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "planning",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "planning",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "planning"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "app",
+              "p01.service": "planning"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "command": [
+                  "/opt/venv/bin/planning-serve"
+                ],
+                "env": [
+                  {
+                    "name": "APP_DEBUG",
+                    "value": "false"
+                  },
+                  {
+                    "name": "APP_ENV",
+                    "value": "production"
+                  },
+                  {
+                    "name": "DB_DATABASE",
+                    "value": "planning"
+                  },
+                  {
+                    "name": "DB_HOST",
+                    "value": "postgres"
+                  },
+                  {
+                    "name": "DB_PASSWORD_FILE",
+                    "value": "/run/secrets/db-password"
+                  },
+                  {
+                    "name": "DB_PORT",
+                    "value": "5432"
+                  },
+                  {
+                    "name": "DB_SSLMODE",
+                    "value": "verify-full"
+                  },
+                  {
+                    "name": "DB_SSLROOTCERT",
+                    "value": "/run/secrets/ca.crt"
+                  },
+                  {
+                    "name": "DB_USERNAME",
+                    "value": "planning_runtime"
+                  },
+                  {
+                    "name": "HEALTH_TOKEN_FILE",
+                    "value": "/run/secrets/health-token"
+                  }
+                ],
+                "image": "p01.local/planning:sha256-52274917612cd7b22ea729c339292a2602bf2445241efaa2c90079a8f2527f7e",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 8080
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "planning",
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "/opt/venv/bin/python",
+                      "-c",
+                      "import pathlib,urllib.request; token=pathlib.Path('/run/secrets/health-token').read_text().strip(); request=urllib.request.Request('http://127.0.0.1:8080/health/dependencies', headers={'Authorization':'Bearer '+token}); response=urllib.request.urlopen(request,timeout=5); raise SystemExit(0 if response.status==200 else 1)"
+                    ]
+                  },
+                  "failureThreshold": 1,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 8
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "startupProbe": {
+                  "failureThreshold": 60,
+                  "periodSeconds": 2,
+                  "tcpSocket": {
+                    "port": 8080
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "planning",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "planning-runtime"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "planning",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 8080,
+            "protocol": "TCP",
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "app",
+          "p01.service": "planning"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "planning-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "nginx.conf": "pid /tmp/nginx.pid;\nerror_log /dev/stderr warn;\nevents { worker_connections 128; }\nhttp {\n    include /etc/nginx/mime.types;\n    default_type application/octet-stream;\n    access_log off;\n    server_tokens off;\n    client_body_temp_path /tmp/client_body;\n    proxy_temp_path /tmp/proxy;\n    fastcgi_temp_path /tmp/fastcgi;\n    uwsgi_temp_path /tmp/uwsgi;\n    scgi_temp_path /tmp/scgi;\n    server {\n        listen 8443 ssl;\n        server_name planning planning-proxy planning-proxy.p01-c9c202786437-601e9835 planning-proxy.p01-c9c202786437-601e9835.svc planning-proxy.p01-c9c202786437-601e9835.svc.cluster.local localhost 127.0.0.1;\n        if ($host !~ ^(planning|planning-proxy|planning-proxy\\.p01-c9c202786437-601e9835|planning-proxy\\.p01-c9c202786437-601e9835\\.svc|planning-proxy\\.p01-c9c202786437-601e9835\\.svc\\.cluster\\.local|localhost|127\\.0\\.0\\.1)$) { return 421; }\n        ssl_certificate /run/secrets/tls.crt;\n        ssl_certificate_key /run/secrets/tls.key;\n        ssl_protocols TLSv1.2 TLSv1.3;\n        add_header X-Content-Type-Options nosniff always;\n        location ~ (^|/)\\. { return 404; }\n        location ~* ^/(app|bootstrap|config|database|resources|routes|storage|vendor)(/|$) { return 404; }\n        location ~* ^/(composer\\.(json|lock)|package(-lock)?\\.json|artisan|Dockerfile|pyproject\\.toml|uv\\.lock)(/|$) { return 404; }\n        location / {\n            proxy_set_header Host $host;\n            proxy_set_header X-Forwarded-Proto https;\n            proxy_set_header X-Forwarded-For $remote_addr;\n            proxy_pass http://planning:8080;\n        }\n    }\n}\n"
+      },
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "planning-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "planning-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "planning"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "proxy",
+              "p01.service": "planning"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "-g",
+                  "daemon off;"
+                ],
+                "command": [
+                  "/usr/sbin/nginx"
+                ],
+                "image": "p01.local/nginx:manifest-sha256-3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "planning-proxy",
+                "readinessProbe": {
+                  "periodSeconds": 5,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/etc/nginx/nginx.conf",
+                    "name": "config",
+                    "readOnly": true,
+                    "subPath": "nginx.conf"
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "planning-proxy",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "planning-tls"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "configMap": {
+                  "name": "planning-proxy"
+                },
+                "name": "config"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "planning-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 8443,
+            "protocol": "TCP",
+            "targetPort": 8443
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "proxy",
+          "p01.service": "planning"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "planning-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "inventory",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "inventory",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "inventory"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "app",
+              "p01.service": "inventory"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "command": [
+                  "/opt/venv/bin/inventory-serve"
+                ],
+                "env": [
+                  {
+                    "name": "APP_DEBUG",
+                    "value": "false"
+                  },
+                  {
+                    "name": "APP_ENV",
+                    "value": "production"
+                  },
+                  {
+                    "name": "DB_DATABASE",
+                    "value": "inventory"
+                  },
+                  {
+                    "name": "DB_HOST",
+                    "value": "postgres"
+                  },
+                  {
+                    "name": "DB_PASSWORD_FILE",
+                    "value": "/run/secrets/db-password"
+                  },
+                  {
+                    "name": "DB_PORT",
+                    "value": "5432"
+                  },
+                  {
+                    "name": "DB_SSLMODE",
+                    "value": "verify-full"
+                  },
+                  {
+                    "name": "DB_SSLROOTCERT",
+                    "value": "/run/secrets/ca.crt"
+                  },
+                  {
+                    "name": "DB_USERNAME",
+                    "value": "inventory_runtime"
+                  },
+                  {
+                    "name": "HEALTH_TOKEN_FILE",
+                    "value": "/run/secrets/health-token"
+                  }
+                ],
+                "image": "p01.local/inventory:sha256-19b1ebbbc7c9298c1a9b9074861d7477725bd5cdac923943d317c663e338acaa",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 8080
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "inventory",
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "/opt/venv/bin/python",
+                      "-c",
+                      "import pathlib,urllib.request; token=pathlib.Path('/run/secrets/health-token').read_text().strip(); request=urllib.request.Request('http://127.0.0.1:8080/health/dependencies', headers={'Authorization':'Bearer '+token}); response=urllib.request.urlopen(request,timeout=5); raise SystemExit(0 if response.status==200 else 1)"
+                    ]
+                  },
+                  "failureThreshold": 1,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 8
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "startupProbe": {
+                  "failureThreshold": 60,
+                  "periodSeconds": 2,
+                  "tcpSocket": {
+                    "port": 8080
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "inventory",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "inventory-runtime"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "inventory",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 8080,
+            "protocol": "TCP",
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "app",
+          "p01.service": "inventory"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "inventory-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "nginx.conf": "pid /tmp/nginx.pid;\nerror_log /dev/stderr warn;\nevents { worker_connections 128; }\nhttp {\n    include /etc/nginx/mime.types;\n    default_type application/octet-stream;\n    access_log off;\n    server_tokens off;\n    client_body_temp_path /tmp/client_body;\n    proxy_temp_path /tmp/proxy;\n    fastcgi_temp_path /tmp/fastcgi;\n    uwsgi_temp_path /tmp/uwsgi;\n    scgi_temp_path /tmp/scgi;\n    server {\n        listen 8443 ssl;\n        server_name inventory inventory-proxy inventory-proxy.p01-c9c202786437-601e9835 inventory-proxy.p01-c9c202786437-601e9835.svc inventory-proxy.p01-c9c202786437-601e9835.svc.cluster.local localhost 127.0.0.1;\n        if ($host !~ ^(inventory|inventory-proxy|inventory-proxy\\.p01-c9c202786437-601e9835|inventory-proxy\\.p01-c9c202786437-601e9835\\.svc|inventory-proxy\\.p01-c9c202786437-601e9835\\.svc\\.cluster\\.local|localhost|127\\.0\\.0\\.1)$) { return 421; }\n        ssl_certificate /run/secrets/tls.crt;\n        ssl_certificate_key /run/secrets/tls.key;\n        ssl_protocols TLSv1.2 TLSv1.3;\n        add_header X-Content-Type-Options nosniff always;\n        location ~ (^|/)\\. { return 404; }\n        location ~* ^/(app|bootstrap|config|database|resources|routes|storage|vendor)(/|$) { return 404; }\n        location ~* ^/(composer\\.(json|lock)|package(-lock)?\\.json|artisan|Dockerfile|pyproject\\.toml|uv\\.lock)(/|$) { return 404; }\n        location / {\n            proxy_set_header Host $host;\n            proxy_set_header X-Forwarded-Proto https;\n            proxy_set_header X-Forwarded-For $remote_addr;\n            proxy_pass http://inventory:8080;\n        }\n    }\n}\n"
+      },
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "inventory-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "inventory-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "inventory"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "proxy",
+              "p01.service": "inventory"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "-g",
+                  "daemon off;"
+                ],
+                "command": [
+                  "/usr/sbin/nginx"
+                ],
+                "image": "p01.local/nginx:manifest-sha256-3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "inventory-proxy",
+                "readinessProbe": {
+                  "periodSeconds": 5,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/etc/nginx/nginx.conf",
+                    "name": "config",
+                    "readOnly": true,
+                    "subPath": "nginx.conf"
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "inventory-proxy",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "inventory-tls"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "configMap": {
+                  "name": "inventory-proxy"
+                },
+                "name": "config"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "inventory-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 8443,
+            "protocol": "TCP",
+            "targetPort": 8443
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "proxy",
+          "p01.service": "inventory"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "inventory-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "lifecycle",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "lifecycle",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "lifecycle"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "app",
+              "p01.service": "lifecycle"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "command": [
+                  "/opt/venv/bin/lifecycle-serve"
+                ],
+                "env": [
+                  {
+                    "name": "APP_DEBUG",
+                    "value": "false"
+                  },
+                  {
+                    "name": "APP_ENV",
+                    "value": "production"
+                  },
+                  {
+                    "name": "DB_DATABASE",
+                    "value": "lifecycle"
+                  },
+                  {
+                    "name": "DB_HOST",
+                    "value": "postgres"
+                  },
+                  {
+                    "name": "DB_PASSWORD_FILE",
+                    "value": "/run/secrets/db-password"
+                  },
+                  {
+                    "name": "DB_PORT",
+                    "value": "5432"
+                  },
+                  {
+                    "name": "DB_SSLMODE",
+                    "value": "verify-full"
+                  },
+                  {
+                    "name": "DB_SSLROOTCERT",
+                    "value": "/run/secrets/ca.crt"
+                  },
+                  {
+                    "name": "DB_USERNAME",
+                    "value": "lifecycle_runtime"
+                  },
+                  {
+                    "name": "HEALTH_TOKEN_FILE",
+                    "value": "/run/secrets/health-token"
+                  }
+                ],
+                "image": "p01.local/lifecycle:sha256-9fe13521b72e60c999fd83240c8f859c97dd5da264269fbb4d98c13679914a6c",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 8080
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "lifecycle",
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "/opt/venv/bin/python",
+                      "-c",
+                      "import pathlib,urllib.request; token=pathlib.Path('/run/secrets/health-token').read_text().strip(); request=urllib.request.Request('http://127.0.0.1:8080/health/dependencies', headers={'Authorization':'Bearer '+token}); response=urllib.request.urlopen(request,timeout=5); raise SystemExit(0 if response.status==200 else 1)"
+                    ]
+                  },
+                  "failureThreshold": 1,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 8
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "startupProbe": {
+                  "failureThreshold": 60,
+                  "periodSeconds": 2,
+                  "tcpSocket": {
+                    "port": 8080
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "lifecycle",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "lifecycle-runtime"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "lifecycle",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 8080,
+            "protocol": "TCP",
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "app",
+          "p01.service": "lifecycle"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "lifecycle-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "nginx.conf": "pid /tmp/nginx.pid;\nerror_log /dev/stderr warn;\nevents { worker_connections 128; }\nhttp {\n    include /etc/nginx/mime.types;\n    default_type application/octet-stream;\n    access_log off;\n    server_tokens off;\n    client_body_temp_path /tmp/client_body;\n    proxy_temp_path /tmp/proxy;\n    fastcgi_temp_path /tmp/fastcgi;\n    uwsgi_temp_path /tmp/uwsgi;\n    scgi_temp_path /tmp/scgi;\n    server {\n        listen 8443 ssl;\n        server_name lifecycle lifecycle-proxy lifecycle-proxy.p01-c9c202786437-601e9835 lifecycle-proxy.p01-c9c202786437-601e9835.svc lifecycle-proxy.p01-c9c202786437-601e9835.svc.cluster.local localhost 127.0.0.1;\n        if ($host !~ ^(lifecycle|lifecycle-proxy|lifecycle-proxy\\.p01-c9c202786437-601e9835|lifecycle-proxy\\.p01-c9c202786437-601e9835\\.svc|lifecycle-proxy\\.p01-c9c202786437-601e9835\\.svc\\.cluster\\.local|localhost|127\\.0\\.0\\.1)$) { return 421; }\n        ssl_certificate /run/secrets/tls.crt;\n        ssl_certificate_key /run/secrets/tls.key;\n        ssl_protocols TLSv1.2 TLSv1.3;\n        add_header X-Content-Type-Options nosniff always;\n        location ~ (^|/)\\. { return 404; }\n        location ~* ^/(app|bootstrap|config|database|resources|routes|storage|vendor)(/|$) { return 404; }\n        location ~* ^/(composer\\.(json|lock)|package(-lock)?\\.json|artisan|Dockerfile|pyproject\\.toml|uv\\.lock)(/|$) { return 404; }\n        location / {\n            proxy_set_header Host $host;\n            proxy_set_header X-Forwarded-Proto https;\n            proxy_set_header X-Forwarded-For $remote_addr;\n            proxy_pass http://lifecycle:8080;\n        }\n    }\n}\n"
+      },
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "lifecycle-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "lifecycle-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "lifecycle"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "proxy",
+              "p01.service": "lifecycle"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "-g",
+                  "daemon off;"
+                ],
+                "command": [
+                  "/usr/sbin/nginx"
+                ],
+                "image": "p01.local/nginx:manifest-sha256-3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "lifecycle-proxy",
+                "readinessProbe": {
+                  "periodSeconds": 5,
+                  "tcpSocket": {
+                    "port": 8443
+                  },
+                  "timeoutSeconds": 2
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 10001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/etc/nginx/nginx.conf",
+                    "name": "config",
+                    "readOnly": true,
+                    "subPath": "nginx.conf"
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "fsGroup": 10001,
+              "runAsGroup": 10001,
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "lifecycle-proxy",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "lifecycle-tls"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "configMap": {
+                  "name": "lifecycle-proxy"
+                },
+                "name": "config"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "lifecycle-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 8443,
+            "protocol": "TCP",
+            "targetPort": 8443
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "proxy",
+          "p01.service": "lifecycle"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "lifecycle-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "entrypoint.sh": "#!/usr/bin/env bash\n# Isolated P01 fixture: TLS-only TCP access and private database identities.\nset -euo pipefail\numask 077\n\nif [[ $(id -u) != 0 ]]; then\n    printf '%s\\n' 'PostgreSQL fixture startup requires root to prepare the TLS key.' >&2\n    exit 1\nfi\nif [[ $# -gt 1 || ( $# -eq 1 && $1 != postgres ) ]]; then\n    printf '%s\\n' 'PostgreSQL fixture startup does not accept server configuration overrides.' >&2\n    exit 1\nfi\n\nfor secret in postgres-password postgres.crt postgres.key ca.crt; do\n    if [[ ! -s /run/secrets/$secret ]]; then\n        printf 'Required PostgreSQL fixture secret is missing or empty: %s\\n' \"$secret\" >&2\n        exit 1\n    fi\ndone\n\n# Docker Compose file-backed secrets cannot set the ownership required by PostgreSQL.\n# Copy only server-side TLS material to the private ephemeral directory.\ninstall -d -m 0750 -o postgres -g postgres /tmp/pg-tls\ninstall -m 0600 -o postgres -g postgres /run/secrets/postgres.key /tmp/pg-tls/server.key\ninstall -m 0644 -o postgres -g postgres /run/secrets/postgres.crt /tmp/pg-tls/server.crt\ninstall -m 0644 -o postgres -g postgres /run/secrets/ca.crt /tmp/pg-tls/ca.crt\n\n# The bootstrap administrator can connect only through the container's Unix socket.\n# All network clients must authenticate to their own database using verified TLS.\n{\n    printf '%s\\n' 'local all postgres peer' 'local all all reject'\n    printf '%s\\n' 'hostnossl all all 0.0.0.0/0 reject' 'hostnossl all all ::/0 reject'\n    for service in console governance catalogue inventory planning lifecycle assurance; do\n        printf 'hostssl %s %s_runtime,%s_migrator 0.0.0.0/0 scram-sha-256\\n' \"$service\" \"$service\" \"$service\"\n        printf 'hostssl %s %s_runtime,%s_migrator ::/0 scram-sha-256\\n' \"$service\" \"$service\" \"$service\"\n    done\n    printf '%s\\n' 'host all all 0.0.0.0/0 reject' 'host all all ::/0 reject'\n} > /tmp/pg-tls/pg_hba.conf\nchown postgres:postgres /tmp/pg-tls/pg_hba.conf\nchmod 0600 /tmp/pg-tls/pg_hba.conf\n\nexport POSTGRES_USER=postgres POSTGRES_DB=postgres\nexport POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password\nexport POSTGRES_INITDB_ARGS='--auth-local=peer --auth-host=scram-sha-256'\nexport POSTGRES_HOST_AUTH_METHOD=scram-sha-256\nexport PGDATA=/var/lib/postgresql/18/docker\nunset POSTGRES_PASSWORD POSTGRES_USER_FILE POSTGRES_DB_FILE POSTGRES_INITDB_ARGS_FILE\n\n# With umask 077, mkdir -p in the official entrypoint leaves the intermediate\n# version directory root-owned and untraversable after it switches to postgres.\n# Prepare the volume root and both levels explicitly; do not recursively change\n# existing database data, including a volume initially created with root ownership.\ninstall -d -m 0750 -o postgres -g postgres /var/lib/postgresql /var/lib/postgresql/18\ninstall -d -m 0700 -o postgres -g postgres \"$PGDATA\"\n\nexec /usr/local/bin/docker-entrypoint.sh postgres \\\n    -c listen_addresses='*' \\\n    -c password_encryption=scram-sha-256 \\\n    -c ssl=on \\\n    -c ssl_min_protocol_version=TLSv1.2 \\\n    -c ssl_cert_file=/tmp/pg-tls/server.crt \\\n    -c ssl_key_file=/tmp/pg-tls/server.key \\\n    -c ssl_ca_file=/tmp/pg-tls/ca.crt \\\n    -c hba_file=/tmp/pg-tls/pg_hba.conf\n",
+        "initialize.sh": "#!/usr/bin/env bash\n# Mount as /docker-entrypoint-initdb.d/10-private-identities.sh (read-only).\n# The official image invokes this as postgres only for an empty PGDATA directory.\nset -euo pipefail\numask 077\n\nfor service in console governance catalogue inventory planning lifecycle assurance; do\n    for identity in runtime migrator; do\n        if [[ ! -s /run/secrets/$service-$identity-password ]]; then\n            printf 'Required database identity secret is missing or empty: %s-%s-password\\n' \"$service\" \"$identity\" >&2\n            exit 1\n        fi\n    done\ndone\n\nfor service in console governance catalogue inventory planning lifecycle assurance; do\n    # psql reads passwords from its environment, never argv, SQL files or output.\n    # Its literal-variable expansion quotes password values as SQL string literals.\n    export FOUNDATION_RUNTIME_PASSWORD=\"$(cat \"/run/secrets/$service-runtime-password\")\"\n    export FOUNDATION_MIGRATOR_PASSWORD=\"$(cat \"/run/secrets/$service-migrator-password\")\"\n    if [[ -z $FOUNDATION_RUNTIME_PASSWORD || -z $FOUNDATION_MIGRATOR_PASSWORD ]]; then\n        printf 'Required database identity secret contains no password: %s\\n' \"$service\" >&2\n        exit 1\n    fi\n\n    psql -X --quiet --username=postgres --dbname=postgres \\\n        --set=ON_ERROR_STOP=1 --set=\"database=$service\" \\\n        --set=\"owner=${service}_owner\" --set=\"runtime=${service}_runtime\" \\\n        --set=\"migrator=${service}_migrator\" <<'SQL'\n\\set ECHO none\n\\set VERBOSITY terse\n\\getenv runtime_password FOUNDATION_RUNTIME_PASSWORD\n\\getenv migrator_password FOUNDATION_MIGRATOR_PASSWORD\nSET log_statement = 'none';\nSET log_min_error_statement = 'panic';\nCREATE ROLE :\"owner\" NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;\nCREATE ROLE :\"runtime\" LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD :'runtime_password';\nCREATE ROLE :\"migrator\" LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD :'migrator_password';\nGRANT :\"owner\" TO :\"migrator\" WITH INHERIT FALSE, SET TRUE;\nCREATE DATABASE :\"database\" OWNER :\"owner\" TEMPLATE template0;\nREVOKE ALL ON DATABASE :\"database\" FROM PUBLIC;\nGRANT CONNECT ON DATABASE :\"database\" TO :\"runtime\", :\"migrator\";\nALTER ROLE :\"runtime\" IN DATABASE :\"database\" SET search_path = pg_catalog, app;\nALTER ROLE :\"migrator\" IN DATABASE :\"database\" SET search_path = pg_catalog, app;\nSQL\n    unset FOUNDATION_RUNTIME_PASSWORD FOUNDATION_MIGRATOR_PASSWORD\n\n    psql -X --quiet --username=postgres --dbname=\"$service\" \\\n        --set=ON_ERROR_STOP=1 --set=\"owner=${service}_owner\" \\\n        --set=\"runtime=${service}_runtime\" <<'SQL'\n\\set ECHO none\n\\set VERBOSITY terse\nBEGIN;\nREVOKE ALL ON SCHEMA public FROM PUBLIC;\nCREATE SCHEMA app AUTHORIZATION :\"owner\";\nGRANT USAGE ON SCHEMA app TO :\"runtime\";\nALTER DEFAULT PRIVILEGES FOR ROLE :\"owner\" IN SCHEMA app GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO :\"runtime\";\nALTER DEFAULT PRIVILEGES FOR ROLE :\"owner\" IN SCHEMA app GRANT USAGE ON SEQUENCES TO :\"runtime\";\nALTER DEFAULT PRIVILEGES FOR ROLE :\"owner\" REVOKE EXECUTE ON ROUTINES FROM PUBLIC;\nCOMMIT;\nSQL\n    printf 'Bootstrapped private database and identities: %s\\n' \"$service\"\ndone\n\n# No application tables are created as administrator. The installation runner must\n# apply migrate.sql using each authenticated migrator over TLS before readiness.\n",
+        "migrate.sql": "-- Connect over verified TLS as <service>_migrator and supply psql variables:\n-- owner=<service>_owner and runtime=<service>_runtime.\n-- This fixture is tenant-keyed; it does not implement tenant authorization or RLS.\n\\set ON_ERROR_STOP on\n\\set ECHO none\n\\set VERBOSITY terse\nBEGIN;\nSET LOCAL ROLE :\"owner\";\n\n-- A replay of this migration is allowed only for the exact existing version.\n-- Refuse empty, newer, older or multiple metadata rows instead of repairing them.\nDO $foundation$\nBEGIN\n    IF session_user <> current_database() || '_migrator'\n        OR current_user <> current_database() || '_owner' THEN\n        RAISE EXCEPTION 'foundation migration identity mismatch';\n    END IF;\n    IF to_regclass('app.foundation_schema') IS NOT NULL THEN\n        IF (SELECT count(*) FROM app.foundation_schema) <> 1\n            OR (SELECT max(version) FROM app.foundation_schema) IS DISTINCT FROM 1 THEN\n            RAISE EXCEPTION 'foundation schema version mismatch';\n        END IF;\n    END IF;\nEND;\n$foundation$;\n\nCREATE TABLE IF NOT EXISTS app.foundation_schema (\n    version integer PRIMARY KEY\n);\nCREATE TABLE IF NOT EXISTS app.foundation_records (\n    tenant_id text NOT NULL,\n    record_id text NOT NULL,\n    payload text NOT NULL,\n    PRIMARY KEY (tenant_id, record_id)\n);\n\nINSERT INTO app.foundation_schema(version) VALUES (1) ON CONFLICT (version) DO NOTHING;\nREVOKE ALL ON app.foundation_schema FROM :\"runtime\";\nGRANT SELECT ON app.foundation_schema TO :\"runtime\";\nGRANT SELECT, INSERT, UPDATE, DELETE ON app.foundation_records TO :\"runtime\";\n\nINSERT INTO app.foundation_records(tenant_id, record_id, payload) VALUES\n    ('tenant_a', 'fixture1', 'synthetic-permit-desk-tenant-a'),\n    ('tenant_b', 'fixture1', 'synthetic-permit-desk-tenant-b')\nON CONFLICT (tenant_id, record_id) DO NOTHING;\n\nCOMMIT;\nSET ROLE :\"owner\";\nSELECT current_database() AS database, session_user AS migration_identity,\n    (SELECT version FROM app.foundation_schema) AS schema_version;\nRESET ROLE;\n"
+      },
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "postgres-scripts",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "postgres-data",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "1Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "automountServiceAccountToken": false,
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "postgres",
+        "namespace": "p01-c9c202786437-601e9835"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "postgres",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "postgres",
+            "p01.service": "postgres"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/part-of": "p01-foundation",
+              "p01.role": "postgres",
+              "p01.service": "postgres"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "args": [
+                  "postgres"
+                ],
+                "command": [
+                  "/bin/bash",
+                  "/opt/foundation/entrypoint.sh"
+                ],
+                "image": "p01.local/postgres:manifest-sha256-9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+                "imagePullPolicy": "Never",
+                "livenessProbe": {
+                  "periodSeconds": 10,
+                  "tcpSocket": {
+                    "port": 5432
+                  },
+                  "timeoutSeconds": 2
+                },
+                "name": "postgres",
+                "ports": [
+                  {
+                    "containerPort": 5432
+                  }
+                ],
+                "readinessProbe": {
+                  "periodSeconds": 5,
+                  "tcpSocket": {
+                    "port": 5432
+                  },
+                  "timeoutSeconds": 2
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "add": [
+                      "CHOWN",
+                      "DAC_OVERRIDE",
+                      "FOWNER",
+                      "SETGID",
+                      "SETUID"
+                    ],
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsGroup": 0,
+                  "runAsNonRoot": false,
+                  "runAsUser": 0
+                },
+                "startupProbe": {
+                  "failureThreshold": 60,
+                  "periodSeconds": 2,
+                  "tcpSocket": {
+                    "port": 5432
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/run/secrets",
+                    "name": "secrets",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/var/run/postgresql",
+                    "name": "socket",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/var/lib/postgresql",
+                    "name": "data",
+                    "readOnly": false
+                  },
+                  {
+                    "mountPath": "/opt/foundation",
+                    "name": "scripts",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/docker-entrypoint-initdb.d/10-private-identities.sh",
+                    "name": "scripts",
+                    "readOnly": true,
+                    "subPath": "initialize.sh"
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "securityContext": {
+              "runAsGroup": 0,
+              "runAsUser": 0,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "postgres",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "secrets",
+                "secret": {
+                  "defaultMode": 292,
+                  "secretName": "postgres-bootstrap"
+                }
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "64Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "16Mi"
+                },
+                "name": "socket"
+              },
+              {
+                "name": "data",
+                "persistentVolumeClaim": {
+                  "claimName": "postgres-data"
+                }
+              },
+              {
+                "configMap": {
+                  "defaultMode": 365,
+                  "name": "postgres-scripts"
+                },
+                "name": "scripts"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "postgres",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "service",
+            "port": 5432,
+            "protocol": "TCP",
+            "targetPort": 5432
+          }
+        ],
+        "selector": {
+          "app.kubernetes.io/part-of": "p01-foundation",
+          "p01.role": "postgres",
+          "p01.service": "postgres"
+        },
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "deny-by-default",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [],
+        "ingress": [],
+        "podSelector": {
+          "matchLabels": {}
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "cluster-dns",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 53,
+                "protocol": "UDP"
+              },
+              {
+                "port": 53,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "namespaceSelector": {
+                  "matchLabels": {
+                    "kubernetes.io/metadata.name": "kube-system"
+                  }
+                },
+                "podSelector": {
+                  "matchLabels": {
+                    "k8s-app": "kube-dns"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {}
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "console-application",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "console"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 9000,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "console"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "console-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 9000,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "console"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "probe",
+                    "p01.service": "console"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "console"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "console-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "migrator",
+            "p01.service": "console"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "console-probe",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "console"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "probe",
+            "p01.service": "console"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "governance-application",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "governance"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 9000,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "governance"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "governance-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 9000,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "governance"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "probe",
+                    "p01.service": "governance"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "governance"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "governance-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "migrator",
+            "p01.service": "governance"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "governance-probe",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "governance"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "probe",
+            "p01.service": "governance"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "catalogue-application",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "catalogue"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 9000,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "catalogue"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "catalogue-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 9000,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "catalogue"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "probe",
+                    "p01.service": "catalogue"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "catalogue"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "catalogue-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "migrator",
+            "p01.service": "catalogue"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "catalogue-probe",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "catalogue"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "probe",
+            "p01.service": "catalogue"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "assurance-application",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "assurance"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 9000,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "assurance"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "assurance-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 9000,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "assurance"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "probe",
+                    "p01.service": "assurance"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "assurance"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "assurance-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "migrator",
+            "p01.service": "assurance"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "assurance-probe",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "assurance"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "probe",
+            "p01.service": "assurance"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "planning-application",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "planning"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 8080,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "planning"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "planning-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 8080,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "planning"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "probe",
+                    "p01.service": "planning"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "planning"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "planning-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "migrator",
+            "p01.service": "planning"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "planning-probe",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "planning"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "probe",
+            "p01.service": "planning"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "inventory-application",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "inventory"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 8080,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "inventory"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "inventory-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 8080,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "inventory"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "probe",
+                    "p01.service": "inventory"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "inventory"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "inventory-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "migrator",
+            "p01.service": "inventory"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "inventory-probe",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "inventory"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "probe",
+            "p01.service": "inventory"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "lifecycle-application",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "lifecycle"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 8080,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "app",
+            "p01.service": "lifecycle"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "lifecycle-proxy",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 8080,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "lifecycle"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "probe",
+                    "p01.service": "lifecycle"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "proxy",
+            "p01.service": "lifecycle"
+          }
+        },
+        "policyTypes": [
+          "Ingress",
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "lifecycle-migrator",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "postgres",
+                    "p01.service": "postgres"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "migrator",
+            "p01.service": "lifecycle"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "lifecycle-probe",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "egress": [
+          {
+            "ports": [
+              {
+                "port": 8443,
+                "protocol": "TCP"
+              }
+            ],
+            "to": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "proxy",
+                    "p01.service": "lifecycle"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "probe",
+            "p01.service": "lifecycle"
+          }
+        },
+        "policyTypes": [
+          "Egress"
+        ]
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "postgres-private-clients",
+        "namespace": "p01-c9c202786437-601e9835"
+      },
+      "spec": {
+        "ingress": [
+          {
+            "from": [
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "console"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "migrator",
+                    "p01.service": "console"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "governance"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "migrator",
+                    "p01.service": "governance"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "catalogue"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "migrator",
+                    "p01.service": "catalogue"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "assurance"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "migrator",
+                    "p01.service": "assurance"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "planning"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "migrator",
+                    "p01.service": "planning"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "inventory"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "migrator",
+                    "p01.service": "inventory"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "lifecycle"
+                  }
+                }
+              },
+              {
+                "podSelector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "migrator",
+                    "p01.service": "lifecycle"
+                  }
+                }
+              }
+            ],
+            "ports": [
+              {
+                "port": 5432,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app.kubernetes.io/part-of": "p01-foundation",
+            "p01.role": "postgres",
+            "p01.service": "postgres"
+          }
+        },
+        "policyTypes": [
+          "Ingress"
+        ]
+      }
+    }
+  ],
+  "kind": "List"
+}

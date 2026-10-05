@@ -1,0 +1,1 @@
+{"status": 503, "body": "{\"reason\":\"foundation_only\",\"scope\":\"service\",\"service\":\"lifecycle\",\"status\":\"not_ready\"}", "cache_control": "no-store"}
