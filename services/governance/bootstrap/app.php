@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('governance:expire-approvals --limit=100')->everyMinute();
         $schedule->command('governance:publish-outbox --limit=10')->everyMinute();
         $schedule->command('identity:publish-outbox --limit=10')->everyMinute();
+        $schedule->command('support:expire-access --limit=100')->everyMinute();
+        $schedule->command('support:publish-outbox --limit=10')->everyMinute();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(RequestTelemetry::class);

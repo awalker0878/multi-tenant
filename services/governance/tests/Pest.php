@@ -11,3 +11,4 @@ pest()->extend(TestCase::class)->afterEach(function (): void {
 })->in('Feature');
 
 require_once __DIR__.'/Support/IdentityFixture.php';
+require_once __DIR__.'/Support/SupportFixture.php';

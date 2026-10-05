@@ -70,6 +70,13 @@ CREATE TABLE IF NOT EXISTS app.support_outbox (
 );
 CREATE INDEX IF NOT EXISTS support_requests_expiry ON app.support_requests (expires_at, id) WHERE state IN ('requested', 'approved', 'active');
 CREATE INDEX IF NOT EXISTS support_outbox_pending ON app.support_outbox (available_at, occurred_at, id) WHERE published_at IS NULL AND quarantined_at IS NULL;
+CREATE INDEX IF NOT EXISTS support_requests_requester_rate ON app.support_requests (requester_id, created_at);
+CREATE INDEX IF NOT EXISTS support_requests_executor_reviews ON app.support_requests (executor_id, effective_until) WHERE admission_count > 0;
+CREATE INDEX IF NOT EXISTS support_requests_effective ON app.support_requests (effective_until, id) WHERE state IN ('requested', 'approved', 'active');
+CREATE INDEX IF NOT EXISTS support_security_scope ON app.support_security_grants (tenant_id, actor_id, site_id, environment, role) WHERE revoked_at IS NULL;
+CREATE INDEX IF NOT EXISTS support_security_assignment_rate ON app.support_security_grants (granted_by, created_at);
+CREATE INDEX IF NOT EXISTS support_audit_resource ON app.support_audit (tenant_id, resource_id, occurred_at, id);
+CREATE INDEX IF NOT EXISTS support_audit_denial_rate ON app.support_audit (actor_id, occurred_at) WHERE event = 'support.access.denied';
 REVOKE ALL ON app.support_security_grants, app.support_requests, app.support_approvals, app.support_reviews, app.support_audit, app.support_outbox FROM governance_runtime;
 GRANT SELECT, INSERT ON app.support_security_grants, app.support_requests, app.support_approvals, app.support_reviews, app.support_audit, app.support_outbox TO governance_runtime;
 GRANT UPDATE (revoked_at, revision) ON app.support_security_grants TO governance_runtime;

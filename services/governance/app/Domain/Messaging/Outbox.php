@@ -8,4 +8,5 @@ enum Outbox: string
 {
     case Governance = 'app.governance_outbox';
     case Identity = 'app.identity_outbox';
+    case Support = 'app.support_outbox';
 }

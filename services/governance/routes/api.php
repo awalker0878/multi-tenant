@@ -9,6 +9,7 @@ use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\OidcController;
+use App\Http\Controllers\SupportAccessController;
 use App\Http\Controllers\TenantController;
 use App\Http\Middleware\AuthenticateConsole;
 use App\Http\Middleware\AuthenticateService;
@@ -65,3 +66,19 @@ Route::prefix('v1/tenants/{tenant}/actor-delegations')->whereUuid('tenant')->mid
 });
 Route::post('/v1/tenants/{tenant}/delegated-authorizations', [DelegationController::class, 'inspect'])
     ->whereUuid('tenant')->middleware(AuthenticateService::class);
+
+Route::middleware(AuthenticateConsole::class)->group(function (): void {
+    Route::post('/v1/support-security-grants', [SupportAccessController::class, 'security'])->defaults('operation', 'grant');
+    Route::post('/v1/support-security-revocations', [SupportAccessController::class, 'security'])->defaults('operation', 'revoke');
+    Route::prefix('/v1/tenants/{tenant}/support-access')->whereUuid('tenant')->group(function (): void {
+        Route::post('/', [SupportAccessController::class, 'request']);
+        Route::get('/{support}', [SupportAccessController::class, 'show'])->whereUuid('support');
+        Route::get('/{support}/audit', [SupportAccessController::class, 'show'])->whereUuid('support')->defaults('history', true);
+        foreach (['approve', 'reject', 'revoke', 'review'] as $operation) {
+            Route::post('/{support}/'.$operation, [SupportAccessController::class, 'decide'])->whereUuid('support')->defaults('operation', $operation);
+        }
+        foreach (['activate', 'inspect'] as $operation) {
+            Route::post('/{support}/'.$operation, [SupportAccessController::class, 'use'])->whereUuid('support')->defaults('operation', $operation);
+        }
+    });
+});

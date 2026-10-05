@@ -1,0 +1,136 @@
+asyncapi: 3.0.0
+info:
+  title: Restricted support committed notifications
+  version: 1.0.0
+  description: Governance-owned audit references; at-least-once and unordered delivery. Never authority.
+channels:
+  security_granted:
+    address: support.security.granted.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  security_revoked:
+    address: support.security.revoked.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  access_requested:
+    address: support.access.requested.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  access_approved:
+    address: support.access.approved.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  access_activated:
+    address: support.access.activated.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  access_admitted:
+    address: support.access.admitted.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  access_denied:
+    address: support.access.denied.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  access_rejected:
+    address: support.access.rejected.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  access_revoked:
+    address: support.access.revoked.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  access_expired:
+    address: support.access.expired.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  access_invalidated:
+    address: support.access.invalidated.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  access_reviewed:
+    address: support.access.reviewed.v1
+    description: Restricted governance.events exchange; dedicated support audit custody queue only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+operations:
+  publish_security_granted:
+    action: send
+    channel:
+      $ref: '#/channels/security_granted'
+  publish_security_revoked:
+    action: send
+    channel:
+      $ref: '#/channels/security_revoked'
+  publish_access_requested:
+    action: send
+    channel:
+      $ref: '#/channels/access_requested'
+  publish_access_approved:
+    action: send
+    channel:
+      $ref: '#/channels/access_approved'
+  publish_access_activated:
+    action: send
+    channel:
+      $ref: '#/channels/access_activated'
+  publish_access_admitted:
+    action: send
+    channel:
+      $ref: '#/channels/access_admitted'
+  publish_access_denied:
+    action: send
+    channel:
+      $ref: '#/channels/access_denied'
+  publish_access_rejected:
+    action: send
+    channel:
+      $ref: '#/channels/access_rejected'
+  publish_access_revoked:
+    action: send
+    channel:
+      $ref: '#/channels/access_revoked'
+  publish_access_expired:
+    action: send
+    channel:
+      $ref: '#/channels/access_expired'
+  publish_access_invalidated:
+    action: send
+    channel:
+      $ref: '#/channels/access_invalidated'
+  publish_access_reviewed:
+    action: send
+    channel:
+      $ref: '#/channels/access_reviewed'
+components:
+  messages:
+    Change:
+      name: SupportChangeV1
+      contentType: application/json
+      payload:
+        schemaFormat: application/schema+json;version=draft-2020-12
+        schema:
+          $ref: ../schemas/events/support-change-v1.json

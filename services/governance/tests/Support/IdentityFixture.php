@@ -47,8 +47,7 @@ function initializeIdentityFixture(object $test): void
             $sql = str_replace('approvals_expiry ON app.approvals', 'app.approvals_expiry ON approvals', $sql);
             $sql = str_replace('membership_directory_position ON app.tenant_memberships', 'app.membership_directory_position ON tenant_memberships', $sql);
             $sql = str_replace('actor_directory_position ON app.tenant_memberships', 'app.actor_directory_position ON tenant_memberships', $sql);
-            $sql = str_replace('support_requests_expiry ON app.support_requests', 'app.support_requests_expiry ON support_requests', $sql);
-            $sql = str_replace('support_outbox_pending ON app.support_outbox', 'app.support_outbox_pending ON support_outbox', $sql);
+            $sql = preg_replace('/CREATE INDEX IF NOT EXISTS (support_[a-z_]+) ON app\.([a-z_]+)/', 'CREATE INDEX IF NOT EXISTS app.$1 ON $2', $sql);
         }
         DB::unprepared($sql);
     }

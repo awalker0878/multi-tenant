@@ -23,6 +23,8 @@ final class SyntheticOidcTransport implements OidcHttpTransport
 
     public array $requests = [];
 
+    public ?array $keyOverride = null;
+
     private string $key;
 
     private array $jwk;
@@ -62,7 +64,7 @@ final class SyntheticOidcTransport implements OidcHttpTransport
             ], $this->metadata);
         }
         if (str_ends_with($url, '/keys')) {
-            return ['keys' => [$this->jwk]];
+            return ['keys' => $this->keyOverride ?? [$this->jwk]];
         }
         $request = $this->codes[$form['code']] ?? null;
         unset($this->codes[$form['code']]);

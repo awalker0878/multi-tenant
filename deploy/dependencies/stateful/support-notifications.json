@@ -1,0 +1,144 @@
+{
+  "vhosts": [
+    {
+      "name": "product"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "governance",
+      "vhost": "product",
+      "configure": "^$",
+      "write": "^governance.events$",
+      "read": "^$"
+    },
+    {
+      "user": "support-audit",
+      "vhost": "product",
+      "configure": "^$",
+      "write": "^$",
+      "read": "^support\\.audit$"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "governance.events",
+      "vhost": "product",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "support.audit",
+      "vhost": "product",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-delivery-limit": -1
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.security.granted.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.security.revoked.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.access.requested.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.access.approved.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.access.activated.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.access.admitted.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.access.denied.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.access.rejected.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.access.revoked.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.access.expired.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.access.invalidated.v1",
+      "arguments": {}
+    },
+    {
+      "source": "governance.events",
+      "vhost": "product",
+      "destination": "support.audit",
+      "destination_type": "queue",
+      "routing_key": "support.access.reviewed.v1",
+      "arguments": {}
+    }
+  ]
+}

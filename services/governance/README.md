@@ -9,7 +9,7 @@ Governance will own tenant membership, grants, authorization decisions, plan app
 | `GET /health/live` | `200`, `status: alive`, `scope: process` | The Laravel HTTP process can answer this request. No dependency is queried. |
 | `GET /health/ready` | `503`, `status: not_ready`, `scope: service`, `reason: foundation_only` | Governance is not ready to serve business traffic. This cannot be enabled with an environment switch or request input. |
 
-Both endpoints return `service: governance` and `Cache-Control: no-store`; readiness also returns `Retry-After: 10`. No session is created and no actor, tenant, grant, dependency address, version or credential is returned. These are unauthenticated process probes, not authorization APIs. Unsupported methods return `405`; unimplemented paths return safe JSON `404` responses. No business routes or native operations exist.
+Both endpoints return `service: governance` and `Cache-Control: no-store`; readiness also returns `Retry-After: 10`. No session is created and no actor, tenant, grant, dependency address, version or credential is returned. These are unauthenticated process probes, not authorization APIs. Unsupported methods return `405`; unimplemented paths return safe JSON `404` responses. Governance also owns the versioned identity, tenancy, approval, delegation and bounded support APIs; none performs native infrastructure effects.
 
 ## Local commands
 
@@ -44,3 +44,19 @@ The service owns `App\` and `Tests\` autoload roots, its framework configuration
 The normal test command includes HTTP and Architecture suites. Deptrac analyzes the actual service and rejects uncovered first-party dependencies; its separate canary command creates temporary parser fixtures, confirms four allowed Laravel/convention dependencies and nine forbidden dependencies, then removes them. A canary must produce its exact intended rule diagnostic, not merely any nonzero process status. These fixtures establish analyzer behavior, not implemented Domain/Application layers or real tenant isolation. The retained P00 convention examples remain reference experiments.
 
 The [image record](../../docs/implementation/p01-laravel-images.md) separately verifies the independently built Governance container and restricted diagnostic process. Database role isolation, federation, delegation, audit/outbox, grant/approval behavior, business readiness and operating acceptance remain P01/P02 work.
+
+
+## Bounded support access
+
+[Policy version 1](../../docs/implementation/p02-support-access.md) and the
+[owner contract](../../contracts/openapi/governance-support-v1.json) define explicit
+membership/grant diagnostics for a named executor. A current tenant administrator
+and separately appointed security approver approve the exact request; every use
+rechecks current authority and commits an immutable audit. This is an API workflow,
+not a new Console screen. Existing tenant grants cannot carry support permissions.
+
+Apply numbered migrations before deploying the new code. Existing ordinary sessions
+remain usable; support operations require reauthentication to retain their verified
+signer. No OIDC environment settings were introduced. Follow the
+[support operations runbook](../../docs/operations/runbooks/support-access.md)
+for current role assignment, containment, expiry, audit delivery and review.
