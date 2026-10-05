@@ -98,3 +98,10 @@ Installation bootstrap, federation, session and delegation notifications use the
 [identity delivery contract and relay](../implementation/p02-identity-events.md).
 Their installation scope, immutable attribution and restricted consumer boundary
 are distinct from tenant change notifications.
+
+
+The [identity recovery admission boundary](../implementation/p02-identity-recovery.md)
+requires independently controlled installation/epoch custody before new user or
+service admission. The [P02 completion review](../implementation/p02-completion-review.md)
+records the remaining exceptional-access policy, actual custody/resumption inputs
+and receiving decision. Unknown support actions remain denied.

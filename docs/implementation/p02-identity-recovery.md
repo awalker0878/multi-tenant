@@ -73,3 +73,13 @@ identities. A separate process observes both rows and five approval audit events
 the campaign restores the complete fixture schema and compares every owned table.
 It does not substitute a test plan for the future P05 producer or resume restored
 authority. Results are counted only after the changed-source campaign executes.
+
+
+## Retained results
+
+EV-P02-018 records three passing 98-check campaigns at `3a5ef6e`; EV-P02-019
+records three passing 100-check campaigns at `fe88107` including the additional
+terminal-history restore. Each final engine verifies 302 exact-source bindings and
+ten artifact hashes. [The final campaign index](../../verification/p02/approval-history-three-engine-index.json)
+links original reports and archives. The [completion review packet](p02-completion-review.md)
+states the actual custody and resumption inputs still needed.

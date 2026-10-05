@@ -93,9 +93,11 @@ five checks, 153 source bindings and ten log hashes. The
 binds the original archive and unchanged-source replay. Historical queue snapshots
 above remain unchanged.
 
-These relay-only campaigns use synthetic receiving witnesses. The separate
-[Console consumer](p02-console-notifications.md) now qualifies five tenant routes;
-it excludes installation identity events. Installation consumer ownership,
-reconciliation APIs, retention/replay budgets, real alert recipients, operated
-custody, HA, independent restore/revocation reconciliation and gate acceptance
-remain open. No authority or customer notification is created by this campaign.
+These historical relay-only campaigns use synthetic receiving witnesses. The
+[Console consumer](p02-console-notifications.md) now covers five tenant routes
+and all twelve installation identity routes. EV-P02-018/019 retain the actual
+identity-relay-to-Console journey in all three engines, with owner-authorized
+setup hints and complete application-table restore checks. Operating retention,
+replay budgets, real alert recipients, custody, HA and independent recovery/gate
+acceptance remain open. Notifications do not grant authority. See the
+[completion review inputs](p02-completion-review.md).

@@ -1,4 +1,4 @@
-# P02 Console tenant notification consumer
+# P02 Console tenant and installation notification consumer
 
 Owner: Console/product engineering with Governance/IAM as fact and authorization
 owner. Packages P02.02/P02.03/P02.05; requirements R03/R04, with early support for R33;
@@ -99,8 +99,9 @@ image-security admission, Kubernetes and corrected-source browser campaigns rema
 distinct requirements; a Compose pass does not replace them.
 
 This increment does not deliver Catalogue resource guard integration, approval/plan
-UI, broker HA, full-store restore or an
-operated notification service. It does not pass G01/G02, approve retention, assign
+UI, broker HA or an operated notification service. Complete application-table
+restore is now measured by the separate recovery continuation below. It does not
+pass G01/G02, approve retention, assign
 an operating receiver, or establish manual accessibility/support-floor acceptance.
 
 ## Installation identity continuation
@@ -129,8 +130,12 @@ Migration 003 relaxes only the inbox tenant column and creates the singleton
 installation hint. Existing receipts and restricted history grants remain intact.
 Apply the ordered migration before starting the extended consumer. The deployed
 queue must include the exact identity bindings; no wildcard or extra broker
-privilege is required. Source-bound local/hosted observations must be retained
-before this new increment is described as qualified.
+privilege is required. EV-P02-017 retains final local checks; EV-P02-018/019
+retain all three hosted engines at their exact source revisions. The final
+[100-check campaign](../../verification/p02/approval-history-three-engine-index.json)
+includes process restart and complete current application-schema restore with
+matching inbox/hint fingerprints. Operating custody and supported browser/manual
+accessibility acceptance remain distinct open obligations.
 
 The first installation-consumer campaign exposed a fixture defect: replaying only
 Governance migration 001 revoked the later outbox delivery-column grants. The

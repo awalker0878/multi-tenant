@@ -15,8 +15,11 @@ supply independent receiving review, activate repository admission, resolve
 OP01–OP07 operating inputs or authorize promotion/native effects. Those conditions
 retain their accountable owners and checkpoints in the delivery register.
 
-The first increment delivers local bootstrap and the console password-change
-journey. External OIDC configuration, verification and atomic handover are the
-next P02.01/P02.05 increment. Tenancy, delegated authorization and approvals follow
-the dependency sequence in [P02](phases/p02.md). No package or G02 is complete
-because its first increment has started.
+The user subsequently directed: “Continue to P02 and next work dont stop until
+P02 complete.” That instruction continues implementation through the phase's
+requirements. Bootstrap, federation, tenancy, delegation, approvals, Console
+navigation, installation notifications and recovery admission now have committed
+implementation and measured evidence. The [current review packet](p02-completion-review.md)
+and [G02 assessment](../qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
+identify exact remaining policy, custody, accessibility and independent review
+obligations; no historical “next increment” paragraph overrides the current register.

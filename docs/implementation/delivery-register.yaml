@@ -103,7 +103,9 @@ phases:
   owner_role: Product engineering and IAM leads
   dependency_phase_ids:
   - P01
-  dependency_note: User-authorized P02 development on 2026-10-05; see p02-development-entry.md. G01 receiving review and operating conditions remain open.
+  dependency_note: User-authorized P02 development continues; source fe88107 passes the three-engine 100-check
+    integration campaign. BL-P02-001–004 identify exact remaining policy, custody, accessibility and receiving
+    obligations. G01 receiving conditions remain open.
   package_ids:
   - P02.01
   - P02.02
@@ -117,6 +119,10 @@ phases:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-016
+  - EV-P02-017
+  - EV-P02-018
+  - EV-P02-019
   - EV-P02-015
   - EV-P02-013
   - EV-P02-014
@@ -132,7 +138,11 @@ phases:
   - EV-P02-004
   - EV-P02-005
   - EV-P02-006
-  blocker_ids: []
+  blocker_ids:
+  - BL-P02-001
+  - BL-P02-002
+  - BL-P02-003
+  - BL-P02-004
 - id: P03
   title: Application catalogue and workspace
   owner_role: Product engineering lead
@@ -816,6 +826,10 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-016
+  - EV-P02-017
+  - EV-P02-018
+  - EV-P02-019
   - EV-P02-015
   - EV-P02-014
   - EV-P02-011
@@ -827,8 +841,12 @@ work_packages:
   - EV-P02-003
   - EV-P02-005
   - EV-P02-006
-  blocker_ids: []
+  blocker_ids:
+  - BL-P02-002
+  - BL-P02-004
   doc_refs:
+  - docs/implementation/p02-completion-review.md
+  - docs/implementation/p02-identity-recovery.md
   - docs/implementation/p02-identity-events.md
   - docs/implementation/p02-service-delegation.md
   - docs/implementation/p02-local-bootstrap.md
@@ -850,6 +868,10 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-016
+  - EV-P02-017
+  - EV-P02-018
+  - EV-P02-019
   - EV-P02-015
   - EV-P02-013
   - EV-P02-014
@@ -858,8 +880,11 @@ work_packages:
   - EV-P02-003
   - EV-P02-004
   - EV-P02-006
-  blocker_ids: []
+  blocker_ids:
+  - BL-P02-004
   doc_refs:
+  - docs/implementation/p02-completion-review.md
+  - docs/implementation/p02-identity-recovery.md
   - docs/implementation/p02-directory.md
   - docs/implementation/p02-browser-synchronization.md
   - docs/implementation/p02-console-notifications.md
@@ -882,6 +907,10 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-016
+  - EV-P02-017
+  - EV-P02-018
+  - EV-P02-019
   - EV-P02-015
   - EV-P02-013
   - EV-P02-014
@@ -894,8 +923,13 @@ work_packages:
   - EV-P02-004
   - EV-P02-005
   - EV-P02-006
-  blocker_ids: []
+  blocker_ids:
+  - BL-P02-001
+  - BL-P02-002
+  - BL-P02-004
   doc_refs:
+  - docs/implementation/p02-completion-review.md
+  - docs/implementation/p02-identity-recovery.md
   - docs/implementation/p02-directory.md
   - docs/implementation/p02-browser-synchronization.md
   - docs/implementation/p02-console-notifications.md
@@ -921,12 +955,19 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-017
+  - EV-P02-018
+  - EV-P02-019
   - EV-P02-011
   - EV-P02-008
   - EV-P02-003
   - EV-P02-004
-  blocker_ids: []
+  blocker_ids:
+  - BL-P02-001
+  - BL-P02-004
   doc_refs:
+  - docs/implementation/p02-completion-review.md
+  - docs/implementation/p02-identity-recovery.md
   - docs/implementation/p02-governance-events.md
   - docs/implementation/p02-tenancy-and-approvals.md
   - docs/implementation/phases/p02.md
@@ -945,6 +986,10 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-016
+  - EV-P02-017
+  - EV-P02-018
+  - EV-P02-019
   - EV-P02-015
   - EV-P02-013
   - EV-P02-014
@@ -956,8 +1001,12 @@ work_packages:
   - EV-P02-002
   - EV-P02-003
   - EV-P02-006
-  blocker_ids: []
+  blocker_ids:
+  - BL-P02-003
+  - BL-P02-004
   doc_refs:
+  - docs/implementation/p02-completion-review.md
+  - docs/implementation/p02-identity-recovery.md
   - docs/implementation/p02-directory.md
   - docs/implementation/p02-browser-synchronization.md
   - docs/implementation/p02-console-notifications.md
@@ -1979,6 +2028,10 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-016
+  - EV-P02-017
+  - EV-P02-018
+  - EV-P02-019
   - EV-P02-015
   - EV-P02-013
   - EV-P02-014
@@ -1993,7 +2046,10 @@ requirements:
   - EV-P02-004
   - EV-P02-005
   - EV-P02-006
-  blocker_ids: []
+  blocker_ids:
+  - BL-P02-001
+  - BL-P02-002
+  - BL-P02-003
 - id: R04
   package_ids:
   - P02.03
@@ -2035,6 +2091,10 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-016
+  - EV-P02-017
+  - EV-P02-018
+  - EV-P02-019
   - EV-P02-015
   - EV-P02-013
   - EV-P02-010
@@ -2045,7 +2105,8 @@ requirements:
   - EV-P02-003
   - EV-P02-004
   - EV-P02-005
-  blocker_ids: []
+  blocker_ids:
+  - BL-P02-001
 - id: R05
   package_ids:
   - P03.01
@@ -2938,6 +2999,7 @@ requirements:
   blocker_ids:
   - BL-P01-001
   - BL-P01-002
+  - BL-P02-002
 - id: R32
   package_ids:
   - P00.05
@@ -2975,6 +3037,8 @@ requirements:
   evidence_ids: []
   blocker_ids:
   - BL-P00-001
+  - BL-P02-001
+  - BL-P02-002
 - id: R33
   package_ids:
   - P03.04
@@ -3200,6 +3264,10 @@ gates:
   reviewer: null
   reviewed_at: null
   evidence_ids:
+  - EV-P02-016
+  - EV-P02-017
+  - EV-P02-018
+  - EV-P02-019
   - EV-P02-015
   - EV-P02-013
   - EV-P02-014
@@ -3215,7 +3283,11 @@ gates:
   - EV-P02-004
   - EV-P02-005
   - EV-P02-006
-  blocker_ids: []
+  blocker_ids:
+  - BL-P02-001
+  - BL-P02-002
+  - BL-P02-003
+  - BL-P02-004
 - id: G03
   phase_id: P03
   decision: NOT_REVIEWED
@@ -5266,6 +5338,156 @@ evidence:
   valid_until: null
   invalidated_at: null
 
+- id: EV-P02-016
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/b2ccd21eb8dcba08a8b2338669e62ed2d6413230/verification/p02/directory-three-engine-index.json
+  sha256: 4c8db93a9d0d157f4762330976c0588218e29c23a2162506de7ed958102bdeb1
+  source_revision: 5c789a1ed2a79f50611dd512855385a00b759b76
+  artifact_revisions:
+    retained_artifact_commit: b2ccd21eb8dcba08a8b2338669e62ed2d6413230
+    chromium_report_sha256: c39caf20a61f9fa3ca381f9bd549cc0da3d05f5ca3722a51c5dee60ffd1e6c53
+    firefox_report_sha256: 9d8381e666fb4d50f7e5b5e7fc1bfaa051c8ae7ea7e1ae3b82671a57213c6a4d
+    webkit_report_sha256: cf0e691f1585d91fd7d2097a842e369b72f16a0149785a3ef728897b77409307
+    chromium_archive_sha256: 7328a4c49ac1326abf5b4a66ce29a04439f41ebb3a46002e67d52da6e5884963
+    firefox_archive_sha256: 87625089af5040d8e443501e38edaebd131f6744ccffa3f1ae3ee3684eae748b
+    webkit_archive_sha256: 63282c6280a9757177b16c02ed6779b722cd8ac9c93105379ee31dd28c9d8e4c
+  environment: GitHub Actions Ubuntu 24.04, PHP 8.5.11, Node 24.19.0, PostgreSQL 18.6 with verified TLS,
+    disposable RabbitMQ TLS queues, compiled Console and independent Playwright Chromium/Firefox/WebKit
+    jobs; synthetic HTTPS OIDC provider.
+  scope: 'Completes directory-source browser evidence: Chromium, Firefox and WebKit each pass 59 checks,
+    110 Governance and 49 Console PostgreSQL/TLS cases, two compiled browser journeys with no skips/retries/failures
+    and six confirmed notifications. Each report has 290 matched source and nine artifact bindings. Original
+    archive bytes and all report/log hashes verified; the earlier WebKit quota-save failure is preserved
+    at its original revision.'
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T21:27:57.405126+00:00'
+  observer: GitHub Actions; original archives retrieved and exact source/artifact bytes checked by Codex
+  reviewer: 'Codex: engineering evidence consistency only; independent receiving review remains open'
+  limitations: Historical directory/tenant-consumer scope, before installation identity consumer and recovery
+    fence. Does not qualify later-source behavior or independently establish browser support, accessibility,
+    operating custody or gate acceptance; no automatic expiry assigned.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P02-017
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/b2ccd21eb8dcba08a8b2338669e62ed2d6413230/verification/p02/recovery/local-final-20261005/report.json
+  sha256: 1b935645f9d6cf410477b80a08f44462ef7a602e0382fed69b425f50648dae6b
+  source_revision: ec4c773992f0d82a0338180b6b5c09f12aa12685
+  artifact_revisions:
+    retained_artifact_commit: b2ccd21eb8dcba08a8b2338669e62ed2d6413230
+  environment: Local PHP 8.5.11, Node 24.19.0, SQLite fixtures, locked independently installed Governance/Console
+    dependencies.
+  scope: 'All 12 command observations pass: 155 Governance cases (2182 assertions) and 135 Console cases
+    (596 assertions), both PHP type/dependency/format checks and Console Vue types/build/boundaries/browser
+    discovery. All 24 distinct stdout/stderr logs and 294 exact-commit source bindings verified. The earlier
+    recorder reused Console log names; its four hash mismatches and original report are preserved in local-evidence-correction.json
+    and excluded from passing E1 registration.'
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.02
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T21:57:53.267561+00:00'
+  observer: Codex local source-bound execution and hash audit
+  reviewer: 'Codex: engineering evidence consistency only; independent receiving review remains open'
+  limitations: E1 only; six Governance and seven Console real-broker cases explicitly skipped locally.
+    Browser discovery is not browser execution. PostgreSQL/TLS/three-engine recovery is separately retained
+    in EV-P02-019. No independent review, support-access policy acceptance or operating qualification;
+    no automatic expiry assigned.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P02-018
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/b2ccd21eb8dcba08a8b2338669e62ed2d6413230/verification/p02/recovery-three-engine-index.json
+  sha256: 827d301695ac0198545cf17ab27a769945f88339174ae03934eb0da56fb02800
+  source_revision: 3a5ef6e8c8d65dfcb12a8ab71c1734b76d1e79fc
+  artifact_revisions:
+    retained_artifact_commit: b2ccd21eb8dcba08a8b2338669e62ed2d6413230
+    chromium_report_sha256: ab612f48a7e858a2417bc02323822f949b5795e47416aef5607e55a35846c509
+    firefox_report_sha256: 3976c4915d387a7c420e82aa23e3b2eb623790c7ffb071b04d4c7cbea7f0df4c
+    webkit_report_sha256: 213df115b27c9e62fb540c5420c19efdc0d13e60f2254139cf8bda937a903876
+    chromium_archive_sha256: a369b790807c1acf7dfea01be41a23c34b6ce1b48b917225f5371913ec0ad7fb
+    firefox_archive_sha256: 237a439506a9492e9c05b624cddc0f6c5ecafbc51116e7d1d79420860c284473
+    webkit_archive_sha256: 18e09a2e9667555f4292cdd62016c2b851bb32b74580d843202aa28c6763e8ff
+  environment: GitHub Actions Ubuntu 24.04, PHP 8.5.11, Node 24.19.0, PostgreSQL 18.6 with verified TLS,
+    disposable RabbitMQ TLS queues, compiled Console and independent Playwright Chromium/Firefox/WebKit
+    jobs; synthetic HTTPS OIDC provider.
+  scope: Three independent 98-check campaigns pass installation/tenant notifications, owner-authorized
+    draft-preserving refresh, external admission custody, complete application-table restart/current restore
+    and preactivation stale-bootstrap quarantine. Each runs 118 Governance cases (1979 assertions), 66
+    Console cases (248 assertions), two browser journeys, four HTTPS/PKCE exchanges and 20–21 confirmed
+    deliveries; 302 source and nine artifact bindings per job. This current browser database has no approval
+    rows; no nonempty approval-history claim is made by this run.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T21:48:15.061156+00:00'
+  observer: GitHub Actions; original archives retrieved and exact source/artifact bytes checked by Codex
+  reviewer: 'Codex: engineering evidence consistency only; independent receiving review remains open'
+  limitations: Synthetic provider and immutable plan fixtures; no operated-provider/DNS/key-custody or
+    ingress/workload topology qualification. No managed-browser floor, manual assistive-technology acceptance,
+    broker-store restore, HA, accepted RTO/RPO, exceptional access, native effect, promotion or G01/G02
+    receiving decision. Actual independent descriptor custody must hold/rotate before stale restore; restoring
+    an old active descriptor with its old database is not detected. Later P03 resources, P05.04 plan producer
+    and P06.03 effect integration retain their own checkpoints. No automatic evidence expiry is assigned;
+    relevant source/scope changes require requalification.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P02-019
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/b2ccd21eb8dcba08a8b2338669e62ed2d6413230/verification/p02/approval-history-three-engine-index.json
+  sha256: c7c9bf3fbd910ba3a40b8bc6be518aecaaa4ed7998daacc43e67d8dacd9de3dc
+  source_revision: fe88107aac0aca028170fd5f39f06e0b0d30cb7f
+  artifact_revisions:
+    retained_artifact_commit: b2ccd21eb8dcba08a8b2338669e62ed2d6413230
+    chromium_report_sha256: c86e9b2328e9d5abf915e63aaea9128b6a2308147c0ab63f1ed526ea62fd14ce
+    firefox_report_sha256: 572e7614fe957e5c59a9ca3e54d7f8ab1b225b07fc04156cf0d2691a6564c508
+    webkit_report_sha256: 5c030819309f624a1ed89a35718ef4e143ccf80b91f35d284e3a66036f3cf61f
+    chromium_archive_sha256: 18cd1ba73e6418303f36c75e671521bc6ea18a996c6f814e77e446bd6efc8174
+    firefox_archive_sha256: 4750411ec9a77c306fcfb5395ebc1a7b03ad530772ca208a2be0af304e5a970f
+    webkit_archive_sha256: 456469956a3ad14bd950a039b6bfa482fc8db66a489e46e841bdbf40ccb23dce
+  environment: GitHub Actions Ubuntu 24.04, PHP 8.5.11, Node 24.19.0, PostgreSQL 18.6 with verified TLS,
+    disposable RabbitMQ TLS queues, compiled Console and independent Playwright Chromium/Firefox/WebKit
+    jobs; synthetic HTTPS OIDC provider.
+  scope: All three engines pass 100 checks each, 119 Governance PostgreSQL cases (2010 assertions), 66
+    Console PostgreSQL/TLS cases (248 assertions), two compiled journeys without skips/retries/failures,
+    four HTTPS/PKCE exchanges and 19–21 confirmed owner-to-Console notifications. A separate process also
+    produces two terminal decisions (rejected and revoked) through real owner actions with distinct synthetic
+    actors and five approval audit events, restores the complete fixture schema and compares every owned
+    table. Complete current Governance/Console table fingerprints match after process restart and same-key
+    restore; older bootstrap restore under new/held custody denies login, old session, OIDC and interactive
+    bootstrap without rebinding. Original archives, ten artifact digests and 302 exact-source bindings
+    per engine verified.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.02
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T21:52:05.418157+00:00'
+  observer: GitHub Actions; original archives retrieved and exact source/artifact bytes checked by Codex
+  reviewer: 'Codex: engineering evidence consistency only; independent receiving review remains open'
+  limitations: Synthetic provider and immutable plan fixtures; no operated-provider/DNS/key-custody or
+    ingress/workload topology qualification. No managed-browser floor, manual assistive-technology acceptance,
+    broker-store restore, HA, accepted RTO/RPO, exceptional access, native effect, promotion or G01/G02
+    receiving decision. Actual independent descriptor custody must hold/rotate before stale restore; restoring
+    an old active descriptor with its old database is not detected. Later P03 resources, P05.04 plan producer
+    and P06.03 effect integration retain their own checkpoints. No automatic evidence expiry is assigned;
+    relevant source/scope changes require requalification.
+  valid_until: null
+  invalidated_at: null
+
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -5378,3 +5600,85 @@ blockers:
   - EV-P01-025
   - EV-P01-026
   - EV-P01-027
+- id: BL-P02-001
+  scope_ids:
+  - P02
+  - P02.03
+  - P02.04
+  - R03
+  - R04
+  - R32
+  - G02
+  owner_role: IAM/security and Governance; actual approver-assignment and review owners not supplied
+  description: P02.03 privileged support policy and P02.04 break-glass audit contract require a reviewed
+    action/scope/approval/expiry/custody decision. Current unknown/support actions are denied and no exceptional
+    elevation path exists. A concrete policy proposal is prepared in p02-completion-review.md; it is not
+    an accepted contract.
+  unblock_condition: Approve or amend the proposed initial action list, independent approver assignment,
+    lifetime and audit/review custody; implement and qualify the accepted versioned contract. An exclusion
+    requires explicit phase-scope review.
+  next_action: IAM/security and Governance review the exceptional-access decision table in docs/implementation/p02-completion-review.md.
+    Then implement the selected new contract and two-tenant/separation/expiry/revocation/recovery cases
+    without changing published v1 schemas.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P02-002
+  scope_ids:
+  - P02
+  - P02.01
+  - P02.03
+  - R03
+  - R31
+  - R32
+  - G02
+  owner_role: IAM/SRE, independent recovery custodian and receiving reviewer; actual assignments not supplied
+  description: EV-P02-018/019 measure external-generation admission, restart, full-schema restore and
+    stale-bootstrap denial. Actual independent custody, current revocation records, authenticated lost-bootstrap/rebind
+    procedure and supported identity/workload topology remain unsupplied. Co-restoring an old active descriptor
+    and old database is outside the implemented fence.
+  unblock_condition: Supply OP03/OP06 protected custody and topology inputs, reconcile current retirement/revocation
+    facts, and execute the approved resumption/lost-bootstrap procedure with independent observation.
+    No application startup or migration may silently rebind authority.
+  next_action: Complete the custody and resumption table in docs/implementation/p02-completion-review.md
+    using actual protected references; hold and rotate the external epoch before restore, drain admission,
+    reconcile and obtain the owner decision before any controlled rebind.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P02-003
+  scope_ids:
+  - P02
+  - P02.05
+  - R03
+  - G02
+  owner_role: Product/quality, managed-browser support owner and representative assistive-technology observer;
+    assignments not supplied
+  description: Three disposable browser engines pass the compiled journeys at fe88107, but OP07 managed
+    browser/OS/policy and assistive-technology combinations are not selected. Manual task review and actual
+    managed-browser history-cache behavior remain unobserved.
+  unblock_condition: Select the exact supported browser/OS/policy/assistive matrix and support owner;
+    complete the per-combination WCAG 2.2 AA task observations and resolve mandatory defects.
+  next_action: Populate OP07 and execute the concrete five-task sheet in docs/implementation/p02-completion-review.md.
+    Retain actual builds, policy, tested criteria, observer, findings and evidence; do not infer managed
+    support from Playwright engines.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P02-004
+  scope_ids:
+  - P02
+  - P02.01
+  - P02.02
+  - P02.03
+  - P02.04
+  - P02.05
+  - G02
+  owner_role: Independent IAM/security, Governance, SRE and product/quality receiving reviewers; identities
+    not recorded
+  description: G02 has no receiving reviewer/date/criterion decision. The requesting user authorized implementation,
+    not a fabricated independent review. G01 receiving conditions also carry forward. Passing automated
+    campaigns do not close those decisions.
+  unblock_condition: Record actual reviewer identities, exact-source evidence and each G02 criterion decision
+    after outstanding mandatory obligations are resolved or explicitly reviewed in scope.
+  next_action: Review EV-P02-016 through EV-P02-019 and the G02 engineering assessment using docs/qualification/gate-reviews/g02.md;
+    record the actual receiving outcome in the canonical register and preserve all original failures.
+  state: OPEN
+  resolution_evidence_ids: []

@@ -1,107 +1,78 @@
 # G02 engineering assessment — 2026-10-05
 
-Recorded by Codex for implementation handoff. **G02 remains NOT_REVIEWED**;
-this is not an independent receiving decision. P02.01–P02.05 work and verification
-remain IN_PROGRESS. G01 receiving inputs still apply.
+P02's implemented continuation passes the expanded three-engine integration
+campaign at `fe88107aac0aca028170fd5f39f06e0b0d30cb7f`. **G02 remains
+NOT_REVIEWED and P02 remains IN_PROGRESS** because the phase's required exceptional
+access policy, actual recovery custody, managed-browser/accessibility scope and
+independent receiving decisions remain open. Codex records engineering examination;
+no independent reviewer or operating assignment is invented.
 
-The [delivery register](../../implementation/delivery-register.yaml) owns evidence
-and state. EV-P02-001 retains local bootstrap. EV-P02-002 retains the signed-token
-OIDC adapter regression. EV-P02-003 retains the preceding tenancy/approval baseline.
-EV-P02-004 records confirmed event delivery and background expiry, including
-32 PostgreSQL/TLS-broker cases (719 assertions). EV-P02-005 records the delegation
-increment and Catalogue's synthetic owner-boundary tests. EV-P02-006 records the
-latest 47-check identity campaign, 80 PostgreSQL feature cases (1,427 assertions),
-two expanded compiled browser journeys, four HTTPS/PKCE exchanges, six artifact
-hashes and 248 exact source bindings at
-`512fd5c2580e5cd40bf0089662cff8d84718a877`. Providers, immutable plans and the
-broker consumer are explicitly synthetic. Positive and negative observations are
-bounded to those implemented surfaces.
+The [delivery register](../../implementation/delivery-register.yaml) owns current
+state. The [completion review packet](../../implementation/p02-completion-review.md)
+contains concrete decisions, acceptance observations and the manual task sheet for
+BL-P02-001–004. G01 receiving conditions carry forward.
 
-EV-P02-007 adds E1 verification of the separate identity relay: 141 local
-Governance tests, 1,714 assertions, six explicitly skipped real-broker cases, nine
-command logs and 158 committed-source bindings. Static/type/format checks pass.
-The [identity delivery record](../../implementation/p02-identity-events.md) and
-[workflow snapshot](../../../verification/p02/identity-delivery-regression-runs.json)
-separate implemented code from queued/pending hosted PostgreSQL/TLS and independent
-Chromium/Firefox/WebKit campaigns. EV-P02-008 subsequently retains 60 passing PostgreSQL/TLS broker cases (854
-assertions) at `1d45f11146913c7401732e9d6be0c8bd7677dfda`. EV-P02-009
-retains Firefox execution at `7b24476c71a778dcf9a865b04c13aa35aa8b3992`: 50
-checks, 105 PostgreSQL cases (1,542 assertions), both browser journeys and four
-HTTPS/PKCE exchanges. Chromium/WebKit remain queued in the
-[hosted follow-up](../../../verification/p02/identity-delivery-hosted-runs.json).
+## Verified continuation
 
-EV-P02-010/012 add the [Console notification consumer](../../implementation/p02-console-notifications.md):
-114 local cases (520 assertions), then Chromium with 58 checks, 105 Governance
-cases (1,542 assertions), 44 Console notification cases (163 assertions), two
-compiled journeys and six real owner-to-Console deliveries. The inbox commits
-before acknowledgement; current owner authorization precedes hint disclosure;
-explicit refresh preserves drafts until the user chooses to replace them.
-Installation identity and approval events are excluded. EV-P02-011 retains the
-previously cancelled relay regression after successful replay. EV-P01-032 retains
-the corrected sockets-enabled Console image and 249-check Compose replay;
-the original build failure is preserved. Current campaign states are in the
-[notification snapshot](../../../verification/p02/console-notification-hosted-runs.json).
+| Evidence | Exact measured result |
+| --- | --- |
+| EV-P02-016 | Directory source `5c789a1`: Chromium, Firefox and WebKit each pass 59 checks, 159 PostgreSQL/TLS feature cases and both compiled journeys. All three original archives, 290 source bindings and nine artifact digests per engine match. This resolves the earlier queued-browser handoff. |
+| EV-P02-017 | Source `ec4c773`, whose application code includes `fe88107`: 155 Governance tests / 2,182 assertions and 135 Console tests / 596 assertions; 12 commands, 24 distinct stream hashes and 294 exact source bindings. Six and seven real-broker cases are explicitly skipped locally and exercised by hosted campaigns. |
+| EV-P02-018 | Source `3a5ef6e`: all three engines pass 98 checks including installation notifications, complete application-table restart/current restore and stale-bootstrap admission denial. Empty approval tables are explicitly recorded rather than treated as nonempty history coverage. |
+| EV-P02-019 | Source `fe88107`: all three engines pass 100 checks, 119 Governance cases / 2,010 assertions, 66 Console cases / 248 assertions, both browser journeys, four HTTPS/PKCE exchanges and 19–21 confirmed notifications. A separate full-schema restore preserves two terminal approval decisions and five decision events. Ten artifact hashes and 302 source bindings per engine match. |
 
-| Criterion | Observed implementation/evidence | Remaining qualification or implementation |
+The [hosted regression receipt](../../../verification/p02/completion-hosted-final.json)
+records all nine workflows successfully completed at `fe88107`, including the
+nine independent packages, images, contracts, policy, events, Compose and
+Kubernetes. It is a timestamped metadata observation; raw P02 campaign evidence
+remains separately retained. The earlier in-progress snapshot is unchanged.
+EV-P02-001–015 retain earlier bootstrap, federation, tenant/approval, relay,
+delegation, Console consumer and directory increments at their original sources.
+
+## Criterion assessment
+
+| Criterion | Measured boundary | Remaining P02 obligation |
 | --- | --- | --- |
-| G02.01 — identity and tenant boundaries | Forced password change; Console-only OIDC settings/test/activation; current federated sessions; explicit membership/role/grant scopes; two-tenant denials; real CSRF; bounded audience/action/scope delegation and a Catalogue guard with independent workload credentials. | Full user/service caller and projection/search/export/evidence matrix as owners expose those surfaces; real Catalogue resource integration and deployed cross-service delegation; complete published HTTP wire conformance across language clients; supported deployment identity topology. |
-| G02.02 — immutable approval binding | Exact synthetic plan ID/revision/digest/action/scope/actors/validity; independent reviewer; named executor; rejection, revocation, expiry and loss/regrant of authority. | Integrate the real P05.04 plan producer; owning-service/native pre-effect admission; approved exceptional-access policy and implementation. No observation JSON is a native permit. |
-| G02.03 — failure/revocation boundaries | Wrong claims/signature/replay/proof/session/revision denied; failed provider test preserves setup; verified handover retires local password/sessions; current session, membership/grant fingerprints, explicit revocation and credential rotation prevent delegated reuse. | Real provider/DNS/key rotation and issuer-loss interoperability; deployed bootstrap/retry/restore/authority-epoch reconciliation; operated workload credential custody and rotation; approved provider revocation/recovery extensions. |
-| G02.04 — durable history and browser journey | Real PostgreSQL; atomic audit/outbox; routed confirmation, competing relays, killed-publisher replay, quarantine and expiry; Console durable inbox, duplicate/conflict handling and actual broker-to-browser refresh preserving drafts; tenant navigation/quota, revoked access, delayed-response isolation and same-session tab sign-out; keyboard controls and page/error focus. | Remaining owner-scoped consumers, including installation identity; restart/whole-store restore qualification of history/inbox/key custody; other browser engines for the new consumer; actual back/forward-cache interoperability, complete assistive-technology campaign, supported browser floor and actual support ownership. |
+| G02.01 — identity and tenant isolation | One-time bootstrap and forced password change, real CSRF, Console-only OIDC configuration, handover/local retirement, current membership/grant decisions, paged tenant/member directories, guessed/cross-tenant denial, scoped delegation and current-owner authorization before tenant/installation hint disclosure. | Review the implemented surface/permission scope and the proposed exceptional-access contract; supply the actual supported identity/workload topology and receiving decision. Future owner surfaces retain their phase-specific isolation tests. |
+| G02.02 — immutable approval binding | Synthetic immutable plan digest/action/scope/actors/validity, independent reviewer and named executor, reject/revoke/expire, changed/regranted authority denial; nonempty terminal decision history survives a separate full-schema PostgreSQL restore. | Accepted support/break-glass policy and audit contract, its implementation and qualification. The real P05.04 producer is a later integration checkpoint, not a prerequisite for P02 synthetic-plan evidence. |
+| G02.03 — failure and revocation | Wrong claim/signature/audience/expiry/replay denied; failed setup preserves changed-password local administration; successful activation retires local credentials/sessions. Missing/held/mismatched external custody denies admission. Whole application restart/restore preserves current records; preactivation restore under held/new custody cannot authenticate, start OIDC or bootstrap/rebind. | Actual independent descriptor/key custody and current revocation records; supported issuer/workload failure/rotation topology; authenticated lost-bootstrap and reconciled resumption procedure. Restoring an old active descriptor with its old database is explicitly not protected. |
+| G02.04 — durable audit and usability | Atomic audit/outbox, confirmed TLS delivery, durable shared inbox, duplicate/conflict/quarantine behavior, immutable history restore, draft-preserving tenant and identity refresh, controlled late responses and same-session tabs, keyboard/page/error focus in three engines. | Managed browser/OS/policy/assistive matrix, real history-cache interoperability and representative manual accessibility tasks; actual support owner and independent receiving review. |
 
-## Next executable increments and owners
+## Completed implementation and limits
 
-1. Governance and owning services: extend the measured Console tenant consumer
-   only for explicit owner-approved use cases. Installation identity consumers,
-   replay/retention policy and independent restore reconciliation remain open.
-   The distinct identity relay's newer-source regression now passes in EV-P02-011;
-   no event grants authority. Complete outstanding corrected-source foundation and
-   browser-engine qualification without substituting documentation-only passes.
-2. IAM/security and owning services: bind the implemented service delegation to
-   actual resources and qualify cross-service wire behavior. Native pre-effect
-   admission remains P05/P06. Define an explicit
-   support/break-glass approval, expiry and audit policy; current unknown/support
-   actions remain denied.
-3. SRE/IAM: bind deployment and restore to approved secret/key custody and
-   revocation reconciliation using actual operating inputs; test no resurrection.
-4. Console/quality: extend the passing controlled late-response and multi-tab
-   cases to actual history-cache restores and manual assistive technology.
-   Historical Firefox and the new consumer's Chromium journey have retained passing
-   evidence. Retain each remaining engine/corrected-source result and qualify the
-   actual managed-browser floor. The [directory increment](../../implementation/p02-directory.md) now pages Console
-   tenants and memberships with live scope/session checks; its hosted qualification
-   must be recorded separately. Published grant/audit v1 lists remain bounded.
-5. Independent IAM/security, Governance, quality/product and SRE reviewers: review
-   every G02 criterion with its measured boundary and record the receiving decision.
+The [installation consumer](../../implementation/p02-console-notifications.md)
+accepts all twelve published identity routes alongside five tenant routes through
+one event-ID namespace. Only settings changes and activation update the setup
+hint. Current Governance settings authorization precedes its disclosure. The
+shared bounded polling component preserves unsaved forms and clears write-only
+secret drafts only when the user explicitly refreshes. Events never confer access.
 
-The [correction history](../../../verification/p02/corrections.md) retains the
-failed timing run, relay timestamp precision/broker readiness failures and the
-rejected published-contract edit. The edit was restored
-to its original bytes; no policy exclusion changed. Hosted regression outcomes
-and source identities must be inspected separately; a successful development
-campaign does not supply actual operating identities, promotion approval or native
-qualification.
+The [recovery admission increment](../../implementation/p02-identity-recovery.md)
+checks infrastructure-owned external custody on each new user/service admission.
+It deliberately supplies no automatic reset or rebind. Operators must hold and
+rotate custody before restore and drain previously admitted work. Hosted evidence
+does not establish an independent production custodian or authorize reopening a
+restored installation.
 
-## Directory and browser follow-up
+Catalogue's real resources and Console-to-Catalogue integration belong to P03;
+the real plan producer belongs to P05.04; immediate native-effect rechecks belong
+to P06.03. No synthetic approval observation is a native permit. Broker HA/store
+recovery, full operating acceptance and RTO/RPO retain their defined later gates.
 
-EV-P02-013 adds local directory/Console implementation checks at `5c789a1`:
-146 Governance cases, 119 Console cases, source-only docs checks and 282 source
-bindings. The original
-[directory snapshot](../../../verification/p02/directory-hosted-runs.json) records
-the then-queued campaign. EV-P02-015 subsequently retains 59 passing checks,
-159 PostgreSQL/TLS cases, two Chromium journeys, six deliveries and 290 source
-bindings at the same implementation revision. Firefox/WebKit remain queued in the
-[follow-up](../../../verification/p02/directory-hosted-followup.json).
-EV-P02-014 retains the separate Firefox consumer pass at `b13996d`; the same-source
-WebKit failure remains, with the correction and later-source reruns tracked
-independently. These records do not pass G02 or replace actual receiving inputs.
+## Corrections and next action
 
-## Current recovery boundary
+The [correction history](../../../verification/p02/corrections.md) preserves
+original failures. The first installation browser run exposed a fixture that
+replayed only the first migration and removed relay update grants; replay now
+applies all ordered migrations. Isolated-package contract tests now use the
+packaged fixture plus an immutable published-schema digest, with exact repository
+comparison retained in integration. No contract freeze or test assertion was
+relaxed. A local recorder log-name collision was separately found, retained and
+corrected with a full hash-verified rerun; that incomplete historical receipt is
+not registered as passing evidence.
 
-The [identity admission increment](../../implementation/p02-identity-recovery.md)
-adds a required external generation check and stale-restore quarantine campaign.
-It does not supply actual independent custody or a recovery/rebind approval. The
-[installation consumer](../../implementation/p02-console-notifications.md) now
-covers installation identity notifications with current owner authorization.
-Changed-source hosted outcomes, correction history and source-bound evidence must
-be retained separately from the earlier three-browser directory results.
+IAM/security and Governance review the concrete exceptional-access proposal;
+IAM/SRE provide OP03/OP06 custody and resumption inputs; product/quality select
+OP07 and execute the supplied task sheet. Then actual independent reviewers
+record each G02 criterion decision using [the receiving procedure](g02.md).
+These are the remaining phase obligations. A green campaign cannot supply them.

@@ -136,11 +136,13 @@ These results are separate from hosted PostgreSQL/browser observations, which mu
 be retained with their exact source/artifact bindings before evidence is claimed.
 
 The [data-facing delegation and Catalogue guard](p02-service-delegation.md)
-implement the initial short-lived service contract. Remaining P02 integration:
-real owning-service resources and cross-service wire qualification; approved support/break-glass contracts and implementation; real consumer integration and receiving of outbox/expiry; deployed recovery/revocation epochs; full browser and
-accessibility qualification. The [new directory APIs](p02-directory.md) page Console tenants and memberships.
-Published v1 lists keep their 200-row bound (audit 100). No native effect, real provider interoperability, complete
-operational acceptance or completed phase is inferred.
+implement the initial short-lived service contract. Remaining P02 obligations are the reviewed exceptional-access policy/contract,
+actual independent recovery custody and resumption procedure, supported
+managed-browser/manual accessibility scope and independent receiving review.
+The [completion packet](p02-completion-review.md) makes each input concrete.
+Installation notifications and full application-table/approval-history restore
+are now implemented and measured in EV-P02-018/019. Real Catalogue resources,
+the P05.04 plan producer and P06.03 native effects keep their later checkpoints.
 
 ## Retained campaign
 

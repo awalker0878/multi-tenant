@@ -92,3 +92,43 @@ The workflow-input change conservatively selects all candidates through the
 existing selector. Check names, required assertions, platform/security checks,
 failure aggregation and permissions stay in force. The new full campaign needs
 its own results; this configuration change is not a passing image admission.
+
+
+## Installation relay migration replay and isolated package fixtures
+
+At `a2c522458c9f61966f794096c435c95464f6b427`, identity run `37376902084`
+fails in all three engines because its fixture replays only migration 001 after
+the complete migration set, removing later identity-outbox UPDATE grants. The
+[original Chromium report](identity/run-37376902084/chromium/report.json) and
+archive preserve the failure. `3a5ef6e` replays every ordered migration, retaining
+the same runtime least-privilege grants and all delivery assertions.
+
+The same source's package run `37376902098` exposes Console and Governance
+tests that read repository-root schema paths outside their independently packaged
+applications. The original [Console receipt](corrections/run-37376902098/console/retrieval.json)
+and [Governance receipt](corrections/run-37376902098/governance/retrieval.json)
+retain the failures. The correction checks the packaged schema against its fixed
+published digest locally; the integration campaign still compares exact published
+repository bytes. No application package reaches into a sibling package and no
+contract-freeze exclusion changes.
+
+Corrected [run 37377875499](recovery-three-engine-index.json) passes all three
+98-check identity jobs. [Run 37378369526](approval-history-three-engine-index.json)
+adds nonempty approval-history recovery and passes 100 checks in each engine.
+The nine isolated package jobs at `fe88107` also pass; their exact workflow
+identity is in [the hosted receipt](completion-hosted-runs.json).
+
+## Local command-log filename collision
+
+The unregistered [initial recovery E1 report](recovery/local-20261005/report.json)
+reused `console-types` and `console-boundaries` filenames for PHP and frontend
+commands. Four original PHP stream hashes therefore do not match the overwritten
+files. Its stored PASS field is not accepted as complete evidence and is left
+unchanged. The [correction receipt](recovery/local-evidence-correction.json)
+records each mismatch without inventing the lost streams.
+
+The [full rerun](recovery/local-final-20261005/report.json) at `ec4c773` uses
+distinct `console-frontend-*` filenames. All twelve commands pass; the separate
+[verification receipt](recovery/local-final-20261005/verification.json) checks
+all 24 streams and 294 exact-commit source bindings. EV-P02-017 registers only
+this corrected evidence. Hosted campaign artifacts did not have this collision.

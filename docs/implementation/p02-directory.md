@@ -87,9 +87,16 @@ owner-to-Console deliveries. Nine artifact digests and 290 source bindings match
 the original archive. PostgreSQL cases traverse multi-page directories; the
 compiled journey exercises the new owner endpoints with two tenants.
 
-Firefox and WebKit remain queued in the
+Firefox and WebKit were queued in the historical
 [follow-up observation](../../verification/p02/directory-hosted-followup.json).
+EV-P02-016 now retains both successful jobs alongside Chromium: each passes
+59 checks, both compiled journeys and the same 290 source bindings. The
+[three-engine index](../../verification/p02/directory-three-engine-index.json)
+links the original reports and archive hashes.
 The earlier correction-only run `37373325859` was cancelled across all engines;
 those cancellations are not relabelled. Changed-source package/image runs were
-cancelled before creating jobs and remain unqualified; no failed job exists for
-the failed-jobs-only retry tool. Separate operated and receiving conditions remain.
+cancelled before creating jobs; no failed job existed for the failed-jobs-only
+retry tool. Later complete package/image campaigns at `fe88107` pass in the
+[current workflow receipt](../../verification/p02/completion-hosted-final.json);
+those new-source results do not rewrite the cancellations. Separate operated and
+receiving conditions remain.

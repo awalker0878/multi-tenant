@@ -1,140 +1,72 @@
-# Next work — P02 identity, tenancy and governance
+# Next work — P02 completion review
 
-Active branch: `greenfield/enterprise-microservices-plan`. The requesting user authorized P02 development on 2026-10-05 in [the entry record](docs/implementation/p02-development-entry.md). **P02 is active across identity, tenancy, authorization, approvals and console navigation. G01 receiving review remains open and G02 is not passed.** The [delivery register](docs/implementation/delivery-register.yaml) owns state; progress and traceability are generated views.
+Active branch: `greenfield/enterprise-microservices-plan`. The requesting user
+authorized continued P02 development through completion. The implementation
+continuation is committed through `fe88107aac0aca028170fd5f39f06e0b0d30cb7f`;
+original evidence is retained through `b2ccd21eb8dcba08a8b2338669e62ed2d6413230`.
+The [delivery register](docs/implementation/delivery-register.yaml) owns status.
+**P02 remains IN_PROGRESS and G02 NOT_REVIEWED** because the existing phase scope
+still has the concrete owner-dependent obligations below. G01 receiving review
+also remains open. Development authorization does not invent receiving approval.
 
-## P02 handoff
+## Completed continuation
 
-Console-managed [OIDC setup and tested handover](docs/implementation/p02-federation.md),
-[tenant authority and plan-bound approvals](docs/implementation/p02-tenancy-and-approvals.md),
-and tenant membership/quota administration are implemented. P02.01–P02.05 remain
-IN_PROGRESS; receiving and the remaining integration scope are open.
+- [Installation notifications](docs/implementation/p02-console-notifications.md):
+  the durable Console inbox now handles the twelve identity routes as well as
+  tenant changes. Current owner authorization precedes setup hints; bounded polling
+  preserves drafts, and explicit refresh clears discarded secret input.
+- [Identity recovery admission](docs/implementation/p02-identity-recovery.md):
+  current external installation/epoch custody is required at new user/service
+  admission. Missing, held or mismatched custody denies access; initialized or
+  restored state cannot automatically rebind or revive bootstrap credentials.
+- Complete application-table process restart/current restore, stale-bootstrap
+  restore denial and a separate nonempty approval-history restore are now measured.
+  Two terminal decisions and five decision audit events survive the latter restore.
 
-The current retained increments are:
+## Retained verification
 
-- **EV-P02-004 — Governance event delivery and background expiry.** Explicit
-  schema/AsyncAPI contracts, bounded scheduler commands, routed confirmations,
-  retry/quarantine and system-attributed expiry. The corrected PostgreSQL/TLS
-  broker campaign passes 32 tests (719 assertions), including competing relays,
-  process death after confirmation and duplicate delivery. Original timestamp
-  precision and broker-readiness failures remain retained with their correction.
-- **EV-P02-005 — Short-lived service actor delegation and Catalogue guard.**
-  Opaque sixty-second handles bind exact audience/action/scope and current
-  session/membership/grant/workload credentials. Logout, revocation/regrant,
-  suspension and credential rotation deny reuse. The hosted identity campaign
-  passes 80 PostgreSQL feature cases (1,427 assertions). Catalogue passes 50
-  boundary/package cases (207 assertions); its owner route and Governance
-  transport are explicit test fixtures, not deployed product integration.
-- **EV-P02-006 — Expanded compiled Console journey.** The latest 47-check
-  campaign at `512fd5c2580e5cd40bf0089662cff8d84718a877` passes two browser
-  journeys with four HTTPS/PKCE exchanges, six artifact hashes and 248 source
-  bindings. A controlled late tenant response cannot replace the newer page;
-  drafts stay separate between tabs and sign-out clears same-session tabs.
-  Protected back/forward-cache restores now reauthenticate; actual browser-cache
-  interoperability and manual assistive-technology qualification remain open.
+| Evidence | Result |
+| --- | --- |
+| EV-P02-016 | Directory baseline: all three engines pass 59 checks each; Firefox/WebKit are no longer queued. |
+| EV-P02-017 | Final local E1: 155 Governance and 135 Console cases pass; all 12 commands, 24 distinct logs and 294 exact source bindings verified. Thirteen broker cases are explicitly skipped locally. |
+| EV-P02-018 | Recovery/installation-consumer source: all three engines pass 98 checks each. |
+| EV-P02-019 | Final source `fe88107`: Chromium, Firefox and WebKit each pass 100 checks, 119 Governance and 66 Console PostgreSQL/TLS cases, two browser journeys with no skips/retries/failures and nonempty approval-history restore. |
 
-EV-P02-001–003 retain the bootstrap, federation and tenancy/approval baselines.
-The [correction record](verification/p02/corrections.md) preserves historical
-failures without changing their outcomes. The published v1 contracts retain their
-original bytes; new behavior uses new contracts. No validation rule was weakened.
-The [regression snapshot](verification/p02/governance-delegation-regression-runs.json)
-records workflow source identities and actual outcomes, including any pending
-runs; the P02 campaign is separate from foundation runtime qualification.
+The [hosted receipt](verification/p02/completion-hosted-final.json) records successful completion of all nine workflows at `fe88107`, including
+all nine independent packages, images, contracts, events, policy, Compose and
+Kubernetes. Passing identity evidence includes original ZIP bytes, ten artifact hashes
+and 302 exact source bindings per engine. Earlier evidence remains in
+EV-P02-001–015; original failures remain in
+[the corrections record](verification/p02/corrections.md). No failed run is
+relabelled, contract freeze weakened or unexecuted manual task counted as passed.
 
-Implementation and limits are in [event delivery](docs/implementation/p02-governance-events.md),
-[service delegation](docs/implementation/p02-service-delegation.md) and
-[tenant/browser behavior](docs/implementation/p02-tenancy-and-approvals.md).
+## Remaining actions to complete P02
 
-**EV-P02-007 — Identity notifications and browser-engine campaign.** The distinct
-[identity relay](docs/implementation/p02-identity-events.md) is implemented with
-versioned contracts, additive migration, restricted routing, retry/quarantine and
-unchanged-wire replay. Local E1 verification passes 141 Governance cases (1,714
-assertions), static/dependency/format checks, Console types and three-engine test
-discovery; six real-broker cases are explicitly skipped locally. Nine logs and
-158 source bindings match `7b24476c71a778dcf9a865b04c13aa35aa8b3992`.
+The [completion review packet](docs/implementation/p02-completion-review.md)
+contains the exact proposal, input tables and manual task sheet. Use it directly:
 
-**EV-P02-008/009 — Hosted identity delivery and Firefox.** The event campaign at
-`1d45f11` passes 60 PostgreSQL/TLS broker cases (854 assertions), five checks,
-153 source bindings and ten log hashes. Firefox at `7b24476` passes 50 checks,
-105 PostgreSQL cases (1,542 assertions), two compiled journeys, four HTTPS/PKCE
-exchanges, 259 source and six artifact hashes. Original ZIP bytes were verified
-before retention; neither result supplies a product consumer or receiving decision.
+1. **BL-P02-001 — IAM/security and Governance:** accept or amend the proposed
+   exceptional-support action list, independent approver assignment, lifetime and
+   audit/review custody; then implement and qualify that selected contract.
+   Unknown/support actions remain denied. An exclusion requires explicit phase
+   scope review; deny-by-default alone does not deliver the requested contract.
+2. **BL-P02-002 — IAM/SRE and the independent custodian:** supply OP03/OP06 actual
+   descriptor/key custody, supported identity topology, current revocation records
+   and the authenticated lost-bootstrap/reconciled resumption procedure. The fence
+   requires custody hold/rotation before restore and cannot detect co-restoration
+   of an old active descriptor with its database.
+3. **BL-P02-003 — Product/quality:** select OP07's exact managed browser/OS/policy
+   and assistive combinations and support owner; execute the five manual tasks,
+   including actual history-cache behavior, and resolve mandatory defects.
+4. **BL-P02-004 — Actual independent reviewers:** examine all four criteria and
+   record the G02 receiving outcome with names, dates and immutable evidence.
 
-**EV-P02-010–012 — Console consumer and relay replay.** The
-[Console notification consumer](docs/implementation/p02-console-notifications.md)
-now records durable receipts/quarantine, acknowledges after commit and offers an
-owner-authorized refresh without replacing drafts. Local E1 passes 114 tests
-(520 assertions), thirteen logs and 134 source bindings. Chromium at `283e6f4`
-passes 58 checks, 105 Governance cases (1,542 assertions), 44 Console notification
-cases (163 assertions), two journeys and six real owner-to-Console deliveries;
-284 source and nine artifact hashes match. The older `7b24476` relay regression
-passes on rerun: 60 cases, 854 assertions, five checks and ten logs. Historical
-snapshots remain unchanged.
-
-**EV-P01-032 — Corrected image/runtime replay.** The first Console image build
-failed because AMQP requires `ext-sockets`. `b13996d` compiles and declares it;
-no platform check or package version is relaxed. The corrected Compose campaign
-`37371858448` passes 249 checks, all seven image builds, 612 log hashes and 451
-unique source bindings. Its complete archive and the original failure are retained.
-This is separate from package replay, image-security admission and Kubernetes.
-
-**Current implementation — paged directories and browser correction.**
-The [directory increment](docs/implementation/p02-directory.md) removes the Console
-200-entry truncation using current-authority, session-bound 50-row pages. Existing
-published APIs remain unchanged. The [quota-save campaign correction](docs/implementation/p02-browser-synchronization.md)
-waits for the returned server values before navigation; the original WebKit failure
-is retained. **EV-P02-013** retains 146 Governance and 119 Console passing local cases,
-15 command observations, 30 logs and 282 source bindings at `5c789a1`.
-Twelve real-broker cases are explicitly skipped locally. **EV-P02-014** retains the
-older Firefox consumer success at `b13996d`: 58 checks, 149 PostgreSQL cases,
-two browser journeys and six deliveries. Its independent WebKit failure remains.
-The [current workflow snapshot](verification/p02/directory-hosted-runs.json)
-keeps pending hosted qualification separate from these observations.
-
-**EV-P02-015 — Hosted directory-source qualification.** Chromium at `5c789a1`
-passes 59 campaign checks, 110 Governance and 49 Console PostgreSQL/TLS cases,
-two compiled journeys, four HTTPS/PKCE exchanges and six owner-to-Console
-deliveries. The original archive, nine artifact digests and 290 source bindings
-match. The earlier correction-only browser run `37373325859` was cancelled;
-its outcomes remain separate from this newer-source result.
-
-**Current continuation — installation identity consumer.** The setup page now has
-owner-authorized, draft-preserving notifications backed by the shared immutable
-inbox. Migration 003 and explicit identity routing extend the tenant consumer.
-The hosted campaign now covers the real identity relay, a second setup tab and
-secret clearing on explicit refresh. Retain the changed-source outcomes separately.
-
-**Current continuation — recovery admission.** Governance now checks an external
-installation/recovery generation at user and service admission. Missing, held or
-mismatched custody denies access; bootstrap cannot bind an initialized or restored
-installation automatically. [The recovery increment](docs/implementation/p02-identity-recovery.md)
-defines the mandatory external hold/rotation procedure and its limits. The hosted
-campaign adds process restart, complete application-schema restore and stale
-bootstrap quarantine. Retain actual results before treating these checks as passed.
-
-**Immediate verification:** retrieve Firefox/WebKit from directory run
-`37374667414`, then retain the affected foundation and event regressions.
-[The follow-up snapshot](verification/p02/directory-hosted-followup.json)
-records Chromium success, queued browsers, and package/image runs
-`37374667583`/`37374667564` cancelled before creating jobs. No failed job exists
-for the failed-jobs-only retry capability. Re-run those complete changed-source
-campaigns through an authorized full-run/dispatch path when available; do not
-substitute documentation-only checks. Preserve the bounded queue correction and
-original outcomes in [the corrections record](verification/p02/corrections.md).
-
-**Next concrete work:** finish notification restart/restore and browser-floor
-qualification, installation-consumer hosted qualification, and the remaining
-manual accessibility campaign. Tenant and membership Console pagination is now
-implemented; grant/audit APIs retain their published v1 bounds. Bind Catalogue's guard to owner resources
-and qualify the Console-to-Catalogue-to-Governance wire path as P03 resources are
-implemented under their entry conditions. Resolve the approved support-access/break-glass contract
-and independent restore/revocation custody before those authority changes. Extend
-the browser campaign to the supported browser floor and manual accessibility.
-The real immutable plan producer belongs to P05.04; the native effect boundary
-belongs to P06.03. P02 uses synthetic plans only in tests and production fails
-closed without the owner. Follow the
-[G02 engineering assessment](docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
-for criterion gaps and accountable reviewers. Provider values remain
-Console-managed application settings. No gate pass or promotion is inferred.
+Follow the [G02 engineering assessment](docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
+for the measured boundary. P03 owns real Catalogue resource/wire integration;
+P05.04 owns the real immutable-plan producer; P06.03 owns immediate native-effect
+rechecks. They retain their own checkpoints. Provider values remain Console-managed
+application settings. No production OIDC registration is needed to continue P02
+development, and no gate pass or promotion is inferred.
 
 ## Retained P01 handoff
 
