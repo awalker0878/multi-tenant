@@ -17,6 +17,19 @@ hashes and 248 exact source bindings at
 broker consumer are explicitly synthetic. Positive and negative observations are
 bounded to those implemented surfaces.
 
+EV-P02-007 adds E1 verification of the separate identity relay: 141 local
+Governance tests, 1,714 assertions, six explicitly skipped real-broker cases, nine
+command logs and 158 committed-source bindings. Static/type/format checks pass.
+The [identity delivery record](../../implementation/p02-identity-events.md) and
+[workflow snapshot](../../../verification/p02/identity-delivery-regression-runs.json)
+separate implemented code from queued/pending hosted PostgreSQL/TLS and independent
+Chromium/Firefox/WebKit campaigns. EV-P02-008 subsequently retains 60 passing PostgreSQL/TLS broker cases (854
+assertions) at `1d45f11146913c7401732e9d6be0c8bd7677dfda`. EV-P02-009
+retains Firefox execution at `7b24476c71a778dcf9a865b04c13aa35aa8b3992`: 50
+checks, 105 PostgreSQL cases (1,542 assertions), both browser journeys and four
+HTTPS/PKCE exchanges. Chromium/WebKit remain queued in the
+[hosted follow-up](../../../verification/p02/identity-delivery-hosted-runs.json).
+
 | Criterion | Observed implementation/evidence | Remaining qualification or implementation |
 | --- | --- | --- |
 | G02.01 — identity and tenant boundaries | Forced password change; Console-only OIDC settings/test/activation; current federated sessions; explicit membership/role/grant scopes; two-tenant denials; real CSRF; bounded audience/action/scope delegation and a Catalogue guard with independent workload credentials. | Full user/service caller and projection/search/export/evidence matrix as owners expose those surfaces; real Catalogue resource integration and deployed cross-service delegation; complete published HTTP wire conformance across language clients; supported deployment identity topology. |
@@ -27,8 +40,9 @@ bounded to those implemented surfaces.
 ## Next executable increments and owners
 
 1. Governance and owning services: integrate actual notification consumers with
-   durable inboxes and current owner-API reconciliation; version and deliver the
-   distinct identity outbox. The implemented tenant relay never grants authority.
+   durable inboxes and current owner-API reconciliation. The distinct identity
+   outbox has E1 and PostgreSQL/TLS E2 verification; retrieve the separately
+   queued newer-source regression before extending that source claim. The implemented tenant relay never grants authority.
 2. IAM/security and owning services: bind the implemented service delegation to
    actual resources and qualify cross-service wire behavior. Native pre-effect
    admission remains P05/P06. Define an explicit
@@ -37,8 +51,9 @@ bounded to those implemented surfaces.
 3. SRE/IAM: bind deployment and restore to approved secret/key custody and
    revocation reconciliation using actual operating inputs; test no resurrection.
 4. Console/quality: extend the passing controlled late-response and multi-tab
-   cases to supported browsers, actual history-cache restores and manual assistive
-   technology. Current lists have explicit 200-row bounds (audit 100);
+   cases to actual history-cache restores and manual assistive technology.
+   Firefox has retained passing evidence. The independent Chromium/WebKit jobs
+   remain queued; retain each result and qualify the actual managed-browser floor. Current lists have explicit 200-row bounds (audit 100);
    pagination is not yet implemented.
 5. Independent IAM/security, Governance, quality/product and SRE reviewers: review
    every G02 criterion with its measured boundary and record the receiving decision.

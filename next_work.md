@@ -44,11 +44,31 @@ Implementation and limits are in [event delivery](docs/implementation/p02-govern
 [service delegation](docs/implementation/p02-service-delegation.md) and
 [tenant/browser behavior](docs/implementation/p02-tenancy-and-approvals.md).
 
-**Current increment:** the distinct [identity outbox delivery](docs/implementation/p02-identity-events.md)
-is implemented; retain the exact-source PostgreSQL/TLS broker and identity
-qualification before registering its evidence. The Console workflow now qualifies
-the same journeys independently in Chromium, Firefox and WebKit; inspect and retain
-each engine result before claiming measured interoperability.
+**EV-P02-007 — Identity notifications and browser-engine campaign.** The distinct
+[identity relay](docs/implementation/p02-identity-events.md) is implemented with
+versioned contracts, additive migration, restricted routing, retry/quarantine and
+unchanged-wire replay. Local E1 verification passes 141 Governance cases (1,714
+assertions), static/dependency/format checks, Console types and three-engine test
+discovery; six real-broker cases are explicitly skipped locally. Nine logs and
+158 source bindings match `7b24476c71a778dcf9a865b04c13aa35aa8b3992`.
+
+**EV-P02-008/009 — Hosted identity delivery and Firefox.** The event campaign at
+`1d45f11` passes 60 PostgreSQL/TLS broker cases (854 assertions), five checks,
+153 source bindings and ten log hashes. Firefox at `7b24476` passes 50 checks,
+105 PostgreSQL cases (1,542 assertions), two compiled journeys, four HTTPS/PKCE
+exchanges, 259 source and six artifact hashes. Original ZIP bytes were verified
+before retention; neither result supplies a product consumer or receiving decision.
+
+**Immediate verification:** retrieve the Chromium and WebKit jobs in `P02 identity`
+run `37367427132` and the newer-source event regression `37367321499`; retain
+original bytes and exact-source bindings, including failures and corrections.
+The [hosted workflow snapshot](verification/p02/identity-delivery-hosted-runs.json)
+records Firefox/event success separately from queued/pending work and superseded
+cancellations. Inspect affected foundation campaigns and replay cancelled required
+checks against their actual changed source; documentation-only passes cannot replace
+those package/image checks. The previous Kubernetes run `37360927382` at
+`512fd5c2580e5cd40bf0089662cff8d84718a877` completed successfully; new affected
+foundation campaigns still need their own results.
 
 **Next concrete work:** integrate actual notification consumers with explicit
 owner scope, durable inboxes and reconciliation APIs. Bind Catalogue's guard to owner resources

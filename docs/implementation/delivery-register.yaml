@@ -116,6 +116,9 @@ phases:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-008
+  - EV-P02-009
+  - EV-P02-007
   - EV-P02-001
   - EV-P02-002
   - EV-P02-003
@@ -803,6 +806,9 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-008
+  - EV-P02-009
+  - EV-P02-007
   - EV-P02-001
   - EV-P02-002
   - EV-P02-003
@@ -810,6 +816,7 @@ work_packages:
   - EV-P02-006
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-identity-events.md
   - docs/implementation/p02-service-delegation.md
   - docs/implementation/p02-local-bootstrap.md
   - docs/implementation/p02-federation.md
@@ -854,12 +861,16 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-008
+  - EV-P02-009
+  - EV-P02-007
   - EV-P02-003
   - EV-P02-004
   - EV-P02-005
   - EV-P02-006
   blocker_ids: []
   doc_refs:
+  - docs/implementation/p02-identity-events.md
   - docs/implementation/p02-service-delegation.md
   - docs/implementation/p02-governance-events.md
   - docs/implementation/p02-tenancy-and-approvals.md
@@ -881,6 +892,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-008
   - EV-P02-003
   - EV-P02-004
   blocker_ids: []
@@ -903,6 +915,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-009
+  - EV-P02-007
   - EV-P02-001
   - EV-P02-002
   - EV-P02-003
@@ -1927,6 +1941,9 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-008
+  - EV-P02-009
+  - EV-P02-007
   - EV-P02-001
   - EV-P02-002
   - EV-P02-003
@@ -1975,6 +1992,9 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-008
+  - EV-P02-009
+  - EV-P02-007
   - EV-P02-003
   - EV-P02-004
   - EV-P02-005
@@ -3132,6 +3152,9 @@ gates:
   reviewer: null
   reviewed_at: null
   evidence_ids:
+  - EV-P02-008
+  - EV-P02-009
+  - EV-P02-007
   - EV-P02-001
   - EV-P02-002
   - EV-P02-003
@@ -4869,6 +4892,102 @@ evidence:
     TLS. Cache-restore reauthentication is implemented but actual back/forward-cache interoperability, supported
     browsers and manual assistive-technology acceptance remain open. Immediate tab clearing needs an available
     browser signal channel. No native authority, whole-store recovery, promotion or gate decision.
+  valid_until: null
+  invalidated_at: null
+
+- id: EV-P02-007
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/3b784465e72c4db3e44f029778485817599b0caf/verification/p02/identity-delivery-local/report.json
+  sha256: 960edf027737d744fbb994f7e02e844f9b4e255a9a8219fa2bce4c3df5bcbe3f
+  source_revision: 7b24476c71a778dcf9a865b04c13aa35aa8b3992
+  artifact_revisions:
+    retained_artifact_commit: 3b784465e72c4db3e44f029778485817599b0caf
+    local_report: verification/p02/identity-delivery-local/report.json
+    workflow_observation: verification/p02/identity-delivery-regression-runs.json
+  environment: Local PHP 8.5.11 / SQLite in-memory fixtures, ConfirmedPublisher double, independently
+    installed Governance package and Console TypeScript toolchain. PostgreSQL and a real broker are unavailable
+    locally.
+  scope: Versioned installation identity delivery, shared durable relay, additive migration, audit agreement,
+    all twelve event types, retry cap, quarantine isolation, unavailable storage, immutable replay and
+    bounded commands. Governance passes 141 tests (1714 assertions); six real-broker cases are explicitly
+    skipped locally. Nine command logs and 158 committed source bindings match. Static analysis, dependency
+    rules, formatter and Console TypeScript pass. Discovery finds both journeys in each of three engines;
+    this is not browser execution.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T20:04:14.725392+00:00'
+  observer: Codex local command capture with exact committed-source and log hash verification
+  reviewer: Codex implementation review only; independent IAM/security, quality and SRE receiving pending
+  limitations: E1 only. New hosted PostgreSQL/TLS event, identity, browser-engine and affected foundation
+    runs were queued/pending at observation; superseded cancellations remain recorded. No product notification
+    consumer, managed browser support, actual history-cache restore, manual accessibility acceptance,
+    operated custody, whole-store recovery, native effect, promotion or gate decision.
+  valid_until: null
+  invalidated_at: null
+
+- id: EV-P02-008
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/a5b8bc00a57f0d160f5dfd9147fb711d456e0c51/verification/p02/events/run-37366983045/retrieval.json
+  sha256: a725e317af9812cbcdeb286f15b15b4b3675a79b3aba1fa70ca9b4b948a6ac42
+  source_revision: 1d45f11146913c7401732e9d6be0c8bd7677dfda
+  artifact_revisions:
+    retained_artifact_commit: a5b8bc00a57f0d160f5dfd9147fb711d456e0c51
+    retrieval_record: verification/p02/events/run-37366983045/retrieval.json
+    workflow_observation: verification/p02/identity-delivery-hosted-runs.json
+  environment: GitHub Actions Ubuntu 24.04; PHP 8.5.11; pinned PostgreSQL 18.6 and RabbitMQ with verified
+    broker TLS, isolated durable queues and synthetic inbox witnesses.
+  scope: Identity and Governance event campaign passes 60 PostgreSQL/TLS-broker cases (854 assertions),
+    five orchestration checks, 153 matching source bindings and ten retained log hashes. Covers concurrent
+    claims, process death after confirmation, unchanged-wire duplicate replay, routing separation, mandatory-route
+    denial, untrusted-CA recovery, all twelve identity event types, audit agreement, retry/quarantine
+    and approval expiry regression.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T20:05:57.832137+00:00'
+  observer: GitHub Actions; archive, retained-byte and committed-source hash verification by Codex
+  reviewer: Codex implementation/evidence review only; independent IAM/security, quality and SRE receiving
+    pending
+  limitations: Synthetic consumers and immutable plans; no product consumer integration, operated custody,
+    HA, whole-store restore, native effects or receiving acceptance. The separate newer-source regression
+    remains pending at the recorded observation.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P02-009
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/a5b8bc00a57f0d160f5dfd9147fb711d456e0c51/verification/p02/identity/run-37367427132/firefox/retrieval.json
+  sha256: 33a67d75463e7c348cd71dba51113848e873d1d620921070efa375b509843fe8
+  source_revision: 7b24476c71a778dcf9a865b04c13aa35aa8b3992
+  artifact_revisions:
+    retained_artifact_commit: a5b8bc00a57f0d160f5dfd9147fb711d456e0c51
+    retrieval_record: verification/p02/identity/run-37367427132/firefox/retrieval.json
+    workflow_observation: verification/p02/identity-delivery-hosted-runs.json
+  environment: GitHub Actions Ubuntu 24.04; PHP 8.5.11, PostgreSQL 18.6 with verified database TLS, Node
+    24.19.0; Playwright Firefox 155.0; compiled Console and synthetic HTTPS OIDC provider.
+  scope: Firefox job passes 50 checks, 105 PostgreSQL cases (1542 assertions), two compiled browser journeys
+    without skips/retries/failures, four HTTPS/PKCE exchanges, 259 source bindings and six artifact hashes.
+    Includes runtime denial of identity-outbox history updates/deletion, local password retirement, OIDC
+    handover, tenant revocation, delayed-response isolation and same-session tab sign-out.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-05T20:06:01.438833+00:00'
+  observer: GitHub Actions; archive, retained-byte and committed-source hash verification by Codex
+  reviewer: Codex implementation/evidence review only; independent IAM/security, quality and SRE receiving
+    pending
+  limitations: This verifies the Firefox job only. Chromium and WebKit jobs remain queued at the observation;
+    their results are not inferred. Synthetic provider/plans and loopback application HTTP do not qualify
+    operated provider/workload TLS topology, managed-browser floor, real back/forward-cache restores,
+    manual accessibility, whole-store recovery, native effects or G02 acceptance.
   valid_until: null
   invalidated_at: null
 

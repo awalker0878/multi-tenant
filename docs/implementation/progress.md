@@ -12,7 +12,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: PASSED | 11 / 2 |
 | P01 | Delivery and runtime foundation | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 31 / 4 |
-| P02 | Identity, tenancy and governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 6 / 0 |
+| P02 | Identity, tenancy and governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 9 / 0 |
 | P03 | Application catalogue and workspace | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
 | P04 | Site commissioning and inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 0 / 0 |
 | P05 | Capabilities and immutable plans | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G05: NOT_REVIEWED | 0 / 0 |
@@ -41,11 +41,11 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P01.04 | CI and supply chain | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 11 / 3 |
 | P01.05 | Runtime dependencies | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 12 / 1 |
 | P01.06 | Baseline operations | SRE/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 13 / 2 |
-| P02.01 | Authentication | Product/IAM | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 5 / 0 |
+| P02.01 | Authentication | Product/IAM | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 8 / 0 |
 | P02.02 | Tenancy | Governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 0 |
-| P02.03 | Authorization | Governance/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 0 |
-| P02.04 | Approval lifecycle | Governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 0 |
-| P02.05 | Console foundation | Console | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 0 |
+| P02.03 | Authorization | Governance/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 7 / 0 |
+| P02.04 | Approval lifecycle | Governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 0 |
+| P02.05 | Console foundation | Console | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 6 / 0 |
 | P03.01 | Core aggregates | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P03.02 | Intent semantics | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P03.03 | Revision behavior | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **48**. Blocker records: **4**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **51**. Blocker records: **4**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -151,6 +151,9 @@ Evidence records: **48**. Blocker records: **4**. Planning inputs awaiting selec
 | EV-P02-004 | E2 | Ubuntu 24.04 GitHub Actions; PHP 8.5.11; pinned PostgreSQL 18.6 and RabbitMQ; verified broker TLS, disposable quorum queue and synthetic inbox. The separate identity regression also verifies database TLS. | 4afcee1d504b8dfb0725d3306f8c2c55eb1f6dce | Synthetic consumer and plans; no product consumer, identity-outbox delivery, operated custody, HA, whole-store restore, native effect or receiving acceptance. Initial timestamp-precision and premature-readiness failures remain retained. |
 | EV-P02-005 | E2 | Ubuntu 24.04 GitHub Actions; PHP 8.5.11, Composer 2.10.3, Node 24.19.0 and PostgreSQL 18.6 with verified database TLS. Independently installed Catalogue uses fake Governance transport for its boundary tests. | 5bc32839ae7dedd186fca68e429e5effa723222d | Catalogue resource and Governance transport are fixtures; no deployed cross-service business journey or Planning/Assurance client qualification. Administrative/native/support delegation is denied. No independent restore epoch, exceptional-access approval, operated provider interoperability, whole-store recovery, promotion or gate pass. |
 | EV-P02-006 | E2 | Ubuntu 24.04 GitHub Actions; PHP 8.5.11, Node 24.19.0 and PostgreSQL 18.6 with verified TLS; compiled Chromium Console; disposable synthetic HTTPS OIDC provider. | 512fd5c2580e5cd40bf0089662cff8d84718a877 | Synthetic provider and immutable plans; loopback application HTTP is not production workload TLS. Cache-restore reauthentication is implemented but actual back/forward-cache interoperability, supported browsers and manual assistive-technology acceptance remain open. Immediate tab clearing needs an available browser signal channel. No native authority, whole-store recovery, promotion or gate decision. |
+| EV-P02-007 | E1 | Local PHP 8.5.11 / SQLite in-memory fixtures, ConfirmedPublisher double, independently installed Governance package and Console TypeScript toolchain. PostgreSQL and a real broker are unavailable locally. | 7b24476c71a778dcf9a865b04c13aa35aa8b3992 | E1 only. New hosted PostgreSQL/TLS event, identity, browser-engine and affected foundation runs were queued/pending at observation; superseded cancellations remain recorded. No product notification consumer, managed browser support, actual history-cache restore, manual accessibility acceptance, operated custody, whole-store recovery, native effect, promotion or gate decision. |
+| EV-P02-008 | E2 | GitHub Actions Ubuntu 24.04; PHP 8.5.11; pinned PostgreSQL 18.6 and RabbitMQ with verified broker TLS, isolated durable queues and synthetic inbox witnesses. | 1d45f11146913c7401732e9d6be0c8bd7677dfda | Synthetic consumers and immutable plans; no product consumer integration, operated custody, HA, whole-store restore, native effects or receiving acceptance. The separate newer-source regression remains pending at the recorded observation. |
+| EV-P02-009 | E2 | GitHub Actions Ubuntu 24.04; PHP 8.5.11, PostgreSQL 18.6 with verified database TLS, Node 24.19.0; Playwright Firefox 155.0; compiled Console and synthetic HTTPS OIDC provider. | 7b24476c71a778dcf9a865b04c13aa35aa8b3992 | This verifies the Firefox job only. Chromium and WebKit jobs remain queued at the observation; their results are not inferred. Synthetic provider/plans and loopback application HTTP do not qualify operated provider/workload TLS topology, managed-browser floor, real back/forward-cache restores, manual accessibility, whole-store recovery, native effects or G02 acceptance. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
 | BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, P01, P01.02, P01.04, P01.05, P01.06, G01, R29, R30 | Requesting user for baseline decisions; actual integration, operating and records owners at their affected checkpoints | OPEN | Supply the concrete runtime, registry/signer, trust, operating or records input before the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward checkpoints; do not request baseline approval again. | Complete the exact OP01–OP07 receiving inputs in release/operating-inputs.json with actual identities and immutable evidence. Run operating_inputs.py --require-complete, then integrate and qualify the affected trust/runtime/operations path. Preserve the accepted G00 decision and later P08/P10/P11 receiving checkpoints. |

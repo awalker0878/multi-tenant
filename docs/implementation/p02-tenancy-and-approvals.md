@@ -172,3 +172,10 @@ tab sign-out. A configured matrix is not a passing result. Retain and inspect ea
 engine report before claiming interoperability. Playwright engine builds do not
 establish a managed enterprise browser floor, real back/forward-cache eligibility
 or manual assistive-technology acceptance; those remain their receiving tasks.
+
+EV-P02-009 retains the Firefox 155.0 job at
+`7b24476c71a778dcf9a865b04c13aa35aa8b3992`: 50 checks, 105 PostgreSQL cases
+(1,542 assertions), both compiled journeys, four verified HTTPS/PKCE exchanges,
+259 matching source and six artifact hashes. The separately retained
+[hosted observation](../../verification/p02/identity-delivery-hosted-runs.json)
+records Chromium/WebKit still queued; Firefox success does not qualify those engines.

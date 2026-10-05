@@ -69,8 +69,21 @@ batches, delayed retry, quarantine isolation, post-revocation delivery and rollb
 replay. Static analysis and dependency boundaries also pass. The hosted event
 campaign now runs identity-specific PostgreSQL concurrency, process death after
 real TLS confirmation, unchanged duplicate wire, separated routing and untrusted
-CA recovery. Its result must be retained against the published source before
-claiming hosted qualification. The identity campaign also checks runtime denial
+CA recovery. EV-P02-008 retains the passing campaign at
+`1d45f11146913c7401732e9d6be0c8bd7677dfda`: 60 PostgreSQL/TLS broker tests
+(854 assertions), five checks, 153 source bindings and ten log hashes.
+EV-P02-007 retains nine passing local command logs,
+141 Governance tests (1,714 assertions; six real-broker cases skipped), and 158
+matching source bindings at `7b24476c71a778dcf9a865b04c13aa35aa8b3992`.
+The [workflow observation](../../verification/p02/identity-delivery-regression-runs.json)
+records the new queued/pending integration campaigns and superseded cancellations;
+none is registered as a pass in that original observation. The
+[hosted follow-up](../../verification/p02/identity-delivery-hosted-runs.json) records
+the later broker success and Firefox job result. EV-P02-009 retains the Firefox
+campaign at `7b24476c71a778dcf9a865b04c13aa35aa8b3992`: 50 checks, 105
+PostgreSQL cases (1,542 assertions), two compiled journeys, four HTTPS/PKCE
+exchanges, 259 source and six artifact hashes. Chromium/WebKit and the newer-source
+broker regression remain queued at that observation. The identity campaign also checks runtime denial
 of immutable identity-outbox updates/deletion.
 
 The current receiving queues are synthetic witnesses. Product consumer ownership,
