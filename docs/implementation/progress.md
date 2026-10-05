@@ -11,7 +11,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | Phase | Outcome | Work | Verification | Native qualification | Operating acceptance | Gate | Evidence / blockers |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: PASSED | 11 / 2 |
-| P01 | Delivery and runtime foundation | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 9 / 2 |
+| P01 | Delivery and runtime foundation | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 11 / 2 |
 | P02 | Identity, tenancy and governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 0 / 0 |
 | P03 | Application catalogue and workspace | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
 | P04 | Site commissioning and inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 0 / 0 |
@@ -35,12 +35,12 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P00.04 | Qualification design | Quality/platform owners | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 1 |
 | P00.05 | Operating requirements | SRE/security | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 2 / 1 |
 | P00.06 | Delivery decomposition | Leads | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 1 |
-| P01.01 | Repository scaffolding | Engineering | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 8 / 0 |
-| P01.02 | Local and integration runtime | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 2 |
+| P01.01 | Repository scaffolding | Engineering | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 10 / 0 |
+| P01.02 | Local and integration runtime | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
 | P01.03 | Contracts and messaging | Architecture | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P01.04 | CI and supply chain | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 1 |
-| P01.05 | Runtime dependencies | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 1 |
-| P01.06 | Baseline operations | SRE/security | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 2 |
+| P01.05 | Runtime dependencies | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 1 |
+| P01.06 | Baseline operations | SRE/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 2 |
 | P02.01 | Authentication | Product/IAM | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.02 | Tenancy | Governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.03 | Authorization | Governance/security | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **20**. Blocker records: **2**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **22**. Blocker records: **2**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -123,6 +123,8 @@ Evidence records: **20**. Blocker records: **2**. Planning inputs awaiting selec
 | EV-P01-007 | E1 | GitHub-hosted Ubuntu 24.04; isolated owned component copies; PHP 8.5.11/Composer 2.10.3, Python 3.12.14/uv 0.12.19 and Node 24.19.0; real loopback Laravel and Chromium foundation page | 4142571874a53b351a9c6023313185fe718d0dac | Development package/process evidence only; public fixture page is not an authenticated product journey. Readiness remains unavailable. No integrated service topology, database roles, real messaging, deployment independence, operated mirror, signing, native qualification or operating acceptance. Initial failed-run uploads omit only four recorded hidden marker files; replay includes them. Later source changes require affected verification. Does not complete P01.01 or pass G01. |
 | EV-P01-008 | E2 | GitHub-hosted Ubuntu 24.04 linux/amd64; pinned Python/uv and PHP/Composer/Node base inputs; isolated owned Docker build contexts and restricted diagnostic containers | 4142571874a53b351a9c6023313185fe718d0dac | Restricted image/process and in-process HTTP kernel measurements only. Image configuration IDs are not published registry manifest digests. No listening FastCGI/proxy deployment, browser hydration inside these images, independent service deployment, integrated dependency health, network/identity qualification, signing/promotion, native operation or operating acceptance. Console browser evidence belongs to separate package run 37239193553. Does not complete P01.01 or pass G01; source changes require affected reruns. |
 | EV-P01-009 | E1 | Local Python control suites and read-only GitHub connector observations; exact-source GitHub Actions selection, package/image matrices and stable aggregate outcomes | 46dd6823504a7d6856588aa4c1c7b31306710e7c | These controls provide execution evidence and feedback, not enforced repository admission. No verified CODEOWNERS/reviewer-account mapping, distinct-role review, trusted-base enforcement, complete base/head consumer graph, branch protection mutation, secret/dependency/image-vulnerability assessment, SBOM/signature or verified promotion. Current settings observations are point-in-time. P01.04 remains in progress and G01.04 is not accepted. |
+| EV-P01-010 | E2 | GitHub-hosted Ubuntu 24.04 linux/amd64; exact-source private locked package replay and isolated application/worker Docker images | c28c87e6c6804450fea9f6d6817a818eed37fc03 | Development package and image/process evidence. Does not establish a complete integrated installation, product readiness, tenant/OIDC authority, message processing, native behavior, production mirror/trust or signed promotion. Image IDs identify local configurations, not published registry manifests. Actual Compose/Kubernetes installation results are recorded independently. P01 packages and G01 remain open; affected later changes require verification. |
+| EV-P01-011 | E2 | GitHub-hosted Ubuntu 24.04 linux/amd64; unique disposable Docker Compose project, private generated PKI/credentials, observed PostgreSQL 18.6 and Nginx immutable manifests, seven exact-source owned application images | e9eac175f2fb845847aa5954522a8470260180dc | Synthetic diagnostic credentials and two tenant-keyed database records only. Product readiness stays unavailable; no OIDC/delegated tenant authority, row-level isolation, full Permit Desk application/configuration fixture, broker/Temporal/evidence store, task consumption or native effects. Database restart is not backup restoration. No alert receipt, failed-deployment recovery, operated deployment, signed promotion or independent gate acceptance. Kubernetes is a separate measured campaign. P01 packages and G01 remain open. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
 | BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, P01, P01.02, P01.04, P01.05, P01.06, G01 | Requesting user for baseline decisions; actual integration, operating and records owners at their affected checkpoints | OPEN | Supply the concrete runtime, registry/signer, trust, operating or records input before the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward checkpoints; do not request baseline approval again. | Implement P01 from the approved DC01–DC10 baseline. Resolve required integration inputs during P01.02/P01.04/P01.05/P01.06, retain application targets before P08 and records/service acceptance at P10/P11, and record actual staffing dates only when supplied. |

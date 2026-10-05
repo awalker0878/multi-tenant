@@ -71,6 +71,8 @@ phases:
   - EV-P01-007
   - EV-P01-008
   - EV-P01-009
+  - EV-P01-010
+  - EV-P01-011
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -79,8 +81,7 @@ phases:
   owner_role: Product engineering and IAM leads
   dependency_phase_ids:
   - P01
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P02.01
   - P02.02
@@ -101,8 +102,7 @@ phases:
   dependency_phase_ids:
   - P01
   - P02
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P03.01
   - P03.02
@@ -123,8 +123,7 @@ phases:
   dependency_phase_ids:
   - P01
   - P02
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P04.01
   - P04.02
@@ -145,8 +144,7 @@ phases:
   dependency_phase_ids:
   - P03
   - P04
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P05.01
   - P05.02
@@ -168,8 +166,7 @@ phases:
   dependency_phase_ids:
   - P02
   - P05
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P06.01
   - P06.02
@@ -190,8 +187,7 @@ phases:
   owner_role: Infrastructure and platform owners
   dependency_phase_ids:
   - P06
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P07.01
   - P07.02
@@ -212,8 +208,7 @@ phases:
   owner_role: Infrastructure and application owner
   dependency_phase_ids:
   - P07
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P08.01
   - P08.02
@@ -237,8 +232,7 @@ phases:
   - P06
   - P07
   - P08
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P09.01
   - P09.02
@@ -259,8 +253,7 @@ phases:
   dependency_phase_ids:
   - P08
   - P09
-  dependency_note: P09 only for tuples selected for this release; explicit deferral
-    is required.
+  dependency_note: P09 only for tuples selected for this release; explicit deferral is required.
   package_ids:
   - P10.01
   - P10.02
@@ -281,8 +274,7 @@ phases:
   owner_role: Product and service owner
   dependency_phase_ids:
   - P10
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P11.01
   - P11.02
@@ -520,6 +512,8 @@ work_packages:
   - EV-P01-006
   - EV-P01-007
   - EV-P01-008
+  - EV-P01-010
+  - EV-P01-011
   blocker_ids: []
   dependency_package_ids: []
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
@@ -545,6 +539,7 @@ work_packages:
   - docs/implementation/p01-governance-bootstrap.md
   - docs/implementation/p01-console-foundation.md
   - docs/implementation/p01-code-control.md
+  - docs/implementation/p01-runtime-integration.md
 - id: P01.02
   phase_id: P01
   title: Local and integration runtime
@@ -554,7 +549,9 @@ work_packages:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-010
+  - EV-P01-011
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -572,6 +569,7 @@ work_packages:
   - docs/engineering/frontend.md
   - docs/operations/deployment-model.md
   - docs/operations/runbooks/install.md
+  - docs/implementation/p01-runtime-integration.md
 - id: P01.03
   phase_id: P01
   title: Contracts and messaging
@@ -585,8 +583,8 @@ work_packages:
   blocker_ids: []
   dependency_package_ids:
   - P01.05
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G01.03
   doc_refs:
@@ -637,7 +635,9 @@ work_packages:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-010
+  - EV-P01-011
   blocker_ids:
   - BL-P00-001
   dependency_package_ids: []
@@ -651,16 +651,18 @@ work_packages:
   - docs/engineering/security-and-tenancy.md
   - docs/engineering/data-and-messaging.md
   - docs/operations/runbooks/upgrade.md
+  - docs/implementation/p01-runtime-integration.md
 - id: P01.06
   phase_id: P01
   title: Baseline operations
   owner_role: SRE/security
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-011
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -681,6 +683,7 @@ work_packages:
   - docs/operations/runbooks/upgrade.md
   - docs/operations/observability.md
   - docs/engineering/testing-and-ci.md
+  - docs/implementation/p01-runtime-integration.md
 - id: P02.01
   phase_id: P02
   title: Authentication
@@ -1727,6 +1730,8 @@ requirements:
   - EV-P01-007
   - EV-P01-008
   - EV-P01-009
+  - EV-P01-010
+  - EV-P01-011
   blocker_ids: []
 - id: R03
   package_ids:
@@ -2869,6 +2874,8 @@ gates:
   - EV-P01-007
   - EV-P01-008
   - EV-P01-009
+  - EV-P01-010
+  - EV-P01-011
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -2954,20 +2961,20 @@ evidence:
     spikes/compatibility/results/13-frontend-clean-install.json: 2db40e07d392f8eb0d3c3ef94f27ec792c79c933661c4bff020033c061d78934
     spikes/compatibility/results/14-clean-frontend-typecheck.json: 02dd3e61a1816ae3d3d477fc4ab755d52befb969ac8fcfd14bae6dfb9e0f27e6
   environment: Local Linux x86-64; Node 24.19.0; npm 11.9.0
-  scope: Clean npm lock install, strict Vue typecheck and Vite asset build; tested
-    TypeScript 6.0.3 tuple. TypeScript 7.0.2 failed and remains unselected.
+  scope: Clean npm lock install, strict Vue typecheck and Vite asset build; tested TypeScript 6.0.3 tuple.
+    TypeScript 7.0.2 failed and remains unselected.
   campaign_ids:
   - Q01
   criterion_ids:
   - G00.03
   observed_at: '2026-10-04T18:21:27.151589+00:00'
   observer: Codex /root/p00_compatibility
-  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE
-    acceptance pending'
-  limitations: Isolated compatibility evidence only; no product service, full HTTP/browser
-    integration, production image, native qualification or operating acceptance. Historical
-    fixed-input observation has no time expiry; changed inputs require a new run.
-    Failed earlier attempts remain in the spike results.
+  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE acceptance
+    pending'
+  limitations: Isolated compatibility evidence only; no product service, full HTTP/browser integration,
+    production image, native qualification or operating acceptance. Historical fixed-input observation
+    has no time expiry; changed inputs require a new run. Failed earlier attempts remain in the spike
+    results.
   valid_until: null
   invalidated_at: null
 - id: EV-P00-002
@@ -2981,20 +2988,20 @@ evidence:
     spikes/compatibility/python/smoke.py: ef3b76d56127c8d2019790bbd737b6c3962112719793119daaf74e9e1411f5a1
     spikes/compatibility/results/07-python-frozen-install.json: bce43f3ad1b815f94326b49c712650b8459b05e2420a888becb251f5070d872b
   environment: Local Linux x86-64; Python 3.12.14; uv 0.12.19
-  scope: Fresh locked Python environment, synthetic valid/invalid JSON handling and
-    in-memory HTTP-library exchange.
+  scope: Fresh locked Python environment, synthetic valid/invalid JSON handling and in-memory HTTP-library
+    exchange.
   campaign_ids:
   - Q01
   criterion_ids:
   - G00.03
   observed_at: '2026-10-04T18:19:52.100216+00:00'
   observer: Codex /root/p00_compatibility
-  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE
-    acceptance pending'
-  limitations: Isolated compatibility evidence only; no product service, full HTTP/browser
-    integration, production image, native qualification or operating acceptance. Historical
-    fixed-input observation has no time expiry; changed inputs require a new run.
-    Failed earlier attempts remain in the spike results.
+  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE acceptance
+    pending'
+  limitations: Isolated compatibility evidence only; no product service, full HTTP/browser integration,
+    production image, native qualification or operating acceptance. Historical fixed-input observation
+    has no time expiry; changed inputs require a new run. Failed earlier attempts remain in the spike
+    results.
   valid_until: null
   invalidated_at: null
 - id: EV-P00-003
@@ -3008,21 +3015,20 @@ evidence:
     spikes/compatibility/results/php-ci/probe.json: c8509898a563e208b34bfd0d728a31d119f2868812ec951f147e76200d62c7e0
     spikes/compatibility/results/php-ci/retrieval.json: 983b89ce5e5c95e23160795609f8bf6bffd13b48d971af1b2c64b15951f3ed9b
   environment: GitHub-hosted ubuntu-24.04 x64; PHP 8.5.11; Composer 2.10.3
-  scope: 'GitHub Actions run 37224453605: PHP dependency resolution, platform checks,
-    SQLite Eloquent commit/rollback, Inertia class autoload and clean lock replay
-    with identical package versions/references.'
+  scope: 'GitHub Actions run 37224453605: PHP dependency resolution, platform checks, SQLite Eloquent
+    commit/rollback, Inertia class autoload and clean lock replay with identical package versions/references.'
   campaign_ids:
   - Q01
   criterion_ids:
   - G00.03
   observed_at: '2026-10-04T18:26:50.905512+00:00'
   observer: GitHub Actions run 37224453605 / attempt 1; inspected by Codex /root
-  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE
-    acceptance pending'
-  limitations: Isolated compatibility evidence only; no product service, full HTTP/browser
-    integration, production image, native qualification or operating acceptance. Historical
-    fixed-input observation has no time expiry; changed inputs require a new run.
-    Failed earlier attempts remain in the spike results.
+  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE acceptance
+    pending'
+  limitations: Isolated compatibility evidence only; no product service, full HTTP/browser integration,
+    production image, native qualification or operating acceptance. Historical fixed-input observation
+    has no time expiry; changed inputs require a new run. Failed earlier attempts remain in the spike
+    results.
   valid_until: null
   invalidated_at: null
 - id: EV-P00-004
@@ -3037,25 +3043,22 @@ evidence:
     spikes/compatibility/python/.importlinter: 55d258a8f15006ac021ae11176412c79508cb1326333cd3631e3bfb5cc925880
     spikes/compatibility/results/python-tooling/09-negative-boundaries.json: 9f5af20c99f3ed0a20498ff65b19360d1887e5c1f90649541bdefb69e062b19e
     spikes/compatibility/results/python-tooling/15-strict-advisories.json: fd3424d5325aa091470ac0541393f3430647bb3fd8c72fb8793b131d68ef13ea
-  environment: Local Linux x86-64; Python 3.12.14; uv 0.12.19; new isolated temporary
-    environment
-  scope: Locked Python tooling installation, Ruff lint/format, strict mypy over 26
-    files, four synthetic behavior tests, three Import Linter contracts and seven
-    semantic negative cases; installed dependency consistency and strict advisory
-    lookup over 49 packages.
+  environment: Local Linux x86-64; Python 3.12.14; uv 0.12.19; new isolated temporary environment
+  scope: Locked Python tooling installation, Ruff lint/format, strict mypy over 26 files, four synthetic
+    behavior tests, three Import Linter contracts and seven semantic negative cases; installed dependency
+    consistency and strict advisory lookup over 49 packages.
   campaign_ids:
   - Q01
   criterion_ids:
   - G00.03
   observed_at: '2026-10-04T18:46:41.615634+00:00'
   observer: Codex /root/p00_python_quality
-  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE
-    acceptance pending'
-  limitations: Synthetic non-product compatibility evidence; no actual service source
-    analyzed, production image, native qualification or operating acceptance. External-library
-    prohibition covers HTTPX and Pydantic in these fixtures, not every future SDK.
-    Advisory observation is time-specific. Historical fixed-input observation has
-    no time expiry; changed inputs require new execution.
+  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE acceptance
+    pending'
+  limitations: Synthetic non-product compatibility evidence; no actual service source analyzed, production
+    image, native qualification or operating acceptance. External-library prohibition covers HTTPX and
+    Pydantic in these fixtures, not every future SDK. Advisory observation is time-specific. Historical
+    fixed-input observation has no time expiry; changed inputs require new execution.
   valid_until: null
   invalidated_at: null
 - id: EV-P00-005
@@ -3071,28 +3074,25 @@ evidence:
     spikes/compatibility/results/integration-37226789018/quality-canaries.log: edf2310092a38e9eed1a8d02a92d256409d8091d79a15ee59d9354c0c0133ccc
     spikes/compatibility/results/integration-37226789018/browser.json: e49cfb9660a6bb3c54e5fa836e30034490d563c60d58cd9f79fe532399b3b983
     spikes/compatibility/results/integration-37226789018/retrieval.json: 62afb0febb65739ca2ed6efaba054dc306b9f128312f095de285f1a412e8159f
-  environment: GitHub-hosted Ubuntu 24.04 x64; PHP 8.5.11; Composer 2.10.3; Node 24.19.0;
-    npm 11.17.0; Playwright 1.63.0; Chromium 153.0.8010.12
-  scope: 'Run 37226789018 passed 26 commands: identical Composer lock and installed-reference
-    replay; Pint, Larastan/PHPStan, Deptrac; 20 Pest tests with 200 assertions; 14
-    intended negative controls; clean npm install, Vue typecheck/build; one complete
-    Chromium/Inertia flow; package advisory lookups. All 52 source bindings and artifact
-    archive digest verified.'
+  environment: GitHub-hosted Ubuntu 24.04 x64; PHP 8.5.11; Composer 2.10.3; Node 24.19.0; npm 11.17.0;
+    Playwright 1.63.0; Chromium 153.0.8010.12
+  scope: 'Run 37226789018 passed 26 commands: identical Composer lock and installed-reference replay;
+    Pint, Larastan/PHPStan, Deptrac; 20 Pest tests with 200 assertions; 14 intended negative controls;
+    clean npm install, Vue typecheck/build; one complete Chromium/Inertia flow; package advisory lookups.
+    All 52 source bindings and artifact archive digest verified.'
   campaign_ids:
   - Q01
   criterion_ids:
   - G00.03
   observed_at: '2026-10-04T19:04:28.137982+00:00'
   observer: GitHub Actions run 37226789018 / attempt 1; inspected by Codex /root
-  reviewer: 'Codex /root: source bindings, artifact hash and actual outcome review
-    only; accountable engineering/SRE acceptance pending'
-  limitations: Isolated synthetic Laravel/SQLite and Chromium evidence. No product
-    service or public contract, PostgreSQL concurrency, real SSO, cross-service runtime
-    integration, managed-browser/accessibility matrix, production image/mirror, native
-    qualification or operating acceptance. Negative controls cover the declared fixture
-    rules. Historical fixed-input observation has no time expiry; changed inputs require
-    a new run. Advisory lookups are time-specific. Earlier failed attempts remain
-    retained.
+  reviewer: 'Codex /root: source bindings, artifact hash and actual outcome review only; accountable engineering/SRE
+    acceptance pending'
+  limitations: Isolated synthetic Laravel/SQLite and Chromium evidence. No product service or public contract,
+    PostgreSQL concurrency, real SSO, cross-service runtime integration, managed-browser/accessibility
+    matrix, production image/mirror, native qualification or operating acceptance. Negative controls cover
+    the declared fixture rules. Historical fixed-input observation has no time expiry; changed inputs
+    require a new run. Advisory lookups are time-specific. Earlier failed attempts remain retained.
   valid_until: null
   invalidated_at: null
 - id: EV-P00-006
@@ -3108,28 +3108,27 @@ evidence:
     spikes/compatibility/results/images/run-37232393563/php-runtime.json: b8e6ebaf383e7a06f2f3caa76a26dc99f78e31a0bb2539adc478dca563917dfe
     spikes/compatibility/results/images/run-37232393563/python-runtime.json: 3cf26436f4084d659b5e65257384ab8f94d8d849d7a6b3dc8dc1e82892eebfa9
     spikes/compatibility/results/images/run-37232132120/report.json: 789b4e5ca3a4dde415aa39647462b2a8e521f46a5d616827cac3160e0c9a2191
-  environment: GitHub-hosted Ubuntu 24.04 x64; Docker 28.0.4 / Buildx 0.37.1; Debian Bookworm
-    linux/amd64; PHP 8.5.11; Python 3.12.14; Node 24.19.0; Composer 2.10.3; uv 0.12.19
-  scope: Run 37232132120 resolved five immutable platform manifests and passed 49 commands;
-    separate run 37232393563 replayed identical input lock and passed 39 commands. Four quality/runtime
-    targets, measured OS/extension/language inventories, UID10001 and read-only controls,
-    four invalid-lock rejections, 20 PHP tests/200 assertions/14 canaries, four Python tests/three
-    contracts/seven rejections, real Laravel HTML/Inertia JSON/two assets and expected CSRF
-    419. All 94 replay source bindings and archive/log hashes verified.
+  environment: GitHub-hosted Ubuntu 24.04 x64; Docker 28.0.4 / Buildx 0.37.1; Debian Bookworm linux/amd64;
+    PHP 8.5.11; Python 3.12.14; Node 24.19.0; Composer 2.10.3; uv 0.12.19
+  scope: Run 37232132120 resolved five immutable platform manifests and passed 49 commands; separate run
+    37232393563 replayed identical input lock and passed 39 commands. Four quality/runtime targets, measured
+    OS/extension/language inventories, UID10001 and read-only controls, four invalid-lock rejections,
+    20 PHP tests/200 assertions/14 canaries, four Python tests/three contracts/seven rejections, real
+    Laravel HTML/Inertia JSON/two assets and expected CSRF 419. All 94 replay source bindings and archive/log
+    hashes verified.
   campaign_ids:
   - Q01
   criterion_ids:
   - G00.03
   observed_at: '2026-10-04T20:32:24.565496+00:00'
   observer: GitHub Actions run 37232393563 / attempt 1; inspected by Codex /root
-  reviewer: 'Codex /root: source bindings, archive/log hashes and actual outcomes reviewed;
-    accountable engineering/SRE acceptance pending'
-  limitations: Candidate fixture evidence only; no product service, native platform, actual
-    PostgreSQL server, production FPM/ingress, mirror/offline installation, operating acceptance,
-    signed/published image, full SBOM or OS vulnerability qualification. Package inventories
-    match across runs; derived config digests differ, so no byte-identical image claim. Inherited
-    PHP development headers remain recorded. Fixed-input observations have no time expiry;
-    changed inputs need new execution.
+  reviewer: 'Codex /root: source bindings, archive/log hashes and actual outcomes reviewed; accountable
+    engineering/SRE acceptance pending'
+  limitations: Candidate fixture evidence only; no product service, native platform, actual PostgreSQL
+    server, production FPM/ingress, mirror/offline installation, operating acceptance, signed/published
+    image, full SBOM or OS vulnerability qualification. Package inventories match across runs; derived
+    config digests differ, so no byte-identical image claim. Inherited PHP development headers remain
+    recorded. Fixed-input observations have no time expiry; changed inputs need new execution.
   valid_until: null
   invalidated_at: null
 - id: EV-P00-007
@@ -3147,28 +3146,27 @@ evidence:
     spikes/compatibility/contracts/package-lock.json: 1c236919916fa9b80aefae8ab8b7323c332457787f21bdaa7e7d37b5865e3fd5
     spikes/compatibility/contracts/openapi.json: 61f84a4bdb76227f4d75600a716476165b21f27850f17cf66608ece4f604f460
     spikes/compatibility/contracts/event.schema.json: 30122652b391070414b33f452e9cae4eaabb6118cf8eea0daba152b45523b963
-  environment: GitHub-hosted Ubuntu 24.04 x64; PHP 8.5.11; Python 3.12.14; Node 24.19.0 /
-    npm 11.17.0; uv 0.12.19; Temurin 17.0.20.1+1; OpenAPI Generator 7.25.0
-  scope: Run 37232194144 passed nine bootstrap commands and 31 contract commands, including
-    clean locked installation; 18 wire fixtures (five valid, 13 invalid), two malformed-schema
-    rejections, 53 identically generated PHP/Python/TypeScript files, changed-schema detection,
-    Python/TypeScript compile/model checks, mock TypeScript HTTP, intentional TypeScript compiler
-    rejection and 11 PHP lints plus model/two negative cases. Generated hashes also match
-    the retained local run. All recorded source/log/archive hashes verified.
+  environment: GitHub-hosted Ubuntu 24.04 x64; PHP 8.5.11; Python 3.12.14; Node 24.19.0 / npm 11.17.0;
+    uv 0.12.19; Temurin 17.0.20.1+1; OpenAPI Generator 7.25.0
+  scope: Run 37232194144 passed nine bootstrap commands and 31 contract commands, including clean locked
+    installation; 18 wire fixtures (five valid, 13 invalid), two malformed-schema rejections, 53 identically
+    generated PHP/Python/TypeScript files, changed-schema detection, Python/TypeScript compile/model checks,
+    mock TypeScript HTTP, intentional TypeScript compiler rejection and 11 PHP lints plus model/two negative
+    cases. Generated hashes also match the retained local run. All recorded source/log/archive hashes
+    verified.
   campaign_ids:
   - Q01
   criterion_ids:
   - G00.03
   observed_at: '2026-10-04T20:28:38.806386+00:00'
   observer: GitHub Actions run 37232194144 / attempt 1; inspected by Codex /root
-  reviewer: 'Codex /root: source bindings, archive/log hashes and actual outcomes reviewed;
-    accountable engineering/SRE acceptance pending'
-  limitations: Synthetic OpenAPI 3.0.4 subset and JSON Schema 2020-12 event envelope only;
-    no product or AsyncAPI channel/broker/outbox/inbox implementation, live HTTP, authorization,
-    canonical digest vectors, compatibility window or operating acceptance. Generated decoders
-    have observed gaps and require wire-schema validation before domain translation. PHP HTTP
-    transport is not tested. Fixed-input observations have no time expiry; changed inputs
-    require new execution.
+  reviewer: 'Codex /root: source bindings, archive/log hashes and actual outcomes reviewed; accountable
+    engineering/SRE acceptance pending'
+  limitations: Synthetic OpenAPI 3.0.4 subset and JSON Schema 2020-12 event envelope only; no product
+    or AsyncAPI channel/broker/outbox/inbox implementation, live HTTP, authorization, canonical digest
+    vectors, compatibility window or operating acceptance. Generated decoders have observed gaps and require
+    wire-schema validation before domain translation. PHP HTTP transport is not tested. Fixed-input observations
+    have no time expiry; changed inputs require new execution.
   valid_until: null
   invalidated_at: null
 - id: EV-P00-008
@@ -3184,15 +3182,13 @@ evidence:
     spikes/compatibility/results/restore/run-37234051654/post-write-capture-bundle.json: b7aa7db46f1dc1c186d618b319b526a455435c0b8d4ad0a7573e593d0dbe1aba
     spikes/compatibility/restore/inputs.lock.json: 122ba9014bb072c4304d7dc7764d17e4ecd0e29df8c9ef8cea5cdccc457fcda9
     spikes/compatibility/restore/schema.sql: 6024d300a3ada764a3796493313cd91aefa6bd7845ebe4c2755affafeeba727d
-  environment: GitHub-hosted Ubuntu 24.04 x64; Docker 28.0.4; PostgreSQL 18.6 Debian Bookworm
-    linux/amd64; source, target and recovery databases on one isolated container; attachment
-    files on disposable runner
-  scope: Locked replay run 37234051654 passed 76 commands (72 successful and four expected
-    SQL rejections), 138 explicit checks, three invalid-lock controls and four invalid-bundle
-    controls before target creation. Three complete capture envelopes preserve database archives,
-    exact attachment bytes/metadata and configuration/writer manifests. Actual pre-target-write
-    source return and target-forward recovery to a clean database preserved a known accepted
-    target write. All 11 source bindings, archive/log hashes and decoded binary envelopes
+  environment: GitHub-hosted Ubuntu 24.04 x64; Docker 28.0.4; PostgreSQL 18.6 Debian Bookworm linux/amd64;
+    source, target and recovery databases on one isolated container; attachment files on disposable runner
+  scope: Locked replay run 37234051654 passed 76 commands (72 successful and four expected SQL rejections),
+    138 explicit checks, three invalid-lock controls and four invalid-bundle controls before target creation.
+    Three complete capture envelopes preserve database archives, exact attachment bytes/metadata and configuration/writer
+    manifests. Actual pre-target-write source return and target-forward recovery to a clean database preserved
+    a known accepted target write. All 11 source bindings, archive/log hashes and decoded binary envelopes
     verified; initial transfer failure 37233785398 retained.
   campaign_ids:
   - Q01
@@ -3200,14 +3196,14 @@ evidence:
   - G00.04
   observed_at: '2026-10-04T20:57:07.088924+00:00'
   observer: GitHub Actions run 37234051654 / attempt 1; artifacts examined by Codex
-  reviewer: 'Codex: engineering evidence and scope examination only; accountable criterion
-    and operating acceptance remain pending'
-  limitations: Synthetic real-dependency E2 evidence, not native qualification or full Permit
-    Desk deployment. No VMware/OpenStack endpoint, independent native fence, real identity/service/network
-    integration or operating acceptance. Fixture gates do not fence administrator access.
-    Target-forward recovery requires readable target and new complete capture; uncaptured
-    target loss and concurrent database/file crash consistency are not proved. Fixed-input
-    observation has no time expiry; changed inputs require affected re-execution.
+  reviewer: 'Codex: engineering evidence and scope examination only; accountable criterion and operating
+    acceptance remain pending'
+  limitations: Synthetic real-dependency E2 evidence, not native qualification or full Permit Desk deployment.
+    No VMware/OpenStack endpoint, independent native fence, real identity/service/network integration
+    or operating acceptance. Fixture gates do not fence administrator access. Target-forward recovery
+    requires readable target and new complete capture; uncaptured target loss and concurrent database/file
+    crash consistency are not proved. Fixed-input observation has no time expiry; changed inputs require
+    affected re-execution.
   valid_until: null
   invalidated_at: null
 - id: EV-P00-009
@@ -3223,13 +3219,12 @@ evidence:
     docs/qualification/feasibility/p00-input-schema.json: b370352851b4167014230543cc9651d196deeee6785d533ae7df9ef5d8349f52
     spikes/compatibility/results/input-review-20261004/input-tests.log: ff000f912f65c26ffdfa9b4677846f97356c5acf1eef86058fe3bff937720761
     spikes/compatibility/results/input-review-20261004/require-route-ready.log: 500a0ce49a02da6261f885930dab1c6e9e06fa04b860e557307b873591deb8f2
-  environment: Local Linux x86-64; Python 3.12.14; standard library; no network or native
-    API
+  environment: Local Linux x86-64; Python 3.12.14; standard library; no network or native API
   scope: Four recorded commands passed their exact expected outcomes. Twenty focused input-validation
-    tests pass. Truthful incomplete record validates; require-ready exits 2 and reports 69
-    route gaps; all-input scope reports 90 gaps. Contradictory status, missing provenance,
-    mutable references, wildcard scope, absent recovery and non-finite JSON values are rejected.
-    All reports deny any execution-authority or feasibility implication.
+    tests pass. Truthful incomplete record validates; require-ready exits 2 and reports 69 route gaps;
+    all-input scope reports 90 gaps. Contradictory status, missing provenance, mutable references, wildcard
+    scope, absent recovery and non-finite JSON values are rejected. All reports deny any execution-authority
+    or feasibility implication.
   campaign_ids:
   - Q01
   criterion_ids:
@@ -3237,14 +3232,13 @@ evidence:
   - G00.06
   observed_at: '2026-10-04T20:55:59.911302+00:00'
   observer: Codex local execution and raw-byte source/log review
-  reviewer: 'Codex: engineering evidence and scope examination only; accountable criterion
-    and operating acceptance remain pending'
-  limitations: Validates declared input structure and completeness only. Does not authenticate
-    observers/reviewers, retrieve or verify evidence content, establish installed facts, check
-    current native permission, authorize an action or pass G00. Synthetic test identities
-    remain only in tests. Full route completeness is not a prerequisite for unrelated isolated
-    engineering. Fixed-input observation has no time expiry; changed record or validator requires
-    revalidation.
+  reviewer: 'Codex: engineering evidence and scope examination only; accountable criterion and operating
+    acceptance remain pending'
+  limitations: Validates declared input structure and completeness only. Does not authenticate observers/reviewers,
+    retrieve or verify evidence content, establish installed facts, check current native permission, authorize
+    an action or pass G00. Synthetic test identities remain only in tests. Full route completeness is
+    not a prerequisite for unrelated isolated engineering. Fixed-input observation has no time expiry;
+    changed record or validator requires revalidation.
   valid_until: null
   invalidated_at: null
 - id: EV-P00-010
@@ -3257,14 +3251,12 @@ evidence:
     docs/implementation/p00-engineering-selections.md: c9b9332da9804b07254d438c65e024989af343c61e51a59ab321b7a4dd56a82d
     spikes/compatibility/results/restore/run-37234051654/report.json: 96be5bc02a704b0a1fe739a4f4db93b09ec40396d7776f2139c8c322beef0f8b
     spikes/compatibility/results/input-review-20261004/report.json: aeba93ec01da9cdf60efba88d6287066248e9f980b7920f92d049dc946a8bbe0
-  environment: Repository engineering examination by Codex on 2026-10-04; initial baseline
-    eb78e463e66d154e58fcfce7e65fad1eaab38914 plus explicitly identified restore/input source
-    revisions
-  scope: Examined all six G00 criteria, verified the seven prior primary artifact hashes,
-    reviewed the selected development baseline and new E2 restore/E1 input evidence, and recorded
-    exact remaining candidate/application/operating/reviewer obligations. Separates bounded
-    E1/E2 G00 feasibility from later E3 native campaigns; no criterion is represented as accountable
-    acceptance.
+  environment: Repository engineering examination by Codex on 2026-10-04; initial baseline eb78e463e66d154e58fcfce7e65fad1eaab38914
+    plus explicitly identified restore/input source revisions
+  scope: Examined all six G00 criteria, verified the seven prior primary artifact hashes, reviewed the
+    selected development baseline and new E2 restore/E1 input evidence, and recorded exact remaining candidate/application/operating/reviewer
+    obligations. Separates bounded E1/E2 G00 feasibility from later E3 native campaigns; no criterion
+    is represented as accountable acceptance.
   campaign_ids:
   - Q01
   criterion_ids:
@@ -3276,14 +3268,13 @@ evidence:
   - G00.06
   observed_at: '2026-10-04T21:03:32.386379+00:00'
   observer: Codex, engineering examiner
-  reviewer: 'Codex: engineering evidence and scope examination only; accountable criterion
-    and operating acceptance remain pending'
-  limitations: Reviewed design/evidence assessment only; no named organizational owner approval,
-    accepted service target, installed tuple, staffing commitment, native qualification or
-    operational acceptance. Earlier seven artifacts retain their original source/environment
-    limits. Later decisions require attributable reviewer/evidence records; this examination
-    starts IN_REVIEW and does not pass G00. No fixed historical expiry; material changes require
-    scoped re-examination.
+  reviewer: 'Codex: engineering evidence and scope examination only; accountable criterion and operating
+    acceptance remain pending'
+  limitations: Reviewed design/evidence assessment only; no named organizational owner approval, accepted
+    service target, installed tuple, staffing commitment, native qualification or operational acceptance.
+    Earlier seven artifacts retain their original source/environment limits. Later decisions require attributable
+    reviewer/evidence records; this examination starts IN_REVIEW and does not pass G00. No fixed historical
+    expiry; material changes require scoped re-examination.
   valid_until: null
   invalidated_at: null
 - id: EV-P00-011
@@ -3350,24 +3341,24 @@ evidence:
     services/inventory/uv.lock: 391ba024ac2d23bde704acccfb0a1998f5988ca07220d2a02fc652132c6b5e2f
     wheel_sha256: 6e6848a305a122b358ca7e8945e1ca6467e5252353c6afc0ce5c2e00bdffc6e5
     wheel_envelope_sha256: f9b51c152d6f44f9cff59bd3c4221af6e48842a343f48dedfb5d6cea6295410b
-  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source directory;
-    locked offline development install and independent empty runtime wheel install
-  scope: 'Partial P01.01 inventory package: ten installed diagnostic tests, Ruff lint/format, strict mypy and
-    18 commands with all expected outcomes; inspected wheel installed without dependencies after removal of
-    copied source/development environment. Eleven source bindings, 36 command-log hashes and full wheel bytes
-    verified; other Python service/worker modules absent.'
+  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source
+    directory; locked offline development install and independent empty runtime wheel install
+  scope: 'Partial P01.01 inventory package: ten installed diagnostic tests, Ruff lint/format, strict mypy
+    and 18 commands with all expected outcomes; inspected wheel installed without dependencies after removal
+    of copied source/development environment. Eleven source bindings, 36 command-log hashes and full wheel
+    bytes verified; other Python service/worker modules absent.'
   campaign_ids: []
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:10.838206+00:00'
   observer: Codex — implementation and local execution
   reviewer: Codex — engineering verification of retained source, logs and wheel
-  limitations: Service package diagnostic only; native operations disabled. One-shot process liveness does
-    not establish a persistent service or dependency readiness, which remains unavailable. No product domain,
-    authority, persistence, messaging, provider or native outcome. No image or hosted-CI outcome is claimed
-    by this local record. Cached offline installation does not qualify an operating mirror. Partial evidence
-    cannot pass G01.01 or G01; no time-based expiry assigned to this immutable source/build record, and relevant
-    changes require rerun.
+  limitations: Service package diagnostic only; native operations disabled. One-shot process liveness
+    does not establish a persistent service or dependency readiness, which remains unavailable. No product
+    domain, authority, persistence, messaging, provider or native outcome. No image or hosted-CI outcome
+    is claimed by this local record. Cached offline installation does not qualify an operating mirror.
+    Partial evidence cannot pass G01.01 or G01; no time-based expiry assigned to this immutable source/build
+    record, and relevant changes require rerun.
   valid_until: null
   invalidated_at: null
 - id: EV-P01-003
@@ -3380,24 +3371,24 @@ evidence:
     services/lifecycle/uv.lock: fb93d6bfcf1f601f44572575d48c682132c2d7ef7e4a2152a00502f33b6ec2d4
     wheel_sha256: 6931167142ad4b7ac975e76b33a88b00eb9d8eadf8b810a9497c8792e2417f0e
     wheel_envelope_sha256: 5b6192647aa67d881d2bdfebe7da68f9e8382c4cff137920aff5e476b2c76f92
-  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source directory;
-    locked offline development install and independent empty runtime wheel install
-  scope: 'Partial P01.01 lifecycle package: ten installed diagnostic tests, Ruff lint/format, strict mypy and
-    18 commands with all expected outcomes; inspected wheel installed without dependencies after removal of
-    copied source/development environment. Eleven source bindings, 36 command-log hashes and full wheel bytes
-    verified; other Python service/worker modules absent.'
+  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source
+    directory; locked offline development install and independent empty runtime wheel install
+  scope: 'Partial P01.01 lifecycle package: ten installed diagnostic tests, Ruff lint/format, strict mypy
+    and 18 commands with all expected outcomes; inspected wheel installed without dependencies after removal
+    of copied source/development environment. Eleven source bindings, 36 command-log hashes and full wheel
+    bytes verified; other Python service/worker modules absent.'
   campaign_ids: []
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:23.801860+00:00'
   observer: Codex — implementation and local execution
   reviewer: Codex — engineering verification of retained source, logs and wheel
-  limitations: Service package diagnostic only; native operations disabled. One-shot process liveness does
-    not establish a persistent service or dependency readiness, which remains unavailable. No product domain,
-    authority, persistence, messaging, provider or native outcome. No image or hosted-CI outcome is claimed
-    by this local record. Cached offline installation does not qualify an operating mirror. Partial evidence
-    cannot pass G01.01 or G01; no time-based expiry assigned to this immutable source/build record, and relevant
-    changes require rerun.
+  limitations: Service package diagnostic only; native operations disabled. One-shot process liveness
+    does not establish a persistent service or dependency readiness, which remains unavailable. No product
+    domain, authority, persistence, messaging, provider or native outcome. No image or hosted-CI outcome
+    is claimed by this local record. Cached offline installation does not qualify an operating mirror.
+    Partial evidence cannot pass G01.01 or G01; no time-based expiry assigned to this immutable source/build
+    record, and relevant changes require rerun.
   valid_until: null
   invalidated_at: null
 - id: EV-P01-004
@@ -3410,24 +3401,24 @@ evidence:
     workers/inventory/uv.lock: f2a0b4cc9553b6af8091d724e506d524d3dcc9f334f24bccd6f68decab408860
     wheel_sha256: 525226782a37090e7f4ae55fe8b2340ea9b7a0cda2b94306d07020bdca4d75c8
     wheel_envelope_sha256: 1ca5159dbb6cc83f237586ab80e257eb7d10ed9d169dafcca11004e3f9844685
-  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source directory;
-    locked offline development install and independent empty runtime wheel install
-  scope: 'Partial P01.01 inventory-workers package: ten installed diagnostic tests, Ruff lint/format, strict
-    mypy and 18 commands with all expected outcomes; inspected wheel installed without dependencies after removal
-    of copied source/development environment. Eleven source bindings, 36 command-log hashes and full wheel
-    bytes verified; other Python service/worker modules absent.'
+  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source
+    directory; locked offline development install and independent empty runtime wheel install
+  scope: 'Partial P01.01 inventory-workers package: ten installed diagnostic tests, Ruff lint/format,
+    strict mypy and 18 commands with all expected outcomes; inspected wheel installed without dependencies
+    after removal of copied source/development environment. Eleven source bindings, 36 command-log hashes
+    and full wheel bytes verified; other Python service/worker modules absent.'
   campaign_ids: []
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:25.501848+00:00'
   observer: Codex — implementation and local execution
   reviewer: Codex — engineering verification of retained source, logs and wheel
-  limitations: Owned worker package diagnostic only; task consumption and native operations disabled. One-shot
-    process liveness does not establish a persistent service or dependency readiness, which remains unavailable.
-    No product domain, authority, persistence, messaging, provider or native outcome. No image or hosted-CI
-    outcome is claimed by this local record. Cached offline installation does not qualify an operating mirror.
-    Partial evidence cannot pass G01.01 or G01; no time-based expiry assigned to this immutable source/build
-    record, and relevant changes require rerun.
+  limitations: Owned worker package diagnostic only; task consumption and native operations disabled.
+    One-shot process liveness does not establish a persistent service or dependency readiness, which remains
+    unavailable. No product domain, authority, persistence, messaging, provider or native outcome. No
+    image or hosted-CI outcome is claimed by this local record. Cached offline installation does not qualify
+    an operating mirror. Partial evidence cannot pass G01.01 or G01; no time-based expiry assigned to
+    this immutable source/build record, and relevant changes require rerun.
   valid_until: null
   invalidated_at: null
 - id: EV-P01-005
@@ -3440,24 +3431,24 @@ evidence:
     workers/lifecycle/uv.lock: 119e31605521f64e26fac8ea549eb3a50189a705eb3856b3936f7c795df39ac3
     wheel_sha256: 79481265397affac2891b7caa159d1b4011890b43023706da5635e57f331d81f
     wheel_envelope_sha256: 3f3fafeb690472b99907f962b102649793cd57dc581b7aafb289a41bc56efe36
-  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source directory;
-    locked offline development install and independent empty runtime wheel install
-  scope: 'Partial P01.01 lifecycle-workers package: ten installed diagnostic tests, Ruff lint/format, strict
-    mypy and 18 commands with all expected outcomes; inspected wheel installed without dependencies after removal
-    of copied source/development environment. Eleven source bindings, 36 command-log hashes and full wheel
-    bytes verified; other Python service/worker modules absent.'
+  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source
+    directory; locked offline development install and independent empty runtime wheel install
+  scope: 'Partial P01.01 lifecycle-workers package: ten installed diagnostic tests, Ruff lint/format,
+    strict mypy and 18 commands with all expected outcomes; inspected wheel installed without dependencies
+    after removal of copied source/development environment. Eleven source bindings, 36 command-log hashes
+    and full wheel bytes verified; other Python service/worker modules absent.'
   campaign_ids: []
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:25.061136+00:00'
   observer: Codex — implementation and local execution
   reviewer: Codex — engineering verification of retained source, logs and wheel
-  limitations: Owned worker package diagnostic only; task consumption and native operations disabled. One-shot
-    process liveness does not establish a persistent service or dependency readiness, which remains unavailable.
-    No product domain, authority, persistence, messaging, provider or native outcome. No image or hosted-CI
-    outcome is claimed by this local record. Cached offline installation does not qualify an operating mirror.
-    Partial evidence cannot pass G01.01 or G01; no time-based expiry assigned to this immutable source/build
-    record, and relevant changes require rerun.
+  limitations: Owned worker package diagnostic only; task consumption and native operations disabled.
+    One-shot process liveness does not establish a persistent service or dependency readiness, which remains
+    unavailable. No product domain, authority, persistence, messaging, provider or native outcome. No
+    image or hosted-CI outcome is claimed by this local record. Cached offline installation does not qualify
+    an operating mirror. Partial evidence cannot pass G01.01 or G01; no time-based expiry assigned to
+    this immutable source/build record, and relevant changes require rerun.
   valid_until: null
   invalidated_at: null
 - id: EV-P01-006
@@ -3481,26 +3472,27 @@ evidence:
       lifecycle: sha256:1429951f2c3d98874b753510338e5f0aed487504697618ea5c01170d7ba3fcb8
       lifecycle-workers: sha256:3176fa6493a06e2ba18a4ea3009814f082375326003cf0f76d2b7cc2d12b3228
       planning: sha256:a142a20e5366fd1f5d9d266bbbffa5a747d984d21c9e52b946098e8c95acb7dd
-  environment: GitHub-hosted ubuntu-24.04 linux/amd64; Docker 28.0.4 and Buildx 0.37.1; immutable Python 3.12.14/uv
-    0.12.19 base manifests; five isolated owned build contexts and real restricted diagnostic containers
+  environment: GitHub-hosted ubuntu-24.04 linux/amd64; Docker 28.0.4 and Buildx 0.37.1; immutable Python
+    3.12.14/uv 0.12.19 base manifests; five isolated owned build contexts and real restricted diagnostic
+    containers
   scope: 'Partial P01.01 image evidence for Planning, Inventory, Lifecycle and both owned worker bootstraps:
-    50 expected command outcomes including five unavailable-readiness and five rejected-override checks; UID/GID
-    10001, read-only root, zero effective capabilities, no-new-privileges and loopback-only networking observed.
-    Five archive digests/sizes, 100 log hashes and 75 source bindings (59 unique files) verified against immutable
-    source blobs. Exact measured input-validation replay passed for all five components.'
+    50 expected command outcomes including five unavailable-readiness and five rejected-override checks;
+    UID/GID 10001, read-only root, zero effective capabilities, no-new-privileges and loopback-only networking
+    observed. Five archive digests/sizes, 100 log hashes and 75 source bindings (59 unique files) verified
+    against immutable source blobs. Exact measured input-validation replay passed for all five components.'
   campaign_ids: []
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:58:19.358892+00:00'
   observer: Codex — authored workflow executed on GitHub-hosted runners
   reviewer: Codex — engineering verification of exact source, archives, logs and observed container controls
-  limitations: Five Python bootstrap images only; no Laravel image represented. One-shot liveness is not persistent
-    service readiness or task consumption. No database/broker/Temporal integration, tenant isolation, native
-    platform or operating acceptance. Runner-local configuration digests are not published registry digests;
-    image-layer bytes were not archived. No registry push, signed image, provenance attestation, SBOM, vulnerability
-    assessment, complete base inventory, byte-identical rebuild or operating mirror claim. Partial evidence
-    cannot pass G01.01 or G01; no time-based expiry assigned to this immutable run record, and relevant changes
-    require rerun.
+  limitations: Five Python bootstrap images only; no Laravel image represented. One-shot liveness is not
+    persistent service readiness or task consumption. No database/broker/Temporal integration, tenant
+    isolation, native platform or operating acceptance. Runner-local configuration digests are not published
+    registry digests; image-layer bytes were not archived. No registry push, signed image, provenance
+    attestation, SBOM, vulnerability assessment, complete base inventory, byte-identical rebuild or operating
+    mirror claim. Partial evidence cannot pass G01.01 or G01; no time-based expiry assigned to this immutable
+    run record, and relevant changes require rerun.
   valid_until: null
   invalidated_at: null
 - id: EV-P01-007
@@ -3622,6 +3614,87 @@ evidence:
     base/head consumer graph, branch protection mutation, secret/dependency/image-vulnerability assessment,
     SBOM/signature or verified promotion. Current settings observations are point-in-time. P01.04 remains
     in progress and G01.04 is not accepted.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-010
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/ea1e98d7f0060faf4f13f0c55482db17e48a1c3a/verification/p01/packages/run-37244794879/retrieval.json
+  sha256: 9d57fe70951c3507253dd3f56e44ae4db93aaddb6078eb710378aa09bc8a7061
+  source_revision: c28c87e6c6804450fea9f6d6817a818eed37fc03
+  artifact_revisions:
+    retained_artifact_commit: ea1e98d7f0060faf4f13f0c55482db17e48a1c3a
+    package_workflow_run_id: 37244794879
+    image_workflow_run_id: 37244794860
+    image_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/ea1e98d7f0060faf4f13f0c55482db17e48a1c3a/verification/p01/images/run-37244794860/retrieval.json
+    image_retrieval_sha256: 93d2c752c75f695e512265f591a56236137518611d3b744680037a5ca5060b72
+    earlier_failed_php_run_id: 37244201538
+    earlier_failed_php_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/ea1e98d7f0060faf4f13f0c55482db17e48a1c3a/verification/p01/packages/run-37244201538/retrieval.json
+    earlier_failed_php_retrieval_sha256: 344acd35dfad29b4e30665e09c51a8d52b37cef8d966c503a4c3fd57aec4c63a
+    implementation_record: docs/implementation/p01-runtime-integration.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; exact-source private locked package replay and
+    isolated application/worker Docker images
+  scope: All nine private packages and all nine restricted image checks passed after authenticated dependency
+    probes and locked Python ASGI/PostgreSQL runtimes were introduced. Package evidence verifies 173 command
+    outcomes, 346 command-log hashes, 388 artifact hashes and 293 unique source bindings; image evidence
+    verifies 86 command outcomes, 172 log hashes and 198 unique source bindings. Installed Python HTTP
+    process probes observe live/ready/authentication/missing-dependency behavior. Earlier PHP formatting
+    and enum final-class rule failures are retained separately.
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  - G01.02
+  - G01.05
+  observed_at: '2026-10-04T23:45:17Z'
+  observer: GitHub Actions — private package and image campaigns
+  reviewer: Codex — archive digests, immutable source bindings, artifact and command-log examination
+  limitations: Development package and image/process evidence. Does not establish a complete integrated
+    installation, product readiness, tenant/OIDC authority, message processing, native behavior, production
+    mirror/trust or signed promotion. Image IDs identify local configurations, not published registry
+    manifests. Actual Compose/Kubernetes installation results are recorded independently. P01 packages
+    and G01 remain open; affected later changes require verification.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-011
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/f2f9e863c9579d7456f0838f0a355523264dc7cc/verification/p01/local/run-37245534459/retrieval.json
+  sha256: 7eccb23349a9a90f64f4ead32b2f3bdf60107953d212decae0086922726984ef
+  source_revision: e9eac175f2fb845847aa5954522a8470260180dc
+  artifact_revisions:
+    retained_artifact_commit: f2f9e863c9579d7456f0838f0a355523264dc7cc
+    workflow_run_id: 37245534459
+    workflow_conclusion: success
+    report_sha256: ae82ae21e02266be9f831a47bd08f2479a5b239151889b6a837aef6434386060
+    earlier_database_failure_run_id: 37244794937
+    earlier_database_failure_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/ea1e98d7f0060faf4f13f0c55482db17e48a1c3a/verification/p01/local/run-37244794937/retrieval.json
+    earlier_port_failure_run_id: 37245241548
+    earlier_port_failure_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/f2f9e863c9579d7456f0838f0a355523264dc7cc/verification/p01/local/run-37245241548/retrieval.json
+    earlier_port_failure_retrieval_sha256: c1654a8074187f773a358be7bf9f2cf07085e73bbd280ef6a8be83688ba43b73
+    implementation_record: docs/implementation/p01-runtime-integration.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; unique disposable Docker Compose project, private
+    generated PKI/credentials, observed PostgreSQL 18.6 and Nginx immutable manifests, seven exact-source
+    owned application images
+  scope: Empty-environment installation passed 126 checks and 127 command outcomes, plus seven embedded
+    passing image campaigns. Measured all seven authenticated dependency probes, denied missing/invalid
+    credentials, verified TLS, cross-database/plaintext/wrong-password denial, runtime DML and DDL/schema-metadata/owner-role
+    denial, token rotation, database login revocation, schema drift and restoration, dependency loss and
+    database restart with exact fixture-data digest equality. Console HTTPS markup, secure session cookie
+    and compiled JS/CSS delivery passed. Cleanup completed. Retrieval verifies 386 command-log hashes
+    and 195 unique source bindings; both preceding failures remain separate.
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  - G01.02
+  - G01.05
+  - G01.06
+  observed_at: '2026-10-04T23:58:01Z'
+  observer: GitHub Actions — isolated Compose installation and denial campaign
+  reviewer: Codex — immutable source/archive/configuration and command-log examination
+  limitations: Synthetic diagnostic credentials and two tenant-keyed database records only. Product readiness
+    stays unavailable; no OIDC/delegated tenant authority, row-level isolation, full Permit Desk application/configuration
+    fixture, broker/Temporal/evidence store, task consumption or native effects. Database restart is not
+    backup restoration. No alert receipt, failed-deployment recovery, operated deployment, signed promotion
+    or independent gate acceptance. Kubernetes is a separate measured campaign. P01 packages and G01 remain
+    open.
   valid_until: null
   invalidated_at: null
 blockers:
