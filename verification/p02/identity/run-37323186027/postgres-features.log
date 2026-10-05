@@ -1,0 +1,15 @@
+
+   PASS  Tests\Feature\LocalIdentityTest
+  ✓ it generates one high entropy credential and never redisplays or re… 0.10s  
+  ✓ it requires independent mounted console identity and rejects health… 0.03s  
+  ✓ it enforces first-login restrictions in direct APIs then rotates al… 0.05s  
+  ✓ it requires the current password and rejects reuse, short or mismat… 0.04s  
+  ✓ it expires temporary sessions and invalidates an explicitly logged…  0.04s  
+  ✓ it commits throttling across requests and denies attempts during th… 0.05s  
+  ✓ it never recreates a retired identity and rejects its existing sess… 0.03s  
+  ✓ it rolls back identity and audit together when outbox persistence f… 0.03s  
+  ✓ it refuses bootstrap through redirected or noninteractive command o… 0.04s  
+
+  Tests:    9 passed (82 assertions)
+  Duration: 0.45s
+

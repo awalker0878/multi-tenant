@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "retrieved_by": "Codex",
+  "records": [
+    {
+      "run_id": 37323186027,
+      "artifact_id": 11350758740,
+      "source_sha": "55edd9fef62ae12e0f03ae2eda5c22ef192852eb",
+      "result": "FAIL",
+      "archive_sha256": "1f231a5e298b527502590e7f5ca2e7dc1f36c4671605753104c13a454b14c4fd",
+      "archive_bytes": 8555,
+      "artifact_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37323186027/artifacts/11350758740",
+      "report_sha256": "fcf9eb21dc4fc3833184402aec8b94863c4d4bec370c660cc6251819854e5bd0",
+      "artifact_hashes_verified": 2
+    },
+    {
+      "run_id": 37324210957,
+      "artifact_id": 11351945292,
+      "source_sha": "007cb7e4fe63ac3a851793682258ffe1d7fb6a57",
+      "result": "PASS",
+      "archive_sha256": "3e247185d9a9b7677babacea22e1b445662944f55e0248a091fc3c1da6c619a8",
+      "archive_bytes": 11678,
+      "artifact_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324210957/artifacts/11351945292",
+      "report_sha256": "d7906626fe7ff03ad663893e4c4ad65d5b4b4b3b9c890a13ee24540bdc10ab95",
+      "artifact_hashes_verified": 6
+    }
+  ]
+}
