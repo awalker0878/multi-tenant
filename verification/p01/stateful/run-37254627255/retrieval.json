@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "run_id": 37254627255,
+  "source_revision": "72706e029b06345caa88608099c3137431ba1d10",
+  "artifact": {
+    "id": 11322054400,
+    "name": "p01-stateful-72706e029b06345caa88608099c3137431ba1d10",
+    "size_in_bytes": 93638,
+    "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11322054400",
+    "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11322054400/zip",
+    "expired": false,
+    "created_at": "2026-10-05T02:18:31Z",
+    "expires_at": "2026-10-19T02:18:30Z",
+    "updated_at": "2026-10-05T02:18:31Z",
+    "digest": "sha256:ba261e879199b4b98381e059a91e501f57e6e8ddc0c2109c0747bf7b5e2914fd",
+    "workflow_run": {
+      "id": 37254627255,
+      "repository_id": 1374801496,
+      "head_repository_id": 1374801496,
+      "head_branch": "greenfield/enterprise-microservices-plan",
+      "head_sha": "72706e029b06345caa88608099c3137431ba1d10"
+    }
+  },
+  "workflow": {
+    "id": 37254627255,
+    "name": "P01 isolated stateful dependencies",
+    "head_sha": "72706e029b06345caa88608099c3137431ba1d10",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "created_at": "2026-10-05T02:14:41Z",
+    "updated_at": "2026-10-05T02:18:34Z",
+    "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37254627255"
+  },
+  "archive_sha256": "ba261e879199b4b98381e059a91e501f57e6e8ddc0c2109c0747bf7b5e2914fd",
+  "archive_bytes": 93638,
+  "archive_checksum_verified": true,
+  "archive_size_verified": true,
+  "result": "VERIFIED",
+  "reported_result": "PASS",
+  "reported_cleanup_complete": true,
+  "withheld_outputs": [],
+  "report_sha256": "e2138059654bce62e1fdd3bae8d1be1ad11ba1be614553baeb6e97005e86a152",
+  "checks_passed": 40,
+  "probe_assertions_passed": 73,
+  "command_outcomes": 67,
+  "command_log_hashes_verified": 134,
+  "immutable_source_bindings_verified": 48,
+  "source_verification_sha256": "0db1c2a9d47e7e7632c6592dba153dea8cd1057df1d1e030b89c2e750b496a67",
+  "precise_database_denials_verified": [
+    "runtime-ddl-denied",
+    "runtime-ownership-escalation-denied",
+    "wrong-private-database-denied",
+    "invalid-database-secret-denied",
+    "plaintext-database-connection-denied"
+  ],
+  "capture": {
+    "bucket": "p01-evidence",
+    "key": "t_demo/campaign/evidence.json",
+    "version_id": "d824e6b8-563a-47fe-a1e2-31f51e533a76",
+    "sha256": "f24d45a5b34c6d3e308d574c56588bc8be58f5d747565f6c3701725afed46ef4",
+    "bytes": 77,
+    "retention_mode": "COMPLIANCE",
+    "retain_until": "2026-10-06T02:17:53.186000+00:00"
+  },
+  "restored_evidence": {
+    "bucket": "p01-evidence",
+    "key": "t_demo/campaign/evidence.json",
+    "version_id": "0cdbbd62-3a90-4475-94f4-619c8e0df0ca",
+    "sha256": "f24d45a5b34c6d3e308d574c56588bc8be58f5d747565f6c3701725afed46ef4",
+    "bytes": 77,
+    "retention_mode": "COMPLIANCE",
+    "retain_until": "2026-10-06T02:18:10.153000+00:00",
+    "source_version_id": "d824e6b8-563a-47fe-a1e2-31f51e533a76"
+  },
+  "workflow_execution": {
+    "workflow_id": "p01-restart-witness",
+    "run_id": "01a109da-6e00-7c3b-b19e-e517e2092743",
+    "marker": "synthetic durable marker"
+  },
+  "reviewer": "Codex \u2014 immutable source, raw probe/command logs, exact database denial diagnostics, retained bytes, workflow identity and cleanup examination",
+  "limitations": [
+    "Single-node disposable Compose dependencies and synthetic identities; no operated adoption or availability claim.",
+    "Probe owns its clients; product contracts/outbox/inbox, shared Console sessions/cache and alert receipt remain separate.",
+    "Workflow issuer-key removal is tested on server restart; no hot revocation SLA is measured.",
+    "Evidence restore preserves pinned bytes and source identity metadata in a fresh store with a new version ID and equal-or-longer retention.",
+    "No native platform calls, promotion trust, gate acceptance, RPO or RTO claims.",
+    "Single selected 77-byte evidence version; no whole-store/all-version, production IAM or regulatory retention qualification."
+  ]
+}

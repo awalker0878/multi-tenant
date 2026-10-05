@@ -1,0 +1,1 @@
+{"stage": "broker-after", "result": "PASS", "checks": [{"name": "restart-retains-unacknowledged-message", "passed": true, "observation": null}, {"name": "restart-redelivery-flag", "passed": true, "observation": null}, {"name": "acknowledgement-removes-delivery", "passed": true, "observation": null}], "state": {}}

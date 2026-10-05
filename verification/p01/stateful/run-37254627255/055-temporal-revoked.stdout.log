@@ -1,0 +1,1 @@
+{"stage": "temporal-revoked", "result": "PASS", "checks": [{"name": "temporal-revoked-visible", "passed": true, "observation": {"status": "PERMISSION_DENIED"}}], "state": {}}

@@ -1,0 +1,745 @@
+[
+  {
+    "command": "database",
+    "stdout_sha256": "c1cce949ca43d8e9dff1357200b703854786a45133d6577ec21c5bb5fbfe93b6",
+    "stage": "database",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "temporal-database-verified-tls",
+        "passed": true,
+        "observation": [
+          true,
+          "TLSv1.3"
+        ]
+      },
+      {
+        "name": "temporal-schema-version-readable",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "runtime-ddl-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "InsufficientPrivilege",
+          "code": null
+        }
+      },
+      {
+        "name": "runtime-ownership-escalation-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "InsufficientPrivilege",
+          "code": null
+        }
+      },
+      {
+        "name": "wrong-private-database-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "OperationalError",
+          "code": null
+        }
+      },
+      {
+        "name": "invalid-database-secret-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "OperationalError",
+          "code": null
+        }
+      },
+      {
+        "name": "plaintext-database-connection-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "OperationalError",
+          "code": null
+        }
+      },
+      {
+        "name": "visibility-schema-version-readable",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "visibility-conversion-function-executable",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "visibility-function-not-public-or-foreign",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "temporal-bootstrap",
+    "stdout_sha256": "4f96ee9dc68312b5654a8bae2bbd6a4d2c38a0c9f49d4c75050bb444e0e2c0db",
+    "stage": "temporal-bootstrap",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "namespace-created-by-bootstrap-only",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "evidence-bootstrap",
+    "stdout_sha256": "e9c4ef71bb0a062c7e2f9c9cacbb1bb9c09a3a31064bfeda69db21985185e1c4",
+    "stage": "evidence-bootstrap",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "bucket-versioning-enabled",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "default-compliance-retention-enabled",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "evidence-bootstrap",
+    "stdout_sha256": "e9c4ef71bb0a062c7e2f9c9cacbb1bb9c09a3a31064bfeda69db21985185e1c4",
+    "stage": "evidence-bootstrap",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "bucket-versioning-enabled",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "default-compliance-retention-enabled",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "broker-before",
+    "stdout_sha256": "57b34d63cba50d369ff8692707769d9b283b87686abeb8cb137ed8f73dece624",
+    "stage": "broker-before",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "rabbit-15672-not-client-accessible",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "rabbit-15692-not-client-accessible",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "invalid-broker-secret-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "ProbableAuthenticationError",
+          "code": null
+        }
+      },
+      {
+        "name": "foreign-vhost-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "ProbableAccessDeniedError",
+          "code": null
+        }
+      },
+      {
+        "name": "plaintext-amqp-listener-disabled",
+        "passed": true,
+        "observation": {
+          "error_type": "AMQPConnectionError",
+          "code": null
+        }
+      },
+      {
+        "name": "consumer-cannot-publish",
+        "passed": true,
+        "observation": {
+          "error_type": "ChannelClosedByBroker",
+          "code": 403
+        }
+      },
+      {
+        "name": "publisher-cannot-consume",
+        "passed": true,
+        "observation": {
+          "error_type": "ChannelClosedByBroker",
+          "code": 403
+        }
+      },
+      {
+        "name": "publisher-cannot-configure-topology",
+        "passed": true,
+        "observation": {
+          "error_type": "ChannelClosedByBroker",
+          "code": 403
+        }
+      },
+      {
+        "name": "publisher-confirmed-durable-message",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "unacknowledged-delivery-bytes",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {
+      "message_sha256": "f24d45a5b34c6d3e308d574c56588bc8be58f5d747565f6c3701725afed46ef4"
+    }
+  },
+  {
+    "command": "temporal-before",
+    "stdout_sha256": "dc439334af32c03dc6f4db6dbe773e0c8dce7ccc9156c997513176ebaec194b3",
+    "stage": "temporal-before",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "namespace-authorized-read",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "temporal-7234-not-client-accessible",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "temporal-7235-not-client-accessible",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "temporal-7236-not-client-accessible",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "temporal-7239-not-client-accessible",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "missing-jwt-denied",
+        "passed": true,
+        "observation": {
+          "status": "PERMISSION_DENIED"
+        }
+      },
+      {
+        "name": "foreign-jwt-denied",
+        "passed": true,
+        "observation": {
+          "status": "PERMISSION_DENIED"
+        }
+      },
+      {
+        "name": "expired-jwt-denied",
+        "passed": true,
+        "observation": {
+          "status": "PERMISSION_DENIED"
+        }
+      },
+      {
+        "name": "wrong-audience-jwt-denied",
+        "passed": true,
+        "observation": {
+          "status": "PERMISSION_DENIED"
+        }
+      },
+      {
+        "name": "worker-cannot-administer-namespaces",
+        "passed": true,
+        "observation": {
+          "status": "PERMISSION_DENIED"
+        }
+      },
+      {
+        "name": "workflow-reached-durable-wait",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {
+      "workflow_id": "p01-restart-witness",
+      "run_id": "01a109d3-524b-707d-858a-9cccf5b01601",
+      "marker": "synthetic durable marker"
+    }
+  },
+  {
+    "command": "evidence-before",
+    "stdout_sha256": "f93a478cf713756865409d5f5824c5ff7f62a8f0556b6faae8346f22d659b782",
+    "stage": "evidence-before",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "version-id-returned",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "wrong-prefix-read-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "AccessDenied",
+          "code": "AccessDenied",
+          "message": "Access Denied.",
+          "http_status": 403
+        }
+      },
+      {
+        "name": "wrong-prefix-write-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "AccessDenied",
+          "code": "AccessDenied",
+          "message": "Access Denied.",
+          "http_status": 403
+        }
+      },
+      {
+        "name": "evidence-client-cannot-list-buckets",
+        "passed": true,
+        "observation": {
+          "error_type": "AccessDenied",
+          "code": "AccessDenied",
+          "message": "Access Denied.",
+          "http_status": 403
+        }
+      },
+      {
+        "name": "evidence-client-cannot-delete-version",
+        "passed": true,
+        "observation": {
+          "error_type": "AccessDenied",
+          "code": "AccessDenied",
+          "message": "Access Denied.",
+          "http_status": 403
+        }
+      },
+      {
+        "name": "invalid-evidence-secret-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "ClientError",
+          "code": "SignatureDoesNotMatch",
+          "message": "The request signature we calculated does not match the signature you provided. Check your key and signing method.",
+          "http_status": 403
+        }
+      },
+      {
+        "name": "object-has-compliance-retention",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {
+      "bucket": "p01-evidence",
+      "key": "t_demo/campaign/evidence.json",
+      "version_id": "868e3906-78ce-4e98-871e-917ba4b9911e",
+      "sha256": "f24d45a5b34c6d3e308d574c56588bc8be58f5d747565f6c3701725afed46ef4",
+      "bytes": 77,
+      "retention_mode": "COMPLIANCE",
+      "retain_until": "2026-10-06T02:10:07.830000+00:00"
+    }
+  },
+  {
+    "command": "evidence-admin-denial",
+    "stdout_sha256": "29cd09a8e3705c4ac9705704786c5ab7e40524f77347dec77fbdedaa51bd8425",
+    "stage": "evidence-admin-denial",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "root-cannot-delete-retained-version",
+        "passed": true,
+        "observation": {
+          "error_type": "InvalidRequest",
+          "code": "InvalidRequest",
+          "message": "Object is WORM protected and cannot be overwritten",
+          "http_status": 400
+        }
+      },
+      {
+        "name": "root-cannot-shorten-compliance-retention",
+        "passed": true,
+        "observation": {
+          "error_type": "InvalidRequest",
+          "code": "InvalidRequest",
+          "message": "Object is WORM protected and cannot be overwritten",
+          "http_status": 400
+        }
+      },
+      {
+        "name": "retention-denials-preserve-object",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "retention-denials-preserve-deadline",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "broker-outage",
+    "stdout_sha256": "f910143babd91fa50fdfd66831748b5743f724b9b8bcdfa0f7022f501daa14b1",
+    "stage": "broker-outage",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "broker-outage-is-visible",
+        "passed": true,
+        "observation": {
+          "error_type": "gaierror",
+          "code": null
+        }
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "temporal-outage",
+    "stdout_sha256": "24a3a4c35d5e9461871c115ac03826c5c35f3a35503ecab29845eae2fc2ab1e5",
+    "stage": "temporal-outage",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "temporal-outage-visible",
+        "passed": true,
+        "observation": {
+          "error_type": "RuntimeError",
+          "phase": "connection",
+          "detail": "Failed client connect: Server connection error: tonic::transport::Error(Transport, ConnectError(ConnectError(\"dns error\", Custom { kind: Uncategorized, error: \"failed to lookup address information: Temporary failure in name resolution\" })))"
+        }
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "evidence-outage",
+    "stdout_sha256": "58bfe4cbee7e3e81835aa3c7dfce0dca88645398027579765b345023b54aa5e5",
+    "stage": "evidence-outage",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "evidence-outage-is-visible",
+        "passed": true,
+        "observation": {
+          "error_type": "EndpointConnectionError",
+          "code": null
+        }
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "broker-after",
+    "stdout_sha256": "7c8fa69e8cc65b9e0bd90bf5f2f6ddae2122388594f0d9f4abdf89390613f4f2",
+    "stage": "broker-after",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "restart-retains-unacknowledged-message",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "restart-redelivery-flag",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "acknowledgement-removes-delivery",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "temporal-after",
+    "stdout_sha256": "fd84b505902c5589fef4fcf95e9159f924327872861e6bd5ad33558f473c542e",
+    "stage": "temporal-after",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "restarted-workflow-still-waiting",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "restarted-workflow-completes-same-execution",
+        "passed": true,
+        "observation": {
+          "run_id": "01a109d3-524b-707d-858a-9cccf5b01601",
+          "result": "synthetic durable marker"
+        }
+      },
+      {
+        "name": "completed-execution-in-private-visibility-store",
+        "passed": true,
+        "observation": {
+          "run_id": "01a109d3-524b-707d-858a-9cccf5b01601",
+          "status": 2
+        }
+      }
+    ],
+    "state": {
+      "workflow_id": "p01-restart-witness",
+      "run_id": "01a109d3-524b-707d-858a-9cccf5b01601",
+      "marker": "synthetic durable marker"
+    }
+  },
+  {
+    "command": "evidence-capture",
+    "stdout_sha256": "4810ddfc38ce6028b4d32c67f74231ea676d808a76fc413a7848efc4944b94f9",
+    "stage": "evidence-capture",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "restart-pinned-version-digest-equality",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "latest-version-does-not-replace-pinned-evidence",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {
+      "bucket": "p01-evidence",
+      "key": "t_demo/campaign/evidence.json",
+      "version_id": "868e3906-78ce-4e98-871e-917ba4b9911e",
+      "sha256": "f24d45a5b34c6d3e308d574c56588bc8be58f5d747565f6c3701725afed46ef4",
+      "bytes": 77,
+      "retention_mode": "COMPLIANCE",
+      "retain_until": "2026-10-06T02:10:07.830000+00:00",
+      "base64": "eyJzY29wZSI6InN5bnRoZXRpYyIsIndpdG5lc3MiOiJyZXRhaW5lZCB2ZXJzaW9uIG9uZSIsIm5hdGl2ZV93cml0ZXMiOmZhbHNlfQo="
+    }
+  },
+  {
+    "command": "evidence-restore",
+    "stdout_sha256": "3e1572fc5af86e4753eb45076109caae5592154671949f463941cd4c59ae5a60",
+    "stage": "evidence-restore",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "capture-digest-admission",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "fresh-store-restored-bytes",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "restore-retains-source-identity-metadata",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "restore-keeps-or-extends-retention",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {
+      "bucket": "p01-evidence",
+      "key": "t_demo/campaign/evidence.json",
+      "version_id": "fa82e8d7-ea5d-4078-8207-99d7bf2c8005",
+      "sha256": "f24d45a5b34c6d3e308d574c56588bc8be58f5d747565f6c3701725afed46ef4",
+      "bytes": 77,
+      "retention_mode": "COMPLIANCE",
+      "retain_until": "2026-10-06T02:10:28.881000+00:00",
+      "source_version_id": "868e3906-78ce-4e98-871e-917ba4b9911e"
+    }
+  },
+  {
+    "command": "evidence-admin-denial",
+    "stdout_sha256": "29cd09a8e3705c4ac9705704786c5ab7e40524f77347dec77fbdedaa51bd8425",
+    "stage": "evidence-admin-denial",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "root-cannot-delete-retained-version",
+        "passed": true,
+        "observation": {
+          "error_type": "InvalidRequest",
+          "code": "InvalidRequest",
+          "message": "Object is WORM protected and cannot be overwritten",
+          "http_status": 400
+        }
+      },
+      {
+        "name": "root-cannot-shorten-compliance-retention",
+        "passed": true,
+        "observation": {
+          "error_type": "InvalidRequest",
+          "code": "InvalidRequest",
+          "message": "Object is WORM protected and cannot be overwritten",
+          "http_status": 400
+        }
+      },
+      {
+        "name": "retention-denials-preserve-object",
+        "passed": true,
+        "observation": null
+      },
+      {
+        "name": "retention-denials-preserve-deadline",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "evidence-after",
+    "stdout_sha256": "70a904217ae5a5e084519d2b2f4a7d95f3abc6a27c164bd7bb80ceef490046dc",
+    "stage": "evidence-after",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "restart-pinned-version-digest-equality",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {
+      "bucket": "p01-evidence",
+      "key": "t_demo/campaign/evidence.json",
+      "version_id": "fa82e8d7-ea5d-4078-8207-99d7bf2c8005",
+      "sha256": "f24d45a5b34c6d3e308d574c56588bc8be58f5d747565f6c3701725afed46ef4",
+      "bytes": 77,
+      "retention_mode": "COMPLIANCE",
+      "retain_until": "2026-10-06T02:10:28.881000+00:00",
+      "source_version_id": "868e3906-78ce-4e98-871e-917ba4b9911e",
+      "base64": "eyJzY29wZSI6InN5bnRoZXRpYyIsIndpdG5lc3MiOiJyZXRhaW5lZCB2ZXJzaW9uIG9uZSIsIm5hdGl2ZV93cml0ZXMiOmZhbHNlfQo="
+    }
+  },
+  {
+    "command": "broker-revoked",
+    "stdout_sha256": "068d70527c47f85d7d1e5d0a7aa2aba196274425da844cbe7e014c42e6fdac61",
+    "stage": "broker-revoked",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "revoked-broker-user-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "ProbableAuthenticationError",
+          "code": null
+        }
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "broker-revoked",
+    "stdout_sha256": "068d70527c47f85d7d1e5d0a7aa2aba196274425da844cbe7e014c42e6fdac61",
+    "stage": "broker-revoked",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "revoked-broker-user-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "ProbableAuthenticationError",
+          "code": null
+        }
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "evidence-revoked",
+    "stdout_sha256": "7f23ce296aacf65941fc577af2ad6b004f1b6bcd0f39a82d1cf7134a89d672ca",
+    "stage": "evidence-revoked",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "revoked-evidence-identity-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "ClientError",
+          "code": "InvalidAccessKeyId",
+          "message": "Your account is disabled; please contact your administrator.",
+          "http_status": 403
+        }
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "evidence-ready",
+    "stdout_sha256": "0385078e72480c03487f9d7f5d0544a991cfc5150e9ba75066f28c009c4c26a9",
+    "stage": "evidence-ready",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "evidence-server-authenticated-ready",
+        "passed": true,
+        "observation": null
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "evidence-revoked",
+    "stdout_sha256": "7f23ce296aacf65941fc577af2ad6b004f1b6bcd0f39a82d1cf7134a89d672ca",
+    "stage": "evidence-revoked",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "revoked-evidence-identity-denied",
+        "passed": true,
+        "observation": {
+          "error_type": "ClientError",
+          "code": "InvalidAccessKeyId",
+          "message": "Your account is disabled; please contact your administrator.",
+          "http_status": 403
+        }
+      }
+    ],
+    "state": {}
+  },
+  {
+    "command": "temporal-revoked",
+    "stdout_sha256": "110e9d70b07489c8de11615630ad1461c0ada3cd2c2253159421511b8957fa3d",
+    "stage": "temporal-revoked",
+    "result": "PASS",
+    "checks": [
+      {
+        "name": "temporal-revoked-visible",
+        "passed": true,
+        "observation": {
+          "status": "PERMISSION_DENIED"
+        }
+      }
+    ],
+    "state": {}
+  }
+]

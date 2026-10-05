@@ -1,0 +1,35 @@
+docker.io/library/golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc: Pulling from library/golang
+eaac70c68abd: Pulling fs layer
+7b2de2423ebd: Pulling fs layer
+81578410df16: Pulling fs layer
+1ddf5cf9dbcd: Pulling fs layer
+ef1dbfdbb5d5: Pulling fs layer
+2ef8b006eb07: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+1ddf5cf9dbcd: Waiting
+ef1dbfdbb5d5: Waiting
+2ef8b006eb07: Waiting
+4f4fb700ef54: Waiting
+7b2de2423ebd: Verifying Checksum
+7b2de2423ebd: Download complete
+eaac70c68abd: Verifying Checksum
+eaac70c68abd: Download complete
+81578410df16: Verifying Checksum
+81578410df16: Download complete
+2ef8b006eb07: Verifying Checksum
+2ef8b006eb07: Download complete
+4f4fb700ef54: Download complete
+ef1dbfdbb5d5: Verifying Checksum
+ef1dbfdbb5d5: Download complete
+1ddf5cf9dbcd: Verifying Checksum
+1ddf5cf9dbcd: Download complete
+eaac70c68abd: Pull complete
+7b2de2423ebd: Pull complete
+81578410df16: Pull complete
+1ddf5cf9dbcd: Pull complete
+ef1dbfdbb5d5: Pull complete
+2ef8b006eb07: Pull complete
+4f4fb700ef54: Pull complete
+Digest: sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc
+Status: Downloaded newer image for golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc
+docker.io/library/golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc

@@ -1,0 +1,1 @@
+{"stage": "evidence-outage", "result": "PASS", "checks": [{"name": "evidence-outage-is-visible", "passed": true, "observation": {"error_type": "EndpointConnectionError", "code": null}}], "state": {}}
