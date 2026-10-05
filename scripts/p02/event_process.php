@@ -5,6 +5,7 @@ declare(strict_types=1);
 // Disposable integration-campaign driver, never included in a service image.
 use App\Application\Messaging\Actions\PublishGovernanceEvent;
 use App\Application\Messaging\Actions\PublishIdentityEvent;
+use App\Application\Messaging\Actions\PublishSupportEvent;
 use App\Application\Messaging\Contracts\ConfirmedPublisher;
 use App\Infrastructure\Messaging\RabbitPublisher;
 use Illuminate\Contracts\Console\Kernel;
@@ -27,4 +28,6 @@ if (($argv[1] ?? '') === 'crash') {
         }
     });
 }
-echo app(($argv[2] ?? '') === 'identity' ? PublishIdentityEvent::class : PublishGovernanceEvent::class)->handle().PHP_EOL;
+echo app(match ($argv[2] ?? '') {
+    'identity' => PublishIdentityEvent::class, 'support' => PublishSupportEvent::class, default => PublishGovernanceEvent::class,
+})->handle().PHP_EOL;

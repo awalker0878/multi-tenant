@@ -20,7 +20,7 @@ def main():
     root = Path(__file__).resolve().parents[2]
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    report = {'schema_version': 1, 'result': 'RUNNING', 'scope': 'P02 Governance and installation identity committed notifications; synthetic consumers, no authority or native effects',
+    report = {'schema_version': 1, 'result': 'RUNNING', 'scope': 'P02 Governance, installation identity and restricted support committed notifications; synthetic consumers, no authority or native effects',
               'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip(),
               'started_at': dt.datetime.now(dt.timezone.utc).isoformat(), 'checks': [], 'commands': []}
     private_values = [os.environ.get('P02_TEST_PASSWORD', '')]
@@ -54,18 +54,19 @@ def main():
 
     try:
         check('disposable-postgres-only', os.environ.get('P02_TEST_POSTGRES') == '1')
-        paths = ['services/governance', 'contracts/schemas/events/governance-change-v1.json', 'contracts/asyncapi/governance.yaml', 'contracts/schemas/events/identity-change-v1.json', 'contracts/asyncapi/identity.yaml', 'scripts/p02', '.github/workflows/p02-governance-events.yml']
+        paths = ['services/governance', 'contracts/schemas/events/governance-change-v1.json', 'contracts/asyncapi/governance.yaml', 'contracts/schemas/events/identity-change-v1.json', 'contracts/asyncapi/identity.yaml', 'contracts/schemas/events/support-change-v1.json', 'contracts/asyncapi/support.yaml', 'scripts/p02', '.github/workflows/p02-governance-events.yml']
         tracked = subprocess.check_output(['git', 'ls-files', '--', *paths], cwd=root, text=True).splitlines()
         report['source_sha256'] = {p: hashlib.sha256((root / p).read_bytes()).hexdigest() for p in tracked}
         check('clean-campaign-source', not subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=all', '--', *paths], cwd=root).strip())
         check('packaged-schema-matches-public-contract', (root / paths[1]).read_bytes() == (root / 'services/governance/resources/contracts/governance-change-v1.json').read_bytes())
         check('packaged-identity-schema-matches-public-contract', (root / 'contracts/schemas/events/identity-change-v1.json').read_bytes() == (root / 'services/governance/resources/contracts/identity-change-v1.json').read_bytes())
+        check('packaged-support-schema-matches-public-contract', (root / 'contracts/schemas/events/support-change-v1.json').read_bytes() == (root / 'services/governance/resources/contracts/support-change-v1.json').read_bytes())
         with tempfile.TemporaryDirectory(prefix='p02-events-private-') as directory:
             private = Path(directory)
             for cert in ['broker', 'untrusted']:
                 run(cert + '-certificate', ['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', str(private / (cert + '.key')), '-out', str(private / (cert + '.crt')), '-days', '1', '-subj', '/CN=localhost', '-addext', 'subjectAltName=IP:127.0.0.1,DNS:localhost'])
             users = []
-            for user in ['governance', 'p02-observer']:
+            for user in ['governance', 'p02-observer', 'console', 'support-audit']:
                 password = secrets.token_urlsafe(32)
                 private_values.append(password)
                 (private / (user + '.password')).write_text(password)
@@ -74,10 +75,13 @@ def main():
                 users.append({'name': user, 'password_hash': base64.b64encode(salt + hashlib.sha256(salt + password.encode()).digest()).decode(), 'hashing_algorithm': 'rabbit_password_hashing_sha256', 'tags': []})
             definitions = {'users': users, 'vhosts': [{'name': 'product'}], 'permissions': [
                 {'user': 'governance', 'vhost': 'product', 'configure': '^$', 'write': '^governance.events$', 'read': '^$'},
-                {'user': 'p02-observer', 'vhost': 'product', 'configure': '^$', 'write': '^$', 'read': '^p02\\.(governance|identity)$'}],
+                {'user': 'p02-observer', 'vhost': 'product', 'configure': '^$', 'write': '^$', 'read': '^p02\\.(governance|identity|support)$'}],
                 'exchanges': [{'name': 'governance.events', 'vhost': 'product', 'type': 'topic', 'durable': True, 'auto_delete': False, 'internal': False, 'arguments': {}}],
-                'queues': [{'name': 'p02.' + family, 'vhost': 'product', 'durable': True, 'auto_delete': False, 'arguments': {'x-queue-type': 'quorum'}} for family in ['governance', 'identity']],
-                'bindings': [{'source': 'governance.events', 'vhost': 'product', 'destination': 'p02.' + family, 'destination_type': 'queue', 'routing_key': family + '.#', 'arguments': {}} for family in ['governance', 'identity']]}
+                'queues': [{'name': 'p02.' + family, 'vhost': 'product', 'durable': True, 'auto_delete': False, 'arguments': {'x-queue-type': 'quorum'}} for family in ['governance', 'identity', 'support']],
+                'bindings': [{'source': 'governance.events', 'vhost': 'product', 'destination': 'p02.' + family, 'destination_type': 'queue', 'routing_key': family + '.#', 'arguments': {}} for family in ['governance', 'identity', 'support']]}
+            definitions['permissions'] += [
+                {'user': 'console', 'vhost': 'product', 'configure': '^$', 'write': '^$', 'read': r'^p02\.(governance|identity)$'},
+                {'user': 'support-audit', 'vhost': 'product', 'configure': '^$', 'write': '^$', 'read': r'^p02\.support$'}]
             (private / 'definitions.json').write_text(json.dumps(definitions))
             (private / 'rabbitmq.conf').write_text('listeners.tcp = none\nlisteners.ssl.default = 5671\nssl_options.certfile = /config/broker.crt\nssl_options.keyfile = /config/broker.key\nssl_options.cacertfile = /config/broker.crt\nssl_options.verify = verify_none\nssl_options.fail_if_no_peer_cert = false\ndefinitions.import_backend = local_filesystem\ndefinitions.local.path = /config/definitions.json\n')
             for file in ['broker.crt', 'broker.key', 'definitions.json', 'rabbitmq.conf']:
@@ -103,10 +107,12 @@ def main():
             run('broker-ready', ['docker', 'exec', name, 'rabbitmq-diagnostics', '-q', 'check_port_connectivity', '--address', '127.0.0.1'], timeout=20)
             environment = os.environ | {'P02_TEST_BROKER': '1', 'GOVERNANCE_BROKER_HOST': '127.0.0.1', 'GOVERNANCE_BROKER_PORT': '5679',
                 'GOVERNANCE_BROKER_PASSWORD_FILE': str(private / 'governance.password'), 'GOVERNANCE_BROKER_CA_FILE': str(private / 'broker.crt'),
+                'P02_CONSOLE_PASSWORD_FILE': str(private / 'console.password'), 'P02_SUPPORT_AUDIT_PASSWORD_FILE': str(private / 'support-audit.password'),
                 'P02_OBSERVER_PASSWORD_FILE': str(private / 'p02-observer.password'), 'P02_UNTRUSTED_CA_FILE': str(private / 'untrusted.crt')}
             run('postgres-and-broker-features', ['php', 'services/governance/vendor/bin/pest', '--configuration=services/governance/phpunit.xml',
                 'services/governance/tests/Feature/GovernanceOutboxTest.php', 'services/governance/tests/Feature/GovernanceBrokerTest.php',
                 'services/governance/tests/Feature/IdentityOutboxTest.php', 'services/governance/tests/Feature/IdentityBrokerTest.php',
+                'services/governance/tests/Feature/SupportOutboxTest.php', 'services/governance/tests/Feature/SupportBrokerTest.php',
                 'services/governance/tests/Feature/ApprovalTest.php', '--fail-on-warning', '--fail-on-risky', '--colors=never'], env=environment)
             check('real-broker-and-postgres-tests-pass', True)
         report['result'] = 'PASS'

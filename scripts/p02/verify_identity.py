@@ -50,7 +50,7 @@ def main() -> int:
               'checks': [], 'source_sha256': {}, 'limitations': ['Synthetic HTTPS OIDC peer; no operated-provider interoperability or DNS rotation qualification', 'Synthetic immutable plan authority; no real planning producer or native admission', 'No operated deployment or G01/G02 acceptance', 'Verified PostgreSQL TLS; loopback HTTP between applications; production ingress/workload TLS topology remains unqualified']}
     tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=root).decode().split('\0')
     for name in tracked:
-        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', '.github/workflows/p02-identity', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-', 'contracts/schemas/events/identity-', 'contracts/asyncapi/identity.', 'deploy/dependencies/stateful/')):
+        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', '.github/workflows/p02-identity', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-', 'contracts/schemas/events/identity-', 'contracts/schemas/events/support-', 'contracts/asyncapi/identity.', 'contracts/asyncapi/support.', 'deploy/dependencies/stateful/')):
             report['source_sha256'][name] = hashlib.sha256((root / name).read_bytes()).hexdigest()
     private_values = [os.environ['P02_TEST_PASSWORD']]
     processes: list[subprocess.Popen] = []
@@ -124,7 +124,7 @@ def main() -> int:
         report['postgres'] = sql('SHOW server_version;').strip()
         report['node'] = run(['node', '--version']).strip()
         check('exact-php-runtime', report['php'] == '8.5.11')
-        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/IdentityAdmissionTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
+        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/IdentityAdmissionTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', 'tests/Feature/SupportTrustTest.php', 'tests/Feature/SupportAccessTest.php', 'tests/Feature/SupportContractTest.php', 'tests/Feature/SupportOutboxTest.php', 'tests/Feature/SupportConcurrencyTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
         check('postgres-feature-suite', True)
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:
@@ -143,6 +143,22 @@ def main() -> int:
                 'snapshot_sha256': approval_archive, 'table_fingerprints': approval_before,
                 'decision_states': ['rejected', 'revoked'], 'approval_events': 5,
                 'limits': ['No native effect or real P05 plan producer', 'Restored authority is not resumed']}
+            check('packaged-support-openapi-contract', (root / 'contracts/openapi/governance-support-v1.json').read_bytes() == (root / 'services/governance/resources/contracts/governance-support-v1.json').read_bytes())
+            run(['php', 'vendor/bin/pest', 'tests/Feature/SupportAccessTest.php', '--filter=retains nonempty terminal support history',
+                 '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'],
+                cwd=root / 'services/governance', env=os.environ.copy(), label='support-history-producer')
+            support_before = history.fingerprint('p02_identity_test')
+            check('support-history-persists-after-producer-process-exit', support_before['support_requests']['rows'] == 1
+                  and support_before['support_approvals']['rows'] == 2 and support_before['support_reviews']['rows'] == 1
+                  and support_before['support_audit']['rows'] == 10 and support_before['support_outbox']['rows'] == 10)
+            support_archive = history.capture('p02_identity_test', 'support-history')
+            history.restore('p02_identity_test', 'support-history')
+            check('support-history-complete-database-restore', history.fingerprint('p02_identity_test') == support_before)
+            check('restored-support-request-stays-terminal', sql("SELECT state || ':' || admission_count FROM app.support_requests;", 'p02_identity_test').strip() == 'revoked:1')
+            report['support_history_recovery'] = {'source': 'real support owner actions with synthetic OIDC fixture',
+                'snapshot_sha256': support_archive, 'table_fingerprints': support_before,
+                'decision_states': ['revoked'], 'approvals': 2, 'admissions': 1, 'reviews': 1, 'audit_events': 10,
+                'limits': ['No native effect or Console support UI', 'Restored authority is not resumed', 'Actual audit custodian remains an operating input']}
             broker = NotificationBroker(root, private_path, run, private_values)
             broker.start()
             report['notification_broker_image'] = broker.image
@@ -232,7 +248,7 @@ def main() -> int:
             check('fresh-process-retry-does-not-redisplay', 'Temporary password:' not in replay and 'already complete' in replay)
 
             runtime_password = environments['governance']['DB_PASSWORD']
-            for label, statement in [('sentinel-delete', 'DELETE FROM app.bootstrap_administrator;'), ('audit-delete', 'DELETE FROM app.identity_audit;'), ('audit-update', "UPDATE app.identity_audit SET event='forged';"), ('schema-create', 'CREATE TABLE app.forbidden (id int);'), ('governance-audit-update', "UPDATE app.governance_audit SET event='forged';"), ('governance-audit-delete', 'DELETE FROM app.governance_audit;'), ('approval-binding-update', "UPDATE app.approvals SET plan_digest='forged';"), ('receipt-delete', 'DELETE FROM app.governance_commands;'), ('outbox-payload-update', "UPDATE app.governance_outbox SET payload_json='forged';"), ('outbox-delete', 'DELETE FROM app.governance_outbox;'), ('identity-outbox-event-update', "UPDATE app.identity_outbox SET event='forged';"), ('identity-outbox-delete', 'DELETE FROM app.identity_outbox;')]:
+            for label, statement in [('sentinel-delete', 'DELETE FROM app.bootstrap_administrator;'), ('audit-delete', 'DELETE FROM app.identity_audit;'), ('audit-update', "UPDATE app.identity_audit SET event='forged';"), ('schema-create', 'CREATE TABLE app.forbidden (id int);'), ('governance-audit-update', "UPDATE app.governance_audit SET event='forged';"), ('governance-audit-delete', 'DELETE FROM app.governance_audit;'), ('approval-binding-update', "UPDATE app.approvals SET plan_digest='forged';"), ('receipt-delete', 'DELETE FROM app.governance_commands;'), ('outbox-payload-update', "UPDATE app.governance_outbox SET payload_json='forged';"), ('outbox-delete', 'DELETE FROM app.governance_outbox;'), ('identity-outbox-event-update', "UPDATE app.identity_outbox SET event='forged';"), ('identity-outbox-delete', 'DELETE FROM app.identity_outbox;'), ('support-binding-update', "UPDATE app.support_requests SET binding_json='forged';"), ('support-request-delete', 'DELETE FROM app.support_requests;'), ('support-role-scope-update', "UPDATE app.support_security_grants SET site_id='forged';"), ('support-approval-update', "UPDATE app.support_approvals SET authority_sha256='forged';"), ('support-approval-delete', 'DELETE FROM app.support_approvals;'), ('support-review-update', "UPDATE app.support_reviews SET outcome='incident';"), ('support-review-delete', 'DELETE FROM app.support_reviews;'), ('support-audit-update', "UPDATE app.support_audit SET event='forged';"), ('support-audit-delete', 'DELETE FROM app.support_audit;'), ('support-outbox-update', "UPDATE app.support_outbox SET payload_json='forged';"), ('support-outbox-delete', 'DELETE FROM app.support_outbox;')]:
                 denial = sql(statement, 'governance', 'governance_runtime', runtime_password, expected=3)
                 check('runtime-denied-' + label, 'permission denied' in denial)
             replacement = secrets.token_urlsafe(32)
