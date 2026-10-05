@@ -122,8 +122,9 @@ projections, manipulated role inputs, revoked navigation and real request forger
 These results are separate from hosted PostgreSQL/browser observations, which must
 be retained with their exact source/artifact bindings before evidence is claimed.
 
-Remaining P02 integration: service-to-service actor delegation and owning-service
-admission; approved support/break-glass contracts and implementation; real consumer integration and receiving of outbox/expiry; deployed recovery/revocation epochs; full browser and
+The [data-facing delegation and Catalogue guard](p02-service-delegation.md)
+implement the initial short-lived service contract. Remaining P02 integration:
+real owning-service resources and cross-service wire qualification; approved support/break-glass contracts and implementation; real consumer integration and receiving of outbox/expiry; deployed recovery/revocation epochs; full browser and
 accessibility qualification. Lists are currently bounded to 200 rows (audit 100)
 without pagination. No native effect, real provider interoperability, complete
 operational acceptance or completed phase is inferred.

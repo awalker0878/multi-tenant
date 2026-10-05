@@ -27,7 +27,7 @@ Enforce separation of duties from effective identities, not UI roles alone. Plan
 
 ## API surface and remaining integration
 
-Implemented endpoint schemas and limits are in the [tenant](../../contracts/openapi/governance-tenancy-v1.json) and [approval](../../contracts/openapi/governance-approvals-v1.json) contracts. Native delegation and support/break-glass remain integration work. Routes are relative to governance. Tenant administration begins at `POST /v1/tenants`; tenant-specific routes use `/v1/tenants/{tenant_id}`.
+Implemented endpoint schemas and limits are in the [tenant](../../contracts/openapi/governance-tenancy-v1.json) and [approval](../../contracts/openapi/governance-approvals-v1.json) contracts. [Data-facing actor delegation](../implementation/p02-service-delegation.md) now provides bounded issuance, target-service resolution and explicit revocation. Native delegation and support/break-glass remain integration work. Routes are relative to governance. Tenant administration begins at `POST /v1/tenants`; tenant-specific routes use `/v1/tenants/{tenant_id}`.
 
 | Method and route | Contract |
 | --- | --- |

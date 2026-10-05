@@ -3,12 +3,14 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\ApprovalController;
+use App\Http\Controllers\DelegationController;
 use App\Http\Controllers\DependencyHealthController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\OidcController;
 use App\Http\Controllers\TenantController;
 use App\Http\Middleware\AuthenticateConsole;
+use App\Http\Middleware\AuthenticateService;
 use App\Http\Middleware\RequireIdentitySetup;
 use Illuminate\Support\Facades\Route;
 
@@ -51,3 +53,10 @@ Route::prefix('v1/tenants/{tenant}/approvals')->whereUuid('tenant')->middleware(
     }
     Route::post('/{approval}/validations', [ApprovalController::class, 'validateApproval'])->whereUuid('approval');
 });
+
+Route::prefix('v1/tenants/{tenant}/actor-delegations')->whereUuid('tenant')->middleware(AuthenticateConsole::class)->group(function (): void {
+    Route::post('/', [DelegationController::class, 'issue']);
+    Route::post('/{delegation}/revocation', [DelegationController::class, 'revoke'])->whereUuid('delegation');
+});
+Route::post('/v1/tenants/{tenant}/delegated-authorizations', [DelegationController::class, 'inspect'])
+    ->whereUuid('tenant')->middleware(AuthenticateService::class);

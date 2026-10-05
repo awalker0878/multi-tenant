@@ -43,7 +43,7 @@ Refinement and validation: provider scope, identity/delegation contracts, sessio
 ## Details to resolve before affected implementation
 
 - The implemented initial profile uses one installation-wide active provider, immutable settings revisions, exact issuer/subject identities and an explicitly named installation administrator. The [federation increment](../implementation/p02-federation.md) records protocol, network and session bounds. Membership administration is separate; provider claims cannot create product grants.
-- Select service identity issuance, delegation validation, revocation propagation and authority-freshness bounds.
+- The [initial data-facing service delegation](../implementation/p02-service-delegation.md) uses distinct mounted workload credentials, opaque sixty-second audience/action/scope-bound handles and uncached current-authority checks. Catalogue registers an owning-service guard; real resource integration follows P03. Operated issuance/custody, durable workflow delegation and pre-effect freshness remain their receiving/P06 checkpoints.
 - Federated sessions expire within thirty minutes and the verified ID token lifetime; the initial handover uses its five-minute proof lifetime. Every request reads current Governance authority. Provider-side revocation is bounded by session expiry; provider logout/revocation events and independently controlled emergency recovery remain receiving extensions. Separation of duties and approval expiry are owned by P02.03/P02.04.
 - Bind protected deployment credential display and interrupted-bootstrap recovery to each supported installation runtime.
 

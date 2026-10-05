@@ -80,3 +80,11 @@ The [transactional messaging foundation](../implementation/p01-messaging.md) add
 service-owned reference fact/outbox (Catalogue) and inbox/projection (Planning).
 It exposes no product API or authorization decision. See that record for the exact
 contract, retry, isolation and verification scope.
+
+## P02 admission foundation
+
+The [service delegation increment](../implementation/p02-service-delegation.md)
+registers Catalogue-owned current-authority middleware and its verified-HTTPS
+Governance client. P03 must bind the guard to actual application routes and enforce
+its own tenant/resource predicates. Current tests use a protected synthetic owner
+route; no Catalogue business API or native admission is inferred.

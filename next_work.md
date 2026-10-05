@@ -29,11 +29,20 @@ corrected contract replay. These remain development observations.
 **Current executable increment:** [Governance event delivery and background
 expiry](docs/implementation/p02-governance-events.md) are implemented with explicit
 schema/AsyncAPI contracts, bounded scheduled commands, confirmation/retry/quarantine
-handling and system-attributed expiry. Local feature/static checks pass; retain the
-hosted PostgreSQL/TLS-broker campaign before claiming integrated qualification.
+handling and system-attributed expiry. The corrected PostgreSQL/TLS-broker and identity/browser campaigns pass at
+`4afcee1d504b8dfb0725d3306f8c2c55eb1f6dce`; exact-source reports and the two
+initial failures are retained separately.
 
-**Next concrete work:** service actor delegation and owning-service admission;
-approved support-access/break-glass contract; restore/revocation reconciliation;
+[Service actor delegation and the Catalogue guard](docs/implementation/p02-service-delegation.md)
+now implement the initial data-facing profile: opaque sixty-second handles, exact
+audience/action/scope, current session/membership/grant checks, credential rotation
+and explicit revocation. Catalogue has a private HTTPS client and registered
+owner middleware. Local guard tests use a synthetic protected resource; real
+Catalogue APIs and cross-service wire qualification remain P03 integration.
+
+**Next concrete work:** qualify the service-delegation PostgreSQL increment and
+real cross-service wire path as owning resources are implemented; resolve and
+implement the approved support-access/break-glass contract; restore/revocation reconciliation;
 and the broader multi-tab/late-response/accessibility campaign. The real immutable plan producer
 belongs to P05.04; P02 injects synthetic plans only in tests and its production
 adapter fails closed without the owner. Follow the
