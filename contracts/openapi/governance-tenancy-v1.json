@@ -1,0 +1,1875 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Governance tenant authority",
+    "version": "1.0.0",
+    "description": "P02.02/P02.03 live tenant authority. Every operation independently resolves its workload and federated user session. Decisions are observations, not native permits. Lists are bounded to 200 (audit 100); pagination is not implemented."
+  },
+  "security": [
+    {
+      "ConsoleWorkload": []
+    }
+  ],
+  "paths": {
+    "/v1/tenants": {
+      "get": {
+        "operationId": "listTenants",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createTenant",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{8,128}$"
+            },
+            "description": "Same tenant/actor/command key and payload returns its committed receipt after current authority is rechecked; changed payload is 409."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantCreated"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "administrator_subject"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "administrator_subject": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}": {
+      "get": {
+        "operationId": "readTenant",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/memberships": {
+      "get": {
+        "operationId": "listTenantMemberships",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "memberships"
+                  ],
+                  "properties": {
+                    "memberships": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Membership"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        }
+      },
+      "post": {
+        "operationId": "changeMembership",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{8,128}$"
+            },
+            "description": "Same tenant/actor/command key and payload returns its committed receipt after current authority is rechecked; changed payload is 409."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "revision",
+                  "subject",
+                  "role",
+                  "state",
+                  "site_id",
+                  "environment",
+                  "expires_at"
+                ],
+                "properties": {
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "subject": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "tenant_admin",
+                      "author",
+                      "reviewer",
+                      "operator",
+                      "reader"
+                    ]
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "revoked"
+                    ]
+                  },
+                  "site_id": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 64
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "environment": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 64
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "expires_at": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/grants": {
+      "get": {
+        "operationId": "listTenantGrants",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "grants"
+                  ],
+                  "properties": {
+                    "grants": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Grant"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        }
+      },
+      "post": {
+        "operationId": "delegateGrant",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{8,128}$"
+            },
+            "description": "Same tenant/actor/command key and payload returns its committed receipt after current authority is rechecked; changed payload is 409."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Grant"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "membership_id",
+                  "action",
+                  "site_id",
+                  "environment",
+                  "resource_id",
+                  "expires_at"
+                ],
+                "properties": {
+                  "membership_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "application.read",
+                      "application.write",
+                      "plan.read",
+                      "plan.create",
+                      "approval.request",
+                      "approval.decide",
+                      "approval.revoke",
+                      "operation.admit",
+                      "evidence.read"
+                    ]
+                  },
+                  "site_id": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 64
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "environment": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 64
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "resource_id": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 128
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "expires_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Future instant less than 30 days away."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/audit": {
+      "get": {
+        "operationId": "listTenantAudit",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "audit"
+                  ],
+                  "properties": {
+                    "audit": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Audit"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/quota": {
+      "get": {
+        "operationId": "readTenantQuota",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quota"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        }
+      },
+      "post": {
+        "operationId": "changeQuota",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{8,128}$"
+            },
+            "description": "Same tenant/actor/command key and payload returns its committed receipt after current authority is rechecked; changed payload is 409."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotaChanged"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "revision",
+                  "entitlement"
+                ],
+                "properties": {
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "entitlement": {
+                    "$ref": "#/components/schemas/Entitlement"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/state": {
+      "post": {
+        "operationId": "changeTenantState",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{8,128}$"
+            },
+            "description": "Same tenant/actor/command key and payload returns its committed receipt after current authority is rechecked; changed payload is 409."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantState"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "revision",
+                  "state"
+                ],
+                "properties": {
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "suspended"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/grant-revocations": {
+      "post": {
+        "operationId": "revokeGrant",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{8,128}$"
+            },
+            "description": "Same tenant/actor/command key and payload returns its committed receipt after current authority is rechecked; changed payload is 409."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "revision",
+                    "revoked_at",
+                    "reason"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "revoked_at": {
+                      "type": "string"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "maxLength": 1000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "grant_id",
+                  "revision",
+                  "reason"
+                ],
+                "properties": {
+                  "grant_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 1000
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/authorization-decisions": {
+      "post": {
+        "operationId": "evaluateTenantPermission",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Opaque server-held federated user session. Body actor/role values are never authority."
+          },
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Decision"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "action",
+                  "scope"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "maxLength": 64
+                  },
+                  "scope": {
+                    "$ref": "#/components/schemas/Scope"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ConsoleWorkload": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Independent mounted Console workload identity; never a health credential."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "environment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Tenant": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "state",
+          "revision"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "TenantChoice": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "state",
+          "revision",
+          "role",
+          "site_id",
+          "environment"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "tenant_admin",
+              "author",
+              "reviewer",
+              "operator",
+              "reader"
+            ]
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "environment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Membership": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "tenant_id",
+          "actor_id",
+          "role",
+          "site_id",
+          "environment",
+          "state",
+          "expires_at",
+          "revision",
+          "subject"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "tenant_admin",
+              "author",
+              "reviewer",
+              "operator",
+              "reader"
+            ]
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "environment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "revoked"
+            ]
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "subject": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      },
+      "MembershipResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "actor_id",
+          "role",
+          "state",
+          "site_id",
+          "environment",
+          "expires_at",
+          "revision"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "tenant_admin",
+              "author",
+              "reviewer",
+              "operator",
+              "reader"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "revoked"
+            ]
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "environment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "Grant": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "tenant_id",
+          "membership_id",
+          "membership_revision",
+          "action",
+          "site_id",
+          "environment",
+          "resource_id",
+          "expires_at",
+          "revision",
+          "created_by"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "membership_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "membership_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "action": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "environment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expires_at": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "Entitlement": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "vcpu",
+          "memory_mib",
+          "storage_gib",
+          "workloads"
+        ],
+        "properties": {
+          "vcpu": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000000
+          },
+          "memory_mib": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000000
+          },
+          "storage_gib": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000000
+          },
+          "workloads": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000000
+          }
+        }
+      },
+      "Audit": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "tenant_id",
+          "actor_id",
+          "event",
+          "resource_id",
+          "revision",
+          "payload_json",
+          "occurred_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "event": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "resource_id": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "payload_json": {
+            "type": "string"
+          },
+          "occurred_at": {
+            "type": "string"
+          }
+        }
+      },
+      "TenantList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tenants",
+          "installation_administrator"
+        ],
+        "properties": {
+          "tenants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TenantChoice"
+            }
+          },
+          "installation_administrator": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TenantDetail": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tenant",
+          "membership"
+        ],
+        "properties": {
+          "tenant": {
+            "$ref": "#/components/schemas/Tenant"
+          },
+          "membership": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "role",
+              "revision",
+              "site_id",
+              "environment"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "tenant_admin",
+                  "author",
+                  "reviewer",
+                  "operator",
+                  "reader"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "site_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "environment": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 64
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "TenantCreated": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "state",
+          "revision",
+          "administrator_id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "administrator_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "TenantState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "state",
+          "revision"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "Quota": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revision",
+          "entitlement",
+          "observed_capacity",
+          "reservations"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "entitlement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Entitlement"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observed_capacity": {
+            "type": "null"
+          },
+          "reservations": {
+            "type": "null"
+          }
+        }
+      },
+      "QuotaChanged": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tenant_id",
+          "revision",
+          "entitlement"
+        ],
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "entitlement": {
+            "$ref": "#/components/schemas/Entitlement"
+          }
+        }
+      },
+      "Decision": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "allowed",
+          "actor_id",
+          "tenant_id",
+          "action",
+          "scope",
+          "membership_revision",
+          "evaluated_at",
+          "authority_use"
+        ],
+        "properties": {
+          "allowed": {
+            "const": true
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "membership_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "evaluated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "authority_use": {
+            "const": "observation_only"
+          }
+        }
+      }
+    }
+  }
+}

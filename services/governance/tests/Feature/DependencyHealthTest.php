@@ -68,7 +68,7 @@ test('successful foundation checks grant only dependency readiness and no busine
     ])->assertHeader('Cache-Control', 'no-store, private');
     expect($response->headers->has('Set-Cookie'))->toBeFalse();
     $this->getJson('/health/ready')->assertStatus(503);
-    $this->getJson('/v1/tenants')->assertNotFound();
+    $this->getJson('/v1/tenants')->assertUnauthorized()->assertJsonPath('error', 'invalid_workload_identity');
     $this->postJson('/health/dependencies')->assertStatus(405);
 });
 

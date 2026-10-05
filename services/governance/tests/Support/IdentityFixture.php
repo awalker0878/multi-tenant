@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use App\Application\Identity\Actions\BootstrapAdministrator;
+use App\Application\Identity\Contracts\OidcHttpTransport;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Testing\TestResponse;
+use Tests\Support\SyntheticOidcTransport;
 
 function initializeIdentityFixture(object $test): void
 {
@@ -55,4 +58,61 @@ function changeLocalPassword(object $test, string $token, string $password = 'a 
     return $test->withHeader('X-Console-Session', $token)->postJson('/identity/password', [
         'current_password' => $test->temporary, 'password' => $password, 'password_confirmation' => $password,
     ])->assertOk()->assertJsonPath('identity.password_change_required', false)->json('session_token');
+}
+
+function saveConnection(object $test, array $overrides = []): void
+{
+    $test->withHeader('X-Console-Session', $test->token)->putJson('/identity/oidc', array_replace($test->settings, $overrides))->assertCreated();
+}
+function beginFederation(object $test, string $purpose = 'setup', ?string $token = null): array
+{
+    $url = $test->withHeader('X-Console-Session', $token ?? $test->token)->postJson('/identity/oidc/flows', ['purpose' => $purpose, 'browser_binding' => $test->binding])
+        ->assertOk()->json('authorization_url');
+
+    return $test->provider->authorize($url) + ['browser_binding' => $test->binding];
+}
+function activateFederation(object $test): string
+{
+    saveConnection($test);
+    $proof = $test->postJson('/identity/oidc/callback', beginFederation($test))->assertOk()->json('verification_token');
+
+    return $test->postJson('/identity/oidc/activation', ['verification_token' => $proof])->assertOk()->assertJsonPath('identity.kind', 'federated')->json('session_token');
+}
+
+function initializeFederationFixture(object $test): void
+{
+    initializeIdentityFixture($test);
+    $test->provider = new SyntheticOidcTransport;
+    app()->instance(OidcHttpTransport::class, $test->provider);
+    $test->token = changeLocalPassword($test, localLogin($test));
+    $test->withHeader('X-Console-Session', $test->token);
+    $test->settings = ['revision' => 0, 'issuer' => 'https://idp.example.test/realm', 'client_id' => 'console-client',
+        'client_secret' => 'synthetic-oidc-secret', 'redirect_uri' => 'https://console.example.test/identity/callback',
+        'administrator_subject' => 'immutable-admin-subject', 'private_networks' => []];
+    $test->binding = bin2hex(random_bytes(32));
+    $test->token = activateFederation($test);
+    $test->withHeader('X-Console-Session', $test->token);
+}
+
+function federatedLogin(object $test, string $subject): string
+{
+    $test->provider->claims = ['sub' => $subject];
+    $token = $test->postJson('/identity/oidc/callback', beginFederation($test, 'login', ''))->assertOk()->json('session_token');
+    $test->provider->claims = [];
+
+    return $token;
+}
+
+function tenantCommand(object $test, string $path, array $input, ?string $token = null, ?string $key = null): TestResponse
+{
+    return $test->withHeader('X-Console-Session', $token ?? $test->token)->withHeader('Idempotency-Key', $key ?? bin2hex(random_bytes(16)))
+        ->postJson($path, $input);
+}
+
+function tenantMember(object $test, string $tenant, string $subject, string $role, array $scope = [], int $revision = 0, string $state = 'active'): array
+{
+    return tenantCommand($test, '/v1/tenants/'.$tenant.'/memberships', [
+        'revision' => $revision, 'subject' => $subject, 'role' => $role, 'state' => $state,
+        'site_id' => $scope['site_id'] ?? null, 'environment' => $scope['environment'] ?? null, 'expires_at' => null,
+    ])->assertOk()->json();
 }

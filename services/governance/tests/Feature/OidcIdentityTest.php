@@ -28,25 +28,6 @@ afterEach(function (): void {
     $this->travelBack();
 });
 
-function saveConnection(object $test, array $overrides = []): void
-{
-    $test->withHeader('X-Console-Session', $test->token)->putJson('/identity/oidc', array_replace($test->settings, $overrides))->assertCreated();
-}
-function beginFederation(object $test, string $purpose = 'setup', ?string $token = null): array
-{
-    $url = $test->withHeader('X-Console-Session', $token ?? $test->token)->postJson('/identity/oidc/flows', ['purpose' => $purpose, 'browser_binding' => $test->binding])
-        ->assertOk()->json('authorization_url');
-
-    return $test->provider->authorize($url) + ['browser_binding' => $test->binding];
-}
-function activateFederation(object $test): string
-{
-    saveConnection($test);
-    $proof = $test->postJson('/identity/oidc/callback', beginFederation($test))->assertOk()->json('verification_token');
-
-    return $test->postJson('/identity/oidc/activation', ['verification_token' => $proof])->assertOk()->assertJsonPath('identity.kind', 'federated')->json('session_token');
-}
-
 it('stores secret references with encrypted custody and rejects pre-change access and stale writes', function (): void {
     saveConnection($this);
     $projection = $this->getJson('/identity/oidc')->assertOk()->assertJsonPath('revision', 1)->assertJsonPath('active_revision', null)->getContent();

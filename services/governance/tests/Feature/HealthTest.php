@@ -31,7 +31,7 @@ test('business authority routes are absent and expose no exception diagnostics',
         ->assertJsonMissingPath('exception')
         ->assertJsonMissingPath('file')
         ->assertJsonMissingPath('trace');
-})->with(['/v1/tenants', '/v1/authorization-decisions', '/v1/approvals']);
+})->with(['/v1/authorization-decisions', '/v1/approvals']);
 
 test('a caller cannot configure readiness or start a browser session through health input', function () {
     $response = $this->withHeaders([

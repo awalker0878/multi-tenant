@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DependencyHealthController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\OidcController;
+use App\Http\Controllers\TenantController;
 use App\Http\Middleware\AuthenticateConsole;
 use App\Http\Middleware\RequireIdentitySetup;
 use Illuminate\Support\Facades\Route;
@@ -26,4 +28,26 @@ Route::prefix('identity')->middleware(AuthenticateConsole::class)->group(functio
     Route::post('/oidc/flows', [OidcController::class, 'begin']);
     Route::post('/oidc/callback', [OidcController::class, 'callback']);
     Route::post('/oidc/activation', [OidcController::class, 'activate'])->middleware(RequireIdentitySetup::class);
+});
+
+Route::prefix('v1/tenants')->middleware(AuthenticateConsole::class)->group(function (): void {
+    Route::get('/', [TenantController::class, 'index']);
+    Route::post('/', [TenantController::class, 'create']);
+    Route::get('/{tenant}', [TenantController::class, 'show'])->whereUuid('tenant');
+    foreach (['memberships', 'grants', 'quota', 'audit'] as $view) {
+        Route::get('/{tenant}/'.$view, [TenantController::class, 'show'])->whereUuid('tenant')->defaults('view', $view);
+    }
+    foreach (['state' => 'state', 'memberships' => 'membership', 'grants' => 'grant', 'grant-revocations' => 'revoke_grant', 'quota' => 'quota'] as $path => $operation) {
+        Route::post('/{tenant}/'.$path, [TenantController::class, 'update'])->whereUuid('tenant')->defaults('operation', $operation);
+    }
+    Route::post('/{tenant}/authorization-decisions', [TenantController::class, 'decision'])->whereUuid('tenant');
+});
+
+Route::prefix('v1/tenants/{tenant}/approvals')->whereUuid('tenant')->middleware(AuthenticateConsole::class)->group(function (): void {
+    Route::post('/', [ApprovalController::class, 'request']);
+    Route::get('/{approval}', [ApprovalController::class, 'show'])->whereUuid('approval');
+    foreach (['approve', 'reject', 'revoke'] as $operation) {
+        Route::post('/{approval}/'.$operation, [ApprovalController::class, 'transition'])->whereUuid('approval')->defaults('operation', $operation);
+    }
+    Route::post('/{approval}/validations', [ApprovalController::class, 'validateApproval'])->whereUuid('approval');
 });
