@@ -1,0 +1,251 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.83kB done
+#1 DONE 0.0s
+
+#2 [auth] library/python:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#3 ...
+
+#4 [internal] load metadata for ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3
+#4 DONE 0.2s
+
+#3 [internal] load metadata for docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#3 DONE 0.3s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 206B done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 42.16kB done
+#6 DONE 0.0s
+
+#7 [build 1/6] FROM docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#7 resolve docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a done
+#7 sha256:1c5e03f304918f89aed0c098c8f4b6f163f7bf9d2702991696bf0132a2853e30 3.53MB / 3.53MB 0.1s done
+#7 sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8 5.24MB / 13.67MB 0.1s
+#7 sha256:7c6fab1667eb7d9029684d783e4c127f11dd7ed5120829f875b799a0b9431558 249B / 249B 0.1s done
+#7 sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a 1.75kB / 1.75kB done
+#7 sha256:febd0be41adb897a0ab8f1f1c693d8912669ea60c4940e076e9946b60e210ef0 5.68kB / 5.68kB done
+#7 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 26.21MB / 28.24MB 0.1s
+#7 sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8 13.67MB / 13.67MB 0.1s done
+#7 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 28.24MB / 28.24MB 0.1s done
+#7 extracting sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150
+#7 extracting sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 1.2s done
+#7 extracting sha256:1c5e03f304918f89aed0c098c8f4b6f163f7bf9d2702991696bf0132a2853e30
+#7 extracting sha256:1c5e03f304918f89aed0c098c8f4b6f163f7bf9d2702991696bf0132a2853e30 0.2s done
+#7 extracting sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8
+#7 ...
+
+#8 [uv-tool 1/1] FROM ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3
+#8 resolve ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3 done
+#8 sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3 669B / 669B done
+#8 sha256:de5ce60260f893ece94ee7b7e9bdc7d0cd51b33e74aabef1358342e642ca71e7 1.30kB / 1.30kB done
+#8 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 23.52MB / 23.52MB 0.2s done
+#8 extracting sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 0.3s done
+#8 sha256:54723a59ba9fe2be41df3ad59d75d4738b62774f60a8e988163ed08002fa4215 98B / 98B 0.2s done
+#8 extracting sha256:54723a59ba9fe2be41df3ad59d75d4738b62774f60a8e988163ed08002fa4215 done
+#8 DONE 3.0s
+
+#7 [build 1/6] FROM docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#7 extracting sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8 1.1s done
+#7 extracting sha256:7c6fab1667eb7d9029684d783e4c127f11dd7ed5120829f875b799a0b9431558
+#7 extracting sha256:7c6fab1667eb7d9029684d783e4c127f11dd7ed5120829f875b799a0b9431558 done
+#7 DONE 3.5s
+
+#9 [runtime 2/5] COPY build/snapshot.sh /tmp/service-snapshot.sh
+#9 DONE 0.0s
+
+#10 [build 2/6] COPY --from=uv-tool /uv /usr/local/bin/uv
+#10 DONE 0.1s
+
+#11 [build 3/6] WORKDIR /build
+#11 DONE 0.0s
+
+#12 [runtime 3/5] RUN sh /tmp/service-snapshot.sh     && apt-get update     && apt-get install -y --no-install-recommends libpcre2-8-0=10.42-1+deb12u2 tzdata=2026c-0+deb12u1     && rm -rf /var/lib/apt/lists/* /tmp/service-snapshot.sh
+#12 ...
+
+#13 [build 4/6] COPY .python-version pyproject.toml uv.lock README.md ./
+#13 DONE 0.0s
+
+#14 [build 5/6] COPY src/ ./src/
+#14 DONE 0.0s
+
+#12 [runtime 3/5] RUN sh /tmp/service-snapshot.sh     && apt-get update     && apt-get install -y --no-install-recommends libpcre2-8-0=10.42-1+deb12u2 tzdata=2026c-0+deb12u1     && rm -rf /var/lib/apt/lists/* /tmp/service-snapshot.sh
+#12 0.266 Get:1 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm InRelease [151 kB]
+#12 0.281 Get:2 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm-updates InRelease [55.4 kB]
+#12 0.284 Get:3 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security InRelease [34.8 kB]
+#12 0.350 Get:4 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm/main amd64 Packages [8790 kB]
+#12 0.437 Get:5 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm-updates/main amd64 Packages [6924 B]
+#12 0.467 Get:6 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 Packages [346 kB]
+#12 1.241 Fetched 9384 kB in 1s (9072 kB/s)
+#12 1.241 Reading package lists...
+#12 1.729 Reading package lists...
+#12 ...
+
+#15 [build 6/6] RUN uv sync --locked --only-group build --no-install-project --no-managed-python     && uv build --offline --no-build-isolation --wheel     && uv venv --no-managed-python --python /usr/local/bin/python /opt/venv     && uv pip install --python /opt/venv/bin/python --offline --no-index --no-deps dist/*.whl
+#15 0.291 Using CPython 3.12.14 interpreter at: /usr/local/bin/python3.12
+#15 0.291 Creating virtual environment at: .venv
+#15 0.294 Resolved 16 packages in 1ms
+#15 0.406 Prepared 3 packages in 110ms
+#15 0.470 Installed 3 packages in 63ms
+#15 0.470  + packaging==26.3
+#15 0.470  + setuptools==84.0.0
+#15 0.470  + wheel==0.48.0
+#15 0.637 Building wheel...
+#15 1.425 running bdist_wheel
+#15 1.432 running build
+#15 1.432 running build_py
+#15 1.434 creating build/lib/inventory_worker
+#15 1.434 copying src/inventory_worker/__init__.py -> build/lib/inventory_worker
+#15 1.435 creating build/lib/inventory_worker/bootstrap
+#15 1.435 copying src/inventory_worker/bootstrap/health.py -> build/lib/inventory_worker/bootstrap
+#15 1.435 copying src/inventory_worker/bootstrap/__init__.py -> build/lib/inventory_worker/bootstrap
+#15 1.436 creating build/lib/inventory_worker/interfaces
+#15 1.436 copying src/inventory_worker/interfaces/health.py -> build/lib/inventory_worker/interfaces
+#15 1.437 copying src/inventory_worker/interfaces/__init__.py -> build/lib/inventory_worker/interfaces
+#15 1.437 running egg_info
+#15 1.438 creating src/product_inventory_worker.egg-info
+#15 1.441 writing src/product_inventory_worker.egg-info/PKG-INFO
+#15 1.441 writing dependency_links to src/product_inventory_worker.egg-info/dependency_links.txt
+#15 1.442 writing entry points to src/product_inventory_worker.egg-info/entry_points.txt
+#15 1.442 writing top-level names to src/product_inventory_worker.egg-info/top_level.txt
+#15 1.443 writing manifest file 'src/product_inventory_worker.egg-info/SOURCES.txt'
+#15 1.446 reading manifest file 'src/product_inventory_worker.egg-info/SOURCES.txt'
+#15 1.448 writing manifest file 'src/product_inventory_worker.egg-info/SOURCES.txt'
+#15 1.449 warning: build_py: byte-compiling is disabled, skipping.
+#15 1.449 
+#15 1.453 installing to build/bdist.linux-x86_64/wheel
+#15 1.453 running install
+#15 1.464 running install_lib
+#15 1.466 creating build/bdist.linux-x86_64/wheel
+#15 1.466 creating build/bdist.linux-x86_64/wheel/inventory_worker
+#15 1.467 creating build/bdist.linux-x86_64/wheel/inventory_worker/bootstrap
+#15 1.467 copying build/lib/inventory_worker/bootstrap/health.py -> build/bdist.linux-x86_64/wheel/./inventory_worker/bootstrap
+#15 1.467 copying build/lib/inventory_worker/bootstrap/__init__.py -> build/bdist.linux-x86_64/wheel/./inventory_worker/bootstrap
+#15 1.468 creating build/bdist.linux-x86_64/wheel/inventory_worker/interfaces
+#15 1.468 copying build/lib/inventory_worker/interfaces/health.py -> build/bdist.linux-x86_64/wheel/./inventory_worker/interfaces
+#15 1.469 warning: install_lib: byte-compiling is disabled, skipping.
+#15 1.469 
+#15 1.469 copying build/lib/inventory_worker/interfaces/__init__.py -> build/bdist.linux-x86_64/wheel/./inventory_worker/interfaces
+#15 1.469 copying build/lib/inventory_worker/__init__.py -> build/bdist.linux-x86_64/wheel/./inventory_worker
+#15 1.469 running install_egg_info
+#15 1.470 Copying src/product_inventory_worker.egg-info to build/bdist.linux-x86_64/wheel/./product_inventory_worker-0.1.0.dev0-py3.12.egg-info
+#15 1.472 running install_scripts
+#15 1.473 creating build/bdist.linux-x86_64/wheel/product_inventory_worker-0.1.0.dev0.dist-info/WHEEL
+#15 1.474 creating '/build/dist/.tmp-old09c69/product_inventory_worker-0.1.0.dev0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+#15 1.474 adding 'inventory_worker/__init__.py'
+#15 1.474 adding 'inventory_worker/bootstrap/__init__.py'
+#15 1.475 adding 'inventory_worker/bootstrap/health.py'
+#15 1.475 adding 'inventory_worker/interfaces/__init__.py'
+#15 1.475 adding 'inventory_worker/interfaces/health.py'
+#15 1.476 adding 'product_inventory_worker-0.1.0.dev0.dist-info/METADATA'
+#15 1.476 adding 'product_inventory_worker-0.1.0.dev0.dist-info/WHEEL'
+#15 1.476 adding 'product_inventory_worker-0.1.0.dev0.dist-info/entry_points.txt'
+#15 1.477 adding 'product_inventory_worker-0.1.0.dev0.dist-info/top_level.txt'
+#15 1.477 adding 'product_inventory_worker-0.1.0.dev0.dist-info/RECORD'
+#15 1.477 removing build/bdist.linux-x86_64/wheel
+#15 1.503 Successfully built dist/product_inventory_worker-0.1.0.dev0-py3-none-any.whl
+#15 1.666 Using CPython 3.12.14 interpreter at: /usr/local/bin/python
+#15 1.666 Creating virtual environment at: /opt/venv
+#15 1.832 Using Python 3.12.14 environment at: /opt/venv
+#15 1.834 Resolved 1 package in 1ms
+#15 1.839 Prepared 1 package in 3ms
+#15 1.842 Installed 1 package in 3ms
+#15 1.842  + product-inventory-worker==0.1.0.dev0 (from file:///build/dist/product_inventory_worker-0.1.0.dev0-py3-none-any.whl)
+#15 DONE 1.9s
+
+#12 [runtime 3/5] RUN sh /tmp/service-snapshot.sh     && apt-get update     && apt-get install -y --no-install-recommends libpcre2-8-0=10.42-1+deb12u2 tzdata=2026c-0+deb12u1     && rm -rf /var/lib/apt/lists/* /tmp/service-snapshot.sh
+#12 1.729 Reading package lists...
+#12 2.219 Building dependency tree...
+#12 2.329 Reading state information...
+#12 2.444 The following packages will be upgraded:
+#12 2.445   libpcre2-8-0 tzdata
+#12 2.490 2 upgraded, 0 newly installed, 0 to remove and 2 not upgraded.
+#12 2.490 Need to get 566 kB of archives.
+#12 2.490 After this operation, 4096 B disk space will be freed.
+#12 2.490 Get:1 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 libpcre2-8-0 amd64 10.42-1+deb12u2 [262 kB]
+#12 2.503 Get:2 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 tzdata all 2026c-0+deb12u1 [304 kB]
+#12 2.595 debconf: delaying package configuration, since apt-utils is not installed
+#12 2.615 Fetched 566 kB in 0s (9714 kB/s)
+#12 2.630 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 6703 files and directories currently installed.)
+#12 2.636 Preparing to unpack .../libpcre2-8-0_10.42-1+deb12u2_amd64.deb ...
+#12 2.639 Unpacking libpcre2-8-0:amd64 (10.42-1+deb12u2) over (10.42-1+deb12u1) ...
+#12 2.674 Setting up libpcre2-8-0:amd64 (10.42-1+deb12u2) ...
+#12 2.695 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 6703 files and directories currently installed.)
+#12 2.701 Preparing to unpack .../tzdata_2026c-0+deb12u1_all.deb ...
+#12 2.814 Unpacking tzdata (2026c-0+deb12u1) over (2026b-0+deb12u1) ...
+#12 3.579 Setting up tzdata (2026c-0+deb12u1) ...
+#12 3.640 debconf: unable to initialize frontend: Dialog
+#12 3.640 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#12 3.640 debconf: falling back to frontend: Readline
+#12 3.640 debconf: unable to initialize frontend: Readline
+#12 3.640 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.36.0 /usr/local/share/perl/5.36.0 /usr/lib/x86_64-linux-gnu/perl5/5.36 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.36 /usr/share/perl/5.36 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+#12 3.640 debconf: falling back to frontend: Teletype
+#12 3.673 
+#12 3.673 Current default time zone: 'Etc/UTC'
+#12 3.675 Local time is now:      Mon Oct  5 04:59:53 UTC 2026.
+#12 3.675 Universal Time is now:  Mon Oct  5 04:59:53 UTC 2026.
+#12 3.675 Run 'dpkg-reconfigure tzdata' if you wish to change it.
+#12 3.675 
+#12 3.729 Processing triggers for libc-bin (2.36-9+deb12u14) ...
+#12 DONE 3.8s
+
+#16 [runtime 4/5] WORKDIR /app
+#16 DONE 0.0s
+
+#17 [runtime 5/5] COPY --from=build /opt/venv/ /opt/venv/
+#17 DONE 0.0s
+
+#18 exporting to image
+#18 exporting layers
+#18 exporting layers 0.5s done
+#18 writing image sha256:53b09489f0468623393e79fc8e4114618914d49eae6d5a4fdcd4b9e444e0e119 done
+#18 naming to docker.io/library/p01-inventory-workers:41bbcaec3be5ec0f2abdd534bab2041e46a74e90 done
+#18 DONE 0.5s

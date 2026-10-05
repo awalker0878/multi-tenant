@@ -1,0 +1,83 @@
+[
+    {
+        "Id": "sha256:bb907bfb7184d14d873acee315fe8fb28db6219e1530f3e6f2a549a0b40b569b",
+        "RepoTags": [
+            "p01-lifecycle-workers:41bbcaec3be5ec0f2abdd534bab2041e46a74e90"
+        ],
+        "RepoDigests": [],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-10-05T04:59:56.690063687Z",
+        "DockerVersion": "",
+        "Author": "",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "10001:10001",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/opt/venv/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "LANG=C.UTF-8",
+                "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+                "PYTHON_VERSION=3.12.14",
+                "PYTHON_SHA256=5c8462af5790baf43a321a1559dbe0db06d1be4300fb85fb53c40060668e548a",
+                "PYTHONDONTWRITEBYTECODE=1",
+                "PYTHONUNBUFFERED=1"
+            ],
+            "Cmd": [
+                "liveness"
+            ],
+            "Healthcheck": {
+                "Test": [
+                    "NONE"
+                ]
+            },
+            "ArgsEscaped": true,
+            "Image": "",
+            "Volumes": null,
+            "WorkingDir": "/app",
+            "Entrypoint": [
+                "/opt/venv/bin/lifecycle-worker-health"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "org.opencontainers.image.revision": "41bbcaec3be5ec0f2abdd534bab2041e46a74e90",
+                "org.opencontainers.image.source": "https://github.com/awalker0878/multi-tenant",
+                "org.opencontainers.image.title": "product-lifecycle-worker bootstrap"
+            }
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 128726863,
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/at6enon5vwk7bafr3t9icvhup/diff:/var/lib/docker/overlay2/v5quw9qx5bk9ac2lv4duupu3l/diff:/var/lib/docker/overlay2/gxcwonqjxc5q5nvj17x2n2wo8/diff:/var/lib/docker/overlay2/2bbcbe9af64348f21f7e77e9ebc5376a61bc0482579dee7befcba5aa5f9cb495/diff:/var/lib/docker/overlay2/613c2863a5af924231bb1f9ecdfaac8e975cd87e269dd1302489e6e5fcec8f4d/diff:/var/lib/docker/overlay2/358ff57a05ae319aaabdb84a283c7a27d1521e25dbb84dedc9f4b8ea2884305a/diff:/var/lib/docker/overlay2/17fa6f8f1872f1afbe8fc4c35508695f1b8e886f06905fac66a5884ef1631c21/diff",
+                "MergedDir": "/var/lib/docker/overlay2/qwul22vtkrdq2j4wt8yq10q6j/merged",
+                "UpperDir": "/var/lib/docker/overlay2/qwul22vtkrdq2j4wt8yq10q6j/diff",
+                "WorkDir": "/var/lib/docker/overlay2/qwul22vtkrdq2j4wt8yq10q6j/work"
+            },
+            "Name": "overlay2"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+                "sha256:16df0073c13c96653ee2b601b16e514321513eb4af983de156c2d4e17df8a5d9",
+                "sha256:9639007baab8a136bc468bd5d757fdf79cf5d77b6ff2a87889071252e334fab3",
+                "sha256:abca6d63c9dbe51fa3bc42e75e0387da12803ef64430ad151814e468d5e1c203",
+                "sha256:e04f122dc452ec322e3f224f0b6cd4708d3aacabf3f39e35b943d704b54978e7",
+                "sha256:194c672228904856e8682b98386c45390debe03348bebd0aa2ebb45eea348d80",
+                "sha256:1880c654f19a90f22333857768185ed02ba85f36c4e1eb06cc0b424537157c6f",
+                "sha256:c5eb8fc6941c79a22ec8995a9ab39b97a4d8746464c0b1c697e8b0d3cde27d0b"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-10-05T04:59:57.148204633Z"
+        }
+    }
+]
