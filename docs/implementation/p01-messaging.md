@@ -46,3 +46,10 @@ Python static analysis have been exercised locally; immutable hosted reports wil
 be recorded after the real PostgreSQL/RabbitMQ campaign. These local observations
 are not a G01 pass. HTTP OpenAPI clients, full compatibility/admission enforcement,
 and other service event integrations remain distinct P01/P02+ work.
+
+The hosted campaign is `scripts/p01/run_messaging.py`: it builds only the two owned
+images, installs TLS dependencies without host ports, runs the owner migrations,
+and injects denied outbox/projection writes, producer/consumer process loss,
+broker/database restart, tenant denial, sequence gaps, outage and publisher
+revocation. It retains source/image identities, results and cleanup; a definition
+of a check is not evidence of its execution.

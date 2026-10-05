@@ -22,11 +22,16 @@ class PythonLockTest(unittest.TestCase):
             with self.subTest(service=service):
                 project, lock = self.project_lock("services/" + service)
                 inventory = production_inventory(project, lock)
-                self.assertEqual(inventory, {
+                expected = {
                     "product-" + service: "0.1.0.dev0", "psycopg": "3.3.6",
                     "psycopg-binary": "3.3.6", "typing-extensions": "4.16.0",
                     "uvicorn": "0.53.0", "click": "8.5.0", "h11": "0.16.0",
-                })
+                }
+                if service == "planning":
+                    expected.update({"attrs": "26.1.0", "jsonschema": "4.26.0",
+                                     "jsonschema-specifications": "2025.9.1", "pika": "1.4.4",
+                                     "referencing": "0.37.0", "rpds-py": "2026.9.1"})
+                self.assertEqual(inventory, expected)
 
     def test_workers_keep_only_owned_distribution(self):
         for worker in ("inventory", "lifecycle"):
