@@ -1,0 +1,131 @@
+{
+  "source_revision": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+  "evidence_head": "870e73c0cc7f89fb6eda32b6371a053456b35016",
+  "observed_at": "2026-10-05T06:50:49.579Z",
+  "runs": {
+    "implementation": [
+      {
+        "id": 37272826368,
+        "name": "Context policy",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37272826368"
+      },
+      {
+        "id": 37272826260,
+        "name": "P01 policy controls",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37272826260"
+      },
+      {
+        "id": 37272826247,
+        "name": "P01 foundation contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37272826247"
+      },
+      {
+        "id": 37272826194,
+        "name": "P01 Permit Desk application recovery",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37272826194"
+      },
+      {
+        "id": 37272826276,
+        "name": "P01 bootstrap images",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37272826276"
+      },
+      {
+        "id": 37272826201,
+        "name": "P01 transactional messaging",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37272826201"
+      },
+      {
+        "id": 37272826310,
+        "name": "P01 foundation packages",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37272826310"
+      },
+      {
+        "id": 37272826323,
+        "name": "P01 isolated Compose integration",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37272826323"
+      },
+      {
+        "id": 37272826299,
+        "name": "P01 isolated stateful dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37272826299"
+      },
+      {
+        "id": 37272826200,
+        "name": "P01 isolated Kubernetes integration",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "b7705eef994c50863d87b4d8f9ff272f9397ca37",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37272826200"
+      }
+    ],
+    "evidence": [
+      {
+        "id": 37273914958,
+        "name": "Context policy",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "870e73c0cc7f89fb6eda32b6371a053456b35016",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37273914958"
+      },
+      {
+        "id": 37273915026,
+        "name": "P01 policy controls",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "870e73c0cc7f89fb6eda32b6371a053456b35016",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37273915026"
+      },
+      {
+        "id": 37273915045,
+        "name": "P01 foundation contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "870e73c0cc7f89fb6eda32b6371a053456b35016",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37273915045"
+      },
+      {
+        "id": 37273914985,
+        "name": "P01 foundation packages",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "870e73c0cc7f89fb6eda32b6371a053456b35016",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37273914985"
+      },
+      {
+        "id": 37273915043,
+        "name": "P01 bootstrap images",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "870e73c0cc7f89fb6eda32b6371a053456b35016",
+        "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37273915043"
+      }
+    ]
+  }
+}
