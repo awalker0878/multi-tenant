@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "source_revision": "b13996d13db9b54736667a04be23c53f74269424",
+  "run_id": 37371858388,
+  "artifact_id": 11369662969,
+  "archive_sha256": "355d0f81b259c528c6194251740f97393608af8b07065268ce4cf1f78c60a1af",
+  "retrieved_at": "2026-10-05T21:16:21.375722+00:00",
+  "matched_source_bindings": 284,
+  "verified_artifact_bindings": 9,
+  "retained_file_sha256": {
+    "browser.json": "9e9b43365302221ead515816b35ce648fe8fe29aba0aa5a8453d9751ef58aae5",
+    "browser.log": "f0fd10664f1c3f10200d11fd7dc27ea1ac1c5221e42c65ba53f8f5649c197db2",
+    "campaign.zip": "355d0f81b259c528c6194251740f97393608af8b07065268ce4cf1f78c60a1af",
+    "console-http.log": "6363b21b740069aefda5ae2cd4700b875fb1c27f7b510e7627f9e8a8184aadc9",
+    "console-notification-features.log": "274763271f19ff670ebb3ea1ca07bbbecffab3278c7dcf0c604f238d0a7bb3f1",
+    "governance-http.log": "6912c3106525be28d49543ccd8c5e25d6e18d17363930711010fb96174412e39",
+    "noninteractive-denial.log": "350a8d53e709600769f9a42f98d128cb95e74590e18ff67a444bd8ce7a7ce5ce",
+    "notification-broker-ready.log": "334459dc7c11f121513f698791bde3abf223e2f550d91d7b5a46e69111b2cbf6",
+    "notification-broker-start.log": "0c3aa4cf3e3558d160c4bb7a9300433df3e7c149092d49c2228efd283f14f896",
+    "postgres-features.log": "d22855533649a80a0a35ad8227ff19a7d2b46c53c6c78003fdee54bd3a10ef2a",
+    "report.json": "3209665f0ba00ff5a0e6cc109a177f7da644bee5f8da5479a8626365f912b72b"
+  },
+  "scope": "Firefox notification campaign at b13996d; separate from the later quota-save test correction and directory changes."
+}
