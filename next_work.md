@@ -22,8 +22,9 @@ The [correction record](verification/p02/corrections.md) preserves the initial
 browser timing and immutable-contract failures. The published v1 contract is
 restored byte-for-byte; no validation rule was weakened. The
 [regression snapshot](verification/p02/tenancy-regression-runs.json) keeps each
-workflow's actual source and outcome; Kubernetes replay is still running while
-the P02 campaign, package/image, Compose, messaging and corrected contract checks pass.
+workflow's actual source and outcome. All nine affected workflow families pass,
+including package/image, Compose, Kubernetes, messaging, the P02 campaign and the
+corrected contract replay. These remain development observations.
 
 **Next concrete work:** implement and qualify Governance outbox delivery and
 background approval expiry against explicit event contracts, then service actor

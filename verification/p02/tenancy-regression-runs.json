@@ -1,9 +1,11 @@
 {
   "schema_version": 1,
   "source_sha": "6fd44860f61d66bf858c92b8099f29a97479758b",
-  "retrieved_at": "2026-10-05T18:24:16.892Z",
+  "unchanged_product_source_through": "c02d0d4968364d739d73bcac105b990bedb6cd40",
+  "verified_p02_source_bindings": 218,
+  "retrieved_at": "2026-10-05T18:32:21.525Z",
   "observer": "Codex via GitHub connector",
-  "scope": "Development regression only. Corrected product source is 6fd4486; unchanged-contract replay at evidence-only descendant b1064b7. Historical failures remain explicit; no gate acceptance.",
+  "scope": "Nine affected development workflow families pass. Full package/image, messaging, Compose, Kubernetes and P02 runs bind to 6fd4486; the unchanged-contract replay at evidence-only descendant b1064b7 is separately retained. No receiving gate acceptance or promotion authority.",
   "runs": [
     {
       "id": 37354292421,
@@ -15,13 +17,13 @@
       "updated_at": "2026-10-05T18:13:36Z"
     },
     {
-      "id": 37354292360,
-      "name": "P01 foundation contracts",
+      "id": 37354292576,
+      "name": "P01 isolated Kubernetes integration",
       "status": "completed",
-      "conclusion": "failure",
+      "conclusion": "success",
       "head_sha": "6fd44860f61d66bf858c92b8099f29a97479758b",
-      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37354292360",
-      "updated_at": "2026-10-05T18:13:47Z"
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37354292576",
+      "updated_at": "2026-10-05T18:31:17Z"
     },
     {
       "id": 37354292314,
@@ -78,51 +80,6 @@
       "updated_at": "2026-10-05T18:16:47Z"
     },
     {
-      "id": 37354292576,
-      "name": "P01 isolated Kubernetes integration",
-      "status": "in_progress",
-      "conclusion": null,
-      "head_sha": "6fd44860f61d66bf858c92b8099f29a97479758b",
-      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37354292576",
-      "updated_at": "2026-10-05T18:21:00Z"
-    },
-    {
-      "id": 37354711807,
-      "name": "P01 bootstrap images",
-      "status": "completed",
-      "conclusion": "success",
-      "head_sha": "b1064b788970780ebab7f87a7bfb9018421e1ed8",
-      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37354711807",
-      "updated_at": "2026-10-05T18:16:55Z"
-    },
-    {
-      "id": 37354711752,
-      "name": "P01 policy controls",
-      "status": "completed",
-      "conclusion": "success",
-      "head_sha": "b1064b788970780ebab7f87a7bfb9018421e1ed8",
-      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37354711752",
-      "updated_at": "2026-10-05T18:16:50Z"
-    },
-    {
-      "id": 37354711708,
-      "name": "P01 foundation packages",
-      "status": "completed",
-      "conclusion": "success",
-      "head_sha": "b1064b788970780ebab7f87a7bfb9018421e1ed8",
-      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37354711708",
-      "updated_at": "2026-10-05T18:16:54Z"
-    },
-    {
-      "id": 37354711838,
-      "name": "Context policy",
-      "status": "completed",
-      "conclusion": "success",
-      "head_sha": "b1064b788970780ebab7f87a7bfb9018421e1ed8",
-      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37354711838",
-      "updated_at": "2026-10-05T18:16:48Z"
-    },
-    {
       "id": 37354711828,
       "name": "P01 foundation contracts",
       "status": "completed",
@@ -130,6 +87,23 @@
       "head_sha": "b1064b788970780ebab7f87a7bfb9018421e1ed8",
       "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37354711828",
       "updated_at": "2026-10-05T18:17:12Z"
+    }
+  ],
+  "historical_failures": [
+    {
+      "run_id": 37353917458,
+      "record": "verification/p02/identity/run-37353917458/report.json",
+      "reason": "Browser URL captured before navigation completed; corrected without relaxing assertions."
+    },
+    {
+      "run_id": 37353917453,
+      "record": "verification/p02/contracts/run-37353917453/report.json",
+      "reason": "Published contract edit rejected; original bytes restored."
+    },
+    {
+      "run_id": 37354292360,
+      "record": "verification/p02/contracts/run-37354292360/report.json",
+      "reason": "Conservative comparison with the rejected previous push sees restoration as a change; original-baseline comparison and subsequent unmodified freeze pass."
     }
   ]
 }
