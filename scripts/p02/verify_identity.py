@@ -111,7 +111,7 @@ def main() -> int:
         report['postgres'] = sql('SHOW server_version;').strip()
         report['node'] = run(['node', '--version']).strip()
         check('exact-php-runtime', report['php'] == '8.5.11')
-        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
+        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/OidcIdentityTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
         check('postgres-feature-suite', True)
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:
@@ -154,7 +154,8 @@ def main() -> int:
                 sql(f'REVOKE ALL ON SCHEMA public FROM PUBLIC; CREATE SCHEMA app AUTHORIZATION {name}_owner; GRANT USAGE ON SCHEMA app TO {name}_runtime;', name)
                 sql(f'ALTER DEFAULT PRIVILEGES FOR ROLE {name}_owner IN SCHEMA app GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {name}_runtime;', name)
                 migration = root / directory / 'database/migrations' / ('001_identity.sql' if name == 'governance' else '001_shared_state.sql')
-                sql(migration.read_text(), name, f'{name}_migrator', migration_password)
+                for owned_migration in sorted(migration.parent.glob('*.sql')):
+                    sql(owned_migration.read_text(), name, f'{name}_migrator', migration_password)
                 key = 'base64:' + base64.b64encode(secrets.token_bytes(32)).decode()
                 private_values.append(key)
                 environments[name] = os.environ | {'APP_ENV': 'p02-verification', 'APP_DEBUG': 'false', 'APP_KEY': key,

@@ -802,6 +802,7 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/p02-local-bootstrap.md
+  - docs/implementation/p02-federation.md
   - docs/implementation/phases/p02.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
@@ -880,6 +881,7 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/p02-local-bootstrap.md
+  - docs/implementation/p02-federation.md
   - docs/implementation/phases/p02.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md

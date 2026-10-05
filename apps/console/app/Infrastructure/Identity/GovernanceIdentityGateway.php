@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Infrastructure\Identity;
 
 use App\Application\Identity\Contracts\IdentityGateway;
-use App\Application\Identity\Data\LocalActor;
-use App\Application\Identity\Data\LocalSession;
+use App\Application\Identity\Data\ConsoleActor;
+use App\Application\Identity\Data\ConsoleSession;
 use App\Domain\Identity\IdentityFailure;
 use App\Infrastructure\Foundation\MountedSecret;
 use Illuminate\Http\Client\ConnectionException;
@@ -16,17 +16,17 @@ final class GovernanceIdentityGateway implements IdentityGateway
 {
     public function __construct(private readonly MountedSecret $secrets) {}
 
-    public function login(string $username, #[\SensitiveParameter] string $password): LocalSession
+    public function login(string $username, #[\SensitiveParameter] string $password): ConsoleSession
     {
         return $this->session($this->send('POST', '/identity/local-sessions', '', ['username' => $username, 'password' => $password]));
     }
 
-    public function current(#[\SensitiveParameter] string $token): LocalActor
+    public function current(#[\SensitiveParameter] string $token): ConsoleActor
     {
         return $this->actor($this->send('GET', '/identity/session', $token));
     }
 
-    public function changePassword(#[\SensitiveParameter] string $token, #[\SensitiveParameter] string $currentPassword, #[\SensitiveParameter] string $password): LocalSession
+    public function changePassword(#[\SensitiveParameter] string $token, #[\SensitiveParameter] string $currentPassword, #[\SensitiveParameter] string $password): ConsoleSession
     {
         return $this->session($this->send('POST', '/identity/password', $token, ['current_password' => $currentPassword, 'password' => $password, 'password_confirmation' => $password]));
     }
@@ -36,7 +36,48 @@ final class GovernanceIdentityGateway implements IdentityGateway
         $this->send('POST', '/identity/logout', $token);
     }
 
-    /** @param array<string, string> $body
+    /** @return array<string, mixed> */
+    public function settings(#[\SensitiveParameter] string $token): array
+    {
+        return $this->send('GET', '/identity/oidc', $token);
+    }
+
+    public function saveSettings(#[\SensitiveParameter] string $token, #[\SensitiveParameter] array $settings): void
+    {
+        $this->send('PUT', '/identity/oidc', $token, $settings);
+    }
+
+    public function begin(string $purpose, #[\SensitiveParameter] string $binding, #[\SensitiveParameter] string $token): string
+    {
+        $data = $this->send('POST', '/identity/oidc/flows', $token, ['purpose' => $purpose, 'browser_binding' => $binding]);
+        $url = $data['authorization_url'] ?? null;
+        if (! is_string($url) || ! filter_var($url, FILTER_VALIDATE_URL) || parse_url($url, PHP_URL_SCHEME) !== 'https'
+            || parse_url($url, PHP_URL_USER) !== null || parse_url($url, PHP_URL_PASS) !== null) {
+            throw new IdentityFailure(503);
+        }
+
+        return $url;
+    }
+
+    public function callback(#[\SensitiveParameter] string $state, #[\SensitiveParameter] string $binding, #[\SensitiveParameter] string $code, #[\SensitiveParameter] string $token): ConsoleSession|array
+    {
+        $data = $this->send('POST', '/identity/oidc/callback', $token, ['state' => $state, 'browser_binding' => $binding, 'code' => $code]);
+        if (isset($data['session_token'])) {
+            return $this->session($data);
+        }
+        if (! is_string($data['verification_token'] ?? null) || ! preg_match('/\A[0-9a-f]{64}\z/', $data['verification_token']) || ! is_int($data['revision'] ?? null)) {
+            throw new IdentityFailure(503);
+        }
+
+        return ['verification_token' => $data['verification_token'], 'revision' => $data['revision']];
+    }
+
+    public function activate(#[\SensitiveParameter] string $token, #[\SensitiveParameter] string $proof): ConsoleSession
+    {
+        return $this->session($this->send('POST', '/identity/oidc/activation', $token, ['verification_token' => $proof]));
+    }
+
+    /** @param array<string, mixed> $body
      * @return array<string, mixed>
      */
     private function send(string $method, string $path, #[\SensitiveParameter] string $token, #[\SensitiveParameter] array $body = []): array
@@ -64,7 +105,7 @@ final class GovernanceIdentityGateway implements IdentityGateway
         if (! $response->successful()) {
             // A bad workload identity is an unavailable dependency, not a browser logout.
             $status = $response->json('error') === 'invalid_workload_identity' ? 503 : $response->status();
-            throw new IdentityFailure(in_array($status, [401, 403, 422, 429], true) ? $status : 503);
+            throw new IdentityFailure(in_array($status, [401, 403, 409, 422, 429], true) ? $status : 503);
         }
         $data = $response->json();
         if (! is_array($data) || array_is_list($data)) {
@@ -75,24 +116,29 @@ final class GovernanceIdentityGateway implements IdentityGateway
     }
 
     /** @param array<string, mixed> $data */
-    private function actor(array $data): LocalActor
+    private function actor(array $data): ConsoleActor
     {
         $identity = $data['identity'] ?? null;
-        if (! is_array($identity) || ($identity['subject'] ?? null) !== 'bootstrap-admin' || ! is_bool($identity['password_change_required'] ?? null)) {
+        if (! is_array($identity) || ! is_string($identity['subject'] ?? null) || ! is_bool($identity['password_change_required'] ?? null)) {
+            throw new IdentityFailure(503);
+        }
+        $federated = ($identity['kind'] ?? null) === 'federated';
+        if (($federated && (! preg_match('/\A[0-9a-f-]{36}\z/', $identity['subject']) || $identity['password_change_required']))
+            || (! $federated && $identity['subject'] !== 'bootstrap-admin')) {
             throw new IdentityFailure(503);
         }
 
-        return new LocalActor($identity['password_change_required']);
+        return new ConsoleActor($identity['password_change_required'], $identity['subject'], $federated, $federated && in_array('identity.setup', (array) ($identity['permissions'] ?? []), true));
     }
 
     /** @param array<string, mixed> $data */
-    private function session(#[\SensitiveParameter] array $data): LocalSession
+    private function session(#[\SensitiveParameter] array $data): ConsoleSession
     {
         $token = $data['session_token'] ?? null;
         if (! is_string($token) || ! preg_match('/\A[0-9a-f]{64}\z/', $token)) {
             throw new IdentityFailure(503);
         }
 
-        return new LocalSession($token, $this->actor($data));
+        return new ConsoleSession($token, $this->actor($data));
     }
 }

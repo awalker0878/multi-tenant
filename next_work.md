@@ -10,15 +10,14 @@ password change, durable session authority and the Console sign-in/setup journey
 The retained EV-P02-001 campaign passes 32 PostgreSQL/HTTP/browser checks, with
 165 matching source bindings. Full local suites pass 46 Governance and 60 Console
 tests. Direct API and browser controls retain their bounded deployment scope.
-P02 remains IN_PROGRESS; external OIDC is not yet configured by the setup screen. The
+P02 remains IN_PROGRESS. Console-managed external OIDC and verified handover now have an implemented [federation increment](docs/implementation/p02-federation.md); its new source requires separate qualification. The
 [regression snapshot](verification/p02/regression-runs.json) records all ten affected
 workflows passing, including the nine package/image jobs and both runtime campaigns.
 
-**Next concrete work:** complete console-managed external OIDC settings and secret
-custody, provider/token validation, verified federated administrator testing and
-atomic handover/local-session retirement. Then implement P02.02 tenant membership
-and quota APIs, P02.03 scoped authorization, and P02.04 plan-bound approvals.
-Provider values remain application settings and never deployment configuration.
+**Next concrete work:** qualify the new OIDC paths against the disposable runtime,
+then implement P02.02 tenant membership and quota APIs, P02.03 scoped authorization,
+and P02.04 plan-bound approvals. Provider values remain application settings and
+never deployment configuration.
 
 ## Retained P01 handoff
 

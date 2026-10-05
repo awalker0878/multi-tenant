@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Application\Identity\Contracts\IdentityGateway;
-use App\Application\Identity\Data\LocalSession;
+use App\Application\Identity\Data\ConsoleSession;
 use App\Domain\Identity\IdentityFailure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,11 +52,6 @@ final class LocalIdentityController
         return $this->acceptSession($request, $session);
     }
 
-    public function setup(): Response
-    {
-        return Inertia::render('identity/Setup');
-    }
-
     public function logout(Request $request, IdentityGateway $identity): RedirectResponse
     {
         $identity->logout((string) $request->session()->get('identity.token'));
@@ -66,7 +61,7 @@ final class LocalIdentityController
         return redirect('/login');
     }
 
-    private function acceptSession(Request $request, LocalSession $session): RedirectResponse
+    private function acceptSession(Request $request, ConsoleSession $session): RedirectResponse
     {
         $request->session()->invalidate();
         $request->session()->regenerateToken();

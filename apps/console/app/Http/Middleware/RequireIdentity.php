@@ -10,7 +10,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class RequireLocalIdentity
+final class RequireIdentity
 {
     public function __construct(private readonly IdentityGateway $identity) {}
 

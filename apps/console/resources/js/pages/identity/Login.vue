@@ -3,6 +3,7 @@ import { useForm } from '@inertiajs/vue3';
 import IdentityLayout from '../../shared/ui/IdentityLayout.vue';
 
 const form = useForm({ username: 'admin', password: '' });
+const federation = useForm({});
 const submit = () => form.post('/login', { onFinish: () => form.reset('password') });
 </script>
 
@@ -16,6 +17,9 @@ const submit = () => form.post('/login', { onFinish: () => form.reset('password'
       <input id="password" v-model="form.password" name="password" type="password" autocomplete="current-password" required maxlength="512" :aria-invalid="!!form.errors.password" aria-describedby="password-error" />
       <p v-if="form.errors.password" id="password-error" role="alert">{{ form.errors.password }}</p>
       <button type="submit" :disabled="form.processing">{{ form.processing ? 'Signing in…' : 'Sign in' }}</button>
+    </form>
+    <form @submit.prevent="federation.post('/identity/sign-in')">
+      <button type="submit" :disabled="federation.processing">Sign in with your identity provider</button>
     </form>
   </IdentityLayout>
 </template>
