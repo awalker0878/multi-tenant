@@ -60,7 +60,10 @@ it('rechecks authority after waiting on a concurrent revocation instead of retur
         $process->start();
         $deadline = microtime(true) + 5;
         do {
-            $waiting = DB::selectOne("SELECT count(*) AS count FROM pg_stat_activity WHERE datname = 'p02_identity_test' AND pid <> pg_backend_pid() AND wait_event_type = 'Lock'")->count;
+            // PostgreSQL caches activity observations for the transaction; refresh
+            // the observer snapshot while retaining the actual revocation lock.
+            DB::select('SELECT pg_stat_clear_snapshot()');
+            $waiting = DB::selectOne("SELECT count(*) AS count FROM pg_stat_activity WHERE datname = 'p02_identity_test' AND wait_event_type = 'Lock' AND pg_backend_pid() = ANY(pg_blocking_pids(pid))")->count;
             if ($waiting > 0 || microtime(true) > $deadline || ! $process->isRunning()) {
                 break;
             }
