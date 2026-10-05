@@ -1,6 +1,6 @@
 # Governance service
 
-Status: P02 local administrator, first-login password change and session authority are implemented in the [bootstrap increment](../implementation/p02-local-bootstrap.md). External OIDC configuration/handover, tenancy and approvals remain planned; the increment does not complete P02 or pass G02. Runtime: Laravel/PHP; source: `services/governance/`. Owner: product engineering with IAM/security. ADR-009 defines the identity baseline and remaining delegation checkpoints.
+Status: P02 local administrator, first-login password change and session authority are implemented in the [bootstrap increment](../implementation/p02-local-bootstrap.md). Console-managed external OIDC and verified handover are implemented in the [federation increment](../implementation/p02-federation.md); tenancy and approvals remain planned; the increment does not complete P02 or pass G02. Runtime: Laravel/PHP; source: `services/governance/`. Owner: product engineering with IAM/security. ADR-009 defines the identity baseline and remaining delegation checkpoints.
 
 The [package replay](../implementation/p01-laravel-foundations.md) and [image measurements](../implementation/p01-laravel-images.md) bind actual source, dependency and execution results. Diagnostic liveness does not establish application readiness; readiness remains HTTP 503 until real dependencies and their probes are implemented.
 

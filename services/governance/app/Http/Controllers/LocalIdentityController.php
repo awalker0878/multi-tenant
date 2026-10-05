@@ -6,8 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Application\Identity\Actions\ChangeLocalPassword;
 use App\Application\Identity\Actions\LoginLocalAdministrator;
-use App\Application\Identity\Actions\LogoutLocalSession;
-use App\Application\Identity\Actions\ResolveLocalSession;
+use App\Application\Identity\Actions\LogoutIdentitySession;
+use App\Application\Identity\Actions\ResolveIdentitySession;
 use App\Application\Identity\Data\SessionCredentials;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,12 +31,12 @@ final class LocalIdentityController
         return $this->sessionResponse($change->handle((string) $request->header('X-Console-Session'), $request->string('current_password')->toString(), $request->string('password')->toString()));
     }
 
-    public function session(Request $request, ResolveLocalSession $resolve): JsonResponse
+    public function session(Request $request, ResolveIdentitySession $resolve): JsonResponse
     {
         return response()->json(['identity' => $resolve->handle((string) $request->header('X-Console-Session'))->toArray()]);
     }
 
-    public function logout(Request $request, LogoutLocalSession $logout): JsonResponse
+    public function logout(Request $request, LogoutIdentitySession $logout): JsonResponse
     {
         $logout->handle((string) $request->header('X-Console-Session'));
 

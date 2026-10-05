@@ -33,13 +33,17 @@ deptrac:
       collectors:
         - type: classLike
           value: '^(Inertia\\|Illuminate\\(Http|Routing|Console|Foundation\\Http)\\|Illuminate\\Support\\Facades\\(Http|Request|Response|Route|Redirect|URL)$|Symfony\\Component\\(HttpFoundation|HttpKernel|Routing|HttpClient|Console)\\|Psr\\Http\\).*'
+    - name: Jwt
+      collectors:
+        - {type: classLike, value: '^Firebase\\JWT\\.*'}
   ruleset:
     Domain: [Framework]
     Application: [Domain, Framework]
-    Infrastructure: [Domain, Application, Framework, Transport, PublishedContracts]
+    Infrastructure: [Domain, Application, Framework, Transport, PublishedContracts, Jwt]
     Delivery: [Domain, Application, Framework, Transport]
     Composition: [Domain, Application, Infrastructure, Delivery, Framework, Transport, PublishedContracts]
     PublishedContracts: []
     ForeignPrivate: []
     Framework: []
     Transport: []
+    Jwt: []

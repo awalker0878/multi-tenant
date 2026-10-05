@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(fn (Request $request, Throwable $exception): bool => true);
         $exceptions->dontReport([IdentityDenied::class]);
-        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation']);
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'client_secret', 'code', 'state', 'browser_binding', 'verification_token']);
         $exceptions->render(function (IdentityDenied $error) {
             return response()->json(['error' => $error->reason], $error->status, [
                 'Cache-Control' => 'no-store, private',

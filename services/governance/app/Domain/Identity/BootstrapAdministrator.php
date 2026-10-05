@@ -14,6 +14,7 @@ use Illuminate\Support\Carbon;
  * @property int $credential_version
  * @property int $failed_attempts
  * @property Carbon|null $locked_until
+ * @property Carbon|null $retired_at
  */
 final class BootstrapAdministrator extends Model
 {

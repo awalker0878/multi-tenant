@@ -42,9 +42,9 @@ Refinement and validation: provider scope, identity/delegation contracts, sessio
 
 ## Details to resolve before affected implementation
 
-- Select installation-wide versus tenant-specific providers and connection cardinality; define stable issuer/subject identity, accepted audiences, claim/group mapping and membership administration.
+- The implemented initial profile uses one installation-wide active provider, immutable settings revisions, exact issuer/subject identities and an explicitly named installation administrator. The [federation increment](../implementation/p02-federation.md) records protocol, network and session bounds. Membership administration is separate; provider claims cannot create product grants.
 - Select service identity issuance, delegation validation, revocation propagation and authority-freshness bounds.
-- Define federated session/freshness and logout bounds, separation of duties, approval expiry and independently controlled emergency recovery after OIDC activation.
+- Federated sessions expire within thirty minutes and the verified ID token lifetime; the initial handover uses its five-minute proof lifetime. Every request reads current Governance authority. Provider-side revocation is bounded by session expiry; provider logout/revocation events and independently controlled emergency recovery remain receiving extensions. Separation of duties and approval expiry are owned by P02.03/P02.04.
 - Bind protected deployment credential display and interrupted-bootstrap recovery to each supported installation runtime.
 
 ## Acceptance and validation

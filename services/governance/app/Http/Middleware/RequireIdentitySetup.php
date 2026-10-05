@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Application\Identity\Actions\ResolveLocalSession;
+use App\Application\Identity\Actions\ResolveIdentitySession;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class RequireLocalSetup
+final class RequireIdentitySetup
 {
-    public function __construct(private readonly ResolveLocalSession $resolve) {}
+    public function __construct(private readonly ResolveIdentitySession $resolve) {}
 
     /** @param Closure(Request): Response $next */
     public function handle(Request $request, Closure $next): Response
