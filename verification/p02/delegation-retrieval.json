@@ -33,7 +33,7 @@
       "run_id": 37360070256,
       "artifact_id": 11365344950,
       "kind": "packages",
-      "report_path": "verification/p02/packages/run-37360070256/catalogue/report.json",
+      "report_path": "verification/p01/packages/run-37360070256/catalogue/report.json",
       "report_sha256": "43487c759821d6269b44ff1ff8a9dc7db888f391f86b65c85b917783f2f7c48c",
       "archive_sha256": "9474055b04174f5b9ba300a2ab1f7a554b5ace0d0af219d328fe83ce3a8aabce",
       "result": "PASS",

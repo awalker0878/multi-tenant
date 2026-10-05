@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_at": "2026-10-05T19:11:02.457Z",
+  "observed_at": "2026-10-05T19:15:35.035Z",
   "observer": "Codex through GitHub connector; workflow metadata, not independently reviewed gate acceptance",
   "scope": "Event delivery, delegation and Console browser increments; exact campaign sources remain distinct",
   "campaigns": [
@@ -166,15 +166,6 @@
           "updated_at": "2026-10-05T19:01:57Z"
         },
         {
-          "run_id": 37360070333,
-          "name": "P01 isolated Kubernetes integration",
-          "status": "in_progress",
-          "conclusion": null,
-          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37360070333",
-          "head_sha": "5bc32839ae7dedd186fca68e429e5effa723222d",
-          "updated_at": "2026-10-05T19:03:14Z"
-        },
-        {
           "run_id": 37360070246,
           "name": "P01 isolated Compose integration",
           "status": "completed",
@@ -182,21 +173,21 @@
           "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37360070246",
           "head_sha": "5bc32839ae7dedd186fca68e429e5effa723222d",
           "updated_at": "2026-10-05T19:02:27Z"
+        },
+        {
+          "run_id": 37360070333,
+          "name": "P01 isolated Kubernetes integration",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37360070333",
+          "head_sha": "5bc32839ae7dedd186fca68e429e5effa723222d",
+          "updated_at": "2026-10-05T19:14:26Z"
         }
       ]
     },
     {
       "source_sha": "512fd5c2580e5cd40bf0089662cff8d84718a877",
       "runs": [
-        {
-          "run_id": 37360927450,
-          "name": "P01 isolated Compose integration",
-          "status": "in_progress",
-          "conclusion": null,
-          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37360927450",
-          "head_sha": "512fd5c2580e5cd40bf0089662cff8d84718a877",
-          "updated_at": "2026-10-05T19:06:12Z"
-        },
         {
           "run_id": 37360927483,
           "name": "Context policy",
@@ -205,15 +196,6 @@
           "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37360927483",
           "head_sha": "512fd5c2580e5cd40bf0089662cff8d84718a877",
           "updated_at": "2026-10-05T19:06:34Z"
-        },
-        {
-          "run_id": 37360927382,
-          "name": "P01 isolated Kubernetes integration",
-          "status": "pending",
-          "conclusion": null,
-          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37360927382",
-          "head_sha": "512fd5c2580e5cd40bf0089662cff8d84718a877",
-          "updated_at": "2026-10-05T19:05:59Z"
         },
         {
           "run_id": 37360927419,
@@ -259,6 +241,24 @@
           "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37360927373",
           "head_sha": "512fd5c2580e5cd40bf0089662cff8d84718a877",
           "updated_at": "2026-10-05T19:06:54Z"
+        },
+        {
+          "run_id": 37360927450,
+          "name": "P01 isolated Compose integration",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37360927450",
+          "head_sha": "512fd5c2580e5cd40bf0089662cff8d84718a877",
+          "updated_at": "2026-10-05T19:09:17Z"
+        },
+        {
+          "run_id": 37360927382,
+          "name": "P01 isolated Kubernetes integration",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37360927382",
+          "head_sha": "512fd5c2580e5cd40bf0089662cff8d84718a877",
+          "updated_at": "2026-10-05T19:14:26Z"
         }
       ]
     }

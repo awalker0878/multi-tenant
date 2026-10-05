@@ -23,7 +23,7 @@
   "console_package": {
     "run_id": 37360927491,
     "artifact_id": 11367225449,
-    "report_path": "verification/p02/packages/run-37360927491/console/report.json",
+    "report_path": "verification/p01/packages/run-37360927491/console/report.json",
     "report_sha256": "43a77978c470c1dee0825674a7a664fe237b8ab45ba68bba2345b5963aa350ac",
     "archive_sha256": "73a800738cebb73feab16cba18fb397014a9d3f2cec9c9277adf21aae7b8575e",
     "result": "PASS",

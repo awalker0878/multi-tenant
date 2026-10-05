@@ -33,3 +33,13 @@ relay eligibility comparison and waits for actual broker health/port readiness.
 No authorization rule, time limit or assertion was relaxed. Corrected campaigns
 37358891052 (identity/browser) and 37358890871 (PostgreSQL/TLS broker) pass;
 their measured source remains distinct from subsequent delegation work.
+
+## Evidence transfer fidelity
+
+One Chromium dependency-install log contains carriage-return progress updates.
+The initial evidence transfer normalized those bytes; `f8f4e8972170f521cfd840f23528af7ea314bb17`
+restores the original downloaded bytes and recorded digest. The reports and test
+outcomes are unchanged. Catalogue/Console package artifacts use the existing
+`verification/p01/packages/run-<id>/<component>/` layout because they originate
+from the P01 package workflow. Its architecture check validates both report/source
+bindings; no source-registration exception was added for P02.
