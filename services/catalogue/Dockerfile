@@ -8,7 +8,7 @@ COPY build/snapshot.sh /tmp/service-snapshot.sh
 RUN sh /tmp/service-snapshot.sh \
     && apt-get update \
     && apt-get install -y --no-install-recommends libpq-dev \
-    && docker-php-ext-install -j2 pdo_pgsql \
+    && docker-php-ext-install -j2 pdo_pgsql sockets \
     && apt-mark manual libpq5 \
     && apt-get purge -y --auto-remove libpq-dev $PHPIZE_DEPS \
     && rm -rf /var/lib/apt/lists/* /tmp/service-snapshot.sh \

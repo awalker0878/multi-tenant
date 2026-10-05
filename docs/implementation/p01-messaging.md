@@ -58,3 +58,9 @@ Initial hosted run `37258199569` passed conformance but stopped before image bui
 the image verifier's explicit Catalogue input list had not yet admitted its owned
 contract resources. The follow-up adds that exact directory, retaining the strict
 input allowlist. The nine-package run `37258199557` passed on the preceding source.
+
+The first admitted Catalogue image then exposed a missing runtime extension:
+php-amqplib requires `ext-sockets`, present on the package-test host but absent in
+the minimal FPM image. Catalogue now compiles sockets alongside PDO PostgreSQL;
+Composer platform verification remains enabled. Failed image artifact `11323877080`
+from run `37258781431` retains the exact dependency error.
