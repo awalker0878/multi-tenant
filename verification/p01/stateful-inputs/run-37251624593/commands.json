@@ -1,0 +1,261 @@
+[
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/library/rabbitmq:4.3.6-management"
+    ],
+    "exit_code": 0,
+    "seconds": 3.249,
+    "stdout": {
+      "path": "01.stdout.log",
+      "sha256": "316ffd2a847e59112eee2c65f04bbd0989d93aaf1486c07b721f8d22d863b968",
+      "bytes": 6525
+    },
+    "stderr": {
+      "path": "01.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/library/rabbitmq@sha256:1d306c8f8c55cd3ed50271198f4094220e4caed9a8d04a14aca869339d3d3ca9"
+    ],
+    "exit_code": 0,
+    "seconds": 0.628,
+    "stdout": {
+      "path": "02.stdout.log",
+      "sha256": "1d306c8f8c55cd3ed50271198f4094220e4caed9a8d04a14aca869339d3d3ca9",
+      "bytes": 3073
+    },
+    "stderr": {
+      "path": "02.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/temporalio/server:1.32.0"
+    ],
+    "exit_code": 0,
+    "seconds": 0.664,
+    "stdout": {
+      "path": "03.stdout.log",
+      "sha256": "c3e752127759616bb1615e0f9ba0e21635aeb5fdeb922de4f371c350955f46ae",
+      "bytes": 1609
+    },
+    "stderr": {
+      "path": "03.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/temporalio/server@sha256:ca47d4de249b9cc28137628dba77ae5e75e8b313ebb5c801c64615c1c99cbb09"
+    ],
+    "exit_code": 0,
+    "seconds": 0.65,
+    "stdout": {
+      "path": "04.stdout.log",
+      "sha256": "ca47d4de249b9cc28137628dba77ae5e75e8b313ebb5c801c64615c1c99cbb09",
+      "bytes": 1241
+    },
+    "stderr": {
+      "path": "04.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/library/golang:1.27.1-bookworm"
+    ],
+    "exit_code": 0,
+    "seconds": 0.618,
+    "stdout": {
+      "path": "05.stdout.log",
+      "sha256": "69a7b9788769bec032d238959b61854e9ae87f57be9029ec04e9885fabf99195",
+      "bytes": 6526
+    },
+    "stderr": {
+      "path": "05.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/library/golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc"
+    ],
+    "exit_code": 0,
+    "seconds": 0.622,
+    "stdout": {
+      "path": "06.stdout.log",
+      "sha256": "966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc",
+      "bytes": 2322
+    },
+    "stderr": {
+      "path": "06.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/temporalio/admin-tools:1.32.0"
+    ],
+    "exit_code": 0,
+    "seconds": 0.639,
+    "stdout": {
+      "path": "07.stdout.log",
+      "sha256": "a9f84fb9a374b2374fe2e67c8efc0468ff3f1c66c8a0b14597ec86e349e62bca",
+      "bytes": 1609
+    },
+    "stderr": {
+      "path": "07.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/temporalio/admin-tools@sha256:8bb84e24db4336de48031a66dbda25a7477d300736fe825893e467042135da1f"
+    ],
+    "exit_code": 0,
+    "seconds": 0.634,
+    "stdout": {
+      "path": "08.stdout.log",
+      "sha256": "8bb84e24db4336de48031a66dbda25a7477d300736fe825893e467042135da1f",
+      "bytes": 1057
+    },
+    "stderr": {
+      "path": "08.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "build",
+      "--platform",
+      "linux/amd64",
+      "--pull",
+      "--iidfile",
+      "/home/runner/work/_temp/p01-stateful-inputs/resolver-image-id.txt",
+      "/home/runner/work/_temp/p01-stateful-inputs/resolver"
+    ],
+    "exit_code": 0,
+    "seconds": 5.753,
+    "stdout": {
+      "path": "09.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "path": "09.stderr.log",
+      "sha256": "a8211cf9b7ff837ba04ee0e16da1573e6f0ad464bd4cafacb5c9ce29cb49c8d2",
+      "bytes": 3954
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "run",
+      "--rm",
+      "--platform",
+      "linux/amd64",
+      "-v",
+      "/home/runner/work/multi-tenant/multi-tenant/scripts/p01/stateful/requirements.in:/requirements.in:ro",
+      "-v",
+      "/home/runner/work/_temp/p01-stateful-inputs:/output",
+      "sha256:8efbf0ec1444f4e9c8953f97eaeae103a681886ee271715e3040318455248678",
+      "pip",
+      "compile",
+      "--python-version",
+      "3.12",
+      "--python-platform",
+      "x86_64-manylinux_2_28",
+      "--generate-hashes",
+      "--no-annotate",
+      "--no-header",
+      "--only-binary",
+      ":all:",
+      "/requirements.in",
+      "-o",
+      "/output/requirements.txt"
+    ],
+    "exit_code": 0,
+    "seconds": 0.853,
+    "stdout": {
+      "path": "10.stdout.log",
+      "sha256": "8502a23321ac4444a5033774030d7ae3ccd1e4de21412c59bc2a1e316b90cdad",
+      "bytes": 34880
+    },
+    "stderr": {
+      "path": "10.stderr.log",
+      "sha256": "57462bc4a084bb06032c4ec18a89e36306df3744a85a74f8b77a6757c8b38c45",
+      "bytes": 30
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "seconds": 0.002,
+    "stdout": {
+      "path": "11.stdout.log",
+      "sha256": "abb970456c17e7fcddee63c1237bb37618a4bef021d67a9280ce42ccc809308d",
+      "bytes": 41
+    },
+    "stderr": {
+      "path": "11.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+]

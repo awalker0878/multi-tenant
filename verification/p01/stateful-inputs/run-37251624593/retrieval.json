@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "workflow": {
+    "id": 37251624593,
+    "name": "P01 stateful dependency input observation",
+    "head_sha": "1ad067ec2d1dd3b1faf73a66ab7fa45b90e00307",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "created_at": "2026-10-05T01:29:28Z",
+    "updated_at": "2026-10-05T01:29:56Z",
+    "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37251624593"
+  },
+  "artifact": {
+    "id": 11320644963,
+    "name": "p01-stateful-inputs-1ad067ec2d1dd3b1faf73a66ab7fa45b90e00307",
+    "size_in_bytes": 66533,
+    "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11320644963",
+    "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11320644963/zip",
+    "expired": false,
+    "created_at": "2026-10-05T01:29:53Z",
+    "expires_at": "2026-10-19T01:29:52Z",
+    "updated_at": "2026-10-05T01:29:53Z",
+    "digest": "sha256:f2c1b98fbfcdb1220c4fb7ef69638fd30a9ca6220fc6ee5ce8cb94a3eaa2ac37",
+    "workflow_run": {
+      "id": 37251624593,
+      "repository_id": 1374801496,
+      "head_repository_id": 1374801496,
+      "head_branch": "greenfield/enterprise-microservices-plan",
+      "head_sha": "1ad067ec2d1dd3b1faf73a66ab7fa45b90e00307"
+    }
+  },
+  "source_revision": "1ad067ec2d1dd3b1faf73a66ab7fa45b90e00307",
+  "archive_sha256": "f2c1b98fbfcdb1220c4fb7ef69638fd30a9ca6220fc6ee5ce8cb94a3eaa2ac37",
+  "archive_bytes": 66533,
+  "archive_checksum_verified": true,
+  "archive_size_verified": true,
+  "result": "VERIFIED",
+  "workflow_result": "success",
+  "command_log_hashes_verified": 22,
+  "scope": "Dependency input observation only; no installed behavior claim",
+  "reviewer": "Codex \u2014 archive, manifest and command output integrity examination",
+  "images_verified": 4,
+  "client_lock_sha256": "8502a23321ac4444a5033774030d7ae3ccd1e4de21412c59bc2a1e316b90cdad",
+  "lock_sha256": "6eec333d4bceed4001b7745332f9f3245232cb3f24c71a08a527d24862077344"
+}

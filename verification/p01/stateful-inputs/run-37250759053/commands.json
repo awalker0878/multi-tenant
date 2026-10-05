@@ -1,0 +1,112 @@
+[
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/library/rabbitmq:4.3.6-management"
+    ],
+    "exit_code": 0,
+    "seconds": 3.135,
+    "stdout": {
+      "path": "01.stdout.log",
+      "sha256": "316ffd2a847e59112eee2c65f04bbd0989d93aaf1486c07b721f8d22d863b968",
+      "bytes": 6525
+    },
+    "stderr": {
+      "path": "01.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/library/rabbitmq@sha256:1d306c8f8c55cd3ed50271198f4094220e4caed9a8d04a14aca869339d3d3ca9"
+    ],
+    "exit_code": 0,
+    "seconds": 0.278,
+    "stdout": {
+      "path": "02.stdout.log",
+      "sha256": "1d306c8f8c55cd3ed50271198f4094220e4caed9a8d04a14aca869339d3d3ca9",
+      "bytes": 3073
+    },
+    "stderr": {
+      "path": "02.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/temporalio/server:1.32.0"
+    ],
+    "exit_code": 0,
+    "seconds": 0.269,
+    "stdout": {
+      "path": "03.stdout.log",
+      "sha256": "c3e752127759616bb1615e0f9ba0e21635aeb5fdeb922de4f371c350955f46ae",
+      "bytes": 1609
+    },
+    "stderr": {
+      "path": "03.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "docker.io/temporalio/server@sha256:ca47d4de249b9cc28137628dba77ae5e75e8b313ebb5c801c64615c1c99cbb09"
+    ],
+    "exit_code": 0,
+    "seconds": 0.287,
+    "stdout": {
+      "path": "04.stdout.log",
+      "sha256": "ca47d4de249b9cc28137628dba77ae5e75e8b313ebb5c801c64615c1c99cbb09",
+      "bytes": 1241
+    },
+    "stderr": {
+      "path": "04.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z"
+    ],
+    "exit_code": 1,
+    "seconds": 0.287,
+    "stdout": {
+      "path": "05.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "path": "05.stderr.log",
+      "sha256": "7ffd44ad63e25fed573d581529b2bc4a52453a7e966120ea26e3385b2344286a",
+      "bytes": 131
+    }
+  }
+]
