@@ -1,0 +1,72 @@
+{
+  "result": "PASS",
+  "fixtures": 16,
+  "cross_language": [
+    {
+      "id": "valid",
+      "valid": true,
+      "sha256": "d873766d166b1bb074ca456c560187074259dea433bd54971c2570607bbba5ca"
+    },
+    {
+      "id": "schema_version-2",
+      "valid": false
+    },
+    {
+      "id": "schema_version-1",
+      "valid": false
+    },
+    {
+      "id": "tenant_id-../foreign",
+      "valid": false
+    },
+    {
+      "id": "revision-9007199254740993",
+      "valid": false
+    },
+    {
+      "id": "revision-0",
+      "valid": false
+    },
+    {
+      "id": "revision-01",
+      "valid": false
+    },
+    {
+      "id": "revision-1e2",
+      "valid": false
+    },
+    {
+      "id": "payload_sha256-fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "valid": false
+    },
+    {
+      "id": "source_revision-aaaaaaa",
+      "valid": false
+    },
+    {
+      "id": "actor_id-None",
+      "valid": false
+    },
+    {
+      "id": "event_type-lifecycle.execute",
+      "valid": false
+    },
+    {
+      "id": "occurred_at-2026-02-30T00:00:00Z",
+      "valid": false
+    },
+    {
+      "id": "unknown-field",
+      "valid": false
+    },
+    {
+      "id": "missing-actor",
+      "valid": false
+    },
+    {
+      "id": "large-revision",
+      "valid": true,
+      "sha256": "7bbca284e8e24131c8d633fbe5c5f91a56b35edf137d58d3eac8117a4583ec90"
+    }
+  ]
+}

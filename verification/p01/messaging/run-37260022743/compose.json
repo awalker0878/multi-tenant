@@ -1,0 +1,540 @@
+{
+  "name": "p01-471b3d07fc5f-5faa77b4",
+  "networks": {
+    "db_catalogue": {
+      "internal": true
+    },
+    "db_planning": {
+      "internal": true
+    },
+    "broker": {
+      "internal": true
+    }
+  },
+  "secrets": {
+    "assurance-app-key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/assurance-app-key"
+    },
+    "assurance-health-token": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/assurance-health-token"
+    },
+    "assurance-migrator-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/assurance-migrator-password"
+    },
+    "assurance-runtime-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/assurance-runtime-password"
+    },
+    "assurance.crt": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/assurance.crt"
+    },
+    "assurance.key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/assurance.key"
+    },
+    "ca.crt": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/ca.crt"
+    },
+    "catalogue-app-key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/catalogue-app-key"
+    },
+    "catalogue-health-token": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/catalogue-health-token"
+    },
+    "catalogue-migrator-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/catalogue-migrator-password"
+    },
+    "catalogue-runtime-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/catalogue-runtime-password"
+    },
+    "catalogue.crt": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/catalogue.crt"
+    },
+    "catalogue.key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/catalogue.key"
+    },
+    "console-app-key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/console-app-key"
+    },
+    "console-health-token": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/console-health-token"
+    },
+    "console-migrator-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/console-migrator-password"
+    },
+    "console-runtime-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/console-runtime-password"
+    },
+    "console.crt": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/console.crt"
+    },
+    "console.key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/console.key"
+    },
+    "governance-app-key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/governance-app-key"
+    },
+    "governance-health-token": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/governance-health-token"
+    },
+    "governance-migrator-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/governance-migrator-password"
+    },
+    "governance-runtime-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/governance-runtime-password"
+    },
+    "governance.crt": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/governance.crt"
+    },
+    "governance.key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/governance.key"
+    },
+    "inventory-health-token": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/inventory-health-token"
+    },
+    "inventory-migrator-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/inventory-migrator-password"
+    },
+    "inventory-runtime-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/inventory-runtime-password"
+    },
+    "inventory.crt": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/inventory.crt"
+    },
+    "inventory.key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/inventory.key"
+    },
+    "lifecycle-health-token": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/lifecycle-health-token"
+    },
+    "lifecycle-migrator-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/lifecycle-migrator-password"
+    },
+    "lifecycle-runtime-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/lifecycle-runtime-password"
+    },
+    "lifecycle.crt": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/lifecycle.crt"
+    },
+    "lifecycle.key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/lifecycle.key"
+    },
+    "planning-health-token": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/planning-health-token"
+    },
+    "planning-migrator-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/planning-migrator-password"
+    },
+    "planning-runtime-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/planning-runtime-password"
+    },
+    "planning.crt": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/planning.crt"
+    },
+    "planning.key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/planning.key"
+    },
+    "postgres-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/postgres-password"
+    },
+    "postgres.crt": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/postgres.crt"
+    },
+    "postgres.key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/postgres.key"
+    },
+    "catalogue-broker-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/catalogue-broker-password"
+    },
+    "planning-broker-password": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/planning-broker-password"
+    },
+    "rabbit.key": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/rabbit.key"
+    },
+    "rabbit.crt": {
+      "file": "/tmp/p01-private-parent-leelqifn/runtime/secrets/rabbit.crt"
+    }
+  },
+  "services": {
+    "postgres": {
+      "cap_add": [
+        "CHOWN",
+        "DAC_OVERRIDE",
+        "FOWNER",
+        "SETGID",
+        "SETUID"
+      ],
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "postgres"
+      ],
+      "entrypoint": [
+        "/bin/bash",
+        "/opt/foundation/entrypoint.sh"
+      ],
+      "healthcheck": {
+        "interval": "2s",
+        "retries": 30,
+        "test": [
+          "CMD",
+          "pg_isready",
+          "-h",
+          "127.0.0.1",
+          "-U",
+          "postgres"
+        ],
+        "timeout": "2s"
+      },
+      "image": "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+      "init": true,
+      "networks": [
+        "db_catalogue",
+        "db_planning"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "postgres-password",
+          "target": "postgres-password"
+        },
+        {
+          "source": "postgres.key",
+          "target": "postgres.key"
+        },
+        {
+          "source": "postgres.crt",
+          "target": "postgres.crt"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "console-runtime-password",
+          "target": "console-runtime-password"
+        },
+        {
+          "source": "console-migrator-password",
+          "target": "console-migrator-password"
+        },
+        {
+          "source": "governance-runtime-password",
+          "target": "governance-runtime-password"
+        },
+        {
+          "source": "governance-migrator-password",
+          "target": "governance-migrator-password"
+        },
+        {
+          "source": "catalogue-runtime-password",
+          "target": "catalogue-runtime-password"
+        },
+        {
+          "source": "catalogue-migrator-password",
+          "target": "catalogue-migrator-password"
+        },
+        {
+          "source": "assurance-runtime-password",
+          "target": "assurance-runtime-password"
+        },
+        {
+          "source": "assurance-migrator-password",
+          "target": "assurance-migrator-password"
+        },
+        {
+          "source": "planning-runtime-password",
+          "target": "planning-runtime-password"
+        },
+        {
+          "source": "planning-migrator-password",
+          "target": "planning-migrator-password"
+        },
+        {
+          "source": "inventory-runtime-password",
+          "target": "inventory-runtime-password"
+        },
+        {
+          "source": "inventory-migrator-password",
+          "target": "inventory-migrator-password"
+        },
+        {
+          "source": "lifecycle-runtime-password",
+          "target": "lifecycle-runtime-password"
+        },
+        {
+          "source": "lifecycle-migrator-password",
+          "target": "lifecycle-migrator-password"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m,mode=1777",
+        "/var/run/postgresql:rw,noexec,nosuid,size=16m,mode=1777"
+      ],
+      "user": "0:0",
+      "volumes": [
+        {
+          "source": "postgres_data",
+          "target": "/var/lib/postgresql",
+          "type": "volume"
+        },
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/home/runner/work/multi-tenant/multi-tenant/deploy/dependencies/postgres/entrypoint.sh",
+          "target": "/opt/foundation/entrypoint.sh",
+          "type": "bind"
+        },
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/home/runner/work/multi-tenant/multi-tenant/deploy/dependencies/postgres/initialize.sh",
+          "target": "/docker-entrypoint-initdb.d/10-private-identities.sh",
+          "type": "bind"
+        },
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/home/runner/work/multi-tenant/multi-tenant/deploy/dependencies/postgres/migrate.sql",
+          "target": "/opt/foundation/migrate.sql",
+          "type": "bind"
+        }
+      ]
+    },
+    "catalogue": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [],
+      "depends_on": {},
+      "environment": {
+        "APP_DEBUG": "false",
+        "APP_ENV": "production",
+        "APP_KEY_FILE": "/run/secrets/app-key",
+        "DB_DATABASE": "catalogue",
+        "DB_HOST": "postgres",
+        "DB_PASSWORD_FILE": "/run/secrets/db-password",
+        "DB_PORT": "5432",
+        "DB_SSLMODE": "verify-full",
+        "DB_SSLROOTCERT": "/run/secrets/ca.crt",
+        "DB_USERNAME": "catalogue_runtime",
+        "HEALTH_TOKEN_FILE": "/run/secrets/health-token"
+      },
+      "image": "sha256:535bdf9e04f72f5f6f2436560db25c66fb62d358f0106972a23f59000a18ab9c",
+      "init": true,
+      "networks": [
+        "db_catalogue",
+        "broker"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "catalogue-runtime-password",
+          "target": "db-password"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "catalogue-health-token",
+          "target": "health-token"
+        },
+        {
+          "source": "catalogue-app-key",
+          "target": "app-key"
+        },
+        {
+          "source": "catalogue-broker-password",
+          "target": "broker-password"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777",
+        "/app/storage:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=0770",
+        "/app/bootstrap/cache:rw,noexec,nosuid,size=16m,uid=10001,gid=10001,mode=0770"
+      ],
+      "user": "10001:10001",
+      "entrypoint": [
+        "php",
+        "/probe/producer.php"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/home/runner/work/multi-tenant/multi-tenant/scripts/p01/messaging",
+          "target": "/probe",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        }
+      ],
+      "profiles": [
+        "probe"
+      ]
+    },
+    "planning": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [],
+      "depends_on": {},
+      "entrypoint": [
+        "/opt/venv/bin/python",
+        "/probe/consumer.py"
+      ],
+      "environment": {
+        "APP_DEBUG": "false",
+        "APP_ENV": "production",
+        "DB_DATABASE": "planning",
+        "DB_HOST": "postgres",
+        "DB_PASSWORD_FILE": "/run/secrets/db-password",
+        "DB_PORT": "5432",
+        "DB_SSLMODE": "verify-full",
+        "DB_SSLROOTCERT": "/run/secrets/ca.crt",
+        "DB_USERNAME": "planning_runtime",
+        "HEALTH_TOKEN_FILE": "/run/secrets/health-token"
+      },
+      "image": "sha256:56cbe5ed39a94984e712e91bb1ee2c1ba1c4061cb83cdee5323a43988ceb6971",
+      "init": true,
+      "networks": [
+        "db_planning",
+        "broker"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "planning-runtime-password",
+          "target": "db-password"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "planning-health-token",
+          "target": "health-token"
+        },
+        {
+          "source": "planning-broker-password",
+          "target": "broker-password"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/home/runner/work/multi-tenant/multi-tenant/scripts/p01/messaging",
+          "target": "/probe",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        }
+      ],
+      "profiles": [
+        "probe"
+      ]
+    },
+    "rabbit": {
+      "image": "docker.io/library/rabbitmq@sha256:1d306c8f8c55cd3ed50271198f4094220e4caed9a8d04a14aca869339d3d3ca9",
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "init": true,
+      "user": "999:999",
+      "hostname": "rabbit",
+      "networks": [
+        "broker"
+      ],
+      "mem_limit": "768m",
+      "tmpfs": [
+        "/tmp:mode=1777"
+      ],
+      "volumes": [
+        "broker_data:/var/lib/rabbitmq",
+        {
+          "type": "bind",
+          "source": "/tmp/p01-private-parent-leelqifn/runtime/rabbitmq.conf",
+          "target": "/etc/rabbitmq/rabbitmq.conf",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        },
+        {
+          "type": "bind",
+          "source": "/tmp/p01-private-parent-leelqifn/runtime/definitions.json",
+          "target": "/run/config/definitions.json",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        }
+      ],
+      "environment": {
+        "RABBITMQ_NODENAME": "rabbit@rabbit",
+        "RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS": "+S 2:2",
+        "RABBITMQ_CTL_ERL_ARGS": "+S 2:2"
+      },
+      "secrets": [
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "rabbit.key",
+          "target": "rabbit.key"
+        },
+        {
+          "source": "rabbit.crt",
+          "target": "rabbit.crt"
+        }
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_port_connectivity --address 127.0.0.1"
+        ],
+        "interval": "3s",
+        "timeout": "5s",
+        "retries": 50
+      }
+    }
+  },
+  "volumes": {
+    "postgres_data": {},
+    "broker_data": {}
+  }
+}

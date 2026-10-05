@@ -1,0 +1,247 @@
+{
+  "scope": "Retrospective wire-schema examination of actual source-bound Compose HTTP observations; no new provider execution",
+  "source_revision": "c14ddbdb5c6deb71b59737948b512b8398af694e",
+  "report_sha256": "47bf8fd6d9d54900dc78c1dd04c44ed34b11ccba2d2b3039ff1604e7cddc3ce9",
+  "contract_sha256": "0ae446a089acaa24d549d11b860efa750d8758b67c70d9d82a056ebcd012977c",
+  "result": "PASS",
+  "observations": [
+    {
+      "check": "missing-health-identity-denied",
+      "service": "console",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "invalid-health-identity-denied",
+      "service": "console",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "owned-dependency-health",
+      "service": "console",
+      "http_status": 200,
+      "schema": "DependenciesReady",
+      "result": "PASS"
+    },
+    {
+      "check": "missing-health-identity-denied",
+      "service": "governance",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "invalid-health-identity-denied",
+      "service": "governance",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "owned-dependency-health",
+      "service": "governance",
+      "http_status": 200,
+      "schema": "DependenciesReady",
+      "result": "PASS"
+    },
+    {
+      "check": "missing-health-identity-denied",
+      "service": "catalogue",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "invalid-health-identity-denied",
+      "service": "catalogue",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "owned-dependency-health",
+      "service": "catalogue",
+      "http_status": 200,
+      "schema": "DependenciesReady",
+      "result": "PASS"
+    },
+    {
+      "check": "missing-health-identity-denied",
+      "service": "assurance",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "invalid-health-identity-denied",
+      "service": "assurance",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "owned-dependency-health",
+      "service": "assurance",
+      "http_status": 200,
+      "schema": "DependenciesReady",
+      "result": "PASS"
+    },
+    {
+      "check": "missing-health-identity-denied",
+      "service": "planning",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "invalid-health-identity-denied",
+      "service": "planning",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "owned-dependency-health",
+      "service": "planning",
+      "http_status": 200,
+      "schema": "DependenciesReady",
+      "result": "PASS"
+    },
+    {
+      "check": "missing-health-identity-denied",
+      "service": "inventory",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "invalid-health-identity-denied",
+      "service": "inventory",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "owned-dependency-health",
+      "service": "inventory",
+      "http_status": 200,
+      "schema": "DependenciesReady",
+      "result": "PASS"
+    },
+    {
+      "check": "missing-health-identity-denied",
+      "service": "lifecycle",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "invalid-health-identity-denied",
+      "service": "lifecycle",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "owned-dependency-health",
+      "service": "lifecycle",
+      "http_status": 200,
+      "schema": "DependenciesReady",
+      "result": "PASS"
+    },
+    {
+      "check": "revoked-health-token-denied",
+      "service": "governance",
+      "http_status": 401,
+      "schema": "DependenciesUnauthorized",
+      "result": "PASS"
+    },
+    {
+      "check": "rotated-health-token-accepted",
+      "service": "governance",
+      "http_status": 200,
+      "schema": "DependenciesReady",
+      "result": "PASS"
+    },
+    {
+      "check": "revoked-database-identity-unavailable",
+      "service": "governance",
+      "http_status": 503,
+      "schema": "DependenciesUnavailable",
+      "result": "PASS"
+    },
+    {
+      "check": "restored-database-identity-healthy",
+      "service": "governance",
+      "http_status": 200,
+      "schema": "DependenciesReady",
+      "result": "PASS"
+    },
+    {
+      "check": "schema-drift-unavailable",
+      "service": "planning",
+      "http_status": 503,
+      "schema": "DependenciesUnavailable",
+      "result": "PASS"
+    },
+    {
+      "check": "schema-restored",
+      "service": "planning",
+      "http_status": 200,
+      "schema": "DependenciesReady",
+      "result": "PASS"
+    },
+    {
+      "check": "dependency-loss-unavailable",
+      "service": "console",
+      "http_status": 503,
+      "schema": "DependenciesUnavailable",
+      "result": "PASS"
+    },
+    {
+      "check": "dependency-loss-unavailable",
+      "service": "governance",
+      "http_status": 503,
+      "schema": "DependenciesUnavailable",
+      "result": "PASS"
+    },
+    {
+      "check": "dependency-loss-unavailable",
+      "service": "catalogue",
+      "http_status": 503,
+      "schema": "DependenciesUnavailable",
+      "result": "PASS"
+    },
+    {
+      "check": "dependency-loss-unavailable",
+      "service": "assurance",
+      "http_status": 503,
+      "schema": "DependenciesUnavailable",
+      "result": "PASS"
+    },
+    {
+      "check": "dependency-loss-unavailable",
+      "service": "planning",
+      "http_status": 503,
+      "schema": "DependenciesUnavailable",
+      "result": "PASS"
+    },
+    {
+      "check": "dependency-loss-unavailable",
+      "service": "inventory",
+      "http_status": 503,
+      "schema": "DependenciesUnavailable",
+      "result": "PASS"
+    },
+    {
+      "check": "dependency-loss-unavailable",
+      "service": "lifecycle",
+      "http_status": 503,
+      "schema": "DependenciesUnavailable",
+      "result": "PASS"
+    }
+  ]
+}
