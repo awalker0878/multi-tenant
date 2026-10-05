@@ -188,6 +188,13 @@ class Campaign:
                        {'path': target.path, 'http_status': asset_status, 'content_type': asset_type,
                         'bytes': len(asset_body), 'sha256': digest(asset_body), 'scope': 'raw_https_static_delivery'})
 
+    def check_console_shared_state(self, stage):
+        # Copy a disposable invocation adapter; product images contain only owner code.
+        self.command('console-copy-shared-state-probe', self.dc('cp', str(self.root/'scripts/p01/console_shared_state.php'), 'console:/tmp/shared-state.php'))
+        raw = self.command('console-shared-state-'+stage, self.dc('exec','-T','console','php','/tmp/shared-state.php'), data=json.dumps({'stage':stage}).encode())
+        report = json.loads(raw)
+        self.check('console-shared-state-'+stage, report['result']=='PASS' and all(x['passed'] for x in report['checks']), report)
+
     def wait_health(self, services=SERVICES):
         deadline = time.monotonic()+90
         waiting = set(services)
@@ -261,6 +268,7 @@ class Campaign:
         migration = (self.root/'deploy/dependencies/postgres/migrate.sql').read_text()
         for service in SERVICES:
             self.sql(service, f'\\set owner {service}_owner\n\\set runtime {service}_runtime\n'+migration, identity='migrator')
+        self.sql('console', (self.root/'apps/console/database/migrations/001_shared_state.sql').read_text(), identity='migrator')
         self.command('install-applications', self.dc('up','-d'), timeout=180)
         # Retain process/port diagnostics before port discovery can fail. Never inspect secret-bearing config.
         for service in SERVICES:
@@ -277,6 +285,8 @@ class Campaign:
         self.tls = ssl.create_default_context(cafile=str(self.runtime/'secrets/ca.crt'))
         self.wait_health()
         self.check_console_http()
+        self.check_console_shared_state("write")
+        self.check_console_shared_state("second-process")
         initial_data = {}
         for service in SERVICES:
             self.health(service, 401, None, 'missing-health-identity-denied')
@@ -327,6 +337,10 @@ class Campaign:
         for service in SERVICES:
             actual = digest(self.sql(service,'SELECT tenant_id,record_id,payload FROM app.foundation_records ORDER BY tenant_id,record_id;'))
             self.check('restart-preserves-fixture-data',actual == initial_data[service],{'service':service,'sha256':actual})
+        self.check_console_shared_state('after-database-restart')
+        self.command('restart-console-process',self.dc('restart','console'))
+        self.wait_health()
+        self.check_console_shared_state('after-console-restart')
         self.command('installed-inventory',self.dc('ps','--format','json'))
         self.report['result'] = 'PASS'
         self.report['limits'] = ['Synthetic data and diagnostic credentials only; no OIDC/delegated product authority.', 'Product readiness remains unavailable; workers consume no tasks and native endpoints are absent.', 'Database restart is measured; full application/configuration restore, broker/Temporal/evidence storage, Kubernetes and operating acceptance remain unmeasured.']

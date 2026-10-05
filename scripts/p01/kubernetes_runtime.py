@@ -275,9 +275,10 @@ def prepare(root: Path, runtime: Path, images: Mapping[str, str], revision: str,
                 f'exec psql -X --quiet --set=ON_ERROR_STOP=1 --set=owner={service}_owner '
                 f'--set=runtime={service}_runtime "host=postgres port=5432 dbname={service} '
                 f'user={service}_migrator sslmode=verify-full sslrootcert=/run/secrets/ca.crt connect_timeout=3" '
-                '--file=/opt/foundation/migrate.sql'],
+                '--file=/opt/foundation/migrate.sql' + (' --file=/opt/foundation/console.sql' if service == 'console' else '')],
                 volumeMounts=[_mount("secrets", "/run/secrets", True),
-                              _mount("migration", "/opt/foundation/migrate.sql", True, "migrate.sql")])
+                              _mount("migration", "/opt/foundation/migrate.sql", True, "migrate.sql"),
+                              _mount("migration", "/opt/foundation/console.sql", True, "console.sql")])
             migration_pod = _pod(migrator_name, [migration], [_secret_volume(f"{service}-migration"),
                                  {"name": "migration", "configMap": {"name": "postgres-scripts"}}])
             migration_pod["restartPolicy"] = "Never"
@@ -290,6 +291,7 @@ def prepare(root: Path, runtime: Path, images: Mapping[str, str], revision: str,
                               {entry["target"]: secret_dir / entry["source"] for entry in pg_source["secrets"]}))
         scripts = {name: (root / "deploy/dependencies/postgres" / name).read_text()
                    for name in ("entrypoint.sh", "initialize.sh", "migrate.sql")}
+        scripts["console.sql"] = (root / "apps/console/database/migrations/001_shared_state.sql").read_text()
         resources.append(_object("ConfigMap", "postgres-scripts", namespace, data=scripts))
         resources.append(_object("PersistentVolumeClaim", "postgres-data", namespace,
                          spec={"accessModes": ["ReadWriteOnce"], "resources": {"requests": {"storage": "1Gi"}}}))

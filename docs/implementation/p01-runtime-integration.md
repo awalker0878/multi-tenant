@@ -185,3 +185,7 @@ Kubernetes dependency-installation, whole-store recovery or operated adoption cl
 Shared Console sessions/cache, service-owned versioned contracts/outbox/inbox, actual
 alert receipt, remaining deployment recovery and admission/promotion trust remain open.
 G01 is still unreviewed.
+
+The [Console shared-state increment](p01-console-shared-state.md) now supplies owner
+migrations and database-backed session/cache configuration. Its new observations
+are separate from the historical runtime counts above.

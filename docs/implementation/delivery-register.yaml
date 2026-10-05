@@ -580,6 +580,7 @@ work_packages:
   - docs/operations/runbooks/permit-desk-recovery.md
   - docs/implementation/p01-stateful-dependencies.md
   - docs/operations/runbooks/stateful-dependency-recovery.md
+  - docs/implementation/p01-console-shared-state.md
 - id: P01.03
   phase_id: P01
   title: Contracts and messaging
@@ -667,6 +668,7 @@ work_packages:
   - docs/implementation/p01-runtime-integration.md
   - docs/implementation/p01-stateful-dependencies.md
   - docs/operations/runbooks/stateful-dependency-recovery.md
+  - docs/implementation/p01-console-shared-state.md
 - id: P01.06
   phase_id: P01
   title: Baseline operations
@@ -706,6 +708,7 @@ work_packages:
   - docs/operations/runbooks/permit-desk-recovery.md
   - docs/implementation/p01-stateful-dependencies.md
   - docs/operations/runbooks/stateful-dependency-recovery.md
+  - docs/implementation/p01-console-shared-state.md
 - id: P02.01
   phase_id: P02
   title: Authentication

@@ -11,6 +11,7 @@
         <env name="APP_ENV" value="testing" force="true"/>
         <env name="APP_KEY" value="base64:MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=" force="true"/>
         <env name="APP_URL" value="http://localhost" force="true"/>
+        <env name="CACHE_STORE" value="array" force="true"/>
         <env name="SESSION_DRIVER" value="array" force="true"/>
         <env name="SESSION_SECURE_COOKIE" value="true" force="true"/>
     </php>

@@ -325,6 +325,7 @@ def php_quality(e: Evidence, component: Path, config: dict, candidate: dict, mod
         "COMPOSER_CACHE_DIR": str(e.output / "composer-cache"),
         "COMPOSER_NO_INTERACTION": "1", "COMPOSER_PROCESS_TIMEOUT": "300",
         "CONSOLE_BASE_URL": "http://127.0.0.1:8031", "SESSION_SECURE_COOKIE": "false",
+        "SESSION_DRIVER": "array", "CACHE_STORE": "array",
     })
     (component / ".env").write_text("# Isolated synthetic test settings come from the runner.\n")
     for path in ["bootstrap/cache", "storage/framework/cache", "storage/framework/sessions", "storage/framework/views", "storage/logs"]:

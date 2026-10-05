@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 return [
-    'driver' => env('SESSION_DRIVER', 'file'),
+    'driver' => env('SESSION_DRIVER', 'database'),
     'lifetime' => 30,
     'expire_on_close' => true,
-    'encrypt' => false,
+    'encrypt' => true,
     'files' => storage_path('framework/sessions'),
-    'connection' => null,
-    'table' => 'sessions',
+    'connection' => 'pgsql',
+    'table' => 'app.sessions',
     'store' => null,
     'lottery' => [2, 100],
     'cookie' => 'console_session',
