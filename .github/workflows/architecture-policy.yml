@@ -42,6 +42,11 @@ jobs:
         run: |
           python scripts/p01/test_retained.py -q
           python scripts/p01/verify_retained.py
+      - name: Reconcile the complete held P01 candidate set
+        run: >-
+          python scripts/p01/artifacts/release_set.py
+          --run-path verification/p01/artifact-trust/run-37265822363
+          --check release/p01-candidate-set.json
       - name: Check generated delivery views
         run: python scripts/render_delivery_views.py --check
       - name: Check documentation and delivery references

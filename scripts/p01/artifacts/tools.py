@@ -34,6 +34,10 @@ def install(root: Path, destination: Path) -> dict[str, str]:
             archive.unlink()
         else:
             archive.rename(target)
+        if item.get('binary_sha256'):
+            with target.open('rb') as stream:
+                if hashlib.file_digest(stream, 'sha256').hexdigest() != item['binary_sha256']:
+                    raise ValueError('tool_binary_digest_mismatch')
         target.chmod(0o700)
         result[name] = str(target)
     return result

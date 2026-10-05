@@ -63,7 +63,8 @@ A successful control exercise is recorded separately from candidate admission.
 Raw scanner output and private keys remain temporary. A clean development candidate is copied to a fresh destination and reverified.
 A held image may be copied only to the campaign quarantine: every byte must match
 and the receiving verifier must still deny it. The image is never rebuilt during
-transfer and a quarantine copy confers no deployment eligibility. Real hosted results remain pending execution.
+transfer and a quarantine copy confers no deployment eligibility. The real hosted
+results are recorded below; all candidates remain held.
 
 The first hosted scan attempt (source `2e1be599cba89275c92396066f091779cd912539`,
 run 37264412362) held all nine candidates because the image scanner does not accept
@@ -109,5 +110,48 @@ Two findings have published fixes: libpcre2-8-0 `10.42-1+deb12u2` and tzdata
 `2026c-0+deb12u1`. Both packages are available in the already selected signed
 20261004 Debian snapshot. All nine runtime builds now request those exact versions.
 The PHP runtime additionally removes unused linux-libc-dev headers during existing
-build-tool cleanup. The corrected images must be rebuilt, probed and rescanned;
-remaining upstream findings continue to hold promotion.
+build-tool cleanup. Corrected run 37265822363 at source
+`41bbcaec3be5ec0f2abdd534bab2041e46a74e90` rebuilt and probed all nine images,
+verified the exact two installed package versions, and rescanned their real bytes.
+All nine owned-source scans have zero blocking findings. The four PHP candidates
+each retain 80 blocking package/advisory matches (36 distinct advisory IDs); the
+five Python candidates each retain 63 matches (23 distinct IDs). None of those
+remaining matches has a scanner-provided fixed version. The observations do not
+establish exploitability or authorize a waiver. Every image stays HELD.
+
+The corrected campaign measured 81 expected denials, nine development signatures
+and nine unchanged-byte transfers into quarantine. Retrieval reverified all nine
+retained manifest signatures, 198 build-log hashes and 225 unique source bindings.
+Its workflow intentionally failed image admission. A passed denial control is
+recorded separately from that failed candidate decision.
+
+## Complete candidate evidence set
+
+[The generated manifest](../../release/p01-candidate-set.json) composes all seven
+applications and both selected workers from the corrected run. It binds each
+source path, revision, lock, image/config digest, build report, SBOM, provenance,
+development signature and negative-case report. The generator rejects missing
+components, a changed registry, mixed sources, altered retained bytes and a claim
+that a held candidate was admitted. It is a historical development evidence set,
+not a deployable product release; full image layers are not retained here.
+
+Regenerate with `python3 scripts/p01/artifacts/release_set.py --run-path verification/p01/artifact-trust/run-37265822363 --output release/p01-candidate-set.json`.
+Normal CI uses `--check` to reject stale generated content. Historical freshness is
+evaluated at the original observation time; later promotion needs new scans and
+independent full-artifact/trust verification.
+
+Receiving-side verification also rejects a correctly signed empty scan inventory,
+missing advisory-database digest, mislabeled scan scope and empty source SBOM.
+These controls are exercised with real Cosign signatures, without weakening the
+existing HIGH/CRITICAL/UNKNOWN or secret finding holds.
+
+The policy workflow now separately scans exact tracked repository content,
+including policy, deployment, tests, documentation and retained evidence. It
+stages no untracked local caches and adds no source-tree exclusion. A generated
+non-credential validates the detector in a separate temporary directory. Only
+rule/location metadata and source hashes leave temporary storage; matched bytes
+and source snippets are discarded. The scanner binary is verified against the
+recorded extraction of the existing checksum-locked archive. This closes the
+coverage gap between component-only scans and repository content. Trivy remains
+a heuristic text detector; success does not prove that no secret exists or scan
+Git history. See [the scanner documentation](https://trivy.dev/latest/docs/scanner/secret/).

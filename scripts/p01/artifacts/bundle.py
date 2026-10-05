@@ -125,6 +125,9 @@ def evaluate_scans(scans: list[dict], now: datetime) -> list[str]:
     for scan in scans:
         require(scan['scanner'] == 'trivy' and scan['version'] == '0.75.0'
                 and scan['completed'] is True and isinstance(scan['results'], list), 'invalid_scan')
+        require(scan['results'] and sum(r.get('packages_count', 0) for r in scan['results']) > 0,
+                'empty_dependency_inventory')
+        require(re.fullmatch(r'[0-9a-f]{64}', scan['database'].get('sha256', '')), 'unbound_scan_database')
         captured = datetime.fromisoformat(scan['observed_at'])
         updated = datetime.fromisoformat(scan['database']['UpdatedAt'])
         require(captured.tzinfo is not None and updated.tzinfo is not None, 'invalid_scan_time')
@@ -163,7 +166,8 @@ def verify(root: Path, anchor: dict, public_key: Path, cosign: str, now=None) ->
     sbom = json.loads((root / 'image-sbom.cdx.json').read_text())
     require(sbom['bomFormat'] == 'CycloneDX' and len(sbom.get('components', [])) > 0, 'missing_sbom')
     source_sbom = json.loads((root / 'source-sbom.cdx.json').read_text())
-    require(source_sbom['bomFormat'] == 'CycloneDX', 'missing_source_sbom')
+    require(source_sbom['bomFormat'] == 'CycloneDX' and len(source_sbom.get('components', [])) > 0,
+            'missing_source_sbom')
     provenance = json.loads((root / 'provenance.json').read_text())
     require(provenance['_type'] == 'https://in-toto.io/Statement/v1'
             and provenance['predicateType'] == 'https://slsa.dev/provenance/v1', 'invalid_provenance')
@@ -172,6 +176,7 @@ def verify(root: Path, anchor: dict, public_key: Path, cosign: str, now=None) ->
     require(predicate['runDetails']['builder']['id'] == anchor['builder_id'] == BUILDER, 'untrusted_builder')
     require(predicate['buildDefinition']['externalParameters']['source_revision'] == anchor['source_revision'], 'provenance_source_mismatch')
     scans = [json.loads((root / name).read_text()) for name in ('image-scan.json', 'source-scan.json')]
+    require([s['scope'] for s in scans] == ['image', 'source'], 'scan_scope_mismatch')
     require(scans[0]['config_digest'] == m['image']['config_digest'], 'scan_image_mismatch')
     require(all(s['source_revision'] == m['source_revision'] for s in scans), 'scan_source_mismatch')
     findings = evaluate_scans(scans, now or datetime.now(timezone.utc))

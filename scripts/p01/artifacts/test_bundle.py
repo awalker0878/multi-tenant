@@ -39,7 +39,7 @@ class BundleTests(unittest.TestCase):
         for name in ['image-sbom.cdx.json','source-sbom.cdx.json']:
             (cls.root/name).write_bytes(encode({'bomFormat':'CycloneDX','components':[{'type':'file','name':'synthetic-marker'}]}))
         for scope in ['image','source']:
-            (cls.root/(scope+'-scan.json')).write_bytes(encode({'scope':scope,'scanner':'trivy','version':'0.75.0','completed':True,'config_digest':cls.config,'source_revision':cls.revision,'observed_at':cls.now.isoformat(),'database':{'UpdatedAt':cls.now.isoformat()},'results':[]}))
+            (cls.root/(scope+'-scan.json')).write_bytes(encode({'scope':scope,'scanner':'trivy','version':'0.75.0','completed':True,'config_digest':cls.config,'source_revision':cls.revision,'observed_at':cls.now.isoformat(),'database':{'UpdatedAt':cls.now.isoformat(),'sha256':'c'*64},'results':[{'packages_count':1,'Vulnerabilities':[],'Secrets':[]}]}))
         (cls.root/'provenance.json').write_bytes(encode({'_type':'https://in-toto.io/Statement/v1','predicateType':'https://slsa.dev/provenance/v1','subject':[{'name':'fixture','digest':{'sha256':cls.image[7:]}}],'predicate':{'buildDefinition':{'externalParameters':{'source_revision':cls.revision}},'runDetails':{'builder':{'id':BUILDER}}}}))
         cls.anchor={'scope':'p01-development','transparency':'synthetic-key-no-log','public_key_sha256':digest(cls.work/'key.pub'),'revoked':False,'source_revision':cls.revision,'component':'fixture','image_digest':cls.image,'builder_id':BUILDER}
         cls.sign(cls.root)
@@ -106,8 +106,22 @@ class BundleTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'^stale_scan$'):self.verify()
 
     def test_even_signed_security_findings_block(self):
-        p=self.copy/'image-scan.json';d=json.loads(p.read_text());d['results']=[{'Vulnerabilities':[{'VulnerabilityID':'CVE-SYNTHETIC','Severity':'HIGH'}]}];p.write_bytes(encode(d));self.sign(self.copy)
+        p=self.copy/'image-scan.json';d=json.loads(p.read_text());d['results']=[{'packages_count':1,'Vulnerabilities':[{'VulnerabilityID':'CVE-SYNTHETIC','Severity':'HIGH'}]}];p.write_bytes(encode(d));self.sign(self.copy)
         with self.assertRaisesRegex(ValueError,'^security_findings:CVE-SYNTHETIC$'):self.verify()
+
+    def test_signed_empty_scan_and_unbound_database_are_denied(self):
+        p=self.copy/'source-scan.json';original=json.loads(p.read_bytes())
+        for key,value,code in [('results',[],'empty_dependency_inventory'),
+                               ('database',{'UpdatedAt':self.now.isoformat()},'unbound_scan_database'),
+                               ('scope','image','scan_scope_mismatch')]:
+            with self.subTest(key=key):
+                d=copy.deepcopy(original);d[key]=value;p.write_bytes(encode(d));self.sign(self.copy)
+                with self.assertRaisesRegex(ValueError,'^'+code+'$'):self.verify()
+
+    def test_signed_empty_source_sbom_is_denied(self):
+        p=self.copy/'source-sbom.cdx.json';d=json.loads(p.read_bytes());d['components']=[]
+        p.write_bytes(encode(d));self.sign(self.copy)
+        with self.assertRaisesRegex(ValueError,'^missing_source_sbom$'):self.verify()
 
     def test_unexpected_file_and_symlink_rejected(self):
         (self.copy/'injected').write_text('unexpected')

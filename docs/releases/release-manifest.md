@@ -30,3 +30,12 @@ Reconcile each service image with the owning context and its declared source/pac
 Each advertised support row must refer to the actual candidate artifacts and applicable qualification evidence or an explicit unaffected-evidence review. Expired or revoked support cannot be restored by publishing the same artifact under a new release name.
 
 The manifest is immutable after acceptance. Any change to an artifact, compatibility promise, support scope or accepted assumption creates a new candidate or controlled superseding record. Retain links to predecessors and the scope of their supersession.
+
+## P01 development evidence set
+
+The current [P01 candidate set](../../release/p01-candidate-set.json) binds the nine
+measured foundation images and their retained build/security records. Its status
+is HELD and `promotion_authorized` is false. It covers development observations
+only; it does not supply the future product release's full worker/automation,
+migration compatibility, operated trust or G10/G11 acceptance fields above.
+Generation and exact coverage are documented in [the artifact record](../implementation/p01-artifact-admission.md).

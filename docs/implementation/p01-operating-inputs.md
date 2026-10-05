@@ -46,6 +46,17 @@ field references; it does not authenticate people or read protected custody.
 Even a complete input record does not authorize promotion. The artifact verifier
 continues to deny operated scope until an actual approved trust integration exists.
 
+The validator now fixes each OP record to its exact carried field inventory,
+rejects hidden values/review data on UNKNOWN records, mutable or mismatched Git
+evidence revisions, credential-bearing references, duplicate evidence and future,
+unattributed or non-UTC reviews. REJECTED observations remain held. Ten negative
+and completeness fixtures exercise these boundaries; fixture people confer no role.
+
+Ordinary CI checks record validity and permits honest UNKNOWN entries. The gate
+readiness command is `python3 scripts/p01/admission/operating_inputs.py --require-complete`;
+it exits unsuccessfully while any of the seven actual inputs remains unreviewed.
+Passing record validation must never be represented as passing this readiness check.
+
 ## Prepared repository settings
 
 The [candidate protection body](../../release/branch-protection.candidate.json)

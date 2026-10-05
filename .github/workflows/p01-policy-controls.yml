@@ -30,6 +30,19 @@ jobs:
           path: ${{ runner.temp }}/p01-policy-evidence/
           if-no-files-found: error
           retention-days: 14
+      - name: Scan tracked repository content with redacted evidence
+        run: >-
+          python3 scripts/p01/artifacts/repository_scan.py
+          --trivy "$RUNNER_TEMP/p01-tools/trivy"
+          --output "$RUNNER_TEMP/p01-repository-secrets"
+      - name: Retain repository secret scan outcome
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p01-repository-secrets-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-repository-secrets/
+          if-no-files-found: error
+          retention-days: 14
       - name: Record the exact successfully tested checkout
         run: python3 scripts/p01/record_check_source.py --name "Foundation policy controls"
       - name: Retain exact check source
