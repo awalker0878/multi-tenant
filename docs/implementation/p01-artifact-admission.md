@@ -155,3 +155,12 @@ recorded extraction of the existing checksum-locked archive. This closes the
 coverage gap between component-only scans and repository content. Trivy remains
 a heuristic text detector; success does not prove that no secret exists or scan
 Git history. See [the scanner documentation](https://trivy.dev/latest/docs/scanner/secret/).
+
+EV-P01-023 retains hosted run 37269433140 at source
+`48a998c8b4517f5d27933973d9d4b04677b48e49`: all 59 policy-control tests passed,
+including 14 real-signature cases, and the positive-controlled repository scan
+reported zero secrets across 9,766 tracked files. Retrieval independently matched
+every source hash to the immutable Git tree and retained the original redacted
+scan report in its hash-verified ZIP. New image run 37269433149 at the same source
+again passed each of nine control campaigns while holding all nine candidates;
+the observed job summaries retain those distinct outcomes.

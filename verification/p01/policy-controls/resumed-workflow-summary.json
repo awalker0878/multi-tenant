@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "source_revision": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+  "observed_at": "2026-10-05T05:59:56.711Z",
+  "workflows": [
+    {
+      "id": 37269433129,
+      "name": "P01 isolated Kubernetes integration",
+      "source_revision": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37269433129"
+    },
+    {
+      "id": 37269433171,
+      "name": "Context policy",
+      "source_revision": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37269433171"
+    },
+    {
+      "id": 37269433140,
+      "name": "P01 policy controls",
+      "source_revision": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37269433140"
+    },
+    {
+      "id": 37269433125,
+      "name": "P01 Permit Desk application recovery",
+      "source_revision": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37269433125"
+    },
+    {
+      "id": 37269433168,
+      "name": "P01 foundation contracts",
+      "source_revision": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37269433168"
+    },
+    {
+      "id": 37269433149,
+      "name": "P01 bootstrap images",
+      "source_revision": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37269433149"
+    },
+    {
+      "id": 37269433112,
+      "name": "P01 foundation packages",
+      "source_revision": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37269433112"
+    },
+    {
+      "id": 37269433114,
+      "name": "P01 isolated Compose integration",
+      "source_revision": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37269433114"
+    }
+  ],
+  "interpretation": "Seven workflows passed. Bootstrap image admission failed: all nine campaigns report PASSED_CONTROLS and HELD with no campaign error. No G01 approval or production promotion is inferred."
+}

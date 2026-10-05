@@ -57,7 +57,7 @@ phases:
   gate_id: G01
   status:
     work: IN_PROGRESS
-    verification: IN_PROGRESS
+    verification: FAILED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
@@ -79,10 +79,16 @@ phases:
   - EV-P01-016
   - EV-P01-017
   - EV-P01-018
+  - EV-P01-019
+  - EV-P01-020
+  - EV-P01-021
+  - EV-P01-022
+  - EV-P01-023
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
   - BL-P01-001
+  - BL-P01-002
 - id: P02
   title: Identity, tenancy and governance
   owner_role: Product engineering and IAM leads
@@ -622,15 +628,21 @@ work_packages:
   owner_role: SRE
   status:
     work: IN_PROGRESS
-    verification: IN_PROGRESS
+    verification: FAILED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-009
   - EV-P01-017
+  - EV-P01-019
+  - EV-P01-020
+  - EV-P01-021
+  - EV-P01-022
+  - EV-P01-023
   blocker_ids:
   - BL-P00-001
   - BL-P01-001
+  - BL-P01-002
   dependency_package_ids:
   - P01.01
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
@@ -1764,7 +1776,7 @@ requirements:
   - G10
   status:
     work: IN_PROGRESS
-    verification: IN_PROGRESS
+    verification: FAILED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
@@ -1786,8 +1798,14 @@ requirements:
   - EV-P01-016
   - EV-P01-017
   - EV-P01-018
+  - EV-P01-019
+  - EV-P01-020
+  - EV-P01-021
+  - EV-P01-022
+  - EV-P01-023
   blocker_ids:
   - BL-P01-001
+  - BL-P01-002
 - id: R03
   package_ids:
   - P02.01
@@ -2716,7 +2734,7 @@ requirements:
   - G10
   status:
     work: IN_PROGRESS
-    verification: IN_PROGRESS
+    verification: FAILED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
@@ -2724,8 +2742,14 @@ requirements:
   - EV-P01-013
   - EV-P01-016
   - EV-P01-018
+  - EV-P01-019
+  - EV-P01-020
+  - EV-P01-021
+  - EV-P01-022
+  - EV-P01-023
   blocker_ids:
   - BL-P01-001
+  - BL-P01-002
 - id: R32
   package_ids:
   - P00.05
@@ -2871,15 +2895,21 @@ requirements:
   - G11
   status:
     work: IN_PROGRESS
-    verification: IN_PROGRESS
+    verification: FAILED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-009
   - EV-P01-015
   - EV-P01-017
+  - EV-P01-019
+  - EV-P01-020
+  - EV-P01-021
+  - EV-P01-022
+  - EV-P01-023
   blocker_ids:
   - BL-P01-001
+  - BL-P01-002
 - id: R36
   package_ids:
   - P00.01
@@ -2914,7 +2944,7 @@ gates:
 - id: G00
   phase_id: P00
   decision: PASSED
-  reviewer: "Requesting user \u2014 accountable G00 reviewer"
+  reviewer: Requesting user — accountable G00 reviewer
   reviewed_at: '2026-10-04T21:23:57Z'
   evidence_ids:
   - EV-P00-001
@@ -2953,10 +2983,16 @@ gates:
   - EV-P01-016
   - EV-P01-017
   - EV-P01-018
+  - EV-P01-019
+  - EV-P01-020
+  - EV-P01-021
+  - EV-P01-022
+  - EV-P01-023
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
   - BL-P01-001
+  - BL-P01-002
 - id: G02
   phase_id: P02
   decision: NOT_REVIEWED
@@ -3363,8 +3399,8 @@ evidence:
   artifact_revisions:
     retained_artifact_commit: 974f218a459c47a62c3615f9d8f985d3868bb7dc
   environment: Accountable reviewer decision in the current user conversation, recorded in the repository
-  scope: "G00.01\u2013G00.06 baseline approval and advancement to P01/G01, with explicit carry-forward\
-    \ of incomplete application feasibility and actual integration/operating/native inputs"
+  scope: G00.01–G00.06 baseline approval and advancement to P01/G01, with explicit carry-forward of incomplete
+    application feasibility and actual integration/operating/native inputs
   campaign_ids: []
   criterion_ids:
   - G00.01
@@ -3374,8 +3410,8 @@ evidence:
   - G00.05
   - G00.06
   observed_at: '2026-10-04T21:23:57Z'
-  observer: "Codex \u2014 recorder of the user statement"
-  reviewer: "Requesting user \u2014 accountable G00 reviewer"
+  observer: Codex — recorder of the user statement
+  reviewer: Requesting user — accountable G00 reviewer
   limitations: E0 baseline and advancement decision only. Does not make unperformed tests pass, complete
     all P00 task axes, supply missing installed facts or staffing, accept receiving-service obligations,
     qualify native outcomes or authorize unspecified native effects. Remaining full application/configuration
@@ -3400,8 +3436,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:32:08.469699+00:00'
-  observer: "Codex \u2014 implementation and execution"
-  reviewer: "Codex \u2014 engineering verification of retained source, logs and wheel"
+  observer: Codex — implementation and execution
+  reviewer: Codex — engineering verification of retained source, logs and wheel
   limitations: One bootstrap package only; process liveness is not dependency readiness, which exits unavailable.
     No product domain, persistent HTTP server, authorization, data/messaging integration, container image,
     other principal deployable, worker, native outcome or operating acceptance. Local cached replay does
@@ -3429,8 +3465,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:10.838206+00:00'
-  observer: "Codex \u2014 implementation and local execution"
-  reviewer: "Codex \u2014 engineering verification of retained source, logs and wheel"
+  observer: Codex — implementation and local execution
+  reviewer: Codex — engineering verification of retained source, logs and wheel
   limitations: Service package diagnostic only; native operations disabled. One-shot process liveness
     does not establish a persistent service or dependency readiness, which remains unavailable. No product
     domain, authority, persistence, messaging, provider or native outcome. No image or hosted-CI outcome
@@ -3459,8 +3495,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:23.801860+00:00'
-  observer: "Codex \u2014 implementation and local execution"
-  reviewer: "Codex \u2014 engineering verification of retained source, logs and wheel"
+  observer: Codex — implementation and local execution
+  reviewer: Codex — engineering verification of retained source, logs and wheel
   limitations: Service package diagnostic only; native operations disabled. One-shot process liveness
     does not establish a persistent service or dependency readiness, which remains unavailable. No product
     domain, authority, persistence, messaging, provider or native outcome. No image or hosted-CI outcome
@@ -3489,8 +3525,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:25.501848+00:00'
-  observer: "Codex \u2014 implementation and local execution"
-  reviewer: "Codex \u2014 engineering verification of retained source, logs and wheel"
+  observer: Codex — implementation and local execution
+  reviewer: Codex — engineering verification of retained source, logs and wheel
   limitations: Owned worker package diagnostic only; task consumption and native operations disabled.
     One-shot process liveness does not establish a persistent service or dependency readiness, which remains
     unavailable. No product domain, authority, persistence, messaging, provider or native outcome. No
@@ -3519,8 +3555,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:49:25.061136+00:00'
-  observer: "Codex \u2014 implementation and local execution"
-  reviewer: "Codex \u2014 engineering verification of retained source, logs and wheel"
+  observer: Codex — implementation and local execution
+  reviewer: Codex — engineering verification of retained source, logs and wheel
   limitations: Owned worker package diagnostic only; task consumption and native operations disabled.
     One-shot process liveness does not establish a persistent service or dependency readiness, which remains
     unavailable. No product domain, authority, persistence, messaging, provider or native outcome. No
@@ -3562,9 +3598,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T21:58:19.358892+00:00'
-  observer: "Codex \u2014 authored workflow executed on GitHub-hosted runners"
-  reviewer: "Codex \u2014 engineering verification of exact source, archives, logs and observed container\
-    \ controls"
+  observer: Codex — authored workflow executed on GitHub-hosted runners
+  reviewer: Codex — engineering verification of exact source, archives, logs and observed container controls
   limitations: Five Python bootstrap images only; no Laravel image represented. One-shot liveness is not
     persistent service readiness or task consumption. No database/broker/Temporal integration, tenant
     isolation, native platform or operating acceptance. Runner-local configuration digests are not published
@@ -3609,8 +3644,8 @@ evidence:
   - G01.01
   - G01.04
   observed_at: '2026-10-04T22:16:47.462672+00:00'
-  observer: "GitHub Actions \u2014 owned package execution"
-  reviewer: "Codex \u2014 retained archive, source binding and artifact/log examination"
+  observer: GitHub Actions — owned package execution
+  reviewer: Codex — retained archive, source binding and artifact/log examination
   limitations: Development package/process evidence only; public fixture page is not an authenticated
     product journey. Readiness remains unavailable. No integrated service topology, database roles, real
     messaging, deployment independence, operated mirror, signing, native qualification or operating acceptance.
@@ -3645,8 +3680,8 @@ evidence:
   criterion_ids:
   - G01.01
   observed_at: '2026-10-04T22:18:56.807458+00:00'
-  observer: "GitHub Actions \u2014 isolated image builds and diagnostics"
-  reviewer: "Codex \u2014 archive, source binding and runtime/log examination"
+  observer: GitHub Actions — isolated image builds and diagnostics
+  reviewer: Codex — archive, source binding and runtime/log examination
   limitations: Restricted image/process and in-process HTTP kernel measurements only. Image configuration
     IDs are not published registry manifest digests. No listening FastCGI/proxy deployment, browser hydration
     inside these images, independent service deployment, integrated dependency health, network/identity
@@ -3686,9 +3721,8 @@ evidence:
   criterion_ids:
   - G01.04
   observed_at: '2026-10-04T22:59:33Z'
-  observer: "Codex \u2014 local controls and read-only repository observations; GitHub Actions \u2014\
-    \ hosted checks"
-  reviewer: "Codex \u2014 engineering examination; no independent admission-policy acceptance claimed"
+  observer: Codex — local controls and read-only repository observations; GitHub Actions — hosted checks
+  reviewer: Codex — engineering examination; no independent admission-policy acceptance claimed
   limitations: These controls provide execution evidence and feedback, not enforced repository admission.
     No verified CODEOWNERS/reviewer-account mapping, distinct-role review, trusted-base enforcement, complete
     base/head consumer graph, branch protection mutation, secret/dependency/image-vulnerability assessment,
@@ -3725,8 +3759,8 @@ evidence:
   - G01.02
   - G01.05
   observed_at: '2026-10-04T23:45:17Z'
-  observer: "GitHub Actions \u2014 private package and image campaigns"
-  reviewer: "Codex \u2014 archive digests, immutable source bindings, artifact and command-log examination"
+  observer: GitHub Actions — private package and image campaigns
+  reviewer: Codex — archive digests, immutable source bindings, artifact and command-log examination
   limitations: Development package and image/process evidence. Does not establish a complete integrated
     installation, product readiness, tenant/OIDC authority, message processing, native behavior, production
     mirror/trust or signed promotion. Image IDs identify local configurations, not published registry
@@ -3767,8 +3801,8 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-04T23:58:01Z'
-  observer: "GitHub Actions \u2014 isolated Compose installation and denial campaign"
-  reviewer: "Codex \u2014 immutable source/archive/configuration and command-log examination"
+  observer: GitHub Actions — isolated Compose installation and denial campaign
+  reviewer: Codex — immutable source/archive/configuration and command-log examination
   limitations: Synthetic diagnostic credentials and two tenant-keyed database records only. Product readiness
     stays unavailable; no OIDC/delegated tenant authority, row-level isolation, full Permit Desk application/configuration
     fixture, broker/Temporal/evidence store, task consumption or native effects. Database restart is not
@@ -3808,16 +3842,16 @@ evidence:
   environment: GitHub-hosted Ubuntu 24.04 linux/amd64; isolated two-node kind v0.33.0/Kubernetes v1.36.4
     with locked Cilium 1.20.2 chart/image inputs; private synthetic namespace, credentials, TLS PostgreSQL
     PVC and seven exact-source application/proxy pairs
-  scope: "Kubernetes passed 157 checks and 315 installation command outcomes plus seven embedded image\
-    \ campaigns; retrieval verifies 762 command-log hashes and 200 unique source bindings. Actual Cilium\
-    \ policy permits eight tested connections and denies fifteen tested connections. Seven migration Job\
-    \ outputs identify owned database/migrator/schema version 1. Authenticated health, TLS and runtime\
-    \ database authority checks pass. Governance login revocation/restoration is measured. During database\
-    \ outage all seven direct probes fail within 2.129\u20132.286 seconds against a five-second bound;\
-    \ after PostgreSQL recreation the seven services recover and fourteen raw before/after SQL outputs\
-    \ confirm identical fixture data. Cleanup completes. At the same corrected source all nine package/image\
-    \ campaigns and all 126 Compose checks pass, including real stalled-TLS regressions for four PHP services.\
-    \ Earlier contract-assertion and PDO timeout failures remain retained separately."
+  scope: Kubernetes passed 157 checks and 315 installation command outcomes plus seven embedded image
+    campaigns; retrieval verifies 762 command-log hashes and 200 unique source bindings. Actual Cilium
+    policy permits eight tested connections and denies fifteen tested connections. Seven migration Job
+    outputs identify owned database/migrator/schema version 1. Authenticated health, TLS and runtime database
+    authority checks pass. Governance login revocation/restoration is measured. During database outage
+    all seven direct probes fail within 2.129–2.286 seconds against a five-second bound; after PostgreSQL
+    recreation the seven services recover and fourteen raw before/after SQL outputs confirm identical
+    fixture data. Cleanup completes. At the same corrected source all nine package/image campaigns and
+    all 126 Compose checks pass, including real stalled-TLS regressions for four PHP services. Earlier
+    contract-assertion and PDO timeout failures remain retained separately.
   campaign_ids: []
   criterion_ids:
   - G01.01
@@ -3825,9 +3859,9 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-05T00:29:48Z'
-  observer: "GitHub Actions \u2014 isolated Kubernetes and corrective package/image/Compose campaigns"
-  reviewer: "Codex \u2014 archive, immutable source, log, migration identity, bounded-probe and actual\
-    \ before/after fixture-output examination"
+  observer: GitHub Actions — isolated Kubernetes and corrective package/image/Compose campaigns
+  reviewer: Codex — archive, immutable source, log, migration identity, bounded-probe and actual before/after
+    fixture-output examination
   limitations: Synthetic foundation scope only. Product readiness remains unavailable; workers consume
     no tasks and native endpoints/effects are absent. Measured pod-network paths do not establish tenant
     authorization, full network-policy coverage or operated cluster security. Kubernetes outage observations
@@ -3873,9 +3907,9 @@ evidence:
   - G01.02
   - G01.06
   observed_at: '2026-10-05T00:53:40.505766+00:00'
-  observer: "GitHub Actions \u2014 P01 Permit Desk application recovery campaign"
-  reviewer: "Codex \u2014 immutable source, capture bytes, raw command/denial logs, state comparison and\
-    \ cleanup evidence examination"
+  observer: GitHub Actions — P01 Permit Desk application recovery campaign
+  reviewer: Codex — immutable source, capture bytes, raw command/denial logs, state comparison and cleanup
+    evidence examination
   limitations: Synthetic workload fixture, not a new control-plane service or product tenancy/identity
     qualification. Compose and same PostgreSQL patch only. Capture requires a readable quiesced source
     or target. No production concurrent crash-consistency, guest/native deployment, uncaptured lost-target
@@ -3930,9 +3964,9 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-05T02:18:30.785311+00:00'
-  observer: "GitHub Actions \u2014 P01 isolated stateful dependency campaign"
-  reviewer: "Codex \u2014 immutable source, raw probe/command logs, exact database denial diagnostics,\
-    \ retained bytes, workflow identity and cleanup examination"
+  observer: GitHub Actions — P01 isolated stateful dependency campaign
+  reviewer: Codex — immutable source, raw probe/command logs, exact database denial diagnostics, retained
+    bytes, workflow identity and cleanup examination
   limitations: Disposable single-node Compose support tooling with synthetic identities and one selected
     evidence object version. Product contracts/outbox/inbox and shared Console sessions/cache remain unimplemented.
     No whole-store/all-version recovery, production vendor/IAM or regulatory retention qualification,
@@ -3968,9 +4002,9 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-05T03:37:16Z'
-  observer: "GitHub Actions \u2014 P01 transactional messaging"
-  reviewer: "Codex \u2014 retained archive, immutable source, command-log and result examination; accountable\
-    \ G01 review remains pending"
+  observer: GitHub Actions — P01 transactional messaging
+  reviewer: Codex — retained archive, immutable source, command-log and result examination; accountable
+    G01 review remains pending
   limitations: Internal reference fact only; no public command API, delegated business authority, native
     effect, other service event adoption, HA or operational/G01 acceptance. No pruning or accepted production
     retry/retention window. Exactly one logical effect is scoped to this retained local projection, not
@@ -4005,9 +4039,9 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-05T03:28:47Z'
-  observer: "GitHub Actions \u2014 P01 isolated Compose integration"
-  reviewer: "Codex \u2014 retained archive, immutable source, command-log and result examination; accountable\
-    \ G01 review remains pending"
+  observer: GitHub Actions — P01 isolated Compose integration
+  reviewer: Codex — retained archive, immutable source, command-log and result examination; accountable
+    G01 review remains pending
   limitations: Synthetic anonymous sessions and receiver; no login/delegation qualification, key rotation,
     scheduler workload, paging-provider or human acknowledgement, accepted outage objective, signed promotion
     or operational/G01 acceptance. The older Planning source in this installation report is not evidence
@@ -4039,9 +4073,9 @@ evidence:
   - G01.03
   - G01.04
   observed_at: '2026-10-05T03:45:53Z'
-  observer: "GitHub Actions \u2014 P01 foundation contracts"
-  reviewer: "Codex \u2014 retained archive, immutable source, command-log and result examination; accountable\
-    \ G01 review remains pending"
+  observer: GitHub Actions — P01 foundation contracts
+  reviewer: Codex — retained archive, immutable source, command-log and result examination; accountable
+    G01 review remains pending
   limitations: Diagnostic endpoints only. Generated adapters are temporary conformance outputs, not full
     validators or product authorization. Exact-byte version freezing is conservative compatibility feedback,
     not general schema-language inclusion, trusted-base policy protection, required-check enforcement,
@@ -4077,13 +4111,158 @@ evidence:
   - G01.05
   - G01.06
   observed_at: '2026-10-05T03:54:58Z'
-  observer: "GitHub Actions \u2014 P01 isolated Kubernetes integration"
-  reviewer: "Codex \u2014 immutable source, raw command, state and failed-rollout observations; accountable\
-    \ G01 review remains pending"
+  observer: GitHub Actions — P01 isolated Kubernetes integration
+  reviewer: Codex — immutable source, raw command, state and failed-rollout observations; accountable
+    G01 review remains pending
   limitations: Disposable diagnostic foundation, anonymous synthetic sessions and same existing encryption
     key. No business login/delegation, key rotation, production multi-site cluster, HA, Kubernetes whole-store
     restore, operated alert route, signed promotion, native effect, accepted RTO/RPO or operational/G01
     acceptance. The failed rollout is a controlled process exit, not a registry/signature-admission experiment.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-019
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/8f68a9a32bc617eeef2d60cd1f6067de5153afcf/verification/p01/policy-controls/run-37265584462/retrieval.json
+  sha256: 2569e93fe9b3fd47090150e0be3cfe4139274008e5ab4bccede76a1e12941fd2
+  source_revision: 011465d805d9b23725df4b05b949e9dc8f4da827
+  artifact_revisions:
+    retained_artifact_commit: 8f68a9a32bc617eeef2d60cd1f6067de5153afcf
+    workflow_run_id: 37265584462
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-artifact-admission.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned development Cosign/Trivy tools, isolated
+    synthetic controls, no native endpoints or operated promotion.
+  scope: 'All 41 policy-control tests passed: 16 impact/review cases, 7 exact-check-source cases, 4 exclusion
+    cases, 2 redaction cases and 12 real Cosign bundle cases. Retained test logs and immutable source
+    bindings were verified.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.04
+  observed_at: '2026-10-05T05:08:12.800959+00:00'
+  observer: GitHub Actions; connector retrieval and independent source/hash examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Synthetic accounts, images and scan records; real cryptography. No actual reviewer role,
+    branch protection, operated signer or G01 acceptance.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-020
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/8f68a9a32bc617eeef2d60cd1f6067de5153afcf/verification/p01/admission/run-37265584488/retrieval.json
+  sha256: db0c46d857a104fcaa437f2946bcaad47cc3ccebb2761635926d6e58f994703c
+  source_revision: 011465d805d9b23725df4b05b949e9dc8f4da827
+  artifact_revisions:
+    retained_artifact_commit: 8f68a9a32bc617eeef2d60cd1f6067de5153afcf
+    workflow_run_id: 37265584488
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-artifact-admission.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned development Cosign/Trivy tools, isolated
+    synthetic controls, no native endpoints or operated promotion.
+  scope: Actual read-only target-base evaluation of the disposable PR returned review_roles_unconfigured.
+    Candidate marker code was not executed. Retained probe and evaluator reports bind the probe source
+    and the distinct evaluated base revision.
+  campaign_ids: []
+  criterion_ids:
+  - G01.04
+  observed_at: '2026-10-05T05:08:12.802713+00:00'
+  observer: GitHub Actions; connector retrieval and independent source/hash examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Explicit push probe, not an installed automatic admission hook. No successful actual-role
+    admission, independent reporting identity, merge protection or CODEOWNERS enforcement. The probe PR
+    was closed unmerged.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-021
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/8f68a9a32bc617eeef2d60cd1f6067de5153afcf/verification/p01/artifact-trust/run-37264699751/retrieval.json
+  sha256: 8e4382c80fdda221546762362be3440d438484e98d1a880869fc4e663a04bd99
+  source_revision: 4d4b12d1e1b4e5db880d5b0722b7ad6715160d69
+  artifact_revisions:
+    retained_artifact_commit: 8f68a9a32bc617eeef2d60cd1f6067de5153afcf
+    workflow_run_id: 37264699751
+    workflow_conclusion: failure
+    implementation_record: docs/implementation/p01-artifact-admission.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned development Cosign/Trivy tools, isolated
+    synthetic controls, no native endpoints or operated promotion.
+  scope: Nine real-image scan/signature campaigns passed their controls and held every image. All exact
+    owned-source scans had zero blocking findings. Initial PHP candidates each had 259 blocking package/advisory
+    matches; Python candidates each had 65. Retained retrieval reverified 9 development signatures, 72
+    denial observations and 220 unique source bindings.
+  campaign_ids: []
+  criterion_ids:
+  - G01.04
+  observed_at: '2026-10-05T05:08:12.423614+00:00'
+  observer: GitHub Actions; connector retrieval and independent source/hash examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Image admission failed. Counts describe scanner observations, not exploitability. Ephemeral
+    development keys and retained small-file evidence do not establish operated trust; complete image
+    layers are not retained. Superseded for the corrected build observations by EV-P01-022, without erasing
+    the original failure.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-022
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/8f68a9a32bc617eeef2d60cd1f6067de5153afcf/verification/p01/artifact-trust/run-37265822363/retrieval.json
+  sha256: 91e0be9a8d56d24e7b2710e5554327f59325ddf89b43c4e10d77bd39bd4a2bdf
+  source_revision: 41bbcaec3be5ec0f2abdd534bab2041e46a74e90
+  artifact_revisions:
+    retained_artifact_commit: 8f68a9a32bc617eeef2d60cd1f6067de5153afcf
+    workflow_run_id: 37265822363
+    workflow_conclusion: failure
+    implementation_record: docs/implementation/p01-artifact-admission.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned development Cosign/Trivy tools, isolated
+    synthetic controls, no native endpoints or operated promotion.
+  scope: Nine corrected builds/probes passed and installed the exact fixed libpcre2 and tzdata packages;
+    PHP builds also removed unused kernel headers. Nine owned-source scans had zero blocking findings.
+    Nine real-image control campaigns passed, including 81 denials and unchanged-byte quarantine transfers,
+    but all candidates remained HELD. Each PHP image retains 80 blocking matches/36 distinct advisories;
+    each Python image retains 63/23, with no scanner-provided fixed versions for remaining matches. Retrieval
+    reverified 9 signatures, 198 raw build-log hashes and 225 unique source bindings. The original log
+    bytes were restored through verified base64 Git blobs.
+  campaign_ids: []
+  criterion_ids:
+  - G01.04
+  observed_at: '2026-10-05T05:08:12.774864+00:00'
+  observer: GitHub Actions; connector retrieval and independent source/hash examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Mandatory candidate admission failed and promotion remains denied. Quarantine transfer
+    is not deployment eligibility. Complete OCI layers are not retained; receiving trust is an ephemeral
+    development fixture. No risk waiver, operated registry transfer, native effect, operating acceptance
+    or G01 decision.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-023
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/d12cb8ceec2066f3c45c9ff36f7abe9291d2abef/verification/p01/policy-controls/run-37269433140/retrieval.json
+  sha256: d441d524feb65e79cb0eb7ba1335c5274c452d5d878b2ac47e4b31af54154a03
+  source_revision: 48a998c8b4517f5d27933973d9d4b04677b48e49
+  artifact_revisions:
+    retained_artifact_commit: d12cb8ceec2066f3c45c9ff36f7abe9291d2abef
+    workflow_run_id: 37269433140
+    workflow_conclusion: success
+    implementation_record: docs/implementation/p01-artifact-admission.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned development Cosign/Trivy tools, isolated
+    synthetic controls, no native endpoints or operated promotion.
+  scope: 'All 59 hosted control tests passed: previous review/source/exclusion/redaction suites, 14 actual
+    Cosign cases, 10 operating-input cases and 6 complete candidate-set cases. Repository-wide secret
+    detection passed with zero findings across 9,766 exact tracked files and a separate positive detector
+    control. Independently verified 7 test-log hashes, both downloaded archive digests and every source
+    SHA-256 against the immutable Git tree. Retained the original redacted scan report ZIP. Unknown operating
+    inputs remain HELD and never authorize promotion.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.04
+  observed_at: '2026-10-05T05:52:20.320334+00:00'
+  observer: GitHub Actions; connector retrieval and independent source/hash examination
+  reviewer: Codex — engineering evidence examination only; accountable G01 and operating reviews remain
+    pending
+  limitations: Operating and review identities in tests are synthetic. A consistent candidate evidence
+    set is not a deployable signed release. Secret scanning is heuristic and does not inspect Git history.
+    This record does not activate repository protection, establish actual operating inputs or supply G01
+    acceptance.
   valid_until: null
   invalidated_at: null
 blockers:
@@ -4114,9 +4293,10 @@ blockers:
   unblock_condition: Supply the concrete runtime, registry/signer, trust, operating or records input before
     the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward
     checkpoints; do not request baseline approval again.
-  next_action: "Implement P01 from the approved DC01\u2013DC10 baseline. Resolve required integration\
-    \ inputs during P01.02/P01.04/P01.05/P01.06, retain application targets before P08 and records/service\
-    \ acceptance at P10/P11, and record actual staffing dates only when supplied."
+  next_action: Complete the exact OP01–OP07 receiving inputs in release/operating-inputs.json with actual
+    identities and immutable evidence. Run operating_inputs.py --require-complete, then integrate and
+    qualify the affected trust/runtime/operations path. Preserve the accepted G00 decision and later P08/P10/P11
+    receiving checkpoints.
   state: OPEN
   resolution_evidence_ids: []
 - id: BL-P00-002
@@ -4162,9 +4342,30 @@ blockers:
   unblock_condition: Use an authorized administration capability to enforce the reviewed branch/check
     policy; supply and verify actual review-role accounts, exact-revision approval requirements and scoped
     bypass identities. Execute missing/failed/stale check and insufficient-role denial cases.
-  next_action: Bind the observed stable checks, including Foundation contracts, to the approved reporting
-    application and enforce current required reviews. Prepare and review the complete CODEOWNERS/rules
-    configuration once actual account mappings and an administration path are available. Keep trusted
-    signing/promotion blocked until the separately carried registry/signer/trust inputs are supplied.
+  next_action: Supply verified numeric reviewer-role IDs/logins and an authorized settings path. Install
+    the trusted default-branch trigger and independently reported exact-PR decision; generate actual CODEOWNERS,
+    require all five observed checks plus the verified admission reporter, and retain real direct-push/missing/stale/insufficient-review
+    denials. The implemented evaluator and prepared candidate body do not activate these controls.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P01-002
+  scope_ids:
+  - P01
+  - P01.04
+  - R02
+  - R31
+  - R35
+  - G01
+  owner_role: Platform image maintainers and security reviewers; actual assignments remain OP02/OP04 inputs
+  description: 'All nine real foundation image candidates fail security admission after available fixed-package
+    remediation. Remaining blocking matches have no fixed versions in the retained scanner observations:
+    80 matches per PHP image and 63 per Python image. No ignore file or risk waiver is applied.'
+  unblock_condition: Deliver pinned remediated or replacement image inputs and rerun affected build, dependency,
+    contract/runtime and security campaigns; alternatively record a separately authorized exact-artifact
+    risk disposition through an implemented reviewed policy. Never convert unavailable fixes into an automatic
+    exception.
+  next_action: Use release/p01-candidate-set.json and EV-P01-022 to triage actual package/advisory identities,
+    assess updated/minimal runtime candidates, and retain fresh full-artifact evidence. Then integrate
+    the actual OP02 signer/registry/trust path and repeat source/target denial and immutable-copy checks.
   state: OPEN
   resolution_evidence_ids: []

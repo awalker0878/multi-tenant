@@ -11,13 +11,48 @@ The resumed foundation increment is implemented and measured. Retain the existin
 - **Console state and recovery:** EV-P01-016 records 149 Compose checks; EV-P01-018 records 166 Kubernetes checks. Encrypted sessions and tenant-scoped cache/locks survive database and application restart, including a replacement Pod. Invalid-key and failed-template recovery preserve the original state. Seven observed outages generate seven actual HTTPS receipts and matching acknowledgements at the synthetic receiver. See [shared state](docs/implementation/p01-console-shared-state.md) and [the operations runbook](docs/operations/runbooks/foundation-operations.md).
 - **Earlier recovery evidence remains scoped:** EV-P01-013 retains 79 Permit Desk checks and two complete fresh-destination application/configuration restores. EV-P01-014 retains 40 stateful-dependency checks and 73 probe assertions, including one selected retained object restored to a fresh store with identical bytes and preserved retention. These remain distinct from product messaging and whole-store/operating qualification.
 
-**Active package: P01.04 artifact trust and repository admission.** The [artifact/admission increment](docs/implementation/p01-artifact-admission.md) adds base/head consumer impact, trusted-base review/exception predicates and a source-bound OCI/SBOM/provenance/signature verifier. Local review fixtures and actual Cosign denial tests pass; hosted real-image scans and transfer observations are next. Role mappings deliberately remain UNCONFIGURED and development keys confer no operated trust.
+**Resumed P01.04 implementation and evidence are committed.** EV-P01-019–023
+now register the actual review-policy, target-base probe, first and corrected
+real-image scans, expanded control suite and repository secret scan. The
+[artifact record](docs/implementation/p01-artifact-admission.md) and complete
+[candidate manifest](release/p01-candidate-set.json) bind all nine components.
+The [retention correction](docs/implementation/p01-evidence-retention.md) restored
+18 original build logs without changing their recorded hashes; normal CI checks
+retained byte integrity. Hosted run 37269433140 passed 59 control tests and scanned
+all 9,766 tracked files with zero secret findings.
 
-**Next execution:** Use the [code-control implementation record](docs/implementation/p01-code-control.md) and [policy](docs/engineering/code-control.md). Implement the remaining secret/dependency/image checks, SBOM/provenance and release-manifest production, then bind signing and verified promotion to the actual selected registry/signer/trust inputs. Finish consumer-impact, exception/exclusion and trusted-base enforcement. Keep ordinary development builds explicitly unpromoted until the exact unsigned/altered-artifact denial cases pass.
+**The mandatory image admission check is FAILED.** After available fixes, all
+nine images remain HELD: 80 blocking package/advisory matches per PHP image and
+63 per Python image, with no fixed versions reported for those remaining matches.
+The nine real-image campaigns passed their denial controls and unchanged-byte
+quarantine transfers. Those successes do not admit a candidate. BL-P01-002 records
+the remediation/requalification action; no waiver or scanner exclusion is applied.
 
-The active branch still reports `protected: false` and repository rulesets `[]`. BL-P01-001 records the missing settings-mutation capability and actual reviewer-account mapping; supply the authorized administration path and identities before claiming required-check, CODEOWNERS or distinct-role enforcement. The observed stable checks are `Architecture registry and documentation`, `Foundation checks`, `Foundation images` and `Foundation contracts`. Successful checks alone do not enforce admission.
+**Next concrete actions:**
 
-Before G01, review the complete [P01 cards](docs/implementation/phases/p01.md) against the [gate procedure](docs/qualification/gate-reviews/g01.md). Retain any remaining observability/operating scope, actual alert receiver and response ownership, approved secrets/trust integration, broader recovery inventory and independent review. The measured receiver is synthetic; no human acknowledgement or operational acceptance is inferred. **P01 remains active and G01 remains unreviewed.** No native effect, accepted RTO/RPO or signed promotion has been claimed.
+1. Resolve the exact retained image findings through pinned image remediation or
+   a separately authorized, implemented risk-disposition policy; rerun affected
+   image/runtime/security checks. Review the selected replacement against existing
+   dependency and recovery evidence before reusing it.
+2. Supply actual reviewer accounts and the administration/reporting path for
+   BL-P01-001. The latest observation still shows `protected: false` and no rulesets.
+   Activate the trusted default-branch hook, independently reported exact-PR
+   decision, CODEOWNERS and required checks. The policy and prepared protection
+   body are implemented candidates; the real enforcement is not installed.
+3. Complete [OP01–OP07](release/operating-inputs.json) with actual runtime, registry,
+   signer, trust/custody, reviewer, alert-response, recovery and support inputs.
+   `python3 scripts/p01/admission/operating_inputs.py --require-complete` currently
+   exits 1 with all seven records held. Ordinary schema validation passing does
+   not satisfy that readiness check. Use those inputs for the affected operated
+   integrations and remaining observability/operational review.
+4. Examine [the criterion-by-criterion G01 assessment](docs/qualification/gate-reviews/g01-engineering-assessment-2026-10-05.md)
+   and complete the receiving reviews. Preserve the measured synthetic scope,
+   alert receiver limitation and remaining signal/resource/operating obligations.
+
+**P01 work remains IN_PROGRESS, its verification roll-up is FAILED, and G01 is
+NOT_REVIEWED.** No native effect, accepted RTO/RPO, operated trust, signed product
+promotion or approval is inferred. The G00 approval remains accepted; do not ask
+for it again or restart completed campaigns merely because this handoff resumed.
 
 ## Carried inputs and checkpoint ownership
 

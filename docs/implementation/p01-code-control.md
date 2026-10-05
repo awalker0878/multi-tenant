@@ -53,7 +53,13 @@ The architecture tests exercise the repository's stated structural/Python-AST/PH
 
 The [artifact/admission increment](p01-artifact-admission.md) now unions base/head ownership and implemented consumer edges, including removed edges. Unknown ownership selects broadly and denies admission. Trusted-base review and bounded exception predicates have executable negative fixtures. Published contract versions remain immutable under the [HTTP contract checks](p01-http-contracts.md). This implemented foundation graph does not infer unseen future public-contract, network, shared-package or native-effect dependencies; semantic changes still require affected-owner review.
 
-The check implementation executes from the checked-out change. No trusted-base or separately governed enforcement workflow has yet been demonstrated. A change to the selector, analyzer or workflow therefore requires independent policy review; running the changed workflow cannot prove that its own weakening was authorized. There is no implemented account/role review-policy evaluator, latest-reviewed-revision validation, CODEOWNERS enforcement or signed artifact admission in this increment.
+Build checks execute from the checked-out change. The later trusted-base evaluator
+implements account/role predicates, current-review and tested-merge binding,
+exceptions and exclusion denials. EV-P01-020 records an actual target-base probe
+that held an unconfigured role policy without executing candidate marker code.
+EV-P01-023 records the expanded 59-test control suite. These results do not install
+the default-branch hook, provide its independent reporting identity or activate
+CODEOWNERS/protection. Changes to the policy still need independent review.
 
 ## Observed repository settings
 
@@ -74,11 +80,11 @@ No `.github/CODEOWNERS` file or validated reviewer-account mapping has been impl
 Complete these P01.04 actions through an available repository administration path, with accountable role mapping and recorded verification:
 
 1. Establish the intended integration/release branch rules and verify supported behavior for this user-owned repository. Require pull requests, current checks, resolved blocking findings and review of the latest change; block branch deletion, force pushes and ordinary direct updates. Record the effective configuration and any explicitly authorized bypass identities and scope.
-2. Bind the stable `Architecture registry and documentation`, `Foundation checks` and `Foundation images` results to the approved reporting application where supported. Demonstrate that a missing, failed, stale, cancelled or incorrectly skipped required result blocks admission. Verify actual check names from hosted check runs rather than relying only on workflow labels.
+2. Bind the five observed stable checks, including `Foundation contracts` and `Foundation policy controls`, to the approved reporting application. Add the independently reported admission context only after its actual identity and current-PR binding are verified. Demonstrate missing, failed, stale, cancelled and incorrectly skipped result denials under effective repository protection.
 3. Map context, consumer, architecture, security and platform roles to actual authorized GitHub accounts. Implement CODEOWNERS for product roots, contracts, registries, migrations, dependency locks, workflows, policy code and CODEOWNERS itself. Verify account access and last-match precedence using representative changed paths.
-4. Enforce the distinct-role review requirements in the policy. Listing multiple owners alone does not require every listed owner to approve. Select a mechanism supported by this repository, or retain explicit manual admission until an exact-revision review-policy check is implemented and proven. Record the actual reviewing identities and separation from the author where required.
+4. Activate the implemented distinct-role evaluator with actual authorized accounts. Listing multiple CODEOWNERS alone does not require every role to approve. Record reviewing identities and separation from the author, then exercise insufficient/current-role denials in the real repository.
 5. Protect admission controls from self-modification: execute the trusted enforcement definition from an approved base or separately governed workflow, test proposed rule/exclusion changes with negative fixtures and require independent policy review before adoption. Keep untrusted source and artifacts outside privileged signing/promotion jobs.
-6. Complete base/head dependency and contract-consumer impact analysis, exclusion/exception controls, secret/dependency/image checking, SBOMs, signed immutable artifacts and release-manifest verification. Demonstrate rejection of unsigned, altered or mismatched artifacts before claiming G01.04 promotion control.
+6. Resolve the real-image security holds and integrate the selected operated registry/signer/trust path. Base/head impact, bounded exceptions, scans, SBOMs, development signatures, complete candidate-set generation and unsigned/altered artifact denials now have measured evidence. They do not authorize an operated promotion or waive unresolved image findings.
 
 Record the effective settings, source revisions and successful denial tests in the G01 evidence register after they are actually observed. Until then, P01.04 remains in progress and this record makes no enforced-merge, protected-branch, trusted-release or complete source-analysis claim.
 
@@ -91,5 +97,9 @@ returned `[]`. Hosted run `37260680627` confirmed successful check name
 No settings were changed. BL-P01-001 records the unavailable settings-mutation
 capability and missing actual reviewer-account mapping with its owner and unblock
 condition. The carried registry/signer/trust inputs remain under BL-P00-001.
-SBOM/provenance production, scanning, verified promotion and trusted-base policy
-execution are still engineering work; ordinary successful CI is not admission.
+The [resumed settings observation](../../verification/p01/admission/resumed-settings-observation.json)
+at source `48a998c8b4517f5d27933973d9d4b04677b48e49` still reports an unprotected
+branch and empty rulesets. Development SBOM/provenance, scanning, exact-byte
+quarantine transfer and target-base policy execution now have evidence. Operated
+promotion, actual review-account binding and repository activation remain open;
+ordinary successful CI is not admission.
