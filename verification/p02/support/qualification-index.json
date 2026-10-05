@@ -1,0 +1,555 @@
+{
+  "schema_version": 1,
+  "result": "PASS",
+  "source_revision": "ad53968f4f3f4c9c1bc031a17f909be4ff6dabf2",
+  "verified_at": "2026-10-05T23:12:07.423960+00:00",
+  "scope": "Accepted bounded support implementation: owner API, independent decisions, current authority, immutable audit, real PostgreSQL concurrency, TLS broker isolation/delivery and nonempty history restore; existing Console browser regression.",
+  "policy": {
+    "path": "verification/p02/support/policy-decision.json",
+    "sha256": "b2bf003f6a1a10236e33e4b24f2882be39be2ddce52fd0478d526b95533707f9"
+  },
+  "local": {
+    "path": "verification/p02/support/local-20261005/report.json",
+    "sha256": "c5fd045f28aaa7fa1ab81d961b785820e9b08cdcbf9a48f24c0a086b1116924e"
+  },
+  "engines": [
+    {
+      "engine": "chromium",
+      "run_id": 37386462647,
+      "report": {
+        "path": "verification/p02/support/run-37386462647/chromium/report.json",
+        "sha256": "175eedae2a5b22983b9614c14d02634a7835f32989f97bf236b11ac68dd19c2d"
+      },
+      "retrieval": {
+        "path": "verification/p02/support/run-37386462647/chromium/retrieval.json",
+        "sha256": "2a3516752a10bcabe0a9ba0f731a78fdebb14875cce15299544be01f3c213172"
+      },
+      "archive_sha256": "141f648616201a3154fc9869713fafacd25208862fa9bdbf0ae9c284af01c80a",
+      "checks": 116,
+      "source_bindings": 337,
+      "artifact_bindings": 11,
+      "governance_postgres": {
+        "passed": 177,
+        "assertions": 4325
+      },
+      "console_postgres_tls": {
+        "passed": 66,
+        "assertions": 248
+      },
+      "browser_stats": {
+        "startTime": "2026-10-05T23:08:16.312Z",
+        "duration": 43649.334,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "support_history_recovery": {
+        "source": "real support owner actions with synthetic OIDC fixture",
+        "snapshot_sha256": "102b9b9d211a95066faa4da967809d5d7582c11c5ddb5d9e520ab5499328686d",
+        "table_fingerprints": {
+          "actor_delegations": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "approvals": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "bootstrap_administrator": {
+            "rows": 1,
+            "sha256": "bc9062e11d3344d07132742496dea093d8ded9b2dbb38b62837636d01f3f6ce3"
+          },
+          "delegated_grants": {
+            "rows": 1,
+            "sha256": "b3ce40839191221262bd535b2613f9b3ba5fcaa710b69849e794a1d0e16e9e58"
+          },
+          "delegation_audit": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "federated_actors": {
+            "rows": 8,
+            "sha256": "dcf9e5e84523d022ca5743fc1ef0028855f118b418c5c397e4de2bc69f928613"
+          },
+          "federated_sessions": {
+            "rows": 7,
+            "sha256": "2c19938da8087b355cc780c5703a6ba43b7c37428dcef0ee6aad96d6c4032121"
+          },
+          "governance_audit": {
+            "rows": 5,
+            "sha256": "ecc3494feed001c905389300315698c4bc6d732eec392cbba08d9da6e815357f"
+          },
+          "governance_commands": {
+            "rows": 13,
+            "sha256": "c59dc1677d3febc370a3768c40e5dedd9c2b892e1c05ce5c951f8d7544a8f4e4"
+          },
+          "governance_outbox": {
+            "rows": 5,
+            "sha256": "d9522bde7cc7e2c9bfabeb7ca42937328c6e836e9399c4643b7676d0aeca032f"
+          },
+          "identity_admission": {
+            "rows": 1,
+            "sha256": "8d6553ed10b85d59fcf88ec1d649aee3bb3aef68520bea1c91f1bdad3ce356e5"
+          },
+          "identity_audit": {
+            "rows": 12,
+            "sha256": "8961f567b155dfad9f55d88e5c474c7b51797fdab92ab217a1026d9e654853ad"
+          },
+          "identity_outbox": {
+            "rows": 12,
+            "sha256": "ead2a9fdda2a051ca223b3520165352fb639b2b1d9570c20e86a1ab2afb0247f"
+          },
+          "identity_secrets": {
+            "rows": 1,
+            "sha256": "d8f644551027a72c36fa67e3758d8ce88e8e10771667f378d822e039fa2ece69"
+          },
+          "identity_sessions": {
+            "rows": 2,
+            "sha256": "31bd97f1854de08402ace823f2dac0870820d7f242d43cba67044b5bf98cea8a"
+          },
+          "oidc_connections": {
+            "rows": 1,
+            "sha256": "c93ab34cc079b2deb71fd4edfa7a95ec0ba6e047ed3ce6b1c01024e1e5e67ebb"
+          },
+          "oidc_flows": {
+            "rows": 7,
+            "sha256": "cd0d8cb40deebbf950f2702d1098f180f280bc4847a1e4dc4fbd636ff55a157d"
+          },
+          "oidc_installation": {
+            "rows": 1,
+            "sha256": "a97ebeefcad8ef15bbc9a976108fd4f393f6b7f3bc3fa550bf7d84e42e2862e9"
+          },
+          "oidc_verifications": {
+            "rows": 1,
+            "sha256": "4d657f7d0bc87aa3d8c4ff80ffaa6cab996a081dd9d4c58758549197e0347564"
+          },
+          "support_approvals": {
+            "rows": 2,
+            "sha256": "ca6dc99977229f292698c1e48d6587e7065b1d207affcc387fd07ab98c6c72fa"
+          },
+          "support_audit": {
+            "rows": 10,
+            "sha256": "c05051c3819d0e1dc90103eb92bd3064e245395d308e47c920c10dd4dfff06af"
+          },
+          "support_outbox": {
+            "rows": 10,
+            "sha256": "241de6cdef361c0eba068823dd6c11b0a3b0ad2d8b9b06e3396d2feca2a0b0e4"
+          },
+          "support_requests": {
+            "rows": 1,
+            "sha256": "90c963728229c94cc069e4628d69b11a5aac18b46646b6b014ef67392519bb42"
+          },
+          "support_reviews": {
+            "rows": 1,
+            "sha256": "30ec1eb574983bd1edcf20503bc5423a812981fee0de546cd964dd1d0aa0fec3"
+          },
+          "support_security_grants": {
+            "rows": 2,
+            "sha256": "27c4cb8977c070d859a38eebcf66406196eb5e0bca10ee56454d1deca109b88e"
+          },
+          "tenant_memberships": {
+            "rows": 4,
+            "sha256": "86dea6eb576c26a0393b71372efe2911d0101d6b72a004145e3ba539792206bb"
+          },
+          "tenant_quotas": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "tenants": {
+            "rows": 2,
+            "sha256": "f4b77c8966ea76977650d8a5e299725d03604142480ed8b21fd2ad06fcde1454"
+          }
+        },
+        "decision_states": [
+          "revoked"
+        ],
+        "approvals": 2,
+        "admissions": 1,
+        "reviews": 1,
+        "audit_events": 10,
+        "limits": [
+          "No native effect or Console support UI",
+          "Restored authority is not resumed",
+          "Actual audit custodian remains an operating input"
+        ]
+      },
+      "observed_at": "2026-10-05T23:06:51.833584+00:00",
+      "completed_at": "2026-10-05T23:09:10.290163+00:00"
+    },
+    {
+      "engine": "firefox",
+      "run_id": 37386462647,
+      "report": {
+        "path": "verification/p02/support/run-37386462647/firefox/report.json",
+        "sha256": "b427a00182ad22a78f879d68c0e74031de07b9f1fb73e74a4b7e4eddeb0e8780"
+      },
+      "retrieval": {
+        "path": "verification/p02/support/run-37386462647/firefox/retrieval.json",
+        "sha256": "8f4e66c1c521a4889444730f06ef361be17a733eba8909d34474b34314af91dc"
+      },
+      "archive_sha256": "06e5dd9ce2350ae8fd39e84f61f6ff967d0649a5805af574affebd1e259d045e",
+      "checks": 116,
+      "source_bindings": 337,
+      "artifact_bindings": 11,
+      "governance_postgres": {
+        "passed": 177,
+        "assertions": 4325
+      },
+      "console_postgres_tls": {
+        "passed": 66,
+        "assertions": 248
+      },
+      "browser_stats": {
+        "startTime": "2026-10-05T23:07:59.528Z",
+        "duration": 48920.348999999995,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "support_history_recovery": {
+        "source": "real support owner actions with synthetic OIDC fixture",
+        "snapshot_sha256": "67ed1423ea75201fee1335da286b6a7d01ca7383cbb88a27cecf142df7be533c",
+        "table_fingerprints": {
+          "actor_delegations": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "approvals": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "bootstrap_administrator": {
+            "rows": 1,
+            "sha256": "2fac6449dac5c4eb3ad5b1e2962bb636958479882ba06c642197e7c5cfaff219"
+          },
+          "delegated_grants": {
+            "rows": 1,
+            "sha256": "92bfd848da14deebca1fbcea754d79bfa282783f01c5eb76f0b56a93bb2bcea0"
+          },
+          "delegation_audit": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "federated_actors": {
+            "rows": 8,
+            "sha256": "cc21f16ab686262eb3f0aaf6030989bbf3a5854057563f0bde63ffe03ba54c88"
+          },
+          "federated_sessions": {
+            "rows": 7,
+            "sha256": "56b447bf89a1bfc21dd9cfd5ea1a3de9d77eb2dcd95fffa45fccc66519bbd401"
+          },
+          "governance_audit": {
+            "rows": 5,
+            "sha256": "32d28049758dc43448ed10f80f0cf379e932288947566a1468dc0afe3cb730d7"
+          },
+          "governance_commands": {
+            "rows": 13,
+            "sha256": "bf16078d9d3e76c22080b395a688653a48b8d42dff7213c6976e58abb718d9f9"
+          },
+          "governance_outbox": {
+            "rows": 5,
+            "sha256": "dc5ab6cf71af889916c31d5549cdbd924159f2463220e260c88271f5d03ee4d1"
+          },
+          "identity_admission": {
+            "rows": 1,
+            "sha256": "b0aee7cc26300822eceb54075d20bbceea12ed3a5a2244a62ce365762cbf07a8"
+          },
+          "identity_audit": {
+            "rows": 12,
+            "sha256": "bfa777328128f4473746792c6eb17101e1f1a059b08b988f4cc3aedc9591d708"
+          },
+          "identity_outbox": {
+            "rows": 12,
+            "sha256": "c874c1e27a3aee1cfcaee70a5fcf932d8f6b88e245b21a0765e356435d49eb62"
+          },
+          "identity_secrets": {
+            "rows": 1,
+            "sha256": "6940782b2c08a674ebd703bbb9891282d73dc4080a35380576d9b0830046591c"
+          },
+          "identity_sessions": {
+            "rows": 2,
+            "sha256": "3232a770c9bb296735aead640c2fb8658ca5cc92bbdc4478a62a9b8f62a7c0ff"
+          },
+          "oidc_connections": {
+            "rows": 1,
+            "sha256": "589ffa37900c456e9c8253227d67dd8b6008df349d010a5136a6157c92ba3e03"
+          },
+          "oidc_flows": {
+            "rows": 7,
+            "sha256": "567ef57711fcc3489dda5fa76ea422af7dd1164a2543a495392ef1522f39c580"
+          },
+          "oidc_installation": {
+            "rows": 1,
+            "sha256": "a97ebeefcad8ef15bbc9a976108fd4f393f6b7f3bc3fa550bf7d84e42e2862e9"
+          },
+          "oidc_verifications": {
+            "rows": 1,
+            "sha256": "2afca627fc414c0eced1b7675439eb3e512bda6409d333d170a4d17e0645fc46"
+          },
+          "support_approvals": {
+            "rows": 2,
+            "sha256": "fc9a37c0dce633a62fa3ea6acc89abd7a5bc9ea7c3910427d924892217d2afe0"
+          },
+          "support_audit": {
+            "rows": 10,
+            "sha256": "b182241819b86481a2a36f9a545f75c08236aa526568508d08ea26fdc96e3417"
+          },
+          "support_outbox": {
+            "rows": 10,
+            "sha256": "ddc34b4c0a2c20d7cf4bf8fd83bc425b987a77c8fae88f2a05fbb2a0ca563d12"
+          },
+          "support_requests": {
+            "rows": 1,
+            "sha256": "7c09ec64875789217740849280bccfb94f7a984d3469b1af4aed61ada572ee51"
+          },
+          "support_reviews": {
+            "rows": 1,
+            "sha256": "eaf7fd410de6cf211cb9c422c252ac9c88a2382595db891e0b57de91502d61c3"
+          },
+          "support_security_grants": {
+            "rows": 2,
+            "sha256": "8812befa8fa7c4cf74c04c013b37a61be71a925dc5e84590bf4480a33b7a34ac"
+          },
+          "tenant_memberships": {
+            "rows": 4,
+            "sha256": "eb7daa09c55ac2105926d748e2bfba744c94513f72693c37d234ee1c10f6c546"
+          },
+          "tenant_quotas": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "tenants": {
+            "rows": 2,
+            "sha256": "f89e0c33e79b5fb07fb8f3a7b2b07b642b84520d549f21629f76b3519bfd6ef3"
+          }
+        },
+        "decision_states": [
+          "revoked"
+        ],
+        "approvals": 2,
+        "admissions": 1,
+        "reviews": 1,
+        "audit_events": 10,
+        "limits": [
+          "No native effect or Console support UI",
+          "Restored authority is not resumed",
+          "Actual audit custodian remains an operating input"
+        ]
+      },
+      "observed_at": "2026-10-05T23:06:41.447764+00:00",
+      "completed_at": "2026-10-05T23:08:58.359681+00:00"
+    },
+    {
+      "engine": "webkit",
+      "run_id": 37386462647,
+      "report": {
+        "path": "verification/p02/support/run-37386462647/webkit/report.json",
+        "sha256": "f3d7ab017d0b533e0ff3efa8d04440a3175cea961c411699d6f5ebd2722f4722"
+      },
+      "retrieval": {
+        "path": "verification/p02/support/run-37386462647/webkit/retrieval.json",
+        "sha256": "82978c796a0b3cb765713234b05376e0f6e0be27ac6d91173795fe68c1f42089"
+      },
+      "archive_sha256": "6e3c1d1de2b8d7e2eed1217aa685115b5611d60c0a568b6670cb66aa36ddf7a6",
+      "checks": 116,
+      "source_bindings": 337,
+      "artifact_bindings": 11,
+      "governance_postgres": {
+        "passed": 177,
+        "assertions": 4325
+      },
+      "console_postgres_tls": {
+        "passed": 66,
+        "assertions": 248
+      },
+      "browser_stats": {
+        "startTime": "2026-10-05T23:08:41.076Z",
+        "duration": 61727.296,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "support_history_recovery": {
+        "source": "real support owner actions with synthetic OIDC fixture",
+        "snapshot_sha256": "198a8d04ca917a021335a3bdc4c765cc34040ccf1c0d6f039c01d5f3ff26a932",
+        "table_fingerprints": {
+          "actor_delegations": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "approvals": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "bootstrap_administrator": {
+            "rows": 1,
+            "sha256": "92f0d7a8646ed93f48b1c43cac01dd3a24ebba0af2d3eeaf569ca19a65a6001d"
+          },
+          "delegated_grants": {
+            "rows": 1,
+            "sha256": "cc700e43b696c2924fc552e717932ef053aeb1930e6317b77bd8bc38fc7944a4"
+          },
+          "delegation_audit": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "federated_actors": {
+            "rows": 8,
+            "sha256": "45dde7d4d3567f525eb9e74fa364609a87b26aee2b56776cdcf4b0f0f1fa700d"
+          },
+          "federated_sessions": {
+            "rows": 7,
+            "sha256": "ca73a3b28b435da782f353cb02c6702e06984c478657f6b4262250975788afb0"
+          },
+          "governance_audit": {
+            "rows": 5,
+            "sha256": "88715d3f72545fc9f17e9d9d126fe2c718affa13cbb34fb2f44e8cd7abc940d7"
+          },
+          "governance_commands": {
+            "rows": 13,
+            "sha256": "a5699f582c586200faac4082c3abdabba18f7d3ffd5e57efe775a781328b02e9"
+          },
+          "governance_outbox": {
+            "rows": 5,
+            "sha256": "ee4e5a2462f85705eafb7b023332dd12203afd286ee24f94c7688ec8e16e90c4"
+          },
+          "identity_admission": {
+            "rows": 1,
+            "sha256": "63949d13bb3e1cfd6742111c93361af2b8e497ffeddb3abf34e20c745cbcd2c0"
+          },
+          "identity_audit": {
+            "rows": 12,
+            "sha256": "6200bbdc3302092811692359dc7a4672ec176ee96495de9bfc951d8b764872bf"
+          },
+          "identity_outbox": {
+            "rows": 12,
+            "sha256": "81f0084dc36973ea195ed7b428698bdd61d0083c7adbdac5b4902754156d1e38"
+          },
+          "identity_secrets": {
+            "rows": 1,
+            "sha256": "0bbfe6ac2dcfa04a33a03b9e0513cfd2b8ca49cdbeaa1bd56378bc769b912b56"
+          },
+          "identity_sessions": {
+            "rows": 2,
+            "sha256": "c2db2f4fa505b1f86772f5026c145bc6619fe25d7d998ccc5b4d481a981e1e8d"
+          },
+          "oidc_connections": {
+            "rows": 1,
+            "sha256": "f3fd9d38cd822d9d6ced79bd5d31f15c0aadde53a5af4e3a290900567a62902d"
+          },
+          "oidc_flows": {
+            "rows": 7,
+            "sha256": "f79eb91f51b894bd63badf001a2e94a06fdd2f68b1d11a695add5b4b7f50a9d3"
+          },
+          "oidc_installation": {
+            "rows": 1,
+            "sha256": "a97ebeefcad8ef15bbc9a976108fd4f393f6b7f3bc3fa550bf7d84e42e2862e9"
+          },
+          "oidc_verifications": {
+            "rows": 1,
+            "sha256": "022c67d05bc3ba531043d5cac070aecf8c2811d6bdefe06a9407089df9cb683e"
+          },
+          "support_approvals": {
+            "rows": 2,
+            "sha256": "4711875276cc8c2b1c3cba5ec9cdad5d6f393305d904b906a38b19c5aef4007b"
+          },
+          "support_audit": {
+            "rows": 10,
+            "sha256": "59f166748d789271d0a9f1f6250fd617716149c9a49e82254cd21c2481531867"
+          },
+          "support_outbox": {
+            "rows": 10,
+            "sha256": "9046f6a81ff45f1515d66b2e8059b1d6de5d81da711240ac153670aa605fc889"
+          },
+          "support_requests": {
+            "rows": 1,
+            "sha256": "53777feab4044d1ffd7bd6a517fba4e66187fab485a3aae855a578434d9e2b91"
+          },
+          "support_reviews": {
+            "rows": 1,
+            "sha256": "411977d72a2cc6e52169872cba75441c0c687f744094243ae1d155ef3c45ec36"
+          },
+          "support_security_grants": {
+            "rows": 2,
+            "sha256": "f792072c5c6bde2ab6876e3d3b60ad4d5292ca1bac0e6bf934e224e687ecdc04"
+          },
+          "tenant_memberships": {
+            "rows": 4,
+            "sha256": "40fcc0bdb61fc6cb60030e6341b8fc46441a7ec5246f58c81854f5f862d9792c"
+          },
+          "tenant_quotas": {
+            "rows": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "tenants": {
+            "rows": 2,
+            "sha256": "9388ce24660fbab81c27b42e954df96d59cd81b22b79323e43bcd7b2680419cd"
+          }
+        },
+        "decision_states": [
+          "revoked"
+        ],
+        "approvals": 2,
+        "admissions": 1,
+        "reviews": 1,
+        "audit_events": 10,
+        "limits": [
+          "No native effect or Console support UI",
+          "Restored authority is not resumed",
+          "Actual audit custodian remains an operating input"
+        ]
+      },
+      "observed_at": "2026-10-05T23:07:16.895184+00:00",
+      "completed_at": "2026-10-05T23:09:52.755700+00:00"
+    }
+  ],
+  "events": {
+    "run_id": 37386462663,
+    "report": {
+      "path": "verification/p02/support/run-37386462663/events/report.json",
+      "sha256": "5377a490be3d019b7bd2801ae30a01ef32bcc938a5d2dcd5dec6ec937a1dffc3"
+    },
+    "retrieval": {
+      "path": "verification/p02/support/run-37386462663/events/retrieval.json",
+      "sha256": "49bc3a55a467f9711028dc4b5f9c3852d1515104cf7008629f92bffb4ef45c1c"
+    },
+    "archive_sha256": "29c6c34a209a0c75162a972435f74df4aae11510ce297b5086a7cef19bd5fa92",
+    "checks": 6,
+    "source_bindings": 198,
+    "artifact_bindings": 10,
+    "tests": {
+      "passed": 74,
+      "assertions": 1358
+    }
+  },
+  "correction": {
+    "failed_source": "cac287efce9ab8e72db0b2795feb8217a56aa714",
+    "failed_run_id": 37386102114,
+    "corrected_source": "ad53968f4f3f4c9c1bc031a17f909be4ff6dabf2",
+    "original_reports": [
+      {
+        "path": "verification/p02/support/run-37386102114/chromium/report.json",
+        "sha256": "0ef713ebcc564c354c3803fe54d04e5dd423cc8e1e432b10dc4d5d9b26fbbcd1"
+      },
+      {
+        "path": "verification/p02/support/run-37386102114/firefox/report.json",
+        "sha256": "1d408f5c11b74f43bd8b8c7961cd0b7881fe1a3b27a2a073ce3a0800b4f1ce60"
+      },
+      {
+        "path": "verification/p02/support/run-37386102114/webkit/report.json",
+        "sha256": "c62a61c0dfec640869807c46289322c4ff9587f74859ee4713a4bb6da2ca80ab"
+      }
+    ],
+    "reason": "The lock observer cached its initial PostgreSQL activity snapshot. Explicit snapshot refresh and a specific blocking-backend check correct the observation; mandatory denial/invalidation assertions remain."
+  },
+  "limitations": [
+    "Synthetic OIDC/plan identities and bounded support diagnostics; no impersonation or native writes.",
+    "Support owner API is qualified with application HTTP feature responses and synthetic OIDC transport. Existing browser journeys separately exercise the deployed HTTPS OIDC adapter; no support Console screen is claimed.",
+    "The process concurrency fixture supplies synthetic trust observations to isolate real PostgreSQL locking; production issuer topology and operating key custody remain separate inputs.",
+    "No managed browser support floor, manual assistive-technology acceptance, production audit sink/custodian/retention, recovery-resumption approval, RTO/RPO or independent G01/G02 receiving decision.",
+    "Other workflow metadata is retained separately; aggregate P02 campaign PASS is not a claim that every repository workflow or receiving gate passed."
+  ]
+}

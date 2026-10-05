@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "campaign_result": "PASS",
+  "source_revision": "ad53968f4f3f4c9c1bc031a17f909be4ff6dabf2",
+  "run_id": 37386462647,
+  "artifact_id": 11380126310,
+  "archive_sha256": "6e3c1d1de2b8d7e2eed1217aa685115b5611d60c0a568b6670cb66aa36ddf7a6",
+  "retrieved_at": "2026-10-05T23:10:16.815573+00:00",
+  "matched_source_bindings": 337,
+  "verified_artifact_bindings": 11,
+  "retained_file_sha256": {
+    "notification-broker-ready.log": "334459dc7c11f121513f698791bde3abf223e2f550d91d7b5a46e69111b2cbf6",
+    "report.json": "f3d7ab017d0b533e0ff3efa8d04440a3175cea961c411699d6f5ebd2722f4722",
+    "postgres-features.log": "29bd66225413675a7578adcd5ba962f3fee24d3712b6e3e6425d44731e4e962c",
+    "noninteractive-denial.log": "350a8d53e709600769f9a42f98d128cb95e74590e18ff67a444bd8ce7a7ce5ce",
+    "support-history-producer.log": "7361505f2280122df1f3e46a331973d7df76b2a6e0149cb141173478d5372a65",
+    "approval-history-producer.log": "34f3de12b65e07406bf0ba0f1c871933a23aa01e074ec374c73245741142f2d1",
+    "governance-http.log": "7773c0f809c6ed67f12ce1d47fc026ce72dd2e20ef4371e83ada09995be4cf3a",
+    "console-notification-features.log": "3580137e8cafb2b2ab1fa7847116cfc9ba8a0de692e071a093236acaa3ee33d2",
+    "browser.log": "360c15de12fc7e42c04db09157daf1b73f2dcbc0463dd9ed0e3db4aa85e3ac0c",
+    "notification-broker-start.log": "0942e82e0abfa5cb03e56af4790f362dd0178cbb082a2af0dd5b63bdb990c430",
+    "campaign.zip": "6e3c1d1de2b8d7e2eed1217aa685115b5611d60c0a568b6670cb66aa36ddf7a6",
+    "console-http.log": "0bef0f83459b560bb5cbc68d0b5afbbba8b327e32488b467fd38004b88c58ecf",
+    "browser.json": "876fce9153d2a69c6549cdd094de5bc758cb814cd4c45eec0e71cfba3a740e34"
+  },
+  "scope": "Original identity campaign archive retained byte-for-byte; campaign result is independent of archive verification. Synthetic test actors/receivers, no operating or receiving acceptance."
+}

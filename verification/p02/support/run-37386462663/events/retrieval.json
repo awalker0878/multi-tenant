@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "campaign_result": "PASS",
+  "source_revision": "ad53968f4f3f4c9c1bc031a17f909be4ff6dabf2",
+  "run_id": 37386462663,
+  "artifact_id": 11379895906,
+  "archive_sha256": "29c6c34a209a0c75162a972435f74df4aae11510ce297b5086a7cef19bd5fa92",
+  "retrieved_at": "2026-10-05T23:10:18.252294+00:00",
+  "matched_source_bindings": 198,
+  "verified_artifact_bindings": 10,
+  "retained_file_sha256": {
+    "broker-ready.stdout.log": "a73474fceb18119f0bcc848da574db749df753a33e0bd529600cc0b449d5964c",
+    "report.json": "5377a490be3d019b7bd2801ae30a01ef32bcc938a5d2dcd5dec6ec937a1dffc3",
+    "broker-start.stdout.log": "ef45e2c5cdd701233fec647ffbbec390abb6f49171b10680b90ce7d261ac3f58",
+    "untrusted-certificate.stderr.log": "f92e9b38f976a899d9d5552ed9ae6f45101a8f9e4b7cc23252c3817aaec71917",
+    "postgres-and-broker-features.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "postgres-and-broker-features.stdout.log": "55b8c736d82eaef645a3662d050739c88b0e3f154ce6152ab2a619df9430d6d6",
+    "broker-ready.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "broker-certificate.stderr.log": "db807dd2c6bd72c2a83ff4f1d76f40af59f571026f301d250303e2116cffec75",
+    "broker-start.stderr.log": "d9c4c7b5e94b3d0268aff64cea938b9aec86d8be6ba6956cb96db2edf1a2f80b",
+    "campaign.zip": "29c6c34a209a0c75162a972435f74df4aae11510ce297b5086a7cef19bd5fa92",
+    "broker-certificate.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untrusted-certificate.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "scope": "Original events campaign archive retained byte-for-byte; campaign result is independent of archive verification. Synthetic test actors/receivers, no operating or receiving acceptance."
+}

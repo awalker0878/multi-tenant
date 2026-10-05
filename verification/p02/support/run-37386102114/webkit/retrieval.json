@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "campaign_result": "FAIL",
+  "source_revision": "cac287efce9ab8e72db0b2795feb8217a56aa714",
+  "run_id": 37386102114,
+  "artifact_id": 11379535471,
+  "archive_sha256": "a6befd5512f1d7adfc44224416e07d2af366f9644771e35c48eef2abbe87e516",
+  "retrieved_at": "2026-10-05T23:07:29.927394+00:00",
+  "matched_source_bindings": 337,
+  "verified_artifact_bindings": 1,
+  "retained_file_sha256": {
+    "report.json": "c62a61c0dfec640869807c46289322c4ff9587f74859ee4713a4bb6da2ca80ab",
+    "postgres-features.log": "837481d31faa6825e8fd38f177042dbbcf195dfd64bbe644965339373b30ab0c",
+    "campaign.zip": "a6befd5512f1d7adfc44224416e07d2af366f9644771e35c48eef2abbe87e516"
+  },
+  "scope": "Original identity campaign archive retained byte-for-byte; campaign result is independent of archive verification. Synthetic test actors/receivers, no operating or receiving acceptance."
+}

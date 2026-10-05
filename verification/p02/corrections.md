@@ -132,3 +132,29 @@ distinct `console-frontend-*` filenames. All twelve commands pass; the separate
 [verification receipt](recovery/local-final-20261005/verification.json) checks
 all 24 streams and 294 exact-commit source bindings. EV-P02-017 registers only
 this corrected evidence. Hosted campaign artifacts did not have this collision.
+
+## Support concurrency observer — 2026-10-05
+
+Source `cac287efce9ab8e72db0b2795feb8217a56aa714`, identity run
+`37386102114`, passed 176 PostgreSQL cases but failed the new concurrent-revocation
+observer in all three engine jobs before browser execution. The observer retained
+its own transaction's initial `pg_stat_activity` snapshot and never observed the
+later waiting process. The original reports, logs and archives are retained under
+`verification/p02/support/run-37386102114/`; these runs are not passing evidence.
+
+[PostgreSQL 18 documents the per-transaction activity snapshot and explicit refresh](https://www.postgresql.org/docs/18/monitoring-stats.html).
+Correction `ad53968f4f3f4c9c1bc031a17f909be4ff6dabf2` calls
+`pg_stat_clear_snapshot()` for each observation while retaining the real row lock,
+and requires the waiter to be blocked specifically by this test's backend PID.
+The wait assertion, denied-result assertion, zero-admission check and terminal
+invalidation check remain mandatory. No application or contract behavior changed.
+Corrected-source run `37386462647` passes all three engines: 116 checks, 177
+Governance PostgreSQL cases (4,325 assertions), 66 Console PostgreSQL/TLS cases
+(248 assertions), and both compiled browser journeys per engine. The corrected
+TLS event run `37386462663` passes 74 cases (1,358 assertions). Original and
+corrected archives are indexed by `verification/p02/support/qualification-index.json`.
+
+The separate real TLS event campaign at the original source passed, including
+publisher-crash replay and Console/support-audit queue separation. Its original
+archive is retained under `verification/p02/support/run-37386101997/events/` and
+remains separate from the failed identity campaign.
