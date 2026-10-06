@@ -87,8 +87,9 @@ dynamic SQL. Apply all ordered migrations before the corresponding application.
 5. Rotate every configured Console/service workload credential. Record the **previous**
    SHA-256 fingerprints in `previous_workloads`; record `null` only for an identity that
    was not configured. Current fingerprints are measured by the command. Unchanged
-   configured credentials fail. Disabling a workload is allowed; retaining its old
-   credential is not. Account for old processes and peer copies before reopening.
+   configured credentials fail. Each current workload needs a distinct credential,
+   and no previous credential may be reassigned to any workload. Disabling a workload
+   is allowed. Account for old processes and peer copies before reopening.
 
 Build a private canonical observations file with exactly these fields:
 

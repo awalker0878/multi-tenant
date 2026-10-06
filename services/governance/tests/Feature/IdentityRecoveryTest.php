@@ -146,6 +146,21 @@ it('rejects shared workload credentials before preparing recovery authority', fu
         ->and(DB::table('app.identity_recovery_receipts')->count())->toBe(0);
 });
 
+it('rejects reassignment of any previous credential to another workload', function (string $direction): void {
+    $observations = $this->observations;
+    if ($direction === 'console-to-service') {
+        $path = $this->recoveryDirectory.'/catalogue-credential';
+        file_put_contents($path, $this->previousWorkload);
+        chmod($path, 0600);
+        config(['identity.service_credentials.catalogue' => $path]);
+    } else {
+        $observations['previous_workloads']['catalogue'] = hash('sha256', $this->workload);
+    }
+    $before = app(RecoveryState::class)->snapshot();
+    expect(fn () => app(PrepareIdentityRecovery::class)->handle($observations))->toThrow(RecoveryDenied::class)
+        ->and(app(RecoveryState::class)->snapshot())->toBe($before);
+})->with(['console-to-service', 'service-to-console']);
+
 it('rolls back every revocation if immutable recovery receipt retention fails', function (): void {
     $plan = app(PrepareIdentityRecovery::class)->handle($this->observations);
     $before = app(RecoveryState::class)->snapshot();

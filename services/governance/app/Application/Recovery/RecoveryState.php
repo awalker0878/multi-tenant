@@ -90,6 +90,12 @@ final class RecoveryState
                 throw new RecoveryDenied;
             }
         }
+        foreach ($workloads as $current) {
+            // Moving an old credential to another workload is not rotation.
+            if ($current !== null && in_array($current, $previous, true)) {
+                throw new RecoveryDenied;
+            }
+        }
         $selected = $observations['memberships'] ?? null;
         if (! is_array($selected) || ! array_is_list($selected) || count($selected) > 100) {
             throw new RecoveryDenied;
