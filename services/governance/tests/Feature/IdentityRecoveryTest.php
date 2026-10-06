@@ -140,6 +140,12 @@ it('denies unrotated workload credentials and unreviewed orphaned or revoked mem
         ->and(DB::table('app.identity_recovery_receipts')->count())->toBe(0);
 })->with(['credential', 'evidence', 'orphan', 'revoked', 'bootstrap']);
 
+it('rejects shared workload credentials before preparing recovery authority', function (): void {
+    config(['identity.service_credentials.catalogue' => $this->credentialFile]);
+    expect(fn () => app(PrepareIdentityRecovery::class)->handle($this->observations))->toThrow(RecoveryDenied::class)
+        ->and(DB::table('app.identity_recovery_receipts')->count())->toBe(0);
+});
+
 it('rolls back every revocation if immutable recovery receipt retention fails', function (): void {
     $plan = app(PrepareIdentityRecovery::class)->handle($this->observations);
     $before = app(RecoveryState::class)->snapshot();

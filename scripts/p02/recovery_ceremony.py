@@ -188,7 +188,11 @@ def qualify_ceremony(root, private, run, sql, check, recovery, stop, start, envi
         callback = {key: values[0] for key, values in urllib.parse.parse_qs(urllib.parse.urlsplit(response.headers['Location']).query).items()}
     session = request('/identity/oidc/callback', callback | {'browser_binding': browser_binding})['session_token']
     private_values.append(session)
-    wire('/identity/session', 'CurrentIdentity', token=session, workload=current_credential)
+    # The frozen local-bootstrap CurrentIdentity schema does not describe a
+    # federated actor. Require this complete, exact reconciled identity instead.
+    recovered_identity = {'const': {'identity': {'subject': member['actor_id'], 'kind': 'federated',
+        'password_change_required': False, 'permissions': ['identity.setup', 'tenants.create', 'identity.logout']}}}
+    wire('/identity/session', recovered_identity, token=session, workload=current_credential)
     check('fresh-recovery-session-is-the-only-live-session', sql('SELECT count(*) FROM app.federated_sessions WHERE revoked_at IS NULL;', 'governance').strip() == '1')
     stop()
     run(['python', str(tool), 'hold', '--directory', str(store), '--case-reference', 'SYNTHETIC-RECONTAIN'], label='recovery-hold-after-resumption')

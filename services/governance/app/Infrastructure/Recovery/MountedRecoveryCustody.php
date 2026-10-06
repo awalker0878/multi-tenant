@@ -34,6 +34,10 @@ final class MountedRecoveryCustody implements RecoveryCustody
             }
             $workloads[$name] = $secret === null ? null : hash('sha256', $secret);
         }
+        $configured = array_values(array_filter($workloads, static fn (?string $value): bool => $value !== null));
+        if (count($configured) !== count(array_unique($configured))) {
+            throw new RecoveryDenied;
+        }
 
         return new RecoveryContext($descriptor['installation_id'], hash('sha256', $descriptor['installation_id'].':'.$descriptor['epoch']),
             hash('sha256', (string) $wire), RecoveryJson::digest($trust), $workloads, $this->code());

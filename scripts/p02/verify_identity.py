@@ -290,7 +290,7 @@ def main() -> int:
                                 raise RuntimeError(name + ' did not start: ' + redact(log[-2000:]))
                             time.sleep(0.1)
             start_applications()
-            def wire(path: str, schema: str, expected: int = 200, body: dict | None = None, token: str = '', workload: str | None = None) -> dict:
+            def wire(path: str, schema: str | dict, expected: int = 200, body: dict | None = None, token: str = '', workload: str | None = None) -> dict:
                 request = urllib.request.Request('http://127.0.0.1:8032' + path,
                     data=json.dumps(body).encode() if body is not None else None,
                     headers={'Authorization': 'Bearer ' + (workload if workload is not None else credential), 'X-Console-Session': token, 'Content-Type': 'application/json', 'Accept': 'application/json'})
@@ -301,7 +301,8 @@ def main() -> int:
                 with response:
                     value = json.loads(response.read())
                     check('wire-' + path + '-' + str(expected), response.status == expected)
-                    OAS31Validator({'$ref': '#/components/schemas/' + schema, 'components': api['components']}).validate(value)
+                    validator = {'$ref': '#/components/schemas/' + schema, 'components': api['components']} if isinstance(schema, str) else schema
+                    OAS31Validator(validator).validate(value)
                     check('wire-' + path + '-no-store', 'no-store' in response.headers.get('Cache-Control', ''))
                     return value
             initial_session = wire('/identity/local-sessions', 'Session', body={'username': 'admin', 'password': temporary})['session_token']
