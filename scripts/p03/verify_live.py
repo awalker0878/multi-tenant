@@ -158,7 +158,7 @@ def main():
             fixture_file = private/'browser.json'
             run(['php', 'scripts/p03/seed_governance.php', str(fixture_file)], env=envs['governance'], label='seed-principals')
             fixture = json.loads(fixture_file.read_text())
-            private_values += [fixture['admin_token'], fixture['author_token']]
+            private_values += [fixture['admin_token'], fixture['author_token'], fixture['foreign_token']]
             run(['php', 'scripts/p03/seed_console.php', str(fixture_file)], env=envs['console'], label='seed-browser-sessions')
             fixture = json.loads(fixture_file.read_text())
             private_values += [fixture['admin_cookie']['value'], fixture['author_cookie']['value']]
@@ -275,7 +275,7 @@ def main():
             catalogue('publishRevision', {'intent': invalid}, app, etag=first['etag'], expected=422)
             catalogue('createSecurityDomain', {'name': 'Forbidden ZIP', 'owner_id': fixture['actor_id'], 'shareable': True, 'zone': 'ZIP'}, token=fixture['admin_token'], expected=422)
             # A real second tenant delegation cannot select another tenant's application.
-            catalogue('getApplication', params=app, selected_tenant=fixture['foreign_tenant'], token=fixture['admin_token'], expected=404)
+            catalogue('getApplication', params=app, selected_tenant=fixture['foreign_tenant'], token=fixture['foreign_token'], expected=404)
             check('wire-negative-invariants-and-tenant-boundary', True)
             with ThreadPoolExecutor(max_workers=2) as pool:
                 candidates = [copy.deepcopy(intent), copy.deepcopy(intent)]
@@ -309,7 +309,7 @@ def main():
             page = catalogue('listApplications')
             page2 = catalogue('listApplications', cursor=page['next_cursor'])
             check('large-skew-pages-bounded-disjoint', len(page['applications']) == len(page2['applications']) == 50 and not ({a['id'] for a in page['applications']} & {a['id'] for a in page2['applications']}))
-            catalogue('listApplications', selected_tenant=fixture['foreign_tenant'], token=fixture['admin_token'], cursor=page['next_cursor'], expected=422)
+            catalogue('listApplications', selected_tenant=fixture['foreign_tenant'], token=fixture['foreign_token'], cursor=page['next_cursor'], expected=422)
             plan = json.loads(sql(f"EXPLAIN (ANALYZE,BUFFERS,FORMAT JSON) SELECT id,name,version FROM app.catalogue_applications WHERE tenant_id='{tenant}' AND id>'{page['applications'][-1]['id']}' ORDER BY id LIMIT 51;", 'catalogue'))
             (out/'application-page-plan.json').write_text(json.dumps(plan, indent=2)+'\n')
             check('actual-page-query-bounded', plan[0]['Plan']['Actual Rows'] == 51 and plan[0]['Execution Time'] < 1000)

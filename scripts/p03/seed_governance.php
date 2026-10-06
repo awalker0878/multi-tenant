@@ -46,10 +46,11 @@ $admin = $call('POST', '/identity/oidc/activation', ['verification_token' => $pr
 $tenant = $call('POST', '/v1/tenants', ['name' => 'P03 Permit Desk', 'administrator_subject' => 'immutable-admin-subject'], $admin, 201)['id'];
 $foreign = $call('POST', '/v1/tenants', ['name' => 'P03 Separate Tenant', 'administrator_subject' => 'immutable-admin-subject'], $admin, 201)['id'];
 $member = $call('POST', '/v1/tenants/'.$tenant.'/memberships', ['revision' => 0, 'subject' => 'p03-author', 'role' => 'author', 'state' => 'active', 'site_id' => null, 'environment' => null, 'expires_at' => null], $admin);
+$call('POST', '/v1/tenants/'.$foreign.'/memberships', ['revision' => 0, 'subject' => 'p03-outsider', 'role' => 'reader', 'state' => 'active', 'site_id' => null, 'environment' => null, 'expires_at' => null], $admin);
 $author = $login('login', '', 'p03-author')['session_token'];
-$actor = $call('GET', '/identity/session', [], $author);
+$outsider = $login('login', '', 'p03-outsider')['session_token'];
 $result = ['tenant' => $tenant, 'foreign_tenant' => $foreign, 'admin_token' => $admin, 'author_token' => $author,
-    'actor_id' => $member['actor_id'], 'membership' => $member];
+    'actor_id' => $member['actor_id'], 'membership' => $member, 'foreign_token' => $outsider];
 file_put_contents($argv[1], json_encode($result, JSON_THROW_ON_ERROR));
 chmod($argv[1], 0600);
 echo "Synthetic principals created using Governance owner actions.\n";
