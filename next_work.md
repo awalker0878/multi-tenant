@@ -1,4 +1,8 @@
-# Next work — P02 receiving and operating obligations
+# Next work — P03 Catalogue and workspace
+
+The user authorizes continued P03 implementation. See [the P03 record](docs/implementation/p03-catalogue.md). Current task: qualify the Catalogue persistence increment, complete the generated contract clients and Console workspace, and execute real authority, concurrency, broker and browser campaigns. Preserve the P01/P02 receiving obligations below. P03/G03 remains open until its actual engineering and receiving criteria are satisfied.
+
+## P02 receiving and operating obligations
 
 Active branch: `greenfield/enterprise-microservices-plan`. The requesting user
 continues to authorize P02 development. Support/break-glass policy and bounded

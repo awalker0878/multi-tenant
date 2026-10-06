@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\ApprovalController;
+use App\Http\Controllers\CatalogueOwnerController;
 use App\Http\Controllers\DelegationController;
 use App\Http\Controllers\DependencyHealthController;
 use App\Http\Controllers\DirectoryController;
@@ -82,3 +83,5 @@ Route::middleware(AuthenticateConsole::class)->group(function (): void {
         }
     });
 });
+
+Route::post('/v1/tenants/{tenant}/catalogue-owner-checks', CatalogueOwnerController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);

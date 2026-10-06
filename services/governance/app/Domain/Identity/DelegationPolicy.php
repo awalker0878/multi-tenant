@@ -10,7 +10,7 @@ final class DelegationPolicy
     // authority require their own exact-plan/exception contracts.
     /** @var array<string, list<string>> */
     public const ACTIONS = [
-        'catalogue' => ['application.read', 'application.write'],
+        'catalogue' => ['application.read', 'application.write', 'reference.read', 'reference.write'],
         'planning' => ['plan.read', 'plan.create'],
         'assurance' => ['evidence.read'],
     ];

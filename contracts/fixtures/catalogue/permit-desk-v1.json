@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "deployment_id": "00000000-0000-4000-8000-000000000003",
+  "environment": {
+    "id": "00000000-0000-4000-8000-000000000010",
+    "version": 1
+  },
+  "service_owner_id": "00000000-0000-4000-8000-000000000002",
+  "acceptance_criteria": [
+    "Submit and retrieve a permit with its attachment"
+  ],
+  "workloads": [
+    {
+      "id": "00000000-0000-4000-8000-000000000100",
+      "name": "Web",
+      "role": "web",
+      "wsd": {
+        "id": "00000000-0000-4000-8000-000000000011",
+        "version": 1
+      },
+      "security_domain": {
+        "id": "00000000-0000-4000-8000-000000000021",
+        "version": 1
+      },
+      "compute": {
+        "vcpus": 2,
+        "memory_mib": 4096,
+        "architecture": "x86_64"
+      },
+      "guest": {
+        "os": "linux",
+        "image": "approved-image-v1",
+        "firmware": "uefi",
+        "secure_boot": true,
+        "hardening_profile": "linux-baseline-v1"
+      },
+      "disks": [
+        {
+          "id": "00000000-0000-4000-8000-000000000200",
+          "order": 0,
+          "size_gib": 40,
+          "storage_class": "standard",
+          "boot": true,
+          "dataset_id": null,
+          "encryption": "required"
+        }
+      ],
+      "nics": [
+        {
+          "id": "00000000-0000-4000-8000-000000000400",
+          "order": 0,
+          "security_domain_id": "00000000-0000-4000-8000-000000000021",
+          "address_families": [
+            "ipv4"
+          ],
+          "address_intent": "reserved",
+          "network_class": "private"
+        }
+      ],
+      "requirements": [
+        {
+          "key": "security.unsupported_control",
+          "strength": "required",
+          "value": true,
+          "reason": "Must be assessed explicitly"
+        }
+      ],
+      "failure_domain": {
+        "group": "permit",
+        "mode": "anti_affinity",
+        "strength": "required"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000101",
+      "name": "Database",
+      "role": "database",
+      "wsd": {
+        "id": "00000000-0000-4000-8000-000000000012",
+        "version": 1
+      },
+      "security_domain": {
+        "id": "00000000-0000-4000-8000-000000000022",
+        "version": 1
+      },
+      "compute": {
+        "vcpus": 2,
+        "memory_mib": 4096,
+        "architecture": "x86_64"
+      },
+      "guest": {
+        "os": "linux",
+        "image": "approved-image-v1",
+        "firmware": "uefi",
+        "secure_boot": true,
+        "hardening_profile": "linux-baseline-v1"
+      },
+      "disks": [
+        {
+          "id": "00000000-0000-4000-8000-000000000201",
+          "order": 0,
+          "size_gib": 40,
+          "storage_class": "standard",
+          "boot": true,
+          "dataset_id": "00000000-0000-4000-8000-000000000300",
+          "encryption": "required"
+        }
+      ],
+      "nics": [
+        {
+          "id": "00000000-0000-4000-8000-000000000401",
+          "order": 0,
+          "security_domain_id": "00000000-0000-4000-8000-000000000022",
+          "address_families": [
+            "ipv4"
+          ],
+          "address_intent": "reserved",
+          "network_class": "private"
+        }
+      ],
+      "requirements": [
+        {
+          "key": "security.unsupported_control",
+          "strength": "required",
+          "value": true,
+          "reason": "Must be assessed explicitly"
+        }
+      ],
+      "failure_domain": {
+        "group": "permit",
+        "mode": "anti_affinity",
+        "strength": "required"
+      }
+    }
+  ],
+  "datasets": [
+    {
+      "id": "00000000-0000-4000-8000-000000000300",
+      "name": "Permit data",
+      "owner_id": "00000000-0000-4000-8000-000000000002",
+      "consistency_group": "permit",
+      "consistency": "application",
+      "recovery": {
+        "rpo_seconds": 0,
+        "rto_seconds": 3600,
+        "method": "application_rebuild_restore",
+        "strength": "required"
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "00000000-0000-4000-8000-000000000100",
+      "to": "00000000-0000-4000-8000-000000000101",
+      "kind": "startup",
+      "readiness": "Database accepts queries",
+      "protocol": "none",
+      "port": null,
+      "controlled_interface": false,
+      "dataset_id": "00000000-0000-4000-8000-000000000300",
+      "strength": "required"
+    },
+    {
+      "from": "00000000-0000-4000-8000-000000000100",
+      "to": "00000000-0000-4000-8000-000000000101",
+      "kind": "communication",
+      "readiness": "Database accepts application connection",
+      "protocol": "tcp",
+      "port": 5432,
+      "controlled_interface": true,
+      "dataset_id": "00000000-0000-4000-8000-000000000300",
+      "strength": "required"
+    }
+  ],
+  "services": [
+    {
+      "name": "backup",
+      "owner_id": "00000000-0000-4000-8000-000000000002",
+      "workload_id": "00000000-0000-4000-8000-000000000101",
+      "requirements": [
+        {
+          "key": "service.backup",
+          "strength": "required",
+          "value": "commvault",
+          "reason": "Protect the application data"
+        }
+      ]
+    }
+  ],
+  "requirements": []
+}

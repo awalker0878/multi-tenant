@@ -7,6 +7,7 @@ namespace App\Http\Middleware;
 use App\Application\Authorization\Contracts\ConsoleCaller;
 use App\Application\Authorization\Contracts\DelegatedAuthority;
 use App\Domain\Authorization\AccessDenied;
+use App\Domain\IntentRevisions\IntentFailure;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,9 +16,13 @@ final class RequireDelegatedActor
 {
     public function __construct(private readonly DelegatedAuthority $authority, private readonly ConsoleCaller $caller) {}
 
-    /** @param Closure(Request): Response $next */
+    /**
+     * @param Closure(Request): Response $next */
     public function handle(Request $request, Closure $next, string $action): Response
     {
+        if (strlen($request->getContent()) > 270336) {
+            throw new IntentFailure('payload_too_large', 413);
+        }
         $workload = $request->headers->all('authorization');
         if (count($workload) !== 1 || ! is_string($workload[0])
             || ! preg_match('/\ABearer ([A-Za-z0-9_-]{32,4096})\z/', $workload[0], $matches) || ! $this->caller->accepts($matches[1])) {
@@ -32,6 +37,9 @@ final class RequireDelegatedActor
         $scope = [];
         foreach (['site_id' => 'site', 'environment' => 'environment', 'resource_id' => 'application'] as $field => $parameter) {
             $value = $request->route($parameter);
+            if ($field === 'environment' && $value === null) {
+                $value = $request->isMethod('GET') ? $request->query('environment') : $request->input('intent.environment.id');
+            }
             if ($value !== null && ! is_string($value)) {
                 throw new AccessDenied;
             }

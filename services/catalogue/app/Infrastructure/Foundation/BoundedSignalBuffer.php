@@ -13,7 +13,8 @@ final class BoundedSignalBuffer implements SignalBuffer
 
     public function __construct(private readonly string $directory = '/tmp/product-telemetry') {}
 
-    /** @return resource */
+    /**
+     * @return resource */
     private function open()
     {
         if (! is_dir($this->directory) && ! @mkdir($this->directory, 0700)) {

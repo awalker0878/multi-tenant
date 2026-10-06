@@ -1,6 +1,6 @@
 # Catalogue service
 
-Status: P01 independently packaged Laravel diagnostic foundation is implemented and measured; the catalogue aggregates, schemas and complete product slice below remain planned. Runtime: Laravel/PHP; source: `services/catalogue/`. Owner: product engineering, with product/architecture review of ADR-013.
+Status: P03 catalogue aggregates and revision APIs are implemented and undergoing qualification; see [the implementation record](../implementation/p03-catalogue.md). Runtime: Laravel/PHP; source: `services/catalogue/`. Owner: product engineering, with product/architecture review of ADR-013.
 
 The [package replay](../implementation/p01-laravel-foundations.md) and [image measurements](../implementation/p01-laravel-images.md) bind actual source, dependency and execution results. Diagnostic liveness does not establish application readiness; readiness remains HTTP 503 until real dependencies and their probes are implemented.
 
@@ -42,7 +42,7 @@ The revision command explicitly compares its parent application's ETag; this is 
 
 ## Authorization and bootstrap
 
-Governance supplies the authenticated tenant, membership and resource/action authorization decision. Catalogue enforces `catalogue.application.read/write` and separate reference-definition administration scopes, and checks environment/WSD restrictions. Author identity is server-derived; a submitted `owner_id` is validated as a permitted service-owner reference, not accepted as caller identity.
+Governance supplies the authenticated tenant, membership and resource/action authorization decision. Catalogue enforces `application.read/write` and `reference.read/write` and separate reference-definition administration scopes, and checks environment/WSD restrictions. Author identity is server-derived; a submitted `owner_id` is validated as a permitted service-owner reference, not accepted as caller identity.
 
 P02 governance bootstrap precedes integrated P03 acceptance. Catalogue has no default tenant, internal superuser or fallback grant when governance is unreachable. An unavailable authority produces a retryable hold/error for new writes; permitted read behavior must be expressly selected by ADR-009. Synthetic governance doubles are isolated tests only.
 

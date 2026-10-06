@@ -6,6 +6,7 @@ namespace App\Application\Foundation\Contracts;
 
 interface SignalBuffer
 {
-    /** @param array<string, mixed> $record */
+    /**
+     * @param array<string, mixed> $record */
     public function append(array $record): string;
 }

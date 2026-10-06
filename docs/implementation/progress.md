@@ -13,7 +13,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: PASSED | 11 / 2 |
 | P01 | Delivery and runtime foundation | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 32 / 4 |
 | P02 | Identity, tenancy and governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 25 / 3 |
-| P03 | Application catalogue and workspace | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
+| P03 | Application catalogue and workspace | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
 | P04 | Site commissioning and inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 0 / 0 |
 | P05 | Capabilities and immutable plans | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G05: NOT_REVIEWED | 0 / 0 |
 | P06 | Durable execution in simulation | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G06: NOT_REVIEWED | 0 / 0 |
@@ -46,11 +46,11 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P02.03 | Authorization | Governance/security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 22 / 2 |
 | P02.04 | Approval lifecycle | Governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 13 / 2 |
 | P02.05 | Console foundation | Console | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 20 / 2 |
-| P03.01 | Core aggregates | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P03.02 | Intent semantics | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P03.03 | Revision behavior | Catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P03.04 | Product workflows | Console/catalogue | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P03.05 | Domain verification | Quality | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P03.01 | Core aggregates | Catalogue | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P03.02 | Intent semantics | Catalogue | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P03.03 | Revision behavior | Catalogue | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P03.04 | Product workflows | Console/catalogue | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P03.05 | Domain verification | Quality | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P04.01 | Site enrollment | Inventory/SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P04.02 | Collectors | Inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P04.03 | Observation store | Inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |

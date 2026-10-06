@@ -14,7 +14,8 @@ final class RequestTelemetry
 {
     public function __construct(private readonly SignalBuffer $buffer) {}
 
-    /** @param Closure(Request): Response $next */
+    /**
+     * @param Closure(Request): Response $next */
     public function handle(Request $request, Closure $next): Response
     {
         $incoming = $request->headers->all('traceparent');

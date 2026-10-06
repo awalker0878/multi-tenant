@@ -29,7 +29,7 @@ final class GovernanceDelegatedAuthority implements DelegatedAuthority
             throw new AccessDenied(503);
         }
         if (! preg_match('/\A[0-9a-f]{64}\z/', $token) || ! $this->uuid($tenant)
-            || ! in_array($action, ['application.read', 'application.write'], true)) {
+            || ! in_array($action, ['application.read', 'application.write', 'reference.read', 'reference.write'], true)) {
             throw new AccessDenied;
         }
         try {
@@ -51,7 +51,7 @@ final class GovernanceDelegatedAuthority implements DelegatedAuthority
                 throw new AccessDenied(503);
             }
 
-            return new ActorContext($body['actor_id'], $tenant, $action, $scope, $body['delegation_id']);
+            return new ActorContext($body['actor_id'], $tenant, $action, $scope, $body['delegation_id'], $token);
         } catch (AccessDenied $error) {
             throw $error;
         } catch (Throwable) {
@@ -65,7 +65,8 @@ final class GovernanceDelegatedAuthority implements DelegatedAuthority
         return is_string($value) && preg_match('/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/', $value) === 1;
     }
 
-    /** @param array{site_id: ?string, environment: ?string, resource_id: ?string} $expected */
+    /**
+     * @param array{site_id: ?string, environment: ?string, resource_id: ?string} $expected */
     private function sameScope(mixed $given, array $expected): bool
     {
         if (! is_array($given)) {
