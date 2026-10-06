@@ -192,3 +192,32 @@ def test_boolean_is_not_numeric_requirement_value() -> None:
     assert not assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)[
         "operationally_eligible"
     ]
+
+
+@pytest.mark.parametrize(
+    "fault,reason",
+    [
+        ("unknown", "requirement_evidence_unassessed"),
+        ("unsupported", "requirement_unsupported"),
+        ("stale", "requirement_observation_expired"),
+        ("mismatch", "constraint_not_satisfied"),
+        ("dependency", "dependency_requires_confirmation"),
+    ],
+)
+def test_lab_qualification_waiver_cannot_mask_observation_safety(fault: str, reason: str) -> None:
+    i, d, p, policy, _ = inputs()
+    observation = d["capabilities"]["placement.tenant_isolation"]
+    if fault in {"unknown", "unsupported"}:
+        observation["status"] = fault
+    elif fault == "stale":
+        observation["expires_at"] = NOW
+    elif fault == "mismatch":
+        observation["values"] = [False]
+    else:
+        observation["dependencies"] = ["independent-isolation-confirmation"]
+    result = assess(i, d, p, policy, {}, "application.provision", "saved_plan", NOW)
+    assert not result["operationally_eligible"]
+    assert any(
+        f["requirement"] == "placement.tenant_isolation" and f["reason"] == reason
+        for f in result["findings"]
+    )

@@ -202,21 +202,29 @@ def assess(
         observation, support = observed.get(key), supported.get(key)
         if observation is None:
             status, reason = "unknown", "mandatory_evidence_missing"
+        # Observation safety is evaluated independently of qualification. A lab
+        # waiver must never mask stale/unsupported facts or unresolved dependencies.
+        elif observation.get("status") == "unsupported":
+            status, reason = "blocked", "requirement_unsupported"
+        elif observation.get("status") != "observed":
+            status, reason = "unknown", "requirement_evidence_unassessed"
+        elif observation.get("expires_at", 0) <= now:
+            status, reason = "unknown", "requirement_observation_expired"
+        elif digest(value) not in [digest(v) for v in observation.get("values", [])]:
+            status, reason = "blocked", "constraint_not_satisfied"
+        elif observation.get("dependencies"):
+            status, reason = "conditional", "dependency_requires_confirmation"
         elif support is None:
             status, reason = "unknown", "requirement_not_qualified"
-        elif observation.get("status") == "unsupported" or support.get("status") == "unsupported":
+        elif support.get("status") == "unsupported":
             status, reason = "blocked", "requirement_unsupported"
-        elif observation.get("status") != "observed" or support.get("status") != "supported":
+        elif support.get("status") != "supported":
             status, reason = "unknown", "requirement_evidence_unassessed"
         elif support.get("expires_at", 0) <= now:
             status, reason = "unknown", "requirement_qualification_expired"
-        elif observation.get("expires_at", 0) <= now:
-            status, reason = "unknown", "requirement_observation_expired"
-        elif digest(value) not in [digest(v) for v in observation.get("values", [])] or digest(
-            value
-        ) not in [digest(v) for v in support.get("values", [])]:
+        elif digest(value) not in [digest(v) for v in support.get("values", [])]:
             status, reason = "blocked", "constraint_not_satisfied"
-        elif observation.get("dependencies") or support.get("dependencies"):
+        elif support.get("dependencies"):
             status, reason = "conditional", "dependency_requires_confirmation"
         else:
             status, reason = "eligible", "requirement_observed_and_qualified"
