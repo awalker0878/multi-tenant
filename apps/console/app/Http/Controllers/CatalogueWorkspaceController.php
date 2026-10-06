@@ -47,7 +47,7 @@ final class CatalogueWorkspaceController
         foreach (['environments' => 'listEnvironments', 'wsds' => 'listWsds', 'domains' => 'listSecurityDomains'] as $key => $op) {
             try {
                 $refs[$key] = $catalogue->call($token, $tenant, $op);
-            } catch (IdentityFailure $e) {
+            } catch (CatalogueFailure|IdentityFailure $e) {
                 if ($e->status !== 403) {
                     throw $e;
                 }$refs[$key] = ['references' => [], 'next_cursor' => null];

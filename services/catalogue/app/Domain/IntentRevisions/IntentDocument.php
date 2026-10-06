@@ -81,7 +81,7 @@ final class IntentDocument
     // Use text for identifiers or exact integers beyond the interoperable range.
     private static function portableIntegers(mixed $value, string $field): void
     {
-        if (is_int($value) && ($value > 9007199254740991 || $value < -9007199254740991)) {
+        if ((is_int($value) || is_float($value)) && ($value > 9007199254740991 || $value < -9007199254740991)) {
             throw new IntentFailure('integer_outside_interoperable_range', 422, $field);
         }
         if (is_array($value)) {

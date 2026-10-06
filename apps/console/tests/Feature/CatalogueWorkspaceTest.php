@@ -81,3 +81,39 @@ it('the generated client binds workload and delegated actor and validates actual
         unlink($catalogue);
     }
 });
+
+it('handles delegation denials as unavailable access without calling Catalogue', function (int $status): void {
+    $governance = tempnam(sys_get_temp_dir(), 'p03-gov-');
+    $catalogue = tempnam(sys_get_temp_dir(), 'p03-cat-');
+    file_put_contents($governance, str_repeat('b', 64));
+    file_put_contents($catalogue, str_repeat('c', 64));
+    config(['identity.governance_url' => 'https://governance.example.test', 'identity.credential_file' => $governance,
+        'catalogue.url' => 'https://catalogue.example.test', 'catalogue.credential_file' => $catalogue]);
+    Http::preventStrayRequests();
+    Http::fake(['governance.example.test/*' => Http::response(['error' => 'unavailable'], $status)]);
+    $this->app->instance(CatalogueGateway::class, app(CatalogueClient::class));
+    try {
+        $response = $this->get('/tenants/'.$this->tenant.'/applications');
+        if ($status === 503) {
+            $response->assertStatus(503)->assertSee('The application catalogue is unavailable.');
+        } else {
+            $response->assertRedirect('/account')->assertSessionHas('tenant_notice');
+        }
+        Http::assertSentCount(1);
+        Http::assertNotSent(fn ($r) => str_contains($r->url(), 'catalogue.example.test'));
+    } finally {
+        unlink($governance);
+        unlink($catalogue);
+    }
+})->with([401, 403, 404, 503]);
+
+it('allows a scoped author to use pinned references when tenant-wide reference browsing is denied', function (): void {
+    foreach (['listEnvironments', 'listWsds', 'listSecurityDomains'] as $operation) {
+        $this->gateway->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->tenant, $operation)
+            ->andThrow(new CatalogueFailure(403, 'access_unavailable'));
+    }
+    $this->gateway->shouldReceive('permitted')->once()->andReturn(true);
+    $this->get('/tenants/'.$this->tenant.'/applications/create')->assertOk()->assertInertia(fn (Assert $p) => $p
+        ->component('catalogue/Editor')->where('canWrite', true)->has('references.environments.references', 0)
+        ->has('references.wsds.references', 0)->has('references.domains.references', 0));
+});

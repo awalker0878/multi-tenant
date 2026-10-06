@@ -60,7 +60,14 @@ final class CatalogueClient implements CatalogueGateway
         if (str_starts_with($spec['action'], 'reference.')) {
             $environment = null;
         }
-        $delegation = $this->governance->send('POST', '/v1/tenants/'.$tenant.'/actor-delegations', $session, ['audience' => 'catalogue', 'action' => $spec['action'], 'scope' => ['site_id' => null, 'environment' => $environment, 'resource_id' => $parameters['application'] ?? null]]);
+        try {
+            $delegation = $this->governance->send('POST', '/v1/tenants/'.$tenant.'/actor-delegations', $session, ['audience' => 'catalogue', 'action' => $spec['action'], 'scope' => ['site_id' => null, 'environment' => $environment, 'resource_id' => $parameters['application'] ?? null]]);
+        } catch (IdentityFailure $e) {
+            if (in_array($e->status, [401, 403, 404], true)) {
+                throw new CatalogueFailure(403, 'access_unavailable');
+            }
+            throw new CatalogueFailure($e->status);
+        }
         $token = $delegation['delegation_token'] ?? null;
         if (! is_string($token) || ! preg_match('/\A[0-9a-f]{64}\z/', $token) || ($delegation['audience'] ?? null) !== 'catalogue' || ($delegation['authority_use'] ?? null) !== 'request_bound') {
             throw new CatalogueFailure(503);

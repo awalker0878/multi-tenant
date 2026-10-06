@@ -72,3 +72,9 @@ it('preserves typed requirement values at the interoperable integer boundary', f
     IntentDocument::check($intent);
     expect(json_decode(CanonicalJson::encode($intent), true)['workloads'][0]['requirements'][0]['value'])->toBe(9007199254740991);
 });
+
+it('rejects an overflowing JSON integer before it can become rounded immutable intent', function (): void {
+    $intent = catalogueIntent();
+    $intent['workloads'][0]['requirements'][0]['value'] = json_decode('9223372036854775808', true, 512, JSON_THROW_ON_ERROR);
+    expect(fn () => IntentDocument::check($intent))->toThrow(IntentFailure::class, 'integer_outside_interoperable_range');
+});
