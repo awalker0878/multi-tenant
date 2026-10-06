@@ -40,7 +40,9 @@ local administrator or revive a session. Retain the restored state and reconcile
 retirement, current revocations, membership/grant revisions and approvals against
 independent current records before any separately authorized rebind.
 
-There is deliberately no automatic rebind, reset-password or break-glass endpoint.
+There is no automatic rebind, reset-password or break-glass endpoint. The supported
+owner-only, dual-signed recovery and resumption ceremony is described in the
+[independent custody runbook](../operations/runbooks/identity-recovery-custody.md).
 An existing pre-009 installation is held until its owner provides a reconciled
 migration binding; migration never silently adopts its authority. The descriptor
 must be mounted read-only for application processes and controlled outside the
@@ -83,3 +85,27 @@ terminal-history restore. Each final engine verifies 302 exact-source bindings a
 ten artifact hashes. [The final campaign index](../../verification/p02/approval-history-three-engine-index.json)
 links original reports and archives. The [completion review packet](p02-completion-review.md)
 states the actual custody and resumption inputs still needed.
+
+## Independent custody and controlled resumption increment
+
+The 2026-10-05 user instruction authorizes implementation of the custody and
+resumption procedure. Migration 011 removes runtime rebind authority and adds
+immutable owner-only recovery receipts/releases. The custodian tool holds and
+rotates the external generation before restore, verifies separate encrypted-key
+signatures from the recovery owner and security reviewer, and records a durable
+hash-linked release journal outside application storage.
+
+The owner-only CLI binds exact code, all table contents, current provider/key
+material, rotated workload identities and current owner records. It revokes
+restored sessions/delegations/grants/approvals/support access, retains only explicitly
+reviewed existing memberships and suspends unreconciled tenants. A separate
+dual-signed release and matching database confirmation are required before external
+admission opens. Local bootstrap stays retired. No normal startup, API request,
+one approver, stale signature or restored receipt can authorize a newer epoch.
+
+[The executable procedure](../operations/runbooks/identity-recovery-custody.md)
+defines enrollment, protected inputs, commands, crash containment, resumption and
+limits. PostgreSQL roles, full restore, current online trust, signer separation and
+fresh sign-in are qualification targets for this increment. Actual independent
+operators, host/mount/backup isolation and approved key-service recovery must still
+be supplied through OP03/OP05/OP06; no synthetic identity is an operating assignment.

@@ -20,7 +20,28 @@ binding cannot admit requests without its separate release record, even when an
 external descriptor is accidentally made active early. Normal startup and HTTP
 routes cannot rebind a restored installation.
 
-The remaining implementation supplies the independent signer/custodian ceremony,
-exact-state reconciliation, controlled resumption, operating procedure and hosted
-qualification. Actual OP03/OP05/OP06 custody and G02 receiving remain open until
-their specific operating evidence and decisions exist.
+## Custodian and owner ceremony
+
+The [custody tool](../../scripts/recovery/custody.py) enrolls verified external public
+keys, holds/rotates admission, validates two independent RSA signatures and appends
+an fsynced hash-linked journal before releasing a held generation. Private keys stay
+encrypted on the separate signing workstations. The custodian has no application
+or database credential; runtime has no custody write/signing or owner credential.
+
+The owner-only `identity:recovery` command prepares a 15-minute exact-state plan,
+applies its two signatures while held, prepares a distinct post-reconciliation
+release plan and confirms that second two-person authorization. Code, all owned
+table contents, external generation, signer policy, provider configuration/current
+keys and rotated workload credentials are rechecked. Old sessions/delegations,
+grants/approvals/support authority are revoked. Existing memberships survive only
+when expressly selected against current owner records; other tenants stay suspended.
+No local bootstrap reset, automatic rebind, API recovery endpoint or native permit
+is introduced. Current OIDC settings remain Console-managed application data.
+
+The [operator procedure](../operations/runbooks/identity-recovery-custody.md) defines
+all inputs, commands, review boundaries, failure containment and key/restore limits.
+Local feature and custody tests cover the mechanism. The hosted campaign additionally
+executes real PostgreSQL roles, encrypted-key terminal signing, the separate custodian
+process, full-schema recovery and fresh HTTPS OIDC sign-in. Record results only after
+that exact-source campaign passes. Actual OP03/OP05/OP06 operators, key-service and
+host/mount/backup separation remain required operating evidence; G02 is not inferred.

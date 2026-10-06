@@ -4,6 +4,11 @@ Procedure ID: OPS-RECOVERY. Owners: SRE incident lead and lifecycle; contributor
 
 Use this procedure after lost control-plane state, uncertain native effects, site isolation, restored authority, or an incident that makes current writer/data ownership uncertain. [Restore control plane](restore-control-plane.md) and [dependency recovery](dependency-recovery.md) perform restoration; this procedure governs reconciliation and safe resumption.
 
+For Governance identity admission, execute the
+[independent custody and resumption ceremony](identity-recovery-custody.md). It
+requires two independently enrolled signers and a separate release of the held
+installation. The broader native/data reconciliation obligations below still apply.
+
 ## Required recovery record
 
 Record incident/recovery ID, procedure/release/configuration revisions, last trusted state, chosen recovery points/watermarks, affected jobs/resources/tenants, backup and key references, current writer locations, incident lead and authoritative owners. Preserve available journals, workflow histories, native request IDs, external reservation receipts, approval/revocation records and independent audit before changing state.

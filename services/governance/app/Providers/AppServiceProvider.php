@@ -18,6 +18,8 @@ use App\Application\Messaging\Actions\PublishIdentityEvent;
 use App\Application\Messaging\Actions\PublishSupportEvent;
 use App\Application\Messaging\Contracts\ConfirmedPublisher;
 use App\Application\Messaging\Contracts\EventEncoder;
+use App\Application\Recovery\Contracts\RecoveryCustody;
+use App\Application\Recovery\Contracts\RecoveryDatabase;
 use App\Application\Support\Contracts\SupportTrust;
 use App\Infrastructure\Approvals\PlanningPlanSource;
 use App\Infrastructure\Foundation\BoundedSignalBuffer;
@@ -33,6 +35,8 @@ use App\Infrastructure\Messaging\GovernanceEventEncoder;
 use App\Infrastructure\Messaging\IdentityEventEncoder;
 use App\Infrastructure\Messaging\RabbitPublisher;
 use App\Infrastructure\Messaging\SupportEventEncoder;
+use App\Infrastructure\Recovery\MountedRecoveryCustody;
+use App\Infrastructure\Recovery\PostgresRecoveryDatabase;
 use App\Infrastructure\Support\OnlineSupportTrust;
 use Illuminate\Support\ServiceProvider;
 
@@ -40,6 +44,8 @@ final class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(RecoveryCustody::class, MountedRecoveryCustody::class);
+        $this->app->bind(RecoveryDatabase::class, PostgresRecoveryDatabase::class);
         $this->app->bind(ConfirmedPublisher::class, RabbitPublisher::class);
         $this->app->bind(SupportTrust::class, OnlineSupportTrust::class);
         $this->app->bind(EventEncoder::class, GovernanceEventEncoder::class);
