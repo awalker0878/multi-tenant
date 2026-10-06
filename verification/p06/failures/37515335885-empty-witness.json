@@ -1,0 +1,36 @@
+{
+  "run_id": 37515335885,
+  "source_revision": "be35575658c3523d9c2edaffc95b4fb970d41494",
+  "error": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+  "observations": [
+    {
+      "name": "console-app-exec",
+      "exit_code": 0,
+      "stdout": {
+        "path": "305-console-app-exec.stdout.log",
+        "bytes": 233,
+        "sha256": "9d8422c7309aebaa2cff915ed67b05011b6b34981eb22881f016f668acd76870"
+      },
+      "stderr": {
+        "path": "305-console-app-exec.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "console-app-exec",
+      "exit_code": 0,
+      "stdout": {
+        "path": "307-console-app-exec.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "307-console-app-exec.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "interpretation": "Second-process PHP/kubectl witness returned no stdout with exit 0; campaign correctly failed JSON interpretation. No cause or pass is inferred from the empty result."
+}

@@ -1,0 +1,31 @@
+{
+  "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+  "result": "PASS",
+  "observed_at": "2026-10-06T19:17:26.471378+00:00",
+  "method": "Reconstruct only exact git-tracked component files in empty isolated roots. Run uv sync --locked under Python 3.12.14 and the pinned setuptools closure. Both post-installation generated metadata hashes match all three live reports. No product source exception.",
+  "uv": "uv 0.12.19 (x86_64-unknown-linux-gnu)",
+  "bindings": [
+    {
+      "path": "services/inventory/src/product_inventory.egg-info/SOURCES.txt",
+      "source": "5e4a47d8190e40e9b83953e6b83a80b8779586480661b90ac67ef1f12ec10f85",
+      "observed": "0678ba79c585728c27d8034067de0c5bbc7ec3fd80af8c5ff9046813615cc351",
+      "retained_file": "build-metadata/inventory-SOURCES.txt"
+    },
+    {
+      "path": "services/lifecycle/src/product_lifecycle.egg-info/PKG-INFO",
+      "source": "6815eb2408b71ad527185683fa7b554cc609e284b406397e4b838d8b07b49d89",
+      "observed": "6decead3711fdb21d805141450d65216de3d9897566db1c29401c2e651296cec",
+      "retained_file": "build-metadata/lifecycle-PKG-INFO"
+    }
+  ],
+  "logs": [
+    {
+      "path": "inventory.log",
+      "sha256": "12d73ebe28448621a459c27edfa58cbad1ecd9f2a2260a8cc150f91334720f22"
+    },
+    {
+      "path": "lifecycle.log",
+      "sha256": "316108509180088cced829f121a68569c21adb2e0ab9ce8cecd88a1ad8d1d3f6"
+    }
+  ]
+}

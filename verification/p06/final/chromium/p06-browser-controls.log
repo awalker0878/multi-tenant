@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › tests/browser-p06/jobs.spec.ts:5:1 › held unknown effects, stale authority, lost control receipt, cancellation and revoked history (15.4s)
+
+  1 passed (16.0s)
