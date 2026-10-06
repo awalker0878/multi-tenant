@@ -120,11 +120,22 @@ class ExecutionApp:
                         ):
                             raise Rejected("invalid_revision", 422)
                         plan = await asyncio.to_thread(
-                            self.authority.plan,
+                            self.execution.prior_admission,
                             tenant,
-                            identity(body["plan_id"]),
-                            body["plan_revision"],
+                            identity(single(headers, b"idempotency-key")),
                         )
+                        if plan is None:
+                            plan = await asyncio.to_thread(
+                                self.authority.plan,
+                                tenant,
+                                identity(body["plan_id"]),
+                                body["plan_revision"],
+                            )
+                        elif (
+                            plan["binding"]["plan_id"] != body["plan_id"]
+                            or plan["binding"]["revision"] != body["plan_revision"]
+                        ):
+                            raise Rejected("command_key_conflict")
                         if (
                             plan.get("invalidated") is not False
                             or plan["binding"]["digest"] != body["plan_digest"]
@@ -154,6 +165,8 @@ class ExecutionApp:
                         )
                         status = 202
                     elif scope["method"] == "POST" and not job_id:
+                        if plan is None:
+                            raise Rejected("plan_unavailable", 503)
                         payload = await asyncio.to_thread(
                             self.execution.admit,
                             tenant,
@@ -171,7 +184,8 @@ class ExecutionApp:
             payload, status = {"error": e.reason}, e.status
         except (ValueError, TypeError, KeyError, UnicodeError, TimeoutError):
             payload, status = {"error": "invalid_request"}, 422
-        except Exception:
+        except Exception as error:
+            print("lifecycle_request_failed:" + type(error).__name__, flush=True)
             payload, status = {"error": "lifecycle_unavailable"}, 503
         encoded = json.dumps(payload, allow_nan=False, separators=(",", ":")).encode()
         await send(

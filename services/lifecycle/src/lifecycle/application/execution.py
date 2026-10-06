@@ -171,6 +171,20 @@ class Execution:
                 )
         return self.read(tenant, job["id"])
 
+    def prior_admission(self, tenant: str, key: str) -> dict[str, Any] | None:
+        # Receipt recovery consults immutable accepted content before fetching live plan currency.
+        # Delivery still authenticates the current caller/delegation; this never grants an effect.
+        with self.database.transaction() as tx:
+            row = tx.one(
+                "SELECT plan,binding FROM app.execution_jobs WHERE tenant=%s AND command_key=%s",
+                (identity(tenant), identity(key)),
+            )
+            return (
+                None
+                if row is None
+                else {"content": row["plan"], "binding": row["binding"], "invalidated": False}
+            )
+
     def job(self, tx: Transaction, tenant: str, job: str) -> dict[str, Any]:
         row = tx.one(
             "SELECT j.*,p.state,p.reason,p.revision,p.updated_at,p.c"

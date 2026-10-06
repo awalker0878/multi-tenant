@@ -38,7 +38,7 @@ def _campaign(c,p):
         password_file=private/(name+'-db.secret');password_file.write_text(password);password_file.chmod(0o600)
         sql(f"CREATE ROLE {role}_owner NOLOGIN; CREATE ROLE {role}_runtime LOGIN NOINHERIT PASSWORD '{password}'; CREATE ROLE {role}_migrator LOGIN NOINHERIT PASSWORD '{migrator}'; GRANT {role}_owner TO {role}_migrator WITH INHERIT FALSE, SET TRUE; CREATE DATABASE {name} OWNER {role}_owner;")
         sql(f'REVOKE ALL ON DATABASE {name} FROM PUBLIC; GRANT CONNECT ON DATABASE {name} TO {role}_runtime,{role}_migrator; REVOKE ALL ON SCHEMA public FROM PUBLIC;',name)
-        if name=='lifecycle':sql('CREATE SCHEMA app AUTHORIZATION lifecycle_owner;',name)
+        if name=='lifecycle':sql('CREATE SCHEMA app AUTHORIZATION lifecycle_owner; GRANT USAGE ON SCHEMA app TO lifecycle_runtime;',name)
         for migration in sorted((root/relative/'migrations').glob('*.sql')):sql(migration.read_text(),name,role+'_migrator',migrator)
         envs[name]=os.environ|common|{'DB_HOST':'127.0.0.1','DB_PORT':'5432','DB_DATABASE':name,'DB_USERNAME':role+'_runtime','DB_PASSWORD_FILE':str(password_file),'DB_SSLMODE':'verify-full','DB_SSLROOTCERT':str(c['certificate'])}
     sql(f"INSERT INTO app.execution_control VALUES(1,'{epoch}',false);",'lifecycle')
@@ -113,11 +113,18 @@ def _campaign(c,p):
         snapshot['campaign'].update(id=campaign_id,adapter='p06-simulator-v1',custody_epoch=epoch,worker_ids=['sim-worker'],action=content['action'],method=content['method'],installed_tuple=content['installed_tuple'],artifacts=content['artifacts'],plan_digest=binding['digest'],expires_at=expires,revoked=False,endpoint_allowlist=snapshot['endpoints'],data_scope=['synthetic-data'],cleanup_owner='disposable-campaign-owner',max_effects=32)
         registry['records'].append(snapshot);registry_file.write_text(json.dumps(registry))
         admission={'plan_id':plan['id'],'plan_revision':1,'plan_digest':binding['digest'],'approval_id':approval['id'],'campaign_id':campaign_id}
-        idem=str(uuid.uuid4());job=lifecycle('jobs',scope,admission,key=idem,expected=202);jobs.append(job);workflows.append(job['workflow_id'])
+        idem=str(uuid.uuid4())
+        if action=='provision':
+            fault_file.write_text(json.dumps({'path':'/v1/tenants/'+tenant+'/jobs'}))
+            lifecycle('jobs',scope,admission,key=idem,expected=503)
+            check('p06-admission-response-lost-after-commit',proxy.injected==1)
+        job=lifecycle('jobs',scope,admission,key=idem,expected=202);jobs.append(job);workflows.append(job['workflow_id'])
         check('p06-'+action+'-one-logical-job',lifecycle('jobs',scope,admission,key=idem,expected=202)['id']==job['id'])
     check('p06-distinct-services-own-stores',sql("SELECT has_table_privilege('assurance_runtime','app.evidence_uploads','UPDATE') OR has_table_privilege('assurance_runtime','app.evidence_records','DELETE');",'assurance')=='f')
     backup=private/'lifecycle-before-effects.sql'
-    run(['pg_dump','--clean','--if-exists','--file',str(backup),'-d','lifecycle'],env=c['pg_env'],label='p06-pre-effect-database-backup')
+    with backup.open('wb') as stream:
+        dumped=subprocess.run(['docker','exec',c['container'],'pg_dump','-U','postgres','--clean','--if-exists','lifecycle'],stdout=stream,stderr=subprocess.PIPE,timeout=30)
+    check('p06-pre-effect-database-backup',dumped.returncode==0)
     backup.chmod(0o600)
     backup_hash=hashlib.sha256(backup.read_bytes()).hexdigest()
     # Process dies after grant commit, before simulated acceptance. A later process seals absence.

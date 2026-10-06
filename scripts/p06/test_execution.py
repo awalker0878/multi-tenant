@@ -221,3 +221,12 @@ def test_committed_facts_finish_custody_after_executor_revocation(world: dict[st
     w['snapshot']['approval']['revoked']=True
     assert service.checkpoint(w['tenant'],job['id'])['state']=='completed'
     assert service.read(w['tenant'],job['id'])['evidence']['native_support'] is False
+
+
+def test_accepted_receipt_can_be_recovered_after_inputs_expire_without_new_authority(world: dict[str, Any]) -> None:
+    w=world;key=str(uuid4());first=w['admit'](key)
+    w['snapshot']['approval']['revoked']=True;w['clock'][0]+=1000
+    assert w['service'].prior_admission(w['tenant'],key)['binding']==w['b']
+    recovered=w['admit'](key)
+    assert recovered['id']==first['id'] and recovered['state']=='admitted'
+    assert w['service'].activity(w['tenant'],first['id'],'reserve','sim-worker')['state']=='held'
