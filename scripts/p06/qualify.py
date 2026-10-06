@@ -16,8 +16,8 @@ def main():
     paths=subprocess.check_output(['git','ls-files'],cwd=ROOT,text=True).splitlines()
     report={'source_revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
             'environment':platform.platform(),'evidence_level':'E2','native_platforms_tested':[],
-            'source_bindings':{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths if p.startswith(('services/lifecycle/','workers/lifecycle/','scripts/p06/','.github/workflows/p06'))},'commands':[]}
-    commands=[]
+            'source_bindings':{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths if p.startswith(('services/lifecycle/','workers/lifecycle/','scripts/p06/','.github/workflows/p06','contracts/openapi/lifecycle-v1','contracts/openapi/assurance-evidence-v1','apps/console/resources/contracts/lifecycle-v1'))},'commands':[]}
+    commands=[('.', ['python','scripts/p06/generate_contracts.py','--check'])]
     for component in ('services/lifecycle','workers/lifecycle'):
         commands += [(component,['uv','sync','--locked']),
                      (component,['uv','run','--frozen','ruff','check','src','tests']),

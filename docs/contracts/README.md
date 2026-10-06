@@ -106,3 +106,16 @@ qualification and authority separate. `scripts/p05/generate_contracts.py --check
 verifies exact consumer snapshots and component-owned test fixtures. See the
 [implementation record](../implementation/p05-planning.md) for immutable semantic
 versus approval identity and the separate P06 atomic admission obligation.
+
+## P06 execution and custody contracts
+
+The implemented [Lifecycle API](../../contracts/openapi/lifecycle-v1.json) binds
+admission, current job projections and idempotent operator requests. Its exact
+Console snapshot validates owner responses before rendering. The
+[Assurance custody API](../../contracts/openapi/assurance-evidence-v1.json)
+separates workload upload/finalization from delegated reads and independent review.
+All receipts remain explicitly E2 simulation with no native support authority.
+`scripts/p06/generate_contracts.py --check` checks owner artifacts and consumer
+drift; the live campaign validates actual successful wire responses against them.
+Use the [implementation record](../implementation/p06-execution.md) for effect
+certainty, current authority and recovery behavior.

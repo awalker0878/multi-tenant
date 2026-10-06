@@ -30,9 +30,23 @@ for path,method,name,body,response,status in [
     if body:op['requestBody']={'required':True,'content':{'application/json':{'schema':body}}}
     paths.setdefault(path,{})[method]=op
 api={'openapi':'3.1.0','info':{'title':'P06 Lifecycle simulation execution','version':'1.0.0','description':'E2 isolated simulation only. Controls are requests, never proof of native undo or release. Exact live Governance authority is rechecked at each effect.'},'security':[{'Workload':[]}],'paths':paths,'components':{'securitySchemes':{'Workload':{'type':'http','scheme':'bearer'}},'schemas':schemas}}
-for name in ['contracts/openapi/lifecycle-v1.json','apps/console/resources/contracts/lifecycle-v1.json']:
-    p=ROOT/name;raw=json.dumps(api,indent=2)+'\n'
+outputs={name:api for name in ['contracts/openapi/lifecycle-v1.json','apps/console/resources/contracts/lifecycle-v1.json']}
+custody_schemas={'UploadReceipt':obj({'id':U,'state':{'const':'uploaded'}}),'Evidence':evidence,'EvidenceRecord':record,'ReviewReceipt':obj(review['properties']|{'native_support':FALSE})}
+custody_paths={}
+for path,method,name,body,response,status,delegated in [
+('/v1/tenants/{tenant}/evidence-uploads','post','uploadSimulationEvidence',obj({'job_id':U,'plan_digest':H,'source_revision':{'type':'string','pattern':'^[0-9a-f]{40}$'},'digest':H,'evidence_level':{'const':'E2'},'content_base64':{'type':'string','maxLength':90000}}),'UploadReceipt','201',False),
+('/v1/tenants/{tenant}/evidence-uploads/{evidence}/finalization','post','finalizeSimulationEvidence',obj({}),'Evidence','200',False),
+('/v1/tenants/{tenant}/evidence/{evidence}','get','readSimulationEvidence',None,'EvidenceRecord','200',True),
+('/v1/tenants/{tenant}/evidence/{evidence}/reviews','post','reviewSimulationEvidence',obj({'decision':{'enum':['accepted_simulation','rejected']}}),'ReviewReceipt','201',True)]:
+    parameters=[{'in':'path','name':p,'required':True,'schema':U} for p in ('tenant','evidence') if '{'+p+'}' in path]
+    if delegated:parameters.append({'in':'header','name':'X-Actor-Delegation','required':True,'schema':H})
+    op={'operationId':name,'parameters':parameters,'responses':{status:{'description':'Digest-bound E2 custody; no-store, private','content':{'application/json':{'schema':R(response)}}},**{str(n):{'description':'Access, digest, binding or owner dependency denied'} for n in [401,403,404,409,422,503]}}}
+    if body is not None:op['requestBody']={'required':True,'content':{'application/json':{'schema':body}}}
+    custody_paths.setdefault(path,{})[method]=op
+outputs['contracts/openapi/assurance-evidence-v1.json']={'openapi':'3.1.0','info':{'title':'P06 Assurance simulation custody','version':'1.0.0','description':'E2 only. Upload/finalize require the distinct Lifecycle producer identity. Read/review require current tenant and resource-scoped Governance delegation; review cannot elevate native support.'},'security':[{'Workload':[]}],'paths':custody_paths,'components':{'securitySchemes':{'Workload':{'type':'http','scheme':'bearer'}},'schemas':custody_schemas}}
+for name,document in outputs.items():
+    p=ROOT/name;raw=json.dumps(document,indent=2)+'\n'
     if '--check' in sys.argv:
         if not p.exists() or p.read_text()!=raw:raise SystemExit('contract drift: '+name)
     else:p.parent.mkdir(exist_ok=True,parents=True);p.write_text(raw)
-print('P06 execution contract and isolated consumer match.')
+print('P06 execution, custody and isolated consumer contracts match.')

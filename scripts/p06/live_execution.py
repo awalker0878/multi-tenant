@@ -73,7 +73,10 @@ def _campaign(c,p):
     envs['lifecycle'].update(ALERTS_URL='https://127.0.0.1:8451',ALERTS_CA_FILE=str(c['certificate']))
     workflows=[];jobs=[];plans=[]
     schema=json.loads((root/'contracts/openapi/lifecycle-v1.json').read_text())
+    custody_schema=json.loads((root/'contracts/openapi/assurance-evidence-v1.json').read_text())
     from openapi_schema_validator import OAS31Validator
+    def custody_contract(name,value):
+        OAS31Validator({'$ref':'#/components/schemas/'+name,'components':custody_schema['components']}).validate(value)
     def lifecycle(tail,scope,body=None,key=None,token=None,expected=200):
         action='operation.read' if body is None else 'operation.admit' if tail=='jobs' else 'operation.control'
         grant=gov('/v1/tenants/'+tenant+'/actor-delegations',{'audience':'lifecycle','action':action,'scope':{k:scope[k] for k in ['site_id','environment','resource_id']}},token=token or fixture['operator_token'])
@@ -167,7 +170,8 @@ def _campaign(c,p):
     read_token=fixture['reviewer_token']
     binding=plans[0]['binding']
     denied=wire('https://127.0.0.1:8442','/v1/tenants/'+tenant+'/execution-approval-checks','POST',{'actor_id':fixture['operator_id'],'approval_id':jobs[0]['approval_id'],'plan_id':binding['plan_id'],'plan_revision':1,'plan_digest':binding['digest']},{'Authorization':'Bearer '+credentials['lifecycle-governance'][0]})
-    check('p06-revoked-executor-cannot-authorize-another-effect',denied[0]==403)
+    # Governance deliberately masks absent/revoked tenant membership as not_found.
+    check('p06-revoked-executor-cannot-authorize-another-effect',denied[0]==404)
     # Restart the actual worker and engine while journal/effect stores survive.
     c['stop']('workflow');temporal.restart();spawn('workflow',worker_command)
     c['start']('assurance')
@@ -184,7 +188,9 @@ def _campaign(c,p):
     raw=json.dumps(observations,sort_keys=True,ensure_ascii=True,separators=(',',':')).encode()
     upload={'job_id':completed['id'],'plan_digest':completed['plan_digest'],'source_revision':os.environ['GITHUB_SHA'],'evidence_level':'E2','digest':hashlib.sha256(raw).hexdigest(),'content_base64':base64.b64encode(raw).decode()}
     producer={'Authorization':'Bearer '+credentials['lifecycle-assurance'][0]};assurance=common['ASSURANCE_URL'];prefix='/v1/tenants/'+tenant
-    check('p06-upload-idempotent-after-revocation',wire(assurance,prefix+'/evidence-uploads','POST',upload,producer)[1]['id']==evidence['id'])
+    upload_reply=wire(assurance,prefix+'/evidence-uploads','POST',upload,producer)
+    check('p06-upload-idempotent-after-revocation',upload_reply[0]==201 and upload_reply[1]['id']==evidence['id'])
+    custody_contract('UploadReceipt',upload_reply[1]);custody_contract('Evidence',evidence)
     check('p06-tampered-upload-rejected',wire(assurance,prefix+'/evidence-uploads','POST',dict(upload,digest='0'*64),producer)[0]==422)
     check('p06-source-substitution-rejected',wire(assurance,prefix+'/evidence-uploads','POST',dict(upload,source_revision='f'*40),producer)[0]==409)
     def evidence_headers(action):
@@ -193,11 +199,14 @@ def _campaign(c,p):
     evidence_path=prefix+'/evidence/'+evidence['id']
     review=wire(assurance,evidence_path+'/reviews','POST',{'decision':'accepted_simulation'},evidence_headers('evidence.review'))
     check('p06-independent-evidence-review-is-simulation-only',review[0]==201 and review[1]['native_support'] is False)
+    custody_contract('ReviewReceipt',review[1])
     check('p06-wrong-tenant-evidence-denied',wire(assurance,'/v1/tenants/'+fixture['foreign_tenant']+'/evidence/'+evidence['id'],headers=evidence_headers('evidence.read'))[0]==404)
     sql("UPDATE app.evidence_uploads SET content='[]' WHERE id='"+evidence['id']+"';",'assurance')
     check('p06-persisted-tamper-denied-on-read',wire(assurance,evidence_path,headers=evidence_headers('evidence.read'))[0]==409)
     sql("UPDATE app.evidence_uploads SET content=convert_from(decode('"+base64.b64encode(raw).decode()+"','base64'),'UTF8') WHERE id='"+evidence['id']+"';",'assurance')
-    check('p06-custody-restored-digest-valid',wire(assurance,evidence_path,headers=evidence_headers('evidence.read'))[0]==200)
+    restored_custody=wire(assurance,evidence_path,headers=evidence_headers('evidence.read'))
+    check('p06-custody-restored-digest-valid',restored_custody[0]==200)
+    custody_contract('EvidenceRecord',restored_custody[1])
     fixture.update(p06_completed=completed);c['fixture_file'].write_text(json.dumps(fixture))
     run(['npx','playwright','test','--config=tests/browser-p06/playwright.evidence.config.ts'],cwd=root/'apps/console',env=os.environ|{'P06_BROWSER_FIXTURE':str(c['fixture_file']),'CONSOLE_BASE_URL':'http://127.0.0.1:8031'},label='p06-browser-evidence')
     evidence_browser=root/'apps/console/test-results/p06-evidence-browser.json';browser_result=json.loads(evidence_browser.read_text());(out/'p06-evidence-browser.json').write_text(c['redact'](evidence_browser.read_text()))
