@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\CatalogueWorkspaceController;
 use App\Http\Controllers\FoundationController;
 use App\Http\Controllers\InstallationNotificationController;
 use App\Http\Controllers\LocalIdentityController;
@@ -32,4 +33,17 @@ Route::middleware(RequireIdentity::class)->group(function (): void {
     Route::post('/tenants/{tenant}/{operation}', [TenantController::class, 'update'])
         ->whereUuid('tenant')->whereIn('operation', ['memberships', 'quota', 'state']);
     Route::post('/logout', [LocalIdentityController::class, 'logout'])->name('identity.logout');
+});
+
+Route::prefix('/tenants/{tenant}')->whereUuid('tenant')->middleware(RequireIdentity::class)->group(function (): void {
+    $c = CatalogueWorkspaceController::class;
+    Route::get('/applications', [$c, 'index']);
+    Route::get('/applications/create', [$c, 'editor']);
+    Route::post('/applications', [$c, 'save']);
+    Route::get('/applications/{application}', [$c, 'show'])->whereUuid('application');
+    Route::get('/applications/{application}/edit', [$c, 'editor'])->whereUuid('application');
+    Route::post('/applications/{application}/revisions', [$c, 'save'])->whereUuid('application');
+    Route::get('/applications/{application}/status', [$c, 'status'])->whereUuid('application');
+    Route::get('/catalogue-references', [$c, 'references']);
+    Route::post('/catalogue-references', [$c, 'referenceSave']);
 });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Application\Catalogue\Contracts\CatalogueGateway;
 use App\Application\Foundation\Contracts\DependencyProbe;
 use App\Application\Foundation\Contracts\HealthCredential;
 use App\Application\Foundation\Contracts\SignalBuffer;
@@ -12,6 +13,7 @@ use App\Application\Notifications\Contracts\NotificationDecoder;
 use App\Application\Notifications\Contracts\NotificationHints;
 use App\Application\Notifications\Contracts\NotificationSource;
 use App\Application\Tenancy\Contracts\TenantGateway;
+use App\Infrastructure\Catalogue\CatalogueClient;
 use App\Infrastructure\Foundation\BoundedSignalBuffer;
 use App\Infrastructure\Foundation\MountedHealthCredential;
 use App\Infrastructure\Foundation\PostgresDependencyProbe;
@@ -26,6 +28,7 @@ final class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(CatalogueGateway::class, CatalogueClient::class);
         $this->app->singleton(NotificationSource::class, RabbitNotificationSource::class);
         $this->app->bind(NotificationDecoder::class, GovernanceNotificationDecoder::class);
         $this->app->bind(NotificationHints::class, PostgresNotificationHints::class);

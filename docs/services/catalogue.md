@@ -88,3 +88,9 @@ registers Catalogue-owned current-authority middleware and its verified-HTTPS
 Governance client. P03 must bind the guard to actual application routes and enforce
 its own tenant/resource predicates. Current tests use a protected synthetic owner
 route; no Catalogue business API or native admission is inferred.
+
+## P03 runtime contract
+
+[Catalogue v1](../../contracts/openapi/catalogue-v1.json) and [the intent schema](../../contracts/schemas/catalogue/intent-v1.json) define the implemented wire surface. Separate `reference.read`/`reference.write` actions give tenant administrators reference administration without implicitly granting application authoring; ordinary application roles may read references. The requested service/data owners must be active Governance members in the admitted scope. Reference sharing is explicit; a non-shared WSD/domain cannot be used by another application's current deployment.
+
+The Console uses contract-generated operation descriptors and exact response validation. Browser credentials and domain database access stay out of that client. The [P03 record](../implementation/p03-catalogue.md) distinguishes implemented behavior from campaigns still running.

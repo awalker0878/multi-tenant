@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Domain\Catalogue\CatalogueFailure;
 use App\Domain\Identity\IdentityFailure;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PageResponseHeaders;
@@ -30,8 +31,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(prepend: [RequireConsoleHost::class], append: [RedactIdentityCallback::class, HandleInertiaRequests::class, PageResponseHeaders::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontReport([IdentityFailure::class]);
-        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'client_secret', 'code', 'state']);
+        $exceptions->dontReport([IdentityFailure::class, CatalogueFailure::class]);
+        $exceptions->render(function (CatalogueFailure $error) {
+            if (in_array($error->status, [403, 404], true)) {
+                return redirect('/account')->with('tenant_notice', 'This application is unavailable or your access changed.');
+            }
+
+            return response('The application catalogue is unavailable. Your accepted revisions are unchanged. Please retry.', 503, ['Cache-Control' => 'no-store, private']);
+        });
+        $exceptions->dontFlash(['intent_json', 'intent', 'current_password', 'password', 'password_confirmation', 'client_secret', 'code', 'state']);
         $exceptions->render(function (IdentityFailure $error) {
             return response('Sign-in is temporarily unavailable. Please try again.', $error->status, ['Cache-Control' => 'no-store, private']);
         });
