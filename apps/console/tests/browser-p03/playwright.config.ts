@@ -5,7 +5,7 @@ const profiles = { chromium: 'Desktop Chrome', firefox: 'Desktop Firefox', webki
 export default defineConfig({
   testDir: '.', forbidOnly: true, retries: 0, workers: 1, timeout: 150_000, globalTimeout: 180_000,
   outputDir: '../../test-results/p03-artifacts',
-  reporter: [['list'], ['json', { outputFile: 'test-results/p03-browser.json' }]],
+  reporter: [['list'], ['json', { outputFile: '../../test-results/p03-browser.json' }]],
   use: { baseURL: process.env.CONSOLE_BASE_URL, ignoreHTTPSErrors: true, actionTimeout: 15_000, navigationTimeout: 15_000, trace: 'off', screenshot: 'off', video: 'off' },
   projects: [{ name: browser, use: { ...devices[profiles[browser]], browserName: browser } }],
 });

@@ -37,13 +37,16 @@ test('authors complete intent, preserves conflicts and uncertain retries, compar
   const stale = await context.newPage();
   stale.on('dialog', dialog => { void dialog.accept(); });
   await stale.goto(editUrl);
-  await stale.getByLabel('Virtual CPUs', { exact: true }).first().fill('6');
+  const importedEdit: Intent = structuredClone(fixture.intent);
+  importedEdit.workloads[0]!.compute.vcpus = 6;
+  await stale.getByRole('button', { name: 'Import complete intent', exact: true }).click();
+  await stale.getByLabel('Complete intent document').fill(JSON.stringify(importedEdit));
   await page.getByLabel('Virtual CPUs', { exact: true }).first().fill('4');
   await page.getByRole('button', { name: 'Publish new revision' }).click();
   await expect(page.getByRole('status')).toContainText('Published revision 2');
   await stale.getByRole('button', { name: 'Publish new revision' }).click();
   await expect(stale.getByRole('alert')).toContainText('changed');
-  await expect(stale.getByLabel('Virtual CPUs', { exact: true }).first()).toHaveValue('6');
+  await expect(stale.getByLabel('Complete intent document')).toHaveValue(JSON.stringify(importedEdit));
   await stale.getByRole('button', { name: 'Review current version' }).click();
   await expect(stale.getByRole('status')).toContainText('current: 4; your draft: 6');
   await stale.getByRole('button', { name: 'Use reviewed current version as base' }).click();

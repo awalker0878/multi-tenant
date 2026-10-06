@@ -13,7 +13,12 @@ const mode = ref<'form' | 'import'>('form');
 const imported = ref('');
 const form = useForm({ name: props.application?.name ?? '', intent_json: '', command_key: crypto.randomUUID(), etag: props.application?.etag ?? null });
 const unknown = ref(false), changed = ref(false), reviewed = ref(false);
-const changedFields = computed(() => differences(props.revision?.intent, draft.value));
+const comparisonDraft = computed(() => {
+ if (mode.value === 'form') return draft.value;
+ try { const value: unknown = JSON.parse(imported.value); return value !== null && typeof value === 'object' && !Array.isArray(value) ? value : undefined; }
+ catch { return undefined; }
+});
+const changedFields = computed(() => comparisonDraft.value === undefined ? [] : differences(props.revision?.intent, comparisonDraft.value));
 const dirty = computed(() => imported.value !== '' || JSON.stringify(draft.value) !== original || (props.application === null && form.name !== ''));
 const newId = () => crypto.randomUUID();
 const submit = () => {
@@ -46,7 +51,7 @@ onUnmounted(() => { active = false; if (timer) clearInterval(timer); removeBefor
  <CatalogueLayout :title="application ? 'Revise ' + application.name : 'Create application'" :tenant-id="tenantId">
   <p class="mb-5 text-slate-600">Publish the complete requested intent. Drafts stay in this tab. Do not include passwords, keys or credentials.</p>
   <div v-if="Object.keys(form.errors).length" id="catalogue-errors" role="alert" tabindex="-1"><p>{{ form.errors.intent_json || Object.values(form.errors)[0] }}</p></div>
-  <div v-if="changed" class="my-5 rounded-lg border border-amber-700 bg-amber-50 p-4" role="status"><p>The application changed. Your draft is preserved.</p><button type="button" class="secondary" @click="refresh">Review current version</button><template v-if="reviewed"><p class="mt-3">Review the differences below before using the current version as the base.</p><ul class="mt-2 max-h-64 overflow-auto"><li v-for="difference in changedFields" :key="difference.path" class="break-all text-sm">{{ difference.path }} — current: {{ difference.before }}; your draft: {{ difference.after }}</li></ul><button type="button" @click="adopt">Use reviewed current version as base</button></template></div>
+  <div v-if="changed" class="my-5 rounded-lg border border-amber-700 bg-amber-50 p-4" role="status"><p>The application changed. Your draft is preserved.</p><button type="button" class="secondary" @click="refresh">Review current version</button><template v-if="reviewed"><p class="mt-3">Review the differences below before using the current version as the base.</p><p v-if="comparisonDraft === undefined">Enter a valid JSON object before comparing this imported draft.</p><ul class="mt-2 max-h-64 overflow-auto"><li v-for="difference in changedFields" :key="difference.path" class="break-all text-sm">{{ difference.path }} — current: {{ difference.before }}; your draft: {{ difference.after }}</li></ul><button type="button" :disabled="comparisonDraft === undefined" @click="adopt">Use reviewed current version as base</button></template></div>
   <p v-if="!canWrite" role="alert">You currently have read access. Publishing requires an application author grant.</p>
   <form @submit.prevent="submit">
    <fieldset :disabled="unknown || form.processing || !canWrite" class="space-y-6">
