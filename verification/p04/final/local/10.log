@@ -1,0 +1,6 @@
+
+> product-console@0.0.0 test:boundaries
+> node --experimental-strip-types tests/architecture/frontend-boundaries.ts
+
+Console frontend boundaries: 25 source files; 10 positive/negative fixtures passed.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
