@@ -6,6 +6,7 @@ adapter, credentials or execution path. Q05/Q06 have not run.
 
 | Observation | Disposition |
 | --- | --- |
+| Context-policy run `37544824899` found the correction record's review-packet link before that packet was published. | Publish the already prepared packet in the following documentation commit and rerun clean-source link checks. The failed run remains recorded. |
 | Firefox campaign run `37544177753` at `249a77e` failed before Temporal started: schema setup received PostgreSQL `57P03` while the database was starting. The fixture's Unix-socket health query could succeed against the temporary initialization server. | Preserve original artifact `11449950917` (SHA-256 `d5e6037ef0ff64e43d76ffd171f63770bb8fc3b645ea3f98c36616a1b0c03e37`). Change only the P06 Temporal fixture health check to wait for the final TCP listener. Rerun all three live campaigns; the original failure remains failed. |
 | Initial local lint/type passes found long lines, compact test formatting and an imprecise variadic-tuple annotation. | Corrected before the respective source commits; final strict Ruff/mypy checks independently pass. |
 | The initial local full Lifecycle run passed 129 tests and skipped five PostgreSQL-dependent cases without a PostgreSQL setting. | Retained as limited local verification, not a database pass. |
