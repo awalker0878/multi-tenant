@@ -1,4 +1,35 @@
-# Next work — P04 native receiving and P05 preparation
+# Next work — P05 receiving and P06 admission
+
+P05 engineering and automated qualification are delivered at
+`c045badc852960f3671942adf4ca2338821b4f67`. The six packages implement all-eleven-dimension
+capability assessment, exact-source immutable compilation, independent owner reads,
+Lifecycle reservation simulation, Console comparison/diff/approval handoff and
+operational versus isolated-campaign admission contracts. Use the
+[implementation record](docs/implementation/p05-planning.md),
+[verified index](verification/p05/final/qualification-index.json),
+[check matrix](verification/p05/check-matrix.md) and
+[runbook](docs/operations/runbooks/planning-review.md).
+
+1. **BL-P05-001 — G05 receiving:** designated Planning/quality, architecture/Governance,
+   security/Assurance and Lifecycle/quality reviewers examine the exact evidence.
+   Product/quality complete the operator task sheet with the selected managed and
+   assistive combinations. Record actual names, dates, findings and the decision
+   using the [completion packet](docs/implementation/p05-completion-review.md).
+   The register keeps G05 NOT_REVIEWED; development authority is already supplied.
+2. **Next executable engineering package — P06.01 admission and dispatch:** use
+   P05.06's contract, current P02 approval checks and the P01 transactional outbox
+   to atomically commit admission, command receipt, reservation bindings and one
+   stable workflow dispatch ID. Exercise duplicate/lost-start delivery against
+   actual PostgreSQL and Temporal with separately controlled simulated effects.
+   Preserve unknown outcomes and immediate authority rechecks. This is the next
+   package, not an assertion that P06 execution has already been implemented.
+3. **Carry operating/native limits forward:** P04 native E3 and earlier receiving
+   obligations remain below. P05 eligible fixture records and simulated reservations
+   supply no production support or native-effect authority. Actual source/state/
+   qualification custody and allocation owners must be selected and qualified for
+   the later native scope.
+
+# Retained P04 native receiving obligations
 
 P04 engineering and its automated qualification are delivered at
 `6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9`. The [implementation record](docs/implementation/p04-inventory.md)
@@ -30,14 +61,7 @@ by these fixtures. Complete the [receiving packet](docs/implementation/p04-compl
    records passing affected identity, Governance events, messaging, recovery and
    Catalogue campaigns. The earlier status receipt remains unchanged. These
    results supply no native or operating acceptance.
-4. **Next independent engineering — P05.01:** begin the versioned capability and
-   qualification resolver using all eleven P04 dimensions and explicit VMware/AHV/
-   OpenStack gaps. Define consumption of Inventory's immutable ordered facts with
-   event-ID deduplication; retain stale, partial, missing qualification and ownership
-   holds when reconciling facts with pinned P03 intent. Keep declared, observed and
-   qualified support distinct. Follow [P05's package sequence](docs/implementation/phases/p05.md)
-   and settle ADR-016 ownership before plan compilation. No native eligibility or
-   reservation authority follows from a synthetic pass.
+4. **P05 engineering delivered:** the implementation and evidence above now consume P04 owner reads and facts while preserving all declared, unassessed and native qualification holds.
 
 The user's development authorization persists; no new baseline/G00 permission is
 needed. The missing native installation records and receiving people are concrete

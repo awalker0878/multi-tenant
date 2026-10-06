@@ -87,3 +87,22 @@ documents locked client generation, PHP/Python fixture interpretation and the
 conservative base/head rule that rejects mutation or deletion of published
 contract artifacts. The rule requires a new artifact for a new version; it does
 not turn proposed business APIs into implemented endpoints.
+
+## P05 Planning owner and review contracts
+
+The implemented [review API](../../contracts/openapi/planning-v1.json) and
+[independent source-owner reads](../../contracts/openapi/planning-inputs-v1.json)
+are bounded synchronous interfaces. The [v1.1 immutable binding](../../contracts/openapi/planning-immutable-plan-v1.1.json)
+adds semantic content digest, canonicalization and authority lane to the exact
+Governance approval binding. Historical v1 artifacts remain unchanged; the
+corrected synthetic plan is explicitly [version 1.1](../../contracts/fixtures/planning/synthetic-plan-v1.1.json).
+
+[Content](../../contracts/schemas/planning/content-v1.json),
+[admission](../../contracts/schemas/planning/admission-record-v1.json),
+[reservation receipt](../../contracts/schemas/planning/reservation-receipt-v1.json),
+[qualification](../../contracts/schemas/planning/qualification-v1.json) and
+[fact](../../contracts/schemas/planning/fact-v1.json) schemas keep observations,
+qualification and authority separate. `scripts/p05/generate_contracts.py --check`
+verifies exact consumer snapshots and component-owned test fixtures. See the
+[implementation record](../implementation/p05-planning.md) for immutable semantic
+versus approval identity and the separate P06 atomic admission obligation.

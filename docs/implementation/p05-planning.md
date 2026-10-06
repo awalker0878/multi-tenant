@@ -1,6 +1,6 @@
 # P05 — Capabilities, immutable plans and admission contracts
 
-P05 engineering is being implemented under the user's continuing development
+P05 engineering is implemented under the user's continuing development
 authorization. This record separates implemented behavior, measured evidence and
 receiving decisions; the delivery register owns phase/gate state.
 
@@ -43,14 +43,6 @@ artifact and unknown-outcome hold behavior. Target first write separates source
 rollback from forward recovery or separately approved reconciled source return.
 Plan construction and approval grant no native write authority.
 
-## Qualification in progress
-
-The first local Planning suite passes 90 tests, including each missing dimension,
-all three platform profiles, exact-scope evidence failures, sovereignty/service
-controls, graph cycles, ownership collisions and canonical binding changes.
-Strict typing and lint pass. Subsequent PostgreSQL, owner-wire and browser evidence
-will bind the final source; this initial local observation is not G05 acceptance.
-
 ## P05.03 / P05.06 — Journal and admission contract
 
 Lifecycle now owns a PostgreSQL reservation journal with immutable intent-command
@@ -92,3 +84,36 @@ Acknowledgment follows inbox/invalidation commit; conflicting/invalid payloads
 retain only a quarantine digest. Facts conservatively invalidate tenant plans and
 never refresh observations, confer qualification or dispatch effects. Direct
 owner rechecks remain required for current validity, including qualification changes.
+
+
+## P05.05 — Review experience
+
+The compiled Console compares currently authorized destinations, exposes unmet
+requirements and remediation, and reviews exact mappings, digests, effects,
+expiry and recovery boundaries. Comparison requires authority over both plans.
+Approval handoff rereads current validity on the server and binds the submitted
+digest to the immutable revision. Revoked or stale source facts disable approval;
+actor revocation clears protected access and history. Uncertain command outcomes
+freeze the original payload/key for an unchanged retry. Polls are bounded and
+back off on unavailable owners.
+
+The browser campaign checks a narrow viewport, keyboard activation, explicit
+current-source revocation, accepted-response loss with exactly one persisted plan,
+and actual Governance approval handoff. Representative operator and assistive
+receiving review remain distinct from these automated observations.
+
+## Delivery and qualification records
+
+See the [verified index](../../verification/p05/final/qualification-index.json),
+[check matrix](../../verification/p05/check-matrix.md) and
+[corrections](../../verification/p05/corrections.md). The final packet retains
+original source-bound local/hosted command logs, real PostgreSQL reservation
+observations, owner responses, broker deliveries and three compiled browser
+campaigns. No native resource was allocated and no E3 qualification is claimed.
+
+The [completion packet](p05-completion-review.md) supplies the concrete receiving
+tasks and P06 handoff. The [runbook](../operations/runbooks/planning-review.md)
+specifies mounted policy/profile/qualification custody, separate workload
+credentials, current authority, recovery and the combined fact topology.
+Formal G05 acceptance remains a designated review, separately recorded in the
+canonical delivery register.
