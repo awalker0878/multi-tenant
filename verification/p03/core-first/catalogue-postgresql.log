@@ -1,0 +1,133 @@
+
+   FAIL  Tests\Feature\CataloguePersistenceTest
+  ✓ it commits full immutable intent receipt audit event and typed tena… 0.15s  
+  ⨯ it returns the original receipt after a lost response and later edi… 0.09s  
+  ✓ it rejects foreign retired stale shared and wrong-kind references w… 0.06s  
+  ✓ it rejects foreign retired stale shared and wrong-kind references w… 0.06s  
+  ✓ it rejects foreign retired stale shared and wrong-kind references w… 0.05s  
+  ✓ it rejects foreign retired stale shared and wrong-kind references w… 0.06s  
+  ⨯ it enforces separate reference administration and refuses ZIP immut… 0.06s  
+  ✓ it rolls back revision pointer receipt audit and workload bindings…  0.07s  
+  ✓ it denies runtime modification of immutable history even outside El… 0.07s  
+  ✓ it reauthorizes duplicate receipts history and detail after revocat… 0.16s  
+  ✓ it never reassigns workloads or deployment identities to another ap… 0.09s  
+  ✓ it holds explicit non-shared references across applications          0.08s  
+  ✓ it bounds representative large tenant pages and rejects foreign cur… 0.21s  
+
+   PASS  Tests\Feature\DelegatedAdmissionTest
+  ✓ it uses its independent service credential and route scope and igno… 0.04s  
+  ✓ it requires independent caller identity and actor delegation before… 0.01s  
+  ✓ it never caches authority between allowed revoked and recovered req… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority respo… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority responses with ('actor_id', 'forged')
+  ✓ it holds malformed stale widened and wrong-audience authority responses with ('allowed', 'true')
+  ✓ it holds malformed stale widened and wrong-audience authority responses with ('authority_use', 'observation_only')
+  ✓ it holds malformed stale widened and wrong-audience authority responses with ('tenant_id', '550e8400-e29b-41d4-a716-446655440099')
+  ✓ it holds malformed stale widened and wrong-audience authority respo… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority respo… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority respo… 0.01s  
+  ✓ it fails closed on redirects and missing workload custody            0.01s  
+  ✓ it retains the owning resource tenant check even if a remote respon… 0.01s  
+
+   PASS  Tests\Feature\DependencyHealthTest
+  ✓ unknown or malformed health identities never reach a dependency wit… 0.02s  
+  ✓ unknown or malformed health identities never reach a dependency with ('Bearer short')
+  ✓ unknown or malformed health identities never reach a dependency with ('Bearer xxxxxxxxxxxxxxxxxxxxxx…xxxxxx')
+  ✓ unknown or malformed health identities never reach a dependency wit… 0.01s  
+  ✓ unknown or malformed health identities never reach a dependency wit… 0.01s  
+  ✓ unknown or malformed health identities never reach a dependency with ('Bearer TOKEN extra')
+  ✓ an absent or malformed mounted identity denies even the formerly valid credential with ('absent')
+  ✓ an absent or malformed mounted identity denies even the formerly valid credential with ('empty')
+  ✓ an absent or malformed mounted identity denies even the formerly valid credential with ('multiline')
+  ✓ an absent or malformed mounted identity denies even the formerly valid credential with ('oversize')
+  ✓ authenticated dependency failure is sanitized and never changes pro… 0.01s  
+  ✓ successful foundation checks grant only dependency readiness and no… 0.01s  
+  ✓ replacing a credential file revokes the old token without restarting the application
+  ✓ credential paths cannot use a stream wrapper                         0.01s  
+  ✓ mounted application key wins and an unavailable file never falls back to the environment key
+  ✓ a TCP peer that never answers TLS negotiation fails within the conn… 2.01s  
+
+   PASS  Tests\Feature\HealthTest
+  ✓ liveness reports only a running process with no configured service…  0.02s  
+  ✓ readiness remains closed until the catalogue dependencies are implemented
+  ✓ health endpoints reject writes with ('/health/live')
+  ✓ health endpoints reject writes with ('/health/ready')
+  ✓ business routes are absent and expose no exception diagnostics with ('/v1/tenants/tenant-a/applications')
+  ✓ business routes are absent and expose no exception diagnostics with ('/v1/tenants/tenant-a/wsds')
+  ✓ business routes are absent and expose no exception diagnostics with ('/v1/tenants/tenant-a/security-domains')
+  ✓ a caller cannot configure readiness or start a browser session through health input
+  ✓ unknown routes return JSON even without an accept header
+
+   PASS  Tests\Feature\IntentDocumentTest
+  ✓ it preserves complete multi-domain intent and unsupported mandatory… 0.01s  
+  ✓ it rejects structural, native-credential and placement ambiguity with ('unknown')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('native')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('fractional')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('empty')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('missing')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('huge')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('strength')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('cycle', 'dependency_cycle')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('self', 'dangling_or_self_dependency')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('dangling', 'dangling_or_self_dependency')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('duplicate', 'duplicate_identity')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('nic', 'nic_domain_mismatch')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('order', 'device_order_gap')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('boot', 'one_boot_disk_required')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('dataset', 'dangling_dataset')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('interface', 'controlled_interface_required')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('port', 'protocol_port_mismatch')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('service', 'dangling_service_workload')
+  ✓ it permits bidirectional communication while checking startup and shutdown graphs independently
+
+   PASS  Tests\Feature\TelemetryTest
+  ✓ diagnostic buffer is bounded and stale acknowledgement preserves ne… 0.01s  
+  ✓ lock contention and oversized records are explicit without overwriting accepted data
+  ✓ unavailable buffer preserves liveness and reports missing collection
+  ✓ request signals redact arbitrary inputs and correlate without granting authority
+  ✓ malformed or zero correlation is replaced and never echoed with ('malformed')
+  ✓ malformed or zero correlation is replaced and never echoed with ('00-00000000000000000000000000…ccc-01')
+  ✓ malformed or zero correlation is replaced and never echoed with ('00-bbbbbbbbbbbbbbbbbbbbbbbbbb…000-01')
+
+   PASS  Tests\Architecture\FoundationTest
+  ✓ service autoload exposes only its own application and tests
+  ✓ the actual bootstrap classes are loaded from the service source
+  ✓ implemented application classes use strict types                     0.07s  
+  ✓ implemented application classes are final
+  ✓ delivery does not reference sibling source or frontend transport     0.01s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CataloguePersistenceTest > it returns the original…    
+  Expected response status code [201] but received 409.
+Failed asserting that 409 is identical to 201.
+
+  at tests/Feature/CataloguePersistenceTest.php:88
+     84▕     $first = publishCatalogue($this, key: $key)->assertCreated()->json();
+     85▕     $i = $this->intent;
+     86▕     $i['workloads'][0]['compute']['vcpus'] = 4;
+     87▕     $second = publishCatalogue($this, $first['application_id'], $first['etag'], intent: $i)->assertCreated()->json();
+  ➜  88▕     publishCatalogue($this, key: $key)->assertCreated()->assertExactJson($first);
+     89▕     publishCatalogue($this, key: $key, intent: $i)->assertStatus(409);
+     90▕     publishCatalogue($this, $first['application_id'], $first['etag'], intent: $i)->assertStatus(412);
+     91▕     $this->getJson($this->path.'/'.$first['application_id'].'/intent-revisions')->assertOk()->assertJsonCount(2, 'revisions');
+     92▕     $this->getJson($this->path.'/'.$first['application_id'].'/intent-revisions/'.$first['revision_id'])->assertJsonPath('intent.workloads.0.compute.vcpus', 2);
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CataloguePersistenceTest > it enforces separate ref…   
+  Expected response status code [409] but received 422.
+Failed asserting that 422 is identical to 409.
+
+  at tests/Feature/CataloguePersistenceTest.php:110
+    106▕     $base = '/v1/tenants/'.$this->tenant.'/security-domains';
+    107▕     $key = (string) Str::uuid();
+    108▕     $this->withHeader('Idempotency-Key', $key)->postJson($base, ['name' => 'ZIP', 'owner_id' => $this->actor, 'shareable' => false, 'zone' => 'ZIP'])->assertStatus(422);
+    109▕     $ref = $this->withHeader('Idempotency-Key', (string) Str::uuid())->postJson($base, ['name' => 'Restricted', 'owner_id' => $this->actor, 'shareable' => true, 'zone' => 'RZ'])->assertCreated()->json();
+  ➜ 110▕     $this->withHeader('Idempotency-Key', (string) Str::uuid())->withHeader('If-Match', $ref['etag'])->putJson($base.'/'.$ref['id'], ['name' => 'Restricted', 'owner_id' => $this->actor, 'shareable' => true, 'zone' => 'OZ'])->assertStatus(409);
+    111▕     $this->withHeader('Idempotency-Key', (string) Str::uuid())->postJson($base.'/'.$ref['id'].'/retirement')->assertCreated()->assertJsonPath('retired', true);
+    112▕     publishCatalogue($this)->assertCreated();
+    113▕     $id = $this->intent['workloads'][0]['security_domain']['id'];
+    114▕     $this->withHeader('Idempotency-Key', (string) Str::uuid())->withHeader('If-Match', '"'.$id.':1"')->postJson($base.'/'.$id.'/retirement')->assertStatus(409);
+
+
+  Tests:    2 failed, 81 passed (299 assertions)
+  Duration: 3.73s
+

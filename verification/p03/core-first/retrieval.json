@@ -1,0 +1,12 @@
+{
+  "source_revision": "1544c5fbe5ffa388c3c8d3574ca9bcf76d84ae96",
+  "run_id": 37399516879,
+  "artifact_id": 11384519233,
+  "archive_sha256": "b41cf5ad7778a7ab7e64a0efc35a91f757eb3f4166c600c7b964d5f0a81e1727",
+  "campaign_result": "FAIL",
+  "retained_files": {
+    "report.json": "1cfa08f07f4686ce47c32d17573c3b576608f41c95dc282fa2120792fe2f73a3",
+    "catalogue-postgresql.log": "f7212009eac47b02e305bdcb040e688ec6145f9a2f3c5b0758780224f732e653",
+    "catalogue-junit.xml": "b799fd1e31b3c739b5bb1fa04a06d8f08a3f61755040e194dc4c1a0465c33f03"
+  }
+}

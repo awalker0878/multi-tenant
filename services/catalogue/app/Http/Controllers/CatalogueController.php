@@ -63,7 +63,7 @@ final class CatalogueController
             throw new IntentFailure('unknown_command_fields');
         }
         $input = $request->validate(['intent' => ['required', 'array'], ...($application === null ? ['name' => ['required', 'string', 'max:200']] : [])]);
-        $response = $publish->handle($this->actor($request), $this->commandKey($request), $input['intent'], $application, $this->etag($request), $input['name'] ?? null);
+        $response = $publish->handle($this->actor($request), $this->commandKey($request), $input['intent'], $application, $application === null ? null : $this->etag($request), $input['name'] ?? null);
 
         return response()->json($response, 201)->header('ETag', $response['etag'])->header('Location', '/v1/tenants/'.$tenant.'/applications/'.$response['application_id'].'/intent-revisions/'.$response['revision_id']);
     }
@@ -122,8 +122,13 @@ final class CatalogueController
         return response()->json(['references' => $rows->map(fn ($row) => ['id' => $row->id, 'kind' => $row->kind, 'version' => (int) $row->version, 'retired' => (bool) $row->retired, 'etag' => '"'.$row->id.':'.$row->version.'"', 'definition' => json_decode($row->definition, true, 512, JSON_THROW_ON_ERROR)])->values(), 'next_cursor' => $more ? $this->encodeCursor('reference:'.$kind, $tenant, null, $rows->last()->id ?? '') : null]);
     }
 
-    public function referenceWrite(Request $request, string $tenant, string $kind, SaveReference $save, ?string $reference = null): JsonResponse
+    public function referenceWrite(Request $request, string $tenant, SaveReference $save): JsonResponse
     {
+        $kind = $request->route('kind');
+        $reference = $request->route('reference');
+        if (! is_string($kind) || ($reference !== null && ! is_string($reference))) {
+            throw new IntentFailure('invalid_reference_route', 422);
+        }
         $result = $save->handle($this->actor($request), $kind, $this->commandKey($request), $request->all(), $reference, $this->etag($request), $request->route('retire') === 'yes');
 
         return response()->json($result, 201)->header('ETag', $result['etag']);
@@ -136,7 +141,7 @@ final class CatalogueController
             throw new IntentFailure('access_unavailable', 403);
         }
 
-return $actor;
+        return $actor;
     }
 
     private function application(string $tenant, string $id): \stdClass
@@ -146,7 +151,7 @@ return $actor;
             throw new IntentFailure('not_found', 404);
         }
 
-return $row;
+        return $row;
     }
 
     private function commandKey(Request $request): string
@@ -156,7 +161,7 @@ return $row;
             throw new IntentFailure('idempotency_key_required', 422, 'command_key');
         }
 
-return $keys[0];
+        return $keys[0];
     }
 
     private function etag(Request $request): ?string
@@ -168,7 +173,7 @@ return $keys[0];
             throw new IntentFailure('invalid_precondition', 422, 'etag');
         }
 
-return $values[0];
+        return $values[0];
     }
 
     private function encodeCursor(string $kind, string $tenant, ?string $environment, string $value): string
@@ -185,10 +190,10 @@ return $values[0];
         $decoded = is_string($value) && strlen($value) <= 1024 ? base64_decode($value, true) : false;
         $data = $decoded !== false ? json_decode($decoded, true) : null;
         if (! is_array($data) || count($data) !== 4 || ($data[0] ?? null) !== $kind || ($data[1] ?? null) !== $tenant || ($data[2] ?? null) !== $environment || ! is_string($data[3] ?? null)
-            || ! preg_match(str_starts_with($kind,'revision:') ? '/\A[1-9][0-9]{0,15}\z/' : '/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/',$data[3])) {
+            || ! preg_match(str_starts_with($kind, 'revision:') ? '/\A[1-9][0-9]{0,15}\z/' : '/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/', $data[3])) {
             throw ValidationException::withMessages(['cursor' => 'Invalid page cursor.']);
         }
 
-return $data[3];
+        return $data[3];
     }
 }
