@@ -1,0 +1,800 @@
+[5381] [Tue Oct  6 02:27:41 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8032) started
+[5382] [Tue Oct  6 02:27:41 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8032) started
+[5383] [Tue Oct  6 02:27:41 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8032) started
+[5380] [Tue Oct  6 02:27:41 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8032) started
+[5384] [Tue Oct  6 02:27:41 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8032) started
+[5384] [Tue Oct  6 02:27:41 2026] 127.0.0.1:35174 Accepted
+[Tue Oct 6 02:27:41 2026] 127.0.0.1:35174 [GET] URI: /health/live
+[5384] [Tue Oct  6 02:27:42 2026] 127.0.0.1:35174 Closing
+[5383] [Tue Oct  6 02:27:42 2026] 127.0.0.1:35176 Accepted
+[Tue Oct 6 02:27:42 2026] 127.0.0.1:35176 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:27:42 2026] 127.0.0.1:35176 Closing
+[5381] [Tue Oct  6 02:27:42 2026] 127.0.0.1:35188 Accepted
+[Tue Oct 6 02:27:42 2026] 127.0.0.1:35188 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35188 Closing
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35196 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35196 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35196 Closing
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35206 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35206 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35206 Closing
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35218 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35218 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35218 Closing
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35232 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35232 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35232 Closing
+[5384] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35242 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35242 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35242 Closing
+[5384] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35248 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35248 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35248 Closing
+[5384] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35258 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35258 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5384] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35258 Closing
+[5384] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35272 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35272 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35272 Closing
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35284 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35284 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35284 Closing
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35292 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35292 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35292 Closing
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35302 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35302 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35302 Closing
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35304 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35304 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35304 Closing
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35308 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35308 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35308 Closing
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35312 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35312 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35312 Closing
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35318 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35318 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35318 Closing
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35330 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35330 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35330 Closing
+[5380] [Tue Oct  6 02:27:43 2026] 127.0.0.1:35346 Accepted
+[Tue Oct 6 02:27:43 2026] 127.0.0.1:35346 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:27:44 2026] 127.0.0.1:35346 Closing
+[5380] [Tue Oct  6 02:27:44 2026] 127.0.0.1:35352 Accepted
+[Tue Oct 6 02:27:44 2026] 127.0.0.1:35352 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:27:44 2026] 127.0.0.1:35352 Closing
+[5382] [Tue Oct  6 02:27:44 2026] 127.0.0.1:35362 Accepted
+[Tue Oct 6 02:27:44 2026] 127.0.0.1:35362 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:27:44 2026] 127.0.0.1:35362 Closing
+[5382] [Tue Oct  6 02:27:44 2026] 127.0.0.1:35368 Accepted
+[Tue Oct 6 02:27:44 2026] 127.0.0.1:35368 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5382] [Tue Oct  6 02:27:44 2026] 127.0.0.1:35368 Closing
+[5380] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36014 Accepted
+[Tue Oct 6 02:27:44 2026] 127.0.0.1:36014 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36014 Closing
+[5380] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36028 Accepted
+[Tue Oct 6 02:27:44 2026] 127.0.0.1:36028 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36028 Closing
+[5381] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36044 Accepted
+[Tue Oct 6 02:27:44 2026] 127.0.0.1:36044 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36044 Closing
+[5382] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36050 Accepted
+[Tue Oct 6 02:27:44 2026] 127.0.0.1:36050 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36050 Closing
+[5382] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36054 Accepted
+[Tue Oct 6 02:27:44 2026] 127.0.0.1:36054 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5382] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36054 Closing
+[5382] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36062 Accepted
+[Tue Oct 6 02:27:44 2026] 127.0.0.1:36062 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36062 Closing
+[5383] [Tue Oct  6 02:27:44 2026] 127.0.0.1:36078 Accepted
+[Tue Oct 6 02:27:44 2026] 127.0.0.1:36078 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36078 Closing
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36080 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36080 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36080 Closing
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36088 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36088 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36088 Closing
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36092 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36092 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36092 Closing
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36098 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36098 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36098 Closing
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36114 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36114 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36114 Closing
+[5383] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36130 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36130 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36130 Closing
+[5383] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36142 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36142 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36142 Closing
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36148 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36148 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36148 Closing
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36154 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36154 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36154 Closing
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36166 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36166 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36166 Closing
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36182 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36182 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36182 Closing
+[5380] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36196 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36196 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36196 Closing
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36198 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36198 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36198 Closing
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36204 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36204 [POST] URI: /v1/tenants/43fb6fc2-659a-4bbe-a79e-6c745792ea04/actor-delegations
+[5384] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36204 Closing
+[5381] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36212 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36212 [POST] URI: /v1/tenants/43fb6fc2-659a-4bbe-a79e-6c745792ea04/delegated-authorizations
+[5381] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36212 Closing
+[5381] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36214 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36214 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36214 Closing
+[5381] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36226 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36226 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36230 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36230 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36226 Closing
+[5383] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36230 Closing
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36242 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36242 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5383] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36258 Accepted
+[Tue Oct 6 02:27:45 2026] 127.0.0.1:36258 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5382] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36242 Closing
+[5383] [Tue Oct  6 02:27:45 2026] 127.0.0.1:36258 Closing
+[5381] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36270 Accepted
+[Tue Oct 6 02:27:46 2026] 127.0.0.1:36270 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36272 Accepted
+[Tue Oct 6 02:27:46 2026] 127.0.0.1:36272 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36270 Closing
+[5382] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36272 Closing
+[5384] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36276 Accepted
+[Tue Oct 6 02:27:46 2026] 127.0.0.1:36276 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36280 Accepted
+[Tue Oct 6 02:27:46 2026] 127.0.0.1:36280 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36276 Closing
+[5384] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36282 Accepted
+[Tue Oct 6 02:27:46 2026] 127.0.0.1:36282 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5382] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36280 Closing
+[5380] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36288 Accepted
+[Tue Oct 6 02:27:46 2026] 127.0.0.1:36288 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5384] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36282 Closing
+[5380] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36288 Closing
+[5380] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36292 Accepted
+[Tue Oct 6 02:27:46 2026] 127.0.0.1:36292 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36292 Closing
+[5380] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36296 Accepted
+[Tue Oct 6 02:27:46 2026] 127.0.0.1:36296 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36296 Closing
+[5384] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36300 Accepted
+[Tue Oct 6 02:27:46 2026] 127.0.0.1:36300 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36300 Closing
+[5381] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36304 Accepted
+[Tue Oct 6 02:27:46 2026] 127.0.0.1:36304 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:27:46 2026] 127.0.0.1:36304 Closing
+[5383] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36308 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36308 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5383] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36308 Closing
+[5383] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36310 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36310 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36310 Closing
+[5381] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36326 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36326 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36326 Closing
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36342 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36342 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36342 Closing
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36346 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36346 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36346 Closing
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36360 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36360 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36360 Closing
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36376 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36376 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36376 Closing
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36392 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36392 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36392 Closing
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36398 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36398 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5380] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36398 Closing
+[5384] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36408 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36408 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36408 Closing
+[5384] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36420 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36420 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36420 Closing
+[5384] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36432 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36432 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36432 Closing
+[5384] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36434 Accepted
+[Tue Oct 6 02:27:47 2026] 127.0.0.1:36434 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:27:47 2026] 127.0.0.1:36434 Closing
+[5384] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36444 Accepted
+[Tue Oct 6 02:27:48 2026] 127.0.0.1:36444 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36444 Closing
+[5384] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36446 Accepted
+[Tue Oct 6 02:27:48 2026] 127.0.0.1:36446 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36446 Closing
+[5384] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36450 Accepted
+[Tue Oct 6 02:27:48 2026] 127.0.0.1:36450 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36450 Closing
+[5381] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36466 Accepted
+[Tue Oct 6 02:27:48 2026] 127.0.0.1:36466 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36466 Closing
+[5382] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36468 Accepted
+[Tue Oct 6 02:27:48 2026] 127.0.0.1:36468 [POST] URI: /v1/tenants/43fb6fc2-659a-4bbe-a79e-6c745792ea04/actor-delegations
+[5382] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36468 Closing
+[5384] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36484 Accepted
+[Tue Oct 6 02:27:48 2026] 127.0.0.1:36484 [POST] URI: /v1/tenants/43fb6fc2-659a-4bbe-a79e-6c745792ea04/delegated-authorizations
+[5384] [Tue Oct  6 02:27:48 2026] 127.0.0.1:36484 Closing
+[5384] [Tue Oct  6 02:28:04 2026] 127.0.0.1:50928 Accepted
+[Tue Oct 6 02:28:04 2026] 127.0.0.1:50928 [GET] URI: /identity/session
+[5384] [Tue Oct  6 02:28:04 2026] 127.0.0.1:50928 Closing
+[5384] [Tue Oct  6 02:28:04 2026] 127.0.0.1:50936 Accepted
+[Tue Oct 6 02:28:04 2026] 127.0.0.1:50936 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:04 2026] 127.0.0.1:50936 Closing
+[5384] [Tue Oct  6 02:28:04 2026] 127.0.0.1:50948 Accepted
+[Tue Oct 6 02:28:04 2026] 127.0.0.1:50948 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:04 2026] 127.0.0.1:50948 Closing
+[5384] [Tue Oct  6 02:28:04 2026] 127.0.0.1:50962 Accepted
+[Tue Oct 6 02:28:04 2026] 127.0.0.1:50962 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:04 2026] 127.0.0.1:50962 Closing
+[5380] [Tue Oct  6 02:28:04 2026] 127.0.0.1:55534 Accepted
+[Tue Oct 6 02:28:04 2026] 127.0.0.1:55534 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:04 2026] 127.0.0.1:55534 Closing
+[5380] [Tue Oct  6 02:28:04 2026] 127.0.0.1:55544 Accepted
+[Tue Oct 6 02:28:04 2026] 127.0.0.1:55544 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:04 2026] 127.0.0.1:55544 Closing
+[5380] [Tue Oct  6 02:28:04 2026] 127.0.0.1:55556 Accepted
+[Tue Oct 6 02:28:04 2026] 127.0.0.1:55556 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:04 2026] 127.0.0.1:55556 Closing
+[5382] [Tue Oct  6 02:28:04 2026] 127.0.0.1:55572 Accepted
+[Tue Oct 6 02:28:04 2026] 127.0.0.1:55572 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5382] [Tue Oct  6 02:28:04 2026] 127.0.0.1:55572 Closing
+[5382] [Tue Oct  6 02:28:04 2026] 127.0.0.1:55584 Accepted
+[Tue Oct 6 02:28:04 2026] 127.0.0.1:55584 [GET] URI: /identity/session
+[5382] [Tue Oct  6 02:28:04 2026] 127.0.0.1:55584 Closing
+[5384] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55596 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55596 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55596 Closing
+[5384] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55598 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55598 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55598 Closing
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55606 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55606 [GET] URI: /identity/session
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55606 Closing
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55612 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55612 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55612 Closing
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55616 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55616 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55616 Closing
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55628 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55628 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55628 Closing
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55632 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55632 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55632 Closing
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55638 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55638 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55638 Closing
+[5384] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55652 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55652 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55652 Closing
+[5384] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55664 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55664 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5384] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55664 Closing
+[5384] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55672 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55672 [GET] URI: /identity/session
+[5384] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55672 Closing
+[5380] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55686 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55686 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55686 Closing
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55696 Accepted
+[Tue Oct 6 02:28:05 2026] 127.0.0.1:55696 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:05 2026] 127.0.0.1:55696 Closing
+[5381] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55712 Accepted
+[Tue Oct 6 02:28:06 2026] 127.0.0.1:55712 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5381] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55712 Closing
+[5384] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55714 Accepted
+[Tue Oct 6 02:28:06 2026] 127.0.0.1:55714 [GET] URI: /identity/session
+[5384] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55714 Closing
+[5384] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55724 Accepted
+[Tue Oct 6 02:28:06 2026] 127.0.0.1:55724 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55724 Closing
+[5384] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55732 Accepted
+[Tue Oct 6 02:28:06 2026] 127.0.0.1:55732 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55732 Closing
+[5383] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55738 Accepted
+[Tue Oct 6 02:28:06 2026] 127.0.0.1:55738 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55738 Closing
+[5383] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55746 Accepted
+[Tue Oct 6 02:28:06 2026] 127.0.0.1:55746 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55746 Closing
+[5383] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55752 Accepted
+[Tue Oct 6 02:28:06 2026] 127.0.0.1:55752 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55752 Closing
+[5384] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55756 Accepted
+[Tue Oct 6 02:28:06 2026] 127.0.0.1:55756 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55756 Closing
+[5384] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55762 Accepted
+[Tue Oct 6 02:28:06 2026] 127.0.0.1:55762 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5384] [Tue Oct  6 02:28:06 2026] 127.0.0.1:55762 Closing
+[5384] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55770 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55770 [GET] URI: /identity/session
+[5384] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55770 Closing
+[5384] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55774 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55774 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55774 Closing
+[5381] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55776 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55776 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55776 Closing
+[5382] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55790 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55790 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55790 Closing
+[5382] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55802 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55802 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55802 Closing
+[5383] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55814 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55814 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55814 Closing
+[5383] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55830 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55830 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55830 Closing
+[5381] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55838 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55838 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55838 Closing
+[5380] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55852 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55852 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55852 Closing
+[5381] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55858 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55858 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55858 Closing
+[5381] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55872 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55872 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55872 Closing
+[5380] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55874 Accepted
+[Tue Oct 6 02:28:07 2026] 127.0.0.1:55874 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5380] [Tue Oct  6 02:28:07 2026] 127.0.0.1:55874 Closing
+[5381] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55876 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55876 [GET] URI: /identity/session
+[5381] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55876 Closing
+[5380] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55886 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55886 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55886 Closing
+[5381] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55892 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55892 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55892 Closing
+[5383] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55908 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55908 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55908 Closing
+[5380] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55924 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55924 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55924 Closing
+[5384] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55926 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55926 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55926 Closing
+[5384] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55930 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55930 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55930 Closing
+[5384] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55946 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55946 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55946 Closing
+[5383] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55962 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55962 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55962 Closing
+[5383] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55974 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55974 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55974 Closing
+[5384] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55976 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55976 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55976 Closing
+[5384] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55984 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55984 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5384] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55984 Closing
+[5383] [Tue Oct  6 02:28:08 2026] 127.0.0.1:55992 Accepted
+[Tue Oct 6 02:28:08 2026] 127.0.0.1:55992 [GET] URI: /identity/session
+[5383] [Tue Oct  6 02:28:09 2026] 127.0.0.1:55992 Closing
+[5383] [Tue Oct  6 02:28:09 2026] 127.0.0.1:55996 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:55996 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:09 2026] 127.0.0.1:55996 Closing
+[5381] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56004 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56004 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56004 Closing
+[5381] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56010 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56010 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5381] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56010 Closing
+[5380] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56022 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56022 [GET] URI: /identity/session
+[5380] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56022 Closing
+[5383] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56026 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56026 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56026 Closing
+[5384] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56036 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56036 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56036 Closing
+[5380] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56052 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56052 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56052 Closing
+[5380] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56062 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56062 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56062 Closing
+[5384] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56074 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56074 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56074 Closing
+[5381] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56082 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56082 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56082 Closing
+[5384] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56086 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56086 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5384] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56086 Closing
+[5384] [Tue Oct  6 02:28:09 2026] 127.0.0.1:56102 Accepted
+[Tue Oct 6 02:28:09 2026] 127.0.0.1:56102 [GET] URI: /identity/session
+[5384] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56102 Closing
+[5384] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56106 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56106 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56106 Closing
+[5383] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56118 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56118 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56118 Closing
+[5383] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56128 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56128 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5383] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56128 Closing
+[5381] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56130 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56130 [GET] URI: /identity/session
+[5381] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56130 Closing
+[5381] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56146 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56146 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56146 Closing
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56148 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56148 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56148 Closing
+[5381] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56156 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56156 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56156 Closing
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56158 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56158 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56158 Closing
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56160 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56160 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56160 Closing
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56172 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56172 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56172 Closing
+[5382] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56186 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56186 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56186 Closing
+[5382] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56194 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56194 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56194 Closing
+[5382] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56198 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56198 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56198 Closing
+[5382] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56208 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56208 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56208 Closing
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56212 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56212 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56212 Closing
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56228 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56228 [GET] URI: /identity/session
+[5380] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56228 Closing
+[5382] [Tue Oct  6 02:28:10 2026] 127.0.0.1:56234 Accepted
+[Tue Oct 6 02:28:10 2026] 127.0.0.1:56234 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56234 Closing
+[5382] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56248 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56248 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56248 Closing
+[5384] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56262 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56262 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56262 Closing
+[5382] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56270 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56270 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56270 Closing
+[5382] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56276 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56276 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56276 Closing
+[5381] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56286 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56286 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56286 Closing
+[5380] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56300 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56300 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56300 Closing
+[5383] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56316 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56316 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56316 Closing
+[5384] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56318 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56318 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56318 Closing
+[5381] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56330 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56330 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56330 Closing
+[5383] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56334 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56334 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5383] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56334 Closing
+[5383] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56338 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56338 [GET] URI: /identity/session
+[5383] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56338 Closing
+[5383] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56342 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56342 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56342 Closing
+[5383] [Tue Oct  6 02:28:11 2026] 127.0.0.1:56350 Accepted
+[Tue Oct 6 02:28:11 2026] 127.0.0.1:56350 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56350 Closing
+[5383] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56352 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56352 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5383] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56352 Closing
+[5382] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56360 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56360 [GET] URI: /identity/session
+[5382] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56360 Closing
+[5382] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56364 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56364 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56364 Closing
+[5382] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56378 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56378 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56378 Closing
+[5382] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56388 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56388 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56388 Closing
+[5382] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56402 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56402 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56402 Closing
+[5380] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56406 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56406 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56406 Closing
+[5380] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56418 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56418 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56418 Closing
+[5384] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56424 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56424 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5384] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56424 Closing
+[5380] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56440 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56440 [GET] URI: /identity/session
+[5380] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56440 Closing
+[5380] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56450 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56450 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56450 Closing
+[5381] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56460 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56460 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56460 Closing
+[5383] [Tue Oct  6 02:28:12 2026] 127.0.0.1:56466 Accepted
+[Tue Oct 6 02:28:12 2026] 127.0.0.1:56466 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56466 Closing
+[5383] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56476 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56476 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56476 Closing
+[5383] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56492 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56492 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56492 Closing
+[5384] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56496 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56496 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56496 Closing
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56506 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56506 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56506 Closing
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56520 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56520 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56520 Closing
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56534 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56534 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56534 Closing
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56548 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56548 [GET] URI: /identity/session
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56548 Closing
+[5383] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56558 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56558 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56558 Closing
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56560 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56560 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56560 Closing
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56574 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56574 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56574 Closing
+[5383] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56590 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56590 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56590 Closing
+[5382] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56594 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56594 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56594 Closing
+[5382] [Tue Oct  6 02:28:13 2026] 127.0.0.1:56606 Accepted
+[Tue Oct 6 02:28:13 2026] 127.0.0.1:56606 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56606 Closing
+[5382] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56610 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:56610 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56610 Closing
+[5382] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56612 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:56612 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56612 Closing
+[5382] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56624 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:56624 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56624 Closing
+[5383] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56632 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:56632 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5383] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56632 Closing
+[5383] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56640 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:56640 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5383] [Tue Oct  6 02:28:14 2026] 127.0.0.1:56640 Closing
+[5383] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57798 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:57798 [GET] URI: /identity/session
+[5383] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57798 Closing
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57808 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:57808 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57808 Closing
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57816 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:57816 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57816 Closing
+[5380] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57826 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:57826 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5380] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57826 Closing
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57840 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:57840 [GET] URI: /identity/session
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57840 Closing
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57842 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:57842 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57842 Closing
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57858 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:57858 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57858 Closing
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57864 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:57864 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57864 Closing
+[5382] [Tue Oct  6 02:28:14 2026] 127.0.0.1:57868 Accepted
+[Tue Oct 6 02:28:14 2026] 127.0.0.1:57868 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57868 Closing
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57880 Accepted
+[Tue Oct 6 02:28:15 2026] 127.0.0.1:57880 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57880 Closing
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57886 Accepted
+[Tue Oct 6 02:28:15 2026] 127.0.0.1:57886 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57886 Closing
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57902 Accepted
+[Tue Oct 6 02:28:15 2026] 127.0.0.1:57902 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57902 Closing
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57908 Accepted
+[Tue Oct 6 02:28:15 2026] 127.0.0.1:57908 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57908 Closing
+[5384] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57912 Accepted
+[Tue Oct 6 02:28:15 2026] 127.0.0.1:57912 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57912 Closing
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57918 Accepted
+[Tue Oct 6 02:28:15 2026] 127.0.0.1:57918 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57918 Closing
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57920 Accepted
+[Tue Oct 6 02:28:15 2026] 127.0.0.1:57920 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5381] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57920 Closing
+[5384] [Tue Oct  6 02:28:15 2026] 127.0.0.1:57934 Accepted
+[Tue Oct 6 02:28:15 2026] 127.0.0.1:57934 [GET] URI: /identity/session
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57934 Closing
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57940 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:57940 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57940 Closing
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57942 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:57942 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57942 Closing
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57944 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:57944 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/catalogue-owner-checks
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57944 Closing
+[5381] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57948 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:57948 [GET] URI: /identity/session
+[5381] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57948 Closing
+[5381] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57956 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:57956 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57956 Closing
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57958 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:57958 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57958 Closing
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57968 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:57968 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57968 Closing
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57980 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:57980 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57980 Closing
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57988 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:57988 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5384] [Tue Oct  6 02:28:16 2026] 127.0.0.1:57988 Closing
+[5381] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58004 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:58004 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58004 Closing
+[5383] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58016 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:58016 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5383] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58016 Closing
+[5382] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58026 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:58026 [GET] URI: /identity/session
+[5382] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58026 Closing
+[5380] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58034 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:58034 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58046 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:58046 [GET] URI: /identity/session
+[5380] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58034 Closing
+[5380] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58056 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:58056 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58046 Closing
+[5381] [Tue Oct  6 02:28:16 2026] 127.0.0.1:58066 Accepted
+[Tue Oct 6 02:28:16 2026] 127.0.0.1:58066 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58056 Closing
+[5381] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58066 Closing
+[5381] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58080 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58080 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58090 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58090 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58080 Closing
+[5382] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58090 Closing
+[5381] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58094 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58094 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58108 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58108 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58094 Closing
+[5384] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58112 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58112 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58108 Closing
+[5383] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58120 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58120 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58112 Closing
+[5383] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58120 Closing
+[5382] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58124 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58124 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5381] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58140 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58140 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58124 Closing
+[5381] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58140 Closing
+[5384] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58144 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58144 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5382] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58150 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58150 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5384] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58144 Closing
+[5382] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58150 Closing
+[5382] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58162 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58162 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5382] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58162 Closing
+[5382] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58176 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58176 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5382] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58176 Closing
+[5380] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58192 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58192 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5380] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58192 Closing
+[5380] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58194 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58194 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/delegated-authorizations
+[5380] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58194 Closing
+[5381] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58200 Accepted
+[Tue Oct 6 02:28:17 2026] 127.0.0.1:58200 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/authorization-decisions
+[5381] [Tue Oct  6 02:28:17 2026] 127.0.0.1:58200 Closing
+[5381] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58212 Accepted
+[Tue Oct 6 02:28:18 2026] 127.0.0.1:58212 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/memberships
+[5381] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58212 Closing
+[5381] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58220 Accepted
+[Tue Oct 6 02:28:18 2026] 127.0.0.1:58220 [GET] URI: /identity/session
+[5381] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58220 Closing
+[5381] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58232 Accepted
+[Tue Oct 6 02:28:18 2026] 127.0.0.1:58232 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5381] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58232 Closing
+[5383] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58236 Accepted
+[Tue Oct 6 02:28:18 2026] 127.0.0.1:58236 [GET] URI: /identity/session
+[5383] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58236 Closing
+[5383] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58248 Accepted
+[Tue Oct 6 02:28:18 2026] 127.0.0.1:58248 [GET] URI: /v1/tenant-directory
+[5383] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58248 Closing
+[5382] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58262 Accepted
+[Tue Oct 6 02:28:18 2026] 127.0.0.1:58262 [GET] URI: /identity/session
+[5383] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58274 Accepted
+[Tue Oct 6 02:28:18 2026] 127.0.0.1:58274 [GET] URI: /identity/session
+[5382] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58262 Closing
+[5383] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58274 Closing
+[5383] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58280 Accepted
+[Tue Oct 6 02:28:18 2026] 127.0.0.1:58280 [POST] URI: /v1/tenants/43fb6fc2-659a-4bbe-a79e-6c745792ea04/actor-delegations
+[5381] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58290 Accepted
+[Tue Oct 6 02:28:18 2026] 127.0.0.1:58290 [POST] URI: /v1/tenants/58531d4b-9f4c-4826-9621-8808689d98fb/actor-delegations
+[5383] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58280 Closing
+[5381] [Tue Oct  6 02:28:18 2026] 127.0.0.1:58290 Closing

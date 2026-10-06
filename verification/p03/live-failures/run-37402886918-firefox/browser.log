@@ -1,0 +1,28 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [firefox] › tests/browser-p03/catalogue.spec.ts:5:1 › authors complete intent, preserves conflicts and uncertain retries, compares history and clears revoked access (2.5m)
+
+
+  1) [firefox] › tests/browser-p03/catalogue.spec.ts:5:1 › authors complete intent, preserves conflicts and uncertain retries, compares history and clears revoked access 
+
+    Test timeout of 150000ms exceeded.
+
+    Error: locator.fill: Test ended.
+    Call log:
+      - waiting for getByLabel('Virtual CPUs', { exact: true }).first()
+
+
+      36 |   stale.on('dialog', dialog => { void dialog.accept(); });
+      37 |   await stale.goto(editUrl);
+    > 38 |   await stale.getByLabel('Virtual CPUs', { exact: true }).first().fill('6');
+         |                                                                   ^
+      39 |   await page.getByLabel('Virtual CPUs', { exact: true }).first().fill('4');
+      40 |   await page.getByRole('button', { name: 'Publish new revision' }).click();
+      41 |   await expect(page.getByRole('status')).toContainText('Published revision 2');
+        at /home/runner/work/multi-tenant/multi-tenant/apps/console/tests/browser-p03/catalogue.spec.ts:38:67
+
+    Error Context: test-results/catalogue-authors-complete-2c958-y-and-clears-revoked-access-firefox/error-context.md
+
+  1 failed
+    [firefox] › tests/browser-p03/catalogue.spec.ts:5:1 › authors complete intent, preserves conflicts and uncertain retries, compares history and clears revoked access 
