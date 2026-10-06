@@ -273,12 +273,15 @@ phases:
   - P07.06
   gate_id: G07
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P07-001
+  delivery_note: Commissioning input evaluator and protected-record parser implemented; actual native facts and
+    scope remain unsupplied. Local checks do not complete the native package.
 - id: P08
   title: VMware-to-OpenStack migration
   owner_role: Infrastructure and application owner
@@ -1683,17 +1686,22 @@ work_packages:
   title: Native site readiness
   owner_role: SRE/platform owners
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P07-001
   doc_refs:
   - docs/implementation/phases/p07.md
+  - docs/implementation/p07-native-provisioning.md
+  - docs/operations/runbooks/openstack-commissioning.md
   criterion_ids:
   - G07.01
   - G07.02
+  delivery_note: Commissioning input evaluator and protected-record parser implemented; actual native facts and
+    scope remain unsupplied. Local checks do not complete the native package.
 - id: P07.02
   phase_id: P07
   title: Infrastructure automation
@@ -3784,7 +3792,8 @@ gates:
   reviewer: null
   reviewed_at: null
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P07-001
 - id: G08
   phase_id: P08
   decision: NOT_REVIEWED
@@ -6806,5 +6815,29 @@ blockers:
     gate.
   next_action: Perform the concrete receiving review. Independently prepare P07.01 actual OpenStack site-readiness
     inputs; native effects remain held until exact campaign authority, scope and operating inputs exist.
+  state: OPEN
+  resolution_evidence_ids: []
+
+- id: BL-P07-001
+  scope_ids:
+  - P07
+  - P07.01
+  - P07.02
+  - P07.03
+  - P07.04
+  - P07.05
+  - P07.06
+  - G07
+  owner_role: OpenStack platform, Infrastructure, security, enterprise service, SRE and qualification owners
+  description: Actual installed OpenStack/API/backend/guest tuple, bounded native write campaign, scoped credentials/trust,
+    tool/provider/state/locking selections, enterprise interfaces, observer and operating/receiving evidence are
+    not supplied. P06 E2 simulation cannot replace them. Native adapters and Q05/Q06 implementation depend on these
+    concrete interfaces.
+  unblock_condition: Supply the protected N01-N15 packet using docs/operations/runbooks/openstack-commissioning.md,
+    resolve ADR-015/016 interface/tool selections, record actual G06 receiving and applicable OP01-OP07 controls,
+    then implement and qualify native adapters against that exact scope.
+  next_action: Complete independent commissioning and saved-plan preparation now; obtain actual site/interface facts
+    before native adapter development and exact-scope authorization before any native effect. No renewed G00 approval
+    is needed.
   state: OPEN
   resolution_evidence_ids: []

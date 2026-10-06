@@ -8,13 +8,13 @@ Requires-Dist: psycopg[binary]==3.3.6
 Requires-Dist: uvicorn==0.53.0
 Requires-Dist: temporalio==1.34.0
 
-# Lifecycle foundation
+# Lifecycle
 
-This independently owned Python service implements the P01 installed bootstrap commands and persistent synthetic dependency diagnostics. Product assessment, inventory, orchestration and native operations remain unavailable. Intended context behavior remains in the [service specification](../../docs/services/lifecycle.md).
+This independently owned Python service implements the P01 installed bootstrap commands and persistent synthetic dependency diagnostics. P06 adds isolated simulation admission, durable Temporal workflows and evidence-bound job projections. Native operations remain unavailable. Intended context behavior remains in the [service specification](../../docs/services/lifecycle.md).
 
 ## Runtime and diagnostic boundaries
 
-`lifecycle-serve` starts Uvicorn on port 8080, binding `0.0.0.0` by default. Use `--host` and `--port` to select a listener. Its minimal ASGI interface exposes only these routes:
+`lifecycle-serve` starts Uvicorn on port 8080, binding `0.0.0.0` by default. Use `--host` and `--port` to select a listener. Its foundation diagnostics expose these routes; P06 execution routes are separately authenticated below:
 
 | Route | Access | Meaning |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ This independently owned Python service implements the P01 installed bootstrap c
 | `GET /health/ready` | Unauthenticated | Always 503 `foundation_only`; product availability is not implemented. |
 | `GET /health/dependencies` | Synthetic Bearer token | 200 requires the owned PostgreSQL connection and schema checks below. This is foundation readiness only. |
 
-All responses disable caching. Unsupported methods return 405; unknown routes return 404. Authentication runs before dependency access. Missing/invalid credentials return 401; missing or malformed mounted authentication material returns 503. Dependency/configuration errors return a generic 503 without driver details, addresses or secret values. Unavailable responses carry `Retry-After: 10`. HTTP access logging and forwarded-header trust are disabled. The application does not implement workload operations or consume worker tasks.
+All responses disable caching. Unsupported methods return 405; unknown routes return 404. Authentication runs before dependency access. Missing/invalid credentials return 401; missing or malformed mounted authentication material returns 503. Dependency/configuration errors return a generic 503 without driver details, addresses or secret values. Unavailable responses carry `Retry-After: 10`. HTTP access logging and forwarded-header trust are disabled. Foundation diagnostics never grant workload authority. P06 simulation runs through its separate API and worker identities.
 
 The original `lifecycle-health liveness` command still exits 0 for its own short-lived process only. `lifecycle-health readiness` still exits 1 with `service_dependencies_not_implemented`; it cannot certify the persistent service. Unsupported command arguments exit 2. Root package imports perform no composition or network access.
 
@@ -72,3 +72,22 @@ lost replies, renew/confirm/release and live-resource expiry holds. No native
 allocation adapter, execution API or dispatch worker is supplied by this increment.
 See the [Planning runbook](../../docs/operations/runbooks/planning-review.md) for
 admission boundaries and P06 handoff.
+
+## P06 execution
+
+`lifecycle-serve` also serves the scoped execution contract in
+[`lifecycle-v1.json`](../../contracts/openapi/lifecycle-v1.json).
+`lifecycle-workflows` runs the versioned Temporal worker and durable dispatcher.
+Owned migrations establish command receipts, journal, resource holds and alerts.
+Use the [implementation record](../../docs/implementation/p06-execution.md) and
+[runbook](../../docs/operations/runbooks/durable-simulation.md) for exact authority,
+TLS/credential/campaign configuration, recovery and qualification limits. No
+operational plan or native effect adapter is enabled.
+
+## P07 commissioning preparation
+
+`python -m lifecycle.bootstrap.commissioning --input <protected-record.json>`
+checks the P07 input packet locally. `--require-complete` exits 2 for an incomplete
+record; malformed input exits 1. A complete packet still grants no native write or
+qualification. See the [commissioning runbook](../../docs/operations/runbooks/openstack-commissioning.md)
+and [implementation record](../../docs/implementation/p07-native-provisioning.md).

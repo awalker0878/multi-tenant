@@ -1,4 +1,24 @@
-# Next work — P07 readiness after P06 engineering
+# Next work — P07 native commissioning
+
+P07 preparation is in progress. The [implementation record](docs/implementation/p07-native-provisioning.md)
+and [commissioning runbook](docs/operations/runbooks/openstack-commissioning.md)
+provide the input checker and N01–N15 owner/case mapping. The
+[input record](release/p07-native-inputs.json) contains no invented native facts.
+
+1. Finish saved-plan preflight checks and exact-source local/hosted qualification.
+2. **BL-P07-001:** supply the installed OpenStack tuple, exact campaign scope,
+   scoped identity/trust, tool/provider/backend/locking choices, service interfaces
+   and independent observers in the protected packet. Use actual G06 receiving
+   and OP01–OP07 controls from their existing authorities.
+3. Implement and qualify the selected native infrastructure, allocation and guest/
+   service adapters, activation, failure recovery, retirement and support dossier
+   against those concrete interfaces. Q05/Q06 E3 remains mandatory for G07.
+
+Development authorization persists. P06 simulation and complete input metadata
+do not authorize native effects. P07 remains incomplete until its scoped outputs
+and native observations exist.
+
+# Retained P06 engineering handoff
 
 P06 engineering and automated qualification are complete at
 `3a9c136639426087d060845184048f52850fcfc7`; original evidence is committed at

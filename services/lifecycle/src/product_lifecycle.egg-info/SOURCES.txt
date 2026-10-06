@@ -7,11 +7,13 @@ src/lifecycle/application/execution_ports.py
 src/lifecycle/application/foundation.py
 src/lifecycle/application/reservations.py
 src/lifecycle/bootstrap/__init__.py
+src/lifecycle/bootstrap/commissioning.py
 src/lifecycle/bootstrap/health.py
 src/lifecycle/bootstrap/server.py
 src/lifecycle/bootstrap/workflow.py
 src/lifecycle/domain/__init__.py
 src/lifecycle/domain/admission.py
+src/lifecycle/domain/commissioning.py
 src/lifecycle/domain/execution.py
 src/lifecycle/infrastructure/__init__.py
 src/lifecycle/infrastructure/execution_owners.py
@@ -21,6 +23,7 @@ src/lifecycle/infrastructure/telemetry.py
 src/lifecycle/infrastructure/temporal.py
 src/lifecycle/infrastructure/workflows.py
 src/lifecycle/interfaces/__init__.py
+src/lifecycle/interfaces/commissioning.py
 src/lifecycle/interfaces/execution.py
 src/lifecycle/interfaces/health.py
 src/lifecycle/interfaces/http.py
@@ -32,6 +35,7 @@ src/product_lifecycle.egg-info/entry_points.txt
 src/product_lifecycle.egg-info/requires.txt
 src/product_lifecycle.egg-info/top_level.txt
 tests/test_admission.py
+tests/test_commissioning.py
 tests/test_foundation.py
 tests/test_health.py
 tests/test_reservations.py

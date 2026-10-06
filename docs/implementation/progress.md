@@ -17,7 +17,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | P04 | Site commissioning and inventory | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 3 / 2 |
 | P05 | Capabilities and immutable plans | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | G05: NOT_REVIEWED | 3 / 1 |
 | P06 | Durable execution in simulation | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | G06: NOT_REVIEWED | 3 / 1 |
-| P07 | Native OpenStack provisioning | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G07: NOT_REVIEWED | 0 / 0 |
+| P07 | Native OpenStack provisioning | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G07: NOT_REVIEWED | 0 / 1 |
 | P08 | VMware-to-OpenStack migration | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G08: NOT_REVIEWED | 0 / 0 |
 | P09 | Platform and capability expansion | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G09: NOT_REVIEWED | 0 / 0 |
 | P10 | Enterprise operating qualification | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G10: NOT_REVIEWED | 0 / 0 |
@@ -68,7 +68,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P06.04 | Evidence custody | Assurance | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P06.05 | Simulation and fault injection | Quality | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P06.06 | Jobs experience | Console | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
-| P07.01 | Native site readiness | SRE/platform owners | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P07.01 | Native site readiness | SRE/platform owners | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 1 |
 | P07.02 | Infrastructure automation | Infrastructure | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P07.03 | Guest and service integration | Infrastructure/service owners | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P07.04 | Activation and verification | Lifecycle/quality | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **80**. Blocker records: **14**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **80**. Blocker records: **15**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -199,3 +199,4 @@ Evidence records: **80**. Blocker records: **14**. Planning inputs awaiting sele
 | BL-P04-002 | P04, P04.01, P04.02, P04.03, P04.04, P04.05, G04 | Inventory / security / SRE / qualification / product owners and representative operator | OPEN | Named receiving reviewers examine the engineering packet and BL-P04-001 native results, complete the Console operator tasks on selected browser/assistive combinations, and record actual identities, dates, limits and decisions. | Use the P04 completion packet and G04 review procedure; retain evidence and decisions without inferring approval from development authorization. |
 | BL-P05-001 | P05, P05.01, P05.02, P05.03, P05.04, P05.05, P05.06, G05 | Planning / architecture / Governance / security / Assurance / Lifecycle / quality leads; product and representative operator | OPEN | Use docs/implementation/p05-completion-review.md to examine exact-source evidence, execute the operator tasks on selected OP07 combinations, resolve mandatory defects and record actual reviewer identities, dates, limits and the G05 decision. Native E3 is not required for this simulation gate and is not inferred. | Perform the concrete receiving tasks and update the gate record. P06 engineering and automated qualification now consume the delivered contracts; P07.01 readiness preparation is the next engineering package. |
 | BL-P06-001 | P06, P06.01, P06.02, P06.03, P06.04, P06.05, P06.06, G06 | Product, qualification, security, Lifecycle, Assurance and SRE leads; representative operator | OPEN | Use docs/implementation/p06-completion-review.md and G06 procedure to examine exact evidence, perform the six operator tasks on selected OP07 combinations, resolve mandatory findings and record actual reviewer identities, dates, limits and the G06 decision. Native E3 is neither claimed nor required for this simulation gate. | Perform the concrete receiving review. Independently prepare P07.01 actual OpenStack site-readiness inputs; native effects remain held until exact campaign authority, scope and operating inputs exist. |
+| BL-P07-001 | P07, P07.01, P07.02, P07.03, P07.04, P07.05, P07.06, G07 | OpenStack platform, Infrastructure, security, enterprise service, SRE and qualification owners | OPEN | Supply the protected N01-N15 packet using docs/operations/runbooks/openstack-commissioning.md, resolve ADR-015/016 interface/tool selections, record actual G06 receiving and applicable OP01-OP07 controls, then implement and qualify native adapters against that exact scope. | Complete independent commissioning and saved-plan preparation now; obtain actual site/interface facts before native adapter development and exact-scope authorization before any native effect. No renewed G00 approval is needed. |

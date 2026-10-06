@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "record_id": "P07-NATIVE-INPUTS",
+  "binding": null,
+  "inputs": [
+    {
+      "id": "N01",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N02",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N03",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N04",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N05",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N06",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N07",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N08",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N09",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N10",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N11",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N12",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N13",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N14",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "N15",
+      "status": "UNKNOWN",
+      "owner_identity": null,
+      "observer_identity": null,
+      "observed_at": null,
+      "expires_at": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewer": null,
+        "reviewed_at": null
+      }
+    }
+  ]
+}

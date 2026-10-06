@@ -73,3 +73,11 @@ Use the [implementation record](../../docs/implementation/p06-execution.md) and
 [runbook](../../docs/operations/runbooks/durable-simulation.md) for exact authority,
 TLS/credential/campaign configuration, recovery and qualification limits. No
 operational plan or native effect adapter is enabled.
+
+## P07 commissioning preparation
+
+`python -m lifecycle.bootstrap.commissioning --input <protected-record.json>`
+checks the P07 input packet locally. `--require-complete` exits 2 for an incomplete
+record; malformed input exits 1. A complete packet still grants no native write or
+qualification. See the [commissioning runbook](../../docs/operations/runbooks/openstack-commissioning.md)
+and [implementation record](../../docs/implementation/p07-native-provisioning.md).
