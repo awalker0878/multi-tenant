@@ -53,3 +53,14 @@ A provider or backend change alters planning/apply behavior, resource ownership 
 - [Decision register](decision-register.md) — authority for disposition, origin and blocking checkpoint.
 - [Phased implementation plan](../implementation/phased-plan.md) — package and gate sequence.
 - [ADR authoring template](../templates/adr.md) — required decision-record fields.
+
+## P05 engineering representation — 2026-10-06
+
+The authorized P05 implementation selects the saved-plan representation above:
+exact saved-plan/toolchain hashes, backend/workspace, state lineage and serial,
+lock owner, and sole writer per managed field. The compiler rejects overlapping
+writers and holds missing state/ownership rather than substituting an unreviewed
+apply-time plan. This is the concrete engineering choice before P05.04 compilation;
+it does not appoint a receiving owner or claim acceptance of a native backend.
+Actual native tool/provider/backend selections and independent state recovery
+qualification remain due at P06.03/P07.02. See the [P05 record](../implementation/p05-planning.md).
