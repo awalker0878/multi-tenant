@@ -17,9 +17,14 @@ complete run and does not relabel an earlier partial campaign as a pass.
 | Context run 37515335859 found the Lifecycle README's new runbook link before the runbook commit. | Publish the complete runbook and review packet; clean-source documentation, architecture and generated-view checks passed. |
 | P06 core run 37516350056 passed 48 cases, then the new connection-loss fixture supplied a duplicate `connect_timeout` keyword. | Use the database adapter's existing bounded timeout. Retain the original failure and rerun the actual refused-connection observation. |
 | Kubernetes run 37515335885 received empty stdout with exit 0 from its second-process shared-state witness. | Preserve the original archive and exact empty witness as failed evidence. A later deployment campaign must independently pass; no successful state or root cause is inferred from empty output. |
+| Inventory regression run 37513710639 attempt 1 stopped the Chromium campaign at `broker_not_ready`. | Retain the original failed archive and retry the failed job with unchanged Inventory/Governance/Console/P04 inputs. Successful Firefox, WebKit and PostgreSQL results remain separately recorded. |
 
 Additional implementation checks identified receipt recovery after input expiry,
 projection freshness on acquisition, ownership recheck at grant redemption and
 separate evidence-page authorization polling. Their corrections are covered by
 the final source-bound campaign. Earlier local PostgreSQL skips are limitations,
 not failed or passing integration results.
+
+The [regression completion receipt](final/regression-completion.json) records the
+later final-source Kubernetes pass, the successful Inventory retry and all carried
+source-impact comparisons. Earlier failures retain their original status and bytes.

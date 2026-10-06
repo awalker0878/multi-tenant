@@ -78,5 +78,16 @@
     "report_present": true,
     "observed_result": "FAIL",
     "correction": "Retain empty second-process witness as a failed observation; final-source deployment regression must independently pass."
+  },
+  {
+    "run_id": 37513710639,
+    "run_attempt": 1,
+    "artifact_id": 11437070523,
+    "source_revision": "4481f3d9b32a91b0fdb95babe00f3931cd2f45d9",
+    "archive": "archives/p06-inventory-broker-startup.zip",
+    "sha256": "1f8a14c077ddd6ea5f2b23657f74a926f95e2849136451f0a44c0b9a2d9b55d0",
+    "report_present": true,
+    "observed_result": "FAIL",
+    "correction": "Broker startup did not become ready; retry only the failed Chromium job on unchanged Inventory, Governance, Console and P04 campaign source. Preserve this original attempt."
   }
 ]

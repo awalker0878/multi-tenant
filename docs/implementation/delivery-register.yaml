@@ -6371,6 +6371,9 @@ evidence:
   artifact_revisions:
     retained_artifact_commit: 4ddb91427236d6ef9f06cc1fb2a937d21102f691
     run_id: '37516991249'
+    core_report_sha256: 1334099510747c66eb449ff8a8056b13010b06a0122fc3829d7950b49fe1fc68
+    assurance_quality_run_id: '37516991238'
+    assurance_quality_report_sha256: c79ead5a1470d561a60b764d71cf2c60135bfab03ad76128d588ebc901544cbe
   campaign_ids:
   - Q01
   - Q03
@@ -6392,8 +6395,8 @@ evidence:
     assumptions require affected requalification.
   valid_until: null
   invalidated_at: null
-  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/4ddb91427236d6ef9f06cc1fb2a937d21102f691/verification/p06/final/core/report.json
-  sha256: 1334099510747c66eb449ff8a8056b13010b06a0122fc3829d7950b49fe1fc68
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/4ddb91427236d6ef9f06cc1fb2a937d21102f691/verification/p06/final/qualification-index.json
+  sha256: a99f0a1a43483b400d09f5432056d72cadf5b1e136264ce9f15b7d054144c46d
   environment: GitHub Actions Ubuntu 24.04; Python 3.12.14, uv 0.12.19 and frozen component locks.
   scope: Generated execution/custody/Console contract drift, independent lock installation, Ruff formatting/lint
     and strict mypy pass at the exact source. The 12-command report additionally retains the separately classified

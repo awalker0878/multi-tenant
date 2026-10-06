@@ -25,3 +25,8 @@ campaigns require later exact-tuple authorization and independent observers.
 Use [corrections](corrections.md) for retained failed observations, and the
 [receiving packet](../../docs/implementation/p06-completion-review.md) for the
 remaining named reviewer and representative operator tasks.
+
+The [regression completion receipt](final/regression-completion.json) records all
+15 associated workflow passes, with exact-source or explicit unchanged-input
+comparisons. It includes final-source package, image, Compose and Kubernetes
+checks and the carried P02–P05 regression boundaries.

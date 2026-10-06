@@ -15,6 +15,9 @@ Use the [implementation record](docs/implementation/p06-execution.md),
 [corrections](verification/p06/corrections.md) and
 [simulation runbook](docs/operations/runbooks/durable-simulation.md).
 
+The [regression completion receipt](verification/p06/final/regression-completion.json)
+records all 15 associated workflow passes, including final-source Kubernetes.
+
 1. **BL-P06-001 — designated receiving:** product, qualification, security,
    Lifecycle, Assurance and SRE reviewers examine the exact evidence and perform
    the six representative operator tasks in the
