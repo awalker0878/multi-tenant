@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "product-inventory-worker"
 version = "0.1.0.dev0"
-description = "Site worker bootstrap; task consumption and native collection are not implemented"
+description = "Bounded read-only Inventory collection worker"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = []
 
 [project.scripts]
-inventory-worker-collect = "inventory_worker.bootstrap.collect:main"
 inventory-worker-health = "inventory_worker.bootstrap.health:main"
+inventory-worker-collect = "inventory_worker.bootstrap.collect:main"
 
 [dependency-groups]
 dev = ["mypy==2.4.0", "pytest==9.1.1", "ruff==0.16.10"]

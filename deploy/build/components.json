@@ -64,7 +64,8 @@
       "runtime_mode": "asgi",
       "runtime_requirements": [
         "psycopg[binary]==3.3.6",
-        "uvicorn==0.53.0"
+        "uvicorn==0.53.0",
+        "pika==1.4.4"
       ],
       "runtime_entrypoint": "/opt/venv/bin/inventory-serve"
     },
@@ -129,7 +130,10 @@
       "readiness_reason": "worker_dependencies_not_implemented",
       "language": "python",
       "runtime_mode": "cli",
-      "runtime_requirements": []
+      "runtime_requirements": [],
+      "additional_scripts": {
+        "inventory-worker-collect": "inventory_worker.bootstrap.collect:main"
+      }
     },
     {
       "id": "lifecycle-workers",

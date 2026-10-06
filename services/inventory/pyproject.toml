@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "product-inventory"
 version = "0.1.0.dev0"
-description = "Inventory service bootstrap; discovery and observations are not implemented"
+description = "Scoped Inventory discovery, observation history and fact delivery"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0", "pika==1.4.4"]

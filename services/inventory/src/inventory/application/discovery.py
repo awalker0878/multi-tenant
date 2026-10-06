@@ -465,7 +465,18 @@ class Discovery:
             if not choices:
                 return {"job": None, "retry_after": 2}
             _, _, _, j, p = min(choices, key=lambda c: c[:3])
-            self.collection_authority(p)
+            try:
+                self.collection_authority(p)
+            except Rejected:
+                # Persist this scope's hold so it cannot starve another eligible tenant.
+                # No lease or native request is authorized while Governance is unavailable.
+                tx.execute(
+                    "UPDATE inventory.jobs SET next_at=%s,"
+                    "reason='collection_authority_unavailable' "
+                    "WHERE id=%s",
+                    (now + 5, j["id"]),
+                )
+                return {"job": None, "retry_after": 5}
             lease = uid()
             tx.execute(
                 (
@@ -569,6 +580,20 @@ class Discovery:
                     ),
                     (status, error, failures, now + min(60, 2**failures), now, job_id),
                 )
+                if status == "partial":
+                    self.record(
+                        tx,
+                        p.tenant,
+                        worker.identity,
+                        "discovery.completed",
+                        job_id,
+                        {
+                            "status": status,
+                            "reason": error,
+                            "endpoint_id": str(e["id"]),
+                            "pages": j["page_count"],
+                        },
+                    )
                 return {"accepted": True, "discovery_id": job_id, "status": status}
             collected = body["collected_at"]
             if (

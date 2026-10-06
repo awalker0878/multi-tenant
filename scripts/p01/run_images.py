@@ -102,8 +102,12 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
             require(project["scripts"].get(component["id"] + "-serve") == component["module"] + ".bootstrap.server:main",
                     "Persistent entrypoint differs from its package manifest")
         else:
-            require(project["dependencies"] == [] and set(project["scripts"]) == {component["entrypoint"].rsplit("/", 1)[1]},
-                    "Worker bootstrap cannot inherit service runtime dependencies or entrypoints")
+            allowed = {component["entrypoint"].rsplit("/", 1)[1]: component["module"]+".bootstrap.health:main",
+                       **component.get("additional_scripts", {})}
+            require(all(value.startswith(component["module"]+".bootstrap.") for value in allowed.values()),
+                    "Worker commands must be owned bootstrap composition")
+            require(project["dependencies"] == [] and project["scripts"] == allowed,
+                    "Worker cannot inherit service dependencies or undeclared entrypoints")
         component["runtime_distributions"] = production_inventory(project, tomllib.loads((root / "uv.lock").read_text()))
         require((root / ".python-version").read_text().strip() == lock["python_version"],
                 "Interpreter selection differs from image lock")

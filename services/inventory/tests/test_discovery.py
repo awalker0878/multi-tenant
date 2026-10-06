@@ -337,9 +337,9 @@ def test_revocation_and_governance_hold_stop_dispatch_and_result(campaign: Campa
     c = campaign
     c.start()
     c.held = True
-    with pytest.raises(Rejected, match="collection_authority"):
-        c.service.claim(c.worker)
+    assert c.service.claim(c.worker) == {"job": None, "retry_after": 5}
     c.held = False
+    c.now += 6
     lease = c.service.claim(c.worker)["job"]
     c.held = True
     with pytest.raises(Rejected, match="collection_authority"):
@@ -470,3 +470,61 @@ def test_expired_early_page_finishes_partial_without_replacing_current(campaign:
             == original
         )
     assert c.resources(job)["reason"] == "generation_expired"
+
+
+def test_unavailable_tenant_cannot_starve_a_shared_worker(campaign: Campaign) -> None:
+    c = campaign
+    p2 = replace(c.policy, policy_id=uid(), tenant=uid(), owner=uid(), native_scope="project-b")
+    c.policies.values[p2.policy_id] = p2
+    other = replace(c.actor, tenant=p2.tenant, actor=p2.owner)
+    endpoint = c.service.command(
+        other, "enroll", {"policy_id": p2.policy_id, "label": "Other"}, uid()
+    )["endpoint_id"]
+    c.start()
+    c.now += 0.01
+    c.service.command(replace(other, action="inventory.discover"), "discover", {}, uid(), endpoint)
+
+    def authority(policy: EnrollmentPolicy) -> None:
+        if policy.tenant == c.policy.tenant:
+            raise Rejected("collection_authority_unavailable", 503)
+
+    c.service.collection_authority = authority
+    assert c.service.claim(c.worker)["job"] is None
+    assert c.service.claim(c.worker)["job"]["endpoint_id"] == endpoint
+
+
+def test_concurrent_claims_respect_tenant_budget_across_authorities(campaign: Campaign) -> None:
+    c = campaign
+    p2 = replace(c.policy, policy_id=uid(), authority="separate-cloud")
+    c.policies.values[p2.policy_id] = p2
+    endpoint = c.service.command(
+        c.actor, "enroll", {"policy_id": p2.policy_id, "label": "Other authority"}, uid()
+    )["endpoint_id"]
+    c.start()
+    c.service.command(
+        replace(c.actor, action="inventory.discover"), "discover", {}, uid(), endpoint
+    )
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        claims = list(pool.map(lambda _: c.service.claim(c.worker), range(4)))
+    assert sum(claim["job"] is not None for claim in claims) == 1
+
+
+def test_retry_exhaustion_emits_original_terminal_fact(campaign: Campaign) -> None:
+    c = campaign
+    job = c.start()
+    for failure in range(3):
+        lease = c.service.claim(c.worker)["job"]
+        body = c.page(lease, [])
+        body["error"] = "throttled"
+        result = c.service.submit(c.worker, body)
+        assert result["status"] == ("partial" if failure == 2 else "queued")
+        assert c.service.claim(c.worker)["job"] is None
+        c.now += 10
+    with c.database.transaction() as tx:
+        fact = tx.one(
+            "SELECT * FROM inventory.outbox WHERE aggregate=%s "
+            "AND event_type='inventory.discovery.completed'",
+            (job,),
+        )
+        assert fact is not None and fact["payload"]["reason"] == "throttled"
+    assert c.resources(job)["completion"] == "partial"

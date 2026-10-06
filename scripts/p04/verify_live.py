@@ -149,7 +149,8 @@ def main():
                 for migration in sorted((root/relative/('migrations' if name == 'inventory' else 'database/migrations')).glob('*.sql')):
                     contents = ('SET ROLE inventory_owner;\n' if name == 'inventory' else '')+migration.read_text()
                     sql(contents, name, name+'_migrator', migrator)
-                    sql(contents, name, name+'_migrator', migrator)
+                    if name == 'inventory' or migration.name == '012_inventory_delegation.sql':
+                        sql(contents, name, name+'_migrator', migrator)
                 app_key = 'base64:'+base64.b64encode(secrets.token_bytes(32)).decode()
                 private_values.append(app_key)
                 envs[name] = os.environ | {'APP_ENV': 'p04-verification', 'P03_TEST_POSTGRES': '1', 'APP_DEBUG': 'false', 'APP_KEY': app_key,
