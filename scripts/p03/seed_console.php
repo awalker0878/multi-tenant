@@ -11,6 +11,9 @@ $app = require $root.'/apps/console/bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 $fixture = json_decode(file_get_contents($argv[1]), true, 512, JSON_THROW_ON_ERROR);
 foreach (['admin', 'author'] as $actor) {
+    // Each browser gets an independent session store. Reusing the previous store
+    // would invalidate the administrator's newly saved session on the second loop.
+    app('session')->forgetDrivers();
     $session = app('session')->driver();
     $session->start();
     $session->invalidate();

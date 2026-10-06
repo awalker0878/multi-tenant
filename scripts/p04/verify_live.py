@@ -168,6 +168,7 @@ def main():
             fixture = json.loads(fixture_file.read_text())
             private_values += [fixture['admin_token'], fixture['author_token'], fixture['foreign_token']]
             run(['php', 'scripts/p03/seed_console.php', str(fixture_file)], env=envs['console'], label='seed-browser-sessions')
+            check('both-independent-browser-sessions-persisted', sql('SELECT count(*) FROM app.sessions;', 'console') == '2')
             fixture = json.loads(fixture_file.read_text())
             private_values += [fixture['admin_cookie']['value'], fixture['author_cookie']['value']]
             fault_file = private/'lose-next-response.json'
