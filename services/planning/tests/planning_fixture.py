@@ -23,9 +23,7 @@ def inputs() -> tuple[
     dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]
 ]:
     intent = json.loads(
-        (
-            Path(__file__).resolve().parents[3] / "contracts/fixtures/catalogue/permit-desk-v1.json"
-        ).read_text()
+        (Path(__file__).resolve().parent / "fixtures/permit-desk-v1.json").read_text()
     )
     for w in intent["workloads"]:
         w["requirements"] = []
@@ -131,6 +129,8 @@ def inputs() -> tuple[
         profile_digest=p["digest"],
         artifacts=artifacts,
     )
+    for capability in q["capabilities"].values():
+        capability["status"] = "supported"
     return intent, d, p, policy, q
 
 

@@ -53,7 +53,7 @@ it('denies widened scopes revocation and mismatched operation', function (): voi
 });
 
 it('verifies Python canonical content binding and rejects an altered digest', function (): void {
-    $path = dirname(__DIR__, 4).'/contracts/fixtures/planning/synthetic-plan-v1.json';
+    $path = dirname(__DIR__).'/Fixtures/synthetic-plan-v1.json';
     $fixture = json_decode(file_get_contents($path), true, 64, JSON_THROW_ON_ERROR);
     $bound = BoundPlan::fromArray($fixture['binding']);
     expect(GovernanceLedger::digest($fixture['content']))->toBe($bound->binding['content_digest']);

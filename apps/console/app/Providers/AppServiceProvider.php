@@ -13,6 +13,8 @@ use App\Application\Inventory\Contracts\InventoryGateway;
 use App\Application\Notifications\Contracts\NotificationDecoder;
 use App\Application\Notifications\Contracts\NotificationHints;
 use App\Application\Notifications\Contracts\NotificationSource;
+use App\Application\Planning\Contracts\ApprovalGateway;
+use App\Application\Planning\Contracts\PlanningGateway;
 use App\Application\Tenancy\Contracts\TenantGateway;
 use App\Infrastructure\Catalogue\CatalogueClient;
 use App\Infrastructure\Foundation\BoundedSignalBuffer;
@@ -24,12 +26,16 @@ use App\Infrastructure\Inventory\InventoryClient;
 use App\Infrastructure\Notifications\GovernanceNotificationDecoder;
 use App\Infrastructure\Notifications\PostgresNotificationHints;
 use App\Infrastructure\Notifications\RabbitNotificationSource;
+use App\Infrastructure\Planning\GovernanceApprovals;
+use App\Infrastructure\Planning\PlanningClient;
 use Illuminate\Support\ServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(ApprovalGateway::class, GovernanceApprovals::class);
+        $this->app->bind(PlanningGateway::class, PlanningClient::class);
         $this->app->bind(InventoryGateway::class, InventoryClient::class);
         $this->app->bind(CatalogueGateway::class, CatalogueClient::class);
         $this->app->singleton(NotificationSource::class, RabbitNotificationSource::class);

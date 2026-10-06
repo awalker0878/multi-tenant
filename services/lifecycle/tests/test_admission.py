@@ -12,10 +12,7 @@ NOW = 2_000_000_000
 
 def fixture() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     plan = json.loads(
-        (
-            Path(__file__).resolve().parents[3]
-            / "contracts/fixtures/planning/synthetic-plan-v1.json"
-        ).read_text()
+        (Path(__file__).resolve().parent / "fixtures/synthetic-plan-v1.json").read_text()
     )
     c, b = plan["content"], plan["binding"]
     current = {
@@ -138,4 +135,92 @@ def test_admission_denies(fault: str) -> None:
             b["digest"] = "b" * 64
         case "expiry":
             c["valid_until"] = NOW
+    assert not evaluate(c, b, current, NOW)["admissible"]
+
+
+def lab_fixture() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    from lifecycle.domain.admission import digest
+
+    c, b, current = deepcopy(fixture())
+    c["lane"] = "isolated_campaign"
+    c["execution_ready"] = False
+    c["holds"] = [
+        "exact_tuple_qualification_missing_or_stale",
+        "dimension_not_qualified",
+        "requirement_not_qualified",
+    ]
+    b["lane"] = "isolated_campaign"
+    b["content_digest"] = digest(c)
+    b["digest"] = digest({k: v for k, v in b.items() if k != "digest"})
+    current["approval"]["plan_digest"] = b["digest"]
+    for r in current["reservations"]:
+        r["plan_digest"] = b["digest"]
+    current.update(
+        lane="isolated_campaign",
+        environment_class="isolated_lab",
+        exact_tuple_qualified=False,
+        qualification_level=None,
+        endpoints=["https://isolated.example.test"],
+        credential_scope_refs=["fixture-read-write"],
+    )
+    current["campaign"] = {
+        k: current[k] for k in ["scope", "actor_id", "environment_class", "credential_scope_refs"]
+    }
+    current["campaign"].update(
+        action=c["action"],
+        method=c["method"],
+        installed_tuple=c["installed_tuple"],
+        artifacts=c["artifacts"],
+        plan_digest=b["digest"],
+        expires_at=NOW + 200,
+        revoked=False,
+        endpoint_allowlist=current["endpoints"],
+        data_scope=["synthetic-data"],
+        cleanup_owner="separate-owner",
+        max_effects=20,
+    )
+    return c, b, current
+
+
+def test_lab_lane_can_test_missing_qualification_without_operational_support() -> None:
+    c, b, current = lab_fixture()
+    result = evaluate(c, b, current, NOW)
+    assert result["admissible"] and not result["native_write_authorized"]
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "production",
+        "endpoint",
+        "credential",
+        "data",
+        "cleanup",
+        "expiry",
+        "impact",
+        "revoked",
+        "isolation",
+    ],
+)
+def test_lab_authority_cannot_expand_or_supply_unknown_safety(fault: str) -> None:
+    c, b, current = lab_fixture()
+    match fault:
+        case "production":
+            current["environment_class"] = "production"
+        case "endpoint":
+            current["endpoints"] = [*current["endpoints"], "https://production.example.test"]
+        case "credential":
+            current["credential_scope_refs"] = ["broad-admin"]
+        case "data":
+            current["campaign"]["data_scope"] = []
+        case "cleanup":
+            current["campaign"]["cleanup_owner"] = None
+        case "expiry":
+            current["campaign"]["expires_at"] = NOW
+        case "impact":
+            current["campaign"]["max_effects"] = 0
+        case "revoked":
+            current["campaign"]["revoked"] = True
+        case "isolation":
+            c["holds"].append("mandatory_evidence_missing")
     assert not evaluate(c, b, current, NOW)["admissible"]

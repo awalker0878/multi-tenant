@@ -12,6 +12,7 @@ const changes=computed(()=>props.comparison?differences(props.comparison.intent,
  <CatalogueLayout :title="application.name" :tenant-id="tenantId">
   <p v-if="notice" role="status" class="mb-4">{{notice}}</p><p class="text-slate-600">Revision {{revision.sequence}} · {{revision.created_at}}</p><p class="mt-2 break-all text-xs">Revision ID {{revision.id}} · SHA-256 {{revision.digest}}</p>
   <Link v-if="canWrite" class="action" :href="`${base}/edit?revision=${revision.id}${scope}`">Revise this intent</Link>
+  <Link class="action secondary" :href="`${base}/environments/${revision.intent.environment.id}/planning?revision=${revision.id}`">Compare destinations and plan</Link>
   <div class="mt-7 grid gap-6 lg:grid-cols-3"><section class="space-y-5 lg:col-span-2"><h2 class="text-xl font-semibold">Application intent</h2>
    <dl class="grid gap-2 sm:grid-cols-2"><dt>Service owner</dt><dd class="break-all">{{revision.intent.service_owner_id}}</dd><dt>Environment</dt><dd class="break-all">{{revision.intent.environment.id}} · version {{revision.intent.environment.version}}</dd></dl>
    <h3 class="font-semibold">Acceptance criteria</h3><ul class="list-inside list-disc"><li v-for="criterion in revision.intent.acceptance_criteria" :key="criterion">{{criterion}}</li></ul>

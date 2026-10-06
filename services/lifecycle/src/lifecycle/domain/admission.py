@@ -105,7 +105,11 @@ def evaluate(
         ):
             holds.append("campaign_scope_not_authorized")
         # Lab authority may waive qualification alone, never missing isolation/custody/facts.
-        permitted = {"exact_tuple_qualification_missing_or_stale", "dimension_not_qualified"}
+        permitted = {
+            "exact_tuple_qualification_missing_or_stale",
+            "dimension_not_qualified",
+            "requirement_not_qualified",
+        }
         if set(content["holds"]) - permitted:
             holds.append("campaign_safety_inputs_missing")
     receipts = current.get("reservations", [])

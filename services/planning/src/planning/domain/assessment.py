@@ -200,13 +200,21 @@ def assess(
         key, value = row["key"], row["value"]
         mandatory = row["strength"] == "required"
         observation, support = observed.get(key), supported.get(key)
-        if observation is None or support is None:
+        if observation is None:
             status, reason = "unknown", "mandatory_evidence_missing"
+        elif support is None:
+            status, reason = "unknown", "requirement_not_qualified"
         elif observation.get("status") == "unsupported" or support.get("status") == "unsupported":
             status, reason = "blocked", "requirement_unsupported"
+        elif observation.get("status") != "observed" or support.get("status") != "supported":
+            status, reason = "unknown", "requirement_evidence_unassessed"
+        elif support.get("expires_at", 0) <= now:
+            status, reason = "unknown", "requirement_qualification_expired"
         elif observation.get("expires_at", 0) <= now:
             status, reason = "unknown", "requirement_observation_expired"
-        elif value not in observation.get("values", []) or value not in support.get("values", []):
+        elif digest(value) not in [digest(v) for v in observation.get("values", [])] or digest(
+            value
+        ) not in [digest(v) for v in support.get("values", [])]:
             status, reason = "blocked", "constraint_not_satisfied"
         elif observation.get("dependencies") or support.get("dependencies"):
             status, reason = "conditional", "dependency_requires_confirmation"
@@ -228,6 +236,8 @@ def assess(
     }
     for kind, amount in demand.items():
         capacity = destination["capacity"].get(kind)
+        if capacity is not None:
+            integer(capacity)
         status = "unknown" if capacity is None else "eligible" if capacity >= amount else "blocked"
         finding(
             "capacity." + kind,
@@ -255,6 +265,8 @@ def assess(
         "demand": demand,
         "reserved": False,
         "expires_at": min(
-            destination["expires_at"], policy["expires_at"], qualification.get("expires_at", 0)
+            destination["expires_at"],
+            policy["expires_at"],
+            qualification["expires_at"] if qualified else destination["expires_at"],
         ),
     }

@@ -168,3 +168,27 @@ def test_ownership_collision_and_missing_state_hold() -> None:
 def test_noncanonical_and_secrets_rejected(value: object) -> None:
     with pytest.raises(Rejected):
         canonical(value)
+
+
+@pytest.mark.parametrize(
+    "side,status",
+    [("observation", "unknown"), ("qualification", "unknown"), ("qualification", "expired")],
+)
+def test_per_requirement_unknown_and_expired_support_cannot_pass(side: str, status: str) -> None:
+    i, d, p, policy, q = inputs()
+    capability = (d if side == "observation" else q)["capabilities"]["placement.tenant_isolation"]
+    if status == "expired":
+        capability["expires_at"] = NOW
+    else:
+        capability["status"] = status
+    assert not assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)[
+        "operationally_eligible"
+    ]
+
+
+def test_boolean_is_not_numeric_requirement_value() -> None:
+    i, d, p, policy, q = inputs()
+    d["capabilities"]["placement.tenant_isolation"]["values"] = [1]
+    assert not assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)[
+        "operationally_eligible"
+    ]

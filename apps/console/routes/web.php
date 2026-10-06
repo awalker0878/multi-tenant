@@ -9,6 +9,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OidcController;
+use App\Http\Controllers\PlanningController;
 use App\Http\Controllers\TenantController;
 use App\Http\Middleware\RequireIdentity;
 use Illuminate\Support\Facades\Route;
@@ -56,4 +57,13 @@ Route::prefix('/tenants/{tenant}/inventory')->whereUuid('tenant')->middleware(Re
     Route::get('/sites/{site}/status', [$c, 'status'])->whereUuid('site');
     Route::get('/sites/{site}/generations/{generation}', [$c, 'resources'])->whereUuid(['site', 'generation']);
     Route::post('/sites/{site}/commands', [$c, 'command'])->whereUuid('site');
+});
+
+Route::prefix('/tenants/{tenant}/applications/{application}/environments/{environment}/planning')->whereUuid(['tenant', 'application', 'environment'])->middleware(RequireIdentity::class)->group(function (): void {
+    $c = PlanningController::class;
+    Route::get('/', [$c, 'index']);
+    Route::get('/destinations/{site}', [$c, 'destinations'])->whereUuid('site');
+    Route::get('/{kind}/{record}', [$c, 'show'])->whereIn('kind', ['assessments', 'plans'])->whereUuid('record');
+    Route::get('/{kind}/{record}/status', [$c, 'status'])->whereIn('kind', ['assessments', 'plans'])->whereUuid('record');
+    Route::post('/commands', [$c, 'command']);
 });

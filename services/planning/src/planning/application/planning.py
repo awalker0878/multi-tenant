@@ -50,6 +50,9 @@ class Planning:
     def save(
         self, actor: Actor, key: str, fingerprint: str, kind: str, payload: dict[str, Any]
     ) -> dict[str, Any]:
+        serialized = canonical(payload)
+        if len(serialized.encode()) > 900000:
+            raise Rejected("assessment_result_bound", 413)
         with self.database.transaction() as tx:
             tx.execute("SELECT pg_advisory_xact_lock(7504001)")
             prior = self.retry(tx, actor, key, fingerprint)
