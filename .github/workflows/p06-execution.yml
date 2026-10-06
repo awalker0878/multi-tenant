@@ -2,7 +2,24 @@ name: P06 execution
 on:
   push:
     branches: [greenfield/enterprise-microservices-plan]
-    paths: ['services/lifecycle/**', 'workers/lifecycle/**', 'services/governance/**', 'services/assurance/**', 'services/planning/**', 'apps/console/**', 'contracts/**', 'scripts/p06/**', '.github/workflows/p06-execution.yml']
+    paths:
+      - 'services/lifecycle/**'
+      - 'workers/lifecycle/**'
+      - 'services/governance/**'
+      - 'services/catalogue/**'
+      - 'services/assurance/**'
+      - 'services/planning/**'
+      - 'services/inventory/**'
+      - 'workers/inventory/**'
+      - 'apps/console/**'
+      - 'contracts/**'
+      - 'scripts/p03/seed_console.php'
+      - 'scripts/p04/**'
+      - 'scripts/p05/**'
+      - 'scripts/p06/**'
+      - 'deploy/dependencies/stateful/inventory-facts.json'
+      - '.github/workflows/p05-planning.yml'
+      - '.github/workflows/p06-execution.yml'
   pull_request:
     branches: [greenfield/enterprise-microservices-plan]
   workflow_dispatch:
