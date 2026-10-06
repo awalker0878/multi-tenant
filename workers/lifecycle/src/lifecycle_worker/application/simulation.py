@@ -66,12 +66,17 @@ class Simulation:
                 "ON CONFLICT DO NOTHING",
                 (grant["job_id"],),
             )
+            if grant["step"] == "fence_source_writers":
+                connection.execute(
+                    "UPDATE sim.writers SET source_writer=false WHERE job=%s",
+                    (grant["job_id"],),
+                )
             if grant["step"] == "activate_target":
                 connection.execute(
                     "UPDATE sim.writers SET source_writer=false,target_writer=true WHERE job=%s",
                     (grant["job_id"],),
                 )
-            if grant["step"] in {"delete_retained_target", "retire_resources"}:
+            if grant["step"] in {"verify_retention_and_deletion"}:
                 connection.execute(
                     "UPDATE sim.writers SET source_writer=false,target_writer=false WHERE job=%s",
                     (grant["job_id"],),

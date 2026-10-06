@@ -80,6 +80,17 @@ final class JobsClient implements JobsGateway
                 throw new JobsFailure(403, 'scope_mismatch');
             }
 
+            if (! $evidence && $method === 'GET') {
+                $result['control_allowed'] = false;
+                try {
+                    $control = $this->governance->send('POST', '/v1/tenants/'.$tenant.'/actor-delegations', $session,
+                        ['audience' => 'lifecycle', 'action' => 'operation.control', 'scope' => $scope]);
+                    $result['control_allowed'] = ($control['audience'] ?? null) === 'lifecycle' && ($control['authority_use'] ?? null) === 'request_bound';
+                } catch (IdentityFailure) {
+                    // A read grant never implies control authority. Every actual command is reauthorized.
+                }
+            }
+
             return $result;
         } catch (JobsFailure $e) {
             throw $e;

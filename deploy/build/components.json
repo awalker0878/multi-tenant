@@ -97,7 +97,8 @@
       "runtime_mode": "asgi",
       "runtime_requirements": [
         "psycopg[binary]==3.3.6",
-        "uvicorn==0.53.0"
+        "uvicorn==0.53.0",
+        "temporalio==1.34.0"
       ],
       "runtime_entrypoint": "/opt/venv/bin/lifecycle-serve"
     },
@@ -164,7 +165,13 @@
       "readiness_reason": "worker_dependencies_not_implemented",
       "language": "python",
       "runtime_mode": "cli",
-      "runtime_requirements": []
+      "runtime_requirements": [
+        "psycopg[binary]==3.3.6",
+        "uvicorn==0.53.0"
+      ],
+      "additional_scripts": {
+        "lifecycle-simulator": "lifecycle_worker.bootstrap.simulation:main"
+      }
     },
     {
       "id": "governance",

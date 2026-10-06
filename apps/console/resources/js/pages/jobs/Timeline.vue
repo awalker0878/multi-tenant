@@ -12,7 +12,7 @@ const uncertain=ref(false),pending=ref('');
 const stale=computed(()=>unavailable.value || !job.value || now.value-job.value.observed_at>20);
 const terminal=computed(()=>['completed','cancelled'].includes(job.value?.state??''));
 const unknown=computed(()=>job.value?.operations.some(o=>['attempting','outcome_unknown'].includes(o.outcome))??true);
-const disabled=computed(()=>stale.value || terminal.value || command.processing || uncertain.value);
+const disabled=computed(()=>stale.value || !job.value?.control_allowed || terminal.value || command.processing || uncertain.value);
 const format=(value:string)=>value.replaceAll('_',' ');
 function submit(){command.post(`${props.base}/${props.job.id}/commands`,{preserveScroll:true,onSuccess:()=>{pending.value=command.action;uncertain.value=false;void poll();},onError:errors=>{uncertain.value=errors.command_status==='503';void poll();}});}
 function request(action:string){if(disabled.value || !job.value)return;command.action=action;command.expected_revision=job.value.revision;command.command_key=crypto.randomUUID();submit();}

@@ -205,11 +205,12 @@ class Execution:
             )
             events = tx.all(
                 "SELECT id,kind,facts,occurred_at FROM app.execution_eve"
-                "nts WHERE job=%s ORDER BY sequence LIMIT 300",
+                "nts WHERE job=%s ORDER BY sequence DESC LIMIT 300",
                 (job,),
             )
             for op in operations:
                 op["id"] = str(op["id"])
+            events.reverse()
             for event in events:
                 event["id"] = str(event["id"])
             return {
@@ -605,6 +606,8 @@ class Execution:
                 (tenant, key, fingerprint, job, json.dumps(receipt)),
             )
             self.event(tx, job, "operator_request", {**receipt, "actor_id": actor})
+            if action in {"pause", "stop"}:
+                self.project(tx, job, "held", "operator_" + action)
         return receipt
 
     def checkpoint(self, tenant: str, job: str) -> dict[str, Any]:

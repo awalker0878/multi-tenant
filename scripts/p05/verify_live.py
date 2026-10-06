@@ -33,7 +33,7 @@ from live_fixture import NativePeer, TlsProxy
 from live_campaign import campaign
 
 
-def main():
+def main(extension=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
@@ -53,7 +53,7 @@ def main():
             'TLS application peers terminate at disposable loopback forwarding proxies; no operated ingress qualification.',
             'Automated browser checks do not establish representative operator, screen-reader or independent G05 receiving acceptance.']}
     paths = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
-    report['source_sha256'] = {n: hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/planning/', 'services/lifecycle/', 'services/assurance/', 'services/inventory/', 'workers/inventory/', 'services/governance/', 'services/catalogue/', 'apps/console/', 'contracts/', 'scripts/p03/seed_', 'scripts/p04/', 'scripts/p05/', '.github/workflows/p05', 'deploy/dependencies/stateful/inventory-facts.json'))}
+    report['source_sha256'] = {n: hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/planning/', 'services/lifecycle/', 'services/assurance/', 'services/inventory/', 'workers/inventory/', 'workers/lifecycle/', 'scripts/p06/', '.github/workflows/p06', 'services/governance/', 'services/catalogue/', 'apps/console/', 'contracts/', 'scripts/p03/seed_', 'scripts/p04/', 'scripts/p05/', '.github/workflows/p05', 'deploy/dependencies/stateful/inventory-facts.json'))}
     private_values = [os.environ['P05_ADMIN_PASSWORD']]
     processes, handles, proxies = {}, [], []
     broker = None
@@ -330,7 +330,7 @@ def main():
             check('independent-native-state-unchanged', native.unchanged() and all(r['method'] == 'GET' and '169.254' not in r['path'] for r in native.requests))
             (out/'native-observer.json').write_text(json.dumps({'synthetic_only': True, 'before_sha256': native.before, 'unchanged': native.unchanged(), 'requests': native.requests}, indent=2)+'\n')
 
-            campaign(locals())
+            campaign(locals(), extension)
             for name in directories:
                 log = (private/(name+'.log')).read_text()
                 (out/(name+'-http.log')).write_text(redact(log))

@@ -65,7 +65,7 @@ def qualify_ceremony(root, private, run, sql, check, recovery, stop, start, envi
                     'restore_sha256': hashlib.sha256((private / 'governance-current.dump').read_bytes()).hexdigest(),
                     'records_sha256': hashlib.sha256(b'Synthetic current owner, retirement, revocation and provider records; not production custody').hexdigest(),
                     'containment_sha256': hashlib.sha256(b'Disposable applications stopped and notification pump drained').hexdigest(),
-                    'previous_workloads': {'console': hashlib.sha256(old_credential.encode()).hexdigest(), 'catalogue': None, 'inventory': None, 'planning': None, 'assurance': None},
+                    'previous_workloads': {'console': hashlib.sha256(old_credential.encode()).hexdigest(), 'catalogue': None, 'inventory': None, 'planning': None, 'assurance': None, 'lifecycle': None},
                     'memberships': [{'id': member['id'], 'owner_record_sha256': hashlib.sha256(b'Synthetic tenant-owner reconciliation approval').hexdigest()}]}
     inputs = directory / 'observations.json'
     custody.write_new(inputs, custody.canonical(observations))

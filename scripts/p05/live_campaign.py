@@ -16,7 +16,7 @@ from openapi_spec_validator import validate_spec
 from live_fixture import InventoryContractPeer,PlanningBroker
 
 
-def campaign(c):
+def campaign(c, extension=None):
     root,private,out=c['root'],c['private'],c['out']
     wire,gov,run,check,sql=c['wire'],c['gov'],c['run'],c['check'],c['sql']
     fixture,credentials,envs=c['fixture'],c['credentials'],c['envs']
@@ -146,3 +146,6 @@ def campaign(c):
     check('planning-fact-lost-receipt-replays-original-event',len(ids)>1 and ids[0]==ids[1] and len(ids)-len(set(ids))==1)
     check('planning-confirmed-outbox-drained',sql('SELECT count(*) FROM app.planning_outbox o LEFT JOIN app.planning_deliveries d ON d.id=o.id WHERE d.id IS NULL;','planning')=='0')
     (out/'owner-observations.json').write_text(json.dumps({'scope':'E2 controlled Inventory contract; no native qualification','reads':peer.reads,'assessment':assessment,'plan':saved,'actual_inventory_findings':actual_view['results']},indent=2)+'\n')
+
+    if extension is not None:
+        extension(c, locals())
