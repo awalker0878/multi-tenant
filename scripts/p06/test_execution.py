@@ -265,7 +265,7 @@ def test_journal_connection_loss_prevents_independent_acceptance(world: dict[str
     # the separately owned simulator remains available through its original endpoint.
     with socket.socket() as closed:
         closed.bind(('127.0.0.1',0))
-        service.database=Postgres(w['postgres']|{'user':'lifecycle_runtime','port':closed.getsockname()[1],'connect_timeout':1})
+        service.database=Postgres(w['postgres']|{'user':'lifecycle_runtime','port':closed.getsockname()[1]})
         try:
             with pytest.raises(psycopg.OperationalError):w['peer'].execute(grant)
             with w['connect']() as connection:
