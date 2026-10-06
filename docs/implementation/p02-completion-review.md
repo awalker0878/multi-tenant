@@ -7,7 +7,9 @@ three engines pass 116 checks, including nonempty support history restore; the
 separate TLS event campaign passes 74 cases. BL-P02-001 is resolved.
 
 The [engineering assessment](../qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
-maps the evidence to G02. **P02 remains IN_PROGRESS and G02 NOT_REVIEWED** pending
+maps the evidence to G02. Recovery source `7ec7a60` additionally passes all three
+156-check custody/resumption campaigns, retained in EV-P02-023/024.
+**P02 remains IN_PROGRESS and G02 NOT_REVIEWED** pending
 the actual custody, managed-browser/accessibility and independent receiving inputs
 below. These are concrete operating/review obligations, not a request to reauthorize
 the completed implementation.
@@ -35,10 +37,20 @@ production resumption after recovery.
 
 ## Identity, support-audit and recovery custody — BL-P02-002
 
-The [implemented recovery boundary](p02-identity-recovery.md) requires the external
-admission descriptor to be held and rotated before restore. It prevents an older
-database from matching current custody; it cannot detect an older database and its
-old active descriptor restored together. There is no automatic rebind or reset.
+The [independent custody and resumption mechanism](p02-recovery-custody.md) now
+implements the requested procedure. A separate custody tool holds/rotates admission;
+two distinct enrolled signing keys approve exact restored-state reconciliation;
+an owner-only command revokes stale authority; a second two-person approval and
+separate custodian release are required before fresh OIDC sign-in. Migration 011
+prevents runtime rebinding or writing recovery receipts/releases. Current credentials
+must be unique and must not reuse any prior workload credential. No automatic rebind
+or local-bootstrap reset is available.
+
+Follow the [executable runbook](../operations/runbooks/identity-recovery-custody.md).
+Its software procedure is delivered; actual independent people, keys, host/mount/backup
+separation, records and supported topology still require the operating observations
+below. Restoring an old database together with its entire old active custody/trust
+store remains outside the filesystem fence.
 
 IAM/SRE/security/records must provide the following in the restricted installation record, through
 OP03/OP05/OP06 in [operating inputs](../../release/operating-inputs.json):
@@ -46,10 +58,10 @@ OP03/OP05/OP06 in [operating inputs](../../release/operating-inputs.json):
 | Input | Concrete acceptance observation |
 | --- | --- |
 | Actual support approvers/reviewers and audit custody | Supply accountable identities, exact scoped role appointments, protected `support.audit` consumer/destination, retention/sovereignty, case/review ownership and escalation. Verify actual custody separately from the disposable broker ACL checks. |
-| Actual independent custodian, protected descriptor location and change authority | Application identities can only read the descriptor; database restore/retry cannot restore or replace it. Hold/new-epoch installation is independently observed before storage restore. |
+| Actual independent custodian, signers, protected store and change authority | Enroll the actual verified recovery owner and a different security reviewer with separate encrypted keys. Only the public directory is mounted read-only into Governance. Demonstrate runtime cannot write custody and that database/application restore cannot roll back its host, keys, journal or descriptor. Independently observe hold/new epoch before restore. |
 | Key/secret service and restore access | The current encryption material is recoverable through approved custody, separate from application backups and runtime credentials. Record protected references, not values. |
 | Retirement/revocation records outside the restored store | Compare activation, local retirement, session/grant/approval revocations and authority revisions after the backup point; missing current facts keep admission held. |
-| Resumption and lost-bootstrap procedure | Named recovery owner and independent reviewer authorize any reconciled binding or pre-activation lost-password recovery. Record exact source, database capture, descriptor generation, revocation reconciliation and denial checks before reopening. No raw ad hoc database change or startup rebind. |
+| Executed resumption and lost-bootstrap disposition | Execute the delivered hold → prepare → two signatures → apply → separately signed resume → confirm → custodian release procedure on the actual isolated installation. Retain exact source/archive, current records, denial checks and fresh sign-in. Lost pre-activation bootstrap remains held; use the accountable clean-installation/data-recovery decision or a separately reviewed design, never reset a retired local administrator. |
 | Supported ingress/workload/provider topology | Supply real endpoint/trust references and failure/rotation expectations; execute the existing identity denial cases at those boundaries. Production OIDC values still enter through Console, never deployment configuration. |
 
 The hosted evidence already measures all application tables across process restart
@@ -57,7 +69,10 @@ and current same-key restore, two terminal approvals and five decision events ac
 a separate full-schema restore, and stale-bootstrap admission denial. The new support
 campaign additionally restores one used revoked request, two approvals, one independent
 review and ten immutable audit/outbox facts, comparing every owned table. It does not
-supply an operating custodian, approve resumption or establish RTO/RPO.
+supply an operating custodian, approve production resumption or establish RTO/RPO.
+The recovery qualification additionally executes the real owner role and custody CLI,
+encrypted-key signing, preserved recovery receipts/releases and fresh HTTPS OIDC
+admission; its synthetic identities do not replace these operating assignments.
 
 ## Managed browser and accessibility scope — BL-P02-003
 

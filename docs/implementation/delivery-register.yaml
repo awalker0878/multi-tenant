@@ -103,10 +103,11 @@ phases:
   owner_role: Product engineering and IAM leads
   dependency_phase_ids:
   - P01
-  dependency_note: User-authorized P02 development continues. Accepted support policy and owner API at
-    ad53968 pass the three-engine 116-check campaign plus PostgreSQL/TLS event qualification. BL-P02-001
-    is resolved for the bounded diagnostic implementation; BL-P02-002–004 retain actual custody, accessibility
-    and independent receiving obligations. G01 receiving conditions remain open.
+  dependency_note: User-authorized P02 development continues. Accepted support policy/owner API and independent
+    recovery custody/resumption are implemented. Recovery source 7ec7a60 passes three 156-check PostgreSQL/TLS/browser
+    campaigns and the separate event campaign. BL-P02-001 is resolved; BL-P02-002–004 retain actual operating
+    custody/topology, accessibility and independent receiving obligations. G01 receiving conditions remain
+    open.
   package_ids:
   - P02.01
   - P02.02
@@ -120,6 +121,8 @@ phases:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-023
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -829,6 +832,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-023
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -851,6 +856,8 @@ work_packages:
   - BL-P02-002
   - BL-P02-004
   doc_refs:
+  - docs/implementation/p02-recovery-custody.md
+  - docs/operations/runbooks/identity-recovery-custody.md
   - docs/implementation/p02-support-access.md
   - docs/operations/runbooks/support-access.md
   - docs/implementation/p02-completion-review.md
@@ -876,6 +883,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-023
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -894,6 +903,8 @@ work_packages:
   blocker_ids:
   - BL-P02-004
   doc_refs:
+  - docs/implementation/p02-recovery-custody.md
+  - docs/operations/runbooks/identity-recovery-custody.md
   - docs/implementation/p02-support-access.md
   - docs/operations/runbooks/support-access.md
   - docs/implementation/p02-completion-review.md
@@ -920,6 +931,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-023
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -943,6 +956,8 @@ work_packages:
   - BL-P02-002
   - BL-P02-004
   doc_refs:
+  - docs/implementation/p02-recovery-custody.md
+  - docs/operations/runbooks/identity-recovery-custody.md
   - docs/implementation/p02-support-access.md
   - docs/operations/runbooks/support-access.md
   - docs/implementation/p02-completion-review.md
@@ -972,6 +987,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-023
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -986,6 +1003,8 @@ work_packages:
   - BL-P02-004
   - BL-P02-002
   doc_refs:
+  - docs/implementation/p02-recovery-custody.md
+  - docs/operations/runbooks/identity-recovery-custody.md
   - docs/implementation/p02-support-access.md
   - docs/operations/runbooks/support-access.md
   - docs/implementation/p02-completion-review.md
@@ -1008,6 +1027,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -2055,6 +2075,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-023
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -2120,6 +2142,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-023
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -3007,6 +3031,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-023
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -3069,6 +3095,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P02-023
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -3300,6 +3328,8 @@ gates:
   reviewer: null
   reviewed_at: null
   evidence_ids:
+  - EV-P02-023
+  - EV-P02-024
   - EV-P02-020
   - EV-P02-021
   - EV-P02-022
@@ -5628,6 +5658,80 @@ evidence:
   valid_until: null
   invalidated_at: null
 
+- id: EV-P02-023
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/646b615b7137bfab300c129bc3baa71ad9972b3b/verification/p02/recovery-custody/local-rotation-20261006/report.json
+  sha256: 87057d083fc9ad8cf75868f80eb30ed9c329f0e67c0405557c882fdfb7ec8317
+  source_revision: 7ec7a60623f60c84ba3356978f0ff51b03e9ca7e
+  artifact_revisions:
+    retained_artifact_commit: 646b615b7137bfab300c129bc3baa71ad9972b3b
+  environment: Local Linux, PHP 8.5.11, locked Governance dependencies, SQLite and OpenSSL encrypted RSA
+    signing fixtures.
+  scope: 239 Governance cases pass with 5,564 assertions, including 28 recovery cases. Five commands cover
+    tests, PHPStan, Deptrac, Pint and 11 Python custody cases. All 218 exact source bindings and ten log-stream
+    hashes match. Covers two distinct keys/roles, tampering/expiry/replay, state/provider/custody changes,
+    stale authority revocation, rollback on receipt failure, separate release, crash containment and shared/reassigned
+    old workload credential denial.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.02
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-06T00:27:57.888170+00:00'
+  observer: 'Codex: executed the local commands and checked source/log hashes against the exact immutable
+    source revision.'
+  reviewer: 'Codex: engineering examination and evidence consistency only; actual independent G02 receiving
+    reviewers remain unassigned.'
+  limitations: Twelve real PostgreSQL/TLS cases are skipped locally and exercised in hosted campaigns.
+    Synthetic operators, keys and records; no actual production host, key service, backup/mount independence,
+    operating approval or independent receiving review. Material source/scope changes require requalification.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P02-024
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/646b615b7137bfab300c129bc3baa71ad9972b3b/verification/p02/recovery-custody/qualification-index.json
+  sha256: bece3a6e176fcf31eda48b8bfe48cdc1780f104c90fed9d312f6c18084161a8d
+  source_revision: 7ec7a60623f60c84ba3356978f0ff51b03e9ca7e
+  artifact_revisions:
+    retained_artifact_commit: 646b615b7137bfab300c129bc3baa71ad9972b3b
+    chromium_archive_sha256: 29f49bb3680d52cfd601a3d163ce7c19ca83cc55f66ac33e9421284ee2fa8058
+    firefox_archive_sha256: 943749c576b3d822f324a044d277bcd708031e1fb551c28a4543411df359ad42
+    webkit_archive_sha256: d4948025e7907f8116db7727faa13be9adda377806a19c08ed44e0987b06cd3d
+    event_archive_sha256: bdcdacb444aeceef908bfb92dd80d0e0388e2cbbb0af7f2d83ecb950ab4d6f63
+  environment: GitHub Actions Ubuntu 24.04; PHP 8.5.11, Node 24.19.0, PostgreSQL 18.6, verified TLS RabbitMQ,
+    compiled Console and Chromium/Firefox/WebKit; synthetic HTTPS OIDC peers and encrypted custodian keys.
+  scope: Each of three engines passes 156 checks, 205 Governance PostgreSQL cases (5,471 assertions),
+    66 Console PostgreSQL/TLS cases (248 assertions) and two compiled browser journeys with no skips/retries/failures.
+    Real custody CLI enrollment/hold, terminal encrypted-key signing, dual-signature owner reconciliation,
+    separately signed release, full-schema receipt/release restore and fresh HTTPS OIDC sign-in execute.
+    Runtime binding/receipt/release mutation and one-signer recovery are denied; an early active descriptor
+    stays held without a release; a later hold defeats restored confirmed authority. The event campaign
+    passes 74 cases (1,358 assertions). Each identity archive matches 358 source bindings and 25 artifact
+    hashes; the event archive matches 217 source bindings and ten log hashes. Original failures remain
+    retained.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G02.01
+  - G02.02
+  - G02.03
+  - G02.04
+  observed_at: '2026-10-06T00:34:58.762968+00:00'
+  observer: 'Codex: original archive bytes, command-log hashes and source bindings checked against immutable
+    Git objects; GitHub Actions executed hosted campaigns.'
+  reviewer: 'Codex: engineering examination and evidence consistency only; actual independent G02 receiving
+    reviewers remain unassigned.'
+  limitations: Synthetic distinct principal IDs/keys do not establish independent people or appoint production
+    operators. Disposable separate-process/filesystem custody does not prove actual host, mount, backup
+    or key-service independence. A party controlling both complete old custody/trust and database can
+    co-restore them. Lost pre-activation bootstrap remains held; no reset/revival, native effect, production
+    recovery approval, HA/RTO/RPO, managed-browser/manual accessibility or independent G01/G02 receiving
+    acceptance is inferred. Material source/scope changes require requalification.
+  valid_until: null
+  invalidated_at: null
+
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -5780,19 +5884,23 @@ blockers:
   - R04
   owner_role: IAM/SRE/security/records; actual custody, support approver/reviewer and resumption authorities
     not supplied
-  description: EV-P02-018/019 measure external-generation admission, restart, full-schema restore and
-    stale-bootstrap denial. Actual independent custody, current revocation records, authenticated lost-bootstrap/rebind
-    procedure and supported identity/workload topology remain unsupplied. Co-restoring an old active descriptor
-    and old database is outside the implemented fence. The support implementation also requires actual
-    scoped security approvers/reviewers, protected audit destination and retention/sovereignty/response
-    ownership; synthetic identities and a broker topology fragment do not supply them.
-  unblock_condition: Supply OP03/OP06 protected custody and topology inputs, reconcile current retirement/revocation
-    facts, and execute the approved resumption/lost-bootstrap procedure with independent observation.
-    No application startup or migration may silently rebind authority. Supply protected support role/review/audit
-    custody references under OP03/OP05 alongside the existing identity/recovery inputs.
-  next_action: Complete the custody and resumption table in docs/implementation/p02-completion-review.md
-    using actual protected references; hold and rotate the external epoch before restore, drain admission,
-    reconcile and obtain the owner decision before any controlled rebind.
+  description: EV-P02-023/024 qualify the implemented independent custody tool, encrypted-key signatures,
+    owner-only reconciliation and separate resumption with real PostgreSQL/TLS and fresh OIDC admission.
+    The executable procedure is delivered. Actual independent recovery owner/reviewer identities and public
+    keys, separately administered host/store, read-only public mount, independent backup/change custody,
+    current revocation/owner records, secret recovery and supported identity/workload topology remain
+    unsupplied. The support implementation also needs actual role/review/audit destination and retention/response
+    ownership. Co-restoring the entire old active custody/trust environment and old database is outside
+    the filesystem fence.
+  unblock_condition: Supply OP03/OP05/OP06 actual custody, current records, support-audit roles/retention
+    and topology. Execute the delivered hold/reconcile/separately approve/confirm/release procedure under
+    the actual independent authorities and retain denial/fresh-admission observations. Record the accountable
+    lost-bootstrap clean-installation/data-recovery disposition; pre-activation reset and retired-local-admin
+    revival remain unsupported.
+  next_action: Use docs/operations/runbooks/identity-recovery-custody.md and the concrete input table
+    in docs/implementation/p02-completion-review.md. Enroll actual verified public identities, prove runtime/restore
+    isolation from custody, hold/rotate before restore, drain work, reconcile current records and obtain
+    separate two-person release. No reauthorization of implemented development work is needed.
   state: OPEN
   resolution_evidence_ids: []
 - id: BL-P02-003
@@ -5829,7 +5937,7 @@ blockers:
     campaigns do not close those decisions.
   unblock_condition: Record actual reviewer identities, exact-source evidence and each G02 criterion decision
     after outstanding mandatory obligations are resolved or explicitly reviewed in scope.
-  next_action: Review EV-P02-016 through EV-P02-022 and the updated G02 engineering assessment using docs/qualification/gate-reviews/g02.md;
+  next_action: Review EV-P02-016 through EV-P02-024 and the updated G02 engineering assessment using docs/qualification/gate-reviews/g02.md;
     record actual independent reviewers, exact scope/source, per-criterion decisions and dispositions
     of the remaining operating/accessibility obligations.
   state: OPEN

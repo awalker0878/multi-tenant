@@ -40,8 +40,26 @@ is introduced. Current OIDC settings remain Console-managed application data.
 
 The [operator procedure](../operations/runbooks/identity-recovery-custody.md) defines
 all inputs, commands, review boundaries, failure containment and key/restore limits.
-Local feature and custody tests cover the mechanism. The hosted campaign additionally
-executes real PostgreSQL roles, encrypted-key terminal signing, the separate custodian
-process, full-schema recovery and fresh HTTPS OIDC sign-in. Record results only after
-that exact-source campaign passes. Actual OP03/OP05/OP06 operators, key-service and
-host/mount/backup separation remain required operating evidence; G02 is not inferred.
+Actual OP03/OP05/OP06 operators, key-service and host/mount/backup separation remain
+required operating evidence; G02 is not inferred.
+
+## Qualified source and retained evidence
+
+Source `7ec7a60623f60c84ba3356978f0ff51b03e9ca7e` passes the final local and
+hosted recovery campaigns. [EV-P02-023/024](delivery-register.yaml) register the
+original [qualification index](../../verification/p02/recovery-custody/qualification-index.json),
+retained at commit `646b615b7137bfab300c129bc3baa71ad9972b3b`.
+
+| Evidence | Measured result |
+| --- | --- |
+| Local Governance/custody | 239 Governance cases / 5,564 assertions, including 28 recovery cases; PHPStan, Deptrac and Pint pass. Eleven real encrypted-key custody tests cover positive, negative and crash paths. Five commands, ten log hashes and 218 source bindings match. Twelve PostgreSQL/TLS cases are explicitly skipped locally. |
+| Three hosted identity campaigns | Chromium, Firefox and WebKit each pass 156 checks, 205 Governance PostgreSQL cases / 5,471 assertions, 66 Console PostgreSQL/TLS cases / 248 assertions and both compiled browser journeys with no skips, retries or failures. Each original archive matches 358 source bindings and 25 artifact hashes. |
+| Actual disposable recovery ceremony | Owner role and runtime denials, separate custody process, two encrypted-key terminal signatures, rejected single approval, committed held reconciliation, early descriptor-opening denial, second signed authorization, full-schema receipt/release restore, independent release and fresh HTTPS OIDC sign-in. A later hold defeats the restored previously confirmed database. |
+| Event regression | 74 PostgreSQL/TLS event cases / 1,358 assertions; 217 source bindings and ten log hashes match, including durable support event delivery and queue isolation. |
+
+The [corrections record](../../verification/p02/corrections.md) preserves the initial
+wrong-schema observation and an earlier empty Kubernetes helper response. No failure
+is relabelled and no published contract, mandatory assertion or security gate is
+weakened. A full environment co-rollback remains outside this filesystem mechanism;
+actual independent people/keys/hosts, current owner records and receiving approval
+must come from the operating owners, never synthetic fixture identities.

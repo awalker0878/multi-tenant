@@ -158,3 +158,31 @@ The separate real TLS event campaign at the original source passed, including
 publisher-crash replay and Console/support-audit queue separation. Its original
 archive is retained under `verification/p02/support/run-37386101997/events/` and
 remains separate from the failed identity campaign.
+
+
+## Independent recovery ceremony observations
+
+Source `f5dbba62bc017632893d6220cbba3f9b3dac5e03`, identity run
+`37393173334`, failed all three campaigns at the new recovered-identity check.
+Real owner reconciliation, separate encrypted-key signatures, full-schema restore,
+independent custody release and fresh OIDC callback had completed. The observer
+incorrectly selected `CurrentIdentity` from the frozen local-bootstrap schema,
+which requires the local administrator and does not describe a federated identity.
+All three original reports, logs and ZIP archives are retained under
+`recovery-custody/run-37393173334/`.
+
+Correction `153b771f0b85135eae45f7d5c929fbbb5f4aae74` requires the **complete exact**
+recovered federated actor, identity kind, password-change state and permissions.
+No published contract or existing local assertion changed. All three corrected
+campaign jobs passed. Final hardening `7ec7a60623f60c84ba3356978f0ff51b03e9ca7e`
+also rejects assigning any old credential to another workload, in addition to
+rejecting shared current credentials. Its local and hosted results are indexed
+in [the recovery qualification](recovery-custody/qualification-index.json).
+
+Earlier foundation source `ad3897d`, Kubernetes run `37392747755`, failed because
+the second Console shared-state helper returned zero bytes with exit zero; strict
+JSON parsing rejected the observation. The [original archive and verified receipt](recovery-custody/run-37392747755/kubernetes/retrieval.json)
+retain all 874 members, 826 verified command-log bindings and 471 exact source
+bindings. The initial shared-state write had passed. The unchanged observer later
+passed the full Kubernetes campaign at `ec60406` (run `37393081051`). This does not
+relabel the earlier failure or waive the final-source Kubernetes regression.

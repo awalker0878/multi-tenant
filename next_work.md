@@ -1,72 +1,58 @@
-# Next work — P02 completion review
+# Next work — P02 receiving and operating obligations
 
 Active branch: `greenfield/enterprise-microservices-plan`. The requesting user
-authorized continued P02 development through completion. The implementation
-continuation is committed through `fe88107aac0aca028170fd5f39f06e0b0d30cb7f`;
-original evidence is retained through `b2ccd21eb8dcba08a8b2338669e62ed2d6413230`.
+continues to authorize P02 development. Support/break-glass policy and bounded
+implementation are complete. Independent recovery custody, signed reconciliation
+and separate resumption are implemented through
+`7ec7a60623f60c84ba3356978f0ff51b03e9ca7e`.
 The [delivery register](docs/implementation/delivery-register.yaml) owns status.
-**P02 remains IN_PROGRESS and G02 NOT_REVIEWED** because the existing phase scope
-still has the concrete owner-dependent obligations below. G01 receiving review
-also remains open. Development authorization does not invent receiving approval.
+**P02 remains IN_PROGRESS and G02 NOT_REVIEWED** pending the actual operating,
+accessibility and receiving obligations below. G01 receiving conditions carry forward.
 
-## Completed continuation
+## Delivered recovery procedure
 
-- [Installation notifications](docs/implementation/p02-console-notifications.md):
-  the durable Console inbox now handles the twelve identity routes as well as
-  tenant changes. Current owner authorization precedes setup hints; bounded polling
-  preserves drafts, and explicit refresh clears discarded secret input.
-- [Identity recovery admission](docs/implementation/p02-identity-recovery.md):
-  current external installation/epoch custody is required at new user/service
-  admission. Missing, held or mismatched custody denies access; initialized or
-  restored state cannot automatically rebind or revive bootstrap credentials.
-- Complete application-table process restart/current restore, stale-bootstrap
-  restore denial and a separate nonempty approval-history restore are now measured.
-  Two terminal decisions and five decision audit events survive the latter restore.
+Use the [recovery runbook](docs/operations/runbooks/identity-recovery-custody.md)
+and [implementation record](docs/implementation/p02-recovery-custody.md). The
+separate custody process enrolls verified public keys and holds/rotates the epoch.
+Two independent operators sign an exact-state reconciliation plan; owner-only SQL
+revokes stale authority while retaining history. A new two-person release plan,
+database confirmation and separate custodian action precede fresh OIDC sign-in.
+Runtime cannot rewrite recovery bindings/receipts/releases. Credentials must rotate
+without cross-identity reuse. Unselected memberships are revoked and tenants held.
+Local bootstrap remains retired; pre-activation lost-password reset is unsupported.
 
-## Retained verification
-
-| Evidence | Result |
-| --- | --- |
-| EV-P02-016 | Directory baseline: all three engines pass 59 checks each; Firefox/WebKit are no longer queued. |
-| EV-P02-017 | Final local E1: 155 Governance and 135 Console cases pass; all 12 commands, 24 distinct logs and 294 exact source bindings verified. Thirteen broker cases are explicitly skipped locally. |
-| EV-P02-018 | Recovery/installation-consumer source: all three engines pass 98 checks each. |
-| EV-P02-019 | Final source `fe88107`: Chromium, Firefox and WebKit each pass 100 checks, 119 Governance and 66 Console PostgreSQL/TLS cases, two browser journeys with no skips/retries/failures and nonempty approval-history restore. |
-
-The [hosted receipt](verification/p02/completion-hosted-final.json) records successful completion of all nine workflows at `fe88107`, including
-all nine independent packages, images, contracts, events, policy, Compose and
-Kubernetes. Passing identity evidence includes original ZIP bytes, ten artifact hashes
-and 302 exact source bindings per engine. Earlier evidence remains in
-EV-P02-001–015; original failures remain in
-[the corrections record](verification/p02/corrections.md). No failed run is
-relabelled, contract freeze weakened or unexecuted manual task counted as passed.
+The [qualification index](verification/p02/recovery-custody/qualification-index.json)
+retains exact-source local and hosted observations, original archives and source/log
+hash verification. Failed observations remain failed in
+[the corrections record](verification/p02/corrections.md). The earlier support
+[qualification](verification/p02/support/qualification-index.json) and final
+[regression receipt](verification/p02/support/hosted-final.json) remain unchanged.
+Published contracts, mandatory checks and phase scope are unchanged.
 
 ## Remaining actions to complete P02
 
 The [completion review packet](docs/implementation/p02-completion-review.md)
-contains the exact proposal, input tables and manual task sheet. Use it directly:
+contains the concrete input table and manual task sheet:
 
-1. **BL-P02-001 — IAM/security and Governance:** accept or amend the proposed
-   exceptional-support action list, independent approver assignment, lifetime and
-   audit/review custody; then implement and qualify that selected contract.
-   Unknown/support actions remain denied. An exclusion requires explicit phase
-   scope review; deny-by-default alone does not deliver the requested contract.
-2. **BL-P02-002 — IAM/SRE and the independent custodian:** supply OP03/OP06 actual
-   descriptor/key custody, supported identity topology, current revocation records
-   and the authenticated lost-bootstrap/reconciled resumption procedure. The fence
-   requires custody hold/rotation before restore and cannot detect co-restoration
-   of an old active descriptor with its database.
-3. **BL-P02-003 — Product/quality:** select OP07's exact managed browser/OS/policy
-   and assistive combinations and support owner; execute the five manual tasks,
-   including actual history-cache behavior, and resolve mandatory defects.
-4. **BL-P02-004 — Actual independent reviewers:** examine all four criteria and
-   record the G02 receiving outcome with names, dates and immutable evidence.
+1. **BL-P02-002 — Actual operating custody:** supply the verified recovery owner,
+   distinct security reviewer/public-key fingerprints, separately administered
+   custody host/store, read-only public directory mount and independent backup/change
+   controls. Supply current owner/revocation records, secret recovery and support-audit
+   custody/retention/role identities and supported identity/workload topology. Execute
+   the delivered ceremony with these actual authorities and retain denial/resumption
+   evidence under OP03/OP05/OP06. Synthetic test principals do not appoint people.
+2. **BL-P02-003 — Product/quality:** select OP07's exact managed browser/OS/policy
+   and assistive combinations and support owner. Execute all five manual tasks,
+   including real history-cache behavior, and resolve mandatory defects.
+3. **BL-P02-004 — Independent reviewers:** examine all four G02 criteria, record
+   actual reviewer identities, dates, immutable evidence and receiving decisions.
 
-Follow the [G02 engineering assessment](docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
-for the measured boundary. P03 owns real Catalogue resource/wire integration;
-P05.04 owns the real immutable-plan producer; P06.03 owns immediate native-effect
-rechecks. They retain their own checkpoints. Provider values remain Console-managed
-application settings. No production OIDC registration is needed to continue P02
-development, and no gate pass or promotion is inferred.
+BL-P02-001 is resolved; the accepted support policy does not need to be requested
+again. The [G02 assessment](docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
+separates measured implementation from outstanding operating/review evidence.
+P03 owns Catalogue resource/wire integration; P05.04 owns the real immutable-plan
+producer; P06.03 owns immediate native-effect rechecks. They keep their own
+checkpoints. OIDC settings remain Console-managed application data.
 
 ## Retained P01 handoff
 
