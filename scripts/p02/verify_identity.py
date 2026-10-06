@@ -27,6 +27,7 @@ import urllib.error
 from synthetic_oidc import SyntheticOidc
 from notification_fixture import NotificationBroker, NotificationPump
 from recovery_fixture import IdentityRecovery
+from recovery_ceremony import qualify_ceremony
 
 from openapi_schema_validator import OAS31Validator
 from openapi_spec_validator import validate_spec
@@ -50,7 +51,7 @@ def main() -> int:
               'checks': [], 'source_sha256': {}, 'limitations': ['Synthetic HTTPS OIDC peer; no operated-provider interoperability or DNS rotation qualification', 'Synthetic immutable plan authority; no real planning producer or native admission', 'No operated deployment or G01/G02 acceptance', 'Verified PostgreSQL TLS; loopback HTTP between applications; production ingress/workload TLS topology remains unqualified']}
     tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=root).decode().split('\0')
     for name in tracked:
-        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', '.github/workflows/p02-identity', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-', 'contracts/schemas/events/identity-', 'contracts/schemas/events/support-', 'contracts/asyncapi/identity.', 'contracts/asyncapi/support.', 'deploy/dependencies/stateful/')):
+        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', 'scripts/recovery/', '.github/workflows/p02-identity', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-', 'contracts/schemas/events/identity-', 'contracts/schemas/events/support-', 'contracts/asyncapi/identity.', 'contracts/asyncapi/support.', 'deploy/dependencies/stateful/')):
             report['source_sha256'][name] = hashlib.sha256((root / name).read_bytes()).hexdigest()
     private_values = [os.environ['P02_TEST_PASSWORD']]
     processes: list[subprocess.Popen] = []
@@ -120,11 +121,13 @@ def main() -> int:
         for contract in sorted((root / 'contracts/openapi').glob('governance-*.json')):
             validate_spec(json.loads(contract.read_text()))
             check('openapi-valid-' + contract.stem, True)
+        run(['python', '-m', 'unittest', 'discover', '-s', 'scripts/recovery', '-p', 'test_*.py', '-v'], label='independent-custody-tests')
+        check('independent-custody-positive-negative-and-crash-cases', True)
         report['php'] = run(['php', '-r', 'echo PHP_VERSION;']).strip()
         report['postgres'] = sql('SHOW server_version;').strip()
         report['node'] = run(['node', '--version']).strip()
         check('exact-php-runtime', report['php'] == '8.5.11')
-        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/IdentityAdmissionTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', 'tests/Feature/SupportTrustTest.php', 'tests/Feature/SupportAccessTest.php', 'tests/Feature/SupportContractTest.php', 'tests/Feature/SupportOutboxTest.php', 'tests/Feature/SupportConcurrencyTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
+        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/IdentityAdmissionTest.php', 'tests/Feature/IdentityRecoveryTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', 'tests/Feature/SupportTrustTest.php', 'tests/Feature/SupportAccessTest.php', 'tests/Feature/SupportContractTest.php', 'tests/Feature/SupportOutboxTest.php', 'tests/Feature/SupportConcurrencyTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
         check('postgres-feature-suite', True)
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:
@@ -202,6 +205,7 @@ def main() -> int:
             admission_file.write_text(json.dumps(admission))
             admission_file.chmod(0o600)
             environments = {}
+            recovery_owner_environment = {}
             for name, directory in [('governance', 'services/governance'), ('console', 'apps/console')]:
                 runtime_password, migration_password = secrets.token_hex(32), secrets.token_hex(32)
                 private_values.extend([runtime_password, migration_password])
@@ -223,6 +227,8 @@ def main() -> int:
                     'DB_HOST': '127.0.0.1', 'DB_PORT': '5432', 'DB_DATABASE': name, 'DB_USERNAME': f'{name}_runtime',
                     'DB_PASSWORD': runtime_password, 'DB_PASSWORD_FILE': str(password_file), 'DB_SSLMODE': 'verify-full', 'DB_SSLROOTCERT': str(certificate), 'CONSOLE_CREDENTIAL_FILE': str(credential_file),
                     'GOVERNANCE_URL': 'http://127.0.0.1:8032', 'SESSION_DRIVER': 'database', 'CACHE_STORE': 'database', 'SESSION_SECURE_COOKIE': 'false'}
+                if name == 'governance':
+                    recovery_owner_environment = environments[name] | {'DB_USERNAME': 'governance_migrator', 'DB_PASSWORD': migration_password}
             for label, statement in [('inbox-update', "UPDATE app.notification_inbox SET event_type='forged';"),
                                      ('inbox-delete', 'DELETE FROM app.notification_inbox;'),
                                      ('quarantine-delete', 'DELETE FROM app.notification_quarantine;'),
@@ -284,10 +290,10 @@ def main() -> int:
                                 raise RuntimeError(name + ' did not start: ' + redact(log[-2000:]))
                             time.sleep(0.1)
             start_applications()
-            def wire(path: str, schema: str, expected: int = 200, body: dict | None = None, token: str = '') -> dict:
+            def wire(path: str, schema: str, expected: int = 200, body: dict | None = None, token: str = '', workload: str | None = None) -> dict:
                 request = urllib.request.Request('http://127.0.0.1:8032' + path,
                     data=json.dumps(body).encode() if body is not None else None,
-                    headers={'Authorization': 'Bearer ' + credential, 'X-Console-Session': token, 'Content-Type': 'application/json', 'Accept': 'application/json'})
+                    headers={'Authorization': 'Bearer ' + (workload if workload is not None else credential), 'X-Console-Session': token, 'Content-Type': 'application/json', 'Accept': 'application/json'})
                 try:
                     response = urllib.request.urlopen(request, timeout=5)
                 except urllib.error.HTTPError as error:
@@ -337,6 +343,8 @@ def main() -> int:
             check('audit-and-outbox-stay-paired', sql('SELECT count(*) FROM app.identity_audit a FULL JOIN app.identity_outbox o USING (id) WHERE a.id IS NULL OR o.id IS NULL;', 'governance').strip() == '0')
             report['recovery'] = recovery.qualify(stop_applications, start_applications, wire, admission, admission_file,
                 initial_session, temporary, lambda expected=0: receive(terminal(environments['governance'], gov), expected))
+            report['independent_recovery_ceremony'] = qualify_ceremony(root, private_path, run, sql, check, recovery, stop_applications, start_applications,
+                environments, recovery_owner_environment, provider, wire, private_values, initial_session)
             for name in ['governance', 'console']:
                 log = (private_path / f'{name}.log').read_text()
                 check(name + '-logs-exclude-credentials', all(value not in log for value in private_values + provider.private_values))

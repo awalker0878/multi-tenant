@@ -3,7 +3,7 @@ name: P02 identity
 on:
   push:
     branches: [greenfield/enterprise-microservices-plan]
-    paths: ['services/governance/**', 'apps/console/**', 'contracts/openapi/governance-*.json', 'contracts/openapi/planning-*.json', 'contracts/schemas/events/governance-*.json', 'contracts/schemas/events/support-*.json', 'contracts/asyncapi/support.yaml', 'deploy/dependencies/stateful/console-notifications.json', 'scripts/p02/**', '.github/workflows/p02-identity.yml']
+    paths: ['services/governance/**', 'apps/console/**', 'contracts/openapi/governance-*.json', 'contracts/openapi/planning-*.json', 'contracts/schemas/events/governance-*.json', 'contracts/schemas/events/support-*.json', 'contracts/asyncapi/support.yaml', 'deploy/dependencies/stateful/console-notifications.json', 'scripts/p02/**', 'scripts/recovery/**', '.github/workflows/p02-identity.yml']
   pull_request:
     branches: [greenfield/enterprise-microservices-plan]
   workflow_dispatch:
