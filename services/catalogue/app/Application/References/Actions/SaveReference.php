@@ -86,7 +86,7 @@ final class SaveReference
             DB::table('app.catalogue_reference_versions')->insert(['tenant_id' => $tenant, 'reference_id' => $id, 'version' => $version, 'definition' => CanonicalJson::encode($definition), 'actor_id' => $actor->actorId]);
             CommandJournal::event($tenant, $actor->actorId, $id, $version, $retire ? 'catalogue.reference.retired' : 'catalogue.reference.changed');
             $response = ['id' => $id, 'kind' => $kind, 'version' => $version, 'etag' => '"'.$id.':'.$version.'"', 'retired' => $retire, 'definition' => $definition];
-            CommandJournal::complete($tenant,$actor->actorId,$key,$fingerprint,$response);
+            CommandJournal::complete($tenant, $actor->actorId, $key, $fingerprint, $response);
 
             return $response;
         });

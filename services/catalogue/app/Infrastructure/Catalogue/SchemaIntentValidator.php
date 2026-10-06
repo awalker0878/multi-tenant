@@ -6,6 +6,7 @@ namespace App\Infrastructure\Catalogue;
 
 use App\Application\IntentRevisions\Contracts\IntentValidator;
 use App\Domain\IntentRevisions\IntentFailure;
+use Opis\JsonSchema\Errors\ErrorFormatter;
 use Opis\JsonSchema\Validator;
 
 final class SchemaIntentValidator implements IntentValidator
@@ -22,7 +23,12 @@ final class SchemaIntentValidator implements IntentValidator
         }
         $result = (new Validator)->validate(json_decode($json), json_decode($schema));
         if (! $result->isValid()) {
-            throw new IntentFailure('invalid_intent_schema');
+
+            $error = $result->error();
+            $fields = $error === null ? [] : (new ErrorFormatter)->format($error, false, fn () => 'invalid');
+            $first = array_key_first($fields);
+            $field = is_string($first) ? str_replace('/', '.', trim($first, '/')) : 'intent';
+            throw new IntentFailure('invalid_intent_schema', 422, $field !== '' && preg_match('/\A[a-zA-Z0-9_.]{1,200}\z/', $field) ? $field : 'intent');
         }
     }
 }

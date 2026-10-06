@@ -126,7 +126,7 @@ final class PublishIntent
         });
     }
 
-    public static function etag(string $id,int $version): string
+    public static function etag(string $id, int $version): string
     {
         return '"'.$id.':'.$version.'"';
     }

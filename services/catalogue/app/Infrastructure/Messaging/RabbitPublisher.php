@@ -11,13 +11,13 @@ use RuntimeException;
 
 final readonly class RabbitPublisher implements ConfirmedPublisher
 {
-    public function __construct(private string $host, private string $password, private string $ca) {}
+    public function __construct(private string $host, private string $password, private string $ca, private string $routingKey = 'catalogue.foundation.recorded.v1', private int $port = 5671) {}
 
     public function publish(string $wire, string $eventId): void
     {
         $config = new AMQPConnectionConfig;
         $config->setHost($this->host);
-        $config->setPort(5671);
+        $config->setPort($this->port);
         $config->setUser('catalogue');
         $config->setPassword($this->password);
         $config->setVhost('product');
@@ -49,7 +49,7 @@ final readonly class RabbitPublisher implements ConfirmedPublisher
                 'content_type' => 'application/json',
                 'message_id' => $eventId,
                 'user_id' => 'catalogue',
-            ]), 'catalogue.events', 'catalogue.foundation.recorded.v1', true);
+            ]), 'catalogue.events', $this->routingKey, true);
             $channel->wait_for_pending_acks_returns(5.0);
             if (! $confirmed || $rejected) {
                 throw new RuntimeException('publication_not_confirmed');

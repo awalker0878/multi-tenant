@@ -1,0 +1,26 @@
+asyncapi: 3.0.0
+info:
+  title: Catalogue committed intent and reference facts
+  version: 1.0.0
+  description: Immutable committed facts, never current authorization or native execution authority. At-least-once delivery; consumers deduplicate event_id and order each resource by sequence.
+channels:
+  intentFacts:
+    address: catalogue.intent.changed.v1
+    description: Private catalogue.events direct exchange. Durable consumer-owned queues and bindings are provisioned by deployment, not the publisher.
+    messages:
+      changed:
+        $ref: '#/components/messages/Changed'
+operations:
+  publishChanged:
+    action: send
+    channel:
+      $ref: '#/channels/intentFacts'
+components:
+  messages:
+    Changed:
+      name: CatalogueIntentChangedV1
+      contentType: application/json
+      payload:
+        schemaFormat: application/schema+json;version=draft-2020-12
+        schema:
+          $ref: ../schemas/events/catalogue-intent-v1.json

@@ -5,6 +5,8 @@ use App\Application\Authorization\Contracts\ConsoleCaller;
 use App\Application\Authorization\Contracts\DelegatedAuthority;
 use App\Application\Authorization\Contracts\OwnerDirectory;
 use App\Application\Authorization\Data\ActorContext;
+use App\Application\Messaging\Actions\PublishCatalogueEvent;
+use App\Application\Messaging\Contracts\CataloguePublisher;
 use App\Domain\Authorization\AccessDenied;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +45,7 @@ beforeEach(function (): void {
                 throw new AccessDenied;
             }
 
-return new ActorContext($this->test->actor, $tenant, $action, $scope, '00000000-0000-4000-8000-000000000005');
+            return new ActorContext($this->test->actor, $tenant, $action, $scope, '00000000-0000-4000-8000-000000000005');
         }
     });
     $this->app->instance(OwnerDirectory::class, new class implements OwnerDirectory
@@ -172,6 +174,39 @@ it('bounds representative large tenant pages and rejects foreign cursors', funct
     expect(count(DB::getQueryLog()))->toBe(1);
     $cursor = $page->json('next_cursor');
     expect($cursor)->toBeString();
-    $this->getJson($this->path.'?cursor='.urlencode($cursor))->assertOk()->assertJsonCount(50,'applications');
-    $this->getJson(str_replace($this->tenant,'00000000-0000-4000-8000-000000000099',$this->path).'?cursor='.urlencode($cursor))->assertStatus(422);
+    $this->getJson($this->path.'?cursor='.urlencode($cursor))->assertOk()->assertJsonCount(50, 'applications');
+    $this->getJson(str_replace($this->tenant, '00000000-0000-4000-8000-000000000099', $this->path).'?cursor='.urlencode($cursor))->assertStatus(422);
+});
+
+it('retains stable event identity on uncertain delivery and publishes each aggregate in order', function (): void {
+    $first = publishCatalogue($this)->assertCreated()->json();
+    $second = publishCatalogue($this, $first['application_id'], $first['etag'])->assertCreated()->json();
+    $publisher = new class implements CataloguePublisher
+    {
+        public bool $fail = true;
+
+        public array $observed = [];
+
+        public function publish(string $wire, string $eventId): void
+        {
+            $this->observed[] = json_decode($wire, true);
+            if ($this->fail) {
+                throw new RuntimeException('synthetic_lost_confirmation');
+            }
+        }
+    };
+    $this->app->instance(CataloguePublisher::class, $publisher);
+    $action = app(PublishCatalogueEvent::class);
+    expect(fn () => $action->handle())->toThrow(RuntimeException::class);
+    expect(DB::table('app.catalogue_outbox')->whereNotNull('published_at')->count())->toBe(0);
+    $publisher->fail = false;
+    expect($action->handle())->toBeTrue()->and($action->handle())->toBeTrue()->and($action->handle())->toBeFalse();
+    expect($publisher->observed[0]['event_id'])->toBe($publisher->observed[1]['event_id'])->and(array_column($publisher->observed, 'sequence'))->toBe([1, 1, 2]);
+    expect(DB::table('app.catalogue_revisions')->count())->toBe(2);
+});
+it('replays controlled migrations without altering published history or receipts', function (): void {
+    $first = publishCatalogue($this)->assertCreated()->json();
+    $migration = file_get_contents(database_path('migrations/002_catalogue.sql'));
+    $this->admin->exec(preg_replace('/^\\\\set.*$/m', '', $migration));
+    expect(DB::table('app.catalogue_revisions')->value('digest'))->toBe($first['digest'])->and(DB::table('app.catalogue_commands')->count())->toBe(1);
 });

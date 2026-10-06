@@ -12,6 +12,7 @@ use App\Application\Foundation\Contracts\DependencyProbe;
 use App\Application\Foundation\Contracts\HealthCredential;
 use App\Application\Foundation\Contracts\SignalBuffer;
 use App\Application\IntentRevisions\Contracts\IntentValidator;
+use App\Application\Messaging\Contracts\CataloguePublisher;
 use App\Infrastructure\Authorization\GovernanceDelegatedAuthority;
 use App\Infrastructure\Authorization\GovernanceOwnerDirectory;
 use App\Infrastructure\Authorization\MountedConsoleCaller;
@@ -19,6 +20,7 @@ use App\Infrastructure\Catalogue\SchemaIntentValidator;
 use App\Infrastructure\Foundation\BoundedSignalBuffer;
 use App\Infrastructure\Foundation\MountedHealthCredential;
 use App\Infrastructure\Foundation\PostgresDependencyProbe;
+use App\Infrastructure\Messaging\RabbitCataloguePublisher;
 use App\Policies\CataloguePolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
@@ -39,6 +41,7 @@ final class AppServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        $this->app->bind(CataloguePublisher::class, RabbitCataloguePublisher::class);
         $this->app->bind(IntentValidator::class, SchemaIntentValidator::class);
         $this->app->bind(OwnerDirectory::class, GovernanceOwnerDirectory::class);
         $this->app->bind(ConsoleCaller::class, MountedConsoleCaller::class);

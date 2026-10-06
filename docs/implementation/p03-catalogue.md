@@ -11,3 +11,7 @@ The strict intent schema is `contracts/schemas/catalogue/intent-v1.json`. P03 co
 Local schema/domain tests and analyzers are being run. The new P03 workflow executes production-engine PostgreSQL TLS tests, including runtime-role denials and outbox failure. Local execution cannot start PostgreSQL because the execution sandbox has no unprivileged database user; no local PostgreSQL pass is claimed. The hosted campaign is required. Actual wire/Console, concurrent-process, broker and browser qualification remains in progress.
 
 No G03 pass, representative-user acceptance, actual managed-browser support or native qualification is claimed by this implementation increment.
+
+## Event delivery and corrected persistence
+
+The corrected core run at `d26a57b` passed all 83 PostgreSQL/TLS cases; its required formatting gate remained failed and was corrected separately without suppressing a rule. `catalogue:publish-events --limit=100` now publishes committed facts with broker confirmation and a stable event ID. A lost confirmation leaves the same row pending. Concurrent relays cannot overtake an older unpublished event for the same aggregate. No event grants downstream authority. The remaining real broker campaign verifies these boundaries; future Planning consumers remain owned by P05.
