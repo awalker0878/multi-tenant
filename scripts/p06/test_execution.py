@@ -2,6 +2,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from pathlib import Path
+import socket
 from typing import Any
 from uuid import uuid4
 
@@ -232,3 +233,44 @@ def test_accepted_receipt_can_be_recovered_after_inputs_expire_without_new_autho
     recovered=w['admit'](key)
     assert recovered['id']==first['id'] and recovered['state']=='admitted'
     assert w['service'].activity(w['tenant'],first['id'],'reserve','sim-worker')['state']=='held'
+
+
+@pytest.mark.parametrize('step',['reserve','apply_reviewed_saved_plan','activate_target'])
+@pytest.mark.parametrize('action',['pause','cancel','stop'])
+@pytest.mark.parametrize('accepted',[False,True])
+def test_operator_controls_at_each_safe_boundary(world: dict[str, Any],step: str,action: str,accepted: bool) -> None:
+    w=world;job=w['admit']();service=w['service']
+    for effect in w['c']['effects']:
+        if effect['id']==step:break
+        assert service.activity(w['tenant'],job['id'],effect['id'],'sim-worker')['state']=='confirmed_succeeded'
+    grant=service.acquire(w['tenant'],job['id'],step,'sim-worker')
+    if accepted:w['peer'].execute(grant)
+    current=service.read(w['tenant'],job['id'])
+    receipt=service.command(w['tenant'],job['id'],w['actor'],str(uuid4()),action,current['revision'])
+    assert receipt['effect_undone'] is False
+    if not accepted:
+        with pytest.raises(Rejected):w['peer'].execute(grant)
+    result=service.reconcile(w['tenant'],job['id'])
+    observed=next(o for o in result['operations'] if o['step']==step)
+    assert observed['observation']['effect_count']==int(accepted)
+    assert service.checkpoint(w['tenant'],job['id'])['state']==('cancelled' if action=='cancel' else 'held')
+    assert service.read(w['tenant'],job['id'])['resources_retained']
+    with pytest.raises(Rejected):service.acquire(w['tenant'],job['id'],step,'sim-worker')
+
+
+def test_journal_connection_loss_prevents_independent_acceptance(world: dict[str, Any]) -> None:
+    w=world;job=w['admit']();service=w['service']
+    grant=service.acquire(w['tenant'],job['id'],'reserve','sim-worker')
+    # A bound, non-listening port supplies a real refused connection to the journal;
+    # the separately owned simulator remains available through its original endpoint.
+    with socket.socket() as closed:
+        closed.bind(('127.0.0.1',0))
+        service.database=Postgres(w['postgres']|{'user':'lifecycle_runtime','port':closed.getsockname()[1],'connect_timeout':1})
+        try:
+            with pytest.raises(psycopg.OperationalError):w['peer'].execute(grant)
+            with w['connect']() as connection:
+                assert connection.execute('SELECT count(*) n FROM sim.observations').fetchone()['n']==0
+        finally:service.database=w['database']
+    observed=service.reconcile(w['tenant'],job['id'])
+    assert observed['operations'][0]['outcome']=='confirmed_failed' and observed['resources_retained']
+    with pytest.raises(ValueError,match='sealed_absent'):w['peer'].execute(grant)
