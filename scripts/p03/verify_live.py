@@ -48,7 +48,7 @@ def main():
             'TLS application peers terminate at disposable loopback forwarding proxies; no operated ingress qualification.',
             'Automated browser checks do not establish representative operator, screen-reader or independent G03 receiving acceptance.']}
     paths = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
-    report['source_sha256'] = {n: hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/catalogue/', 'services/governance/', 'apps/console/', 'contracts/', 'scripts/p03/', '.github/workflows/p03'))}
+    report['source_sha256'] = {n: hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/catalogue/', 'services/governance/', 'apps/console/', 'contracts/', 'scripts/p03/', '.github/workflows/p03', 'deploy/dependencies/stateful/catalogue-intent.json'))}
     private_values = [os.environ['P03_ADMIN_PASSWORD']]
     processes, handles, proxies = {}, [], []
     broker = None

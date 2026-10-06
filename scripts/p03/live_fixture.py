@@ -76,10 +76,13 @@ class CatalogueBroker:
         self.run = run
         self.environment = {}
         self.private = private
-        definitions = {'vhosts': [{'name': 'product'}], 'users': [], 'permissions': [],
-            'exchanges': [{'name': 'catalogue.events', 'vhost': 'product', 'type': 'direct', 'durable': True, 'auto_delete': False, 'internal': False, 'arguments': {}}],
-            'queues': [{'name': 'p03.observer', 'vhost': 'product', 'durable': True, 'auto_delete': False, 'arguments': {'x-queue-type': 'quorum'}}],
-            'bindings': [{'source': 'catalogue.events', 'vhost': 'product', 'destination': 'p03.observer', 'destination_type': 'queue', 'routing_key': 'catalogue.intent.changed.v1', 'arguments': {}}]}
+        definitions = json.loads((root/'deploy/dependencies/stateful/catalogue-intent.json').read_text())
+        # Qualify the provisioned binding with an independent observer identity;
+        # this does not claim the future Planning consumer is implemented.
+        definitions['users'] = []
+        definitions['permissions'] = []
+        definitions['queues'][0]['name'] = 'p03.observer'
+        definitions['bindings'][0]['destination'] = 'p03.observer'
         for user in ['catalogue', 'p03-observer']:
             password = secrets.token_hex(32)
             secrets_list.append(password)

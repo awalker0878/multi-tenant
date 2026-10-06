@@ -31,6 +31,8 @@ test('authors complete intent, preserves conflicts and uncertain retries, compar
   await expect(page.getByRole('heading', { name: 'Data and recovery' })).toBeVisible();
   const applicationUrl = page.url();
   await page.getByRole('link', { name: 'Revise this intent' }).click();
+  await expect(page).toHaveURL(/\/edit\?/);
+  await expect(page.getByLabel('Virtual CPUs', { exact: true }).first()).toBeVisible();
   const editUrl = page.url();
   const stale = await context.newPage();
   stale.on('dialog', dialog => { void dialog.accept(); });
