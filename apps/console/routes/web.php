@@ -75,6 +75,7 @@ Route::prefix('/tenants/{tenant}/sites/{site}/applications/{application}/environ
     Route::post('/', [$c, 'admit']);
     Route::get('/{job}', [$c, 'show'])->whereUuid('job');
     Route::get('/{job}/status', [$c, 'status'])->whereUuid('job');
+    Route::get('/{job}/evidence/{evidence}/status', [$c, 'evidenceStatus'])->whereUuid(['job', 'evidence']);
     Route::get('/{job}/evidence/{evidence}', [$c, 'evidence'])->whereUuid(['job', 'evidence']);
     Route::post('/{job}/commands', [$c, 'command'])->whereUuid('job');
 });

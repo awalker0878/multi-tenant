@@ -39,7 +39,22 @@ final class JobsController
         abort_unless(($result['job_id'] ?? null) === $job, 404);
         Inertia::clearHistory();
 
-        return Inertia::render('jobs/Evidence', ['tenantId' => $tenant, 'jobUrl' => $this->base($tenant, $site, $application, $environment).'/'.$job, 'evidence' => $result]);
+        return Inertia::render('jobs/Evidence', ['tenantId' => $tenant, 'jobUrl' => $this->base($tenant, $site, $application, $environment).'/'.$job, 'evidence' => $result, 'job' => $current]);
+    }
+
+    public function evidenceStatus(Request $request, string $tenant, string $site, string $application, string $environment, string $job, string $evidence, JobsGateway $jobs): JsonResponse
+    {
+        try {
+            $scope = $this->scope($site, $application, $environment);
+            $result = $jobs->call($this->session($request), $tenant, $scope, 'GET', 'evidence/'.$evidence);
+            if (($result['job_id'] ?? null) !== $job) {
+                throw new JobsFailure(404, 'not_found');
+            }
+
+            return response()->json(['id' => $result['id'], 'digest' => $result['digest']])->header('Cache-Control', 'no-store, private');
+        } catch (JobsFailure $e) {
+            return response()->json(['error' => $e->reason], $e->status)->header('Cache-Control', 'no-store, private');
+        }
     }
 
     public function status(Request $request, string $tenant, string $site, string $application, string $environment, string $job, JobsGateway $jobs): JsonResponse

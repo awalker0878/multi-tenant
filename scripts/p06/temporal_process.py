@@ -16,18 +16,23 @@ from lifecycle.infrastructure.temporal import Dispatcher
 from lifecycle.infrastructure.workflows import SimulationJourney
 
 async def client(admin=False):
-    return await Client.connect(os.environ['TEMPORAL_TARGET'],namespace='lifecycle',tls=TLSConfig(server_root_ca_cert=Path(os.environ['TEMPORAL_CA_FILE']).read_bytes(),domain='temporal'),rpc_metadata={'authorization':'Bearer '+Path(os.environ['P06_TEMPORAL_ADMIN_FILE' if admin else 'TEMPORAL_CREDENTIAL_FILE']).read_text().strip()})
+    c=await asyncio.wait_for(Client.connect(os.environ['TEMPORAL_TARGET'],namespace='lifecycle',tls=TLSConfig(server_root_ca_cert=Path(os.environ['TEMPORAL_CA_FILE']).read_bytes(),domain='temporal')),5)
+    c.rpc_metadata={'authorization':'Bearer '+Path(os.environ['P06_TEMPORAL_ADMIN_FILE' if admin else 'TEMPORAL_CREDENTIAL_FILE']).read_text().strip()}
+    return c
 
 async def main():
     mode=sys.argv[1]
     if mode=='initialize':
-        for _ in range(60):
+        last='not_started'
+        for _ in range(45):
             try:
                 c=await client(True)
                 await c.workflow_service.register_namespace(RegisterNamespaceRequest(namespace='lifecycle',workflow_execution_retention_period=Duration(seconds=86400)),timeout=timedelta(seconds=3))
                 return
-            except Exception:await asyncio.sleep(1)
-        raise RuntimeError('temporal_namespace_unavailable')
+            except Exception as error:
+                last=type(error).__name__+': '+str(error)[:500]
+                await asyncio.sleep(1)
+        raise RuntimeError('temporal_namespace_unavailable: '+last)
     if mode in ['dispatch_lost','dispatch','replay']:
         c=await client()
         if mode=='replay':

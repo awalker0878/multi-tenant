@@ -193,3 +193,31 @@ def test_stale_ui_cannot_resume_or_retry_unknown(world: dict[str, Any]) -> None:
         service.command(w['tenant'],job['id'],w['actor'],str(uuid4()),'resume',job['revision'])
     with pytest.raises(Rejected,match='reconciliation_required'):
         service.command(w['tenant'],job['id'],w['actor'],str(uuid4()),'resume',service.read(w['tenant'],job['id'])['revision'])
+
+
+@pytest.mark.parametrize('step', ['reserve','apply_reviewed_saved_plan','configure_and_restore','activate_target','confirm_owner_allocations'])
+@pytest.mark.parametrize('accepted',[False,True])
+def test_each_effect_boundary_has_sealed_certainty_before_further_work(world: dict[str, Any],step: str,accepted: bool) -> None:
+    w=world;job=w['admit']();service=w['service']
+    for effect in w['c']['effects']:
+        if effect['id']==step:break
+        assert service.activity(w['tenant'],job['id'],effect['id'],'sim-worker')['state']=='confirmed_succeeded'
+    grant=service.acquire(w['tenant'],job['id'],step,'sim-worker')
+    if accepted:w['peer'].execute(grant)
+    assert service.activity(w['tenant'],job['id'],step,'sim-worker')['state']=='held'
+    observed=service.reconcile(w['tenant'],job['id'])
+    operation=next(o for o in observed['operations'] if o['step']==step)
+    assert operation['observation']['sealed'] and operation['observation']['effect_count']==int(accepted)
+    if accepted:assert w['peer'].execute(grant)['duplicate'] is True
+    else:
+        with pytest.raises(ValueError,match='sealed_absent'):w['peer'].execute(grant)
+    assert observed['resources_retained']
+
+
+def test_committed_facts_finish_custody_after_executor_revocation(world: dict[str, Any]) -> None:
+    w=world;job=w['admit']();service=w['service']
+    for effect in w['c']['effects']:
+        assert service.activity(w['tenant'],job['id'],effect['id'],'sim-worker')['state']=='confirmed_succeeded'
+    w['snapshot']['approval']['revoked']=True
+    assert service.checkpoint(w['tenant'],job['id'])['state']=='completed'
+    assert service.read(w['tenant'],job['id'])['evidence']['native_support'] is False

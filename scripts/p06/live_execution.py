@@ -66,7 +66,7 @@ def _campaign(c,p):
         try:return wire(base,'/health/live')[0]==200
         except OSError:return False
     wait_for('lifecycle_ready',lambda:ready(common['LIFECYCLE_URL']),15);wait_for('simulation_ready',lambda:ready(common['SIMULATOR_URL']),15)
-    temporal=TemporalFixture(root,private,run,c['private_values']);c['proxies'].append(temporal);temporal.start();envs['lifecycle'].update(temporal.environment)
+    temporal=TemporalFixture(root,private,run,c['private_values']);c['p06_temporal']=temporal;temporal.start();envs['lifecycle'].update(temporal.environment)
     witness=[str(root/'services/lifecycle/.venv/bin/python'),'scripts/p06/temporal_process.py']
     run([*witness,'initialize'],env=envs['lifecycle'],label='p06-real-temporal-namespace')
     alert=AlertReceiver(c['certificate'],c['key'],credentials['lifecycle-alerts'][0],out/'alert-receipts.json');c['proxies'].append(alert)
@@ -116,6 +116,10 @@ def _campaign(c,p):
         idem=str(uuid.uuid4());job=lifecycle('jobs',scope,admission,key=idem,expected=202);jobs.append(job);workflows.append(job['workflow_id'])
         check('p06-'+action+'-one-logical-job',lifecycle('jobs',scope,admission,key=idem,expected=202)['id']==job['id'])
     check('p06-distinct-services-own-stores',sql("SELECT has_table_privilege('assurance_runtime','app.evidence_uploads','UPDATE') OR has_table_privilege('assurance_runtime','app.evidence_records','DELETE');",'assurance')=='f')
+    backup=private/'lifecycle-before-effects.sql'
+    run(['pg_dump','--clean','--if-exists','--file',str(backup),'-d','lifecycle'],env=c['pg_env'],label='p06-pre-effect-database-backup')
+    backup.chmod(0o600)
+    backup_hash=hashlib.sha256(backup.read_bytes()).hexdigest()
     # Process dies after grant commit, before simulated acceptance. A later process seals absence.
     grant_file=private/'late-grant.json'
     run([*witness,'crash_before',tenant,jobs[0]['id'],'reserve',str(grant_file)],env=envs['lifecycle'],expected=75,label='p06-crash-before-acceptance')
@@ -193,6 +197,19 @@ def _campaign(c,p):
     check('p06-evidence-browser-no-skips-retries-failures',browser_result['stats']['expected']==1 and all(browser_result['stats'][k]==0 for k in ['unexpected','flaky','skipped']))
     file=private/'workflow-ids.json';file.write_text(json.dumps(workflows));run([*witness,'replay',str(file),str(out/'temporal-replay.json')],env=envs['lifecycle'],label='p06-version-one-history-replay')
     (out/'execution-observations.json').write_text(json.dumps({'simulation':True,'jobs':[current(i) for i in range(4)],'effect_count':int(sql('SELECT count(*) FROM sim.observations WHERE effect_count=1;','simulation'))},indent=2)+'\n')
+    # Restore an older journal while Temporal and the independent effect owner retain acceptance.
+    c['stop']('workflow');c['stop']('lifecycle')
+    recovered_epoch=str(uuid.uuid4());epoch_file.write_text(recovered_epoch)
+    before_restore_count=sql('SELECT count(*) FROM sim.observations WHERE effect_count=1;','simulation')
+    run(['psql','-X','-v','ON_ERROR_STOP=1','-d','lifecycle','-f',str(backup)],env=c['pg_env'],label='p06-restore-older-journal')
+    spawn('lifecycle',lifecycle_command);wait_for('restored_lifecycle',lambda:ready(common['LIFECYCLE_URL']),15)
+    run([*witness,'effect',tenant,jobs[0]['id'],'reserve'],env=envs['lifecycle'],expected=1,label='p06-restored-worker-denied')
+    check('p06-old-database-starts-without-new-write-authority',current(0)['state']=='held' and current(0)['resources_retained'])
+    late=json.loads(grant_file.read_text())
+    check('p06-pre-restore-worker-cannot-write-new-epoch',wire(common['SIMULATOR_URL'],'/v1/effects','POST',late,{'Authorization':'Bearer '+credentials['lifecycle-simulator'][0]})[0]==403)
+    check('p06-restore-independent-accepted-effects-preserved',sql('SELECT count(*) FROM sim.observations WHERE effect_count=1;','simulation')==before_restore_count)
+    check('p06-restore-does-not-invent-completion',sql("SELECT count(*) FROM app.execution_projection WHERE state='completed';",'lifecycle')=='0')
+    (out/'restore-observations.json').write_text(json.dumps({'backup_sha256':backup_hash,'restored_jobs':4,'independent_effect_count':int(before_restore_count),'external_epoch_changed':True,'read_only_hold':True,'re_enable_decision':'DENIED: restored journal and current epoch require independent reconciliation and newly bound authority; no automatic release or old-epoch restoration'},indent=2)+'\n')
     for name in ['lifecycle','simulation','workflow']:
         log=(private/(name+'.log')).read_text();(out/(name+'-http.log')).write_text(c['redact'](log));check('p06-'+name+'-redacted',all(value not in log for value in c['private_values']))
 
@@ -201,6 +218,9 @@ def campaign(c,p):
     try:
         _campaign(c,p)
     finally:
+        c['stop']('workflow')
+        if c.get('p06_temporal') is not None:
+            c['p06_temporal'].close()
         for name in ['lifecycle','simulation','workflow']:
             log=c['private']/(name+'.log')
             if log.exists():(c['out']/(name+'-http.log')).write_text(c['redact'](log.read_text()))

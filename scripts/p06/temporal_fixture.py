@@ -17,6 +17,7 @@ class TemporalFixture:
         self.path=module.prepare(root,private/'temporal',images)
         config=json.loads(self.path.read_text());config['services']={k:v for k,v in config['services'].items() if k in ['postgres','schema','temporal']}
         config['services']['temporal']['ports']=['127.0.0.1:17233:7233']
+        config['networks']['workflow']={'internal':False} # Loopback-published TLS frontend is reached from the host campaign.
         self.path.chmod(0o600);self.path.write_text(json.dumps(config))
         self.run=run;self.command=['docker','compose','-f',str(self.path)]
         secrets=private/'temporal/secrets'
@@ -31,4 +32,6 @@ class TemporalFixture:
         run([*self.command,'run','--rm','schema'],label='p06-temporal-schema')
         run([*self.command,'up','-d','temporal'],label='p06-temporal-server')
     def restart(self):self.run([*self.command,'restart','temporal'],label='p06-temporal-restart')
-    def close(self):self.run([*self.command,'down','--volumes','--remove-orphans'],label='p06-temporal-cleanup')
+    def close(self):
+        self.run([*self.command,'logs','--no-color','temporal'],label='p06-temporal-server-runtime')
+        self.run([*self.command,'down','--volumes','--remove-orphans'],label='p06-temporal-cleanup')
