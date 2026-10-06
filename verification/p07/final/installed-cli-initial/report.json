@@ -1,0 +1,12 @@
+{
+  "source_revision": "249a77e9fda5c0a3e25918ce3efdb52f4ab415de",
+  "result": "INCOMPLETE",
+  "stage": "synthetic input generator",
+  "error": "parent interpreter lacks pytest required by committed test-fixture helper",
+  "completed_steps": [
+    "isolated environment",
+    "installed wheel",
+    "strict HELD commissioning check"
+  ],
+  "correction": "Run the fixture generator with the locked Lifecycle test interpreter; the installed child remains isolated and dependency-free."
+}

@@ -37,3 +37,11 @@ guest/service adapters, quarantine activation, native failure/restore/retirement
 and the reviewed native support dossier are not delivered by this preparation.
 P06 continues to expose simulation only. A metadata checker is neither an OpenStack
 adapter nor a substitute for the independent Q05/Q06 campaign.
+
+The [check matrix](../../verification/p07/check-matrix.md) and
+[original evidence index](../../verification/p07/final/qualification-index.json)
+record 105 preparation tests, isolated installed-command checks and separately
+bounded P06 regression results. The
+[remaining implementation and review packet](p07-completion-review.md) identifies
+the actual inputs and native outputs still required for each package. No P07
+package or G07 criterion is marked complete by the preparation campaign.

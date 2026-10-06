@@ -64,3 +64,15 @@ apply-time plan. This is the concrete engineering choice before P05.04 compilati
 it does not appoint a receiving owner or claim acceptance of a native backend.
 Actual native tool/provider/backend selections and independent state recovery
 qualification remain due at P06.03/P07.02. See the [P05 record](../implementation/p05-planning.md).
+
+## P07 preparation representation — 2026-10-06
+
+The [P07 implementation](../implementation/p07-native-provisioning.md) compares
+the existing P05 saved-plan byte hash with a versioned, exactly pinned toolchain
+manifest and supplied state/lock/ownership observations. Its protected commissioning
+packet binds those identities to the exact plan, site, tuple, resource scope and
+campaign. Unknown effects and mismatches remain held. These are offline comparison
+contracts; they do not authenticate owners, select a native provider/backend,
+enforce its lock, or issue a grant. Actual tool-byte verification, state custody,
+fencing and native readback remain part of the selected P07.02 integration. This
+refinement does not change the decision register's receiving disposition.

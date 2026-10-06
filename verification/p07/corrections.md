@@ -33,6 +33,14 @@ one-file discrepancies remain separately identified in the final index; none is
 silently converted into a source-qualified pass. This closes the identified
 regression defects, without supplying any missing P07 native observation.
 
+Corrected Kubernetes run `37546672554` at
+`b0f5516409dd4047c3c25eb0ba0861f76d321c11` passes 271 checks, including all
+five verified probe transfers and the existing shared session/cache/lock checks.
+All 103 installation source bindings and 445 command-stream pairs match;
+cleanup succeeds. The associated [workflow receipt](final/regression-completion.json)
+records all twelve preparation/regression workflow passes with their own source
+revisions. The original empty-output failure remains retained and failed.
+
 The PostgreSQL image's [entrypoint source](https://github.com/docker-library/postgres/blob/master/docker-entrypoint.sh)
 starts its temporary initialization server without a TCP listener; PostgreSQL's
 [readiness tool](https://www.postgresql.org/docs/16/app-pg-isready.html) can target

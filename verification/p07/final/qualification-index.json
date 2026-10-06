@@ -1,0 +1,602 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-06T23:23:53.904736+00:00",
+  "p07_delivery": "INCOMPLETE",
+  "preparation_result": "PASS",
+  "preparation_evidence_level": "E1",
+  "preparation_source": "249a77e9fda5c0a3e25918ce3efdb52f4ab415de",
+  "regression_result": "PASS",
+  "regression_evidence_level": "E2",
+  "regression_source": "c2c29067f0ecdb7d0df0c92687507b66415219e5",
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "g07_decision": "NOT_REVIEWED",
+  "actual_commissioning_record": {
+    "result": "HELD",
+    "missing_input_ids": [
+      "N01",
+      "N02",
+      "N03",
+      "N04",
+      "N05",
+      "N06",
+      "N07",
+      "N08",
+      "N09",
+      "N10",
+      "N11",
+      "N12",
+      "N13",
+      "N14",
+      "N15"
+    ],
+    "path": "../../../release/p07-native-inputs.json"
+  },
+  "preparation": [
+    {
+      "source_revision": "249a77e9fda5c0a3e25918ce3efdb52f4ab415de",
+      "report": "preparation/report.json",
+      "report_sha256": "a999e5272e8f82fd839656674eb9ccca0193c624fd34214f70fda2f5d885b21a",
+      "reported_result": "PASSED",
+      "source_bindings_checked": 50,
+      "source_discrepancies": [],
+      "command_logs_checked": 6,
+      "artifact_hashes_checked": 0,
+      "test_suites": [
+        {
+          "path": "preparation/preparation.xml",
+          "tests": 105,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ]
+    },
+    {
+      "source_revision": "249a77e9fda5c0a3e25918ce3efdb52f4ab415de",
+      "report": "local-preparation/report.json",
+      "report_sha256": "7fbb1132da9074dd249069b6e863e080056c5fd6876ff0abacb40b6f04e07ad0",
+      "reported_result": "PASSED",
+      "source_bindings_checked": 50,
+      "source_discrepancies": [],
+      "command_logs_checked": 6,
+      "artifact_hashes_checked": 0,
+      "test_suites": [
+        {
+          "path": "local-preparation/preparation.xml",
+          "tests": 105,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ]
+    },
+    {
+      "source_revision": "249a77e9fda5c0a3e25918ce3efdb52f4ab415de",
+      "report": "regression-core/report.json",
+      "report_sha256": "1ccbc4c5f71162843ee5acbf4947dc39785478fd6d2e8f309b38a463ea121443",
+      "reported_result": "PASSED",
+      "source_bindings_checked": 165,
+      "source_discrepancies": [],
+      "command_logs_checked": 12,
+      "artifact_hashes_checked": 0,
+      "test_suites": [
+        {
+          "path": "regression-core/services-lifecycle.xml",
+          "tests": 184,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "regression-core/execution.xml",
+          "tests": 49,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "regression-core/workers-lifecycle.xml",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ]
+    },
+    {
+      "source_revision": "414225d9d89ac11ac6ef995b4c7179b59240cda4",
+      "report": "regression-core-corrected/report.json",
+      "report_sha256": "a977167059a760d8fd36e7620052982ca8a23d08f05d23628111292fc65bdbec",
+      "reported_result": "PASSED",
+      "source_bindings_checked": 165,
+      "source_discrepancies": [],
+      "command_logs_checked": 12,
+      "artifact_hashes_checked": 0,
+      "test_suites": [
+        {
+          "path": "regression-core-corrected/services-lifecycle.xml",
+          "tests": 184,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "regression-core-corrected/execution.xml",
+          "tests": 49,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "regression-core-corrected/workers-lifecycle.xml",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ]
+    },
+    {
+      "source_revision": "249a77e9fda5c0a3e25918ce3efdb52f4ab415de",
+      "report": "installed-cli/report.json",
+      "report_sha256": "446a8f1b101358369ac14a8fd6652e6a0c8dc4fc7c0fa9dd4def9e16f41785cf",
+      "reported_result": "PASSED",
+      "source_bindings_checked": 0,
+      "source_discrepancies": [],
+      "command_logs_checked": 5,
+      "artifact_hashes_checked": 0
+    }
+  ],
+  "live_regressions": [
+    {
+      "artifact_id": 11451220811,
+      "run_id": 37545874970,
+      "archive": "archives/p07-final-firefox.zip",
+      "archive_sha256": "b742110fc7a4076b8a5271e71e9741fa218958eca4de6e213ca84313de6d2a97",
+      "source_revision": "c2c29067f0ecdb7d0df0c92687507b66415219e5",
+      "report": "qualified-firefox/report.json",
+      "report_sha256": "0bfeeebe1b9242795887a021bdf94d1325865ae81488fb0823fc84aa3435e3fa",
+      "reported_result": "PASS",
+      "source_bindings_checked": 1021,
+      "source_discrepancies": [],
+      "command_logs_checked": 61,
+      "artifact_hashes_checked": 81,
+      "checks": 148,
+      "browser": "firefox",
+      "browser_journeys": {
+        "p06-browser.json": {
+          "startTime": "2026-10-06T23:21:52.814Z",
+          "duration": 15382.028,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-06T23:22:29.742Z",
+          "duration": 2462.975,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "browser.json": {
+          "startTime": "2026-10-06T23:20:45.308Z",
+          "duration": 34963.808000000005,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "retention": "Original archive contains all command logs, browser outputs and artifact bytes; report retained separately for review."
+    },
+    {
+      "artifact_id": 11450787912,
+      "run_id": 37545874970,
+      "archive": "archives/p07-final-webkit.zip",
+      "archive_sha256": "4f7fa3194967ca3518736df0aa0b7035aa0bd1bd75551a740398d0fdc8b6728e",
+      "source_revision": "c2c29067f0ecdb7d0df0c92687507b66415219e5",
+      "report": "qualified-webkit/report.json",
+      "report_sha256": "6d071c6f13ae4f09ae44aaea2a1cc42716e10293a75e0743b1aa9f00dab1ce81",
+      "reported_result": "PASS",
+      "source_bindings_checked": 1021,
+      "source_discrepancies": [],
+      "command_logs_checked": 61,
+      "artifact_hashes_checked": 81,
+      "checks": 148,
+      "browser": "webkit",
+      "browser_journeys": {
+        "p06-browser.json": {
+          "startTime": "2026-10-06T23:22:28.522Z",
+          "duration": 16258.669,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-06T23:23:10.638Z",
+          "duration": 2622.1319999999996,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "browser.json": {
+          "startTime": "2026-10-06T23:20:59.444Z",
+          "duration": 43285.714,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "retention": "Original archive contains all command logs, browser outputs and artifact bytes; report retained separately for review."
+    },
+    {
+      "artifact_id": 11450662904,
+      "run_id": 37545874970,
+      "archive": "archives/p07-final-chromium.zip",
+      "archive_sha256": "c55441b723d347fc512aa889cc7ef9cb62836925720a009e716d05b387328eaa",
+      "source_revision": "c2c29067f0ecdb7d0df0c92687507b66415219e5",
+      "report": "qualified-chromium/report.json",
+      "report_sha256": "669f1789c82383a037fd3e6394c37785a84cbc65931a3f60980f76065d4ba904",
+      "reported_result": "PASS",
+      "source_bindings_checked": 1021,
+      "source_discrepancies": [],
+      "command_logs_checked": 61,
+      "artifact_hashes_checked": 81,
+      "checks": 148,
+      "browser": "chromium",
+      "browser_journeys": {
+        "p06-browser.json": {
+          "startTime": "2026-10-06T23:22:27.599Z",
+          "duration": 15543.042,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-06T23:23:09.061Z",
+          "duration": 2468.439,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "browser.json": {
+          "startTime": "2026-10-06T23:21:05.903Z",
+          "duration": 37571.968,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "retention": "Original archive contains all command logs, browser outputs and artifact bytes; report retained separately for review."
+    }
+  ],
+  "core_regression": {
+    "artifact_id": 11450028355,
+    "run_id": 37545874970,
+    "archive": "archives/p07-final-core.zip",
+    "archive_sha256": "0904ea1975708bdaff6b118375aff2aba8ca72ca40fe2c7a6521332a42345a6e",
+    "source_revision": "c2c29067f0ecdb7d0df0c92687507b66415219e5",
+    "report": "qualified-core/report.json",
+    "report_sha256": "a90565b48555853491f873ce3d048ee89c1d9c3ed5eaa0909662b00d84fe9777",
+    "reported_result": "PASSED",
+    "source_bindings_checked": 165,
+    "source_discrepancies": [],
+    "command_logs_checked": 12,
+    "artifact_hashes_checked": 0,
+    "test_suites": [
+      {
+        "path": "qualified-core/services-lifecycle.xml",
+        "tests": 184,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "qualified-core/execution.xml",
+        "tests": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "qualified-core/workers-lifecycle.xml",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "original_archives": [
+    {
+      "archive": "archives/p07-preparation-37544177842.zip",
+      "artifact_id": 11449249796,
+      "run_id": 37544177842,
+      "archive_sha256": "368861ecda9f70dd21f63a8b86cea2d4857d954fd856e845ebfdace2669e708a"
+    },
+    {
+      "archive": "archives/p07-p06-regression-core.zip",
+      "artifact_id": 11448819533,
+      "run_id": 37544177753,
+      "archive_sha256": "0cad630d84a15e9bb1f54105861a4db3f017bf7e64199d37eca8ec09eeee0bc2"
+    },
+    {
+      "archive": "archives/p07-firefox-initial-failure.zip",
+      "artifact_id": 11449950917,
+      "run_id": 37544177753,
+      "archive_sha256": "d5e6037ef0ff64e43d76ffd171f63770bb8fc3b645ea3f98c36616a1b0c03e37"
+    },
+    {
+      "archive": "archives/p07-p06-corrected-core.zip",
+      "artifact_id": 11450465435,
+      "run_id": 37544824901,
+      "archive_sha256": "6238e8341abafb4e3ce43948c3036a18e1f1c34a3aa4ed4b3c532bb882815b29"
+    }
+  ],
+  "superseded_live": [
+    {
+      "artifact_id": 11450376343,
+      "run_id": 37544824901,
+      "archive": "archives/p07-corrected-chromium.zip",
+      "archive_sha256": "917d70a8b9630d2cdb139bcdea33cd50cdeb5273f655efe5dce2fed078b392cb",
+      "source_revision": "414225d9d89ac11ac6ef995b4c7179b59240cda4",
+      "report": "superseded-live-chromium/report.json",
+      "report_sha256": "bb8d73b22f36d6b580268d99ca35b4f719c0da9b8aa5ffea8e8f2374f95632b8",
+      "reported_result": "PASS",
+      "source_bindings_checked": 1021,
+      "source_discrepancies": [
+        {
+          "path": "services/inventory/src/product_inventory.egg-info/SOURCES.txt",
+          "reported_sha256": "0678ba79c585728c27d8034067de0c5bbc7ec3fd80af8c5ff9046813615cc351",
+          "committed_sha256": "5e4a47d8190e40e9b83953e6b83a80b8779586480661b90ac67ef1f12ec10f85"
+        }
+      ],
+      "command_logs_checked": 61,
+      "artifact_hashes_checked": 81,
+      "checks": 148,
+      "browser": "chromium",
+      "browser_journeys": {
+        "p06-browser.json": {
+          "startTime": "2026-10-06T23:11:13.614Z",
+          "duration": 15683.899,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-06T23:11:55.739Z",
+          "duration": 2491.237,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "browser.json": {
+          "startTime": "2026-10-06T23:09:52.525Z",
+          "duration": 35633.608,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "limitation": "Behavior passed; one generated package manifest differs from declared commit. This is not an exact-source qualification pass."
+    },
+    {
+      "artifact_id": 11450356494,
+      "run_id": 37544824901,
+      "archive": "archives/p07-corrected-webkit.zip",
+      "archive_sha256": "b4c9855033536095cdfae3c9f5feb999f04c16c0527c8650f4c8d1caeef7042d",
+      "source_revision": "414225d9d89ac11ac6ef995b4c7179b59240cda4",
+      "report": "superseded-live-webkit/report.json",
+      "report_sha256": "64bab197a563f12dcf65913be368f43b656f66fffc1404f26ca7473aec546f5f",
+      "reported_result": "PASS",
+      "source_bindings_checked": 1021,
+      "source_discrepancies": [
+        {
+          "path": "services/inventory/src/product_inventory.egg-info/SOURCES.txt",
+          "reported_sha256": "0678ba79c585728c27d8034067de0c5bbc7ec3fd80af8c5ff9046813615cc351",
+          "committed_sha256": "5e4a47d8190e40e9b83953e6b83a80b8779586480661b90ac67ef1f12ec10f85"
+        }
+      ],
+      "command_logs_checked": 61,
+      "artifact_hashes_checked": 81,
+      "checks": 148,
+      "browser": "webkit",
+      "browser_journeys": {
+        "p06-browser.json": {
+          "startTime": "2026-10-06T23:11:23.494Z",
+          "duration": 15402.987000000001,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-06T23:12:02.689Z",
+          "duration": 1619.595,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "browser.json": {
+          "startTime": "2026-10-06T23:10:05.293Z",
+          "duration": 37451.905,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "limitation": "Behavior passed; one generated package manifest differs from declared commit. This is not an exact-source qualification pass."
+    },
+    {
+      "artifact_id": 11450271761,
+      "run_id": 37544824901,
+      "archive": "archives/p07-corrected-firefox.zip",
+      "archive_sha256": "0f5c93cc4638ff7b5246a0fbf7f04de6916f479f17993fd51a6f33bc3437290c",
+      "source_revision": "414225d9d89ac11ac6ef995b4c7179b59240cda4",
+      "report": "superseded-live-firefox/report.json",
+      "report_sha256": "f00e7ab3c6dff417626e6ac9c1c88e45d4327fb88b0c876932f832e4f47b6819",
+      "reported_result": "PASS",
+      "source_bindings_checked": 1021,
+      "source_discrepancies": [
+        {
+          "path": "services/inventory/src/product_inventory.egg-info/SOURCES.txt",
+          "reported_sha256": "0678ba79c585728c27d8034067de0c5bbc7ec3fd80af8c5ff9046813615cc351",
+          "committed_sha256": "5e4a47d8190e40e9b83953e6b83a80b8779586480661b90ac67ef1f12ec10f85"
+        }
+      ],
+      "command_logs_checked": 61,
+      "artifact_hashes_checked": 81,
+      "checks": 148,
+      "browser": "firefox",
+      "browser_journeys": {
+        "p06-browser.json": {
+          "startTime": "2026-10-06T23:11:35.995Z",
+          "duration": 17576.878,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-06T23:12:18.520Z",
+          "duration": 3626.924,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "browser.json": {
+          "startTime": "2026-10-06T23:10:13.287Z",
+          "duration": 37467.130999999994,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "limitation": "Behavior passed; one generated package manifest differs from declared commit. This is not an exact-source qualification pass."
+    }
+  ],
+  "initial_firefox_failure": {
+    "report": "initial-firefox-report.json",
+    "report_sha256": "ce6c2f8d0932603dd462239ddfdec66912449820631d40955ab364dc3b529880",
+    "result": "FAIL",
+    "source_revision": "249a77e9fda5c0a3e25918ce3efdb52f4ab415de",
+    "run_id": 37544177753,
+    "reason": "Temporal SQL schema setup failed with PostgreSQL 57P03 before the final database server was ready.",
+    "limitation": "Incomplete failed campaign, retained unchanged; not a native observation or exact-source qualification pass."
+  },
+  "installed_cli_initial": {
+    "report": "installed-cli-initial/report.json",
+    "result": "INCOMPLETE",
+    "limitation": "Parent fixture generator lacked pytest; corrected isolated child execution is recorded separately."
+  },
+  "source_impact_review": {
+    "reviewer": "Codex engineering source comparison",
+    "preparation_source_bindings_unchanged": 50,
+    "checked_against": "c2c29067f0ecdb7d0df0c92687507b66415219e5",
+    "explanation": "All 50 source bindings from the passing P07 preparation campaign exactly match the final regression source. Subsequent implementation corrections change only the P06 PostgreSQL fixture, Inventory generated manifest and consumed-path CI filter. Later evidence/documentation commits do not imply a fresh native qualification.",
+    "last_implementation_source": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+    "unchanged_bindings_at_last_implementation_source": {
+      "preparation/report.json": 50,
+      "qualified-core/report.json": 165,
+      "qualified-chromium/report.json": 1021,
+      "qualified-firefox/report.json": 1021,
+      "qualified-webkit/report.json": 1021
+    },
+    "foundation_fixture_correction": "The subsequent P01-only Kubernetes probe transfer correction does not change any of the measured P07 preparation or P06 regression source bindings. The affected Kubernetes campaign has a separate source and outcome."
+  },
+  "limitations": [
+    "No native OpenStack, Terraform apply, enterprise service, backup/restore, network policy, revocation or retirement campaign was run.",
+    "P07.01 and P07.02 have preparation only; no P07 package is complete. P07.03-P07.06 native implementations and Q05/Q06 E3 remain outstanding.",
+    "File inputs are synthetic metadata except the deliberately incomplete actual commissioning record. Matching file metadata is not authenticated current authority or proof of native lock possession.",
+    "P06 core and live evidence are existing simulated execution regressions with real PostgreSQL/Temporal/browser dependencies, not P07 native support.",
+    "Original archives preserve all logs and artifacts. Earlier failures and the one-file source discrepancy are not relabeled as qualified passes.",
+    "No time-based expiry is asserted for fixed-source E1/E2 observations; material input/source/assumption changes require affected qualification. Receiving and operating acceptance remain open."
+  ],
+  "foundation_regression": {
+    "result": "PASS",
+    "corrected_source": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+    "original_failure": {
+      "run_id": 37545566682,
+      "artifact_id": 11450158762,
+      "source_revision": "cf3992c3c33b95a060a2ef34677d054b51d9a8c0",
+      "result": "FAIL",
+      "archive": "archives/p07-kubernetes-initial-failure.zip",
+      "archive_sha256": "e125c16776e6a6b134c5af365c64079b59a9e92a8a74a9939c85423b03602421",
+      "report": "initial-kubernetes-report.json",
+      "report_sha256": "987716d01af41209719c2823088c3891b813f50494e469d0337aba793594e446",
+      "reason": "Empty successful Console probe stdout failed strict JSON parsing; original copied file bytes unmeasured.",
+      "command_stream_pairs_checked": 328
+    },
+    "corrected_kubernetes": {
+      "run_id": 37546672554,
+      "artifact_id": 11450678893,
+      "archive": "archives/p07-kubernetes-corrected.zip",
+      "archive_sha256": "ff2b4812b5def6750a9bc664ab4a7197d64698c3cbb70d2b5d919252b1bcdd3a",
+      "report": "corrected-kubernetes-report.json",
+      "report_sha256": "aace1e965be03e607e7bae32d5776e9d0c85e144203ed7a4c05d70c50c398362",
+      "source_revision": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+      "result": "PASS",
+      "checks": 271,
+      "command_stream_pairs_checked": 445,
+      "installation_source_bindings_checked": 103,
+      "verified_probe_transfers": 5,
+      "cleanup_complete": true,
+      "native_platforms_tested": [],
+      "limitation": "Isolated synthetic kind/Cilium foundation regression; no native OpenStack qualification. Original archive retains all command streams and image build reports.",
+      "image_builds_verified": [
+        {
+          "component": "assurance",
+          "source_bindings_checked": 50,
+          "command_stream_pairs_checked": 12
+        },
+        {
+          "component": "catalogue",
+          "source_bindings_checked": 80,
+          "command_stream_pairs_checked": 12
+        },
+        {
+          "component": "console",
+          "source_bindings_checked": 148,
+          "command_stream_pairs_checked": 12
+        },
+        {
+          "component": "governance",
+          "source_bindings_checked": 174,
+          "command_stream_pairs_checked": 12
+        },
+        {
+          "component": "inventory",
+          "source_bindings_checked": 43,
+          "command_stream_pairs_checked": 11
+        },
+        {
+          "component": "lifecycle",
+          "source_bindings_checked": 46,
+          "command_stream_pairs_checked": 11
+        },
+        {
+          "component": "planning",
+          "source_bindings_checked": 54,
+          "command_stream_pairs_checked": 11
+        }
+      ]
+    }
+  },
+  "associated_workflow_receipt": "regression-completion.json"
+}
