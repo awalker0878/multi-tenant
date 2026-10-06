@@ -16,6 +16,12 @@ class TemporalFixture:
         images.update({k:images['temporal'] for k in ['probe','minio','mc']})
         self.path=module.prepare(root,private/'temporal',images)
         config=json.loads(self.path.read_text());config['services']={k:v for k,v in config['services'].items() if k in ['postgres','schema','temporal']}
+        # The image's temporary initialization server accepts Unix-socket queries
+        # before shutting down. Schema migration uses TCP, so readiness must wait
+        # for the final TCP listener instead of accepting that temporary server.
+        config['services']['postgres']['healthcheck']['test']=[
+            'CMD','pg_isready','-h','127.0.0.1','-p','5432','-U','postgres','-d','postgres',
+        ]
         config['services']['temporal']['ports']=['127.0.0.1:17233:7233']
         config['networks']['workflow']={'internal':False} # Loopback-published TLS frontend is reached from the host campaign.
         self.path.chmod(0o600);self.path.write_text(json.dumps(config))
