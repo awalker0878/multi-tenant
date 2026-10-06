@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "source_revision": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+  "observed_at": "2026-10-06T00:52:02.732356+00:00",
+  "result": "PASS",
+  "scope": "Completed workflow/job metadata for the Governance/runtime recovery source before the separately qualified protected-terminal custody refinement. Original PostgreSQL/TLS/browser/custody reports, archives and source/log hashes are separately retained in qualification-index.json. Engineering regression evidence only; no independent G02 or production custody enrollment is implied.",
+  "raw_p02_evidence": "verification/p02/recovery-custody/qualification-index.json",
+  "workflow_count": 9,
+  "job_count": 18,
+  "successful_jobs": 17,
+  "expected_skipped_jobs": [
+    {
+      "id": 112046031542,
+      "reason": "The unchanged Python application package family was unselected. The selector reported python=[] and php=[console, governance] for the recovery PHP implementation/test and runbook changes. Custody Python tests separately pass in every identity campaign. The required Foundation checks aggregate passed.",
+      "selection_job_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147951/job/112045976119",
+      "aggregate_job_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147951/job/112046416754"
+    }
+  ],
+  "runs": [
+    {
+      "id": 37394147824,
+      "name": "P02 identity",
+      "head_sha": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+      "path": ".github/workflows/p02-identity.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147824",
+      "run_attempt": 1,
+      "created_at": "2026-10-06T00:27:58Z",
+      "updated_at": "2026-10-06T00:34:05Z",
+      "jobs": [
+        {
+          "id": 112045975209,
+          "name": "P02 identity, tenancy, approval, support and notifications (webkit)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147824/job/112045975209",
+          "started_at": "2026-10-06T00:29:09Z",
+          "completed_at": "2026-10-06T00:34:05Z"
+        },
+        {
+          "id": 112045975339,
+          "name": "P02 identity, tenancy, approval, support and notifications (firefox)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147824/job/112045975339",
+          "started_at": "2026-10-06T00:28:01Z",
+          "completed_at": "2026-10-06T00:31:11Z"
+        },
+        {
+          "id": 112045975433,
+          "name": "P02 identity, tenancy, approval, support and notifications (chromium)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147824/job/112045975433",
+          "started_at": "2026-10-06T00:28:02Z",
+          "completed_at": "2026-10-06T00:32:27Z"
+        }
+      ]
+    },
+    {
+      "id": 37394148062,
+      "name": "P01 bootstrap images",
+      "head_sha": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+      "path": ".github/workflows/p01-images.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148062",
+      "run_attempt": 1,
+      "created_at": "2026-10-06T00:27:58Z",
+      "updated_at": "2026-10-06T00:29:31Z",
+      "jobs": [
+        {
+          "id": 112045977353,
+          "name": "Select affected independent images",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148062/job/112045977353",
+          "started_at": "2026-10-06T00:28:01Z",
+          "completed_at": "2026-10-06T00:28:09Z"
+        },
+        {
+          "id": 112046026886,
+          "name": "governance isolated image",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148062/job/112046026886",
+          "started_at": "2026-10-06T00:28:12Z",
+          "completed_at": "2026-10-06T00:29:18Z"
+        },
+        {
+          "id": 112046027216,
+          "name": "console isolated image",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148062/job/112046027216",
+          "started_at": "2026-10-06T00:28:12Z",
+          "completed_at": "2026-10-06T00:29:17Z"
+        },
+        {
+          "id": 112046358317,
+          "name": "Foundation images",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148062/job/112046358317",
+          "started_at": "2026-10-06T00:29:22Z",
+          "completed_at": "2026-10-06T00:29:30Z"
+        }
+      ]
+    },
+    {
+      "id": 37394148205,
+      "name": "P01 isolated Compose integration",
+      "head_sha": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+      "path": ".github/workflows/p01-local-integration.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148205",
+      "run_attempt": 1,
+      "created_at": "2026-10-06T00:27:58Z",
+      "updated_at": "2026-10-06T00:31:09Z",
+      "jobs": [
+        {
+          "id": 112045993422,
+          "name": "Private foundation installation and denial checks",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148205/job/112045993422",
+          "started_at": "2026-10-06T00:28:05Z",
+          "completed_at": "2026-10-06T00:31:08Z"
+        }
+      ]
+    },
+    {
+      "id": 37394147917,
+      "name": "Context policy",
+      "head_sha": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+      "path": ".github/workflows/architecture-policy.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147917",
+      "run_attempt": 1,
+      "created_at": "2026-10-06T00:27:58Z",
+      "updated_at": "2026-10-06T00:28:21Z",
+      "jobs": [
+        {
+          "id": 112045975968,
+          "name": "Architecture registry and documentation",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147917/job/112045975968",
+          "started_at": "2026-10-06T00:28:01Z",
+          "completed_at": "2026-10-06T00:28:21Z"
+        }
+      ]
+    },
+    {
+      "id": 37394148004,
+      "name": "P02 Governance events",
+      "head_sha": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+      "path": ".github/workflows/p02-governance-events.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148004",
+      "run_attempt": 1,
+      "created_at": "2026-10-06T00:27:58Z",
+      "updated_at": "2026-10-06T00:29:07Z",
+      "jobs": [
+        {
+          "id": 112045975891,
+          "name": "Governance PostgreSQL and confirmed TLS event delivery",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148004/job/112045975891",
+          "started_at": "2026-10-06T00:28:02Z",
+          "completed_at": "2026-10-06T00:29:06Z"
+        }
+      ]
+    },
+    {
+      "id": 37394147985,
+      "name": "P01 foundation contracts",
+      "head_sha": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+      "path": ".github/workflows/p01-contracts.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147985",
+      "run_attempt": 1,
+      "created_at": "2026-10-06T00:27:58Z",
+      "updated_at": "2026-10-06T00:29:00Z",
+      "jobs": [
+        {
+          "id": 112045975915,
+          "name": "Foundation contracts",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147985/job/112045975915",
+          "started_at": "2026-10-06T00:28:09Z",
+          "completed_at": "2026-10-06T00:28:59Z"
+        }
+      ]
+    },
+    {
+      "id": 37394148012,
+      "name": "P01 policy controls",
+      "head_sha": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+      "path": ".github/workflows/p01-policy-controls.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148012",
+      "run_attempt": 1,
+      "created_at": "2026-10-06T00:27:58Z",
+      "updated_at": "2026-10-06T00:28:24Z",
+      "jobs": [
+        {
+          "id": 112045976691,
+          "name": "Foundation policy controls",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394148012/job/112045976691",
+          "started_at": "2026-10-06T00:28:02Z",
+          "completed_at": "2026-10-06T00:28:24Z"
+        }
+      ]
+    },
+    {
+      "id": 37394147951,
+      "name": "P01 foundation packages",
+      "head_sha": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+      "path": ".github/workflows/p01-foundations.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147951",
+      "run_attempt": 1,
+      "created_at": "2026-10-06T00:27:58Z",
+      "updated_at": "2026-10-06T00:29:41Z",
+      "jobs": [
+        {
+          "id": 112045976119,
+          "name": "Select affected independent packages",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147951/job/112045976119",
+          "started_at": "2026-10-06T00:28:02Z",
+          "completed_at": "2026-10-06T00:28:10Z"
+        },
+        {
+          "id": 112046030310,
+          "name": "Laravel console",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147951/job/112046030310",
+          "started_at": "2026-10-06T00:28:13Z",
+          "completed_at": "2026-10-06T00:29:30Z"
+        },
+        {
+          "id": 112046030410,
+          "name": "Laravel governance",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147951/job/112046030410",
+          "started_at": "2026-10-06T00:28:14Z",
+          "completed_at": "2026-10-06T00:29:22Z"
+        },
+        {
+          "id": 112046031542,
+          "name": "Python ${{ matrix.component }}",
+          "status": "completed",
+          "conclusion": "skipped",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147951/job/112046031542",
+          "started_at": "2026-10-06T00:28:10Z",
+          "completed_at": "2026-10-06T00:28:10Z"
+        },
+        {
+          "id": 112046416754,
+          "name": "Foundation checks",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147951/job/112046416754",
+          "started_at": "2026-10-06T00:29:35Z",
+          "completed_at": "2026-10-06T00:29:41Z"
+        }
+      ]
+    },
+    {
+      "id": 37394147963,
+      "name": "P01 isolated Kubernetes integration",
+      "head_sha": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+      "path": ".github/workflows/p01-kubernetes-integration.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147963",
+      "run_attempt": 1,
+      "created_at": "2026-10-06T00:27:58Z",
+      "updated_at": "2026-10-06T00:51:29Z",
+      "jobs": [
+        {
+          "id": 112050032602,
+          "name": "Private kind Cilium foundation and policy denials",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37394147963/job/112050032602",
+          "started_at": "2026-10-06T00:42:29Z",
+          "completed_at": "2026-10-06T00:51:29Z"
+        }
+      ]
+    }
+  ]
+}

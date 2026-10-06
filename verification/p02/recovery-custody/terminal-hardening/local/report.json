@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "result": "PASS",
+  "source_revision": "d5ccd142cca22e51448a1a86996bbd0a14cba2b5",
+  "observed_at": "2026-10-06T00:48:13.583202+00:00",
+  "source_sha256": {
+    "scripts/recovery/custody.py": "e7767edacd5016378a6fa51dbefc131c6073fa5ba9b6dbf1420026422286b276",
+    "scripts/recovery/test_custody.py": "86c7c80182212af7f81f707be5ad6215e4a13d108907b3ea82659fa3555c24b8"
+  },
+  "exit_code": 0,
+  "custody_tests": 13,
+  "streams": {
+    "stdout": {
+      "path": "stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": "stderr.log",
+      "sha256": "0f1e64d63c9cf55a1fd04ef2df0b04d1b3d9e7414037c10b0ee26fd0d3fca159"
+    }
+  },
+  "scope": "Protected-terminal signing and complete existing custody-tool regression. No production host or operator enrollment."
+}

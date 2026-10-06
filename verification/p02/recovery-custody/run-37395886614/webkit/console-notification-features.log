@@ -1,0 +1,82 @@
+
+   PASS  Tests\Feature\NotificationInboxTest
+  ✓ it commits minimal immutable receipts and hints before acknowledgem… 0.16s  
+  ✓ it recovers a commit followed by an uncertain broker acknowledgemen… 0.03s  
+  ✓ it rolls back the receipt and leaves delivery unacknowledged when t… 0.02s  
+  ✓ it refuses to acknowledge inside an outer transaction                0.02s  
+  ✓ it quarantines conflicting bytes without replacing a receipt or ano… 0.03s  
+  ✓ it stores bounded poison envelopes encrypted and acknowledges only…  0.02s  
+  ✓ it never acknowledges truncated or oversized payloads with ([true])  0.02s  
+  ✓ it never acknowledges truncated or oversized payloads with (['xxxxx… 0.02s  
+  ✓ it never acknowledges truncated or oversized payloads with (['xxxxx… 0.02s  
+  ✓ it keeps reordered events as generic hints and isolates tenants      0.03s  
+  ✓ it bounds command work and redacts operational errors while closing… 0.07s  
+
+   PASS  Tests\Feature\NotificationContractTest
+  ✓ it accepts the five tenant administration routes without projecting… 0.02s  
+  ✓ it accepts the five tenant administration routes without projecting… 0.01s  
+  ✓ it accepts the five tenant administration routes without projecting… 0.01s  
+  ✓ it accepts the five tenant administration routes without projecting… 0.01s  
+  ✓ it accepts the five tenant administration routes without projecting… 0.01s  
+  ✓ it rejects unauthorized families, unknown fields, versions and mism… 0.01s  
+  ✓ it rejects unauthorized families, unknown fields, versions and mism… 0.01s  
+  ✓ it rejects unauthorized families, unknown fields, versions and mism… 0.01s  
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with ([2], [])
+  ✓ it rejects unauthorized families, unknown fields, versions and mism… 0.01s  
+  ✓ it rejects unauthorized families, unknown fields, versions and mismatched transport attribution with (['invalid'], [])
+  ✓ it rejects unauthorized families, unknown fields, versions and mism… 0.01s  
+  ✓ it rejects unauthorized families, unknown fields, versions and mism… 0.01s  
+  ✓ it rejects unauthorized families, unknown fields, versions and mism… 0.01s  
+  ✓ it rejects unauthorized families, unknown fields, versions and mism… 0.01s  
+  ✓ it rejects unauthorized families, unknown fields, versions and mism… 0.01s  
+  ✓ it fails before a connection when broker custody is missing          0.01s  
+
+   PASS  Tests\Feature\NotificationAccessTest
+  ✓ it rechecks current owner authority on every poll and returns only…  0.06s  
+  ✓ it denies readers and scoped administrators before the hint lookup…  0.01s  
+  ✓ it denies readers and scoped administrators before the hint lookup…  0.01s  
+  ✓ it denies readers and scoped administrators before the hint lookup…  0.01s  
+  ✓ it does not expose a hint when the owner or session authority is un… 0.01s  
+  ✓ it does not expose a hint when the owner or session authority is un… 0.01s  
+  ✓ it does not expose a hint when the owner or session authority is un… 0.01s  
+  ✓ it does not expose a hint when the owner or session authority is un… 0.01s  
+  ✓ it reports hint storage outages without exposing database details    0.01s  
+  ✓ it preserves owner-backed administration while marking unavailable…  0.02s  
+
+   PASS  Tests\Feature\InstallationNotificationTest
+  ✓ it retains installation receipts in the shared immutable ID namespa… 0.04s  
+  ✓ it retains login receipts without changing the settings hint         0.03s  
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.02s  
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.02s  
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.03s  
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.03s  
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.03s  
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.03s  
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.02s  
+  ✓ it rejects tenant substitution and untrusted identity event envelop… 0.02s  
+  ✓ it rolls back an installation receipt when its hint cannot commit    0.02s  
+  ✓ it checks current installation ownership before revealing a hint wi… 0.03s  
+  ✓ it checks current installation ownership before revealing a hint wi… 0.03s  
+  ✓ it checks current installation ownership before revealing a hint wi… 0.03s  
+  ✓ it checks current installation ownership before revealing a hint wi… 0.03s  
+  ✓ it packages the identity schema without editing its published bytes  0.02s  
+
+   PASS  Tests\Feature\DirectoryTest
+  ✓ it forwards only an encoded cursor and renders the next owner-provi… 0.01s  
+  ✓ it renders continued membership pages only after current tenant aut… 0.03s  
+  ✓ it restarts invalid or expired page links without rendering remembe… 0.01s  
+  ✓ it does not downgrade owner unavailability to an empty successful t… 0.01s  
+  ✓ it denies guessed and revoked tenant continuations before retrievin… 0.02s  
+
+   PASS  Tests\Feature\NotificationBrokerTest
+  ✓ it consumes verified TLS messages into PostgreSQL and handles dupli… 0.12s  
+  ✓ it redelivers the same bytes after the consumer closes between comm… 0.06s  
+  ✓ it retains oversized bytes at the broker instead of acknowledging a… 0.06s  
+  ✓ it rejects an untrusted broker certificate                           0.03s  
+  ✓ it does not grant Console queue configuration or reads of another s… 0.04s  
+  ✓ it does not grant Console queue configuration or reads of another s… 0.04s  
+  ✓ it delivers installation settings through the same verified broker…  0.07s  
+
+  Tests:    66 passed (248 assertions)
+  Duration: 1.73s
+
