@@ -57,9 +57,31 @@ retained at commit `646b615b7137bfab300c129bc3baa71ad9972b3b`.
 | Actual disposable recovery ceremony | Owner role and runtime denials, separate custody process, two encrypted-key terminal signatures, rejected single approval, committed held reconciliation, early descriptor-opening denial, second signed authorization, full-schema receipt/release restore, independent release and fresh HTTPS OIDC sign-in. A later hold defeats the restored previously confirmed database. |
 | Event regression | 74 PostgreSQL/TLS event cases / 1,358 assertions; 217 source bindings and ten log hashes match, including durable support event delivery and queue isolation. |
 
+The [final regression receipt](../../verification/p02/recovery-custody/hosted-final.json)
+records all nine workflows passing at Governance/runtime source `7ec7a60`, including independent packages,
+images, contracts, policy, events, Compose and Kubernetes. All selected jobs pass;
+the unchanged Python application-package family is explicitly unselected.
+
 The [corrections record](../../verification/p02/corrections.md) preserves the initial
 wrong-schema observation and an earlier empty Kubernetes helper response. No failure
 is relabelled and no published contract, mandatory assertion or security gate is
 weakened. A full environment co-rollback remains outside this filesystem mechanism;
 actual independent people/keys/hosts, current owner records and receiving approval
 must come from the operating owners, never synthetic fixture identities.
+
+
+## Protected terminal refinement
+
+Source `d5ccd142cca22e51448a1a86996bbd0a14cba2b5` refuses signing without an
+interactive terminal or when Python cannot protect terminal echo. It never falls
+back to visible passphrase input. [EV-P02-025](delivery-register.yaml) retains
+[the final qualification](../../verification/p02/recovery-custody/terminal-hardening/qualification-index.json):
+13 custody cases pass locally and in every repeated 156-check Chromium, Firefox
+and WebKit campaign. The real encrypted-key terminal ceremony remains successful.
+All 358 source bindings and 25 artifact hashes per engine match.
+
+The index records identical Git tree identities for every unchanged application,
+deployment, P01/P02 integration, contract and workflow directory. The 239-case
+Governance local suite, 74-case event campaign and complete nine-workflow runtime
+regression at `7ec7a60` therefore remain the evidence for those unchanged components.
+The earlier reports retain their original sources and 11-case custody counts.

@@ -4,7 +4,7 @@ Active branch: `greenfield/enterprise-microservices-plan`. The requesting user
 continues to authorize P02 development. Support/break-glass policy and bounded
 implementation are complete. Independent recovery custody, signed reconciliation
 and separate resumption are implemented through
-`7ec7a60623f60c84ba3356978f0ff51b03e9ca7e`.
+`d5ccd142cca22e51448a1a86996bbd0a14cba2b5`.
 The [delivery register](docs/implementation/delivery-register.yaml) owns status.
 **P02 remains IN_PROGRESS and G02 NOT_REVIEWED** pending the actual operating,
 accessibility and receiving obligations below. G01 receiving conditions carry forward.
@@ -21,9 +21,13 @@ Runtime cannot rewrite recovery bindings/receipts/releases. Credentials must rot
 without cross-identity reuse. Unselected memberships are revoked and tenants held.
 Local bootstrap remains retired; pre-activation lost-password reset is unsupported.
 
-The [qualification index](verification/p02/recovery-custody/qualification-index.json)
+The [final qualification index](verification/p02/recovery-custody/terminal-hardening/qualification-index.json)
 retains exact-source local and hosted observations, original archives and source/log
-hash verification. Failed observations remain failed in
+hash verification. The [final regression receipt](verification/p02/recovery-custody/hosted-final.json)
+records all nine workflows passing at Governance/runtime source `7ec7a60`, including
+Compose and Kubernetes. The final protected-terminal refinement repeats all three
+156-check recovery campaigns with 13 custody cases; unchanged runtime tree identities
+are retained explicitly. Failed observations remain failed in
 [the corrections record](verification/p02/corrections.md). The earlier support
 [qualification](verification/p02/support/qualification-index.json) and final
 [regression receipt](verification/p02/support/hosted-final.json) remain unchanged.

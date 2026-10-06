@@ -7,8 +7,9 @@ three engines pass 116 checks, including nonempty support history restore; the
 separate TLS event campaign passes 74 cases. BL-P02-001 is resolved.
 
 The [engineering assessment](../qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
-maps the evidence to G02. Recovery source `7ec7a60` additionally passes all three
-156-check custody/resumption campaigns, retained in EV-P02-023/024.
+maps the evidence to G02. Recovery source `d5ccd14` additionally passes all three
+156-check custody/resumption campaigns, including 13 custody tests and protected
+terminal signing. EV-P02-023–025 retain the implementation and its refinements.
 **P02 remains IN_PROGRESS and G02 NOT_REVIEWED** pending
 the actual custody, managed-browser/accessibility and independent receiving inputs
 below. These are concrete operating/review obligations, not a request to reauthorize

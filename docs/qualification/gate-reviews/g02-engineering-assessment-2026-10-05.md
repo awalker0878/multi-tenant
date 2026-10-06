@@ -9,7 +9,8 @@ managed-browser/accessibility scope and independent receiving decisions remain o
 Codex records engineering examination; no independent reviewer or operating assignment
 is invented, and the existing policy authorization is not requested again.
 
-Recovery continuation observed on 2026-10-06 UTC is qualified at `7ec7a60`:
+Recovery continuation observed on 2026-10-06 UTC is qualified at `7ec7a60`,
+with separately requalified protected-terminal signing at `d5ccd14`:
 239 local Governance cases and all three hosted 156-check campaigns pass. The
 implemented procedure is complete; actual operating custody and receiving remain open.
 
@@ -28,6 +29,7 @@ BL-P02-002–004. The resolved BL-P02-001 retains its decision and implementatio
 | EV-P02-019 | Source `fe88107`: all three engines pass 100 checks, 119 Governance cases / 2,010 assertions, 66 Console cases / 248 assertions, both browser journeys, four HTTPS/PKCE exchanges and 19–21 confirmed notifications. A separate full-schema restore preserves two terminal approval decisions and five decision events. Ten artifact hashes and 302 source bindings per engine match. |
 | EV-P02-020–022 | The user instruction and documented conservative policy, 211 local Governance cases / 4,418 assertions with static/architecture/format checks, and corrected source `ad53968`: three engines each pass 116 checks, 177 Governance PostgreSQL cases / 4,325 assertions, 66 Console PostgreSQL/TLS cases / 248 assertions and both existing browser journeys. A separate support restore retains one used revoked request, two approvals, one independent review and ten audit/outbox facts. The TLS event campaign passes 74 cases / 1,358 assertions, including crash replay and queue ACL separation. |
 | EV-P02-023/024 | Recovery source `7ec7a60`: 239 local Governance cases / 5,564 assertions, 11 custody cases, static/architecture/format checks; 218 source and ten log hashes. Each hosted engine passes 156 checks, 205 Governance PostgreSQL cases / 5,471 assertions, 66 Console PostgreSQL/TLS cases / 248 assertions and both browser journeys. Actual encrypted-key signing, owner/runtime role denial, separately approved release, full-schema recovery receipts and fresh HTTPS OIDC admission execute. Each identity archive matches 358 source and 25 artifact hashes; the separate 74-case TLS event campaign matches 217 source and ten log hashes. |
+| EV-P02-025 | Protected-terminal refinement `d5ccd14`: signing refuses non-terminal or unprotected input. All 13 custody tests and all three full 156-check PostgreSQL/TLS/browser campaigns pass. Exact Git tree identities prove the application, deployment, integration, contract and workflow code is unchanged from the nine-workflow `7ec7a60` runtime regression. The new archive/source hashes and scope comparison are retained separately. |
 
 The [hosted regression receipt](../../../verification/p02/completion-hosted-final.json)
 records all nine workflows successfully completed at `fe88107`, including the
@@ -48,7 +50,12 @@ complements the retained P02 campaign evidence without broadening G02 acceptance
 
 The [recovery index](../../../verification/p02/recovery-custody/qualification-index.json)
 retains the subsequent passing ceremony and its original failed observations at
-their separate immutable sources. No synthetic custodian is an operating assignment.
+their separate immutable sources. The [final recovery regression receipt](../../../verification/p02/recovery-custody/hosted-final.json)
+records all nine workflows passing at `7ec7a60`, including Compose and Kubernetes.
+All selected jobs pass; the unchanged Python application-package family is explicitly
+unselected. The [terminal refinement index](../../../verification/p02/recovery-custody/terminal-hardening/qualification-index.json)
+retains the repeated current-source ceremony and exact unchanged-component comparison.
+No synthetic custodian is an operating assignment.
 
 EV-P02-001–015 retain earlier bootstrap, federation, tenant/approval, relay,
 delegation, Console consumer and directory increments at their original sources.
