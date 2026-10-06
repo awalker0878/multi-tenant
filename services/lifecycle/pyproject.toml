@@ -15,6 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
+lifecycle-workflows = "lifecycle.bootstrap.workflow:main"
 lifecycle-health = "lifecycle.bootstrap.health:main"
 lifecycle-serve = "lifecycle.bootstrap.server:main"
 

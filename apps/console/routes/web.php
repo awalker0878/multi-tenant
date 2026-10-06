@@ -6,6 +6,7 @@ use App\Http\Controllers\CatalogueWorkspaceController;
 use App\Http\Controllers\FoundationController;
 use App\Http\Controllers\InstallationNotificationController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\JobsController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OidcController;
@@ -66,4 +67,14 @@ Route::prefix('/tenants/{tenant}/applications/{application}/environments/{enviro
     Route::get('/{kind}/{record}', [$c, 'show'])->whereIn('kind', ['assessments', 'plans'])->whereUuid('record');
     Route::get('/{kind}/{record}/status', [$c, 'status'])->whereIn('kind', ['assessments', 'plans'])->whereUuid('record');
     Route::post('/commands', [$c, 'command']);
+});
+
+Route::prefix('/tenants/{tenant}/sites/{site}/applications/{application}/environments/{environment}/jobs')->whereUuid(['tenant', 'site', 'application', 'environment'])->middleware(RequireIdentity::class)->group(function (): void {
+    $c = JobsController::class;
+    Route::get('/create', [$c, 'create']);
+    Route::post('/', [$c, 'admit']);
+    Route::get('/{job}', [$c, 'show'])->whereUuid('job');
+    Route::get('/{job}/status', [$c, 'status'])->whereUuid('job');
+    Route::get('/{job}/evidence/{evidence}', [$c, 'evidence'])->whereUuid(['job', 'evidence']);
+    Route::post('/{job}/commands', [$c, 'command'])->whereUuid('job');
 });

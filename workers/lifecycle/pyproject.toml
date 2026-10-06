@@ -11,6 +11,7 @@ requires-python = ">=3.12,<3.13"
 dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0"]
 
 [project.scripts]
+lifecycle-simulator = "lifecycle_worker.bootstrap.simulation:main"
 lifecycle-worker-health = "lifecycle_worker.bootstrap.health:main"
 
 [dependency-groups]

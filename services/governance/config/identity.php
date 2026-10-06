@@ -8,6 +8,7 @@ return [
     'recovery_trust_file' => env('GOVERNANCE_IDENTITY_RECOVERY_TRUST_FILE'),
     'console_credential_file' => env('CONSOLE_CREDENTIAL_FILE'),
     'service_credentials' => [
+        'lifecycle' => env('LIFECYCLE_GOVERNANCE_CREDENTIAL_FILE'),
         'catalogue' => env('CATALOGUE_GOVERNANCE_CREDENTIAL_FILE'),
         'inventory' => env('INVENTORY_GOVERNANCE_CREDENTIAL_FILE'),
         'planning' => env('PLANNING_GOVERNANCE_CREDENTIAL_FILE'),

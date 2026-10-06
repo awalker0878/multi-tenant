@@ -118,6 +118,24 @@ class Simulation:
             "outcome": "confirmed_succeeded" if count else "confirmed_failed",
         }
 
+    def observe(self, request: dict[str, Any]) -> dict[str, Any]:
+        expected = self.binding(request)
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM sim.observations WHERE operation_id=%s AND attempt_id=%s",
+                (request["operation_id"], request["attempt_id"]),
+            ).fetchone()
+            if row is None or row["binding"] != expected:
+                raise ValueError("observation_absent_or_mismatched")
+            count = row["effect_count"]
+        return {
+            **expected,
+            "sealed": True,
+            "effect_count": count,
+            "observed_at": self.clock(),
+            "outcome": "confirmed_succeeded" if count else "confirmed_failed",
+        }
+
     @staticmethod
     def binding(grant: dict[str, Any]) -> dict[str, Any]:
         return {

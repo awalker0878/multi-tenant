@@ -33,15 +33,18 @@ class PythonLockTest(unittest.TestCase):
                                      "referencing": "0.37.0", "rpds-py": "2026.9.1"})
                 if service == "inventory":
                     expected["pika"] = "1.4.4"
+                if service == "lifecycle":
+                    expected.update({"temporalio": "1.34.0", "nexus-rpc": "1.4.0", "protobuf": "7.36.2", "types-protobuf": "7.35.1.20260906"})
                 self.assertEqual(inventory, expected)
 
-    def test_workers_keep_only_owned_distribution(self):
+    def test_workers_keep_only_owned_distribution_and_declared_runtime(self):
         for worker in ("inventory", "lifecycle"):
             with self.subTest(worker=worker):
                 project, lock = self.project_lock("workers/" + worker)
-                self.assertEqual(production_inventory(project, lock), {
-                    "product-" + worker + "-worker": "0.1.0.dev0",
-                })
+                expected = {"product-" + worker + "-worker": "0.1.0.dev0"}
+                if worker == "lifecycle":
+                    expected.update({"psycopg": "3.3.6", "psycopg-binary": "3.3.6", "typing-extensions": "4.16.0", "uvicorn": "0.53.0", "click": "8.5.0", "h11": "0.16.0"})
+                self.assertEqual(production_inventory(project, lock), expected)
 
     def test_platform_markers_select_only_accepted_linux_cpython_runtime(self):
         self.assertFalse(target_marker("sys_platform == 'win32'"))

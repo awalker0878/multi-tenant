@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Domain\Catalogue\CatalogueFailure;
 use App\Domain\Identity\IdentityFailure;
 use App\Domain\Inventory\InventoryFailure;
+use App\Domain\Jobs\JobsFailure;
 use App\Domain\Planning\PlanningFailure;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PageResponseHeaders;
@@ -33,7 +34,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(prepend: [RequireConsoleHost::class], append: [RedactIdentityCallback::class, HandleInertiaRequests::class, PageResponseHeaders::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontReport([PlanningFailure::class, IdentityFailure::class, CatalogueFailure::class, InventoryFailure::class]);
+        $exceptions->dontReport([JobsFailure::class, PlanningFailure::class, IdentityFailure::class, CatalogueFailure::class, InventoryFailure::class]);
+        $exceptions->render(function (JobsFailure $error) {
+            if (in_array($error->status, [401, 403, 404], true)) {
+                return redirect('/account')->with('tenant_notice', 'Your job or evidence access changed.');
+            }
+
+            return response('The current job or evidence is unavailable. Refresh to retry.', 503, ['Cache-Control' => 'no-store, private']);
+        });
         $exceptions->render(function (PlanningFailure $error) {
             if (in_array($error->status, [401, 403, 404], true)) {
                 return redirect('/account')->with('tenant_notice', 'Your planning access changed.');

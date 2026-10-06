@@ -275,6 +275,27 @@ class Planning:
                 raise Rejected("not_found", 404)
             return dict(row["payload"]["binding"])
 
+    def execution_plan(self, tenant: str, identity_value: str, revision: int) -> dict[str, Any]:
+        if revision != 1:
+            raise Rejected("not_found", 404)
+        with self.database.transaction() as tx:
+            row = tx.one(
+                "SELECT payload FROM app.planning_records WHERE id=%s AN"
+                "D tenant=%s AND kind='plan'",
+                (identifier(identity_value), identifier(tenant)),
+            )
+            if row is None:
+                raise Rejected("not_found", 404)
+            invalidated = tx.one(
+                "SELECT event_id FROM app.planning_invalidations WHERE plan=%s LIMIT 1",
+                (identity_value,),
+            )
+            return {
+                "content": row["payload"]["content"],
+                "binding": row["payload"]["binding"],
+                "invalidated": invalidated is not None,
+            }
+
     def invalidate(self, event: dict[str, Any]) -> bool:
         """Broker hints invalidate only; direct owner reads still decide current validity."""
         event_id = identifier(event["event_id"])

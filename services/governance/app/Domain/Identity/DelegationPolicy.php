@@ -13,7 +13,8 @@ final class DelegationPolicy
         'catalogue' => ['application.read', 'application.write', 'reference.read', 'reference.write'],
         'inventory' => ['inventory.read', 'inventory.admin', 'inventory.discover', 'inventory.match'],
         'planning' => ['plan.read', 'plan.create'],
-        'assurance' => ['evidence.read'],
+        'assurance' => ['evidence.read', 'evidence.review'],
+        'lifecycle' => ['operation.admit', 'operation.read', 'operation.control'],
     ];
 
     public static function permits(string $audience, string $action): bool

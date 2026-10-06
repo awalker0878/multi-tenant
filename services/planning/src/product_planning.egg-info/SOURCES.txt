@@ -48,5 +48,6 @@ tests/test_foundation.py
 tests/test_health.py
 tests/test_messaging.py
 tests/test_planning.py
+tests/test_planning_http.py
 tests/test_planning_store.py
 tests/test_telemetry.py

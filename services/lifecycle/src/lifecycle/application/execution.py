@@ -205,7 +205,7 @@ class Execution:
             )
             events = tx.all(
                 "SELECT id,kind,facts,occurred_at FROM app.execution_eve"
-                "nts WHERE job=%s ORDER BY occurred_at,id LIMIT 300",
+                "nts WHERE job=%s ORDER BY sequence LIMIT 300",
                 (job,),
             )
             for op in operations:
@@ -216,6 +216,8 @@ class Execution:
                 "id": row["id"],
                 "tenant_id": tenant,
                 "actor_id": row["actor"],
+                "requested_by": row["binding"]["requested_by"],
+                "source_revision": row["admission"].get("source_revision"),
                 "scope": row["plan"]["scope"],
                 "plan_id": row["binding"]["plan_id"],
                 "plan_digest": row["binding"]["digest"],
@@ -264,6 +266,10 @@ class Execution:
         with self.database.transaction() as tx:
             tx.execute(LOCK)
             self.job(tx, tenant, job)
+            if reason != "evidence_pending":
+                tx.execute(
+                    "UPDATE app.execution_projection SET pause_requested=true WHERE job=%s", (job,)
+                )
             self.project(tx, job, "held", reason)
         return {"state": "held", "reason": reason}
 
@@ -440,10 +446,18 @@ class Execution:
                 "ion=%s::jsonb,revision=revision+1 WHERE id=%s",
                 (result["outcome"], json.dumps(result), op["id"]),
             )
+            tx.execute(
+                "UPDATE app.execution_projection SET revision=revision+1"
+                ",updated_at=%s WHERE job=%s",
+                (self.clock(), job),
+            )
             self.event(
                 tx, job, "outcome_recorded", {"operation_id": str(op["id"]), "observation": result}
             )
             if result["outcome"] != "confirmed_succeeded":
+                tx.execute(
+                    "UPDATE app.execution_projection SET pause_requested=true WHERE job=%s", (job,)
+                )
                 self.project(tx, job, "held", result["outcome"])
 
     def activity(self, tenant: str, job: str, step: str, worker: str) -> dict[str, Any]:

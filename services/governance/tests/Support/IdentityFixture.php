@@ -34,12 +34,12 @@ function initializeIdentityFixture(object $test): void
         $sql = preg_replace('/^\\\\.*$/m', '', $sql);
         $sql = preg_replace('/^(?:SET LOCAL ROLE|GRANT|REVOKE) [^;]+;\s*/m', '', $sql);
         if (DB::getDriverName() === 'sqlite') {
-            // SQLite cannot replace CHECK constraints; materialize the post-012 shape.
+            // SQLite cannot replace CHECK constraints; materialize the post-013 shape.
             // The actual additive constraint migration and replay run on PostgreSQL.
             if (basename($migration) === '006_actor_delegation.sql') {
-                $sql = str_replace("'catalogue', 'planning', 'assurance'", "'catalogue', 'inventory', 'planning', 'assurance'", $sql);
+                $sql = str_replace("'catalogue', 'planning', 'assurance'", "'catalogue', 'inventory', 'planning', 'assurance', 'lifecycle'", $sql);
             }
-            if (basename($migration) === '012_inventory_delegation.sql') {
+            if (in_array(basename($migration), ['012_inventory_delegation.sql', '013_lifecycle_delegation.sql'], true)) {
                 continue;
             }
             // Real owner/function privileges are exercised on PostgreSQL, never inferred here.

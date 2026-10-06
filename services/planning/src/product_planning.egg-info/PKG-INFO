@@ -9,18 +9,18 @@ Requires-Dist: uvicorn==0.53.0
 Requires-Dist: jsonschema==4.26.0
 Requires-Dist: pika==1.4.4
 
-# Planning foundation
+# Planning
 
-This independently owned Python service implements the P01 installed bootstrap commands and persistent synthetic dependency diagnostics. Product assessment, inventory, orchestration and native operations remain unavailable. Intended context behavior remains in the [service specification](../../docs/services/planning.md).
+This independently owned Python service implements bounded P05 destination assessments, immutable plan compilation, current owner reads, review validity and confirmed facts. See the [P05 implementation](../../docs/implementation/p05-planning.md), [wire contract](../../contracts/openapi/planning-v1.json) and [operating runbook](../../docs/operations/runbooks/planning-review.md). Native execution remains unavailable; Lifecycle owns admission and reservation acquisition.
 
 ## Runtime and diagnostic boundaries
 
-`planning-serve` starts Uvicorn on port 8080, binding `0.0.0.0` by default. Use `--host` and `--port` to select a listener. Its minimal ASGI interface exposes only these routes:
+`planning-serve` starts Uvicorn on port 8080, binding `0.0.0.0` by default. Use `--host` and `--port` to select a listener. Its diagnostic ASGI interface retains these routes alongside the authenticated P05 API:
 
 | Route | Access | Meaning |
 | --- | --- | --- |
 | `GET /health/live` | Unauthenticated | 200 means this HTTP process can answer; dependencies are not queried. |
-| `GET /health/ready` | Unauthenticated | Always 503 `foundation_only`; product availability is not implemented. |
+| `GET /health/ready` | Unauthenticated | 503 `foundation_only`; this inherited probe does not certify P05 dependency or operational readiness. |
 | `GET /health/dependencies` | Synthetic Bearer token | 200 requires the owned PostgreSQL connection and schema checks below. This is foundation readiness only. |
 
 All responses disable caching. Unsupported methods return 405; unknown routes return 404. Authentication runs before dependency access. Missing/invalid credentials return 401; missing or malformed mounted authentication material returns 503. Dependency/configuration errors return a generic 503 without driver details, addresses or secret values. Unavailable responses carry `Retry-After: 10`. HTTP access logging and forwarded-header trust are disabled. The application does not implement workload operations or consume worker tasks.

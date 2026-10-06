@@ -50,7 +50,7 @@ final class DelegationController
         }
 
         return $request->validate([
-            ...($issuing ? ['audience' => ['required', 'string', 'in:catalogue,inventory,planning,assurance']] : []),
+            ...($issuing ? ['audience' => ['required', 'string', 'in:catalogue,inventory,planning,assurance,lifecycle']] : []),
             'action' => ['required', 'string', 'max:64'], 'scope' => ['required', 'array:site_id,environment,resource_id'],
             'scope.site_id' => ['present', 'nullable', 'string', 'max:64'],
             'scope.environment' => ['present', 'nullable', 'string', 'max:64'],

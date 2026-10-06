@@ -75,7 +75,7 @@ def execution_plan(content: dict[str, Any], binding: dict[str, Any]) -> list[str
 def hold_keys(content: dict[str, Any]) -> list[str]:
     scope = content["scope"]
     # Environment/application IDs cannot partition ownership of the same native field.
-    base = {k: scope[k] for k in ("tenant_id", "site_id", "endpoint_id", "native_scope")}
+    base = {k: scope[k] for k in ("site_id", "endpoint_id", "native_scope")}
     keys = {digest({**base, "resource": scope["resource_id"], "field": "application_writer"})}
     for owner in content["ownership"]:
         if not owner.get("fields") or not owner.get("writer") or not owner.get("resource"):

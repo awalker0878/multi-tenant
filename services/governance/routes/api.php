@@ -7,6 +7,7 @@ use App\Http\Controllers\CatalogueOwnerController;
 use App\Http\Controllers\DelegationController;
 use App\Http\Controllers\DependencyHealthController;
 use App\Http\Controllers\DirectoryController;
+use App\Http\Controllers\ExecutionApprovalController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\InventoryCollectionController;
 use App\Http\Controllers\LocalIdentityController;
@@ -91,3 +92,5 @@ Route::post('/v1/tenants/{tenant}/catalogue-owner-checks', CatalogueOwnerControl
 Route::post('/v1/tenants/{tenant}/inventory-collection-checks', InventoryCollectionController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);
 
 Route::post('/v1/tenants/{tenant}/planning-input-checks', PlanningInputController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);
+
+Route::post('/v1/tenants/{tenant}/execution-approval-checks', ExecutionApprovalController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);

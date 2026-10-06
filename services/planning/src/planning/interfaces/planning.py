@@ -84,7 +84,17 @@ class PlanningApp:
             immutable = re.fullmatch(
                 rf"/v1/plans/({UUID})/revisions/([1-9][0-9]{{0,8}})", scope["path"]
             )
-            if immutable and scope["method"] == "GET":
+            execution = re.fullmatch(
+                rf"/v1/tenants/({UUID})/execution-plans/({UUID})/revisions/([1-9][0-9]{{0,8}})",
+                scope["path"],
+            )
+            if execution and scope["method"] == "GET":
+                await asyncio.to_thread(self.authority.caller, credential, "lifecycle_reader")
+                payload = await asyncio.to_thread(
+                    self.planning.execution_plan, execution[1], execution[2], int(execution[3])
+                )
+                status = 200
+            elif immutable and scope["method"] == "GET":
                 await asyncio.to_thread(self.authority.caller, credential, "governance_reader")
                 payload = await asyncio.to_thread(
                     self.planning.bound_plan, immutable[1], int(immutable[2])

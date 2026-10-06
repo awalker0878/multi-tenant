@@ -10,9 +10,9 @@ final class PermissionMatrix
     public const ROLES = [
         'tenant_admin' => ['inventory.read', 'inventory.admin', 'inventory.discover', 'inventory.match', 'reference.read', 'reference.write', 'tenant.read', 'tenant.manage', 'membership.manage', 'grant.manage', 'quota.read', 'quota.manage', 'audit.read'],
         'author' => ['inventory.read', 'inventory.match', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'application.write', 'plan.read', 'plan.create', 'approval.request'],
-        'reviewer' => ['inventory.read', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'approval.decide', 'approval.revoke', 'evidence.read'],
-        'operator' => ['inventory.read', 'inventory.discover', 'inventory.match', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'operation.admit', 'evidence.read'],
-        'reader' => ['inventory.read', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'evidence.read'],
+        'reviewer' => ['inventory.read', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'operation.read', 'approval.decide', 'approval.revoke', 'evidence.read', 'evidence.review'],
+        'operator' => ['inventory.read', 'inventory.discover', 'inventory.match', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'operation.read', 'operation.control', 'operation.admit', 'evidence.read'],
+        'reader' => ['inventory.read', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'operation.read', 'evidence.read'],
     ];
 
     /** Explicit grants cannot delegate administrative or support authority. @var list<string> */
