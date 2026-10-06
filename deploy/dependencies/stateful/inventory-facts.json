@@ -1,0 +1,10 @@
+{
+  "vhosts": [{"name": "product"}],
+  "permissions": [
+    {"user": "inventory", "vhost": "product", "configure": "^$", "write": "^inventory\\.events$", "read": "^$"},
+    {"user": "planning", "vhost": "product", "configure": "^$", "write": "^$", "read": "^planning\\.inventory$"}
+  ],
+  "exchanges": [{"name": "inventory.events", "vhost": "product", "type": "direct", "durable": true, "auto_delete": false, "internal": false, "arguments": {}}],
+  "queues": [{"name": "planning.inventory", "vhost": "product", "durable": true, "auto_delete": false, "arguments": {"x-queue-type": "quorum", "x-delivery-limit": -1}}],
+  "bindings": [{"source": "inventory.events", "vhost": "product", "destination": "planning.inventory", "destination_type": "queue", "routing_key": "inventory.facts.v1", "arguments": {}}]
+}

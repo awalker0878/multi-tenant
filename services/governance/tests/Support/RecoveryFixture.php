@@ -83,7 +83,7 @@ function initializeRecoveryFixture(object $test): void
     $test->observations = ['case_reference' => 'REC-100', 'restore_sha256' => hash('sha256', 'synthetic-restored-archive'),
         'records_sha256' => hash('sha256', 'synthetic-current-retirement-revocation-and-provider-records'),
         'containment_sha256' => hash('sha256', 'synthetic-infrastructure-containment-observations'),
-        'previous_workloads' => ['console' => hash('sha256', $test->previousWorkload), 'catalogue' => null, 'planning' => null, 'assurance' => null],
+        'previous_workloads' => ['console' => hash('sha256', $test->previousWorkload), 'catalogue' => null, 'inventory' => null, 'planning' => null, 'assurance' => null],
         'memberships' => [['id' => $test->ownerMembership, 'owner_record_sha256' => hash('sha256', 'synthetic-current-tenant-owner-decision')]]];
 }
 

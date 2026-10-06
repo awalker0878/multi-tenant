@@ -162,6 +162,7 @@ class MountedPolicies:
             origins: dict[str, str] = {}
             authorities: dict[str, tuple[int, int]] = {}
             workers: dict[str, str] = {}
+            tenants: dict[str, int] = {}
             for raw in data["policies"]:
                 p = parse_policy(raw)
                 if p.policy_id in result:
@@ -179,6 +180,8 @@ class MountedPolicies:
                     raise ValueError("Conflicting endpoint budget")
                 if workers.setdefault(p.worker_fingerprint, p.worker) != p.worker:
                     raise ValueError("Shared worker credential")
+                if tenants.setdefault(p.tenant, p.tenant_concurrency) != p.tenant_concurrency:
+                    raise ValueError("Conflicting tenant budget")
                 if p.expires_at > time.time():
                     result[p.policy_id] = p
             return result

@@ -6,6 +6,7 @@ Requires-Python: <3.13,>=3.12
 Description-Content-Type: text/markdown
 Requires-Dist: psycopg[binary]==3.3.6
 Requires-Dist: uvicorn==0.53.0
+Requires-Dist: pika==1.4.4
 
 # Inventory foundation
 

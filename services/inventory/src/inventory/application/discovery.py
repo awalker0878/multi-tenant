@@ -151,6 +151,12 @@ class Discovery:
                     )
                     if pending and pending["n"] >= 20:
                         raise Rejected("tenant_backpressure", 429)
+                    backlog = tx.one(
+                        "SELECT count(*) AS n FROM inventory.jobs "
+                        "WHERE status IN ('queued','running')"
+                    )
+                    if backlog and backlog["n"] >= 1000:
+                        raise Rejected("service_backpressure", 429)
                     job = uid()
                     now = self.clock()
                     tx.execute(
@@ -607,8 +613,12 @@ class Discovery:
             if not body["coverage"] or not p.coverage_reference:
                 status, reason = "partial", "privilege_coverage_unknown"
             elif stream == len(p.streams):
-                status = "complete"
-                self.publish(tx, j, e, p, [r["payload"] for r in previous] + [body])
+                accepted = [r["payload"] for r in previous] + [body]
+                if any(page["collected_at"] + p.freshness_seconds <= now for page in accepted):
+                    status, reason = "partial", "generation_expired"
+                else:
+                    status = "complete"
+                    self.publish(tx, j, e, p, accepted)
             elif pages >= p.max_pages or len(seen) >= 10000:
                 status, reason = "partial", "collection_bound"
             tx.execute(

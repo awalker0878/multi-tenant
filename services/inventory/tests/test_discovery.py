@@ -2,6 +2,7 @@
 
 import copy
 import hashlib
+import json
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
@@ -171,12 +172,13 @@ class Campaign:
 
 @pytest.fixture
 def campaign(postgres: dict[str, Any]) -> Campaign:
-    sql = (Path(__file__).parents[1] / "migrations/002_inventory.sql").read_text()
+    sqls = [p.read_text() for p in sorted((Path(__file__).parents[1] / "migrations").glob("*.sql"))]
     with psycopg.connect(**postgres, autocommit=True) as connection:
         connection.execute("DROP SCHEMA IF EXISTS inventory CASCADE")
         connection.execute("SET ROLE inventory_owner")
-        connection.execute(sql)
-        connection.execute(sql)  # Actual replay, not a schema-text assertion.
+        for sql in sqls:
+            connection.execute(sql)
+            connection.execute(sql)  # Actual replay, not a schema-text assertion.
     return Campaign(postgres)
 
 
@@ -425,3 +427,46 @@ def test_interrupted_pages_resume_without_false_completeness(campaign: Campaign)
     assert resumed["cursor"] == "vm-a" and resumed["sequence"] == 1
     assert c.resources(lease["discovery_id"])["completion"] == "running"
     assert c.resources(lease["discovery_id"])["items"] == []
+
+
+def test_outbox_uncertainty_preserves_identity_and_order_after_revocation(
+    campaign: Campaign,
+) -> None:
+    from inventory.application.events import publish_one
+
+    c = campaign
+    c.complete()
+    delivered: list[dict[str, Any]] = []
+
+    def uncertain(fact: dict[str, Any]) -> None:
+        delivered.append(fact)
+        raise RuntimeError("lost confirmation")
+
+    with pytest.raises(RuntimeError, match="lost confirmation"):
+        publish_one(c.database, uncertain)
+    c.held = True
+    assert publish_one(c.database, delivered.append)
+    assert delivered[0] == delivered[1]
+    while publish_one(c.database, delivered.append):
+        pass
+    assert [v["sequence"] for v in delivered[1:]] == sorted(v["sequence"] for v in delivered[1:])
+    assert not publish_one(c.database, delivered.append)
+    assert all(v["tenant_id"] == c.actor.tenant for v in delivered)
+    assert TOKEN not in json.dumps(delivered)
+
+
+def test_expired_early_page_finishes_partial_without_replacing_current(campaign: Campaign) -> None:
+    c = campaign
+    original = c.complete()
+    job = c.start()
+    for index in range(3):
+        c.now += 301 if index == 1 else 2
+        lease = c.service.claim(c.worker)["job"]
+        result = c.service.submit(c.worker, c.page(lease, []))
+    assert result["status"] == "partial"
+    with c.database.transaction() as tx:
+        assert (
+            str(row(tx, "SELECT current_generation FROM inventory.endpoints")["current_generation"])
+            == original
+        )
+    assert c.resources(job)["reason"] == "generation_expired"

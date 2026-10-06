@@ -22,13 +22,13 @@ def main():
     bindings = {name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in paths if name and (ROOT/name).is_file() and name.startswith(('services/inventory/', 'workers/inventory/', 'scripts/p04/', 'contracts/', 'services/governance/'))}
     report = {'source_revision': source, 'environment': platform.platform(), 'evidence_level': 'E2', 'native_platforms_tested': [], 'source_bindings': bindings, 'commands': []}
     commands = []
-    for component in ('services/inventory',):
+    for component in ('services/inventory', 'workers/inventory'):
         commands.extend([
             (component, ['uv', 'sync', '--locked']),
             (component, ['uv', 'run', '--frozen', 'ruff', 'check', 'src', 'tests']),
             (component, ['uv', 'run', '--frozen', 'ruff', 'format', '--check', 'src', 'tests']),
             (component, ['uv', 'run', '--frozen', 'mypy', 'src', 'tests']),
-            (component, ['uv', 'run', '--frozen', 'pytest', '-q', '--junitxml='+str(out/'inventory.xml')]),
+            (component, ['uv', 'run', '--frozen', 'pytest', '-q', '--junitxml='+str(out/(component.replace('/', '-')+'.xml'))]),
         ])
     failed = False
     for index, (component, command) in enumerate(commands):

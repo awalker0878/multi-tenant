@@ -1,0 +1,410 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Governance actor delegation",
+    "version": "1.1.0",
+    "description": "P02 initial data-facing profile: Console-originated opaque delegation, maximum sixty seconds bounded by source session. Exact audience/action/scope; current session, issuer, actor, membership/grant and workload custody checks on every resolution. No offline cache, renewal, redelegation, administrative or native execution authority. Issuance retries mint a new bounded credential; no raw token is persisted."
+  },
+  "paths": {
+    "/v1/tenants/{tenant}/actor-delegations": {
+      "post": {
+        "operationId": "issueActorDelegation",
+        "security": [
+          {
+            "ConsoleWorkload": [],
+            "ConsoleSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Current result; Cache-Control: no-store, private. Tokens are server-only and must never enter browser props or logs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuedDelegation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or delegation/session"
+          },
+          "403": {
+            "description": "Current authority denied"
+          },
+          "404": {
+            "description": "Unknown or inaccessible tenant/delegation"
+          },
+          "422": {
+            "description": "Invalid or extra input"
+          },
+          "429": {
+            "description": "Bounded issuance limit"
+          },
+          "503": {
+            "description": "Authority or custody unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/delegated-authorizations": {
+      "post": {
+        "operationId": "inspectActorDelegation",
+        "security": [
+          {
+            "ServiceWorkload": [],
+            "ActorDelegation": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current result; Cache-Control: no-store, private. Tokens are server-only and must never enter browser props or logs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentDelegation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or delegation/session"
+          },
+          "403": {
+            "description": "Current authority denied"
+          },
+          "404": {
+            "description": "Unknown or inaccessible tenant/delegation"
+          },
+          "422": {
+            "description": "Invalid or extra input"
+          },
+          "429": {
+            "description": "Bounded issuance limit"
+          },
+          "503": {
+            "description": "Authority or custody unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/actor-delegations/{delegation}/revocation": {
+      "post": {
+        "operationId": "revokeActorDelegation",
+        "security": [
+          {
+            "ConsoleWorkload": [],
+            "ConsoleSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "delegation",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current result; Cache-Control: no-store, private. Tokens are server-only and must never enter browser props or logs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Revoked"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or delegation/session"
+          },
+          "403": {
+            "description": "Current authority denied"
+          },
+          "404": {
+            "description": "Unknown or inaccessible tenant/delegation"
+          },
+          "422": {
+            "description": "Invalid or extra input"
+          },
+          "429": {
+            "description": "Bounded issuance limit"
+          },
+          "503": {
+            "description": "Authority or custody unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ConsoleWorkload": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Bearer Console workload credential; independently provisioned."
+      },
+      "ConsoleSession": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Console-Session",
+        "description": "Current server-held federated Console user session."
+      },
+      "ServiceWorkload": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Bearer workload credential identifying exactly one target service."
+      },
+      "ActorDelegation": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Actor-Delegation",
+        "description": "Short-lived opaque delegation; its target service must resolve it on every request."
+      }
+    },
+    "schemas": {
+      "Scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "site_id",
+          "environment",
+          "resource_id"
+        ],
+        "properties": {
+          "site_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 64
+          },
+          "environment": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 64
+          },
+          "resource_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          }
+        }
+      },
+      "IssueRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "scope",
+          "audience"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "audience": {
+            "enum": [
+              "catalogue",
+              "inventory",
+              "planning",
+              "assurance"
+            ]
+          }
+        }
+      },
+      "InspectRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "scope"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          }
+        }
+      },
+      "IssuedDelegation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "delegation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "delegation_token": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "writeOnly": false
+          },
+          "audience": {
+            "enum": [
+              "catalogue",
+              "inventory",
+              "planning",
+              "assurance"
+            ]
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "authority_use": {
+            "const": "request_bound"
+          }
+        },
+        "required": [
+          "delegation_id",
+          "delegation_token",
+          "audience",
+          "expires_at",
+          "authority_use"
+        ]
+      },
+      "CurrentDelegation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "allowed": {
+            "const": true
+          },
+          "delegation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "delegating_service": {
+            "const": "console"
+          },
+          "audience": {
+            "enum": [
+              "catalogue",
+              "inventory",
+              "planning",
+              "assurance"
+            ]
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action": {
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "expires_at": {
+            "type": "string"
+          },
+          "evaluated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "authority_use": {
+            "const": "request_bound"
+          }
+        },
+        "required": [
+          "allowed",
+          "delegation_id",
+          "actor_id",
+          "delegating_service",
+          "audience",
+          "tenant_id",
+          "action",
+          "scope",
+          "expires_at",
+          "evaluated_at",
+          "authority_use"
+        ]
+      },
+      "Revoked": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revoked"
+        ],
+        "properties": {
+          "revoked": {
+            "const": true
+          }
+        }
+      }
+    }
+  }
+}

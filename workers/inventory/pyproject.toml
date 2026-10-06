@@ -11,6 +11,7 @@ requires-python = ">=3.12,<3.13"
 dependencies = []
 
 [project.scripts]
+inventory-worker-collect = "inventory_worker.bootstrap.collect:main"
 inventory-worker-health = "inventory_worker.bootstrap.health:main"
 
 [dependency-groups]
