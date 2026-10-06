@@ -1,0 +1,154 @@
+{
+  "qualification_source": "c045badc852960f3671942adf4ca2338821b4f67",
+  "observed_at": "2026-10-06T13:57:58.199Z",
+  "result": "PASS",
+  "runs": [
+    {
+      "name": "P01 isolated Compose integration",
+      "run_id": 37471438084,
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37471438084",
+      "updated_at": "2026-10-06T13:34:34Z",
+      "impact_review": "Final runtime source."
+    },
+    {
+      "name": "P01 isolated Kubernetes integration",
+      "run_id": 37471437320,
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37471437320",
+      "updated_at": "2026-10-06T13:48:38Z",
+      "impact_review": "Final runtime source."
+    },
+    {
+      "name": "P01 bootstrap images",
+      "run_id": 37471437082,
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37471437082",
+      "updated_at": "2026-10-06T13:32:43Z",
+      "impact_review": "Final runtime source."
+    },
+    {
+      "name": "P01 transactional messaging",
+      "run_id": 37471437202,
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37471437202",
+      "updated_at": "2026-10-06T13:33:44Z",
+      "impact_review": "Final runtime source."
+    },
+    {
+      "name": "P01 foundation contracts",
+      "run_id": 37471437108,
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37471437108",
+      "updated_at": "2026-10-06T13:32:00Z",
+      "impact_review": "Final runtime source."
+    },
+    {
+      "name": "P01 foundation packages",
+      "run_id": 37471437339,
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37471437339",
+      "updated_at": "2026-10-06T13:31:56Z",
+      "impact_review": "Final runtime source."
+    },
+    {
+      "name": "P01 policy controls",
+      "run_id": 37471437184,
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37471437184",
+      "updated_at": "2026-10-06T13:31:44Z",
+      "impact_review": "Final runtime source."
+    },
+    {
+      "name": "Context policy",
+      "run_id": 37471437197,
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37471437197",
+      "updated_at": "2026-10-06T13:31:36Z",
+      "impact_review": "Final runtime source."
+    },
+    {
+      "name": "P05 planning",
+      "run_id": 37471437083,
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "run_attempt": 2,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37471437083",
+      "updated_at": "2026-10-06T13:55:33Z",
+      "impact_review": "Final runtime source."
+    },
+    {
+      "name": "P02 identity",
+      "run_id": 37470962562,
+      "source_revision": "8ad4e85d5c0ab416d8e864de54758c16201e3a15",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37470962562",
+      "updated_at": "2026-10-06T13:32:59Z",
+      "impact_review": "P02/P03/P04 service and campaign inputs unchanged; the later runtime change is confined to Planning observation ordering and five focused tests."
+    },
+    {
+      "name": "P04 inventory",
+      "run_id": 37470962620,
+      "source_revision": "8ad4e85d5c0ab416d8e864de54758c16201e3a15",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37470962620",
+      "updated_at": "2026-10-06T13:30:25Z",
+      "impact_review": "P02/P03/P04 service and campaign inputs unchanged; the later runtime change is confined to Planning observation ordering and five focused tests."
+    },
+    {
+      "name": "P03 catalogue",
+      "run_id": 37470962648,
+      "source_revision": "8ad4e85d5c0ab416d8e864de54758c16201e3a15",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37470962648",
+      "updated_at": "2026-10-06T13:30:24Z",
+      "impact_review": "P02/P03/P04 service and campaign inputs unchanged; the later runtime change is confined to Planning observation ordering and five focused tests."
+    },
+    {
+      "name": "P02 Governance events",
+      "run_id": 37469317964,
+      "source_revision": "6051eacf4f422e426825b25799d4d32565825011",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37469317964",
+      "updated_at": "2026-10-06T13:16:15Z",
+      "impact_review": "Governance and existing Console notification production inputs unchanged; later changes concern Planning, source qualification custody and separate tests."
+    }
+  ],
+  "limitations": [
+    "Workflow results describe their exact source and measured scope. They confer no native qualification or designated receiving decision.",
+    "P05 WebKit attempt 1 timed out during dependency installation before product tests; its job log is retained. Attempt 2 passed at the unchanged source."
+  ]
+}

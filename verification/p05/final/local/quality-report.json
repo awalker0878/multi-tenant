@@ -1,0 +1,77 @@
+{
+  "source_revision": "8ad4e85d5c0ab416d8e864de54758c16201e3a15",
+  "observed_at": "2026-10-06T13:29:29.171971+00:00",
+  "result": "PASS",
+  "commands": [
+    {
+      "component": "governance",
+      "commands": [
+        "composer test:format",
+        "composer test:types",
+        "composer test:architecture",
+        "composer test"
+      ],
+      "result": "PASS",
+      "log": "governance-quality.log",
+      "sha256": "ba94204e8638f0f33a36f356d1b7e29a7d60dad60a9d2b8b3b2677bb6dda465c"
+    },
+    {
+      "component": "catalogue",
+      "commands": [
+        "composer test:format",
+        "composer test:types",
+        "composer test:architecture",
+        "composer test"
+      ],
+      "result": "PASS",
+      "log": "catalogue-quality.log",
+      "sha256": "2ed65b5588cf2c20cfc5a4d3f8ab03a415b7174a60489161849f1b1ed3de3d66"
+    },
+    {
+      "component": "assurance",
+      "commands": [
+        "composer test:format",
+        "composer test:types",
+        "composer test:architecture",
+        "composer test"
+      ],
+      "result": "PASS",
+      "log": "assurance-quality.log",
+      "sha256": "0f78923cd8a51f84d9fefe308d0398815da03a173dba5c74f2121dd22816c078"
+    },
+    {
+      "component": "console",
+      "commands": [
+        "composer test:format",
+        "composer test:types",
+        "composer test:architecture",
+        "composer test"
+      ],
+      "result": "PASS",
+      "log": "console-quality.log",
+      "sha256": "a23e2e1373582f540a95bffba3ff9b56ad8c91377fa50f51d46b5a67db50dca3"
+    },
+    {
+      "component": "console",
+      "commands": [
+        "npm run typecheck --prefix apps/console"
+      ],
+      "exit_code": 0,
+      "log": "typecheck.log",
+      "sha256": "b2cb9f11e30ea8a05e2f17a9e9c06722688c9fc479c42d9344e33c3205772915"
+    },
+    {
+      "component": "console",
+      "commands": [
+        "npm run build --prefix apps/console"
+      ],
+      "exit_code": 0,
+      "log": "build.log",
+      "sha256": "5a6c52a4f3195aaa0977756ae339af3ee009e1fa05c58deda084a9e0dde9c62f"
+    }
+  ],
+  "limits": [
+    "PostgreSQL-only tests skip locally; separate hosted P05 and regression campaigns exercise actual databases."
+  ],
+  "impact_review": "PHP/Console production, test and build inputs are byte-identical between 8ad4e85 and c045bad; only the Planning evaluator and its targeted Python tests changed. Python checks were repeated at c045bad in report.json."
+}

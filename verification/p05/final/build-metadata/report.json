@@ -1,0 +1,37 @@
+{
+  "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+  "result": "PASS",
+  "observed_at": "2026-10-06T13:53:29.109971+00:00",
+  "method": "Copy only git-tracked exact-source component files to empty isolated roots; run uv sync --locked with pinned setuptools and Python; match all three generated wheel metadata hashes recorded after installation in the live campaigns. No product source exception.",
+  "uv": "uv 0.12.19 (x86_64-unknown-linux-gnu)",
+  "bindings": [
+    {
+      "path": "services/inventory/src/product_inventory.egg-info/SOURCES.txt",
+      "source": "5e4a47d8190e40e9b83953e6b83a80b8779586480661b90ac67ef1f12ec10f85",
+      "observed": "0678ba79c585728c27d8034067de0c5bbc7ec3fd80af8c5ff9046813615cc351",
+      "retained_file": "build-metadata/inventory-SOURCES.txt"
+    },
+    {
+      "path": "services/planning/src/product_planning.egg-info/PKG-INFO",
+      "source": "4750f8fd911713f80ad7bc0914c4dd71bd9410ddb04b5e2ef3b0f5a6cf906f0d",
+      "observed": "d0a18e7a63d0521100d014413949021fd504a9330c2b6c333e4b34c8adf4a65c",
+      "retained_file": "build-metadata/planning-PKG-INFO"
+    },
+    {
+      "path": "services/planning/src/product_planning.egg-info/SOURCES.txt",
+      "source": "7ee4fa7f720ccc1d623ecef91a17f7789a6e051507999145ada4b0e095141ed3",
+      "observed": "cba9708cec426fac2f0f7cea67ae0e11cfa1dd184d5a7e6669ff7666add3c594",
+      "retained_file": "build-metadata/planning-SOURCES.txt"
+    }
+  ],
+  "logs": [
+    {
+      "path": "inventory.log",
+      "sha256": "26a6f3433030398d0129fb6fad8b37e7d233addd242a0af8799027f38e52269f"
+    },
+    {
+      "path": "planning.log",
+      "sha256": "261d788d4dd35cbbe45ea510f57854aab80e29a928c02cf6578f64838dd35add"
+    }
+  ]
+}

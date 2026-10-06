@@ -1,0 +1,11 @@
+{
+  "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+  "run_id": 37471437083,
+  "job_id": 112295651149,
+  "run_attempt": 1,
+  "conclusion": "cancelled",
+  "observed_at": "2026-10-06T13:54:54.452110+00:00",
+  "log": "webkit-install-37471437083-1.log",
+  "sha256": "7db245d66cc2d10570193dcfa9ae63c7e2abe360fd5a9a31ea69402e910cf0a9",
+  "observation": "Job hit its unchanged 20-minute limit while Playwright apt dependencies downloaded slowly from azure.archive.ubuntu.com. Product campaign and browser tests never started; no product artifact was uploaded. Retry requested for this job at the same commit."
+}

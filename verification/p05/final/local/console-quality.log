@@ -1,0 +1,230 @@
+{"tool":"pint","result":"passed"}Note: Using configuration file /workspace/scratch/e0ba18164d29/multi-tenant/apps/console/phpstan.neon.
+
+ [OK] No errors                                                                 
+
+  0/61 [░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0%
+ 31/61 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░]  50%
+ 49/61 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░]  80%
+ 61/61 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+
+
+ -------------------------- 
+  Report                    
+ -------------------- ----- 
+  Violations           0    
+  Skipped violations   0    
+  Uncovered            0    
+  Allowed              574  
+  Warnings             0    
+  Errors               0    
+ -------------------- ----- 
+
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\CatalogueWorkspaceTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit renders the bounded owner list and no bearer or implicit tenant[39m[90m… [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit preserves exact command identity and resolves stale edits throug[39m[90m…[39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps uncertainty explicit instead of silently issuing a replace[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid imports before calling a domain owner[39m[90m            [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies the real CSRF middleware to application and reference wr[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies the real CSRF middleware to application and reference wr[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit the generated client binds workload and delegated actor and vali[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit handles delegation denials as unavailable access without calling[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit handles delegation denials as unavailable access without calling[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit handles delegation denials as unavailable access without calling[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit handles delegation denials as unavailable access without calling[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows a scoped author to use pinned references when tenant-wide[39m[90m…[39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\DependencyHealthTest[39m
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency wit[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency wit[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency wit[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency wit[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency wit[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency wit[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90man absent or malformed mounted identity denies even the formerly va[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90man absent or malformed mounted identity denies even the formerly va[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90man absent or malformed mounted identity denies even the formerly va[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90man absent or malformed mounted identity denies even the formerly va[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mauthenticated dependency failure is sanitized and never changes pro[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuccessful foundation checks grant only dependency readiness and no[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplacing a credential file revokes the old token without restartin[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcredential paths cannot use a stream wrapper[39m[90m                        [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmounted application key wins and an unavailable file never falls ba[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma TCP peer that never answers TLS negotiation fails within the conn[39m[90m…[39m [90m2.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\DirectoryTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit forwards only an encoded cursor and renders the next owner-provi[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit renders continued membership pages only after current tenant aut[39m[90m…[39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit restarts invalid or expired page links without rendering remembe[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not downgrade owner unavailability to an empty successful t[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit denies guessed and revoked tenant continuations before retrievin[39m[90m…[39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\FoundationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit serves the public foundation page with only its declared page pr[39m[90m…[39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit supports Inertia navigation without adding an authenticated iden[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit sets a private non-cacheable response and secure cookie for the[39m[90m… [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires a fresh page when the browser supplies an obsolete asse[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit exposes no registration or workload endpoints in the foundation[39m[90m… [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit exposes no registration or workload endpoints in the foundation[39m[90m… [39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\HealthTest[39m
+  [32;1m✓[39;22m[90m [39m[90mliveness reports only a running process with no configured authorit[39m[90m…[39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreadiness remains closed until the console dependencies are impleme[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mhealth endpoints reject writes with ('/health/live')[39m[90m                [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mhealth endpoints reject writes with ('/health/ready')[39m[90m               [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mbusiness authority routes are absent and expose no exception diagno[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mbusiness authority routes are absent and expose no exception diagnostics with ('/v1/authorization-decisions')[39m
+  [32;1m✓[39;22m[90m [39m[90mbusiness authority routes are absent and expose no exception diagnostics with ('/v1/approvals')[39m
+  [32;1m✓[39;22m[90m [39m[90ma caller cannot configure readiness or start a browser session through health input[39m
+  [32;1m✓[39;22m[90m [39m[90munimplemented browser pages return an ordinary not-found response[39m[90m   [39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\InstallationNotificationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit retains installation receipts in the shared immutable ID namespa[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit retains login receipts without changing the settings hint[39m[90m        [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects tenant substitution and untrusted identity event envelop[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects tenant substitution and untrusted identity event envelop[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects tenant substitution and untrusted identity event envelop[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects tenant substitution and untrusted identity event envelopes with ([2], [])[39m
+  [32;1m✓[39;22m[90m [39m[90mit rejects tenant substitution and untrusted identity event envelop[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects tenant substitution and untrusted identity event envelopes with ([], ['governance.quota.changed.v1'])[39m
+  [32;1m✓[39;22m[90m [39m[90mit rejects tenant substitution and untrusted identity event envelop[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects tenant substitution and untrusted identity event envelop[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back an installation receipt when its hint cannot commit[39m[90m   [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit checks current installation ownership before revealing a hint wi[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit checks current installation ownership before revealing a hint wi[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit checks current installation ownership before revealing a hint wi[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit checks current installation ownership before revealing a hint wi[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit packages the identity schema without editing its published bytes[39m[90m [39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\InventoryWorkspaceTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit renders scoped sites with encrypted cleared history and no crede[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not request protected enrollment policies for a reader[39m[90m      [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit preserves command identity on a stale or uncertain result with ([39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit preserves command identity on a stale or uncertain result with ([39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit preserves command identity on a stale or uncertain result with ([39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit redirects revoked or guessed site access without displaying inve[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit uses actual CSRF middleware for enrollment and discovery command[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit confirms Catalogue revision access before recording a matching p[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit binds separate workload and current delegation and rejects addit[39m[90m…[39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\LocalIdentityTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit renders an accessible sign-in page without making an identity ca[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit replaces the anonymous session and CSRF state and keeps the owne[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rechecks owner authority on each protected page and blocks setup[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rotates session and CSRF again after changing the password and d[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not flash passwords after a rejected change and never expos[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit invalidates revoked sessions and never trusts a forged browser i[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit fails closed on an unavailable owner while retaining the session[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit revokes owner authority before clearing the browser session on l[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces real CSRF middleware before any login password or logou[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces real CSRF middleware before any login password or logou[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces real CSRF middleware before any login password or logou[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts the matching CSRF token on the real login route[39m[90m          [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects hostile hosts and ignores untrusted proxy host headers[39m[90m   [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit refuses insecure nonloopback service addresses and absent worklo[39m[90m…[39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\NotificationAccessTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit rechecks current owner authority on every poll and returns only[39m[90m… [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit denies readers and scoped administrators before the hint lookup[39m[90m… [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit denies readers and scoped administrators before the hint lookup[39m[90m… [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit denies readers and scoped administrators before the hint lookup[39m[90m… [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not expose a hint when the owner or session authority is un[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not expose a hint when the owner or session authority is un[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not expose a hint when the owner or session authority is un[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not expose a hint when the owner or session authority is un[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports hint storage outages without exposing database details[39m[90m   [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit preserves owner-backed administration while marking unavailable[39m[90m… [39m [90m0.01s[39m  
+
+  [30;43;1m WARN [39;49;22m[39m Tests\Feature\NotificationBrokerTest[39m
+  [33;1m-[39;22m[90m [39m[90mit consumes verified TLS messages into PostgreSQL and handles duplicate and conflicting redeliveries[39m[90m [39m[33m→ Requires the isolated verified-TLS broker campaign.[39m
+  [33;1m-[39;22m[90m [39m[90mit redelivers the same bytes after the consumer closes between commit and acknowledgement[39m[90m [39m[33m→ Requires the isolated verified-TLS broker campaign.[39m
+  [33;1m-[39;22m[90m [39m[90mit retains oversized bytes at the broker instead of acknowledging a truncated quarantine[39m[90m [39m[33m→ Requires the isolated verified-TLS broker campaign.[39m
+  [33;1m-[39;22m[90m [39m[90mit rejects an untrusted broker certificate[39m[90m [39m[33m→ Requires the isolated verified-TLS broker campaign.[39m
+  [33;1m-[39;22m[90m [39m[90mit does not grant Console queue configuration or reads of another service queue with ('configure')[39m[90m [39m[33m→ Requires the isolated verified-TLS broker campaign.[39m
+  [33;1m-[39;22m[90m [39m[90mit does not grant Console queue configuration or reads of another service queue with ('read')[39m[90m [39m[33m→ Requires the isolated verified-TLS broker campaign.[39m
+  [33;1m-[39;22m[90m [39m[90mit delivers installation settings through the same verified broker without a tenant hint[39m[90m [39m[33m→ Requires the isolated verified-TLS broker campaign.[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\NotificationContractTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit accepts the five tenant administration routes without projecting[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts the five tenant administration routes without projecting[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts the five tenant administration routes without projecting[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts the five tenant administration routes without projecting[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts the five tenant administration routes without projecting[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthorized families, unknown fields, versions and mism[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit fails before a connection when broker custody is missing[39m[90m         [39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\NotificationInboxTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit commits minimal immutable receipts and hints before acknowledgem[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit recovers a commit followed by an uncertain broker acknowledgemen[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back the receipt and leaves delivery unacknowledged when t[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit refuses to acknowledge inside an outer transaction[39m[90m               [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit quarantines conflicting bytes without replacing a receipt or ano[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit stores bounded poison envelopes encrypted and acknowledges only[39m[90m… [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit never acknowledges truncated or oversized payloads with ([true])[39m
+  [32;1m✓[39;22m[90m [39m[90mit never acknowledges truncated or oversized payloads with (['xxxxxxxxxxxxxxxxxxxxxxxxxxxxx…xxxxxx']) #1[39m
+  [32;1m✓[39;22m[90m [39m[90mit never acknowledges truncated or oversized payloads with (['xxxxx[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps reordered events as generic hints and isolates tenants[39m[90m     [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit bounds command work and redacts operational errors while closing[39m[90m…[39m [90m0.04s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\OidcTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit projects only permitted settings and keeps proof and secrets out[39m[90m…[39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit never flashes a client secret and does not accept a browser-supp[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit consumes its browser binding and stores successful verification[39m[90m… [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires the server-held proof then rotates the entire session o[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit preserves local access on failed callback and never reflects pro[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires real CSRF on provider settings test activation and sign[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires real CSRF on provider settings test activation and sign[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires real CSRF on provider settings test activation and sign[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires real CSRF on provider settings test activation and sign[39m[90m…[39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PlanningWorkspaceTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit requires a fresh matching plan digest before requesting approval[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires a fresh matching plan digest before requesting approval[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit hands the exact fresh immutable revision and expiry to Governanc[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit retains the same command body and identity after an uncertain re[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit removes revoked planning access and uses real CSRF protection[39m[90m    [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit binds request delegation and rejects extra response fields[39m[90m       [39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\RequestForgeryTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit rejects a browser mutation without its session request-forgery t[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts a matching session token through the same web middleware[39m[90m [39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TelemetryTest[39m
+  [32;1m✓[39;22m[90m [39m[90mdiagnostic buffer is bounded and stale acknowledgement preserves ne[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlock contention and oversized records are explicit without overwriting accepted data[39m
+  [32;1m✓[39;22m[90m [39m[90munavailable buffer preserves liveness and reports missing collectio[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrequest signals redact arbitrary inputs and correlate without grant[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmalformed or zero correlation is replaced and never echoed with ('m[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmalformed or zero correlation is replaced and never echoed with ('0[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmalformed or zero correlation is replaced and never echoed with ('0[39m[90m…[39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TenancyTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit renders only current owner memberships and clears old tenant his[39m[90m…[39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit never fetches administration projections for a scoped reader or[39m[90m… [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit removes a revoked or guessed tenant from the journey without ren[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps command identity stable and sends only approved membership[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires the real CSRF middleware on all tenant writes with ('')[39m[90m [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires the real CSRF middleware on all tenant writes with ('me[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires the real CSRF middleware on all tenant writes with ('qu[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires the real CSRF middleware on all tenant writes with ('st[39m[90m…[39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Architecture\FoundationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mservice autoload exposes only its own application and tests[39m[90m         [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe actual bootstrap classes are loaded from the service source[39m
+  [32;1m✓[39;22m[90m [39m[90mimplemented application classes use strict types[39m[90m                    [39m [90m0.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90mimplemented application classes are final[39m
+  [32;1m✓[39;22m[90m [39m[90mdelivery does not reference sibling service source[39m[90m                  [39m [90m0.05s[39m  
+
+  [90mTests:[39m    [33;1m7 skipped[39;22m[90m,[39m[39m [39m[32;1m162 passed[39;22m[90m (769 assertions)[39m
+  [90mDuration:[39m [39m4.08s[39m
+

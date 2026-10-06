@@ -1,0 +1,14 @@
+INFO:     Started server process [5840]
+INFO:     Uvicorn running on http://127.0.0.1:8035 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Finished server process [5840]
+INFO:     Started server process [6274]
+INFO:     Uvicorn running on http://127.0.0.1:8035 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Finished server process [6274]
+INFO:     Started server process [6330]
+INFO:     Uvicorn running on http://127.0.0.1:8035 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Finished server process [6330]
+INFO:     Started server process [6464]
+INFO:     Uvicorn running on http://127.0.0.1:8035 (Press CTRL+C to quit)

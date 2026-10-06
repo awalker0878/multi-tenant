@@ -1,0 +1,132 @@
+{
+  "qualification_source": "c045badc852960f3671942adf4ca2338821b4f67",
+  "verified_at": "2026-10-06T13:56:47.831094+00:00",
+  "result": "PASS",
+  "level": "E1/E2",
+  "native_platforms_tested": [],
+  "local": {
+    "report": "local/report.json",
+    "report_sha256": "a0df4ddfdfcafd91ea321fc4c0cc1c8fef1ba373fd2b94cd533205d49142c82e",
+    "commands": 11,
+    "quality_report": "local/quality-report.json",
+    "quality_report_sha256": "6bbdb6128accb03e8c6cbbb77d81066380e7517ad2392659cda859f5894b8e11",
+    "quality_source": "8ad4e85d5c0ab416d8e864de54758c16201e3a15",
+    "impact_review": "PHP/Console production, test and build inputs are byte-identical between 8ad4e85 and c045bad; only the Planning evaluator and its targeted Python tests changed. Python checks were repeated at c045bad in report.json.",
+    "limits": [
+      "Local PostgreSQL-only cases skip; hosted core executes every case."
+    ]
+  },
+  "core": {
+    "run_id": 37471437083,
+    "run_attempt": 1,
+    "artifact_id": 11417032309,
+    "archive_sha256": "a695c919960ce8346bcd93a2242e6630c036d0949c70ba5a69019e54c5a27b56",
+    "archive": "archives/p05-core-37471437083-1.zip",
+    "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+    "report": "core/report.json",
+    "report_sha256": "9f94d4f41d2aa949efb7b8a539eefa00baa8476ee324a2bc040bac4689dfbe82",
+    "commands": 11,
+    "suites": [
+      {
+        "suite": "services-lifecycle.xml",
+        "tests": 79,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "services-planning.xml",
+        "tests": 110,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "live": [
+    {
+      "run_id": 37471437083,
+      "run_attempt": "1",
+      "artifact_id": 11416957780,
+      "archive_sha256": "a795feb7f00e68d50040f9b6dccba7dfd9a752788ab0ec544bd600b1a4110257",
+      "archive": "archives/p05-live-chromium-37471437083-1.zip",
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "report": "chromium/report.json",
+      "report_sha256": "336ae2b969194bb0578cfeaa352f91376be427fe149a26ff23be1efc19d5f055",
+      "commands": 32,
+      "engine": "chromium",
+      "checks": 73,
+      "browser": {
+        "startTime": "2026-10-06T13:33:07.484Z",
+        "duration": 36607.691,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "broker_deliveries": 6,
+      "unique_events": 5,
+      "observed_at": "2026-10-06T13:32:44.236166+00:00"
+    },
+    {
+      "run_id": 37471437083,
+      "run_attempt": "1",
+      "artifact_id": 11417023467,
+      "archive_sha256": "5119526b6d0b03a8fae102784bc1f00e8d55eaf65066ad7c103dda68e8ed347b",
+      "archive": "archives/p05-live-firefox-37471437083-1.zip",
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "report": "firefox/report.json",
+      "report_sha256": "b24d6724693bf54969b2f91ca3e823893fc2189f2a1f6a229fa6e88fb015bcbe",
+      "commands": 32,
+      "engine": "firefox",
+      "checks": 73,
+      "browser": {
+        "startTime": "2026-10-06T13:33:22.825Z",
+        "duration": 36781.774,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "broker_deliveries": 6,
+      "unique_events": 5,
+      "observed_at": "2026-10-06T13:33:01.830625+00:00"
+    },
+    {
+      "run_id": 37471437083,
+      "run_attempt": "2",
+      "artifact_id": 11417814107,
+      "archive_sha256": "f0b2e09a691a4d8a73562a633daf9d94f57ae4f714355e1353c01a202e65baa2",
+      "archive": "archives/p05-live-webkit-37471437083-2.zip",
+      "source_revision": "c045badc852960f3671942adf4ca2338821b4f67",
+      "report": "webkit/report.json",
+      "report_sha256": "12898b80c982ba5b321ded35b74dbea9fe2e1affb2fc3356c359e90b3cb00130",
+      "commands": 32,
+      "engine": "webkit",
+      "checks": 73,
+      "browser": {
+        "startTime": "2026-10-06T13:54:33.627Z",
+        "duration": 38785.530000000006,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "broker_deliveries": 6,
+      "unique_events": 5,
+      "observed_at": "2026-10-06T13:54:14.959766+00:00"
+    }
+  ],
+  "limits": [
+    "No native E3 installation, actual production effects, representative operator or designated G05 receiving decision is inferred.",
+    "Real P04 owner observations remain unassessed; eligible integration cases use a separately controlled Inventory contract and synthetic qualification-shaped records."
+  ],
+  "reproduced_build_metadata": {
+    "report": "build-metadata/report.json",
+    "sha256": "2affef0e6960881f7b72c888f283af2ec81689ff0ff54cdd8cb931ee4a7578bc",
+    "bindings": 3,
+    "boundary": "Three generated wheel metadata files are independently reconstructed from exact git source using the locked build toolchain. All other reported source hashes match the source commit directly."
+  },
+  "verified_unique_source_bindings": 909,
+  "verified_command_logs": 124
+}

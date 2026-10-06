@@ -1,0 +1,2 @@
+> pest --fail-on-warning --fail-on-risky --fail-on-empty-test-suite
+Script pest --fail-on-warning --fail-on-risky --fail-on-empty-test-suite handling the test event returned with error code 2

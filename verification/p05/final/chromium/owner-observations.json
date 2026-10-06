@@ -1,0 +1,3719 @@
+{
+  "scope": "E2 controlled Inventory contract; no native qualification",
+  "reads": [
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/1c726c67-d1af-4119-9035-f5c49c0fb408/8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "status": 200
+    },
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/1c726c67-d1af-4119-9035-f5c49c0fb408/8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "status": 200
+    },
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/cb7bc2c9-400e-49ef-8918-083d43f2da3b/884896e8-3b69-428f-80b0-14e239b12077/a2c9f14a-f73e-45d4-866c-5f458aa5478d",
+      "status": 200
+    },
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/cb7bc2c9-400e-49ef-8918-083d43f2da3b/884896e8-3b69-428f-80b0-14e239b12077/a2c9f14a-f73e-45d4-866c-5f458aa5478d",
+      "status": 200
+    },
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/1c726c67-d1af-4119-9035-f5c49c0fb408/8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "status": 200
+    },
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/1c726c67-d1af-4119-9035-f5c49c0fb408/8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "status": 200
+    },
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/1c726c67-d1af-4119-9035-f5c49c0fb408/8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "status": 200
+    },
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/1c726c67-d1af-4119-9035-f5c49c0fb408/8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "status": 200
+    },
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/1c726c67-d1af-4119-9035-f5c49c0fb408/8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "status": 200
+    },
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/1c726c67-d1af-4119-9035-f5c49c0fb408/8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "status": 200
+    },
+    {
+      "path": "/v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/1c726c67-d1af-4119-9035-f5c49c0fb408/8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "status": 200
+    }
+  ],
+  "assessment": {
+    "id": "d80eba80-ae6c-4ca8-a209-35814991fc13",
+    "action": "application.provision",
+    "inputs": [
+      {
+        "policy": {
+          "id": "synthetic-policy",
+          "version": 1,
+          "artifacts": {
+            "adapter": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+            "compiler": "8d9aa3ce74652dc4e69fac8954afd3f92db75062429b870d650291969189b46e",
+            "contracts": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f",
+            "automation": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4"
+          },
+          "ownership": [
+            {
+              "fields": [
+                "infrastructure"
+              ],
+              "writer": "terraform",
+              "resource": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+              "state_ref": "fixture://state",
+              "native_identity": null
+            },
+            {
+              "fields": [
+                "infrastructure"
+              ],
+              "writer": "terraform",
+              "resource": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+              "state_ref": "fixture://state",
+              "native_identity": null
+            }
+          ],
+          "terraform": {
+            "workspace": "fixture",
+            "lock_owner": "lifecycle",
+            "backend_ref": "fixture://state",
+            "state_serial": 1,
+            "state_lineage": "lineage",
+            "toolchain_sha256": "dd04afac1bebb050783a245ed0d88633759f352c85d4ab3bea3d416bf2019c75",
+            "saved_plan_sha256": "a9347c50430fb5947a6d022b1ae4dcfc5f961af3fd9a22899aff3b4437c0136b"
+          },
+          "expires_at": 1791297181,
+          "requirements": [],
+          "downtime_seconds": 3600,
+          "reservation_owners": {
+            "vcpus": "synthetic-vcpus",
+            "addresses": "synthetic-addresses",
+            "memory_mib": "synthetic-memory_mib",
+            "storage_gib": "synthetic-storage_gib"
+          }
+        },
+        "profile": {
+          "digest": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
+          "version": "synthetic-v1",
+          "platform": "openstack",
+          "dimensions": [
+            {
+              "dimension": "installed_identity",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "compute_placement",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "storage_datasets",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "network_vpc",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "security_edge",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "guest_image",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "lifecycle_adoption",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "mobility",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "shared_services",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "resilience_operations",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "assurance_sovereignty",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            }
+          ]
+        },
+        "destination": {
+          "holds": [],
+          "current": true,
+          "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+          "capacity": {
+            "vcpus": 4,
+            "addresses": 2,
+            "memory_mib": 8192,
+            "storage_gib": 80
+          },
+          "platform": "openstack",
+          "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+          "completion": "complete",
+          "dimensions": {
+            "mobility": "observed",
+            "guest_image": "observed",
+            "network_vpc": "observed",
+            "security_edge": "observed",
+            "shared_services": "observed",
+            "storage_datasets": "observed",
+            "compute_placement": "observed",
+            "installed_identity": "observed",
+            "lifecycle_adoption": "observed",
+            "assurance_sovereignty": "observed",
+            "resilience_operations": "observed"
+          },
+          "expires_at": 1791295381,
+          "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+          "capabilities": {
+            "guest.os": {
+              "status": "observed",
+              "values": [
+                "linux"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.image": {
+              "status": "observed",
+              "values": [
+                "approved-image-v1"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.class": {
+              "status": "observed",
+              "values": [
+                "private"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "storage.class": {
+              "status": "observed",
+              "values": [
+                "standard"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.firmware": {
+              "status": "observed",
+              "values": [
+                "uefi"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.family": {
+              "status": "observed",
+              "values": [
+                "ipv4"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "service.backup": {
+              "status": "observed",
+              "values": [
+                "commvault"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.method": {
+              "status": "observed",
+              "values": [
+                "application_rebuild_restore"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "data.consistency": {
+              "status": "observed",
+              "values": [
+                "application"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.secure_boot": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "storage.encryption": {
+              "status": "observed",
+              "values": [
+                "required"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.custody": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "compute.architecture": {
+              "status": "observed",
+              "values": [
+                "x86_64"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.rpo_seconds": {
+              "status": "observed",
+              "values": [
+                0
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.rto_seconds": {
+              "status": "observed",
+              "values": [
+                3600
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "service.backup.owner": {
+              "status": "observed",
+              "values": [
+                "98a5797d-c4d3-40ea-be11-f845a86f19b7"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.location": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.data_path": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.address_intent": {
+              "status": "observed",
+              "values": [
+                "reserved"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.zone_allowed": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.hardening_profile": {
+              "status": "observed",
+              "values": [
+                "linux-baseline-v1"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.domain_isolation": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.tenant_isolation": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.controlled_interface": {
+              "status": "observed",
+              "values": [
+                {
+                  "to": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+                  "from": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+                  "port": 5432,
+                  "protocol": "tcp"
+                }
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.failure_domain.anti_affinity": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            }
+          },
+          "native_scope": "project:synthetic",
+          "generation_id": "8c3274d2-f428-4987-8c29-1ca708bd9343",
+          "domain_bindings": {
+            "05f1d178-6c62-4613-9f2d-6a257499a78b": "synthetic-domain-1",
+            "b817122e-0bf4-448c-811f-18b7925b934d": "synthetic-domain-0"
+          },
+          "installed_tuple": {
+            "guest": "synthetic",
+            "release": "synthetic",
+            "platform": "openstack",
+            "compute_api": "2.1",
+            "network_api": "2.0",
+            "storage_api": "3",
+            "network_backend": "synthetic",
+            "storage_backend": "synthetic"
+          },
+          "workload_bindings": {},
+          "installed_provenance": "observed"
+        },
+        "qualification": {
+          "id": "synthetic-evidence",
+          "scope": {
+            "action": "application.provision",
+            "method": "saved_plan",
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "artifacts": {
+              "adapter": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+              "compiler": "8d9aa3ce74652dc4e69fac8954afd3f92db75062429b870d650291969189b46e",
+              "contracts": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f",
+              "automation": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4"
+            },
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "native_scope": "project:synthetic",
+            "profile_digest": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
+            "installed_tuple": {
+              "guest": "synthetic",
+              "release": "synthetic",
+              "platform": "openstack",
+              "compute_api": "2.1",
+              "network_api": "2.0",
+              "storage_api": "3",
+              "network_backend": "synthetic",
+              "storage_backend": "synthetic"
+            }
+          },
+          "status": "qualified",
+          "revoked": false,
+          "version": 1,
+          "dimensions": [
+            "installed_identity",
+            "compute_placement",
+            "storage_datasets",
+            "network_vpc",
+            "security_edge",
+            "guest_image",
+            "lifecycle_adoption",
+            "mobility",
+            "shared_services",
+            "resilience_operations",
+            "assurance_sovereignty"
+          ],
+          "expires_at": 1791295381,
+          "capabilities": {
+            "guest.os": {
+              "status": "supported",
+              "values": [
+                "linux"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.image": {
+              "status": "supported",
+              "values": [
+                "approved-image-v1"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.class": {
+              "status": "supported",
+              "values": [
+                "private"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "storage.class": {
+              "status": "supported",
+              "values": [
+                "standard"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.firmware": {
+              "status": "supported",
+              "values": [
+                "uefi"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.family": {
+              "status": "supported",
+              "values": [
+                "ipv4"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "service.backup": {
+              "status": "supported",
+              "values": [
+                "commvault"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.method": {
+              "status": "supported",
+              "values": [
+                "application_rebuild_restore"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "data.consistency": {
+              "status": "supported",
+              "values": [
+                "application"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.secure_boot": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "storage.encryption": {
+              "status": "supported",
+              "values": [
+                "required"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.custody": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "compute.architecture": {
+              "status": "supported",
+              "values": [
+                "x86_64"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.rpo_seconds": {
+              "status": "supported",
+              "values": [
+                0
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.rto_seconds": {
+              "status": "supported",
+              "values": [
+                3600
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "service.backup.owner": {
+              "status": "supported",
+              "values": [
+                "98a5797d-c4d3-40ea-be11-f845a86f19b7"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.location": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.data_path": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.address_intent": {
+              "status": "supported",
+              "values": [
+                "reserved"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.zone_allowed": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.hardening_profile": {
+              "status": "supported",
+              "values": [
+                "linux-baseline-v1"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.domain_isolation": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.tenant_isolation": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.controlled_interface": {
+              "status": "supported",
+              "values": [
+                {
+                  "to": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+                  "from": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+                  "port": 5432,
+                  "protocol": "tcp"
+                }
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.failure_domain.anti_affinity": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            }
+          },
+          "evidence_refs": [
+            "fixture://not-native-evidence"
+          ],
+          "evidence_level": "E3"
+        }
+      },
+      {
+        "policy": {
+          "id": "synthetic-policy",
+          "version": 1,
+          "artifacts": {
+            "adapter": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+            "compiler": "8d9aa3ce74652dc4e69fac8954afd3f92db75062429b870d650291969189b46e",
+            "contracts": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f",
+            "automation": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4"
+          },
+          "ownership": [
+            {
+              "fields": [
+                "infrastructure"
+              ],
+              "writer": "terraform",
+              "resource": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+              "state_ref": "fixture://state",
+              "native_identity": null
+            },
+            {
+              "fields": [
+                "infrastructure"
+              ],
+              "writer": "terraform",
+              "resource": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+              "state_ref": "fixture://state",
+              "native_identity": null
+            }
+          ],
+          "terraform": {
+            "workspace": "fixture",
+            "lock_owner": "lifecycle",
+            "backend_ref": "fixture://state",
+            "state_serial": 1,
+            "state_lineage": "lineage",
+            "toolchain_sha256": "dd04afac1bebb050783a245ed0d88633759f352c85d4ab3bea3d416bf2019c75",
+            "saved_plan_sha256": "a9347c50430fb5947a6d022b1ae4dcfc5f961af3fd9a22899aff3b4437c0136b"
+          },
+          "expires_at": 1791297181,
+          "requirements": [],
+          "downtime_seconds": 3600,
+          "reservation_owners": {
+            "vcpus": "synthetic-vcpus",
+            "addresses": "synthetic-addresses",
+            "memory_mib": "synthetic-memory_mib",
+            "storage_gib": "synthetic-storage_gib"
+          }
+        },
+        "profile": {
+          "digest": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
+          "version": "synthetic-v1",
+          "platform": "openstack",
+          "dimensions": [
+            {
+              "dimension": "installed_identity",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "compute_placement",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "storage_datasets",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "network_vpc",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "security_edge",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "guest_image",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "lifecycle_adoption",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "mobility",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "shared_services",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "resilience_operations",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            },
+            {
+              "dimension": "assurance_sovereignty",
+              "declaration": {
+                "status": "declared",
+                "operations": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              }
+            }
+          ]
+        },
+        "destination": {
+          "holds": [],
+          "current": true,
+          "site_id": "cb7bc2c9-400e-49ef-8918-083d43f2da3b",
+          "capacity": {
+            "vcpus": 1,
+            "addresses": 2,
+            "memory_mib": 8192,
+            "storage_gib": 80
+          },
+          "platform": "openstack",
+          "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+          "completion": "complete",
+          "dimensions": {
+            "mobility": "observed",
+            "guest_image": "observed",
+            "network_vpc": "observed",
+            "security_edge": "observed",
+            "shared_services": "observed",
+            "storage_datasets": "observed",
+            "compute_placement": "observed",
+            "installed_identity": "observed",
+            "lifecycle_adoption": "observed",
+            "assurance_sovereignty": "observed",
+            "resilience_operations": "observed"
+          },
+          "expires_at": 1791295381,
+          "endpoint_id": "884896e8-3b69-428f-80b0-14e239b12077",
+          "capabilities": {
+            "guest.os": {
+              "status": "observed",
+              "values": [
+                "linux"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.image": {
+              "status": "observed",
+              "values": [
+                "approved-image-v1"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.class": {
+              "status": "observed",
+              "values": [
+                "private"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "storage.class": {
+              "status": "observed",
+              "values": [
+                "standard"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.firmware": {
+              "status": "observed",
+              "values": [
+                "uefi"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.family": {
+              "status": "observed",
+              "values": [
+                "ipv4"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "service.backup": {
+              "status": "observed",
+              "values": [
+                "commvault"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.method": {
+              "status": "observed",
+              "values": [
+                "application_rebuild_restore"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "data.consistency": {
+              "status": "observed",
+              "values": [
+                "application"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.secure_boot": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "storage.encryption": {
+              "status": "observed",
+              "values": [
+                "required"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.custody": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "compute.architecture": {
+              "status": "observed",
+              "values": [
+                "x86_64"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.rpo_seconds": {
+              "status": "observed",
+              "values": [
+                0
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.rto_seconds": {
+              "status": "observed",
+              "values": [
+                3600
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "service.backup.owner": {
+              "status": "observed",
+              "values": [
+                "98a5797d-c4d3-40ea-be11-f845a86f19b7"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.location": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.data_path": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.address_intent": {
+              "status": "observed",
+              "values": [
+                "reserved"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.zone_allowed": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.hardening_profile": {
+              "status": "observed",
+              "values": [
+                "linux-baseline-v1"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.domain_isolation": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.tenant_isolation": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.controlled_interface": {
+              "status": "observed",
+              "values": [
+                {
+                  "to": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+                  "from": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+                  "port": 5432,
+                  "protocol": "tcp"
+                }
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.failure_domain.anti_affinity": {
+              "status": "observed",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            }
+          },
+          "native_scope": "project:synthetic",
+          "generation_id": "a2c9f14a-f73e-45d4-866c-5f458aa5478d",
+          "domain_bindings": {
+            "05f1d178-6c62-4613-9f2d-6a257499a78b": "synthetic-domain-1",
+            "b817122e-0bf4-448c-811f-18b7925b934d": "synthetic-domain-0"
+          },
+          "installed_tuple": {
+            "guest": "synthetic",
+            "release": "synthetic",
+            "platform": "openstack",
+            "compute_api": "2.1",
+            "network_api": "2.0",
+            "storage_api": "3",
+            "network_backend": "synthetic",
+            "storage_backend": "synthetic"
+          },
+          "workload_bindings": {},
+          "installed_provenance": "observed"
+        },
+        "qualification": {
+          "id": "synthetic-evidence",
+          "scope": {
+            "action": "application.provision",
+            "method": "saved_plan",
+            "site_id": "cb7bc2c9-400e-49ef-8918-083d43f2da3b",
+            "artifacts": {
+              "adapter": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+              "compiler": "8d9aa3ce74652dc4e69fac8954afd3f92db75062429b870d650291969189b46e",
+              "contracts": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f",
+              "automation": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4"
+            },
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "884896e8-3b69-428f-80b0-14e239b12077",
+            "native_scope": "project:synthetic",
+            "profile_digest": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
+            "installed_tuple": {
+              "guest": "synthetic",
+              "release": "synthetic",
+              "platform": "openstack",
+              "compute_api": "2.1",
+              "network_api": "2.0",
+              "storage_api": "3",
+              "network_backend": "synthetic",
+              "storage_backend": "synthetic"
+            }
+          },
+          "status": "qualified",
+          "revoked": false,
+          "version": 1,
+          "dimensions": [
+            "installed_identity",
+            "compute_placement",
+            "storage_datasets",
+            "network_vpc",
+            "security_edge",
+            "guest_image",
+            "lifecycle_adoption",
+            "mobility",
+            "shared_services",
+            "resilience_operations",
+            "assurance_sovereignty"
+          ],
+          "expires_at": 1791295381,
+          "capabilities": {
+            "guest.os": {
+              "status": "supported",
+              "values": [
+                "linux"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.image": {
+              "status": "supported",
+              "values": [
+                "approved-image-v1"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.class": {
+              "status": "supported",
+              "values": [
+                "private"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "storage.class": {
+              "status": "supported",
+              "values": [
+                "standard"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.firmware": {
+              "status": "supported",
+              "values": [
+                "uefi"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.family": {
+              "status": "supported",
+              "values": [
+                "ipv4"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "service.backup": {
+              "status": "supported",
+              "values": [
+                "commvault"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.method": {
+              "status": "supported",
+              "values": [
+                "application_rebuild_restore"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "data.consistency": {
+              "status": "supported",
+              "values": [
+                "application"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.secure_boot": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "storage.encryption": {
+              "status": "supported",
+              "values": [
+                "required"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.custody": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "compute.architecture": {
+              "status": "supported",
+              "values": [
+                "x86_64"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.rpo_seconds": {
+              "status": "supported",
+              "values": [
+                0
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "recovery.rto_seconds": {
+              "status": "supported",
+              "values": [
+                3600
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "service.backup.owner": {
+              "status": "supported",
+              "values": [
+                "98a5797d-c4d3-40ea-be11-f845a86f19b7"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.location": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "sovereignty.data_path": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.address_intent": {
+              "status": "supported",
+              "values": [
+                "reserved"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.zone_allowed": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "guest.hardening_profile": {
+              "status": "supported",
+              "values": [
+                "linux-baseline-v1"
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.domain_isolation": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.tenant_isolation": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "network.controlled_interface": {
+              "status": "supported",
+              "values": [
+                {
+                  "to": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+                  "from": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+                  "port": 5432,
+                  "protocol": "tcp"
+                }
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            },
+            "placement.failure_domain.anti_affinity": {
+              "status": "supported",
+              "values": [
+                true
+              ],
+              "expires_at": 1791295381,
+              "dependencies": []
+            }
+          },
+          "evidence_refs": [
+            "fixture://not-native-evidence"
+          ],
+          "evidence_level": "E3"
+        }
+      }
+    ],
+    "intent": {
+      "id": "81af93ab-3c7a-4240-b3d8-47b53dd85046",
+      "digest": "305e2b3da8d5eddfb11d2a39de11c73a19de346223a9b77c971139443990a3fb",
+      "intent": {
+        "datasets": [
+          {
+            "id": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "name": "Permit data",
+            "owner_id": "98a5797d-c4d3-40ea-be11-f845a86f19b7",
+            "recovery": {
+              "method": "application_rebuild_restore",
+              "strength": "required",
+              "rpo_seconds": 0,
+              "rto_seconds": 3600
+            },
+            "consistency": "application",
+            "consistency_group": "permit"
+          }
+        ],
+        "services": [
+          {
+            "name": "backup",
+            "owner_id": "98a5797d-c4d3-40ea-be11-f845a86f19b7",
+            "workload_id": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "requirements": [
+              {
+                "key": "service.backup",
+                "value": "commvault",
+                "reason": "Protect the application data",
+                "strength": "required"
+              }
+            ]
+          }
+        ],
+        "workloads": [
+          {
+            "id": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "wsd": {
+              "id": "a9f0cdf6-eb1c-42f2-8b25-588f615cb9ac",
+              "version": 1
+            },
+            "name": "Web",
+            "nics": [
+              {
+                "id": "c81a1c75-db6c-447e-b698-95953129afe1",
+                "order": 0,
+                "network_class": "private",
+                "address_intent": "reserved",
+                "address_families": [
+                  "ipv4"
+                ],
+                "security_domain_id": "b817122e-0bf4-448c-811f-18b7925b934d"
+              }
+            ],
+            "role": "web",
+            "disks": [
+              {
+                "id": "74866a11-286e-45de-8afd-cc691328584e",
+                "boot": true,
+                "order": 0,
+                "size_gib": 40,
+                "dataset_id": null,
+                "encryption": "required",
+                "storage_class": "standard"
+              }
+            ],
+            "guest": {
+              "os": "linux",
+              "image": "approved-image-v1",
+              "firmware": "uefi",
+              "secure_boot": true,
+              "hardening_profile": "linux-baseline-v1"
+            },
+            "compute": {
+              "vcpus": 2,
+              "memory_mib": 4096,
+              "architecture": "x86_64"
+            },
+            "requirements": [],
+            "failure_domain": {
+              "mode": "anti_affinity",
+              "group": "permit",
+              "strength": "required"
+            },
+            "security_domain": {
+              "id": "b817122e-0bf4-448c-811f-18b7925b934d",
+              "version": 1
+            }
+          },
+          {
+            "id": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "wsd": {
+              "id": "9ed4873e-722b-4a04-a4e5-01746c22f002",
+              "version": 1
+            },
+            "name": "Database",
+            "nics": [
+              {
+                "id": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+                "order": 0,
+                "network_class": "private",
+                "address_intent": "reserved",
+                "address_families": [
+                  "ipv4"
+                ],
+                "security_domain_id": "05f1d178-6c62-4613-9f2d-6a257499a78b"
+              }
+            ],
+            "role": "database",
+            "disks": [
+              {
+                "id": "f88b15d9-811a-4e1c-8831-7bb8cde79d92",
+                "boot": true,
+                "order": 0,
+                "size_gib": 40,
+                "dataset_id": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+                "encryption": "required",
+                "storage_class": "standard"
+              }
+            ],
+            "guest": {
+              "os": "linux",
+              "image": "approved-image-v1",
+              "firmware": "uefi",
+              "secure_boot": true,
+              "hardening_profile": "linux-baseline-v1"
+            },
+            "compute": {
+              "vcpus": 2,
+              "memory_mib": 4096,
+              "architecture": "x86_64"
+            },
+            "requirements": [],
+            "failure_domain": {
+              "mode": "anti_affinity",
+              "group": "permit",
+              "strength": "required"
+            },
+            "security_domain": {
+              "id": "05f1d178-6c62-4613-9f2d-6a257499a78b",
+              "version": 1
+            }
+          }
+        ],
+        "environment": {
+          "id": "f3ac5e7d-8269-4944-9072-581913f329ac",
+          "version": 1
+        },
+        "dependencies": [
+          {
+            "to": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "from": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "kind": "startup",
+            "port": null,
+            "protocol": "none",
+            "strength": "required",
+            "readiness": "Database accepts queries",
+            "dataset_id": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "controlled_interface": false
+          },
+          {
+            "to": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "from": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "kind": "communication",
+            "port": 5432,
+            "protocol": "tcp",
+            "strength": "required",
+            "readiness": "Database accepts application connection",
+            "dataset_id": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "controlled_interface": true
+          }
+        ],
+        "requirements": [],
+        "deployment_id": "c8d1d218-25c8-470a-8a53-2b397c250b86",
+        "schema_version": 1,
+        "service_owner_id": "98a5797d-c4d3-40ea-be11-f845a86f19b7",
+        "acceptance_criteria": [
+          "Submit and retrieve a permit with its attachment"
+        ]
+      },
+      "application_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0"
+    },
+    "method": "saved_plan",
+    "results": [
+      {
+        "demand": {
+          "vcpus": 4,
+          "addresses": 2,
+          "memory_mib": 8192,
+          "storage_gib": 80
+        },
+        "status": "eligible",
+        "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+        "findings": [
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "inventory.current"
+          },
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "inventory.complete"
+          },
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "inventory.fresh"
+          },
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "inventory.identity"
+          },
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "installed_identity"
+          },
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "policy.fresh"
+          },
+          {
+            "reason": "qualified_exact_scope",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Assurance must qualify the exact operation, method, tuple, scope and artifacts.",
+            "requirement": "qualification.exact_tuple"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "installed_identity"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "compute_placement"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "storage_datasets"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "network_vpc"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "security_edge"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "guest_image"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "lifecycle_adoption"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "mobility"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "shared_services"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "resilience_operations"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "assurance_sovereignty"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "compute.architecture"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.os"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.image"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.firmware"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.secure_boot"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.hardening_profile"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.tenant_isolation"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.domain_isolation"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.zone_allowed"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.failure_domain.anti_affinity"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "74866a11-286e-45de-8afd-cc691328584e",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "storage.class"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "74866a11-286e-45de-8afd-cc691328584e",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "storage.encryption"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "c81a1c75-db6c-447e-b698-95953129afe1",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.class"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "c81a1c75-db6c-447e-b698-95953129afe1",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.family"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "c81a1c75-db6c-447e-b698-95953129afe1",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.address_intent"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "compute.architecture"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.os"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.image"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.firmware"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.secure_boot"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.hardening_profile"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.tenant_isolation"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.domain_isolation"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.zone_allowed"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.failure_domain.anti_affinity"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "f88b15d9-811a-4e1c-8831-7bb8cde79d92",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "storage.class"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "f88b15d9-811a-4e1c-8831-7bb8cde79d92",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "storage.encryption"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.class"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.family"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.address_intent"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "data.consistency"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "recovery.method"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "recovery.rpo_seconds"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "recovery.rto_seconds"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "service.backup.owner"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "service.backup"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.controlled_interface"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "baseline",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "sovereignty.location"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "baseline",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "sovereignty.custody"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "baseline",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "sovereignty.data_path"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "baseline",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.tenant_isolation"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "baseline",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.domain_isolation"
+          },
+          {
+            "reason": "observed_capacity_only",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Lifecycle must acquire authoritative owner receipts.",
+            "requirement": "capacity.vcpus"
+          },
+          {
+            "reason": "observed_capacity_only",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Lifecycle must acquire authoritative owner receipts.",
+            "requirement": "capacity.memory_mib"
+          },
+          {
+            "reason": "observed_capacity_only",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Lifecycle must acquire authoritative owner receipts.",
+            "requirement": "capacity.storage_gib"
+          },
+          {
+            "reason": "observed_capacity_only",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Lifecycle must acquire authoritative owner receipts.",
+            "requirement": "capacity.addresses"
+          }
+        ],
+        "platform": "openstack",
+        "reserved": false,
+        "expires_at": 1791295381,
+        "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+        "generation_id": "8c3274d2-f428-4987-8c29-1ca708bd9343",
+        "input_digests": {
+          "intent": "305e2b3da8d5eddfb11d2a39de11c73a19de346223a9b77c971139443990a3fb",
+          "policy": "34c38f274dbf9cd8d083a2fff6e2832cb27972c08f3d714047ccf4ee84760a8a",
+          "profile": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
+          "inventory": "1c4ce2d4515fcb525207f68025e2ccb160a9ff630005a5e183c81136ac2cea61",
+          "qualification": "1036005ef70c826d9eec70f6b044ff94823103e77646cfd33104859aa8ef3a86"
+        },
+        "operationally_eligible": true
+      },
+      {
+        "demand": {
+          "vcpus": 4,
+          "addresses": 2,
+          "memory_mib": 8192,
+          "storage_gib": 80
+        },
+        "status": "blocked",
+        "site_id": "cb7bc2c9-400e-49ef-8918-083d43f2da3b",
+        "findings": [
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "inventory.current"
+          },
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "inventory.complete"
+          },
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "inventory.fresh"
+          },
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "inventory.identity"
+          },
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "installed_identity"
+          },
+          {
+            "reason": "verified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Refresh and independently verify this exact destination input.",
+            "requirement": "policy.fresh"
+          },
+          {
+            "reason": "qualified_exact_scope",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Assurance must qualify the exact operation, method, tuple, scope and artifacts.",
+            "requirement": "qualification.exact_tuple"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "installed_identity"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "compute_placement"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "storage_datasets"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "network_vpc"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "security_edge"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "guest_image"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "lifecycle_adoption"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "mobility"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "shared_services"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "resilience_operations"
+          },
+          {
+            "reason": "observed_and_qualified",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Supply current observations and exact scoped evidence.",
+            "requirement": "assurance_sovereignty"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "compute.architecture"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.os"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.image"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.firmware"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.secure_boot"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.hardening_profile"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.tenant_isolation"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.domain_isolation"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.zone_allowed"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.failure_domain.anti_affinity"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "74866a11-286e-45de-8afd-cc691328584e",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "storage.class"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "74866a11-286e-45de-8afd-cc691328584e",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "storage.encryption"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "c81a1c75-db6c-447e-b698-95953129afe1",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.class"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "c81a1c75-db6c-447e-b698-95953129afe1",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.family"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "c81a1c75-db6c-447e-b698-95953129afe1",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.address_intent"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "compute.architecture"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.os"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.image"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.firmware"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.secure_boot"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "guest.hardening_profile"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.tenant_isolation"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.domain_isolation"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.zone_allowed"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.failure_domain.anti_affinity"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "f88b15d9-811a-4e1c-8831-7bb8cde79d92",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "storage.class"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "f88b15d9-811a-4e1c-8831-7bb8cde79d92",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "storage.encryption"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.class"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.family"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.address_intent"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "data.consistency"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "recovery.method"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "recovery.rpo_seconds"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "recovery.rto_seconds"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "service.backup.owner"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "service.backup"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "network.controlled_interface"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "baseline",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "sovereignty.location"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "baseline",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "sovereignty.custody"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "baseline",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "sovereignty.data_path"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "baseline",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.tenant_isolation"
+          },
+          {
+            "reason": "requirement_observed_and_qualified",
+            "source": "baseline",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+            "requirement": "placement.domain_isolation"
+          },
+          {
+            "reason": "observed_capacity_insufficient",
+            "source": "destination",
+            "status": "blocked",
+            "mandatory": true,
+            "remediation": "Lifecycle must acquire authoritative owner receipts.",
+            "requirement": "capacity.vcpus"
+          },
+          {
+            "reason": "observed_capacity_only",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Lifecycle must acquire authoritative owner receipts.",
+            "requirement": "capacity.memory_mib"
+          },
+          {
+            "reason": "observed_capacity_only",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Lifecycle must acquire authoritative owner receipts.",
+            "requirement": "capacity.storage_gib"
+          },
+          {
+            "reason": "observed_capacity_only",
+            "source": "destination",
+            "status": "eligible",
+            "mandatory": true,
+            "remediation": "Lifecycle must acquire authoritative owner receipts.",
+            "requirement": "capacity.addresses"
+          }
+        ],
+        "platform": "openstack",
+        "reserved": false,
+        "expires_at": 1791295381,
+        "endpoint_id": "884896e8-3b69-428f-80b0-14e239b12077",
+        "generation_id": "a2c9f14a-f73e-45d4-866c-5f458aa5478d",
+        "input_digests": {
+          "intent": "305e2b3da8d5eddfb11d2a39de11c73a19de346223a9b77c971139443990a3fb",
+          "policy": "34c38f274dbf9cd8d083a2fff6e2832cb27972c08f3d714047ccf4ee84760a8a",
+          "profile": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
+          "inventory": "79d9f0353359961a47dad41f8ea252ff6181dd6dd4be2d1aaf1367f24305bfb0",
+          "qualification": "afe663145138f3d34535bdb409aa4308bbfa06817f3fd28a38d7d626612b807b"
+        },
+        "operationally_eligible": false
+      }
+    ],
+    "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+    "candidates": [
+      {
+        "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+        "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+        "generation_id": "8c3274d2-f428-4987-8c29-1ca708bd9343"
+      },
+      {
+        "site_id": "cb7bc2c9-400e-49ef-8918-083d43f2da3b",
+        "endpoint_id": "884896e8-3b69-428f-80b0-14e239b12077",
+        "generation_id": "a2c9f14a-f73e-45d4-866c-5f458aa5478d"
+      }
+    ],
+    "created_at": 1791293584,
+    "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+    "application_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0"
+  },
+  "plan": {
+    "id": "61e4c11f-dab5-44e8-8e19-ca8a217182c3",
+    "binding": {
+      "lane": "operational",
+      "action": "application.provision",
+      "digest": "ba612fc1a63e9f7b404bac662a2f209887501ff5e055e7a65091a75241582496",
+      "plan_id": "61e4c11f-dab5-44e8-8e19-ca8a217182c3",
+      "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+      "revision": 1,
+      "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+      "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+      "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+      "valid_until": 1791294484,
+      "executor_ids": [
+        "f4454f09-b4a0-467e-ac7d-5cad0d557f53"
+      ],
+      "requested_by": "98a5797d-c4d3-40ea-be11-f845a86f19b7",
+      "content_digest": "58a7e5eb9bf3823f272d7efc9d2146f39b6913cf390a1cfcaf7a30ce19fa605c",
+      "canonicalization": "p05-json-v1"
+    },
+    "content": {
+      "lane": "operational",
+      "holds": [],
+      "scope": {
+        "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+        "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+        "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+        "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+        "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+        "native_scope": "project:synthetic"
+      },
+      "action": "application.provision",
+      "method": "saved_plan",
+      "budgets": {
+        "demand": {
+          "vcpus": 4,
+          "addresses": 2,
+          "memory_mib": 8192,
+          "storage_gib": 80
+        },
+        "downtime_basis": "assumption_requires_application_acceptance",
+        "downtime_seconds": 3600,
+        "max_parallel_effects": 1
+      },
+      "effects": [
+        {
+          "id": "reserve",
+          "after": [],
+          "owner": "lifecycle",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "boundary": "authoritative_owner_receipts",
+          "on_unknown": "hold_and_observe_before_retry",
+          "destructive": false,
+          "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
+          "authority_recheck": "immediately_before_effect"
+        },
+        {
+          "id": "preflight",
+          "after": [
+            "reserve"
+          ],
+          "owner": "lifecycle",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "boundary": "current_scope_artifact_state_and_approval",
+          "on_unknown": "hold_and_observe_before_retry",
+          "destructive": false,
+          "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
+          "authority_recheck": "immediately_before_effect"
+        },
+        {
+          "id": "apply_reviewed_saved_plan",
+          "after": [
+            "preflight"
+          ],
+          "owner": "terraform",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "boundary": "exact_saved_plan_and_state_lock",
+          "on_unknown": "hold_and_observe_before_retry",
+          "destructive": false,
+          "artifact_digest": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+          "authority_recheck": "immediately_before_effect"
+        },
+        {
+          "id": "configure_and_restore",
+          "after": [
+            "apply_reviewed_saved_plan"
+          ],
+          "owner": "lifecycle",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "boundary": "isolated_target_no_business_effects",
+          "on_unknown": "hold_and_observe_before_retry",
+          "destructive": true,
+          "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
+          "authority_recheck": "immediately_before_effect"
+        },
+        {
+          "id": "verify_application",
+          "after": [
+            "configure_and_restore"
+          ],
+          "owner": "lifecycle",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "boundary": "independent_application_and_security_postconditions",
+          "on_unknown": "hold_and_observe_before_retry",
+          "destructive": false,
+          "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
+          "authority_recheck": "immediately_before_effect"
+        },
+        {
+          "id": "activate_target",
+          "after": [
+            "verify_application"
+          ],
+          "owner": "lifecycle",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "boundary": "target_first_write",
+          "on_unknown": "hold_and_observe_before_retry",
+          "destructive": true,
+          "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
+          "authority_recheck": "immediately_before_effect"
+        },
+        {
+          "id": "confirm_owner_allocations",
+          "after": [
+            "activate_target"
+          ],
+          "owner": "lifecycle",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "boundary": "observe_actual_consumption",
+          "on_unknown": "hold_and_observe_before_retry",
+          "destructive": false,
+          "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
+          "authority_recheck": "immediately_before_effect"
+        }
+      ],
+      "mappings": [
+        {
+          "wsd": {
+            "id": "a9f0cdf6-eb1c-42f2-8b25-588f615cb9ac",
+            "version": 1
+          },
+          "desired": {
+            "guest": {
+              "os": "linux",
+              "image": "approved-image-v1",
+              "firmware": "uefi",
+              "secure_boot": true,
+              "hardening_profile": "linux-baseline-v1"
+            },
+            "compute": {
+              "vcpus": 2,
+              "memory_mib": 4096,
+              "architecture": "x86_64"
+            }
+          },
+          "devices": {
+            "nics": [
+              {
+                "id": "c81a1c75-db6c-447e-b698-95953129afe1",
+                "order": 0,
+                "network_class": "private",
+                "address_intent": "reserved",
+                "address_families": [
+                  "ipv4"
+                ],
+                "security_domain_id": "b817122e-0bf4-448c-811f-18b7925b934d"
+              }
+            ],
+            "disks": [
+              {
+                "id": "74866a11-286e-45de-8afd-cc691328584e",
+                "boot": true,
+                "order": 0,
+                "size_gib": 40,
+                "dataset_id": null,
+                "encryption": "required",
+                "storage_class": "standard"
+              }
+            ]
+          },
+          "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+          "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+          "workload_id": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "native_scope": "project:synthetic",
+          "domain_instance": "synthetic-domain-0",
+          "native_identity": null,
+          "security_domain": {
+            "id": "b817122e-0bf4-448c-811f-18b7925b934d",
+            "version": 1
+          }
+        },
+        {
+          "wsd": {
+            "id": "9ed4873e-722b-4a04-a4e5-01746c22f002",
+            "version": 1
+          },
+          "desired": {
+            "guest": {
+              "os": "linux",
+              "image": "approved-image-v1",
+              "firmware": "uefi",
+              "secure_boot": true,
+              "hardening_profile": "linux-baseline-v1"
+            },
+            "compute": {
+              "vcpus": 2,
+              "memory_mib": 4096,
+              "architecture": "x86_64"
+            }
+          },
+          "devices": {
+            "nics": [
+              {
+                "id": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+                "order": 0,
+                "network_class": "private",
+                "address_intent": "reserved",
+                "address_families": [
+                  "ipv4"
+                ],
+                "security_domain_id": "05f1d178-6c62-4613-9f2d-6a257499a78b"
+              }
+            ],
+            "disks": [
+              {
+                "id": "f88b15d9-811a-4e1c-8831-7bb8cde79d92",
+                "boot": true,
+                "order": 0,
+                "size_gib": 40,
+                "dataset_id": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+                "encryption": "required",
+                "storage_class": "standard"
+              }
+            ]
+          },
+          "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+          "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+          "workload_id": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "native_scope": "project:synthetic",
+          "domain_instance": "synthetic-domain-1",
+          "native_identity": null,
+          "security_domain": {
+            "id": "05f1d178-6c62-4613-9f2d-6a257499a78b",
+            "version": 1
+          }
+        }
+      ],
+      "recovery": {
+        "after_target_write": "forward_recovery_or_approved_reconciled_source_return",
+        "before_target_write": "restore_confirmed_source_after_target_fence",
+        "automatic_source_restart": false,
+        "expiry_releases_live_resources": false
+      },
+      "artifacts": {
+        "adapter": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+        "compiler": "8d9aa3ce74652dc4e69fac8954afd3f92db75062429b870d650291969189b46e",
+        "contracts": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f",
+        "automation": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4"
+      },
+      "ownership": [
+        {
+          "fields": [
+            "infrastructure"
+          ],
+          "writer": "terraform",
+          "resource": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "state_ref": "fixture://state",
+          "native_identity": null
+        },
+        {
+          "fields": [
+            "infrastructure"
+          ],
+          "writer": "terraform",
+          "resource": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "state_ref": "fixture://state",
+          "native_identity": null
+        }
+      ],
+      "terraform": {
+        "workspace": "fixture",
+        "lock_owner": "lifecycle",
+        "backend_ref": "fixture://state",
+        "state_serial": 1,
+        "state_lineage": "lineage",
+        "toolchain_sha256": "dd04afac1bebb050783a245ed0d88633759f352c85d4ab3bea3d416bf2019c75",
+        "saved_plan_sha256": "a9347c50430fb5947a6d022b1ae4dcfc5f961af3fd9a22899aff3b4437c0136b"
+      },
+      "valid_until": 1791294484,
+      "executor_ids": [
+        "f4454f09-b4a0-467e-ac7d-5cad0d557f53"
+      ],
+      "input_digests": {
+        "intent": "305e2b3da8d5eddfb11d2a39de11c73a19de346223a9b77c971139443990a3fb",
+        "policy": "34c38f274dbf9cd8d083a2fff6e2832cb27972c08f3d714047ccf4ee84760a8a",
+        "profile": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
+        "inventory": "1c4ce2d4515fcb525207f68025e2ccb160a9ff630005a5e183c81136ac2cea61",
+        "qualification": "1036005ef70c826d9eec70f6b044ff94823103e77646cfd33104859aa8ef3a86"
+      },
+      "schema_version": 1,
+      "execution_ready": true,
+      "installed_tuple": {
+        "guest": "synthetic",
+        "release": "synthetic",
+        "platform": "openstack",
+        "compute_api": "2.1",
+        "network_api": "2.0",
+        "storage_api": "3",
+        "network_backend": "synthetic",
+        "storage_backend": "synthetic"
+      },
+      "intent_revision": "81af93ab-3c7a-4240-b3d8-47b53dd85046",
+      "canonicalization": "p05-json-v1",
+      "input_fresh_until": 1791295381,
+      "reservation_intents": [
+        {
+          "kind": "addresses",
+          "owner": "synthetic-addresses",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "amount": 2,
+          "authority": "intent_only",
+          "on_expiry": "hold_until_owner_readback",
+          "ttl_seconds": 300
+        },
+        {
+          "kind": "memory_mib",
+          "owner": "synthetic-memory_mib",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "amount": 8192,
+          "authority": "intent_only",
+          "on_expiry": "hold_until_owner_readback",
+          "ttl_seconds": 300
+        },
+        {
+          "kind": "storage_gib",
+          "owner": "synthetic-storage_gib",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "amount": 80,
+          "authority": "intent_only",
+          "on_expiry": "hold_until_owner_readback",
+          "ttl_seconds": 300
+        },
+        {
+          "kind": "vcpus",
+          "owner": "synthetic-vcpus",
+          "scope": {
+            "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+            "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+            "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+            "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+            "resource_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+            "native_scope": "project:synthetic"
+          },
+          "amount": 4,
+          "authority": "intent_only",
+          "on_expiry": "hold_until_owner_readback",
+          "ttl_seconds": 300
+        }
+      ],
+      "inventory_generation": "8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "native_write_authorized": false
+    },
+    "candidate": 0,
+    "tenant_id": "8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb",
+    "candidates": [
+      {
+        "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+        "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+        "generation_id": "8c3274d2-f428-4987-8c29-1ca708bd9343"
+      }
+    ],
+    "environment": "f3ac5e7d-8269-4944-9072-581913f329ac",
+    "assessment_id": "d80eba80-ae6c-4ca8-a209-35814991fc13",
+    "application_id": "865b9693-2dd2-4756-87e7-0e991f7f47c0",
+    "validity": {
+      "current": true,
+      "holds": [],
+      "evaluated_at": 1791293585,
+      "approval_digest": "ba612fc1a63e9f7b404bac662a2f209887501ff5e055e7a65091a75241582496",
+      "native_write_authorized": false
+    }
+  },
+  "actual_inventory_findings": [
+    {
+      "demand": {
+        "vcpus": 4,
+        "addresses": 2,
+        "memory_mib": 8192,
+        "storage_gib": 80
+      },
+      "status": "unknown",
+      "site_id": "596cc169-2cb9-421d-8266-7a6a8df2372b",
+      "findings": [
+        {
+          "reason": "verified",
+          "source": "destination",
+          "status": "eligible",
+          "mandatory": true,
+          "remediation": "Refresh and independently verify this exact destination input.",
+          "requirement": "inventory.current"
+        },
+        {
+          "reason": "verified",
+          "source": "destination",
+          "status": "eligible",
+          "mandatory": true,
+          "remediation": "Refresh and independently verify this exact destination input.",
+          "requirement": "inventory.complete"
+        },
+        {
+          "reason": "verified",
+          "source": "destination",
+          "status": "eligible",
+          "mandatory": true,
+          "remediation": "Refresh and independently verify this exact destination input.",
+          "requirement": "inventory.fresh"
+        },
+        {
+          "reason": "verified",
+          "source": "destination",
+          "status": "eligible",
+          "mandatory": true,
+          "remediation": "Refresh and independently verify this exact destination input.",
+          "requirement": "inventory.identity"
+        },
+        {
+          "reason": "installed_tuple_only_declared",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Refresh and independently verify this exact destination input.",
+          "requirement": "installed_identity"
+        },
+        {
+          "reason": "verified",
+          "source": "destination",
+          "status": "eligible",
+          "mandatory": true,
+          "remediation": "Refresh and independently verify this exact destination input.",
+          "requirement": "policy.fresh"
+        },
+        {
+          "reason": "exact_tuple_qualification_missing_or_stale",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Assurance must qualify the exact operation, method, tuple, scope and artifacts.",
+          "requirement": "qualification.exact_tuple"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "installed_identity"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "compute_placement"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "storage_datasets"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "network_vpc"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "security_edge"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "guest_image"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "lifecycle_adoption"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "mobility"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "shared_services"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "resilience_operations"
+        },
+        {
+          "reason": "dimension_not_observed",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Supply current observations and exact scoped evidence.",
+          "requirement": "assurance_sovereignty"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "compute.architecture"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "guest.os"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "guest.image"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "guest.firmware"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "guest.secure_boot"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "guest.hardening_profile"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "placement.tenant_isolation"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "placement.domain_isolation"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "placement.zone_allowed"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "placement.failure_domain.anti_affinity"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "74866a11-286e-45de-8afd-cc691328584e",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "storage.class"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "74866a11-286e-45de-8afd-cc691328584e",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "storage.encryption"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "c81a1c75-db6c-447e-b698-95953129afe1",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "network.class"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "c81a1c75-db6c-447e-b698-95953129afe1",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "network.family"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "c81a1c75-db6c-447e-b698-95953129afe1",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "network.address_intent"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "compute.architecture"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "guest.os"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "guest.image"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "guest.firmware"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "guest.secure_boot"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "guest.hardening_profile"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "placement.tenant_isolation"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "placement.domain_isolation"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "placement.zone_allowed"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "placement.failure_domain.anti_affinity"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "f88b15d9-811a-4e1c-8831-7bb8cde79d92",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "storage.class"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "f88b15d9-811a-4e1c-8831-7bb8cde79d92",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "storage.encryption"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "network.class"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "network.family"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "d1d9beb0-44e2-46d8-8ba1-72ae76eda24f",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "network.address_intent"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "data.consistency"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "recovery.method"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "recovery.rpo_seconds"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "76dfc657-cfb3-46df-8b8a-f3fcfa90a95f",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "recovery.rto_seconds"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "service.backup.owner"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "86ad0aa0-b30a-4392-9ad3-3d4bdb0ac731",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "service.backup"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "46e2bdef-819f-41ea-b56c-e449208c6a51",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "network.controlled_interface"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "baseline",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "sovereignty.location"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "baseline",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "sovereignty.custody"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "baseline",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "sovereignty.data_path"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "baseline",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "placement.tenant_isolation"
+        },
+        {
+          "reason": "mandatory_evidence_missing",
+          "source": "baseline",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Resolve this requirement with its service or evidence owner, then reassess.",
+          "requirement": "placement.domain_isolation"
+        },
+        {
+          "reason": "capacity_unobserved",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Lifecycle must acquire authoritative owner receipts.",
+          "requirement": "capacity.vcpus"
+        },
+        {
+          "reason": "capacity_unobserved",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Lifecycle must acquire authoritative owner receipts.",
+          "requirement": "capacity.memory_mib"
+        },
+        {
+          "reason": "capacity_unobserved",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Lifecycle must acquire authoritative owner receipts.",
+          "requirement": "capacity.storage_gib"
+        },
+        {
+          "reason": "capacity_unobserved",
+          "source": "destination",
+          "status": "unknown",
+          "mandatory": true,
+          "remediation": "Lifecycle must acquire authoritative owner receipts.",
+          "requirement": "capacity.addresses"
+        }
+      ],
+      "platform": "openstack",
+      "reserved": false,
+      "expires_at": 1791293878,
+      "endpoint_id": "1c726c67-d1af-4119-9035-f5c49c0fb408",
+      "generation_id": "8c3274d2-f428-4987-8c29-1ca708bd9343",
+      "input_digests": {
+        "intent": "305e2b3da8d5eddfb11d2a39de11c73a19de346223a9b77c971139443990a3fb",
+        "policy": "34c38f274dbf9cd8d083a2fff6e2832cb27972c08f3d714047ccf4ee84760a8a",
+        "profile": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
+        "inventory": "3c53fee4d2195a3f7fae5f1eecfcce23c5f332261a39c443a63506835d267cdb",
+        "qualification": "d5314eb7264ef0b503a763823464ab50536c2b622da3ead3dbc9480b7f546443"
+      },
+      "operationally_eligible": false
+    }
+  ]
+}

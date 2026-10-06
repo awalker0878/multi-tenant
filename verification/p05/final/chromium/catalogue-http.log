@@ -1,0 +1,56 @@
+[5830] [Tue Oct  6 13:32:49 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8033) started
+[5831] [Tue Oct  6 13:32:49 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8033) started
+[5832] [Tue Oct  6 13:32:49 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8033) started
+[5829] [Tue Oct  6 13:32:49 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8033) started
+[5833] [Tue Oct  6 13:32:49 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8033) started
+[5829] [Tue Oct  6 13:32:49 2026] 127.0.0.1:34112 Accepted
+[Tue Oct 6 13:32:49 2026] 127.0.0.1:34112 [GET] URI: /health/live
+[5829] [Tue Oct  6 13:32:50 2026] 127.0.0.1:34112 Closing
+[5832] [Tue Oct  6 13:33:00 2026] 127.0.0.1:45006 Accepted
+[Tue Oct 6 13:33:00 2026] 127.0.0.1:45006 [POST] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/environments
+[5832] [Tue Oct  6 13:33:00 2026] 127.0.0.1:45006 Closing
+[5832] [Tue Oct  6 13:33:00 2026] 127.0.0.1:45014 Accepted
+[Tue Oct 6 13:33:00 2026] 127.0.0.1:45014 [POST] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/wsds
+[5832] [Tue Oct  6 13:33:00 2026] 127.0.0.1:45014 Closing
+[5832] [Tue Oct  6 13:33:00 2026] 127.0.0.1:45020 Accepted
+[Tue Oct 6 13:33:00 2026] 127.0.0.1:45020 [POST] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/wsds
+[5832] [Tue Oct  6 13:33:01 2026] 127.0.0.1:45020 Closing
+[5832] [Tue Oct  6 13:33:01 2026] 127.0.0.1:45028 Accepted
+[Tue Oct 6 13:33:01 2026] 127.0.0.1:45028 [POST] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/security-domains
+[5832] [Tue Oct  6 13:33:01 2026] 127.0.0.1:45028 Closing
+[5832] [Tue Oct  6 13:33:01 2026] 127.0.0.1:45038 Accepted
+[Tue Oct 6 13:33:01 2026] 127.0.0.1:45038 [POST] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/security-domains
+[5832] [Tue Oct  6 13:33:01 2026] 127.0.0.1:45038 Closing
+[5832] [Tue Oct  6 13:33:01 2026] 127.0.0.1:45046 Accepted
+[Tue Oct 6 13:33:01 2026] 127.0.0.1:45046 [POST] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/applications
+[5832] [Tue Oct  6 13:33:01 2026] 127.0.0.1:45046 Closing
+[5832] [Tue Oct  6 13:33:02 2026] 127.0.0.1:45054 Accepted
+[Tue Oct 6 13:33:02 2026] 127.0.0.1:45054 [GET] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/81af93ab-3c7a-4240-b3d8-47b53dd85046
+[5832] [Tue Oct  6 13:33:02 2026] 127.0.0.1:45054 Closing
+[5832] [Tue Oct  6 13:33:03 2026] 127.0.0.1:45064 Accepted
+[Tue Oct 6 13:33:03 2026] 127.0.0.1:45064 [GET] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/81af93ab-3c7a-4240-b3d8-47b53dd85046
+[5829] [Tue Oct  6 13:33:03 2026] 127.0.0.1:45066 Accepted
+[Tue Oct 6 13:33:03 2026] 127.0.0.1:45066 [GET] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/81af93ab-3c7a-4240-b3d8-47b53dd85046
+[5832] [Tue Oct  6 13:33:04 2026] 127.0.0.1:45064 Closing
+[5829] [Tue Oct  6 13:33:04 2026] 127.0.0.1:45066 Closing
+[5832] [Tue Oct  6 13:33:04 2026] 127.0.0.1:45076 Accepted
+[Tue Oct 6 13:33:04 2026] 127.0.0.1:45076 [GET] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/81af93ab-3c7a-4240-b3d8-47b53dd85046
+[5832] [Tue Oct  6 13:33:05 2026] 127.0.0.1:45076 Closing
+[5832] [Tue Oct  6 13:33:06 2026] 127.0.0.1:45084 Accepted
+[Tue Oct 6 13:33:06 2026] 127.0.0.1:45084 [GET] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/81af93ab-3c7a-4240-b3d8-47b53dd85046
+[5832] [Tue Oct  6 13:33:06 2026] 127.0.0.1:45084 Closing
+[5832] [Tue Oct  6 13:33:06 2026] 127.0.0.1:45098 Accepted
+[Tue Oct 6 13:33:06 2026] 127.0.0.1:45098 [GET] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/81af93ab-3c7a-4240-b3d8-47b53dd85046
+[5832] [Tue Oct  6 13:33:06 2026] 127.0.0.1:45098 Closing
+[5832] [Tue Oct  6 13:33:11 2026] 127.0.0.1:59300 Accepted
+[Tue Oct 6 13:33:11 2026] 127.0.0.1:59300 [GET] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/81af93ab-3c7a-4240-b3d8-47b53dd85046
+[5832] [Tue Oct  6 13:33:11 2026] 127.0.0.1:59300 Closing
+[5832] [Tue Oct  6 13:33:12 2026] 127.0.0.1:59312 Accepted
+[Tue Oct 6 13:33:12 2026] 127.0.0.1:59312 [GET] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/81af93ab-3c7a-4240-b3d8-47b53dd85046
+[5832] [Tue Oct  6 13:33:12 2026] 127.0.0.1:59312 Closing
+[5829] [Tue Oct  6 13:33:12 2026] 127.0.0.1:59328 Accepted
+[Tue Oct 6 13:33:12 2026] 127.0.0.1:59328 [GET] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/81af93ab-3c7a-4240-b3d8-47b53dd85046
+[5829] [Tue Oct  6 13:33:12 2026] 127.0.0.1:59328 Closing
+[5833] [Tue Oct  6 13:33:27 2026] 127.0.0.1:35516 Accepted
+[Tue Oct 6 13:33:27 2026] 127.0.0.1:35516 [GET] URI: /v1/tenants/8fffbdf4-dd1f-49f1-bb58-4c4dd5afa9eb/planning-inputs/865b9693-2dd2-4756-87e7-0e991f7f47c0/f3ac5e7d-8269-4944-9072-581913f329ac/596cc169-2cb9-421d-8266-7a6a8df2372b/81af93ab-3c7a-4240-b3d8-47b53dd85046
+[5833] [Tue Oct  6 13:33:27 2026] 127.0.0.1:35516 Closing
