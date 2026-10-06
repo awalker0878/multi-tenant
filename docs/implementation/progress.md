@@ -14,7 +14,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | P01 | Delivery and runtime foundation | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 32 / 4 |
 | P02 | Identity, tenancy and governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 25 / 3 |
 | P03 | Application catalogue and workspace | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 3 / 2 |
-| P04 | Site commissioning and inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 0 / 0 |
+| P04 | Site commissioning and inventory | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 0 / 0 |
 | P05 | Capabilities and immutable plans | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G05: NOT_REVIEWED | 0 / 0 |
 | P06 | Durable execution in simulation | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G06: NOT_REVIEWED | 0 / 0 |
 | P07 | Native OpenStack provisioning | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G07: NOT_REVIEWED | 0 / 0 |
@@ -51,10 +51,10 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P03.03 | Revision behavior | Catalogue | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P03.04 | Product workflows | Console/catalogue | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
 | P03.05 | Domain verification | Quality | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
-| P04.01 | Site enrollment | Inventory/SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P04.01 | Site enrollment | Inventory/SRE | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P04.02 | Collectors | Inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P04.03 | Observation store | Inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P04.04 | Discovery controls | Infrastructure | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P04.03 | Observation store | Inventory | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P04.04 | Discovery controls | Infrastructure | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P04.05 | Inventory experience | Console | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P05.01 | Capability registry | Planning | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P05.02 | Policy and assessment | Planning | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |

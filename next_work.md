@@ -1,4 +1,6 @@
-# Next work — P03 acceptance and P04 preparation
+# Next work — P04 Inventory implementation
+
+The user authorizes P04 development. Continue the [P04 implementation](docs/implementation/p04-inventory.md): qualify the persistence/trust increment, complete bounded collectors and Console inventory, and retain the actual acceptance evidence. Native installed facts/read scopes remain required for E3/G04.
 
 P03 engineering and its automated qualification are delivered at
 `1c51f56a928291870e5125508aeb04935583fd56`. The

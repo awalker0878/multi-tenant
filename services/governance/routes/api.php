@@ -8,6 +8,7 @@ use App\Http\Controllers\DelegationController;
 use App\Http\Controllers\DependencyHealthController;
 use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\InventoryCollectionController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\OidcController;
 use App\Http\Controllers\SupportAccessController;
@@ -85,3 +86,5 @@ Route::middleware(AuthenticateConsole::class)->group(function (): void {
 });
 
 Route::post('/v1/tenants/{tenant}/catalogue-owner-checks', CatalogueOwnerController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);
+
+Route::post('/v1/tenants/{tenant}/inventory-collection-checks', InventoryCollectionController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);

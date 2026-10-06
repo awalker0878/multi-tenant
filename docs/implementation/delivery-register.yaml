@@ -191,7 +191,7 @@ phases:
   - P04.05
   gate_id: G04
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -1216,7 +1216,7 @@ work_packages:
   title: Site enrollment
   owner_role: Inventory/SRE
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -1226,6 +1226,7 @@ work_packages:
   - docs/implementation/phases/p04.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
+  - docs/implementation/p04-inventory.md
   criterion_ids:
   - G04.02
   - G04.04
@@ -1250,7 +1251,7 @@ work_packages:
   title: Observation store
   owner_role: Inventory
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -1258,6 +1259,7 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p04.md
+  - docs/implementation/p04-inventory.md
   criterion_ids:
   - G04.02
   - G04.04
@@ -1266,7 +1268,7 @@ work_packages:
   title: Discovery controls
   owner_role: Infrastructure
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -1276,6 +1278,7 @@ work_packages:
   - docs/implementation/phases/p04.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
+  - docs/implementation/p04-inventory.md
   criterion_ids:
   - G04.03
 - id: P04.05
@@ -5775,10 +5778,10 @@ evidence:
   artifact_revisions:
     retained_artifact_commit: 187ead3a02521cc3d6be063c6f449f0e3b79113a
   environment: Local Linux managed workspace, PHP 8.5.11 and Node 24; independent locked Console/Catalogue packages.
-  scope: 'Final-source Console passes 147 tests and 674 assertions; seven explicitly PostgreSQL-gated cases
-    are skipped. Nine commands pass: Console tests/format/types/architecture, Vue typecheck, production build,
-    frontend boundary checks, 24 intent domain cases (40 assertions) and exact generated-client drift check.
-    Source bytes and command logs are retained.'
+  scope: 'Final-source Console passes 147 tests and 674 assertions; seven explicitly PostgreSQL-gated cases are
+    skipped. Nine commands pass: Console tests/format/types/architecture, Vue typecheck, production build, frontend
+    boundary checks, 24 intent domain cases (40 assertions) and exact generated-client drift check. Source bytes
+    and command logs are retained.'
   campaign_ids:
   - Q01
   criterion_ids:
@@ -5786,13 +5789,13 @@ evidence:
   - G03.02
   - G03.04
   observed_at: '2026-10-06T02:44:00.063632+00:00'
-  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched
-    retained source, archive and log bytes.
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched retained
+    source, archive and log bytes.
   reviewer: Codex engineering evidence consistency only; designated independent and representative-user reviews
     remain open.
-  limitations: Local PostgreSQL is unavailable; skipped persistence cases are not passes. Real dependency and
-    browser observations are recorded separately. No manual accessibility, independent receiving or operating
-    claim. No time-based expiry is asserted; material source, scope or assumptions require affected requalification.
+  limitations: Local PostgreSQL is unavailable; skipped persistence cases are not passes. Real dependency and browser
+    observations are recorded separately. No manual accessibility, independent receiving or operating claim. No
+    time-based expiry is asserted; material source, scope or assumptions require affected requalification.
   valid_until: null
   invalidated_at: null
 - id: EV-P03-002
@@ -5805,11 +5808,11 @@ evidence:
     archive_sha256: 3c6c4da5b7d7846c8dab1189fcdc330a3d3ced8726b0dd93dc3d5b4f69214566
   environment: GitHub Actions Ubuntu 24.04; PHP 8.5.11; pinned PostgreSQL 18.6 image with verified TLS and separate
     owner/runtime roles.
-  scope: Run 37405120516 passes all 89 Catalogue cases (335 assertions), with no skipped/failed/error cases.
-    It verifies immutable full intent, reference/workload/deployment ownership, current retry admission, original
-    receipts after later edits, atomic outbox rollback, runtime-history denials, migration replay, confirmed
-    publisher ordering and bounded pages. Catalogue/Governance formatting, types and architecture gates pass;
-    327 source files and 16 command logs match.
+  scope: Run 37405120516 passes all 89 Catalogue cases (335 assertions), with no skipped/failed/error cases. It
+    verifies immutable full intent, reference/workload/deployment ownership, current retry admission, original receipts
+    after later edits, atomic outbox rollback, runtime-history denials, migration replay, confirmed publisher ordering
+    and bounded pages. Catalogue/Governance formatting, types and architecture gates pass; 327 source files and
+    16 command logs match.
   campaign_ids:
   - Q01
   criterion_ids:
@@ -5818,14 +5821,13 @@ evidence:
   - G03.03
   - G03.04
   observed_at: '2026-10-06T02:39:12.512384+00:00'
-  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched
-    retained source, archive and log bytes.
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched retained
+    source, archive and log bytes.
   reviewer: Codex engineering evidence consistency only; designated independent and representative-user reviews
     remain open.
-  limitations: Core authority/owner ports use synthetic fixtures. Live Governance, wire, concurrent-process,
-    broker and browser checks are separate in EV-P03-003. No native, operated ingress, human accessibility or
-    independent receiving claim. No time-based expiry is asserted; material source, scope or assumptions require
-    affected requalification.
+  limitations: Core authority/owner ports use synthetic fixtures. Live Governance, wire, concurrent-process, broker
+    and browser checks are separate in EV-P03-003. No native, operated ingress, human accessibility or independent
+    receiving claim. No time-based expiry is asserted; material source, scope or assumptions require affected requalification.
   valid_until: null
   invalidated_at: null
 - id: EV-P03-003
@@ -5840,14 +5842,14 @@ evidence:
     webkit_archive_sha256: 9a04e2cf403d622c788a347f7654c4c0fb264fcb57cefa86c20be96bfcf60504
   environment: GitHub Actions Ubuntu 24.04; independent Laravel processes/databases, verified PostgreSQL/RabbitMQ
     TLS, disposable application TLS proxies, Chromium/Firefox/WebKit and compiled Console assets.
-  scope: All three complete live campaigns pass 38 checks each at source 1c51f56. Browser journeys have zero
-    failures/skips/retries. Real current Governance and owner contracts, wire invariants, concurrent distinct/identical
-    commands, process restart, exact stale-import comparison, accepted-response loss, history/revocation and
-    foreign-tenant denial pass. Each broker campaign observes 11 deliveries for 10 stable event identities in
-    order, then four committed facts after author revocation. Independent counts confirm four browser revisions
-    and audit/outbox pairing. Large/small tenants contain 10,001/1,001 applications; 50-entry pages are 6,812–6,817
-    bytes, index scans read 51 rows in 0.081–0.188 ms. Five final reports bind 475 unique source files; archive,
-    report, command-log and artifact hashes are verified.
+  scope: All three complete live campaigns pass 38 checks each at source 1c51f56. Browser journeys have zero failures/skips/retries.
+    Real current Governance and owner contracts, wire invariants, concurrent distinct/identical commands, process
+    restart, exact stale-import comparison, accepted-response loss, history/revocation and foreign-tenant denial
+    pass. Each broker campaign observes 11 deliveries for 10 stable event identities in order, then four committed
+    facts after author revocation. Independent counts confirm four browser revisions and audit/outbox pairing. Large/small
+    tenants contain 10,001/1,001 applications; 50-entry pages are 6,812–6,817 bytes, index scans read 51 rows in
+    0.081–0.188 ms. Five final reports bind 475 unique source files; archive, report, command-log and artifact hashes
+    are verified.
   campaign_ids:
   - Q01
   criterion_ids:
@@ -5856,16 +5858,16 @@ evidence:
   - G03.03
   - G03.04
   observed_at: '2026-10-06T02:45:48.814541+00:00'
-  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched
-    retained source, archive and log bytes.
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched retained
+    source, archive and log bytes.
   reviewer: Codex engineering evidence consistency only; designated independent and representative-user reviews
     remain open.
-  limitations: Synthetic principal bootstrap uses isolated OIDC transport; live requests use actual current
-    authority. The broker observer is not the P05 Planning product consumer. Loopback TLS/HTTP, metadata skew
-    and automated keyboard/reflow checks do not qualify production ingress/capacity, managed browsers, assistive
-    technology, representative comprehension or G03 approval. The final-source foundation Kubernetes campaign
-    remains queued; historical passes are not transferred. No time-based expiry is asserted; material source,
-    scope or assumptions require affected requalification.
+  limitations: Synthetic principal bootstrap uses isolated OIDC transport; live requests use actual current authority.
+    The broker observer is not the P05 Planning product consumer. Loopback TLS/HTTP, metadata skew and automated
+    keyboard/reflow checks do not qualify production ingress/capacity, managed browsers, assistive technology, representative
+    comprehension or G03 approval. The final-source foundation Kubernetes campaign remains queued; historical passes
+    are not transferred. No time-based expiry is asserted; material source, scope or assumptions require affected
+    requalification.
   valid_until: null
   invalidated_at: null
 blockers:
@@ -6078,12 +6080,12 @@ blockers:
   - R33
   - G03
   owner_role: Product owner / quality / representative application operator
-  description: The complete automated three-engine authoring campaigns pass, but G03.04 and P03.04/.05 require
-    actual operator comprehension and selected managed-browser/assistive observations. Synthetic browser actions
-    cannot supply those people or observations.
+  description: The complete automated three-engine authoring campaigns pass, but G03.04 and P03.04/.05 require actual
+    operator comprehension and selected managed-browser/assistive observations. Synthetic browser actions cannot
+    supply those people or observations.
   unblock_condition: Provide the representative operator/observer and OP07 browser/OS/policy/assistive combinations.
-    Execute all seven tasks in docs/implementation/p03-completion-review.md on the qualified source; retain
-    exact outcomes and resolve mandatory defects.
+    Execute all seven tasks in docs/implementation/p03-completion-review.md on the qualified source; retain exact
+    outcomes and resolve mandatory defects.
   next_action: Run the concrete completion task sheet and record actual identities, versions, WCAG observations,
     defects and immutable evidence.
   state: OPEN
@@ -6105,12 +6107,12 @@ blockers:
   - G03
   owner_role: Catalogue owner / architecture lead / independent quality lead / product owner
   description: Repository implementation and P03 automated qualification are delivered, but the designated package
-    and criterion reviews have not occurred. Codex source/evidence examination does not establish independent
-    quality or receiving approval.
+    and criterion reviews have not occurred. Codex source/evidence examination does not establish independent quality
+    or receiving approval.
   unblock_condition: Named accountable reviewers examine EV-P03-001–003 and each G03 criterion, including representative-user
     evidence from BL-P03-001; record actual identities, dates, decisions and unresolved scope.
   next_action: Use the G03 engineering assessment and docs/qualification/gate-reviews/g03.md. Retain the queued
-    foundation Kubernetes outcome separately; do not infer a pass. Record the actual G03 decision only after
-    required evidence/review.
+    foundation Kubernetes outcome separately; do not infer a pass. Record the actual G03 decision only after required
+    evidence/review.
   state: OPEN
   resolution_evidence_ids: []

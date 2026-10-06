@@ -8,11 +8,11 @@ final class PermissionMatrix
 {
     /** @var array<string, list<string>> */
     public const ROLES = [
-        'tenant_admin' => ['reference.read', 'reference.write', 'tenant.read', 'tenant.manage', 'membership.manage', 'grant.manage', 'quota.read', 'quota.manage', 'audit.read'],
-        'author' => ['reference.read', 'tenant.read', 'quota.read', 'application.read', 'application.write', 'plan.read', 'plan.create', 'approval.request'],
-        'reviewer' => ['reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'approval.decide', 'approval.revoke', 'evidence.read'],
-        'operator' => ['reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'operation.admit', 'evidence.read'],
-        'reader' => ['reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'evidence.read'],
+        'tenant_admin' => ['inventory.read', 'inventory.admin', 'inventory.discover', 'inventory.match', 'reference.read', 'reference.write', 'tenant.read', 'tenant.manage', 'membership.manage', 'grant.manage', 'quota.read', 'quota.manage', 'audit.read'],
+        'author' => ['inventory.read', 'inventory.match', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'application.write', 'plan.read', 'plan.create', 'approval.request'],
+        'reviewer' => ['inventory.read', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'approval.decide', 'approval.revoke', 'evidence.read'],
+        'operator' => ['inventory.read', 'inventory.discover', 'inventory.match', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'operation.admit', 'evidence.read'],
+        'reader' => ['inventory.read', 'reference.read', 'tenant.read', 'quota.read', 'application.read', 'plan.read', 'evidence.read'],
     ];
 
     /** Explicit grants cannot delegate administrative or support authority. @var list<string> */

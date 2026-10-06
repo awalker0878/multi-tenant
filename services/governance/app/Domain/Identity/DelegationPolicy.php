@@ -11,6 +11,7 @@ final class DelegationPolicy
     /** @var array<string, list<string>> */
     public const ACTIONS = [
         'catalogue' => ['application.read', 'application.write', 'reference.read', 'reference.write'],
+        'inventory' => ['inventory.read', 'inventory.admin', 'inventory.discover', 'inventory.match'],
         'planning' => ['plan.read', 'plan.create'],
         'assurance' => ['evidence.read'],
     ];
