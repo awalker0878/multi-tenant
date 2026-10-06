@@ -10,6 +10,7 @@ final class IntentDocument
      * @param array<string,mixed> $intent */
     public static function check(array $intent): void
     {
+        self::portableIntegers($intent, 'intent');
         $workloads = [];
         $datasets = [];
         foreach ($intent['datasets'] as $i => $dataset) {
@@ -72,6 +73,20 @@ final class IntentDocument
             self::unique($services, $service['name'], "services.$i.name");
             if (! isset($workloads[$service['workload_id']])) {
                 throw new IntentFailure('dangling_service_workload', 422, "services.$i.workload_id");
+            }
+        }
+    }
+
+    // Complete snapshots must survive PHP/Python/JavaScript transport unchanged.
+    // Use text for identifiers or exact integers beyond the interoperable range.
+    private static function portableIntegers(mixed $value, string $field): void
+    {
+        if (is_int($value) && ($value > 9007199254740991 || $value < -9007199254740991)) {
+            throw new IntentFailure('integer_outside_interoperable_range', 422, $field);
+        }
+        if (is_array($value)) {
+            foreach ($value as $key => $child) {
+                self::portableIntegers($child, $field.'.'.$key);
             }
         }
     }

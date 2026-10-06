@@ -58,3 +58,17 @@ it('permits bidirectional communication while checking startup and shutdown grap
     IntentDocument::check($i);
     expect(true)->toBeTrue();
 });
+
+it('rejects integer values that a browser would silently round', function (int $value): void {
+    $intent = catalogueIntent();
+    $intent['workloads'][0]['requirements'][0]['value'] = $value;
+    (new SchemaIntentValidator)->validate($intent);
+    expect(fn () => IntentDocument::check($intent))->toThrow(IntentFailure::class, 'integer_outside_interoperable_range');
+})->with([9007199254740992, -9007199254740992]);
+
+it('preserves typed requirement values at the interoperable integer boundary', function (): void {
+    $intent = catalogueIntent();
+    $intent['workloads'][0]['requirements'][0]['value'] = 9007199254740991;
+    IntentDocument::check($intent);
+    expect(json_decode(CanonicalJson::encode($intent), true)['workloads'][0]['requirements'][0]['value'])->toBe(9007199254740991);
+});

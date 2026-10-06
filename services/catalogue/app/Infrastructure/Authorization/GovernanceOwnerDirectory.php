@@ -38,7 +38,8 @@ final class GovernanceOwnerDirectory implements OwnerDirectory
             if ($response->status() !== 200) {
                 throw new AccessDenied(in_array($response->status(), [401, 403, 404], true) ? 403 : 503);
             }
-            if ($response->json('owners') !== $owners || $response->json('tenant_id') !== $actor->tenantId || $response->json('allowed') !== true) {
+            $body = $response->json();
+            if (! is_array($body) || count($body) !== 3 || ($body['owners'] ?? null) !== $owners || ($body['tenant_id'] ?? null) !== $actor->tenantId || ($body['allowed'] ?? null) !== true) {
                 throw new AccessDenied(503);
             }
         } catch (AccessDenied|IntentFailure $e) {

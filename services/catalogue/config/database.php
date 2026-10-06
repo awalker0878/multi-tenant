@@ -29,6 +29,7 @@ return [
             'search_path' => 'app',
             'sslmode' => 'verify-full',
             'sslrootcert' => $certificate,
+            'server_options' => ['statement_timeout' => '5000', 'lock_timeout' => '3000', 'idle_in_transaction_session_timeout' => '15000'],
             'options' => [PDO::ATTR_TIMEOUT => 2],
         ],
     ],

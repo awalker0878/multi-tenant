@@ -259,6 +259,19 @@ def main():
                 return json.loads(re.sub(r'00000000-0000-4000-8000-[0-9]{12}', lambda m: replacements[m.group()], template))
 
             intent = fresh_intent()
+            owner_contract = json.loads((root/'contracts/openapi/governance-catalogue-owners-v1.json').read_text())
+            validate_spec(owner_contract)
+            owner_scope = {'site_id': None, 'environment': intent['environment']['id'], 'resource_id': None}
+            owner_token = delegation('application.write', environment=intent['environment']['id'])
+            owner_body = {'action': 'application.write', 'scope': owner_scope, 'owners': [fixture['actor_id']]}
+            owner_headers = {'Authorization': 'Bearer '+credentials['catalogue-governance'][0], 'X-Actor-Delegation': owner_token}
+            status, owner_result, owner_response_headers, _ = wire('https://127.0.0.1:8442', '/v1/tenants/'+tenant+'/catalogue-owner-checks', 'POST', owner_body, owner_headers)
+            OAS31Validator(owner_contract['components']['schemas']['OwnerCheckResult']).validate(owner_result)
+            check('independent-owner-contract-current-authority', status == 200 and 'no-store' in owner_response_headers.get('Cache-Control', ''))
+            status, _, _, _ = wire('https://127.0.0.1:8442', '/v1/tenants/'+tenant+'/catalogue-owner-checks', 'POST', owner_body | {'unexpected': True}, owner_headers)
+            check('owner-contract-rejects-extra-fields', status == 422)
+            gov('/v1/tenants/'+tenant+'/actor-delegations', {'audience': 'catalogue', 'action': 'reference.write', 'scope': {'site_id': None, 'environment': None, 'resource_id': None}}, token=fixture['author_token'], expected=403)
+            check('application-author-cannot-administer-reference-definitions', True)
             receipt_key = str(uuid.uuid4())
             first = catalogue('createApplication', {'name': 'Wire Permit Desk', 'intent': intent}, key=receipt_key)
             app = {'application': first['application_id']}
@@ -353,6 +366,12 @@ def main():
             check('live-post-commit-response-loss-exercised', proxies[1].injected == 1)
             check('application-audit-outbox-atomic-pairing', sql('SELECT count(*) FROM app.catalogue_audit a FULL JOIN app.catalogue_outbox o USING(event_id) WHERE a.event_id IS NULL OR o.event_id IS NULL;', 'catalogue') == '0')
             check('browser-created-exactly-four-revisions', sql("SELECT count(*) FROM app.catalogue_revisions r JOIN app.catalogue_applications a ON a.id=r.application_id WHERE a.name='Browser Permit Desk';", 'catalogue') == '4')
+            run(['php', 'artisan', 'catalogue:publish-events'], cwd=root/'services/catalogue', env=envs['catalogue'], label='broker-after-actor-revocation')
+            run(['php', 'scripts/p03/broker_process.php', 'observe', str(events_file)], env=envs['catalogue'], label='observer-after-actor-revocation')
+            committed = json.loads(events_file.read_text())
+            for event in committed:
+                Draft202012Validator(schema).validate(event['body'])
+            check('committed-facts-delivered-after-actor-revocation', len(committed) == 4 and [e['body']['sequence'] for e in committed] == [1, 2, 3, 4] and all(e['body']['actor_id'] == fixture['actor_id'] for e in committed))
             for name in directories:
                 log = (private/(name+'.log')).read_text()
                 (out/(name+'-http.log')).write_text(redact(log))

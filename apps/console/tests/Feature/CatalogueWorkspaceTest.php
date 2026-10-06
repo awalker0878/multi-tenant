@@ -26,7 +26,8 @@ it('renders the bounded owner list and no bearer or implicit tenant context', fu
     $this->gateway->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->tenant, 'listApplications', [], [], null, null, null, null)
         ->andReturn(['applications' => [['id' => $this->applicationId, 'name' => '<script>intent</script>', 'etag' => '"'.$this->applicationId.':1"']], 'next_cursor' => null]);
     $this->gateway->shouldReceive('permitted')->once()->andReturn(true);
-    $this->get('/tenants/'.$this->tenant.'/applications')->assertOk()->assertInertia(fn (Assert $p) => $p->component('catalogue/Index')->has('applications', 1)->missing('session_token')->missing('delegation_token')->where('tenantId', $this->tenant));
+    $this->get('/tenants/'.$this->tenant.'/applications')->assertOk()->assertViewHas('page', fn (array $page): bool => $page['encryptHistory'] === true && $page['clearHistory'] === true)
+        ->assertInertia(fn (Assert $p) => $p->component('catalogue/Index')->has('applications', 1)->missing('session_token')->missing('delegation_token')->where('tenantId', $this->tenant));
 });
 
 it('preserves exact command identity and resolves stale edits through the Inertia error bag', function (): void {

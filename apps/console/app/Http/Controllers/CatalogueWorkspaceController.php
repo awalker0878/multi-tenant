@@ -54,6 +54,7 @@ final class CatalogueWorkspaceController
             }
         }
         $actor = $request->attributes->get('local_actor');
+        Inertia::clearHistory();
 
         return Inertia::render('catalogue/Editor', ['tenantId' => $tenant, 'environment' => $environment, 'application' => $data, 'revision' => $revision, 'references' => $refs, 'actorId' => $actor instanceof ConsoleActor ? $actor->subject : null,
             'canWrite' => $catalogue->permitted($token, $tenant, 'application.write', $application, $revision['intent']['environment']['id'] ?? $environment)]);
@@ -102,6 +103,7 @@ final class CatalogueWorkspaceController
         if (is_string($request->query('compare'))) {
             $compare = $catalogue->call($token, $tenant, 'getRevision', $args + ['revision' => $request->query('compare')], environment: $environment);
         }
+        Inertia::clearHistory();
 
         return Inertia::render('catalogue/Application', ['tenantId' => $tenant, 'environment' => $environment, 'application' => $data, 'history' => $history, 'revision' => $revision, 'comparison' => $compare,
             'canWrite' => $catalogue->permitted($token, $tenant, 'application.write', $application, $revision['intent']['environment']['id']), 'notice' => $request->session()->get('catalogue_notice')]);
@@ -125,6 +127,7 @@ final class CatalogueWorkspaceController
             throw new CatalogueFailure(422, 'invalid_reference_kind');
         }
         $data = $catalogue->call($this->session($request), $tenant, 'list'.$kind.'s', cursor: $this->cursor($request));
+        Inertia::clearHistory();
 
         return Inertia::render('catalogue/References', ['tenantId' => $tenant, 'kind' => $kind, 'page' => $data, 'canWrite' => $catalogue->permitted($this->session($request), $tenant, 'reference.write'), 'notice' => $request->session()->get('catalogue_notice'), 'actorId' => $request->attributes->get('local_actor') instanceof ConsoleActor ? $request->attributes->get('local_actor')->subject : '']);
     }

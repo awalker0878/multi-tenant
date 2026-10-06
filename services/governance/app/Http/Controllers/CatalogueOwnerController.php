@@ -16,6 +16,9 @@ final class CatalogueOwnerController
 {
     public function __invoke(Request $request, string $tenant, InspectActorDelegation $inspect): JsonResponse
     {
+        if (array_diff(array_keys($request->all()), ['action', 'scope', 'owners']) !== []) {
+            throw ValidationException::withMessages(['request' => 'Unexpected fields.']);
+        }
         $input = $request->validate(['action' => ['required', 'in:application.write,reference.write'], 'scope' => ['required', 'array:site_id,environment,resource_id'],
             'scope.site_id' => ['present', 'nullable', 'string', 'max:64'], 'scope.environment' => ['present', 'nullable', 'string', 'max:64'], 'scope.resource_id' => ['present', 'nullable', 'string', 'max:128'],
             'owners' => ['required', 'array', 'min:1', 'max:301'], 'owners.*' => ['required', 'uuid', 'lowercase', 'distinct']]);

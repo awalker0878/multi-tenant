@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    'history' => ['encrypt' => true],
     'ssr' => ['enabled' => false],
     'pages' => [
         'ensure_pages_exist' => true,

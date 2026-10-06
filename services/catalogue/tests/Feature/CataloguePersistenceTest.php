@@ -76,6 +76,7 @@ function publishCatalogue(object $t, ?string $app = null, ?string $etag = null, 
     return $t->postJson($t->path.($app === null ? '' : '/'.$app.'/intent-revisions'), ['intent' => $intent ?? $t->intent, ...($app === null ? ['name' => 'Permit Desk'] : [])]);
 }
 it('commits full immutable intent receipt audit event and typed tenant associations in one transaction', function (): void {
+    expect(DB::selectOne("SELECT current_setting('statement_timeout') AS statement_limit, current_setting('lock_timeout') AS lock_limit"))->toMatchObject(['statement_limit' => '5s', 'lock_limit' => '3s']);
     $first = publishCatalogue($this)->assertCreated()->json();
     $this->getJson($this->path.'/'.$first['application_id'].'/intent-revisions/'.$first['revision_id'])->assertOk()->assertJsonPath('intent.workloads.0.requirements.0.strength', 'required')->assertJsonPath('digest', $first['digest']);
     expect(DB::table('app.catalogue_revisions')->count())->toBe(1)->and(DB::table('app.catalogue_commands')->count())->toBe(1)->and(DB::table('app.catalogue_audit')->count())->toBe(1)->and(DB::table('app.catalogue_outbox')->count())->toBe(1)->and(DB::table('app.catalogue_revision_references')->count())->toBe(5);
