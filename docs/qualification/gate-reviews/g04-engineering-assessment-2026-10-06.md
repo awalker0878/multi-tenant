@@ -22,3 +22,9 @@ cannot be marked COMPLETE while their required native and receiving evidence is
 missing. No actual reviewer identity, observed native fact or gate decision is
 invented. The user has already authorized development; these are missing facts and
 reviews, not a request to repeat that authorization.
+
+The [regression completion receipt](../../../verification/p04/final/regression-completion.json)
+records the passing final runtime-source Kubernetes campaign and affected
+foundation/identity/Catalogue regressions with explicit source-impact boundaries.
+Those engineering checks are complete; actual native E3 and designated receiving
+reviews remain the outstanding P04 completion work.

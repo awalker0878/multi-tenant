@@ -109,3 +109,10 @@ actual native inputs and receiving reviews. The [G04 assessment](../qualificatio
 and [completion packet](p04-completion-review.md) explain why P04/G04 cannot be
 marked formally complete from these E1/E2 results. No native write or qualification
 claim follows from enrollment, profile completeness or the automated campaigns.
+
+The final runtime-source Kubernetes run `37438932585` passed at `fb37bb22`;
+product/image/deployment inputs are identical to qualification source `6b21490a`.
+The [regression completion receipt](../../verification/p04/final/regression-completion.json)
+records that outcome and passing affected P01/P02/P03 regressions, preserving
+the original pending receipt separately. No automated campaign remains pending
+as P04 engineering qualification work.

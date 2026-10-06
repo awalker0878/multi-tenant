@@ -23,10 +23,13 @@ by these fixtures. Complete the [receiving packet](docs/implementation/p04-compl
    SRE, qualification and product roles examine every G04 criterion and the operator
    task sheet, including selected managed-browser/assistive behavior. Record actual
    identities, dates, outcomes and unresolved limits. Do not invent review approval.
-3. **Foundation regression follow-up:** the [regression receipt](verification/p04/final/regression-status.json)
-   records passing package/image/Compose and other affected campaigns. Observe
-   final runtime-source Kubernetes run `37438932585`; the prior corrective-source
-   run `37438413577` passed and is not substituted for it.
+3. **Completed regression receipt:** final runtime-source Kubernetes run
+   `37438932585` passed at `fb37bb22`; source-impact checks establish identical
+   product/deployment inputs at the qualified `6b21490a` source. The
+   [completion receipt](verification/p04/final/regression-completion.json) also
+   records passing affected identity, Governance events, messaging, recovery and
+   Catalogue campaigns. The earlier status receipt remains unchanged. These
+   results supply no native or operating acceptance.
 4. **Next independent engineering — P05.01:** begin the versioned capability and
    qualification resolver using all eleven P04 dimensions and explicit VMware/AHV/
    OpenStack gaps. Define consumption of Inventory's immutable ordered facts with

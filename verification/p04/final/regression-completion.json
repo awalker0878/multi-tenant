@@ -1,0 +1,70 @@
+{
+  "observed_at": "2026-10-06T09:11:03.769Z",
+  "qualification_source": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+  "observation": "Subsequent GitHub Actions run-status reads; the earlier regression-status.json receipt remains unchanged.",
+  "completed_runs": [
+    {
+      "id": 37438932585,
+      "name": "P01 isolated Kubernetes integration",
+      "source_revision": "fb37bb225d07516e7c4e277ec4a140a7d09186c6",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37438932585",
+      "updated_at": "2026-10-06T09:09:18Z"
+    },
+    {
+      "id": 37437859343,
+      "name": "P02 identity",
+      "source_revision": "9cfb9d70b8986428e8dbb2004c64d0b9cca14995",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37437859343",
+      "updated_at": "2026-10-06T08:47:10Z"
+    },
+    {
+      "id": 37436983342,
+      "name": "P02 Governance events",
+      "source_revision": "8f73a44dbca61796b6f7648485b3977d5276fcd4",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37436983342",
+      "updated_at": "2026-10-06T08:35:25Z"
+    },
+    {
+      "id": 37438413553,
+      "name": "P01 transactional messaging",
+      "source_revision": "3ab6d72fbfe4ec5b635f78f35a602a58a79b7a94",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37438413553",
+      "updated_at": "2026-10-06T08:49:42Z"
+    },
+    {
+      "id": 37438413625,
+      "name": "P01 Permit Desk application recovery",
+      "source_revision": "3ab6d72fbfe4ec5b635f78f35a602a58a79b7a94",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37438413625",
+      "updated_at": "2026-10-06T08:47:47Z"
+    },
+    {
+      "id": 37439404672,
+      "name": "P03 catalogue",
+      "source_revision": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37439404672",
+      "updated_at": "2026-10-06T08:58:16Z"
+    }
+  ],
+  "impact_review": [
+    "Final runtime-source Kubernetes run 37438932585 passes at fb37bb22. Product code, locks, image definitions and deployment inputs are byte-identical to qualification source 6b21490a; only the separate synthetic session fixture and its assertion changed.",
+    "Governance source and P02 recovery fixture changes were measured at 8f73a44d and the complete Console/Governance source at 9cfb9d70. Later P04 corrections do not change those product interfaces.",
+    "The Catalogue live regression at 6b21490a passes after correcting the shared synthetic session fixture. The final documentation/evidence commits do not change product source."
+  ],
+  "limitations": [
+    "Actions status receipts do not imply independent operating or native qualification.",
+    "All G04 E3 installation and designated receiving obligations remain open."
+  ]
+}
