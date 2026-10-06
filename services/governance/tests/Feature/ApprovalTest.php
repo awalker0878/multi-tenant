@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use App\Application\Approvals\Actions\ExpireApprovals;
+use App\Application\Approvals\Actions\InspectExecution;
 use App\Application\Approvals\Contracts\ImmutablePlanSource;
+use App\Domain\Identity\IdentityDenied;
 use App\Domain\Tenancy\GovernanceLedger;
 use App\Infrastructure\Approvals\PlanningPlanSource;
 use App\Infrastructure\Messaging\GovernanceEventEncoder;
@@ -207,3 +209,29 @@ it('retains nonempty terminal decision history for recovery qualification', func
         ->and(DB::table('app.governance_audit')->where('resource_id', $rejected)->count())->toBe(2)
         ->and(DB::table('app.governance_audit')->where('resource_id', $revoked)->count())->toBe(3);
 });
+
+it('rechecks the live executor reviewer and requester at every simulation boundary', function (string $fault): void {
+    $binding = $this->plan;
+    unset($binding['digest']);
+    $binding += ['content_digest' => str_repeat('a', 64), 'canonicalization' => 'p05-json-v1', 'lane' => 'isolated_campaign'];
+    $this->plan = $binding + ['digest' => GovernanceLedger::digest($binding)];
+    app()->instance(ImmutablePlanSource::class, new SyntheticPlanSource($this->plan));
+    $this->input['plan_digest'] = $this->plan['digest'];
+    $id = approvePlan($this);
+    $input = ['actor_id' => $this->operatorMember['actor_id'], 'approval_id' => $id, 'plan_id' => $this->plan['plan_id'], 'plan_revision' => 1, 'plan_digest' => $this->plan['digest']];
+    $action = app(InspectExecution::class);
+    expect($action->handle($this->tenant, $input))->toMatchArray(['allowed' => true, 'native_write_authorized' => false, 'authority_use' => 'simulation_boundary']);
+    if ($fault === 'digest') {
+        $input['plan_digest'] = str_repeat('b', 64);
+    } elseif ($fault === 'expiry') {
+        $this->travel(2)->hours();
+    } elseif ($fault === 'revoked') {
+        DB::table('app.approvals')->where('id', $id)->update(['state' => 'revoked']);
+    } elseif ($fault === 'disabled') {
+        DB::table('app.federated_actors')->where('id', $input['actor_id'])->update(['disabled_at' => now()]);
+    } else {
+        $member = $this->{$fault.'Member'};
+        DB::table('app.tenant_memberships')->where('id', $member['id'])->update(['state' => 'revoked', 'revision' => 2]);
+    }
+    expect(fn () => $action->handle($this->tenant, $input))->toThrow(IdentityDenied::class);
+})->with(['digest', 'expiry', 'revoked', 'disabled', 'operator', 'reviewer', 'author']);

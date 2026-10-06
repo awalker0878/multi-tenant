@@ -23,6 +23,10 @@ class TemporalFixture:
         for name in ['jwt-lifecycle','jwt-admin','jwt-foreign','jwt-expired','jwt-wrong-audience']:
             redactions.append((secrets/name).read_text().strip())
         self.environment={'TEMPORAL_TARGET':'127.0.0.1:17233','TEMPORAL_NAMESPACE':'lifecycle','TEMPORAL_SERVER_NAME':'temporal','TEMPORAL_CA_FILE':str(secrets/'ca.crt'),'TEMPORAL_CREDENTIAL_FILE':str(secrets/'jwt-lifecycle'),'P06_TEMPORAL_ADMIN_FILE':str(secrets/'jwt-admin')}
+        self.images={k:images[k] for k in ['postgres','temporal','temporal_admin']}
+    def start(self):
+        run=self.run
+        for name,reference in self.images.items():run(['docker','pull',reference],label='p06-pull-'+name)
         run([*self.command,'up','-d','--wait','postgres'],label='p06-temporal-postgres')
         run([*self.command,'run','--rm','schema'],label='p06-temporal-schema')
         run([*self.command,'up','-d','temporal'],label='p06-temporal-server')

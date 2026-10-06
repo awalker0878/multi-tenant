@@ -106,8 +106,8 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
                        **component.get("additional_scripts", {})}
             require(all(value.startswith(component["module"]+".bootstrap.") for value in allowed.values()),
                     "Worker commands must be owned bootstrap composition")
-            require(project["dependencies"] == [] and project["scripts"] == allowed,
-                    "Worker cannot inherit service dependencies or undeclared entrypoints")
+            require(project["dependencies"] == component["runtime_requirements"] and project["scripts"] == allowed,
+                    "Worker must match its declared runtime and owned entrypoints")
         component["runtime_distributions"] = production_inventory(project, tomllib.loads((root / "uv.lock").read_text()))
         require((root / ".python-version").read_text().strip() == lock["python_version"],
                 "Interpreter selection differs from image lock")

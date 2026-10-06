@@ -1,5 +1,6 @@
 """Q04 actual TLS owners, PostgreSQL stores, Temporal histories and Console journey."""
 import copy
+import base64
 import datetime
 import hashlib
 import json
@@ -13,7 +14,7 @@ import uuid
 from temporal_fixture import TemporalFixture
 
 
-def campaign(c,p):
+def _campaign(c,p):
     from fault_peers import TlsProxy, AlertReceiver
     root,private,out=c['root'],c['private'],c['out']
     run,sql,gov,wire,check=c['run'],c['sql'],c['gov'],c['wire'],c['check']
@@ -65,7 +66,7 @@ def campaign(c,p):
         try:return wire(base,'/health/live')[0]==200
         except OSError:return False
     wait_for('lifecycle_ready',lambda:ready(common['LIFECYCLE_URL']),15);wait_for('simulation_ready',lambda:ready(common['SIMULATOR_URL']),15)
-    temporal=TemporalFixture(root,private,run,c['private_values']);c['proxies'].append(temporal);envs['lifecycle'].update(temporal.environment)
+    temporal=TemporalFixture(root,private,run,c['private_values']);c['proxies'].append(temporal);temporal.start();envs['lifecycle'].update(temporal.environment)
     witness=[str(root/'services/lifecycle/.venv/bin/python'),'scripts/p06/temporal_process.py']
     run([*witness,'initialize'],env=envs['lifecycle'],label='p06-real-temporal-namespace')
     alert=AlertReceiver(c['certificate'],c['key'],credentials['lifecycle-alerts'][0],out/'alert-receipts.json');c['proxies'].append(alert)
@@ -84,7 +85,8 @@ def campaign(c,p):
         check('p06-'+tail.split('/')[-1]+'-bounded-no-store',size<310000 and 'no-store' in returned.get('Cache-Control',''))
         if status<400:OAS31Validator({'$ref':'#/components/schemas/'+('CommandReceipt' if tail.endswith('commands') else 'Job'),'components':schema['components']}).validate(value)
         return value
-    def current(index):return lifecycle('jobs/'+jobs[index]['id'],plans[index]['content']['scope'])
+    read_token=fixture['operator_token']
+    def current(index):return lifecycle('jobs/'+jobs[index]['id'],plans[index]['content']['scope'],token=read_token)
     def command(index,action):
         view=current(index)
         return lifecycle('jobs/'+view['id']+'/commands',view['scope'],{'action':action,'expected_revision':view['revision']},expected=202)
@@ -149,6 +151,12 @@ def campaign(c,p):
     worker_command=[str(root/'services/lifecycle/.venv/bin/lifecycle-workflows')];spawn('workflow',worker_command)
     wait_for('evidence_held',lambda:sql("SELECT count(*) FROM app.execution_projection WHERE reason='evidence_pending';",'lifecycle')=='3')
     check('p06-no-evidence-no-completion',sql("SELECT count(*) FROM app.execution_projection WHERE state='completed';",'lifecycle')=='0')
+    operator_revision=int(sql("SELECT revision FROM app.tenant_memberships WHERE actor_id='"+fixture['operator_id']+"' AND tenant_id='"+tenant+"';",'governance'))
+    gov('/v1/tenants/'+tenant+'/memberships',{'revision':operator_revision,'subject':'p05-operator','role':'operator','state':'revoked','site_id':None,'environment':None,'expires_at':None},expected=200)
+    read_token=fixture['reviewer_token']
+    binding=plans[0]['binding']
+    denied=wire('https://127.0.0.1:8442','/v1/tenants/'+tenant+'/execution-approval-checks','POST',{'actor_id':fixture['operator_id'],'approval_id':jobs[0]['approval_id'],'plan_id':binding['plan_id'],'plan_revision':1,'plan_digest':binding['digest']},{'Authorization':'Bearer '+credentials['lifecycle-governance'][0]})
+    check('p06-revoked-executor-cannot-authorize-another-effect',denied[0]==403)
     # Restart the actual worker and engine while journal/effect stores survive.
     c['stop']('workflow');temporal.restart();spawn('workflow',worker_command)
     c['start']('assurance')
@@ -160,7 +168,46 @@ def campaign(c,p):
     check('p06-independent-alert-delivery-and-receipt',len(alert.receipts)>0)
     check('p06-retirement-has-no-writer',sql("SELECT source_writer OR target_writer FROM sim.writers WHERE job='"+jobs[3]['id']+"';",'simulation')=='f')
     check('p06-no-simultaneous-writers',sql('SELECT count(*) FROM sim.writers WHERE source_writer AND target_writer;','simulation')=='0')
+    # Custody finalized committed effects after executor revocation; live retrieval stays authorized.
+    completed=current(0);evidence=completed['evidence'];observations=[o['observation'] for o in completed['operations']]
+    raw=json.dumps(observations,sort_keys=True,ensure_ascii=True,separators=(',',':')).encode()
+    upload={'job_id':completed['id'],'plan_digest':completed['plan_digest'],'source_revision':os.environ['GITHUB_SHA'],'evidence_level':'E2','digest':hashlib.sha256(raw).hexdigest(),'content_base64':base64.b64encode(raw).decode()}
+    producer={'Authorization':'Bearer '+credentials['lifecycle-assurance'][0]};assurance=common['ASSURANCE_URL'];prefix='/v1/tenants/'+tenant
+    check('p06-upload-idempotent-after-revocation',wire(assurance,prefix+'/evidence-uploads','POST',upload,producer)[1]['id']==evidence['id'])
+    check('p06-tampered-upload-rejected',wire(assurance,prefix+'/evidence-uploads','POST',dict(upload,digest='0'*64),producer)[0]==422)
+    check('p06-source-substitution-rejected',wire(assurance,prefix+'/evidence-uploads','POST',dict(upload,source_revision='f'*40),producer)[0]==409)
+    def evidence_headers(action):
+        grant=gov(prefix+'/actor-delegations',{'audience':'assurance','action':action,'scope':{k:completed['scope'][k] for k in ['site_id','environment','resource_id']}},token=fixture['reviewer_token'])
+        c['private_values'].append(grant['delegation_token']);return {'Authorization':'Bearer '+credentials['console-assurance'][0],'X-Actor-Delegation':grant['delegation_token']}
+    evidence_path=prefix+'/evidence/'+evidence['id']
+    review=wire(assurance,evidence_path+'/reviews','POST',{'decision':'accepted_simulation'},evidence_headers('evidence.review'))
+    check('p06-independent-evidence-review-is-simulation-only',review[0]==201 and review[1]['native_support'] is False)
+    check('p06-wrong-tenant-evidence-denied',wire(assurance,'/v1/tenants/'+fixture['foreign_tenant']+'/evidence/'+evidence['id'],headers=evidence_headers('evidence.read'))[0]==404)
+    sql("UPDATE app.evidence_uploads SET content='[]' WHERE id='"+evidence['id']+"';",'assurance')
+    check('p06-persisted-tamper-denied-on-read',wire(assurance,evidence_path,headers=evidence_headers('evidence.read'))[0]==409)
+    sql("UPDATE app.evidence_uploads SET content=convert_from(decode('"+base64.b64encode(raw).decode()+"','base64'),'UTF8') WHERE id='"+evidence['id']+"';",'assurance')
+    check('p06-custody-restored-digest-valid',wire(assurance,evidence_path,headers=evidence_headers('evidence.read'))[0]==200)
+    fixture.update(p06_completed=completed);c['fixture_file'].write_text(json.dumps(fixture))
+    run(['npx','playwright','test','--config=tests/browser-p06/playwright.evidence.config.ts'],cwd=root/'apps/console',env=os.environ|{'P06_BROWSER_FIXTURE':str(c['fixture_file']),'CONSOLE_BASE_URL':'http://127.0.0.1:8031'},label='p06-browser-evidence')
+    evidence_browser=root/'apps/console/test-results/p06-evidence-browser.json';browser_result=json.loads(evidence_browser.read_text());(out/'p06-evidence-browser.json').write_text(c['redact'](evidence_browser.read_text()))
+    check('p06-evidence-browser-no-skips-retries-failures',browser_result['stats']['expected']==1 and all(browser_result['stats'][k]==0 for k in ['unexpected','flaky','skipped']))
     file=private/'workflow-ids.json';file.write_text(json.dumps(workflows));run([*witness,'replay',str(file),str(out/'temporal-replay.json')],env=envs['lifecycle'],label='p06-version-one-history-replay')
     (out/'execution-observations.json').write_text(json.dumps({'simulation':True,'jobs':[current(i) for i in range(4)],'effect_count':int(sql('SELECT count(*) FROM sim.observations WHERE effect_count=1;','simulation'))},indent=2)+'\n')
     for name in ['lifecycle','simulation','workflow']:
         log=(private/(name+'.log')).read_text();(out/(name+'-http.log')).write_text(c['redact'](log));check('p06-'+name+'-redacted',all(value not in log for value in c['private_values']))
+
+
+def campaign(c,p):
+    try:
+        _campaign(c,p)
+    finally:
+        for name in ['lifecycle','simulation','workflow']:
+            log=c['private']/(name+'.log')
+            if log.exists():(c['out']/(name+'-http.log')).write_text(c['redact'](log.read_text()))
+        for name in ['p06-browser.json','p06-evidence-browser.json']:
+            log=c['root']/'apps/console/test-results'/name
+            if log.exists():(c['out']/name).write_text(c['redact'](log.read_text()))
+        try:
+            data=c['sql']("SELECT coalesce(json_agg(row_to_json(p)), '[]'::json) FROM app.execution_projection p;",'lifecycle')
+            (c['out']/'final-projection.json').write_text(data+'\n')
+        except Exception:pass
