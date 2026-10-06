@@ -5,7 +5,10 @@ workflows, current effect authority, independent readback, evidence custody and
 the Jobs experience. Use the [implementation record](p06-execution.md),
 [phase scope](phases/p06.md), [G06 procedure](../qualification/gate-reviews/g06.md)
 and [operator runbook](../operations/runbooks/durable-simulation.md). Exact-source
-verification and the canonical register determine which observations are complete.
+verification is retained in the [qualification index](../../verification/p06/final/qualification-index.json):
+138 core tests, three complete 148-check live campaigns, all four workflow history
+replays, actual alerts, custody and older-journal restore pass. The canonical
+register keeps the receiving decision separate.
 Development authority and automated passes do not appoint receiving reviewers.
 
 ## BL-P06-001 — designated receiving and operator review

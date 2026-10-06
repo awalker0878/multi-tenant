@@ -48,3 +48,13 @@ Retain chronological journal/workflow/worker/native observations, message IDs, s
 ## Cleanup and reruns
 
 Reconcile every held operation and allocation before cleanup; never delete unknown resources merely to reset a test. Rotate test identities and retain failed-run evidence. Rerun affected cases after workflow versioning, adapter retry/readback, fencing, journal, evidence or recovery changes.
+
+## Executed P06 simulation
+
+The [P06 check matrix](../../../verification/p06/check-matrix.md) maps this campaign
+to source-bound PostgreSQL, actual Temporal and three-browser observations.
+The [qualification index](../../../verification/p06/final/qualification-index.json)
+retains passing results and the [correction record](../../../verification/p06/corrections.md)
+retains failed attempts. These are E2 simulation observations. The older-journal
+restore deliberately denies re-enable; no native recovery or automatic epoch
+rebind is inferred. Designated receiving remains in the canonical G06 record.

@@ -1,6 +1,38 @@
-# Next work — P06 durable execution
+# Next work — P07 readiness after P06 engineering
 
-P06 engineering is active. Continue the six packages in [the phase card](docs/implementation/phases/p06.md), with the [implementation record](docs/implementation/p06-execution.md). Complete authenticated admission and Temporal dispatch, boundary authority, evidence custody, integrated fault campaigns and the Jobs console. Retain exact-source observations and update the delivery register. Development authorization persists; independent receiving decisions remain separate.
+P06 engineering and automated qualification are complete at
+`3a9c136639426087d060845184048f52850fcfc7`; original evidence is committed at
+`4ddb91427236d6ef9f06cc1fb2a937d21102f691`. All six packages deliver atomic
+admission/dispatch, durable simulation, current effect authority, independent
+readback, Assurance custody and the Console Jobs experience. The final run passes
+138 core tests without skips and 148 checks in each of Chromium, Firefox and
+WebKit. Each live campaign replays four actual workflow histories, records five
+alert receipts and preserves 29 accepted effects through an older-journal restore.
+
+Use the [implementation record](docs/implementation/p06-execution.md),
+[qualification index](verification/p06/final/qualification-index.json),
+[check matrix](verification/p06/check-matrix.md),
+[corrections](verification/p06/corrections.md) and
+[simulation runbook](docs/operations/runbooks/durable-simulation.md).
+
+1. **BL-P06-001 — designated receiving:** product, qualification, security,
+   Lifecycle, Assurance and SRE reviewers examine the exact evidence and perform
+   the six representative operator tasks in the
+   [completion packet](docs/implementation/p06-completion-review.md). Record actual
+   names, dates, ADR dispositions and decisions. The register keeps formal P06
+   receiving IN_PROGRESS and G06 NOT_REVIEWED; all scoped engineering outputs and
+   automated P06 checks are delivered.
+2. **Next engineering package — P07.01 native site readiness:** inventory the
+   actual OpenStack tuple, project/endpoints/trust, scoped identities, immutable
+   tooling, state/locking/custody owners, image/network/storage constraints,
+   quotas and independent observer. Populate the exact Q05 campaign inputs and
+   record missing inputs with owners using the [P07 card](docs/implementation/phases/p07.md).
+   Existing development authorization continues. A native effect still requires
+   the actual exact-scope campaign authority and operating inputs.
+3. **Carry prior receiving and native limits:** P06 remains E2 isolated simulation;
+   its restored journal safely denies re-enable until independent reconciliation
+   and newly bound authority have an approved implementation. The earlier P00–P05
+   receiving/native/operating obligations below remain explicit.
 
 # Retained P05 receiving and handoff
 
@@ -20,13 +52,9 @@ operational versus isolated-campaign admission contracts. Use the
    assistive combinations. Record actual names, dates, findings and the decision
    using the [completion packet](docs/implementation/p05-completion-review.md).
    The register keeps G05 NOT_REVIEWED; development authority is already supplied.
-2. **Next executable engineering package — P06.01 admission and dispatch:** use
-   P05.06's contract, current P02 approval checks and the P01 transactional outbox
-   to atomically commit admission, command receipt, reservation bindings and one
-   stable workflow dispatch ID. Exercise duplicate/lost-start delivery against
-   actual PostgreSQL and Temporal with separately controlled simulated effects.
-   Preserve unknown outcomes and immediate authority rechecks. This is the next
-   package, not an assertion that P06 execution has already been implemented.
+2. **P06 engineering delivered:** the verified implementation above now consumes
+   P05's immutable contracts and current approvals through real PostgreSQL and
+   Temporal. The next engineering package is P07.01 readiness preparation.
 3. **Carry operating/native limits forward:** P04 native E3 and earlier receiving
    obligations remain below. P05 eligible fixture records and simulated reservations
    supply no production support or native-effect authority. Actual source/state/

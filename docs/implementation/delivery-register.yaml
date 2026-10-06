@@ -247,11 +247,17 @@ phases:
   gate_id: G06
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
+  delivery_note: All six engineering outputs and source-bound E1/E2 qualification delivered at 3a9c136639426087d060845184048f52850fcfc7;
+    designated receiving and operator review remain open. No native or operational acceptance is inferred.
 - id: P07
   title: Native OpenStack provisioning
   owner_role: Infrastructure and platform owners
@@ -1519,105 +1525,159 @@ work_packages:
   owner_role: Lifecycle
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
   doc_refs:
   - docs/implementation/phases/p06.md
+  - docs/implementation/p06-execution.md
+  - docs/implementation/p06-completion-review.md
+  - docs/operations/runbooks/durable-simulation.md
   criterion_ids:
   - G06.01
   - G06.02
   - G06.03
+  delivery_note: All six engineering outputs and source-bound E1/E2 qualification delivered at 3a9c136639426087d060845184048f52850fcfc7;
+    designated receiving and operator review remain open. No native or operational acceptance is inferred.
 - id: P06.02
   phase_id: P06
   title: Workflow state
   owner_role: Lifecycle
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
   doc_refs:
   - docs/implementation/phases/p06.md
   - docs/engineering/coverage.md
   - docs/engineering/data-and-messaging.md
+  - docs/implementation/p06-execution.md
+  - docs/implementation/p06-completion-review.md
+  - docs/operations/runbooks/durable-simulation.md
   criterion_ids:
   - G06.01
   - G06.03
+  delivery_note: All six engineering outputs and source-bound E1/E2 qualification delivered at 3a9c136639426087d060845184048f52850fcfc7;
+    designated receiving and operator review remain open. No native or operational acceptance is inferred.
 - id: P06.03
   phase_id: P06
   title: Execution authority
   owner_role: Lifecycle/workers
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
   doc_refs:
   - docs/implementation/phases/p06.md
+  - docs/implementation/p06-execution.md
+  - docs/implementation/p06-completion-review.md
+  - docs/operations/runbooks/durable-simulation.md
   criterion_ids:
   - G06.02
   - G06.03
+  delivery_note: All six engineering outputs and source-bound E1/E2 qualification delivered at 3a9c136639426087d060845184048f52850fcfc7;
+    designated receiving and operator review remain open. No native or operational acceptance is inferred.
 - id: P06.04
   phase_id: P06
   title: Evidence custody
   owner_role: Assurance
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
   doc_refs:
   - docs/implementation/phases/p06.md
+  - docs/implementation/p06-execution.md
+  - docs/implementation/p06-completion-review.md
+  - docs/operations/runbooks/durable-simulation.md
   criterion_ids:
   - G06.04
+  delivery_note: All six engineering outputs and source-bound E1/E2 qualification delivered at 3a9c136639426087d060845184048f52850fcfc7;
+    designated receiving and operator review remain open. No native or operational acceptance is inferred.
 - id: P06.05
   phase_id: P06
   title: Simulation and fault injection
   owner_role: Quality
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
   doc_refs:
   - docs/implementation/phases/p06.md
   - docs/engineering/coverage.md
   - docs/engineering/data-and-messaging.md
   - docs/engineering/testing-and-ci.md
+  - docs/implementation/p06-execution.md
+  - docs/implementation/p06-completion-review.md
+  - docs/operations/runbooks/durable-simulation.md
   criterion_ids:
   - G06.01
   - G06.02
   - G06.03
   - G06.04
+  delivery_note: All six engineering outputs and source-bound E1/E2 qualification delivered at 3a9c136639426087d060845184048f52850fcfc7;
+    designated receiving and operator review remain open. No native or operational acceptance is inferred.
 - id: P06.06
   phase_id: P06
   title: Jobs experience
   owner_role: Console
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
   doc_refs:
   - docs/implementation/phases/p06.md
   - docs/engineering/coverage.md
   - docs/engineering/frontend.md
+  - docs/implementation/p06-execution.md
+  - docs/implementation/p06-completion-review.md
+  - docs/operations/runbooks/durable-simulation.md
   criterion_ids:
   - G06.01
   - G06.04
+  delivery_note: All six engineering outputs and source-bound E1/E2 qualification delivered at 3a9c136639426087d060845184048f52850fcfc7;
+    designated receiving and operator review remain open. No native or operational acceptance is inferred.
 - id: P07.01
   phase_id: P07
   title: Native site readiness
@@ -2272,9 +2332,13 @@ requirements:
   - EV-P02-004
   - EV-P02-005
   - EV-P02-006
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
   blocker_ids:
   - BL-P02-002
   - BL-P02-003
+  - BL-P06-001
 - id: R04
   package_ids:
   - P02.03
@@ -2342,9 +2406,13 @@ requirements:
   - EV-P05-001
   - EV-P05-002
   - EV-P05-003
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
   blocker_ids:
   - BL-P03-002
   - BL-P05-001
+  - BL-P06-001
 - id: R05
   package_ids:
   - P03.01
@@ -2657,8 +2725,12 @@ requirements:
   - EV-P05-001
   - EV-P05-002
   - EV-P05-003
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
   blocker_ids:
   - BL-P05-001
+  - BL-P06-001
 - id: R14
   package_ids:
   - P05.04
@@ -2691,8 +2763,12 @@ requirements:
   - EV-P05-001
   - EV-P05-002
   - EV-P05-003
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
   blocker_ids:
   - BL-P05-001
+  - BL-P06-001
 - id: R15
   package_ids:
   - P01.03
@@ -2721,7 +2797,11 @@ requirements:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-015
-  blocker_ids: []
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
 - id: R16
   package_ids:
   - P06.03
@@ -2750,8 +2830,12 @@ requirements:
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
 - id: R17
   package_ids:
   - P05.03
@@ -2791,8 +2875,12 @@ requirements:
   - EV-P05-001
   - EV-P05-002
   - EV-P05-003
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
   blocker_ids:
   - BL-P05-001
+  - BL-P06-001
 - id: R18
   package_ids:
   - P07.01
@@ -2967,8 +3055,12 @@ requirements:
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
 - id: R23
   package_ids:
   - P06.02
@@ -2998,8 +3090,12 @@ requirements:
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
 - id: R24
   package_ids:
   - P06.02
@@ -3025,8 +3121,12 @@ requirements:
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
 - id: R25
   package_ids:
   - P07.05
@@ -3183,8 +3283,12 @@ requirements:
   - EV-P01-029
   - EV-P01-030
   - EV-P01-031
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
   blocker_ids:
   - BL-P00-001
+  - BL-P06-001
 - id: R30
   package_ids:
   - P01.06
@@ -3226,8 +3330,12 @@ requirements:
   - EV-P01-026
   - EV-P01-029
   - EV-P01-030
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
   blocker_ids:
   - BL-P00-001
+  - BL-P06-001
 - id: R31
   package_ids:
   - P01.04
@@ -3301,10 +3409,14 @@ requirements:
   - EV-P01-029
   - EV-P01-030
   - EV-P01-031
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
   blocker_ids:
   - BL-P01-001
   - BL-P01-002
   - BL-P02-002
+  - BL-P06-001
 - id: R32
   package_ids:
   - P00.05
@@ -3401,10 +3513,14 @@ requirements:
   - EV-P05-001
   - EV-P05-002
   - EV-P05-003
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
   blocker_ids:
   - BL-P03-001
   - BL-P03-002
   - BL-P05-001
+  - BL-P06-001
 - id: R34
   package_ids:
   - P00.05
@@ -3656,8 +3772,12 @@ gates:
   decision: NOT_REVIEWED
   reviewer: null
   reviewed_at: null
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P06-001
+  - EV-P06-002
+  - EV-P06-003
+  blocker_ids:
+  - BL-P06-001
 - id: G07
   phase_id: P07
   decision: NOT_REVIEWED
@@ -6245,6 +6365,113 @@ evidence:
   invalidated_at: null
   artifact_uri: https://github.com/awalker0878/multi-tenant/blob/3a1ca27112c77ad32540f8057584839d724c2988/verification/p05/final/qualification-index.json
   sha256: 28dc2ef01218254c73365c5e8f1e64d336a6f3bf72c6c705ab39b0d10d0e50f0
+- id: EV-P06-001
+  level: E1
+  source_revision: 3a9c136639426087d060845184048f52850fcfc7
+  artifact_revisions:
+    retained_artifact_commit: 4ddb91427236d6ef9f06cc1fb2a937d21102f691
+    run_id: '37516991249'
+  campaign_ids:
+  - Q01
+  - Q03
+  - Q04
+  criterion_ids:
+  - G06.01
+  - G06.02
+  - G06.03
+  - G06.04
+  observed_at: '2026-10-06T19:17:39.007198+00:00'
+  observer: GitHub Actions executed hosted campaigns; Codex independently matched original archive, source, report
+    and log bytes.
+  reviewer: Codex engineering consistency review only; designated G06 receiving and representative operator reviews
+    remain open.
+  limitations: E1/E2 simulation only. Controlled source/qualification records and synthetic OIDC bootstrap confer
+    no native E3 or operating acceptance. Loopback TLS, keyboard/reflow and browser automation do not establish
+    operated ingress, representative comprehension or assistive support. Restore denies re-enable; no automatic
+    epoch rebind or native recovery adapter exists. No time-based expiry is asserted; material source, scope or
+    assumptions require affected requalification.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/4ddb91427236d6ef9f06cc1fb2a937d21102f691/verification/p06/final/core/report.json
+  sha256: 1334099510747c66eb449ff8a8056b13010b06a0122fc3829d7950b49fe1fc68
+  environment: GitHub Actions Ubuntu 24.04; Python 3.12.14, uv 0.12.19 and frozen component locks.
+  scope: Generated execution/custody/Console contract drift, independent lock installation, Ruff formatting/lint
+    and strict mypy pass at the exact source. The 12-command report additionally retains the separately classified
+    real PostgreSQL suites. Local Assurance has 40 tests/188 assertions passing; its original output is retained.
+    Hosted Assurance quality also passes all 15 locked installation, format/type/architecture, unit, canary and
+    cache commands at the same source; all 146 source bindings and original archive/log hashes are verified.
+- id: EV-P06-002
+  level: E2
+  source_revision: 3a9c136639426087d060845184048f52850fcfc7
+  artifact_revisions:
+    retained_artifact_commit: 4ddb91427236d6ef9f06cc1fb2a937d21102f691
+    run_id: '37516991249'
+  campaign_ids:
+  - Q01
+  - Q03
+  - Q04
+  criterion_ids:
+  - G06.01
+  - G06.02
+  - G06.03
+  - G06.04
+  observed_at: '2026-10-06T19:17:39.007198+00:00'
+  observer: GitHub Actions executed hosted campaigns; Codex independently matched original archive, source, report
+    and log bytes.
+  reviewer: Codex engineering consistency review only; designated G06 receiving and representative operator reviews
+    remain open.
+  limitations: E1/E2 simulation only. Controlled source/qualification records and synthetic OIDC bootstrap confer
+    no native E3 or operating acceptance. Loopback TLS, keyboard/reflow and browser automation do not establish
+    operated ingress, representative comprehension or assistive support. Restore denies re-enable; no automatic
+    epoch rebind or native recovery adapter exists. No time-based expiry is asserted; material source, scope or
+    assumptions require affected requalification.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/4ddb91427236d6ef9f06cc1fb2a937d21102f691/verification/p06/final/core/report.json
+  sha256: 1334099510747c66eb449ff8a8056b13010b06a0122fc3829d7950b49fe1fc68
+  environment: GitHub Actions Ubuntu 24.04; real PostgreSQL 16 over verified TLS, separate Lifecycle and simulator
+    owner/runtime roles.
+  scope: 'All 138 tests pass with zero skips/errors/failures: 79 Lifecycle, 10 worker and 49 integrated execution
+    cases. Includes concurrent atomic admission, immutable storage, nine denial classes, accepted-reply uncertainty,
+    five effect boundaries on both sides of acceptance, 18 pause/cancel/stop cases, actual refused journal connection
+    and committed custody after revocation.'
+- id: EV-P06-003
+  level: E2
+  source_revision: 3a9c136639426087d060845184048f52850fcfc7
+  artifact_revisions:
+    retained_artifact_commit: 4ddb91427236d6ef9f06cc1fb2a937d21102f691
+    run_id: '37516991249'
+  campaign_ids:
+  - Q01
+  - Q03
+  - Q04
+  criterion_ids:
+  - G06.01
+  - G06.02
+  - G06.03
+  - G06.04
+  observed_at: '2026-10-06T19:17:39.007198+00:00'
+  observer: GitHub Actions executed hosted campaigns; Codex independently matched original archive, source, report
+    and log bytes.
+  reviewer: Codex engineering consistency review only; designated G06 receiving and representative operator reviews
+    remain open.
+  limitations: E1/E2 simulation only. Controlled source/qualification records and synthetic OIDC bootstrap confer
+    no native E3 or operating acceptance. Loopback TLS, keyboard/reflow and browser automation do not establish
+    operated ingress, representative comprehension or assistive support. Restore denies re-enable; no automatic
+    epoch rebind or native recovery adapter exists. No time-based expiry is asserted; material source, scope or
+    assumptions require affected requalification.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/4ddb91427236d6ef9f06cc1fb2a937d21102f691/verification/p06/final/qualification-index.json
+  sha256: a99f0a1a43483b400d09f5432056d72cadf5b1e136264ce9f15b7d054144c46d
+  environment: GitHub Actions Ubuntu 24.04; separately owned TLS APIs/stores; pinned PostgreSQL 18.6, AMQPS and
+    real Temporal; compiled Chromium/Firefox/WebKit.
+  scope: Each of three complete live campaigns passes 148 checks and 61 commands, including intentional nonzero
+    crash/denial witnesses. All three browser journeys per engine have zero failures/skips/retries. Four actual
+    histories replay; 29 independent effects remain after older-journal restore. Three jobs complete E2 custody
+    and migrated target acceptance is safely cancelled. Lost admission/start/control replies, actor revocation,
+    tamper/source/tenant denials, alert receipts and no simultaneous writers are observed. All original archive,
+    source, command and retained artifact hashes match.
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -6542,17 +6769,39 @@ blockers:
   - P05.05
   - P05.06
   - G05
-  owner_role: Planning / architecture / Governance / security / Assurance / Lifecycle / quality leads; product
-    and representative operator
+  owner_role: Planning / architecture / Governance / security / Assurance / Lifecycle / quality leads; product and
+    representative operator
   description: All P05 engineering outputs and automated E1/E2 campaigns are delivered. Designated criterion/package
-    receiving decisions, ADR-016 receiving disposition and representative Console comprehension/assistive
-    review have not occurred. Automated results and development authorization do not supply actual reviewers
-    or operator observations.
+    receiving decisions, ADR-016 receiving disposition and representative Console comprehension/assistive review
+    have not occurred. Automated results and development authorization do not supply actual reviewers or operator
+    observations.
   unblock_condition: Use docs/implementation/p05-completion-review.md to examine exact-source evidence, execute
-    the operator tasks on selected OP07 combinations, resolve mandatory defects and record actual reviewer
-    identities, dates, limits and the G05 decision. Native E3 is not required for this simulation gate and
-    is not inferred.
-  next_action: Perform the concrete receiving tasks and update the gate record; independently continue P06.01
-    admission/dispatch using the delivered contracts and existing development authorization.
+    the operator tasks on selected OP07 combinations, resolve mandatory defects and record actual reviewer identities,
+    dates, limits and the G05 decision. Native E3 is not required for this simulation gate and is not inferred.
+  next_action: Perform the concrete receiving tasks and update the gate record. P06 engineering and automated qualification
+    now consume the delivered contracts; P07.01 readiness preparation is the next engineering package.
+  state: OPEN
+  resolution_evidence_ids: []
+
+- id: BL-P06-001
+  scope_ids:
+  - P06
+  - P06.01
+  - P06.02
+  - P06.03
+  - P06.04
+  - P06.05
+  - P06.06
+  - G06
+  owner_role: Product, qualification, security, Lifecycle, Assurance and SRE leads; representative operator
+  description: All P06 engineering outputs and source-bound E1/E2 checks are delivered. Designated package/criterion
+    receiving decisions, ADR-007/010/018/020 dispositions and representative operator/assistive observations remain
+    open. Development authorization and automated fixtures do not supply reviewer signatures.
+  unblock_condition: Use docs/implementation/p06-completion-review.md and G06 procedure to examine exact evidence,
+    perform the six operator tasks on selected OP07 combinations, resolve mandatory findings and record actual reviewer
+    identities, dates, limits and the G06 decision. Native E3 is neither claimed nor required for this simulation
+    gate.
+  next_action: Perform the concrete receiving review. Independently prepare P07.01 actual OpenStack site-readiness
+    inputs; native effects remain held until exact campaign authority, scope and operating inputs exist.
   state: OPEN
   resolution_evidence_ids: []

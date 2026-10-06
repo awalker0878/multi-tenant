@@ -1,9 +1,13 @@
 # P06 — Durable simulation execution
 
-The six P06 engineering packages implement isolated E2 simulation. Verification
-is in progress; the delivery register retains the actual gate decision and
-reviewers. The implementation contains no native effect adapter or operational
-admission lane.
+The six P06 engineering packages and their automated E1/E2 qualification are
+delivered at `3a9c136639426087d060845184048f52850fcfc7`. The final campaign passes
+138 core tests without skips and 148 live checks in each of Chromium, Firefox and
+WebKit. The [qualification index](../../verification/p06/final/qualification-index.json)
+binds original archives, reports and exact-source observations; the
+[check matrix](../../verification/p06/check-matrix.md) maps them to G06/Q04.
+The delivery register retains designated receiving and the gate decision separately.
+The implementation contains no native effect adapter or operational admission lane.
 
 ## Admission and exact authority
 
@@ -92,3 +96,12 @@ operated ingress, a representative user's comprehension or assistive support.
 Use the [simulation runbook](../operations/runbooks/durable-simulation.md) for
 configuration, operator decisions and recovery. Native E3, operating acceptance,
 prior receiving obligations and named G06 acceptance remain separate.
+
+The final run records 29 independent accepted effects, five alert receipts and
+four successful actual-history replays per browser campaign. Provision, recover
+and retire finish with E2 custody; migrate exercises accepted target writes and
+safe cancellation. Each older-journal restore preserves accepted effects and
+denies automatic re-enable. All archive, command and artifact hashes are verified;
+two generated package metadata outputs are independently reproduced from the
+locked exact source. The [correction record](../../verification/p06/corrections.md)
+retains earlier failed observations.
