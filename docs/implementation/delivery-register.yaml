@@ -1707,18 +1707,24 @@ work_packages:
   title: Infrastructure automation
   owner_role: Infrastructure
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P07-001
   doc_refs:
   - docs/implementation/phases/p07.md
+  - docs/implementation/p07-native-provisioning.md
+  - docs/operations/runbooks/openstack-commissioning.md
   criterion_ids:
   - G07.01
   - G07.02
   - G07.03
+  delivery_note: Offline saved-plan byte, toolchain, state/lock and ownership comparisons implemented. No Terraform
+    apply, authenticated native adapter or native readback is supplied; actual tuple/interface/tool selections are
+    required.
 - id: P07.03
   phase_id: P07
   title: Guest and service integration

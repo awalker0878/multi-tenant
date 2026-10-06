@@ -69,7 +69,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P06.05 | Simulation and fault injection | Quality | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P06.06 | Jobs experience | Console | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P07.01 | Native site readiness | SRE/platform owners | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 1 |
-| P07.02 | Infrastructure automation | Infrastructure | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P07.02 | Infrastructure automation | Infrastructure | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 1 |
 | P07.03 | Guest and service integration | Infrastructure/service owners | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P07.04 | Activation and verification | Lifecycle/quality | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P07.05 | Failure and retirement | Lifecycle | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |

@@ -1,0 +1,36 @@
+name: P07 native readiness preparation
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: ['services/lifecycle/**', 'release/p07-native-inputs.json', 'scripts/p07/**', '.github/workflows/p07-native-readiness.yml']
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preparation:
+    name: P07 commissioning and saved-plan comparisons (E1 only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - name: Verify offline preparation without native credentials or authority
+        run: python scripts/p07/qualify.py --output "$RUNNER_TEMP/p07-preparation"
+      - name: Retain source-bound observations including held inputs and failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p07-preparation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p07-preparation/
+          if-no-files-found: error
+          retention-days: 14

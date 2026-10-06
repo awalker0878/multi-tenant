@@ -76,6 +76,56 @@ Even a complete packet returns `native_write_authorized: false` and
 adapter, scope proof or published support claim. There is no native runtime adapter
 in this increment; P06 remains an isolated simulation.
 
+## Compare the reviewed saved plan
+
+The second local command compares the P05 immutable envelope with the protected
+commissioning record, supplied toolchain/state/ownership observations and actual
+saved-plan file bytes:
+
+```sh
+uv run --project services/lifecycle --frozen python -m lifecycle.bootstrap.native_preflight \
+  --plan /protected/plan-envelope.json \
+  --commissioning /protected/p07-native-inputs.json \
+  --toolchain /protected/toolchain.json \
+  --snapshot /protected/independent-snapshot.json \
+  --saved-plan /protected/reviewed.tfplan
+```
+
+The envelope contains exactly P05 `content` and `binding`. This preparation is
+limited to `application.provision`, `saved_plan`, `isolated_campaign`, and an
+OpenStack tuple. Other operations require their own implementation and qualification.
+It compares the canonical envelope/content hashes, plan/fact expiry and the
+commissioning packet's exact scope, tuple, artifacts, ownership, toolchain and
+state-binding hashes. State-binding material is the five fields `backend_ref`,
+`workspace`, `state_lineage`, `state_serial` and `lock_owner`. Backend references
+are protected `evidence://` identities, not inline connection configuration.
+
+The version-1 toolchain manifest contains `terraform: {version, sha256}`,
+`providers: [{source, version, sha256}]`, `modules: [{id, uri, revision, sha256}]`,
+`dependency_lock_sha256` and `worker_image_digest` (`sha256:<digest>`).
+Use exact three-part release versions; floating ranges/tags and duplicate provider
+or module entries are rejected. These are identities of the selected tools, not
+a default Terraform/provider/module version or a claim of their compatibility.
+
+The independent snapshot contains `scope`, `installed_tuple`, `artifacts`,
+`ownership`, `toolchain_sha256`, `observed_at`, `observer_id`, `executor_id`,
+`outstanding_operation_ids` and `terraform`. Its Terraform object carries the five
+state-binding fields plus `lock_id`, positive integer `fence`, `lease_expires_at`
+and boolean `held`. Observation age is bounded to five seconds. The observer must
+differ from the approved executor. A changed backend/workspace/lineage/serial/owner,
+missing/expired lock, changed mapping/writer, stale observation, or any unresolved
+operation holds the preflight. It never proposes a blind retry or automatic cleanup.
+
+Exit 0 means this offline comparison passed; exit 1 means invalid input; exit 2
+means held. Saved-plan files are bounded to 64 MiB and JSON files to 256 KiB.
+The report grants neither apply nor retry authority. The command does **not**
+authenticate or fetch owner records, inspect Terraform plan semantics, verify
+executable/provider/module bytes, acquire a lock, redeem a grant, execute a native
+effect or confirm its outcome. Actual native adapters must obtain those records
+independently, verify artifact bytes under the real state lock and current grant,
+and retain independent readback. A file can change after this offline check;
+its report is never a reusable execution token.
+
 ## Execute only after concrete prerequisites are supplied
 
 Resolve ADR-014/015/016's actual tuple, interfaces and tooling with the owning

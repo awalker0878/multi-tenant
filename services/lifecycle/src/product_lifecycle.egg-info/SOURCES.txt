@@ -9,12 +9,14 @@ src/lifecycle/application/reservations.py
 src/lifecycle/bootstrap/__init__.py
 src/lifecycle/bootstrap/commissioning.py
 src/lifecycle/bootstrap/health.py
+src/lifecycle/bootstrap/native_preflight.py
 src/lifecycle/bootstrap/server.py
 src/lifecycle/bootstrap/workflow.py
 src/lifecycle/domain/__init__.py
 src/lifecycle/domain/admission.py
 src/lifecycle/domain/commissioning.py
 src/lifecycle/domain/execution.py
+src/lifecycle/domain/native_preflight.py
 src/lifecycle/infrastructure/__init__.py
 src/lifecycle/infrastructure/execution_owners.py
 src/lifecycle/infrastructure/foundation.py
@@ -38,5 +40,6 @@ tests/test_admission.py
 tests/test_commissioning.py
 tests/test_foundation.py
 tests/test_health.py
+tests/test_native_preflight.py
 tests/test_reservations.py
 tests/test_telemetry.py
