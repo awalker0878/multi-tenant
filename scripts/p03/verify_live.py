@@ -65,6 +65,8 @@ def main():
             raise RuntimeError(name)
 
     def run(command, *, cwd=root, env=None, data=None, expected=0, label=None):
+        if command[0] == 'php':
+            command = [command[0], '-d', 'zend.exception_ignore_args=On', *command[1:]]
         result = subprocess.run(command, cwd=cwd, env=env, input=data, text=True, capture_output=True, timeout=240)
         if label:
             body = redact(result.stdout+result.stderr)
@@ -100,7 +102,7 @@ def main():
                     (out/'browser.json').write_text(redact(browser_file.read_text()))
 
     try:
-        api = json.loads((root/'contracts/openapi/catalogue-v1.json').read_text())
+        api = json.loads((root/'contracts/openapi/catalogue-v1.0.1.json').read_text())
         validate_spec(api)
         check('independent-openapi-specification-validation', True)
         run(['python', 'scripts/p03/generate_clients.py', '--check'], label='generated-clients')

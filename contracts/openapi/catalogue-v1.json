@@ -12,16 +12,6 @@
         "x-response-schema": "ApplicationPage",
         "parameters": [
           {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
-          {
             "name": "environment",
             "in": "query",
             "required": false,
@@ -69,16 +59,6 @@
         "x-catalogue-action": "application.write",
         "x-response-schema": "Receipt",
         "parameters": [
-          {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
           {
             "name": "Idempotency-Key",
             "in": "header",
@@ -146,16 +126,6 @@
         "x-response-schema": "Application",
         "parameters": [
           {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
-          {
             "name": "application",
             "in": "path",
             "required": true,
@@ -206,16 +176,6 @@
         "x-catalogue-action": "application.read",
         "x-response-schema": "RevisionPage",
         "parameters": [
-          {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
           {
             "name": "application",
             "in": "path",
@@ -274,16 +234,6 @@
         "x-catalogue-action": "application.write",
         "x-response-schema": "Receipt",
         "parameters": [
-          {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
           {
             "name": "application",
             "in": "path",
@@ -363,16 +313,6 @@
         "x-response-schema": "Revision",
         "parameters": [
           {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
-          {
             "name": "application",
             "in": "path",
             "required": true,
@@ -434,16 +374,6 @@
         "x-response-schema": "ReferencePage",
         "parameters": [
           {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
-          {
             "name": "environment",
             "in": "query",
             "required": false,
@@ -491,16 +421,6 @@
         "x-catalogue-action": "reference.write",
         "x-response-schema": "Reference",
         "parameters": [
-          {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
           {
             "name": "Idempotency-Key",
             "in": "header",
@@ -578,16 +498,6 @@
         "x-catalogue-action": "reference.write",
         "x-response-schema": "Reference",
         "parameters": [
-          {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
           {
             "name": "reference",
             "in": "path",
@@ -684,16 +594,6 @@
         "x-response-schema": "Reference",
         "parameters": [
           {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
-          {
             "name": "reference",
             "in": "path",
             "required": true,
@@ -766,16 +666,6 @@
         "x-response-schema": "ReferencePage",
         "parameters": [
           {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
-          {
             "name": "environment",
             "in": "query",
             "required": false,
@@ -823,16 +713,6 @@
         "x-catalogue-action": "reference.write",
         "x-response-schema": "Reference",
         "parameters": [
-          {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
           {
             "name": "Idempotency-Key",
             "in": "header",
@@ -910,16 +790,6 @@
         "x-catalogue-action": "reference.write",
         "x-response-schema": "Reference",
         "parameters": [
-          {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
           {
             "name": "reference",
             "in": "path",
@@ -1016,16 +886,6 @@
         "x-response-schema": "Reference",
         "parameters": [
           {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
-          {
             "name": "reference",
             "in": "path",
             "required": true,
@@ -1098,16 +958,6 @@
         "x-response-schema": "ReferencePage",
         "parameters": [
           {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
-          {
             "name": "environment",
             "in": "query",
             "required": false,
@@ -1155,16 +1005,6 @@
         "x-catalogue-action": "reference.write",
         "x-response-schema": "Reference",
         "parameters": [
-          {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
           {
             "name": "Idempotency-Key",
             "in": "header",
@@ -1242,16 +1082,6 @@
         "x-catalogue-action": "reference.write",
         "x-response-schema": "Reference",
         "parameters": [
-          {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
           {
             "name": "reference",
             "in": "path",
@@ -1347,16 +1177,6 @@
         "x-catalogue-action": "reference.write",
         "x-response-schema": "Reference",
         "parameters": [
-          {
-            "name": "tenant",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-            }
-          },
           {
             "name": "reference",
             "in": "path",

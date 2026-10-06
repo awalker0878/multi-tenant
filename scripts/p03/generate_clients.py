@@ -8,7 +8,7 @@ from pathlib import Path
 import argparse,hashlib,json
 ROOT=Path(__file__).resolve().parents[2]
 def outputs():
- source=ROOT/'contracts/openapi/catalogue-v1.json';api=json.loads(source.read_text());digest=hashlib.sha256(source.read_bytes()).hexdigest()
+ source=ROOT/'contracts/openapi/catalogue-v1.0.1.json';api=json.loads(source.read_text());digest=hashlib.sha256(source.read_bytes()).hexdigest()
  operations={spec['operationId']:{'method':method.upper(),'path':path,'action':spec['x-catalogue-action'],'schema':spec['x-response-schema'],'status':200 if method=='get' else 201} for path,methods in api['paths'].items() for method,spec in methods.items()}
  def php(v):
   if isinstance(v,dict):return '['+', '.join(php(k)+' => '+php(x) for k,x in v.items())+']'

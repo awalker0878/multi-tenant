@@ -7,7 +7,7 @@ import RequirementsEditor from '../../features/catalogue/RequirementsEditor.vue'
 import { intent as emptyIntent, workload, differences } from '../../features/catalogue/defaults';
 import type { Intent, Application, Revision, ReferencePage } from '../../features/catalogue/contracts';
 const props = defineProps<{ tenantId: string; environment: string | null; application: Application | null; revision: Revision | null; references: { environments: ReferencePage; wsds: ReferencePage; domains: ReferencePage }; actorId: string; canWrite: boolean }>();
-const draft = ref<Intent>(structuredClone(props.revision?.intent ?? emptyIntent(props.actorId)));
+const draft = ref<Intent>(JSON.parse(JSON.stringify(props.revision?.intent ?? emptyIntent(props.actorId))) as Intent);
 const original = JSON.stringify(draft.value);
 const mode = ref<'form' | 'import'>('form');
 const imported = ref('');

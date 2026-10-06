@@ -15,7 +15,7 @@ $kernel->bootstrap();
 $provider = new Tests\Support\SyntheticOidcTransport;
 $app->instance(App\Application\Identity\Contracts\OidcHttpTransport::class, $provider);
 $credential = trim(file_get_contents(getenv('CONSOLE_CREDENTIAL_FILE')));
-$call = function (string $method, string $path, array $body = [], string $token = '', int $status = 200) use ($kernel, $credential): array {
+$call = function (string $method, string $path, #[SensitiveParameter] array $body = [], #[SensitiveParameter] string $token = '', int $status = 200) use ($kernel, $credential): array {
     $request = Illuminate\Http\Request::create($path, $method, [], [], [], [
         'HTTP_AUTHORIZATION' => 'Bearer '.$credential, 'HTTP_X_CONSOLE_SESSION' => $token,
         'HTTP_IDEMPOTENCY_KEY' => bin2hex(random_bytes(16)), 'HTTP_ACCEPT' => 'application/json', 'CONTENT_TYPE' => 'application/json',
@@ -35,11 +35,11 @@ $local = $call('POST', '/identity/password', ['current_password' => $temporary, 
 $call('PUT', '/identity/oidc', ['revision' => 0, 'issuer' => 'https://idp.example.test/realm', 'client_id' => 'console-client',
     'client_secret' => 'synthetic-oidc-secret', 'redirect_uri' => 'https://console.example.test/identity/callback',
     'administrator_subject' => 'immutable-admin-subject', 'private_networks' => []], $local, 201);
-$login = function (string $purpose, string $token, string $subject) use ($call, $provider): array {
+$login = function (string $purpose, #[SensitiveParameter] string $token, string $subject) use ($call, $provider): array {
     $binding = bin2hex(random_bytes(32));
     $url = $call('POST', '/identity/oidc/flows', ['purpose' => $purpose, 'browser_binding' => $binding], $token)['authorization_url'];
     $provider->claims = ['sub' => $subject];
-    return $call('POST', '/identity/oidc/callback', $provider->authorize($url) + ['browser_binding' => $binding]);
+    return $call('POST', '/identity/oidc/callback', $provider->authorize($url) + ['browser_binding' => $binding], $token);
 };
 $proof = $login('setup', $local, 'immutable-admin-subject')['verification_token'];
 $admin = $call('POST', '/identity/oidc/activation', ['verification_token' => $proof], $local)['session_token'];
