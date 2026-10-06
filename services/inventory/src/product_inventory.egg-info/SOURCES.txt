@@ -5,6 +5,7 @@ src/inventory/application/__init__.py
 src/inventory/application/discovery.py
 src/inventory/application/events.py
 src/inventory/application/foundation.py
+src/inventory/application/planning.py
 src/inventory/application/ports.py
 src/inventory/application/views.py
 src/inventory/bootstrap/__init__.py
@@ -24,6 +25,7 @@ src/inventory/interfaces/__init__.py
 src/inventory/interfaces/discovery.py
 src/inventory/interfaces/health.py
 src/inventory/interfaces/http.py
+src/inventory/interfaces/planning.py
 src/inventory/interfaces/telemetry.py
 src/product_inventory.egg-info/PKG-INFO
 src/product_inventory.egg-info/SOURCES.txt
