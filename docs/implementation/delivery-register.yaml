@@ -246,7 +246,7 @@ phases:
   - P06.06
   gate_id: G06
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -1518,7 +1518,7 @@ work_packages:
   title: Admission and dispatch
   owner_role: Lifecycle
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -1535,7 +1535,7 @@ work_packages:
   title: Workflow state
   owner_role: Lifecycle
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -1553,7 +1553,7 @@ work_packages:
   title: Execution authority
   owner_role: Lifecycle/workers
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -1584,7 +1584,7 @@ work_packages:
   title: Simulation and fault injection
   owner_role: Quality
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED

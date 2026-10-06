@@ -1,0 +1,1 @@
+"""Separately authenticated simulation adapters."""

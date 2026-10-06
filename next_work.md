@@ -1,4 +1,8 @@
-# Next work — P05 receiving and P06 admission
+# Next work — P06 durable execution
+
+P06 engineering is active. Continue the six packages in [the phase card](docs/implementation/phases/p06.md), with the [implementation record](docs/implementation/p06-execution.md). Complete authenticated admission and Temporal dispatch, boundary authority, evidence custody, integrated fault campaigns and the Jobs console. Retain exact-source observations and update the delivery register. Development authorization persists; independent receiving decisions remain separate.
+
+# Retained P05 receiving and handoff
 
 P05 engineering and automated qualification are delivered at
 `c045badc852960f3671942adf4ca2338821b4f67`. The six packages implement all-eleven-dimension

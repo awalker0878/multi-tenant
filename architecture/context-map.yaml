@@ -89,6 +89,7 @@ workers:
     root: workers/lifecycle
     language: python
     module: lifecycle_worker
+    host_roots: [src/lifecycle_worker/bootstrap, tests, migrations]
     owner_role: lifecycle-maintainer
     allowed_packages: [python-contracts, python-technical]
     include_owner_source: true

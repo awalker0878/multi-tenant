@@ -5,10 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "product-lifecycle"
 version = "0.1.0.dev0"
-description = "Lifecycle service bootstrap; admission and execution are not implemented"
+description = "Lifecycle service bootstrap; durable simulation admission and execution"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
-dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0"]
+dependencies = [
+    "psycopg[binary]==3.3.6",
+    "uvicorn==0.53.0",
+    "temporalio==1.34.0",
+]
 
 [project.scripts]
 lifecycle-health = "lifecycle.bootstrap.health:main"

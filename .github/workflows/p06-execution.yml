@@ -1,0 +1,38 @@
+name: P06 execution
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: ['services/lifecycle/**', 'workers/lifecycle/**', 'services/governance/**', 'services/assurance/**', 'services/planning/**', 'apps/console/**', 'contracts/**', 'scripts/p06/**', '.github/workflows/p06-execution.yml']
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  execution:
+    name: P06 PostgreSQL journal and independent simulation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - name: Qualify journal and separately owned simulated effects
+        env:
+          P05_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+        run: python scripts/p06/qualify.py --output "$RUNNER_TEMP/p06-core"
+      - name: Retain exact-source results including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p06-core-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p06-core/
+          if-no-files-found: error
+          retention-days: 14

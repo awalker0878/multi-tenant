@@ -16,7 +16,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | P03 | Application catalogue and workspace | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 3 / 2 |
 | P04 | Site commissioning and inventory | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 3 / 2 |
 | P05 | Capabilities and immutable plans | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | G05: NOT_REVIEWED | 3 / 1 |
-| P06 | Durable execution in simulation | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G06: NOT_REVIEWED | 0 / 0 |
+| P06 | Durable execution in simulation | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | G06: NOT_REVIEWED | 0 / 0 |
 | P07 | Native OpenStack provisioning | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G07: NOT_REVIEWED | 0 / 0 |
 | P08 | VMware-to-OpenStack migration | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G08: NOT_REVIEWED | 0 / 0 |
 | P09 | Platform and capability expansion | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G09: NOT_REVIEWED | 0 / 0 |
@@ -62,11 +62,11 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P05.04 | Plan compilation | Planning | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P05.05 | Review experience | Console | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P05.06 | Admission contract | Planning/governance/lifecycle | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
-| P06.01 | Admission and dispatch | Lifecycle | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P06.02 | Workflow state | Lifecycle | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P06.03 | Execution authority | Lifecycle/workers | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P06.01 | Admission and dispatch | Lifecycle | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P06.02 | Workflow state | Lifecycle | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P06.03 | Execution authority | Lifecycle/workers | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P06.04 | Evidence custody | Assurance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P06.05 | Simulation and fault injection | Quality | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P06.05 | Simulation and fault injection | Quality | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P06.06 | Jobs experience | Console | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P07.01 | Native site readiness | SRE/platform owners | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P07.02 | Infrastructure automation | Infrastructure | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
