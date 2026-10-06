@@ -386,6 +386,19 @@ def test_owner_collisions_are_proposals_and_cannot_grant_ownership(campaign: Cam
         )
         assert result["ownership_granted"] is False
     assert "ownership_collision" in c.resources(job)["items"][0]["holds"]
+    with pytest.raises(Rejected, match="matching_held"):
+        c.service.command(
+            replace(c.actor, action="inventory.match"),
+            "match",
+            {
+                "resource_id": resource,
+                "application_id": uid(),
+                "intent_revision": uid(),
+                "generation_id": job,
+            },
+            uid(),
+            c.endpoint,
+        )
 
 
 def test_runtime_cannot_rewrite_pages_history_receipts_or_audit(campaign: Campaign) -> None:

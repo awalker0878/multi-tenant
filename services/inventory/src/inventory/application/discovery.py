@@ -314,7 +314,9 @@ class Discovery:
         self.policy(endpoint)
         row = tx.one(
             (
-                "SELECT r.*,o.expires_at FROM inventory.resources r JOIN"
+                "SELECT r.*,o.expires_at,(SELECT count(DISTINCT application) "
+                "FROM inventory.matches m WHERE m.resource=r.id AND m.tenant=r.tenant) "
+                "AS candidates FROM inventory.resources r JOIN"
                 " inventory.observations o ON o.resource=r.id AND "
                 "o.generation=%s WHERE r.id=%s AND r.tenant=%s AND "
                 "r.endpoint=%s"
@@ -328,6 +330,7 @@ class Discovery:
             or row["expires_at"] <= self.clock()
             or row["identity_hold"]
             or row["tombstone"]
+            or row["candidates"] > 1
         ):
             raise Rejected("matching_held", 409)
         match_id = uid()

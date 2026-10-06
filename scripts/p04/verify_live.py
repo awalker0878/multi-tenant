@@ -193,10 +193,7 @@ def main():
                             raise RuntimeError(name+'_start_failed')
                         time.sleep(.1)
 
-            owner = sql("SELECT actor_id FROM app.tenant_memberships WHERE tenant_id='"+fixture['tenant']+"' AND role='administrator';", 'governance')
-            if not owner:
-                # Product role spelling is admin in the permission matrix.
-                owner = sql("SELECT actor_id FROM app.tenant_memberships WHERE tenant_id='"+fixture['tenant']+"' AND role='admin';", 'governance')
+            owner = sql("SELECT actor_id FROM app.tenant_memberships WHERE tenant_id='"+fixture['tenant']+"' AND role='tenant_admin' AND state='active';", 'governance')
             check('independent-site-owner-resolved', re.fullmatch('[0-9a-f-]{36}', owner) is not None)
             site, worker_id = str(uuid.uuid4()), str(uuid.uuid4())
             policy = {
