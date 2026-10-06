@@ -9,6 +9,7 @@ use App\Application\Foundation\Contracts\DependencyProbe;
 use App\Application\Foundation\Contracts\HealthCredential;
 use App\Application\Foundation\Contracts\SignalBuffer;
 use App\Application\Identity\Contracts\IdentityGateway;
+use App\Application\Inventory\Contracts\InventoryGateway;
 use App\Application\Notifications\Contracts\NotificationDecoder;
 use App\Application\Notifications\Contracts\NotificationHints;
 use App\Application\Notifications\Contracts\NotificationSource;
@@ -19,6 +20,7 @@ use App\Infrastructure\Foundation\MountedHealthCredential;
 use App\Infrastructure\Foundation\PostgresDependencyProbe;
 use App\Infrastructure\Governance\GovernanceTenantGateway;
 use App\Infrastructure\Identity\GovernanceIdentityGateway;
+use App\Infrastructure\Inventory\InventoryClient;
 use App\Infrastructure\Notifications\GovernanceNotificationDecoder;
 use App\Infrastructure\Notifications\PostgresNotificationHints;
 use App\Infrastructure\Notifications\RabbitNotificationSource;
@@ -28,6 +30,7 @@ final class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(InventoryGateway::class, InventoryClient::class);
         $this->app->bind(CatalogueGateway::class, CatalogueClient::class);
         $this->app->singleton(NotificationSource::class, RabbitNotificationSource::class);
         $this->app->bind(NotificationDecoder::class, GovernanceNotificationDecoder::class);

@@ -31,6 +31,8 @@ class PythonLockTest(unittest.TestCase):
                     expected.update({"attrs": "26.1.0", "jsonschema": "4.26.0",
                                      "jsonschema-specifications": "2025.9.1", "pika": "1.4.4",
                                      "referencing": "0.37.0", "rpds-py": "2026.9.1"})
+                if service == "inventory":
+                    expected["pika"] = "1.4.4"
                 self.assertEqual(inventory, expected)
 
     def test_workers_keep_only_owned_distribution(self):

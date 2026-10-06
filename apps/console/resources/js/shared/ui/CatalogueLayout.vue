@@ -7,8 +7,9 @@ onMounted(async () => { await nextTick(); document.getElementById('catalogue-hea
 <template>
  <Head :title="`${title} | Workload Mobility`" />
  <main class="catalogue mx-auto min-h-screen max-w-6xl px-5 py-10 text-slate-900">
-  <nav aria-label="Catalogue navigation" class="mb-8 flex flex-wrap gap-5 text-sm font-semibold text-teal-800">
+  <nav aria-label="Workspace navigation" class="mb-8 flex flex-wrap gap-5 text-sm font-semibold text-teal-800">
    <Link href="/account">Your tenants</Link><Link :href="`/tenants/${tenantId}`">Tenant settings</Link><Link :href="`/tenants/${tenantId}/applications`">Applications</Link><Link :href="`/tenants/${tenantId}/catalogue-references`">Environments and domains</Link>
+   <Link :href="`/tenants/${tenantId}/inventory`">Observed inventory</Link>
    <Link href="/logout" method="post" as="button" class="ml-auto">Sign out</Link>
   </nav>
   <h1 id="catalogue-heading" tabindex="-1" class="mb-7 text-3xl font-semibold tracking-tight">{{ title }}</h1><slot />

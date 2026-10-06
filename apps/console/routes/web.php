@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\CatalogueWorkspaceController;
 use App\Http\Controllers\FoundationController;
 use App\Http\Controllers\InstallationNotificationController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OidcController;
@@ -46,4 +47,13 @@ Route::prefix('/tenants/{tenant}')->whereUuid('tenant')->middleware(RequireIdent
     Route::get('/applications/{application}/status', [$c, 'status'])->whereUuid('application');
     Route::get('/catalogue-references', [$c, 'references']);
     Route::post('/catalogue-references', [$c, 'referenceSave']);
+});
+
+Route::prefix('/tenants/{tenant}/inventory')->whereUuid('tenant')->middleware(RequireIdentity::class)->group(function (): void {
+    $c = InventoryController::class;
+    Route::get('/', [$c, 'index']);
+    Route::get('/sites/{site}', [$c, 'site'])->whereUuid('site');
+    Route::get('/sites/{site}/status', [$c, 'status'])->whereUuid('site');
+    Route::get('/sites/{site}/generations/{generation}', [$c, 'resources'])->whereUuid(['site', 'generation']);
+    Route::post('/sites/{site}/commands', [$c, 'command'])->whereUuid('site');
 });

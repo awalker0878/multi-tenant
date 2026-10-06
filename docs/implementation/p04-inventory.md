@@ -71,3 +71,21 @@ skips (run `37433829615`, artifact `11398072994`). Its original source bindings 
 logs are retained in `verification/p04/core-8290f144/`. Later collector, event and
 Console work requires its own exact-source runs. The operation and native-input
 handoff is in [the runbook](../operations/runbooks/inventory-discovery.md).
+
+## Console increment
+
+The Console now exposes tenant-scoped sites, approved enrollment policies, endpoint
+health, discovery commands, eleven-dimensional capability gaps and fixed-generation
+observations. Expiry and eligibility holds remain visible. Application matching
+checks current Catalogue revision access before recording an unverified proposal.
+The client validates generated wire contracts, streams bounded responses and uses
+separate workload credentials plus current site-scoped actor delegation. Uncertain
+commands retain their original key/body/revision for an unchanged retry. Current
+access polling clears revoked views and pauses commands on authority outage.
+
+Local Console checks: 156 passing tests (738 assertions), seven PostgreSQL-specific
+checks deferred to hosted qualification; Vue type checking and production build
+pass. Governance: 245 passing tests (5663 assertions), twelve PostgreSQL-only checks
+deferred to hosted qualification. The new `P04 live discovery, Console and delivery`
+campaign requires Chromium, Firefox and WebKit against actual local services,
+PostgreSQL TLS, native HTTPS fixtures and an independently observed AMQPS broker.

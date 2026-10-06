@@ -26,7 +26,7 @@ const edit = (value: Member) => {
 <template>
   <IdentityLayout :title="tenant.name" description="Tenant membership and entitlement settings.">
     <Link href="/account" class="mt-5 inline-block text-teal-800 underline">All your tenants</Link>
-    <nav class="mt-4 flex flex-wrap gap-4" aria-label="Tenant workspaces"><Link :href="`/tenants/${tenant.id}/applications${membership.environment ? '?environment=' + encodeURIComponent(membership.environment) : ''}`" class="text-teal-800 underline">Application catalogue</Link><Link :href="`/tenants/${tenant.id}/catalogue-references`" class="text-teal-800 underline">Environments and domains</Link></nav>
+    <nav class="mt-4 flex flex-wrap gap-4" aria-label="Tenant workspaces"><Link :href="`/tenants/${tenant.id}/applications${membership.environment ? '?environment=' + encodeURIComponent(membership.environment) : ''}`" class="text-teal-800 underline">Application catalogue</Link><Link :href="`/tenants/${tenant.id}/catalogue-references`" class="text-teal-800 underline">Environments and domains</Link><Link :href="`/tenants/${tenant.id}/inventory${membership.site_id ? '/sites/' + membership.site_id : ''}`" class="text-teal-800 underline">Observed inventory</Link></nav>
     <p class="mt-3 text-sm text-slate-600">Your role: {{ membership.role.replaceAll('_', ' ') }}<span v-if="membership.site_id"> · {{ membership.site_id }}</span><span v-if="membership.environment"> · {{ membership.environment }}</span></p>
     <p v-if="notice" role="status" class="mt-4 text-sm text-teal-800">{{ notice }}</p>
     <div v-if="errors.length" role="alert" tabindex="-1"><p v-for="error in errors" :key="error">{{ error }}</p></div>

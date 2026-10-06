@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Domain\Catalogue\CatalogueFailure;
 use App\Domain\Identity\IdentityFailure;
+use App\Domain\Inventory\InventoryFailure;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PageResponseHeaders;
 use App\Http\Middleware\RedactIdentityCallback;
@@ -31,7 +32,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(prepend: [RequireConsoleHost::class], append: [RedactIdentityCallback::class, HandleInertiaRequests::class, PageResponseHeaders::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontReport([IdentityFailure::class, CatalogueFailure::class]);
+        $exceptions->dontReport([IdentityFailure::class, CatalogueFailure::class, InventoryFailure::class]);
+        $exceptions->render(function (InventoryFailure $error) {
+            if (in_array($error->status, [403, 404], true)) {
+                return redirect('/account')->with('tenant_notice', 'Your inventory access changed.');
+            }
+
+            return response('Inventory is temporarily unavailable. Retry to refresh the observed data.', 503, ['Cache-Control' => 'no-store, private']);
+        });
         $exceptions->render(function (CatalogueFailure $error) {
             if (in_array($error->status, [403, 404], true)) {
                 return redirect('/account')->with('tenant_notice', 'This application is unavailable or your access changed.');
