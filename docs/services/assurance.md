@@ -78,3 +78,11 @@ Owned source root: `services/assurance/app/`. Evidence metadata/custody, qualifi
 Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). This service owns its own `App\` namespace. Organize business behavior in `app/Domain/<Capability>/` and use cases in `app/Application/<Capability>/Actions/`, with `handle()` as the Action entrypoint. Keep external adapters in `app/Infrastructure/` and controllers, requests, jobs, listeners, policies and providers in normal Laravel directories. Domain code cannot depend on Application or Infrastructure; Eloquent and Laravel facilities remain available under [ADR-024](../decisions/adr-024-pragmatic-laravel-domain-convention.md). Same-context capabilities may collaborate directly; repositories and DTOs require a concrete reason. Public API/event schemas define cross-service access, and internal models, use cases and migrations remain private.
 
 The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.
+
+## P06 implemented simulation boundary
+
+The [P06 implementation record](../implementation/p06-execution.md) and
+[simulation runbook](../operations/runbooks/durable-simulation.md) identify the
+implemented admission, workflow, custody and Console boundary, executable
+configuration, and remaining native/operating limits. Simulation evidence is E2;
+no native effect, automatic restore re-enable or production support is implied.

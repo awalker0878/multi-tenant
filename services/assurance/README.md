@@ -2,7 +2,7 @@
 
 Assurance owns attributable evidence metadata, artifact custody, qualification decisions and conditional support publication. Its detailed responsibility, invariants and delivery cases are in the [service specification](../../docs/services/assurance.md).
 
-This P01 increment establishes a service-private Laravel application boundary and diagnostic HTTP endpoints. The evidence upload or verification, object storage, custody controls, qualification decisions, authorization, database migrations, outbox delivery and public business endpoints are not implemented. A passing foundation check does not establish those product capabilities or operational acceptance. P06.04 implements the business behavior.
+This P01 increment establishes a service-private Laravel application boundary and diagnostic HTTP endpoints. P06.04 now implements scoped simulation uploads, digest verification, independent observations, append-only SQL custody and review. External object-store operation, native qualification publication and operational acceptance remain separate from this increment.
 
 ## Service ownership
 
@@ -15,7 +15,7 @@ This application owns `composer.json`, its service-private `composer.lock`, its 
 | `GET /health/live` | HTTP 200, `status: alive`, `scope: process` | The Laravel request reached this process. |
 | `GET /health/ready` | HTTP 503, `status: not_ready`, `reason: foundation_only` | Required application dependencies and their checks are not implemented. |
 
-Both endpoints return JSON with `Cache-Control: no-store`; readiness also returns `Retry-After: 10`. They do not start browser sessions, accept tenant identity or check database connectivity. Health writes are rejected, unknown routes return JSON and business endpoints are absent. There is no configuration flag that changes this foundation into a ready service. These routes are diagnostic probes, not a public business API or authorization contract.
+Both endpoints return JSON with `Cache-Control: no-store`; readiness also returns `Retry-After: 10`. They do not start browser sessions, accept tenant identity or check database connectivity. Health writes are rejected and unknown routes return JSON. P05/P06 owner routes are authenticated separately. There is no configuration flag that changes this foundation into a ready service. These routes are diagnostic probes, not a public business API or authorization contract.
 
 ## Install and check
 
@@ -40,3 +40,12 @@ The ordinary tests exercise actual HTTP responses, absent routes, write rejectio
 ## Current verification scope
 
 The [package record](../../docs/implementation/p01-laravel-foundations.md) binds the successful private-lock replay, PHP quality, 14 Pest tests / 44 assertions and cached HTTP probes in run 37239193553. The [image record](../../docs/implementation/p01-laravel-images.md) separately binds the independently built image and restricted process diagnostics. These are foundation measurements, not acceptance of the future product behavior. Dependency readiness remains unavailable until its real probes and required dependencies are implemented; process liveness cannot promote this state.
+
+## P06 simulation custody
+
+The owned evidence migration grants runtime insert/read only. Uploads are bounded
+allowlisted JSON; finalization verifies source/scope/digest with Lifecycle and reads
+each effect directly from the independent simulator. Current delegated authority
+controls retrieval/review. Simulation stays E2 and cannot publish native support.
+See the [implementation record](../../docs/implementation/p06-execution.md) and
+[configuration/runbook](../../docs/operations/runbooks/durable-simulation.md).

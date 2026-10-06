@@ -99,7 +99,7 @@ Build a private canonical observations file with exactly these fields:
 | `restore_sha256` | SHA-256 of the actual restored archive |
 | `records_sha256` | Digest of the reviewed current retirement, revocation and provider reconciliation record |
 | `containment_sha256` | Digest of independently observed containment/drain evidence |
-| `previous_workloads` | `console`, `catalogue`, `inventory`, `planning`, `assurance` mapped to previous credential fingerprints or justified nulls |
+| `previous_workloads` | `console`, `catalogue`, `inventory`, `planning`, `assurance`, `lifecycle` mapped to previous credential fingerprints or justified nulls |
 | `memberships` | Up to 100 selected `{id, owner_record_sha256}` entries; use `[]` to resume identity with every tenant suspended |
 
 Each selected membership must already be active, unexpired, tied to an enabled actor

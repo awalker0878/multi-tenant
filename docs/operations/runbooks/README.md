@@ -14,6 +14,7 @@ Owner: SRE with the domain and native resource owners named in each procedure. A
 | Restore the control plane in isolated recovery | [Restore control plane](restore-control-plane.md) | SRE/lifecycle |
 | Reconcile recovered control/native/application state and resume | [Recovery](recovery.md) | Lifecycle/SRE/application owner |
 | Commission a site and its constrained worker pools | [Commissioning](commissioning.md) | Inventory/platform owner |
+| Execute and reconcile an isolated simulation | [Durable simulation](durable-simulation.md) | Lifecycle/SRE/Assurance |
 | Diagnose an alert, contain impact and route an incident | [Handle alert](handle-alert.md) | Receiving responder/incident lead |
 
 The task-specific recovery procedures use the common reconciliation and no-duplicate-write rules in [recovery](recovery.md). Do not duplicate those rules into a local shortcut. Use [support](../support.md) for ownership/escalation and [observability](../observability.md) for signal definitions.

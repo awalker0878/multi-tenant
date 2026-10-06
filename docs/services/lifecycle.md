@@ -79,3 +79,11 @@ Owned source root: `services/lifecycle/src/lifecycle/`. Admission, execution aut
 Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). This Python service retains `domain/`, `application/`, `infrastructure/` and `interfaces/` with the documented dependency direction. Its capability modules may collaborate within the same owning context. Composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages. The pragmatic Laravel convention in ADR-024 applies to PHP services and does not relocate this Python source.
 
 The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.
+
+## P06 implemented simulation boundary
+
+The [P06 implementation record](../implementation/p06-execution.md) and
+[simulation runbook](../operations/runbooks/durable-simulation.md) identify the
+implemented admission, workflow, custody and Console boundary, executable
+configuration, and remaining native/operating limits. Simulation evidence is E2;
+no native effect, automatic restore re-enable or production support is implied.

@@ -53,3 +53,13 @@ The selected runtime cannot be operated within deployment constraints, replay co
 - [Decision register](decision-register.md) — authority for disposition, origin and blocking checkpoint.
 - [Phased implementation plan](../implementation/phased-plan.md) — package and gate sequence.
 - [ADR authoring template](../templates/adr.md) — required decision-record fields.
+
+## P06 engineering refinement
+
+The [P06 implementation record](../implementation/p06-execution.md) defines the
+shipped V1 workflow/queue, bounded activities, exact simulation authority, sealed
+attempt reconciliation, custody and restore quarantine. Its
+[runbook](../operations/runbooks/durable-simulation.md) gives executable bindings.
+These engineering choices preserve the directed baseline. Accountable receiving
+review, operated dependency ownership and native qualification remain separate;
+this addition does not change the recorded disposition or manufacture acceptance.
