@@ -128,10 +128,12 @@ def test_crash_before_acceptance_seals_late_worker_before_retry(world: dict[str,
     assert service.activity(w['tenant'],job['id'],'reserve','sim-worker')['state']=='confirmed_succeeded'
 
 
-@pytest.mark.parametrize('fault',['epoch','expiry','worker','revoked','stop','owner_partition','plan_input','snapshot_scope'])
+@pytest.mark.parametrize('fault',['epoch','expiry','worker','revoked','stop','owner_partition','plan_input','snapshot_scope','ownership'])
 def test_boundary_denials(world: dict[str, Any], fault: str) -> None:
     w=world; job=w['admit'](); service=w['service']
     grant=service.acquire(w['tenant'],job['id'],'reserve','sim-worker')
+    if fault=='ownership':
+        with w['database'].transaction() as tx:tx.execute('UPDATE app.execution_holds SET retained=false')
     if fault=='epoch': w['current'].epoch=str(uuid4())
     if fault=='expiry': w['clock'][0]+=16
     if fault=='worker': grant['worker_id']='foreign-worker'

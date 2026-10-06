@@ -142,7 +142,7 @@ def _campaign(c,p):
     run([*witness,'crash_after',tenant,jobs[1]['id'],'activate_target',str(grant_file)],env=envs['lifecycle'],expected=75,label='p06-crash-after-target-write')
     view=current(1);check('p06-unknown-target-write-is-forward-recovery',view['recovery_mode']=='forward_recovery_required' and any(o['outcome']=='attempting' for o in view['operations']))
     # Browser exercises unknown state, stale controls, stop, cancel, history and revoked access.
-    fixture['reader_member']=gov('/v1/tenants/'+tenant+'/memberships',{'revision':0,'subject':'p03-outsider','role':'reader','state':'active','site_id':None,'environment':None,'expires_at':None})
+    fixture['reader_member']=gov('/v1/tenants/'+tenant+'/memberships',{'revision':0,'subject':'p03-outsider','role':'reader','state':'active','site_id':None,'environment':None,'expires_at':None},expected=200)
     fixture['reader_token']=fixture['foreign_token']
     fixture.update(p06_jobs=jobs,p06_plans=plans,p06_fault_file=str(fault_file),p06_registry_file=str(registry_file),p06_api_url=common['LIFECYCLE_URL'])
     c['fixture_file'].write_text(json.dumps(fixture));run(['php','scripts/p06/seed_console.php',str(c['fixture_file'])],env=envs['console'],label='p06-browser-sessions')

@@ -334,6 +334,11 @@ class Execution:
                 "at=%s,redeemed=false,revision=revision+1 WHERE id=%s",
                 (attempt, grant, worker, epoch, expiry, op["id"]),
             )
+            tx.execute(
+                "UPDATE app.execution_projection SET revision=revision+1"
+                ",updated_at=%s WHERE job=%s",
+                (self.clock(), job_id),
+            )
             self.project(tx, job_id, "running")
             self.event(
                 tx,
@@ -401,6 +406,13 @@ class Execution:
                 or self.clock() - snapshot["evaluated_at"] > 5
             ):
                 raise Rejected("grant_not_current", 403)
+            for resource in hold_keys(job["plan"]):
+                held = tx.one(
+                    "SELECT job,retained FROM app.execution_holds WHERE resource_key=%s",
+                    (resource,),
+                )
+                if not held or str(held["job"]) != job["id"] or not held["retained"]:
+                    raise Rejected("ownership_lost", 423)
             tx.execute(
                 "UPDATE app.execution_operations SET redeemed=true,revision=revision+1 WHERE id=%s",
                 (op["id"],),

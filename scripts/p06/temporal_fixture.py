@@ -21,6 +21,8 @@ class TemporalFixture:
         self.path.chmod(0o600);self.path.write_text(json.dumps(config))
         self.run=run;self.command=['docker','compose','-f',str(self.path)]
         secrets=private/'temporal/secrets'
+        for secret in secrets.glob('*-password'):
+            redactions.append(secret.read_text().strip())
         for name in ['jwt-lifecycle','jwt-admin','jwt-foreign','jwt-expired','jwt-wrong-audience']:
             redactions.append((secrets/name).read_text().strip())
         self.environment={'TEMPORAL_TARGET':'127.0.0.1:17233','TEMPORAL_NAMESPACE':'lifecycle','TEMPORAL_SERVER_NAME':'temporal','TEMPORAL_CA_FILE':str(secrets/'ca.crt'),'TEMPORAL_CREDENTIAL_FILE':str(secrets/'jwt-lifecycle'),'P06_TEMPORAL_ADMIN_FILE':str(secrets/'jwt-admin')}
