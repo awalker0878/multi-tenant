@@ -57,6 +57,8 @@ can insert/read custody records but cannot update/delete them. Retention is
 recorded for 365 days; no runtime purge is implemented. Raw logs and credentials
 are excluded by the observation schema. Current scoped delegation controls reads
 and independent review. Reviews cannot turn simulation into native support.
+Reads return the most recent 1,000 reviews in chronological order; older immutable
+reviews remain in custody.
 
 Custody for committed facts may finish after executor revocation. Missing or
 invalid evidence prevents job completion. Review decisions and receipts remain

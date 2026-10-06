@@ -103,7 +103,7 @@ final class ManageEvidence
         abort_unless(is_string($raw) && hash_equals($receipt['digest'], hash('sha256', $raw)), 409, 'custody_tampered');
 
         return $receipt + ['observations' => json_decode($raw, true, 32, JSON_THROW_ON_ERROR),
-            'reviews' => DB::table('app.evidence_reviews')->where('evidence', $id)->orderBy('recorded_at')->get()->all()];
+            'reviews' => DB::table('app.evidence_reviews')->where('evidence', $id)->orderByDesc('recorded_at')->orderByDesc('id')->limit(1000)->get()->reverse()->values()->all()];
     }
 
     /** @param array<string, list<string|null>> $headers
