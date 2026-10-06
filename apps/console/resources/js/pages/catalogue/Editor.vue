@@ -26,12 +26,12 @@ const loadFile = async (e: Event) => {
  if (file.size > 262144) { form.setError('intent_json', 'Choose an intent file no larger than 256 KiB.'); return; }
  imported.value = await file.text(); mode.value = 'import';
 };
-const refresh = () => { reviewed.value = false; router.reload({ only: ['application', 'revision', 'canWrite'], onSuccess: () => { reviewed.value = true; } }); };
+const refresh = () => { reviewed.value = false; router.get(window.location.pathname, { environment: props.revision?.intent.environment.id ?? props.environment }, { only: ['application', 'revision', 'canWrite'], preserveState: true, preserveScroll: true, onSuccess: () => { reviewed.value = true; } }); };
 const adopt = () => { form.etag = props.application?.etag ?? null; form.command_key = crypto.randomUUID(); changed.value = false; reviewed.value = false; form.clearErrors(); };
 const chooseEnvironment = (e: Event) => { const item = props.references.environments.references.find(r => r.id === (e.target as HTMLSelectElement).value); if (item) draft.value.environment = { id: item.id, version: item.version }; };
 let timer: ReturnType<typeof setInterval> | undefined, active = true, removeBefore: (() => void) | undefined;
 const check = async () => {
- if (!props.application || document.hidden) return;
+ if (!props.application || document.hidden || unknown.value) return;
  try { const response = await fetch(`/tenants/${props.tenantId}/applications/${props.application.id}/status${props.environment ? '?environment=' + props.environment : ''}`, { headers: { Accept: 'application/json' }, credentials: 'same-origin', cache: 'no-store' });
   if (!active) return;
   if (response.status === 403 || response.redirected) { active = false; router.cancelAll(); router.clearHistory(); window.location.replace('/account'); return; }
