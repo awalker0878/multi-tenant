@@ -1,6 +1,41 @@
-# Next work — P03 Catalogue and workspace
+# Next work — P03 acceptance and P04 preparation
 
-The user authorizes continued P03 implementation. See [the P03 record](docs/implementation/p03-catalogue.md). Current task: qualify the Catalogue persistence increment, complete the generated contract clients and Console workspace, and execute real authority, concurrency, broker and browser campaigns. Preserve the P01/P02 receiving obligations below. P03/G03 remains open until its actual engineering and receiving criteria are satisfied.
+P03 engineering and its automated qualification are delivered at
+`1c51f56a928291870e5125508aeb04935583fd56`. The
+[P03 record](docs/implementation/p03-catalogue.md) and
+[retained index](verification/p03/final/qualification-index.json) bind 89 passing
+PostgreSQL tests and all three passing 38-check live campaigns. The generated
+clients, complete Console workspace, concurrency/restart, broker fault/replay and
+post-revocation delivery are verified. Evidence is committed at
+`187ead3a02521cc3d6be063c6f449f0e3b79113a`; original failures remain available.
+
+The [delivery register](docs/implementation/delivery-register.yaml) retains P03
+IN_PROGRESS and G03 NOT_REVIEWED because actual representative-user and designated
+review obligations remain. Continue with the concrete
+[completion packet](docs/implementation/p03-completion-review.md):
+
+1. **BL-P03-001 — Product/operator review:** identify the representative operator,
+   observer and OP07 browser/OS/policy/assistive combinations. Execute all seven
+   authoring, validation, conflict, comparison, uncertain-retry, access-change and
+   draft tasks; retain comprehension/accessibility findings and resolve defects.
+2. **BL-P03-002 — Criterion reviews:** Catalogue, architecture/quality, independent
+   quality and product owners examine EV-P03-001–003 through the
+   [G03 assessment](docs/qualification/gate-reviews/g03-engineering-assessment-2026-10-06.md).
+   Record actual identities, dates, evidence and the G03 decision. Development and
+   the accepted initial DC03 rules do not require renewed authorization.
+3. **Queued foundation regression:** observe final-source Kubernetes run
+   `37405120379` after the existing branch queue drains. Current-source package,
+   image, contract, policy, Compose and P02 identity checks pass; the historical
+   Kubernetes pass does not supply this queued result. Keep its broader foundation
+   result separate from the completed P03 dependency/browser qualification.
+4. **Next P04 inputs:** obtain installed VMware/OpenStack product/API versions,
+   endpoint/trust references, tenant/project/site scope, lab owner and permitted
+   read-only discovery effects. Use [P04's task cards](docs/implementation/phases/p04.md)
+   once those actual facts are supplied. No native campaign is authorized or
+   qualified by the P03 tests.
+
+Preserve the P01/P02 receiving obligations below. No source change, review, native
+result or operating acceptance is inferred from a generated progress view.
 
 ## P02 receiving and operating obligations
 

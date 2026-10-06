@@ -1,6 +1,6 @@
 # Product domain model
 
-Status: proposed ADR-013 specification, 2026-10-04. This page makes the planned relationships reviewable; it does not resolve ADR-013 or approve a database schema. P00 validates representative examples and ownership; the decision must close before P03 schema implementation. All IDs and values below are synthetic.
+Status: initial Catalogue cardinalities accepted through G00/DC03 on 2026-10-04; see [ADR-013](../decisions/adr-013-product-aggregate-invariants.md). P03 implements the logical application/reference/revision rules. Native managed bindings and later placement exceptions remain separately scoped refinements. All example IDs and values below are synthetic.
 
 ## Terms and record ownership
 
@@ -15,7 +15,7 @@ Each record has one authoritative writer. Cross-context references are IDs and v
 | Application | Catalogue | Tenant-owned business grouping with accountable service owner and acceptance requirements; `application_id`, `tenant_id` |
 | Workload | Catalogue | Stable logical component belonging to one application; `workload_id`, `application_id`, `tenant_id`; native VM IDs are separate references |
 | DatasetDefinition | Catalogue; part of versioned application intent | Logical data and consistency requirements with `dataset_id`, accountable data owner and consistency-group identity; native volumes, backup copies and transfer artifacts have separate provenance |
-| ApplicationDeployment | Catalogue; proposed association | One application in one environment; `deployment_id`, `application_id`, `environment_id`, `tenant_id`; separates environment-specific intent from the reusable application identity |
+| ApplicationDeployment | Catalogue; implemented association | One application in one environment; `deployment_id`, `application_id`, `environment_id`, `tenant_id`; separates environment-specific intent from the reusable application identity |
 | WorkloadSecurityDomain (WSD) | Catalogue | Tenant-owned grouping by service ownership, lifecycle and security/recovery requirements; `wsd_id`, `tenant_id`, accountable owner and policy references |
 | SecurityDomain | Catalogue | Tenant-owned logical zone instance with zone class and security authority; `security_domain_id`, `tenant_id`; zone taxonomy such as OZ/RZ is a reusable value, not a shared tenant boundary |
 | IntentRevision | Catalogue | Immutable desired state for one ApplicationDeployment; `intent_revision_id`, parent, schema version, actor, canonical digest and complete requirement/placement snapshot |
@@ -52,9 +52,9 @@ erDiagram
     SecurityDomain ||--o{ WorkloadPlacement : places
 ```
 
-The proposed create-application command accepts a complete valid initial intent, establishing its first deployment and immutable revision atomically. A user may compose an incomplete console draft before submission, but this does not create an accepted catalogue revision; a dedicated persisted draft API is outside the first slice. Reference aggregates such as WSDs may exist before a placement uses them. Every published intent includes at least one workload placement and passes the invariants below. The diagram describes logical references, not physical cross-service joins.
+The create-application command accepts a complete valid initial intent, establishing its first deployment and immutable revision atomically. A user may compose an incomplete console draft before submission, but this does not create an accepted catalogue revision; a dedicated persisted draft API is outside the first slice. Reference aggregates such as WSDs may exist before a placement uses them. Every published intent includes at least one workload placement and passes the invariants below. The diagram describes logical references, not physical cross-service joins.
 
-| Association | Proposed rule and rationale |
+| Association | Initial rule and rationale |
 | --- | --- |
 | Tenant → Application/Environment/WSD/SecurityDomain | Each child belongs to exactly one tenant. Matching names or zone classes across tenants never merge their authority boundaries. |
 | Application → Workload | Each workload definition belongs to exactly one application. A shared service used by several applications is a separately owned dependency/attachment, not the same workload silently owned by several apps. |
@@ -66,7 +66,7 @@ The proposed create-application command accepts a complete valid initial intent,
 | WorkloadPlacement → network attachments | One or more declared attachments if networking is required. Every attachment must remain within its placement's approved domain scope; multi-NIC is not an implicit bridge between zones. Cross-domain appliances require a separately designed and qualified exception profile. |
 | SecurityDomain → native realization | Zero or more approved ManagedDomainBindings across sites/endpoints. Every active native isolation scope has one tenant/domain owner; historical binding records retain prior epochs. |
 
-These are deliberately concrete proposals for review. P00 must specifically validate whether one active deployment per application/environment and one domain per ordinary workload cover real workloads. If not, change ADR-013 and its examples before generating contracts; do not encode undocumented exceptions.
+G00/DC03 accepts one active deployment per application/environment and one domain per ordinary workload for initial Catalogue implementation. A future topology that requires a different key or domain exception must explicitly revise ADR-013 and its examples; native placement remains a later qualification boundary.
 
 ## Native realization and execution cardinalities
 

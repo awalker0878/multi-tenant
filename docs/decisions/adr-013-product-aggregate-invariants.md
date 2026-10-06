@@ -2,13 +2,13 @@
 
 Owner role: Product/architecture leads. Related phases: P00, P03, P05. Record date: 2026-10-04.
 
-Origin: `DESIGN`. Disposition: `OPEN` as recorded in the [decision register](decision-register.md).
+Origin: `DESIGN`. Disposition: `ACCEPTED` for the initial Catalogue development baseline as recorded in the [decision register](decision-register.md).
 
-This record develops the existing baseline for review. No accountable-owner acceptance, experiment result or native qualification is claimed; the register disposition is unchanged.
+The requesting user accepted the initial DC03 development choices through the [2026-10-04 G00 decision](../qualification/gate-reviews/g00-user-decision-2026-10-04.md). This scoped update records that existing acceptance; it is not a new approval or native qualification. P03 implements and verifies these Catalogue rules. Native placement refinements remain due before P05.02.
 
 ## Context
 
-Tenant, WSD, SecurityDomain, DomainInstance, Application and Workload describe different business and placement responsibilities. Ambiguous cardinalities would create inconsistent APIs, authorization and deletion behavior. The draft domain model is an input to this open decision, not evidence that every invariant has been accepted.
+Tenant, WSD, SecurityDomain, DomainInstance, Application and Workload describe different business and placement responsibilities. Ambiguous cardinalities would create inconsistent APIs, authorization and deletion behavior. The domain model separates the accepted logical Catalogue baseline from later managed/native realization details.
 
 ## Decision and scope
 
@@ -31,10 +31,18 @@ Refinement and validation: Aggregate constraints before P03.01; real placement s
 - Catalogue owns desired application structure; inventory observations and native identifiers remain separately sourced facts.
 - Cross-aggregate deletion and sharing need an explicit lifecycle protocol rather than implicit cascading writes across services.
 
-## Unresolved details and evidence needed
+## Accepted initial Catalogue rules
 
-- Resolve each cardinality, uniqueness boundary, shared attachment rule and reassignment restriction.
-- Specify deletion eligibility, retained historical references and how domain instances realize policy at sites.
+- One owning tenant for applications and reference definitions; one application owns each stable workload identity.
+- One deployment identity per application/environment. A workload placement selects exactly one same-tenant WSD and logical security domain; an application may span several of each.
+- WSD/domain reuse across applications requires explicit sharing. Ordinary NICs cannot cross their placement domain. Controlled interfaces are dependency intent; ZIP is never a workload placement zone.
+- Publish complete immutable snapshots with explicit device order, requirement strength, data/service ownership and recovery intent. Startup/shutdown order graphs are checked independently from possibly bidirectional communication.
+- The strong application ETag serializes all deployment streams. Tenant/actor command receipts bind action, payload and expected revision; current authority is checked before returning a receipt.
+- Reference versions remain immutable. Names/zones cannot be reassigned; retirement cannot invalidate a current deployment. Historical references remain retained.
+
+## Remaining refinement
+
+Native DomainInstance/ManagedDomainBinding realization, cross-domain appliance exceptions, cross-tenant shared routing, cross-application dependency attachments and any regional deployment-key extension require their own scoped design and qualification. None is enabled implicitly by P03. The accepted baseline does not establish native placement semantics or receiving acceptance.
 
 ## Acceptance and validation
 
@@ -56,4 +64,4 @@ A required application or site topology cannot be represented without breaking a
 
 ## P00 domain review
 
-The [P00.02 domain review](../implementation/p00-domain-review.md) now provides concrete valid/invalid cases, command/event concurrency and one-writer assignments, including logical datasets, observed native identity, managed workload bindings and reservation journals. These are inspectable recommendations for the current service model. They do not import the historical schema or accept cardinalities without the designated architecture/service/security review.
+The [P00.02 domain review](../implementation/p00-domain-review.md) now provides concrete valid/invalid cases, command/event concurrency and one-writer assignments, including logical datasets, observed native identity, managed workload bindings and reservation journals. These examples informed the accepted G00/DC03 development baseline. They do not import the historical schema, authorize native effects or replace later architecture/service/security receiving review.

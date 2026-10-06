@@ -169,8 +169,13 @@ phases:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-001
+  - BL-P03-002
 - id: P04
   title: Site commissioning and inventory
   owner_role: Infrastructure engineering lead
@@ -1079,11 +1084,15 @@ work_packages:
   owner_role: Catalogue
   status:
     work: IN_PROGRESS
-    verification: IN_PROGRESS
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-002
   doc_refs:
   - docs/implementation/p03-catalogue.md
   - docs/implementation/phases/p03.md
@@ -1091,6 +1100,9 @@ work_packages:
   - docs/engineering/security-and-tenancy.md
   - docs/engineering/laravel-conventions.md
   - docs/engineering/data-and-messaging.md
+  - docs/implementation/p03-completion-review.md
+  - docs/qualification/gate-reviews/g03-engineering-assessment-2026-10-06.md
+  - verification/p03/check-matrix.md
   criterion_ids:
   - G03.01
   - G03.02
@@ -1100,14 +1112,21 @@ work_packages:
   owner_role: Catalogue
   status:
     work: IN_PROGRESS
-    verification: IN_PROGRESS
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-002
   doc_refs:
   - docs/implementation/p03-catalogue.md
   - docs/implementation/phases/p03.md
+  - docs/implementation/p03-completion-review.md
+  - docs/qualification/gate-reviews/g03-engineering-assessment-2026-10-06.md
+  - verification/p03/check-matrix.md
   criterion_ids:
   - G03.01
   - G03.02
@@ -1117,16 +1136,23 @@ work_packages:
   owner_role: Catalogue
   status:
     work: IN_PROGRESS
-    verification: IN_PROGRESS
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-002
   doc_refs:
   - docs/implementation/p03-catalogue.md
   - docs/implementation/phases/p03.md
   - docs/engineering/coverage.md
   - docs/engineering/data-and-messaging.md
+  - docs/implementation/p03-completion-review.md
+  - docs/qualification/gate-reviews/g03-engineering-assessment-2026-10-06.md
+  - verification/p03/check-matrix.md
   criterion_ids:
   - G03.03
 - id: P03.04
@@ -1138,13 +1164,21 @@ work_packages:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-001
+  - BL-P03-002
   doc_refs:
   - docs/implementation/p03-catalogue.md
   - docs/implementation/phases/p03.md
   - docs/engineering/coverage.md
   - docs/engineering/frontend.md
+  - docs/implementation/p03-completion-review.md
+  - docs/qualification/gate-reviews/g03-engineering-assessment-2026-10-06.md
+  - verification/p03/check-matrix.md
   criterion_ids:
   - G03.01
   - G03.04
@@ -1157,14 +1191,22 @@ work_packages:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-001
+  - BL-P03-002
   doc_refs:
   - docs/implementation/p03-catalogue.md
   - docs/implementation/phases/p03.md
   - docs/engineering/coverage.md
   - docs/engineering/data-and-messaging.md
   - docs/engineering/testing-and-ci.md
+  - docs/implementation/p03-completion-review.md
+  - docs/qualification/gate-reviews/g03-engineering-assessment-2026-10-06.md
+  - verification/p03/check-matrix.md
   criterion_ids:
   - G03.02
   - G03.03
@@ -2174,7 +2216,11 @@ requirements:
   - EV-P02-003
   - EV-P02-004
   - EV-P02-005
-  blocker_ids: []
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-002
 - id: R05
   package_ids:
   - P03.01
@@ -2195,12 +2241,17 @@ requirements:
   gate_ids:
   - G03
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-001
+  - BL-P03-002
 - id: R06
   package_ids:
   - P00.02
@@ -2228,12 +2279,16 @@ requirements:
   - G07
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
   blocker_ids:
   - BL-P00-001
+  - BL-P03-002
 - id: R07
   package_ids:
   - P03.02
@@ -2264,12 +2319,16 @@ requirements:
   - G07
   - G09
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-002
 - id: R08
   package_ids:
   - P04.01
@@ -2634,12 +2693,16 @@ requirements:
   - G05
   - G07
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-002
 - id: R20
   package_ids:
   - P05.02
@@ -3155,12 +3218,17 @@ requirements:
   - G08
   - G11
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-001
+  - BL-P03-002
 - id: R34
   package_ids:
   - P00.05
@@ -3377,8 +3445,13 @@ gates:
   decision: NOT_REVIEWED
   reviewer: null
   reviewed_at: null
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P03-001
+  - EV-P03-002
+  - EV-P03-003
+  blocker_ids:
+  - BL-P03-001
+  - BL-P03-002
 - id: G04
   phase_id: P04
   decision: NOT_REVIEWED
@@ -5694,6 +5767,107 @@ evidence:
     changes require requalification.
   valid_until: null
   invalidated_at: null
+- id: EV-P03-001
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/187ead3a02521cc3d6be063c6f449f0e3b79113a/verification/p03/final/local/report.json
+  sha256: d68d3fcf3dddea0624b98ac0326a03b1bbb49b47446a481dd9ad5604a91dfd6a
+  source_revision: 1c51f56a928291870e5125508aeb04935583fd56
+  artifact_revisions:
+    retained_artifact_commit: 187ead3a02521cc3d6be063c6f449f0e3b79113a
+  environment: Local Linux managed workspace, PHP 8.5.11 and Node 24; independent locked Console/Catalogue packages.
+  scope: 'Final-source Console passes 147 tests and 674 assertions; seven explicitly PostgreSQL-gated cases
+    are skipped. Nine commands pass: Console tests/format/types/architecture, Vue typecheck, production build,
+    frontend boundary checks, 24 intent domain cases (40 assertions) and exact generated-client drift check.
+    Source bytes and command logs are retained.'
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G03.01
+  - G03.02
+  - G03.04
+  observed_at: '2026-10-06T02:44:00.063632+00:00'
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched
+    retained source, archive and log bytes.
+  reviewer: Codex engineering evidence consistency only; designated independent and representative-user reviews
+    remain open.
+  limitations: Local PostgreSQL is unavailable; skipped persistence cases are not passes. Real dependency and
+    browser observations are recorded separately. No manual accessibility, independent receiving or operating
+    claim. No time-based expiry is asserted; material source, scope or assumptions require affected requalification.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P03-002
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/187ead3a02521cc3d6be063c6f449f0e3b79113a/verification/p03/final/core/report.json
+  sha256: a4e8e2bd37ae10a28a54553cf0739c6d965f10164f53f6a9b98e39defa3e8d97
+  source_revision: 1c51f56a928291870e5125508aeb04935583fd56
+  artifact_revisions:
+    retained_artifact_commit: 187ead3a02521cc3d6be063c6f449f0e3b79113a
+    archive_sha256: 3c6c4da5b7d7846c8dab1189fcdc330a3d3ced8726b0dd93dc3d5b4f69214566
+  environment: GitHub Actions Ubuntu 24.04; PHP 8.5.11; pinned PostgreSQL 18.6 image with verified TLS and separate
+    owner/runtime roles.
+  scope: Run 37405120516 passes all 89 Catalogue cases (335 assertions), with no skipped/failed/error cases.
+    It verifies immutable full intent, reference/workload/deployment ownership, current retry admission, original
+    receipts after later edits, atomic outbox rollback, runtime-history denials, migration replay, confirmed
+    publisher ordering and bounded pages. Catalogue/Governance formatting, types and architecture gates pass;
+    327 source files and 16 command logs match.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G03.01
+  - G03.02
+  - G03.03
+  - G03.04
+  observed_at: '2026-10-06T02:39:12.512384+00:00'
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched
+    retained source, archive and log bytes.
+  reviewer: Codex engineering evidence consistency only; designated independent and representative-user reviews
+    remain open.
+  limitations: Core authority/owner ports use synthetic fixtures. Live Governance, wire, concurrent-process,
+    broker and browser checks are separate in EV-P03-003. No native, operated ingress, human accessibility or
+    independent receiving claim. No time-based expiry is asserted; material source, scope or assumptions require
+    affected requalification.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P03-003
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/187ead3a02521cc3d6be063c6f449f0e3b79113a/verification/p03/final/qualification-index.json
+  sha256: df101825f57f88df85fee5540f2dd7a8eff77d498416b24d32c393d38b862009
+  source_revision: 1c51f56a928291870e5125508aeb04935583fd56
+  artifact_revisions:
+    retained_artifact_commit: 187ead3a02521cc3d6be063c6f449f0e3b79113a
+    chromium_archive_sha256: 8c8d5d2b6104768a30492cec160a2afe5939b640bed0ac018d3a6f6582626a32
+    firefox_archive_sha256: d788b00c3c7bb040bb28d81f2ef277e7050848b9d948e0e296b6bafbbe0cd96f
+    webkit_archive_sha256: 9a04e2cf403d622c788a347f7654c4c0fb264fcb57cefa86c20be96bfcf60504
+  environment: GitHub Actions Ubuntu 24.04; independent Laravel processes/databases, verified PostgreSQL/RabbitMQ
+    TLS, disposable application TLS proxies, Chromium/Firefox/WebKit and compiled Console assets.
+  scope: All three complete live campaigns pass 38 checks each at source 1c51f56. Browser journeys have zero
+    failures/skips/retries. Real current Governance and owner contracts, wire invariants, concurrent distinct/identical
+    commands, process restart, exact stale-import comparison, accepted-response loss, history/revocation and
+    foreign-tenant denial pass. Each broker campaign observes 11 deliveries for 10 stable event identities in
+    order, then four committed facts after author revocation. Independent counts confirm four browser revisions
+    and audit/outbox pairing. Large/small tenants contain 10,001/1,001 applications; 50-entry pages are 6,812–6,817
+    bytes, index scans read 51 rows in 0.081–0.188 ms. Five final reports bind 475 unique source files; archive,
+    report, command-log and artifact hashes are verified.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G03.01
+  - G03.02
+  - G03.03
+  - G03.04
+  observed_at: '2026-10-06T02:45:48.814541+00:00'
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched
+    retained source, archive and log bytes.
+  reviewer: Codex engineering evidence consistency only; designated independent and representative-user reviews
+    remain open.
+  limitations: Synthetic principal bootstrap uses isolated OIDC transport; live requests use actual current
+    authority. The broker observer is not the P05 Planning product consumer. Loopback TLS/HTTP, metadata skew
+    and automated keyboard/reflow checks do not qualify production ingress/capacity, managed browsers, assistive
+    technology, representative comprehension or G03 approval. The final-source foundation Kubernetes campaign
+    remains queued; historical passes are not transferred. No time-based expiry is asserted; material source,
+    scope or assumptions require affected requalification.
+  valid_until: null
+  invalidated_at: null
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -5893,5 +6067,50 @@ blockers:
   next_action: Review EV-P02-016 through EV-P02-025 and the updated G02 engineering assessment using docs/qualification/gate-reviews/g02.md;
     record actual independent reviewers, exact scope/source, per-criterion decisions and dispositions of the remaining
     operating/accessibility obligations.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P03-001
+  scope_ids:
+  - P03
+  - P03.04
+  - P03.05
+  - R05
+  - R33
+  - G03
+  owner_role: Product owner / quality / representative application operator
+  description: The complete automated three-engine authoring campaigns pass, but G03.04 and P03.04/.05 require
+    actual operator comprehension and selected managed-browser/assistive observations. Synthetic browser actions
+    cannot supply those people or observations.
+  unblock_condition: Provide the representative operator/observer and OP07 browser/OS/policy/assistive combinations.
+    Execute all seven tasks in docs/implementation/p03-completion-review.md on the qualified source; retain
+    exact outcomes and resolve mandatory defects.
+  next_action: Run the concrete completion task sheet and record actual identities, versions, WCAG observations,
+    defects and immutable evidence.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P03-002
+  scope_ids:
+  - P03
+  - P03.01
+  - P03.02
+  - P03.03
+  - P03.04
+  - P03.05
+  - R04
+  - R05
+  - R06
+  - R07
+  - R19
+  - R33
+  - G03
+  owner_role: Catalogue owner / architecture lead / independent quality lead / product owner
+  description: Repository implementation and P03 automated qualification are delivered, but the designated package
+    and criterion reviews have not occurred. Codex source/evidence examination does not establish independent
+    quality or receiving approval.
+  unblock_condition: Named accountable reviewers examine EV-P03-001–003 and each G03 criterion, including representative-user
+    evidence from BL-P03-001; record actual identities, dates, decisions and unresolved scope.
+  next_action: Use the G03 engineering assessment and docs/qualification/gate-reviews/g03.md. Retain the queued
+    foundation Kubernetes outcome separately; do not infer a pass. Record the actual G03 decision only after
+    required evidence/review.
   state: OPEN
   resolution_evidence_ids: []
