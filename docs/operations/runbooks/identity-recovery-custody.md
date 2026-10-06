@@ -142,7 +142,9 @@ python scripts/recovery/custody.py sign \
   --key /restricted/operator-encrypted-key.pem --output /restricted/operator-signature.json
 ```
 
-The passphrase is requested privately from the terminal. Securely return only the
+The passphrase requires an interactive terminal with echo protection. Piped input
+or an unavailable protected prompt is refused; there is no visible-input fallback.
+Securely return only the
 detached signature; never the key or passphrase. Assemble the two approvals:
 
 ```sh

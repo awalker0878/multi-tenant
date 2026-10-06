@@ -6,6 +6,7 @@ from pathlib import Path
 import tempfile
 import time
 import unittest
+import warnings
 from unittest.mock import patch
 
 import custody
@@ -127,6 +128,24 @@ class CustodyTests(unittest.TestCase):
         plan = self.put('sign-plan.json', self.plan())
         with self.assertRaises(custody.Held):
             custody.sign(self.trust, plan, self.policy['principals'][0]['id'], self.keys[1], self.root / 'invalid-signature.json', passphrase=self.phrase)
+        self.assertFalse((self.root / 'invalid-signature.json').exists())
+
+    def test_signing_without_a_terminal_never_reads_a_passphrase(self):
+        plan = self.put('sign-plan.json', self.plan())
+        with patch.object(custody.sys.stdin, 'isatty', return_value=False), patch.object(custody.getpass, 'getpass') as prompt:
+            with self.assertRaises(custody.Held):
+                custody.sign(self.trust, plan, self.policy['principals'][0]['id'], self.keys[0], self.root / 'invalid-signature.json')
+            prompt.assert_not_called()
+        self.assertFalse((self.root / 'invalid-signature.json').exists())
+
+    def test_unavailable_terminal_echo_protection_never_falls_back_to_input(self):
+        plan = self.put('sign-plan.json', self.plan())
+        def unsafe_prompt(_):
+            warnings.warn('synthetic terminal echo failure', custody.getpass.GetPassWarning)
+            self.fail('Unprotected passphrase input must never be reached')
+        with patch.object(custody.sys.stdin, 'isatty', return_value=True), patch.object(custody.getpass, 'getpass', side_effect=unsafe_prompt):
+            with self.assertRaises(custody.Held):
+                custody.sign(self.trust, plan, self.policy['principals'][0]['id'], self.keys[0], self.root / 'invalid-signature.json')
         self.assertFalse((self.root / 'invalid-signature.json').exists())
 
     def test_descriptor_or_confirmation_substitution_cannot_release(self):

@@ -23,6 +23,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import warnings
 
 DOMAIN = b'governance-identity-recovery-v1\n'
 LIMIT = 131072
@@ -199,7 +200,16 @@ def sign(trust_path, payload_path, principal_id, key_path, output, passphrase=No
     principal = next((p for p in trust['principals'] if p['id'] == principal_id), None)
     key = read(key_path, private=True, limit=16384)
     require(principal is not None and key.startswith(b'-----BEGIN ENCRYPTED PRIVATE KEY-----'))
-    phrase = passphrase if passphrase is not None else getpass.getpass('Private signing key passphrase: ').encode()
+    phrase = passphrase
+    if phrase is None:
+        require(sys.stdin.isatty())
+        with warnings.catch_warnings():
+            # Never let getpass fall back to visible/unprotected standard input.
+            warnings.simplefilter('error', getpass.GetPassWarning)
+            try:
+                phrase = getpass.getpass('Private signing key passphrase: ').encode()
+            except (getpass.GetPassWarning, EOFError) as error:
+                raise Held('identity_recovery_held') from error
     require(isinstance(phrase, bytes) and phrase and b'\n' not in phrase and len(phrase) <= 1024)
     with tempfile.TemporaryDirectory(prefix='custody-sign-') as name:
         private = Path(name) / 'key.pem'
