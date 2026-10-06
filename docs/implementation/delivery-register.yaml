@@ -277,11 +277,14 @@ phases:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P07-001
+  - EV-P07-002
   blocker_ids:
   - BL-P07-001
-  delivery_note: Commissioning input evaluator and protected-record parser implemented; actual native facts and
-    scope remain unsupplied. Local checks do not complete the native package.
+  delivery_note: Commissioning-input and saved-plan comparison preparation passes E1 qualification; existing execution
+    passes E2 regression. All fifteen actual input groups remain missing. Native adapters and Q05/Q06 E3 are unimplemented,
+    so no P07 package or G07 criterion is complete.
 - id: P08
   title: VMware-to-OpenStack migration
   owner_role: Infrastructure and application owner
@@ -1690,18 +1693,20 @@ work_packages:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P07-001
   blocker_ids:
   - BL-P07-001
   doc_refs:
   - docs/implementation/phases/p07.md
   - docs/implementation/p07-native-provisioning.md
   - docs/operations/runbooks/openstack-commissioning.md
+  - docs/implementation/p07-completion-review.md
   criterion_ids:
   - G07.01
   - G07.02
-  delivery_note: Commissioning input evaluator and protected-record parser implemented; actual native facts and
-    scope remain unsupplied. Local checks do not complete the native package.
+  delivery_note: Bounded commissioning-input evaluator and protected-file parser pass E1 checks; all N01-N15 actual
+    inputs remain missing. Metadata comparison supplies neither native site readiness nor write authority.
 - id: P07.02
   phase_id: P07
   title: Infrastructure automation
@@ -1711,13 +1716,15 @@ work_packages:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P07-001
   blocker_ids:
   - BL-P07-001
   doc_refs:
   - docs/implementation/phases/p07.md
   - docs/implementation/p07-native-provisioning.md
   - docs/operations/runbooks/openstack-commissioning.md
+  - docs/implementation/p07-completion-review.md
   criterion_ids:
   - G07.01
   - G07.02
@@ -1735,12 +1742,16 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P07-001
   doc_refs:
   - docs/implementation/phases/p07.md
+  - docs/implementation/p07-completion-review.md
   criterion_ids:
   - G07.01
   - G07.03
+  delivery_note: Native implementation is not started; the exact interface and campaign prerequisites are recorded
+    in BL-P07-001 and the remaining implementation packet.
 - id: P07.04
   phase_id: P07
   title: Activation and verification
@@ -1751,12 +1762,16 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P07-001
   doc_refs:
   - docs/implementation/phases/p07.md
+  - docs/implementation/p07-completion-review.md
   criterion_ids:
   - G07.01
   - G07.02
+  delivery_note: Native implementation is not started; the exact interface and campaign prerequisites are recorded
+    in BL-P07-001 and the remaining implementation packet.
 - id: P07.05
   phase_id: P07
   title: Failure and retirement
@@ -1767,12 +1782,16 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P07-001
   doc_refs:
   - docs/implementation/phases/p07.md
+  - docs/implementation/p07-completion-review.md
   criterion_ids:
   - G07.03
   - G07.04
+  delivery_note: Native implementation is not started; the exact interface and campaign prerequisites are recorded
+    in BL-P07-001 and the remaining implementation packet.
 - id: P07.06
   phase_id: P07
   title: Native support dossier
@@ -1783,14 +1802,18 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P07-001
   doc_refs:
   - docs/implementation/phases/p07.md
+  - docs/implementation/p07-completion-review.md
   criterion_ids:
   - G07.01
   - G07.02
   - G07.03
   - G07.04
+  delivery_note: Native implementation is not started; the exact interface and campaign prerequisites are recorded
+    in BL-P07-001 and the remaining implementation packet.
 - id: P08.01
   phase_id: P08
   title: Source readiness
@@ -2540,9 +2563,11 @@ requirements:
   - EV-P05-001
   - EV-P05-002
   - EV-P05-003
+  - EV-P07-001
   blocker_ids:
   - BL-P03-002
   - BL-P05-001
+  - BL-P07-001
 - id: R08
   package_ids:
   - P04.01
@@ -2583,6 +2608,7 @@ requirements:
   - EV-P05-003
   blocker_ids:
   - BL-P05-001
+  - BL-P07-001
 - id: R09
   package_ids:
   - P04.02
@@ -2840,16 +2866,18 @@ requirements:
   - G06
   - G07
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P06-001
   - EV-P06-002
   - EV-P06-003
+  - EV-P07-001
   blocker_ids:
   - BL-P06-001
+  - BL-P07-001
 - id: R17
   package_ids:
   - P05.03
@@ -2895,6 +2923,7 @@ requirements:
   blocker_ids:
   - BL-P05-001
   - BL-P06-001
+  - BL-P07-001
 - id: R18
   package_ids:
   - P07.01
@@ -2917,12 +2946,14 @@ requirements:
   gate_ids:
   - G07
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P07-001
+  blocker_ids:
+  - BL-P07-001
 - id: R19
   package_ids:
   - P03.02
@@ -2965,6 +2996,7 @@ requirements:
   blocker_ids:
   - BL-P03-002
   - BL-P05-001
+  - BL-P07-001
 - id: R20
   package_ids:
   - P05.02
@@ -3005,6 +3037,7 @@ requirements:
   - EV-P05-003
   blocker_ids:
   - BL-P05-001
+  - BL-P07-001
 - id: R21
   package_ids:
   - P05.02
@@ -3041,6 +3074,7 @@ requirements:
   - EV-P05-003
   blocker_ids:
   - BL-P05-001
+  - BL-P07-001
 - id: R22
   package_ids:
   - P06.02
@@ -3172,7 +3206,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P07-001
 - id: R26
   package_ids:
   - P09.01
@@ -3303,6 +3338,7 @@ requirements:
   blocker_ids:
   - BL-P00-001
   - BL-P06-001
+  - BL-P07-001
 - id: R30
   package_ids:
   - P01.06
@@ -3350,6 +3386,7 @@ requirements:
   blocker_ids:
   - BL-P00-001
   - BL-P06-001
+  - BL-P07-001
 - id: R31
   package_ids:
   - P01.04
@@ -3431,6 +3468,7 @@ requirements:
   - BL-P01-002
   - BL-P02-002
   - BL-P06-001
+  - BL-P07-001
 - id: R32
   package_ids:
   - P00.05
@@ -3535,6 +3573,7 @@ requirements:
   - BL-P03-002
   - BL-P05-001
   - BL-P06-001
+  - BL-P07-001
 - id: R34
   package_ids:
   - P00.05
@@ -6490,6 +6529,68 @@ evidence:
     and migrated target acceptance is safely cancelled. Lost admission/start/control replies, actor revocation,
     tamper/source/tenant denials, alert receipts and no simultaneous writers are observed. All original archive,
     source, command and retained artifact hashes match.
+- id: EV-P07-001
+  level: E1
+  source_revision: 249a77e9fda5c0a3e25918ce3efdb52f4ab415de
+  artifact_revisions:
+    retained_artifact_commit: 7205717cb41e38b412ed76d2164dcc4b2dc26126
+    run_id: '37544177842'
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-06T23:01:43.030352+00:00'
+  observer: GitHub Actions hosted campaigns and Codex local installed-command checks; original archive, source,
+    report and log bytes independently compared.
+  reviewer: Codex engineering consistency review only; designated G06/G07 receiving and native qualification remain
+    open.
+  limitations: Offline comparison only; input identities and evidence records are not authenticated and lock possession
+    is not established. No native adapter is implemented and no P07 package or G07 criterion is complete. No native
+    OpenStack/Terraform/service/backup/policy/revocation/retirement execution or support claim. No operating or
+    receiving acceptance. Fixed-source observations have no asserted time expiry; changed relevant source, scope
+    or assumptions require affected qualification.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/7205717cb41e38b412ed76d2164dcc4b2dc26126/verification/p07/final/preparation/report.json
+  sha256: a999e5272e8f82fd839656674eb9ccca0193c624fd34214f70fda2f5d885b21a
+  environment: GitHub Actions Ubuntu 24.04/Python 3.12.14/uv 0.12.19; separate local isolated installed-wheel smoke.
+  scope: '105 tests pass without skips: 55 commissioning metadata/parser cases and 50 saved-plan byte/scope/tool/state/ownership
+    comparisons. Strict actual commissioning record returns HELD with N01-N15 missing. Installed command accepts
+    matching synthetic inputs and denies changed saved bytes. All 50 preparation source hashes remain unchanged
+    at the regression revision.'
+- id: EV-P07-002
+  level: E2
+  source_revision: c2c29067f0ecdb7d0df0c92687507b66415219e5
+  artifact_revisions:
+    retained_artifact_commit: 818e41ebc2e4e0f0f1b78c1cf9a09456de08a507
+    run_id: '37545874970'
+  campaign_ids:
+  - Q01
+  - Q03
+  - Q04
+  criterion_ids:
+  - G06.01
+  - G06.02
+  - G06.03
+  - G06.04
+  observed_at: '2026-10-06T23:41:32.108433+00:00'
+  observer: GitHub Actions hosted campaigns and Codex local installed-command checks; original archive, source,
+    report and log bytes independently compared.
+  reviewer: Codex engineering consistency review only; designated G06/G07 receiving and native qualification remain
+    open.
+  limitations: P06 E2 regression only; not a Q05/Q06 native campaign. Restored simulation remains held until independent
+    reconciliation and newly bound authority. No native OpenStack/Terraform/service/backup/policy/revocation/retirement
+    execution or support claim. No operating or receiving acceptance. Fixed-source observations have no asserted
+    time expiry; changed relevant source, scope or assumptions require affected qualification.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/818e41ebc2e4e0f0f1b78c1cf9a09456de08a507/verification/p07/final/qualification-index.json
+  sha256: d507bc85aa82d5148bbcc69accf10f71503417be1f68df19647363ee97a6ecdc
+  environment: GitHub Actions Ubuntu 24.04; real PostgreSQL journal/effect simulation and independently owned TLS
+    APIs, Temporal, AMQPS and compiled Chromium/Firefox/WebKit.
+  scope: Existing execution regression passes 243 tests without skips, including the 105 new E1 cases; each of three
+    live browser campaigns passes 148 checks, 61 command records and three browser journeys without failures/skips/flakiness.
+    All 1,021 source bindings and 81 artifact hashes match per browser. Original failures and superseded one-file
+    source discrepancies are retained. Associated foundation regression has its own explicitly recorded source and
+    outcome.
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -6834,16 +6935,31 @@ blockers:
   - P07.05
   - P07.06
   - G07
+  - R07
+  - R08
+  - R16
+  - R17
+  - R18
+  - R19
+  - R20
+  - R21
+  - R25
+  - R29
+  - R30
+  - R31
+  - R33
   owner_role: OpenStack platform, Infrastructure, security, enterprise service, SRE and qualification owners
   description: Actual installed OpenStack/API/backend/guest tuple, bounded native write campaign, scoped credentials/trust,
     tool/provider/state/locking selections, enterprise interfaces, observer and operating/receiving evidence are
     not supplied. P06 E2 simulation cannot replace them. Native adapters and Q05/Q06 implementation depend on these
     concrete interfaces.
-  unblock_condition: Supply the protected N01-N15 packet using docs/operations/runbooks/openstack-commissioning.md,
-    resolve ADR-015/016 interface/tool selections, record actual G06 receiving and applicable OP01-OP07 controls,
-    then implement and qualify native adapters against that exact scope.
-  next_action: Complete independent commissioning and saved-plan preparation now; obtain actual site/interface facts
-    before native adapter development and exact-scope authorization before any native effect. No renewed G00 approval
-    is needed.
+  unblock_condition: Supply the actual tuple and selected interfaces in the protected N01-N15 packet for native
+    adapter implementation and resolve ADR-015/016 selections. Before native effects, supply exact campaign authority
+    and complete applicable G06 receiving and OP01-OP07 controls. Qualify the implemented adapters on that exact
+    native scope.
+  next_action: Supply the actual site and service/interface inputs in the protected N01-N15 packet so selected native
+    adapters can be implemented. Complete campaign authority and applicable G06/operating receiving before Q05/Q06
+    native effects. Independent input/saved-plan preparation and bounded E1/E2 regression are delivered; no renewed
+    G00 approval is needed.
   state: OPEN
   resolution_evidence_ids: []
