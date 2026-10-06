@@ -50,3 +50,45 @@ all three platform profiles, exact-scope evidence failures, sovereignty/service
 controls, graph cycles, ownership collisions and canonical binding changes.
 Strict typing and lint pass. Subsequent PostgreSQL, owner-wire and browser evidence
 will bind the final source; this initial local observation is not G05 acceptance.
+
+## P05.03 / P05.06 — Journal and admission contract
+
+Lifecycle now owns a PostgreSQL reservation journal with immutable intent-command
+receipts and event history. Owner calls happen after durable attempt recording.
+Unknown responses require observation; independent owner receipts preserve partial
+success. Concurrent plans are checked by the authoritative simulated owner, not
+by cached capacity. Expiry records a hold; release requires fresh unused readback
+and the owner rechecks live consumption. Late command receipts cannot replace a
+newer reconciliation result. No native allocation adapter or execution dispatch
+is installed by this increment.
+
+The admission evaluator binds exact current entitlement, commissioned scope,
+state/ownership, artifacts, facts, approval and reservation receipts. Revocation,
+expiry, changed inputs and missing exact-tuple support deny operational admission.
+An isolated campaign additionally binds endpoint/credential/data scope, actor,
+impact limit, cleanup owner and expiry; it cannot target production. Its result
+specifies the atomic P06 admission/receipt/reservation/outbox transaction and
+immediate effect rechecks. Evaluating this contract never creates an executable job.
+
+## Persistence and source boundaries
+
+Planning persists immutable assessments and plans, command receipts and an outbox
+in one owned transaction. Identical tenant/actor command retries return the
+original pinned result after current delegation checks. PostgreSQL runtime grants
+exclude update/delete of history. Current validity is returned alongside immutable
+content; it never rewrites reviewed bytes. Tenant command budgets and input/graph
+bounds constrain synchronous computation.
+
+Catalogue, Inventory and Assurance expose independently authenticated Planning
+source reads. Governance checks the original exact Planning delegation and current
+application and site read permissions. No source shares another owner's database
+or workload secret. Inventory's P04 declarations and unassessed dimensions remain
+held. Assurance reads exact records from independently mounted qualification
+custody; an absent record is explicitly unknown. It does not create qualification.
+
+`planning-facts` publishes with mandatory publisher confirms and consumes the
+published Catalogue/Inventory fact contracts with durable event-ID deduplication.
+Acknowledgment follows inbox/invalidation commit; conflicting/invalid payloads
+retain only a quarantine digest. Facts conservatively invalidate tenant plans and
+never refresh observations, confer qualification or dispatch effects. Direct
+owner rechecks remain required for current validity, including qualification changes.

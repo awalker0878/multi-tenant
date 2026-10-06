@@ -8,9 +8,11 @@ src/lifecycle/bootstrap/health.py
 src/lifecycle/bootstrap/server.py
 src/lifecycle/infrastructure/__init__.py
 src/lifecycle/infrastructure/foundation.py
+src/lifecycle/infrastructure/telemetry.py
 src/lifecycle/interfaces/__init__.py
 src/lifecycle/interfaces/health.py
 src/lifecycle/interfaces/http.py
+src/lifecycle/interfaces/telemetry.py
 src/product_lifecycle.egg-info/PKG-INFO
 src/product_lifecycle.egg-info/SOURCES.txt
 src/product_lifecycle.egg-info/dependency_links.txt
@@ -19,3 +21,4 @@ src/product_lifecycle.egg-info/requires.txt
 src/product_lifecycle.egg-info/top_level.txt
 tests/test_foundation.py
 tests/test_health.py
+tests/test_telemetry.py

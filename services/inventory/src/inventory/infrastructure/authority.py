@@ -178,3 +178,88 @@ class GovernanceAuthority:
                 raise ValueError("Stale admission")
         except (KeyError, TypeError, ValueError, OSError, http.client.HTTPException):
             raise Rejected("collection_authority_unavailable", 503) from None
+
+
+def planning_actor(
+    credential: str,
+    delegation: str,
+    tenant: str,
+    action: str,
+    application: str,
+    environment: str,
+    site: str,
+) -> None:
+    """Derive a read-only source check from the original exact Planning delegation."""
+    try:
+        incoming = mounted_secret("INVENTORY_PLANNING_CREDENTIAL_FILE")
+        outgoing = mounted_secret("INVENTORY_GOVERNANCE_CREDENTIAL_FILE")
+        if incoming == outgoing or not hmac.compare_digest(incoming, credential):
+            raise Rejected("invalid_workload", 401)
+        if not re.fullmatch("[0-9a-f]{64}", delegation) or action not in {
+            "plan.read",
+            "plan.create",
+        }:
+            raise Rejected("source_access_denied", 403)
+        u = urlsplit(os.environ["GOVERNANCE_URL"])
+        ca = os.environ["GOVERNANCE_CA_FILE"]
+        if (
+            u.scheme != "https"
+            or not u.hostname
+            or u.path
+            or u.username
+            or u.password
+            or u.query
+            or u.fragment
+            or not os.path.isabs(ca)
+        ):
+            raise ValueError
+        scope = {"site_id": site, "environment": environment, "resource_id": application}
+        connection = http.client.HTTPSConnection(
+            u.hostname, u.port or 443, timeout=4, context=ssl.create_default_context(cafile=ca)
+        )
+        try:
+            connection.request(
+                "POST",
+                f"/v1/tenants/{tenant}/planning-input-checks",
+                json.dumps({"action": action, "scope": scope}),
+                {
+                    "Authorization": "Bearer " + outgoing,
+                    "X-Actor-Delegation": delegation,
+                    "Content-Type": "application/json",
+                    "Accept-Encoding": "identity",
+                },
+            )
+            response = connection.getresponse()
+            raw = response.read(16385)
+            if response.status in {401, 403, 404}:
+                raise Rejected("source_access_denied", 403)
+            if (
+                response.status != 200
+                or len(raw) > 16384
+                or response.getheader("Content-Encoding", "identity") != "identity"
+            ):
+                raise ValueError
+            body = json.loads(raw)
+        finally:
+            connection.close()
+        expected = {
+            "allowed": True,
+            "audience": "planning",
+            "delegating_service": "console",
+            "source_owner": "inventory",
+            "source_use": "planning_read_only",
+            "tenant_id": tenant,
+            "action": action,
+            "scope": scope,
+            "authority_use": "request_bound",
+        }
+        if any(body.get(k) != v for k, v in expected.items()):
+            raise ValueError
+        expiry = datetime.fromisoformat(body["expires_at"].replace("Z", "+00:00")).timestamp()
+        evaluated = datetime.fromisoformat(body["evaluated_at"].replace("Z", "+00:00")).timestamp()
+        if not time.time() < expiry <= time.time() + 65 or abs(time.time() - evaluated) > 5:
+            raise ValueError
+    except Rejected:
+        raise
+    except (KeyError, ValueError, TypeError, OSError, http.client.HTTPException):
+        raise Rejected("source_authority_unavailable", 503) from None

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://multi-tenant.invalid/contracts/inventory/fact-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "specversion",
+    "event_id",
+    "tenant_id",
+    "aggregate_id",
+    "event_type",
+    "sequence",
+    "occurred_at",
+    "data"
+  ],
+  "properties": {
+    "specversion": {
+      "const": "1.0"
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "tenant_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "aggregate_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "event_type": {
+      "enum": [
+        "inventory.endpoint.changed",
+        "inventory.discovery.requested",
+        "inventory.discovery.completed",
+        "inventory.observation-generation.published",
+        "inventory.match.proposed"
+      ]
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "occurred_at": {
+      "type": "number"
+    },
+    "data": {
+      "type": "object",
+      "maxProperties": 8
+    }
+  }
+}

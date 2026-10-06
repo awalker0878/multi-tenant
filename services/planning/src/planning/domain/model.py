@@ -129,3 +129,25 @@ def profile(platform: str, version: str, declarations: dict[str, Any]) -> dict[s
         rows.append({"dimension": dimension, "declaration": declaration})
     result = {"platform": platform, "version": version, "dimensions": rows}
     return result | {"digest": digest(result)}
+
+
+def decode(raw: bytes) -> dict[str, Any]:
+    def pairs(rows: list[tuple[str, Any]]) -> dict[str, Any]:
+        output: dict[str, Any] = {}
+        for k, v in rows:
+            if k in output:
+                raise Rejected("duplicate_json_key")
+            output[k] = v
+        return output
+
+    try:
+        value = json.loads(
+            raw,
+            object_pairs_hook=pairs,
+            parse_constant=lambda _: (_ for _ in ()).throw(ValueError()),
+        )
+        if not isinstance(value, dict):
+            raise ValueError
+        return value
+    except (ValueError, UnicodeError, RecursionError):
+        raise Rejected("invalid_json") from None

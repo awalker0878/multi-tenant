@@ -11,6 +11,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\InventoryCollectionController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\OidcController;
+use App\Http\Controllers\PlanningInputController;
 use App\Http\Controllers\SupportAccessController;
 use App\Http\Controllers\TenantController;
 use App\Http\Middleware\AuthenticateConsole;
@@ -88,3 +89,5 @@ Route::middleware(AuthenticateConsole::class)->group(function (): void {
 Route::post('/v1/tenants/{tenant}/catalogue-owner-checks', CatalogueOwnerController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);
 
 Route::post('/v1/tenants/{tenant}/inventory-collection-checks', InventoryCollectionController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);
+
+Route::post('/v1/tenants/{tenant}/planning-input-checks', PlanningInputController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);

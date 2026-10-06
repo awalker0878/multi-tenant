@@ -7,13 +7,14 @@ import uvicorn
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from inventory.application.discovery import Discovery
-from inventory.infrastructure.authority import GovernanceAuthority
+from inventory.infrastructure.authority import GovernanceAuthority, planning_actor
 from inventory.infrastructure.foundation import database_ready
 from inventory.infrastructure.policies import MountedPolicies
 from inventory.infrastructure.store import Postgres
 from inventory.infrastructure.telemetry import BoundedSignalBuffer
 from inventory.interfaces.discovery import InventoryApp
 from inventory.interfaces.http import FoundationApp
+from inventory.interfaces.planning import PlanningInputApp
 from inventory.interfaces.telemetry import RequestTelemetry
 
 
@@ -24,12 +25,15 @@ class InventoryRouter:
         self.inventory = InventoryApp(
             Discovery(Postgres(), policies, authority.collection), authority
         )
+        self.planning = PlanningInputApp(self.inventory.discovery, planning_actor)
         self.foundation = FoundationApp(database_ready)
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        if scope["type"] == "http" and (
+        if scope["type"] == "http" and "/planning-inputs/" in scope["path"]:
+            await self.planning(scope, receive, send)
+        elif scope["type"] == "http" and (
             scope["path"].startswith("/v1/") or scope["path"].startswith("/internal/")
         ):
             await self.inventory(scope, receive, send)

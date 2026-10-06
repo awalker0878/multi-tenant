@@ -1,3 +1,4 @@
 [console_scripts]
+planning-facts = planning.bootstrap.facts:main
 planning-health = planning.bootstrap.health:main
 planning-serve = planning.bootstrap.server:main

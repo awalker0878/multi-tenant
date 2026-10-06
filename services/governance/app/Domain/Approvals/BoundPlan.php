@@ -19,6 +19,13 @@ final readonly class BoundPlan
         $digest = $response['digest'] ?? null;
         unset($response['digest']);
         $keys = ['plan_id', 'revision', 'tenant_id', 'action', 'site_id', 'environment', 'resource_id', 'requested_by', 'executor_ids', 'valid_until'];
+        if (array_key_exists('content_digest', $response)) {
+            $keys = [...$keys, 'content_digest', 'canonicalization', 'lane'];
+            if (! is_string($response['content_digest']) || ! preg_match('/\A[0-9a-f]{64}\z/', $response['content_digest'])
+                || ($response['canonicalization'] ?? null) !== 'p05-json-v1' || ! in_array($response['lane'] ?? null, ['operational', 'isolated_campaign'], true)) {
+                throw new IdentityDenied('invalid_plan_binding', 422);
+            }
+        }
         if (count($response) !== count($keys) || array_diff($keys, array_keys($response)) !== []
             || ! is_string($digest) || ! preg_match('/\A[0-9a-f]{64}\z/', $digest)
             || ! is_int($response['revision']) || $response['revision'] < 1 || ! is_int($response['valid_until'])

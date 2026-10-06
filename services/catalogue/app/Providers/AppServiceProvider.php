@@ -21,6 +21,7 @@ use App\Infrastructure\Foundation\BoundedSignalBuffer;
 use App\Infrastructure\Foundation\MountedHealthCredential;
 use App\Infrastructure\Foundation\PostgresDependencyProbe;
 use App\Infrastructure\Messaging\RabbitCataloguePublisher;
+use App\Infrastructure\Planning\PlanningInputAuthority;
 use App\Policies\CataloguePolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
@@ -41,6 +42,7 @@ final class AppServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        $this->app->bind(\App\Application\Planning\Contracts\PlanningInputAuthority::class, PlanningInputAuthority::class);
         $this->app->bind(CataloguePublisher::class, RabbitCataloguePublisher::class);
         $this->app->bind(IntentValidator::class, SchemaIntentValidator::class);
         $this->app->bind(OwnerDirectory::class, GovernanceOwnerDirectory::class);
