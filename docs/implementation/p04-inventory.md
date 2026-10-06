@@ -21,13 +21,13 @@ both fence active work. Worker dispatch and result acceptance consult current
 Governance owner/tenant admission as well as the live enrollment policy.
 
 The queue applies an aggregate endpoint request interval, endpoint concurrency,
-tenant concurrency, a 20-job tenant backlog, a 30-second page lease, three failed
+tenant concurrency, a 20-job tenant and 1000-job service backlog, a 30-second page lease, three failed
 attempts, a one-hour collection deadline, 100 pages and 10,000 observed resources.
 Competing tenants rotate per endpoint. Limits are initial engineering bounds;
 actual site budgets remain operating inputs. Expired pages cannot refresh a
 generation. Native retry continuations contain identifiers, never returned URLs.
 
-## Qualification in progress
+## Engineering qualification
 
 The new [P04 workflow](../../.github/workflows/p04-inventory.yml) executes real
 PostgreSQL/TLS, immutable-role, competing-tenant, restart, revocation and hostile
@@ -36,8 +36,8 @@ package. The current local user namespace maps only UID 0; PostgreSQL correctly
 rejects that process identity, so the database campaign runs on the unprivileged
 hosted runner. This is an environment limitation, not a passing database result.
 
-Worker, Console, published contracts and integrated acceptance continue in the
-next increments. G04 requires actual installed OpenStack/VMware tuple, endpoint,
+Worker, Console and published contracts are implemented. Integrated acceptance
+is recorded in the final qualification packet. G04 requires actual installed OpenStack/VMware tuple, endpoint,
 trust, read privilege/scope and independent before/after observations. None has
 been supplied, and no synthetic result qualifies those platforms. All eleven
 profile dimensions remain explicit for VMware, AHV and OpenStack; declarations
@@ -89,3 +89,23 @@ pass. Governance: 245 passing tests (5663 assertions), twelve PostgreSQL-only ch
 deferred to hosted qualification. The new `P04 live discovery, Console and delivery`
 campaign requires Chromium, Firefox and WebKit against actual local services,
 PostgreSQL TLS, native HTTPS fixtures and an independently observed AMQPS broker.
+
+## Final retained engineering evidence
+
+Final qualification source: `6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9`.
+Original evidence is committed at `91ee1152ccd723857056aa32cf2217a5d87608fb`.
+The [qualification index](../../verification/p04/final/qualification-index.json)
+records 75 Inventory and 24 worker tests passing with no skips and three successful
+live campaigns of 60 checks/29 commands each. Every engine has zero browser
+failures, skips or retries. Each independent broker observer records ten deliveries
+for nine original event IDs, with one deliberate replay in order. All 1180
+source-revision/path bindings, archive/report/log bytes and source-unchanged checks
+were verified. Twenty local checks pass, with their PostgreSQL-only skips explicit.
+
+The [check matrix](../../verification/p04/check-matrix.md) defines the measured
+scope, and [corrections](../../verification/p04/corrections.md) preserve failed
+attempts and fixes. EV-P04-001–003 record the evidence; BL-P04-001/002 retain the
+actual native inputs and receiving reviews. The [G04 assessment](../qualification/gate-reviews/g04-engineering-assessment-2026-10-06.md)
+and [completion packet](p04-completion-review.md) explain why P04/G04 cannot be
+marked formally complete from these E1/E2 results. No native write or qualification
+claim follows from enrollment, profile completeness or the automated campaigns.

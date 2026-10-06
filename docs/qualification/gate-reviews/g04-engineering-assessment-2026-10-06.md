@@ -1,7 +1,7 @@
 # G04 engineering assessment — 2026-10-06
 
-This is Codex's examination of the P04 implementation and retained engineering
-measurements. It is not an independent G04 receiving decision. The canonical gate
+This is Codex's examination of source `6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9`
+and original engineering measurements retained at `91ee1152ccd723857056aa32cf2217a5d87608fb`. It is not an independent G04 receiving decision. The canonical gate
 requires native E3 observations; no actual OpenStack or VMware installation has
 been accessed or qualified by this work.
 
@@ -15,10 +15,7 @@ been accessed or qualified by this work.
 The [check matrix](../../../verification/p04/check-matrix.md) maps executable
 boundaries; the [corrections record](../../../verification/p04/corrections.md)
 retains failures. The [completion packet](../../implementation/p04-completion-review.md)
-names concrete native inputs, steps and receiving roles. Final campaign identities
-and exact-source results are recorded in the delivery register and qualification
-index. Any failed final-source check remains corrective work before the engineering
-qualification can be described as complete.
+names concrete native inputs, steps and receiving roles. Final qualification passes all 99 core/worker tests and all three live 60-check campaigns, with no skipped or failed hosted cases. Twenty local quality commands pass with their database-only skips explicit. Campaign identities and exact-source results are recorded in EV-P04-001–003 and the qualification index.
 
 BL-P04-001/002 remain open and G04 remains NOT_REVIEWED. Package and phase work
 cannot be marked COMPLETE while their required native and receiving evidence is

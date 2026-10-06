@@ -1,6 +1,46 @@
-# Next work — P04 Inventory implementation
+# Next work — P04 native receiving and P05 preparation
 
-The user authorizes P04 development. Continue the [P04 implementation](docs/implementation/p04-inventory.md): qualify the persistence/trust increment, complete bounded collectors and Console inventory, and retain the actual acceptance evidence. Native installed facts/read scopes remain required for E3/G04.
+P04 engineering and its automated qualification are delivered at
+`6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9`. The [implementation record](docs/implementation/p04-inventory.md)
+and [verified index](verification/p04/final/qualification-index.json) retain all
+75 Inventory and 24 worker tests passing without skips, plus three live campaigns
+of 60 checks each in Chromium, Firefox and WebKit. Enrollment, scoped collectors,
+durable generations, budget/retry controls, confirmed facts and the Console pass
+those measured boundaries. Twenty local quality commands also pass. Evidence is
+committed at `91ee1152ccd723857056aa32cf2217a5d87608fb`.
+
+The [delivery register](docs/implementation/delivery-register.yaml) keeps P04
+IN_PROGRESS and G04 NOT_REVIEWED: the canonical gate requires actual native E3
+observations and designated receiving reviews, neither of which can be replaced
+by these fixtures. Complete the [receiving packet](docs/implementation/p04-completion-review.md):
+
+1. **BL-P04-001 — Actual native qualification:** obtain the installed VMware and
+   OpenStack tuples, approved destinations/trust, tenant/project/datacenter scope,
+   restricted read identities, independent visibility audit, budgets and observer.
+   Run the five Q02 task groups using the [discovery runbook](docs/operations/runbooks/inventory-discovery.md)
+   and retain original before/after no-change, negative and recovery observations.
+2. **BL-P04-002 — Receiving and operator review:** the named platform, security,
+   SRE, qualification and product roles examine every G04 criterion and the operator
+   task sheet, including selected managed-browser/assistive behavior. Record actual
+   identities, dates, outcomes and unresolved limits. Do not invent review approval.
+3. **Foundation regression follow-up:** the [regression receipt](verification/p04/final/regression-status.json)
+   records passing package/image/Compose and other affected campaigns. Observe
+   final runtime-source Kubernetes run `37438932585`; the prior corrective-source
+   run `37438413577` passed and is not substituted for it.
+4. **Next independent engineering — P05.01:** begin the versioned capability and
+   qualification resolver using all eleven P04 dimensions and explicit VMware/AHV/
+   OpenStack gaps. Define consumption of Inventory's immutable ordered facts with
+   event-ID deduplication; retain stale, partial, missing qualification and ownership
+   holds when reconciling facts with pinned P03 intent. Keep declared, observed and
+   qualified support distinct. Follow [P05's package sequence](docs/implementation/phases/p05.md)
+   and settle ADR-016 ownership before plan compilation. No native eligibility or
+   reservation authority follows from a synthetic pass.
+
+The user's development authorization persists; no new baseline/G00 permission is
+needed. The missing native installation records and receiving people are concrete
+external inputs. P01/P02/P03 receiving obligations remain below.
+
+## P03 receiving obligations
 
 P03 engineering and its automated qualification are delivered at
 `1c51f56a928291870e5125508aeb04935583fd56`. The
@@ -25,16 +65,11 @@ review obligations remain. Continue with the concrete
    [G03 assessment](docs/qualification/gate-reviews/g03-engineering-assessment-2026-10-06.md).
    Record actual identities, dates, evidence and the G03 decision. Development and
    the accepted initial DC03 rules do not require renewed authorization.
-3. **Queued foundation regression:** observe final-source Kubernetes run
-   `37405120379` after the existing branch queue drains. Current-source package,
-   image, contract, policy, Compose and P02 identity checks pass; the historical
-   Kubernetes pass does not supply this queued result. Keep its broader foundation
-   result separate from the completed P03 dependency/browser qualification.
-4. **Next P04 inputs:** obtain installed VMware/OpenStack product/API versions,
-   endpoint/trust references, tenant/project/site scope, lab owner and permitted
-   read-only discovery effects. Use [P04's task cards](docs/implementation/phases/p04.md)
-   once those actual facts are supplied. No native campaign is authorized or
-   qualified by the P03 tests.
+3. **Resolved foundation regression:** final-source Kubernetes run `37405120379`
+   subsequently passed at P03 source `1c51f56a`. The P04 regression receipt records
+   its observed completion; the original P03 receipt remains an immutable record
+   of its previously pending state. This resolves the queued-result follow-up and
+   supplies no representative-user or independent receiving decision.
 
 Preserve the P01/P02 receiving obligations below. No source change, review, native
 result or operating acceptance is inferred from a generated progress view.

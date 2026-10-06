@@ -192,11 +192,16 @@ phases:
   gate_id: G04
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P04-001
+  - EV-P04-002
+  - EV-P04-003
+  blocker_ids:
+  - BL-P04-001
+  - BL-P04-002
 - id: P05
   title: Capabilities and immutable plans
   owner_role: Infrastructure engineering lead
@@ -1217,16 +1222,26 @@ work_packages:
   owner_role: Inventory/SRE
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P04-001
+  - EV-P04-002
+  - EV-P04-003
+  blocker_ids:
+  - BL-P04-001
+  - BL-P04-002
   doc_refs:
   - docs/implementation/phases/p04.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
   - docs/implementation/p04-inventory.md
+  - docs/implementation/p04-completion-review.md
+  - docs/operations/runbooks/inventory-discovery.md
+  - docs/qualification/gate-reviews/g04-engineering-assessment-2026-10-06.md
+  - verification/p04/check-matrix.md
+  - verification/p04/corrections.md
   criterion_ids:
   - G04.02
   - G04.04
@@ -1235,14 +1250,25 @@ work_packages:
   title: Collectors
   owner_role: Inventory
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P04-001
+  - EV-P04-002
+  - EV-P04-003
+  blocker_ids:
+  - BL-P04-001
+  - BL-P04-002
   doc_refs:
   - docs/implementation/phases/p04.md
+  - docs/implementation/p04-inventory.md
+  - docs/implementation/p04-completion-review.md
+  - docs/operations/runbooks/inventory-discovery.md
+  - docs/qualification/gate-reviews/g04-engineering-assessment-2026-10-06.md
+  - verification/p04/check-matrix.md
+  - verification/p04/corrections.md
   criterion_ids:
   - G04.01
   - G04.02
@@ -1252,14 +1278,24 @@ work_packages:
   owner_role: Inventory
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: PASSED
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P04-001
+  - EV-P04-002
+  - EV-P04-003
+  blocker_ids:
+  - BL-P04-001
+  - BL-P04-002
   doc_refs:
   - docs/implementation/phases/p04.md
   - docs/implementation/p04-inventory.md
+  - docs/implementation/p04-completion-review.md
+  - docs/operations/runbooks/inventory-discovery.md
+  - docs/qualification/gate-reviews/g04-engineering-assessment-2026-10-06.md
+  - verification/p04/check-matrix.md
+  - verification/p04/corrections.md
   criterion_ids:
   - G04.02
   - G04.04
@@ -1269,16 +1305,26 @@ work_packages:
   owner_role: Infrastructure
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P04-001
+  - EV-P04-002
+  - EV-P04-003
+  blocker_ids:
+  - BL-P04-001
+  - BL-P04-002
   doc_refs:
   - docs/implementation/phases/p04.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
   - docs/implementation/p04-inventory.md
+  - docs/implementation/p04-completion-review.md
+  - docs/operations/runbooks/inventory-discovery.md
+  - docs/qualification/gate-reviews/g04-engineering-assessment-2026-10-06.md
+  - verification/p04/check-matrix.md
+  - verification/p04/corrections.md
   criterion_ids:
   - G04.03
 - id: P04.05
@@ -1286,14 +1332,25 @@ work_packages:
   title: Inventory experience
   owner_role: Console
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P04-001
+  - EV-P04-002
+  - EV-P04-003
+  blocker_ids:
+  - BL-P04-001
+  - BL-P04-002
   doc_refs:
   - docs/implementation/phases/p04.md
+  - docs/implementation/p04-inventory.md
+  - docs/implementation/p04-completion-review.md
+  - docs/operations/runbooks/inventory-discovery.md
+  - docs/qualification/gate-reviews/g04-engineering-assessment-2026-10-06.md
+  - verification/p04/check-matrix.md
+  - verification/p04/corrections.md
   criterion_ids:
   - G04.02
   - G04.03
@@ -3460,8 +3517,13 @@ gates:
   decision: NOT_REVIEWED
   reviewer: null
   reviewed_at: null
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P04-001
+  - EV-P04-002
+  - EV-P04-003
+  blocker_ids:
+  - BL-P04-001
+  - BL-P04-002
 - id: G05
   phase_id: P05
   decision: NOT_REVIEWED
@@ -5865,11 +5927,104 @@ evidence:
   limitations: Synthetic principal bootstrap uses isolated OIDC transport; live requests use actual current authority.
     The broker observer is not the P05 Planning product consumer. Loopback TLS/HTTP, metadata skew and automated
     keyboard/reflow checks do not qualify production ingress/capacity, managed browsers, assistive technology, representative
-    comprehension or G03 approval. The final-source foundation Kubernetes campaign remains queued; historical passes
-    are not transferred. No time-based expiry is asserted; material source, scope or assumptions require affected
-    requalification.
+    comprehension or G03 approval. The formerly queued final-source foundation Kubernetes campaign 37405120379 subsequently
+    passed; the P04 regression receipt records its original source and actual completion. No time-based expiry is
+    asserted; material source, scope or assumptions require affected requalification.
   valid_until: null
   invalidated_at: null
+- id: EV-P04-001
+  level: E1
+  source_revision: fb37bb225d07516e7c4e277ec4a140a7d09186c6
+  artifact_revisions:
+    retained_artifact_commit: 91ee1152ccd723857056aa32cf2217a5d87608fb
+  environment: Local Linux managed workspace with locked PHP 8.5.11, Python 3.12.14 and Node 24 packages.
+  scope: 'Twenty commands pass: Console and Governance tests/format/types/architecture, Vue typecheck/build/boundaries,
+    Inventory and worker Ruff/format/mypy/tests, generated-client drift. Console: 156 tests/738 assertions; Governance:
+    245 tests/5663 assertions; Inventory: 53 local passes; worker: 24 passes. Source bindings and original logs
+    match.'
+  observed_at: '2026-10-06T08:52:11.156526+00:00'
+  limitations: Seven Console, twelve Governance and twenty-two Inventory PostgreSQL-gated checks are skipped locally;
+    separate hosted campaigns provide persistence evidence. Product source is identical to final qualification source
+    6b21490a; only the isolated browser fixture/assertion changed. No native, manual accessibility or receiving
+    claim. No time-based expiry is asserted; material source, scope or assumptions require affected requalification.
+  campaign_ids: &id001
+  - Q02
+  criterion_ids: &id002
+  - G04.01
+  - G04.02
+  - G04.03
+  - G04.04
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched retained
+    source, archive, report and log bytes.
+  reviewer: Codex engineering evidence consistency only; designated independent native, operator and receiving reviews
+    remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/91ee1152ccd723857056aa32cf2217a5d87608fb/verification/p04/final/local/report.json
+  sha256: 8f02c396ee7ab380439a161232c89fbde699b49693b6e6cd80f486d9b16cc723
+- id: EV-P04-002
+  level: E2
+  source_revision: 6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9
+  artifact_revisions:
+    retained_artifact_commit: 91ee1152ccd723857056aa32cf2217a5d87608fb
+    run_id: '37439404279'
+    artifact_id: '11399794610'
+    archive_sha256: 4144d82a17d3b57b4e41cf423167b0eed1706ac783c155df9b701a80ac41493d
+  environment: GitHub Actions Ubuntu 24.04; Python 3.12.14; disposable unprivileged PostgreSQL cluster from /usr/lib/postgresql/16/bin,
+    verified TLS and independent owner/runtime roles.
+  scope: All 75 Inventory and 24 worker cases pass with zero skips/errors/failures. Ten locked commands and 381
+    source bindings verify. Coverage includes additive migration replay, immutable runtime denials, scope/egress/lease
+    fencing, partial/expired pages, reused IDs/tombstones, direct collision holds, four concurrent claims across
+    authorities, shared-worker authority backoff, fairness, retry exhaustion, restart and original outbox identity/order
+    after uncertainty.
+  observed_at: '2026-10-06T08:56:14Z'
+  limitations: Native API and current-authority ports in core tests are controlled fixtures. Independent native
+    TLS parser tests establish explicit engineering bounds only. Live authority/broker/Console results are EV-P04-003.
+    Actual installed permission completeness, budgets, E3 and receiving reviews remain open. No time-based expiry
+    is asserted; material source, scope or assumptions require affected requalification.
+  campaign_ids: *id001
+  criterion_ids: *id002
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched retained
+    source, archive, report and log bytes.
+  reviewer: Codex engineering evidence consistency only; designated independent native, operator and receiving reviews
+    remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/91ee1152ccd723857056aa32cf2217a5d87608fb/verification/p04/final/core/report.json
+  sha256: eaccce423b4646794b4c0ae2fdf42ec4b7612f598107109d921b0d0813a29d8a
+- id: EV-P04-003
+  level: E2
+  source_revision: 6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9
+  artifact_revisions:
+    retained_artifact_commit: 91ee1152ccd723857056aa32cf2217a5d87608fb
+    chromium_archive_sha256: a799382a2008164754bbc8b93ec7a2f0d62c7a3798d3fe41ea854602d3630587
+    firefox_archive_sha256: b156d41517b1e2057e428b26c9bda540286f2eb1dfca1eb4e33164dcef1a4d6c
+    webkit_archive_sha256: db3d964d82247ded5fdc81619a7123cc97723bfdfbcc47d4185eebda2afcc85f
+  environment: GitHub Actions Ubuntu 24.04; independent Laravel/Python services; pinned PostgreSQL 18.6 and RabbitMQ
+    with verified TLS; native HTTPS fixtures; compiled Console in Chromium, Firefox and WebKit.
+  scope: All three live campaigns pass 60 checks and 29 commands each, with zero browser failures/skips/retries.
+    Real current Governance scope and tenant suspension, independently persisted browser sessions, provider-lowered
+    pagination, process restart, partial preservation, stable identities, exact-source wire contracts, escaped labels,
+    focus/reflow, accepted-response loss with unchanged retry, revocation/history clearing and no duplicate enrollment
+    pass. Each broker observer records ten deliveries for nine original event IDs with one deliberate replay in
+    order. Synthetic native before/after state is unchanged; committed facts still publish after tenant suspension.
+    All archive/report/log hashes and 1180 source-revision/path bindings across the final packet are verified.
+  observed_at: '2026-10-06T08:57:16.579340+00:00'
+  limitations: Native scope has four synthetic resources, not an actual VMware/OpenStack installation or approved
+    installation load. Synthetic OIDC exists only in principal bootstrap. Loopback TLS does not qualify operated
+    ingress. The observer is not a P05 Planning product consumer. Automated browser tasks do not establish representative
+    comprehension or managed/assistive support. Native E3 and independent G04 receiving remain open. No time-based
+    expiry is asserted; material source, scope or assumptions require affected requalification.
+  campaign_ids: *id001
+  criterion_ids: *id002
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently matched retained
+    source, archive, report and log bytes.
+  reviewer: Codex engineering evidence consistency only; designated independent native, operator and receiving reviews
+    remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/91ee1152ccd723857056aa32cf2217a5d87608fb/verification/p04/final/qualification-index.json
+  sha256: 3a0a9d234ff27049f43f892b86ca6e8e2f25d827edfaa916dfa8d05d538dfd15
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -6111,8 +6266,48 @@ blockers:
     or receiving approval.
   unblock_condition: Named accountable reviewers examine EV-P03-001–003 and each G03 criterion, including representative-user
     evidence from BL-P03-001; record actual identities, dates, decisions and unresolved scope.
-  next_action: Use the G03 engineering assessment and docs/qualification/gate-reviews/g03.md. Retain the queued
-    foundation Kubernetes outcome separately; do not infer a pass. Record the actual G03 decision only after required
-    evidence/review.
+  next_action: Use the G03 engineering assessment and docs/qualification/gate-reviews/g03.md. The formerly queued
+    foundation Kubernetes outcome is now recorded as passed at its actual P03 source; retain it separately from
+    receiving review. Record the actual G03 decision only after required evidence/review.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P04-001
+  scope_ids:
+  - P04
+  - P04.01
+  - P04.02
+  - P04.03
+  - P04.04
+  - P04.05
+  - G04
+  owner_role: Inventory/platform owners / independent native observer
+  description: G04.01 and G04.04 require E3 observations from selected actual OpenStack and VMware installations;
+    G04.02/.03 include native negative and budget cases. Installed tuples, approved destinations, restricted read
+    identities, visibility audit, budgets and independent before/after observations have not been supplied. Synthetic
+    peers cannot provide them.
+  unblock_condition: Supply the installation records and approved read scope in docs/implementation/p04-completion-review.md,
+    execute scoped Q02 on both native platforms, and retain exact-source original observations including independent
+    no-change proof.
+  next_action: Provide the native input records, enroll the approved policies using the runbook, execute the five
+    native task groups and resolve mandatory defects.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P04-002
+  scope_ids:
+  - P04
+  - P04.01
+  - P04.02
+  - P04.03
+  - P04.04
+  - P04.05
+  - G04
+  owner_role: Inventory / security / SRE / qualification / product owners and representative operator
+  description: Designated G04 criterion and package receiving reviews have not occurred. Automated browser and source
+    checks do not establish independent platform observation, operator comprehension or assistive-technology acceptance.
+  unblock_condition: Named receiving reviewers examine the engineering packet and BL-P04-001 native results, complete
+    the Console operator tasks on selected browser/assistive combinations, and record actual identities, dates,
+    limits and decisions.
+  next_action: Use the P04 completion packet and G04 review procedure; retain evidence and decisions without inferring
+    approval from development authorization.
   state: OPEN
   resolution_evidence_ids: []

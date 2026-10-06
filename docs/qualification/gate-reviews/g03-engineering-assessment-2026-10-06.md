@@ -20,12 +20,12 @@ records archive/report/source hashes and results. The
 campaigns, including the history-restoration disclosure found and fixed during
 qualification. No original failure is relabeled as a pass.
 
-P03-specific automated qualification is complete. The separate final-source
-foundation Kubernetes workflow remains queued, with no pass claimed; the
-[regression receipt](../../../verification/p03/final/regression-status.json)
-identifies each source/result. Observe that queued result before claiming broader
-foundation requalification. Kubernetes installer/manifests are unchanged;
-current-source images and Compose pass.
+P03-specific automated qualification is complete. The formerly queued final-source
+foundation Kubernetes workflow `37405120379` subsequently passed at `1c51f56a`.
+The [P04 follow-up receipt](../../../verification/p04/final/regression-status.json)
+records its actual source and completion. The original P03 regression receipt
+remains the record of what was known at that earlier observation. No receiving
+or operating acceptance follows from this completed regression.
 
 The [completion packet](../../implementation/p03-completion-review.md) provides
 seven manual tasks, precise inputs and reviewer roles. BL-P03-001/002 remain open.
