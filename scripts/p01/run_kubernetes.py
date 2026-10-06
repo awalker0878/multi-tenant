@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 from concurrent.futures import ThreadPoolExecutor
 import json
 from pathlib import Path
@@ -253,10 +254,19 @@ class KubernetesCampaign(Campaign):
         return self.exec(service, ['sh', '-ec', RESOURCE_PROBE], timeout=15)
 
     def check_console_shared_state(self, stage: str) -> None:
-        self.exec("console", ["sh", "-ec", "cat > /tmp/shared-state.php"],
-                  data=(self.root / "scripts/p01/console_shared_state.php").read_bytes())
-        raw = self.exec("console", ["php", "/tmp/shared-state.php"],
-                        data=json.dumps({"stage": stage}).encode())
+        probe = (self.root / "scripts/p01/console_shared_state.php").read_bytes()
+        # These are public fixture bytes. Avoid streaming the file and request
+        # over kubectl stdin; record and verify the installed bytes before use.
+        copied = self.exec("console", ["php", "-r",
+            "$bytes = base64_decode($argv[1], true); "
+            "if ($bytes === false || file_put_contents('/tmp/shared-state.php', $bytes) !== strlen($bytes)) { exit(1); } "
+            "echo hash_file('sha256', '/tmp/shared-state.php');",
+            base64.b64encode(probe).decode()])
+        self.check("console-shared-state-probe-bytes-" + stage,
+                   copied.decode().strip() == digest(probe))
+        raw = self.exec("console", ["sh", "-ec",
+            'printf "%s" "$1" | php /tmp/shared-state.php', "p01-console-state",
+            json.dumps({"stage": stage})])
         observed = json.loads(raw)
         self.check("console-shared-state-" + stage,
                    observed["result"] == "PASS" and all(x["passed"] for x in observed["checks"]), observed)

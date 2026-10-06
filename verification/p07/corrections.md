@@ -6,6 +6,7 @@ adapter, credentials or execution path. Q05/Q06 have not run.
 
 | Observation | Disposition |
 | --- | --- |
+| Kubernetes run `37545566682` returned exit 0 with empty stdout from the Console shared-state PHP probe, then failed strict JSON parsing. The original copied file bytes were not measured, so the original cause cannot be established from that output alone. | Preserve artifact `11450158762`, SHA-256 `e125c16776e6a6b134c5af365c64079b59a9e92a8a74a9939c85423b03602421`. Transfer public probe bytes as encoded argv, verify the installed SHA-256, and provide the stage through a local pipe inside the container. Keep strict JSON parsing and every session/cache/lock assertion; rerun the affected Kubernetes campaign. No native/product pass is inferred from the failed probe. |
 | The P06 push filter omitted Inventory, Catalogue and shared P04/P05 fixture inputs used by its live campaign, so the corrected Inventory manifest did not trigger P06. | Include these consumed source paths and rerun on the corrected source. Keep earlier behavior passes separate from exact-source qualification. |
 | All three corrected live campaigns passed behavior checks, but independent source-hash comparison found Inventory's tracked `SOURCES.txt` missing the already present Planning interface/application modules. Frozen installation regenerated that manifest before the campaign's source snapshot. | Reproduce the generated manifest with the locked build environment: SHA-256 `0678ba79c585728c27d8034067de0c5bbc7ec3fd80af8c5ff9046813615cc351`. Publish those two missing entries. Preserve original reports and the explicit source discrepancy; compare every measured source byte and rerun affected qualification on the corrected source. No product module is added or changed by this metadata fix. |
 | Context-policy run `37544824899` found the correction record's review-packet link before that packet was published. | Publish the already prepared packet in the following documentation commit and rerun clean-source link checks. The failed run remains recorded. |
@@ -22,6 +23,15 @@ expected outcome of absent real inputs. A passing checker campaign does not mark
 the native input packet ready or any P07 package complete. The register and
 [remaining review packet](../../docs/implementation/p07-completion-review.md)
 keep the unimplemented native outputs and receiving obligations explicit.
+
+Final execution regression run `37545874970` at
+`c2c29067f0ecdb7d0df0c92687507b66415219e5` passes all 243 core tests and all
+148 checks in each of Chromium, Firefox and WebKit. Independent comparison now
+matches every measured source byte, including the regenerated Inventory manifest.
+All command and artifact hashes match. Original archives and the three earlier
+one-file discrepancies remain separately identified in the final index; none is
+silently converted into a source-qualified pass. This closes the identified
+regression defects, without supplying any missing P07 native observation.
 
 The PostgreSQL image's [entrypoint source](https://github.com/docker-library/postgres/blob/master/docker-entrypoint.sh)
 starts its temporary initialization server without a TCP listener; PostgreSQL's
