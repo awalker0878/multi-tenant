@@ -1,0 +1,16 @@
+test_canonical_json_rejects_duplicate_keys_and_float_ambiguity (test_custody.CustodyTests.test_canonical_json_rejects_duplicate_keys_and_float_ambiguity) ... ok
+test_corrupt_journal_still_allows_containment_but_never_resumption (test_custody.CustodyTests.test_corrupt_journal_still_allows_containment_but_never_resumption) ... ok
+test_crash_between_authorization_and_admission_stays_held_and_requires_a_new_epoch (test_custody.CustodyTests.test_crash_between_authorization_and_admission_stays_held_and_requires_a_new_epoch) ... ok
+test_descriptor_or_confirmation_substitution_cannot_release (test_custody.CustodyTests.test_descriptor_or_confirmation_substitution_cannot_release) ... ok
+test_duplicate_person_key_role_or_expired_policy_cannot_authorize (test_custody.CustodyTests.test_duplicate_person_key_role_or_expired_policy_cannot_authorize) ... ok
+test_expired_future_long_lived_or_wrong_installation_payload_cannot_be_signed (test_custody.CustodyTests.test_expired_future_long_lived_or_wrong_installation_payload_cannot_be_signed) ... ok
+test_private_files_cannot_be_world_readable_symlinked_or_overwritten (test_custody.CustodyTests.test_private_files_cannot_be_world_readable_symlinked_or_overwritten) ... ok
+test_rotated_epoch_rejects_previously_signed_release (test_custody.CustodyTests.test_rotated_epoch_rejects_previously_signed_release) ... ok
+test_signer_key_must_match_the_independently_enrolled_public_key (test_custody.CustodyTests.test_signer_key_must_match_the_independently_enrolled_public_key) ... ok
+test_tampered_or_duplicate_signature_does_not_release (test_custody.CustodyTests.test_tampered_or_duplicate_signature_does_not_release) ... ok
+test_two_encrypted_keys_can_release_only_the_current_confirmed_held_generation (test_custody.CustodyTests.test_two_encrypted_keys_can_release_only_the_current_confirmed_held_generation) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 2.718s
+
+OK

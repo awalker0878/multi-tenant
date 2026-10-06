@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "campaign_result": "FAIL",
+  "source_revision": "ad3897d5a3dada557152eb7ec43c712556336fbe",
+  "run_id": 37392747755,
+  "artifact_id": 11381863645,
+  "archive_sha256": "4be3e43d7ef01011e5f844fa99135eb799264236830d583aeac19cdddf6866bd",
+  "retrieved_at": "2026-10-06T00:30:08.591718+00:00",
+  "verified_members": 874,
+  "verified_command_logs": 826,
+  "verified_source_bindings": 471,
+  "failure": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+  "observation": "Second Console shared-state process returned zero bytes with exit zero; strict JSON observation failed. Initial write passed. No recovery operation was reached; this is not a passing Kubernetes campaign.",
+  "retained_file_sha256": {
+    "307-console-app-exec.stdout.log": "9d8422c7309aebaa2cff915ed67b05011b6b34981eb22881f016f668acd76870",
+    "report.json": "4983512680890a8d893c46d691e75c5bd52ba9d146e6c9f589ca5d7eb11e9d2f",
+    "309-console-app-exec.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "309-console-app-exec.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "campaign.zip": "4be3e43d7ef01011e5f844fa99135eb799264236830d583aeac19cdddf6866bd"
+  }
+}

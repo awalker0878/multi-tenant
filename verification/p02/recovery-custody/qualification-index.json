@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "result": "PASS",
+  "source_revision": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+  "verified_at": "2026-10-06T00:34:58.762968+00:00",
+  "scope": "Independent custody CLI, two separately encrypted signing keys, owner-only PostgreSQL reconciliation, separate fresh resumption authorization and custodian release, stale-authority revocation, current HTTPS OIDC login, full-schema recovery and existing three-engine Console regression.",
+  "development_authorization": "Requesting user: Do actual independent recovery custody and resumption procedure securely. This authorizes implementation and disposable qualification; no production operator, key, host or restore approval is fabricated.",
+  "local": {
+    "path": "verification/p02/recovery-custody/local-rotation-20261006/report.json",
+    "sha256": "87057d083fc9ad8cf75868f80eb30ed9c329f0e67c0405557c882fdfb7ec8317"
+  },
+  "local_result": {
+    "governance_cases": 239,
+    "assertions": 5564,
+    "skipped_postgres_tls": 12,
+    "custody_cases": 11,
+    "commands": 5,
+    "log_bindings": 10,
+    "source_bindings": 218
+  },
+  "engines": [
+    {
+      "engine": "chromium",
+      "run_id": 37394147824,
+      "report": {
+        "path": "verification/p02/recovery-custody/run-37394147824/chromium/report.json",
+        "sha256": "b03d74738edef00c53760d2c84bebe124ccdbdce2a447888079e714950b0aaa1"
+      },
+      "retrieval": {
+        "path": "verification/p02/recovery-custody/run-37394147824/chromium/retrieval.json",
+        "sha256": "dfe2c5203a8fada416ad18bb7340199210a241beb3ff7c97da1a6dc7d2283644"
+      },
+      "archive_sha256": "29f49bb3680d52cfd601a3d163ce7c19ca83cc55f66ac33e9421284ee2fa8058",
+      "checks": 156,
+      "source_bindings": 358,
+      "artifact_bindings": 25,
+      "governance_postgres": {
+        "passed": 205,
+        "assertions": 5471
+      },
+      "console_postgres_tls": {
+        "passed": 66,
+        "assertions": 248
+      },
+      "browser_stats": {
+        "startTime": "2026-10-06T00:31:12.789Z",
+        "duration": 45024.734000000004,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "ceremony": {
+        "plan_sha256": "18209971b8da45cccbcc324c344173d6d0a45ddd210ec461f50bdabd6f75a726",
+        "reconcile_envelope_sha256": "2d03482d43c69c9d97e1752666e115c75389145072ab926326fc1a7fd951e0c6",
+        "resume_envelope_sha256": "da6087f7dc6a43f23933dd7c1df97f2a9286687c344a6595483ea9a29222763a",
+        "reconciled_archive_sha256": "09a7eee8fd84719bc4621b9b6cf0e3ad873c507de0703a6dae3543c5c04b94b0",
+        "restored_tables": 30,
+        "receipt_rows": 1,
+        "release_rows": 1,
+        "custody_journal_sha256": "df80ed4ef9eee98146ceb1c89d516abfd413c9ce489a39c915b785c5bcefc5ed"
+      }
+    },
+    {
+      "engine": "firefox",
+      "run_id": 37394147824,
+      "report": {
+        "path": "verification/p02/recovery-custody/run-37394147824/firefox/report.json",
+        "sha256": "624bbb5cdecfe82b0d6651fcde6b1dcb9d3f7eb8bcaf84eec7c1b9e89f522809"
+      },
+      "retrieval": {
+        "path": "verification/p02/recovery-custody/run-37394147824/firefox/retrieval.json",
+        "sha256": "2502aafc4c8a97bd539a2f059d1b92052a916c7533c05522bc2450c48609e447"
+      },
+      "archive_sha256": "943749c576b3d822f324a044d277bcd708031e1fb551c28a4543411df359ad42",
+      "checks": 156,
+      "source_bindings": 358,
+      "artifact_bindings": 25,
+      "governance_postgres": {
+        "passed": 205,
+        "assertions": 5471
+      },
+      "console_postgres_tls": {
+        "passed": 66,
+        "assertions": 248
+      },
+      "browser_stats": {
+        "startTime": "2026-10-06T00:30:08.939Z",
+        "duration": 43294.339,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "ceremony": {
+        "plan_sha256": "ca81a021fe2fdf23791323469258ca8066933c827aa231a848b1c5e1567f9bd4",
+        "reconcile_envelope_sha256": "7458708453260687b22964a706bf048223639ac2422731a198ead7cacf5753db",
+        "resume_envelope_sha256": "db5dcbe39e272a46e59f592a2b6c56238bfd25acf4a3b0e21d9bffb4009a403c",
+        "reconciled_archive_sha256": "63bcb52fe57c995de8b80f0e098b6df8ef3c478d3cb49275bbf91207edf1ca78",
+        "restored_tables": 30,
+        "receipt_rows": 1,
+        "release_rows": 1,
+        "custody_journal_sha256": "ba523fb9c4ad79ec692cf7f9a86fe9eb1a28890ffff9aac5fbdbe9bbd3d09a04"
+      }
+    },
+    {
+      "engine": "webkit",
+      "run_id": 37394147824,
+      "report": {
+        "path": "verification/p02/recovery-custody/run-37394147824/webkit/report.json",
+        "sha256": "7cffb839595d6f577f22c32cdf7f127dc833e9222b5f0be9409045e3136eba51"
+      },
+      "retrieval": {
+        "path": "verification/p02/recovery-custody/run-37394147824/webkit/retrieval.json",
+        "sha256": "64fb87d09e964a6e4771167e0b8d74e19ac885b7acf2fcfd12b33ee8677128e4"
+      },
+      "archive_sha256": "d4948025e7907f8116db7727faa13be9adda377806a19c08ed44e0987b06cd3d",
+      "checks": 156,
+      "source_bindings": 358,
+      "artifact_bindings": 25,
+      "governance_postgres": {
+        "passed": 205,
+        "assertions": 5471
+      },
+      "console_postgres_tls": {
+        "passed": 66,
+        "assertions": 248
+      },
+      "browser_stats": {
+        "startTime": "2026-10-06T00:32:32.013Z",
+        "duration": 63657.188,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "ceremony": {
+        "plan_sha256": "a1a95666c768d0112b34af5867e9fd7aea17515da679d5bdba1bc95faea5cb28",
+        "reconcile_envelope_sha256": "19a075ee7ffc2546d8cf5c57508261568f6939f820fd75501992840312dac825",
+        "resume_envelope_sha256": "dfa3d298d8650a62cb6d4bb263f0ec6cabd995423f6e3fa4f8a9ee831f19c84d",
+        "reconciled_archive_sha256": "07e9034470c77732ddb71a0e5eaf250e2364cced0010468038fca06356f5884c",
+        "restored_tables": 30,
+        "receipt_rows": 1,
+        "release_rows": 1,
+        "custody_journal_sha256": "9a9a488c2391c171f237d948b5a2e84e3e5af40e0216d1f1cbb4d9ace539cb04"
+      }
+    }
+  ],
+  "events": {
+    "run_id": 37394148004,
+    "report": {
+      "path": "verification/p02/recovery-custody/run-37394148004/events/report.json",
+      "sha256": "be15d39270329fc7296a2295a15446673e661235c8c34da978522a9c10cdae57"
+    },
+    "retrieval": {
+      "path": "verification/p02/recovery-custody/run-37394148004/events/retrieval.json",
+      "sha256": "62293532a5fb25dd2253cd29e5888e7bc29ad5d5f77133d244b69185fdacd83c"
+    },
+    "archive_sha256": "bdcdacb444aeceef908bfb92dd80d0e0388e2cbbb0af7f2d83ecb950ab4d6f63",
+    "source_bindings": 217,
+    "log_bindings": 10,
+    "passed": 74,
+    "assertions": 1358
+  },
+  "original_failures": [
+    {
+      "run_id": 37393173334,
+      "source_revision": "f5dbba62bc017632893d6220cbba3f9b3dac5e03",
+      "result": "FAIL",
+      "reason": "The new positive recovered-identity observation incorrectly selected the frozen local-bootstrap-only schema. Corrected to require the exact reconciled federated actor and complete permission list. No published contract, authority check, browser or assertion was excluded.",
+      "retrievals": [
+        {
+          "path": "verification/p02/recovery-custody/run-37393173334/chromium/retrieval.json",
+          "sha256": "1ea0dd2b3be22b2bd9d96b7211047725c9a8dc7ee7210e3d730aa9da2931e192"
+        },
+        {
+          "path": "verification/p02/recovery-custody/run-37393173334/firefox/retrieval.json",
+          "sha256": "503a561d48b9ccdb6a1f54dc2a5a23d884044b67e9a15dd4343b11b91dcffe25"
+        },
+        {
+          "path": "verification/p02/recovery-custody/run-37393173334/webkit/retrieval.json",
+          "sha256": "04ebd7bb8363a5206fb5f30d7fc7514ad3efa0462ec9b6aa31d461e2824a56f2"
+        }
+      ]
+    },
+    {
+      "run_id": 37392747755,
+      "source_revision": "ad3897d5a3dada557152eb7ec43c712556336fbe",
+      "result": "FAIL",
+      "reason": "Second Console shared-state helper returned no bytes; strict JSON parsing rejected the observation. Subsequent unchanged helper execution at ec60406 passed the full Kubernetes campaign. Original evidence remains failed.",
+      "retrieval": {
+        "path": "verification/p02/recovery-custody/run-37392747755/kubernetes/retrieval.json",
+        "sha256": "e0cbf974b63f130d18481c157c92c9cedb9343740ae46657cb8cf4838baa7586"
+      }
+    }
+  ],
+  "earlier_local_observations": [
+    {
+      "path": "verification/p02/recovery-custody/local-20261006/report.json",
+      "sha256": "82bc90dbf1b09c90ba801483498a0793184585f39ccb6bd51546caa9c27bcd42"
+    },
+    {
+      "path": "verification/p02/recovery-custody/local-final-20261006/report.json",
+      "sha256": "d3069e5f0b320e4690e5e5c3ffbbd090459b97b4ae330636c92012693a43de5d"
+    }
+  ],
+  "limits": [
+    "Synthetic recovery owner/reviewer identities, encrypted keys and current owner records; actual independent people and production key custody are not supplied.",
+    "Separate process and protected filesystem store in a disposable environment; actual separately administered host, read-only public directory mount and independent backup/change authority need operating evidence.",
+    "A party able to co-restore the entire old active custody/trust environment and old database can defeat the filesystem fence; this is not hardware or remote-consensus anti-rollback.",
+    "Lost pre-activation bootstrap is deliberately not reset; missing current keys, records, provider or approvals keep admission held.",
+    "No production OIDC registration, recovery approval, native effect, HA, RTO/RPO, managed-browser or manual accessibility acceptance, independent G01/G02 receiving decision or promotion is inferred."
+  ]
+}

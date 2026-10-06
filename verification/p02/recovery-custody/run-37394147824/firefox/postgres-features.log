@@ -1,0 +1,239 @@
+
+   PASS  Tests\Feature\LocalIdentityTest
+  ✓ it generates one high entropy credential and never redisplays or re… 0.10s  
+  ✓ it requires independent mounted console identity and rejects health… 0.07s  
+  ✓ it enforces first-login restrictions in direct APIs then rotates al… 0.10s  
+  ✓ it requires the current password and rejects reuse, short or mismat… 0.16s  
+  ✓ it expires temporary sessions and invalidates an explicitly logged…  0.08s  
+  ✓ it commits throttling across requests and denies attempts during th… 0.08s  
+  ✓ it never recreates a retired identity and rejects its existing sess… 0.07s  
+  ✓ it rolls back identity and audit together when outbox persistence f… 0.06s  
+  ✓ it refuses bootstrap through redirected or noninteractive command o… 0.08s  
+
+   PASS  Tests\Feature\IdentityAdmissionTest
+  ✓ it binds bootstrap to external custody once and keeps the binding w… 0.07s  
+  ✓ it fails closed for missing malformed held or changed external cust… 0.07s  
+  ✓ it fails closed for missing malformed held or changed external cust… 0.07s  
+  ✓ it fails closed for missing malformed held or changed external cust… 0.06s  
+  ✓ it fails closed for missing malformed held or changed external cust… 0.06s  
+  ✓ it fails closed for missing malformed held or changed external cust… 0.07s  
+  ✓ it never adopts a restored initialized database or recreates an adm… 0.07s  
+  ✓ it cannot initialize admission through a direct request or adopt an… 0.06s  
+
+   PASS  Tests\Feature\IdentityRecoveryTest
+  ✓ it reconciles under dual signatures and requires a second approved…  2.00s  
+  ✓ it rejects missing duplicated modified expired wrong-purpose or for… 0.43s  
+  ✓ it rejects missing duplicated modified expired wrong-purpose or for… 0.34s  
+  ✓ it rejects missing duplicated modified expired wrong-purpose or for… 0.36s  
+  ✓ it rejects missing duplicated modified expired wrong-purpose or for… 0.34s  
+  ✓ it rejects missing duplicated modified expired wrong-purpose or for… 0.35s  
+  ✓ it rejects missing duplicated modified expired wrong-purpose or for… 0.38s  
+  ✓ it rejects missing duplicated modified expired wrong-purpose or for… 0.37s  
+  ✓ it denies state key custody descriptor credential or current issuer… 0.37s  
+  ✓ it denies state key custody descriptor credential or current issuer… 0.36s  
+  ✓ it denies state key custody descriptor credential or current issuer… 0.36s  
+  ✓ it denies state key custody descriptor credential or current issuer… 0.45s  
+  ✓ it denies state key custody descriptor credential or current issuer… 1.01s  
+  ✓ it denies state key custody descriptor credential or current issuer… 0.36s  
+  ✓ it denies unrotated workload credentials and unreviewed orphaned or… 0.45s  
+  ✓ it denies unrotated workload credentials and unreviewed orphaned or… 0.32s  
+  ✓ it denies unrotated workload credentials and unreviewed orphaned or… 0.33s  
+  ✓ it denies unrotated workload credentials and unreviewed orphaned or… 0.32s  
+  ✓ it denies unrotated workload credentials and unreviewed orphaned or… 0.32s  
+  ✓ it rejects shared workload credentials before preparing recovery au… 0.33s  
+  ✓ it rejects reassignment of any previous credential to another workl… 0.34s  
+  ✓ it rejects reassignment of any previous credential to another workl… 0.33s  
+  ✓ it rolls back every revocation if immutable recovery receipt retent… 0.38s  
+  ✓ it rejects replay and any post-reconciliation changes before confir… 0.43s  
+  ✓ it never accepts duplicate principal IDs same-key roles revoked pol… 0.31s  
+  ✓ it never accepts duplicate principal IDs same-key roles revoked pol… 0.30s  
+  ✓ it never accepts duplicate principal IDs same-key roles revoked pol… 0.31s  
+  ✓ it never accepts duplicate principal IDs same-key roles revoked pol… 0.81s  
+
+   PASS  Tests\Feature\OidcIdentityTest
+  ✓ it stores secret references with encrypted custody and rejects pre-… 0.23s  
+  ✓ it preserves local setup after provider failure and never activates… 0.09s  
+  ✓ it uses real signed tokens, verifies PKCE and atomically retires ev… 0.12s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.09s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.09s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.09s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.09s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.09s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.09s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.09s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.10s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.10s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.09s  
+  ✓ it rejects a forged signature and consumes the failed flow           0.09s  
+  ✓ it binds browser state and proof to their initiating session and se… 0.12s  
+  ✓ it expires sign-in attempts and handover proofs                      0.21s  
+  ✓ it keeps the active connection during draft edits and denies setup…  0.14s  
+  ✓ it rolls activation back if its audit outbox cannot commit           0.11s  
+  ✓ it refuses insecure URLs and discovery that redirects authority or…  0.09s  
+  ✓ it denies metadata and loopback targets and permits only selected p… 0.08s  
+
+   PASS  Tests\Feature\TenancyTest
+  ✓ it requires workload and federated identity and grants no implied e… 0.17s  
+  ✓ it scopes role decisions by tenant site environment and current mem… 0.17s  
+  ✓ it bounds delegated grants and revokes them without trusting a stal… 0.17s  
+  ✓ it invalidates old delegated grants when membership revision change… 0.17s  
+  ✓ it rejects guessed cross-tenant membership and grant identifiers     0.15s  
+  ✓ it keeps quota entitlement distinct from capacity and reservations…  0.16s  
+  ✓ it preserves independent immutable histories and refuses removal of… 0.12s  
+  ✓ it suspends new access and permits the scoped tenant administrator…  0.14s  
+  ✓ it rolls back quota and command receipts if its durable outbox fail… 0.13s  
+
+   PASS  Tests\Feature\DirectoryTest
+  ✓ it pages every authorized tenant beyond the old bound without dupli… 0.38s  
+  ✓ it pages memberships beyond 200 and preserves the published v1 proj… 0.29s  
+  ✓ it rejects cursor tampering expiry and reuse across views tenants o… 0.22s  
+  ✓ it rechecks revocation and role scope before returning a continued…  0.21s  
+  ✓ it denies unknown tenants missing workload identity and malformed p… 0.12s  
+
+   PASS  Tests\Feature\ApprovalTest
+  ✓ it binds an independent approval to an immutable plan and named exe… 0.20s  
+  ✓ it denies self-approval even if the requestor also has a reviewer g… 0.41s  
+  ✓ it denies a named executor from approving even if given approval au… 0.18s  
+  ✓ it rejects every changed approval binding rather than widening the…  0.18s  
+  ✓ it rejects every changed approval binding rather than widening the…  0.18s  
+  ✓ it rejects every changed approval binding rather than widening the…  0.19s  
+  ✓ it rejects every changed approval binding rather than widening the…  0.19s  
+  ✓ it rejects every changed approval binding rather than widening the…  0.18s  
+  ✓ it rejects every changed approval binding rather than widening the…  0.18s  
+  ✓ it rejects every changed approval binding rather than widening the…  0.22s  
+  ✓ it denies an unnamed executor and cross-tenant approval identifiers  0.30s  
+  ✓ it records rejection and revocation without destroying history or p… 0.21s  
+  ✓ it expires approval authoritatively and records the transition once  0.20s  
+  ✓ it requires fresh authority and cannot resurrect an approval after…  0.21s  
+  ✓ it fails closed on missing plan authority and detects changed autho… 0.19s  
+  ✓ it returns the original idempotent decision but rejects changed rea… 0.19s  
+  ✓ it does not fall back to a synthetic plan source in the deployed ad… 0.21s  
+  ✓ it records background expiry once without a live session or availab… 0.20s  
+  ✓ it preserves the v1 audit UUID contract without attributing system…  0.20s  
+  ✓ it expires bounded batches at the exact deadline and leaves termina… 0.21s  
+  ✓ it rolls expiry back if its durable outbox cannot be written         0.19s  
+  ✓ it retains nonempty terminal decision history for recovery qualific… 0.21s  
+
+   PASS  Tests\Feature\GovernanceOutboxTest
+  ✓ it publishes a schema-validated minimal fact reference and preserve… 0.12s  
+  ✓ it retains an uncertain publication and replays exactly the same ev… 0.12s  
+  ✓ it replays a confirmed event after the database acknowledgement is…  0.20s  
+  ✓ it delivers committed history even when its originating actor no lo… 0.12s  
+  ✓ it quarantines malformed facts without blocking independent tenant…  0.12s  
+  ✓ it rejects unknown event types and mismatched scope without publish… 0.11s  
+  ✓ it rejects unknown event types and mismatched scope without publish… 0.13s  
+  ✓ it fails closed without broker custody and bounds operator commands  0.12s  
+
+   PASS  Tests\Feature\IdentityOutboxTest
+  ✓ it delivers an existing bootstrap fact without rewriting its audit…  0.07s  
+  ✓ it preserves identical identity wire bytes across uncertain confirm… 0.06s  
+  ✓ it replays identity history after database acknowledgement rollback  0.17s  
+  ✓ it caps retry delay and isolates a malformed event from the remaini… 0.07s  
+  ✓ it validates identity event types, audit attribution and immutable…  0.06s  
+  ✓ it validates identity event types, audit attribution and immutable…  0.06s  
+  ✓ it validates identity event types, audit attribution and immutable…  0.06s  
+  ✓ it validates identity event types, audit attribution and immutable…  0.06s  
+  ✓ it validates identity event types, audit attribution and immutable…  0.06s  
+  ✓ it validates identity event types, audit attribution and immutable…  0.15s  
+  ✓ it reports unavailable audit storage without poisoning a pending fa… 0.07s  
+  ✓ it continues delivery after federation retirement and session revoc… 0.09s  
+  ✓ it denies invalid batch limits and keeps schemata byte-identical     0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.06s  
+  ✓ it encodes every supported identity event using internal attributio… 0.14s  
+
+   PASS  Tests\Feature\ActorDelegationTest
+  ✓ it binds an opaque delegation to current actor service action and e… 0.15s  
+  ✓ it rejects the wrong service and changed action or resource scope    0.20s  
+  ✓ it rejects service identity alone and never accepts console identit… 0.14s  
+  ✓ it expires within sixty seconds and cannot extend its source sessio… 0.14s  
+  ✓ it immediately denies logout disabled actors and credential rotatio… 0.14s  
+  ✓ it immediately denies logout disabled actors and credential rotatio… 0.14s  
+  ✓ it immediately denies logout disabled actors and credential rotatio… 0.14s  
+  ✓ it immediately denies logout disabled actors and credential rotatio… 0.14s  
+  ✓ it denies the old delegation with a newly rotated valid service cre… 0.14s  
+  ✓ it cannot revive a delegated request after membership revocation an… 0.17s  
+  ✓ it permits only its originating actor to revoke and records one imm… 0.16s  
+  ✓ it denies administrative native and support delegation and caller s… 0.15s  
+  ✓ it fails closed on missing or shared service credentials and rolls…  0.15s  
+
+   PASS  Tests\Feature\SupportTrustTest
+  ✓ it binds handover and subsequent federated sessions to their verifi… 0.21s  
+  ✓ it fails the online support trust check when issuer signing keys or… 0.11s  
+  ✓ it fails the online support trust check when issuer signing keys or… 0.11s  
+  ✓ it fails the online support trust check when issuer signing keys or… 0.11s  
+
+   PASS  Tests\Feature\SupportAccessTest
+  ✓ it requires dual independent approval and executor activation befor… 0.35s  
+  ✓ it rejects body privilege injection unsupported actions wildcards a… 0.23s  
+  ✓ it rejects body privilege injection unsupported actions wildcards a… 0.25s  
+  ✓ it rejects body privilege injection unsupported actions wildcards a… 0.23s  
+  ✓ it rejects body privilege injection unsupported actions wildcards a… 0.23s  
+  ✓ it rejects body privilege injection unsupported actions wildcards a… 0.23s  
+  ✓ it rejects body privilege injection unsupported actions wildcards a… 0.22s  
+  ✓ it lets neither requester executor nor one person supply both appro… 0.31s  
+  ✓ it cannot appoint security authority through tenant administration…  0.25s  
+  ✓ it denies changed digest tenant action site environment and resourc… 0.28s  
+  ✓ it denies changed digest tenant action site environment and resourc… 0.30s  
+  ✓ it denies changed digest tenant action site environment and resourc… 0.38s  
+  ✓ it denies changed digest tenant action site environment and resourc… 0.30s  
+  ✓ it denies changed digest tenant action site environment and resourc… 0.29s  
+  ✓ it requires resources to belong to the exact tenant site and enviro… 0.30s  
+  ✓ it enforces request and decision idempotency after rechecking curre… 0.30s  
+  ✓ it makes expiry effective exactly at the deadline and records one i… 0.28s  
+  ✓ it bounds lifetime to one hour and to the initiating session and de… 0.32s  
+  ✓ it permanently invalidates a request after requester approver or ex… 0.30s  
+  ✓ it permanently invalidates a request after requester approver or ex… 0.70s  
+  ✓ it permanently invalidates a request after requester approver or ex… 0.38s  
+  ✓ it permanently invalidates a request after requester approver or ex… 0.30s  
+  ✓ it rejects disabled executors at authentication before any diagnost… 0.29s  
+  ✓ it denies signing-key removal before ordinary session expiry and re… 0.40s  
+  ✓ it holds support access on issuer or key-custody loss but still per… 0.29s  
+  ✓ it holds support access on issuer or key-custody loss but still per… 0.40s  
+  ✓ it holds every support entrypoint under changed recovery custody wi… 0.29s  
+  ✓ it requires independent post-use review and preserves immutable aud… 0.34s  
+  ✓ it rolls back protected data admission if its audit outbox cannot c… 0.30s  
+  ✓ it requires ownership of the commit boundary before returning prote… 0.30s  
+  ✓ it denies self approval even when the named requester or executor h… 0.27s  
+  ✓ it denies self approval even when the named requester or executor h… 0.27s  
+  ✓ it denies an approving actor post-use review even if separately ass… 0.33s  
+  ✓ it refuses new privileges from stale or legacy sessions while prese… 0.29s  
+  ✓ it invalidates after tenant restoration or Console credential rotat… 0.43s  
+  ✓ it invalidates after tenant restoration or Console credential rotat… 0.31s  
+  ✓ it requires a security role matching the tenant site and environmen… 0.26s  
+  ✓ it keeps invalidation durable after the attributed denial budget is… 1.06s  
+  ✓ it reauthorizes every audit page and rejects cross-request position… 1.64s  
+  ✓ it blocks another activation until an overdue used request receives… 0.37s  
+  ✓ it retains nonempty terminal support history for recovery qualifica… 0.33s  
+  ✓ it rechecks the presented Console workload after remote trust verif… 0.24s  
+
+   PASS  Tests\Feature\SupportContractTest
+  ✓ it matches the published support contract across creation decisions… 0.38s  
+
+   PASS  Tests\Feature\SupportOutboxTest
+  ✓ it publishes only restricted audit references with stable bytes acr… 0.24s  
+  ✓ it rejects outbox disagreement without losing later immutable facts… 0.24s  
+  ✓ it rejects outbox disagreement without losing later immutable facts… 0.25s  
+  ✓ it rejects outbox disagreement without losing later immutable facts… 0.24s  
+  ✓ it rejects outbox disagreement without losing later immutable facts… 0.23s  
+  ✓ it rejects outbox disagreement without losing later immutable facts… 0.34s  
+  ✓ it quarantines malformed facts while storage outage leaves a claim…  0.24s  
+  ✓ it delivers every declared support fact without depending on curren… 0.28s  
+  ✓ it bounds relay and expiry batches without authorizing from schedul… 0.24s  
+
+   PASS  Tests\Feature\SupportConcurrencyTest
+  ✓ it serializes independent approval races and requires the losing ac… 0.39s  
+  ✓ it rechecks authority after waiting on a concurrent revocation inst… 0.40s  
+
+  Tests:    205 passed (5471 assertions)
+  Duration: 47.61s
+
