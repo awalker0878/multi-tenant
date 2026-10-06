@@ -34,6 +34,8 @@ function initializeIdentityFixture(object $test): void
         $sql = preg_replace('/^\\\\.*$/m', '', $sql);
         $sql = preg_replace('/^(?:SET LOCAL ROLE|GRANT|REVOKE) [^;]+;\s*/m', '', $sql);
         if (DB::getDriverName() === 'sqlite') {
+            // Real owner/function privileges are exercised on PostgreSQL, never inferred here.
+            $sql = preg_replace('/-- BEGIN POSTGRES RECOVERY FUNCTION.*?-- END POSTGRES RECOVERY FUNCTION/s', '', $sql);
             $sql = str_replace('identity_sessions_expiry ON app.identity_sessions', 'app.identity_sessions_expiry ON identity_sessions', $sql);
             $sql = str_replace('REFERENCES app.', 'REFERENCES ', $sql);
             // SQLite cannot DROP NOT NULL; materialize the post-005 audit shape.
