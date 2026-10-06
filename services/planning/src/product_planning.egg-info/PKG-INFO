@@ -1,7 +1,7 @@
 Metadata-Version: 2.4
 Name: product-planning
 Version: 0.1.0.dev0
-Summary: Planning service bootstrap; assessment and plan compilation are not implemented
+Summary: Planning assessments and immutable review plans with current owner authority
 Requires-Python: <3.13,>=3.12
 Description-Content-Type: text/markdown
 Requires-Dist: psycopg[binary]==3.3.6

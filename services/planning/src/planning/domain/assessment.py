@@ -154,7 +154,7 @@ def assess(
         "artifacts": policy["artifacts"],
     }
     qualified = (
-        qualification.get("scope") == expected
+        digest(qualification.get("scope")) == digest(expected)
         and qualification.get("status") == "qualified"
         and qualification.get("evidence_level") in {"E3", "E4"}
         and qualification.get("expires_at", 0) > now

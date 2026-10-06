@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "product-planning"
 version = "0.1.0.dev0"
-description = "Planning service bootstrap; assessment and plan compilation are not implemented"
+description = "Planning assessments and immutable review plans with current owner authority"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0", "jsonschema==4.26.0", "pika==1.4.4"]
@@ -43,6 +43,7 @@ addopts = "--strict-config --strict-markers"
 [tool.setuptools.package-data]
 "planning.infrastructure.messaging" = ["*.json"]
 "planning.infrastructure.facts" = ["*.json"]
+"planning.infrastructure.inputs" = ["*.json"]
 
 [[tool.mypy.overrides]]
 module = ["jsonschema.*", "pika.*"]

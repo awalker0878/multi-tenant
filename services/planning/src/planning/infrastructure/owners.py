@@ -9,11 +9,14 @@ import re
 import ssl
 import time
 from datetime import datetime
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
-from planning.domain.model import Actor, Rejected, identifier, profile
+from jsonschema import Draft202012Validator, FormatChecker
+
+from planning.domain.model import Actor, Rejected, decode, identifier, profile
 from planning.infrastructure.foundation import mounted_secret
 
 
@@ -65,9 +68,22 @@ def request(
                 or response.getheader("Content-Encoding", "identity") != "identity"
             ):
                 raise ValueError
-            result = json.loads(raw)
+            result = decode(raw)
             if not isinstance(result, dict):
                 raise ValueError
+            if owner in {"CATALOGUE", "INVENTORY", "ASSURANCE"}:
+                name = {
+                    "CATALOGUE": "catalogue-input-v1",
+                    "INVENTORY": "inventory-input-v1",
+                    "ASSURANCE": "qualification-v1",
+                }[owner]
+                schema = json.loads(
+                    files("planning.infrastructure.inputs").joinpath(name + ".json").read_text()
+                )
+                if not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(
+                    result
+                ):
+                    raise ValueError
             return result
         finally:
             connection.close()
@@ -152,7 +168,7 @@ class OwnerSources:
             path = Path(os.environ["PLANNING_REGISTRY_FILE"])
             if not path.is_absolute() or path.stat().st_size > 524288:
                 raise ValueError
-            registry = json.loads(path.read_text())
+            registry = decode(path.read_bytes())
             if registry["schema_version"] != 1:
                 raise ValueError
             first = candidates[0]

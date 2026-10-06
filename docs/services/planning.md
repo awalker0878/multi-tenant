@@ -1,6 +1,6 @@
 # Planning service
 
-Status: the initial independently packaged [service foundation](../../services/planning/README.md) and development image are implemented; the assessment, profile and plan behavior specified below remains planned. Runtime: Python; source: `services/planning/`. Owner: infrastructure engineering with architecture/security and platform profile owners.
+Status: P05 implements the assessment, immutable plan, review and source-owner contracts described in the [implementation record](../implementation/p05-planning.md). Native effects and operational readiness remain unavailable. Runtime: Python; source: `services/planning/`. Owner: infrastructure engineering with architecture/security and platform profile owners.
 
 The private service package owns its manifest, dependency lock, wheel and installed `planning-health` diagnostic. It implements one-shot process liveness; dependency readiness deliberately exits unavailable. No HTTP API, compilation worker, task consumption, assessment, plan compilation, persistence or other business behavior is implemented. Native operations are disabled.
 
@@ -25,24 +25,34 @@ All mandatory inputs must be present and sufficiently fresh to issue an executab
 
 Plan inputs pin catalogue revision, inventory generations, policy/profile revisions, qualification scope, adapters/automation artifacts, service contracts, state ownership, action graph, reservation intents and recovery boundaries. Secrets are referenced by approved scope, never embedded. Resource mappings preserve tenant, WSD, logical domain and native-instance distinctions.
 
-## Proposed API surface
+## Implemented P05 API surface
 
-Routes use `/v1/tenants/{tenant_id}`. Planned schemas belong to `contracts/openapi/planning.yaml`.
+The [published API](../../contracts/openapi/planning-v1.json) uses
+`/v1/tenants/{tenant}/applications/{application}/environments/{environment}`.
+Commands are synchronous and bounded to three destinations, 50 workloads,
+800 requirements, 500 graph nodes, a 256 KiB request, a 900 KiB stored result
+and 30 accepted commands per tenant per minute. The Console preserves exact
+command identity when a post-commit reply is lost. A future asynchronous API
+would require a separately versioned contract; no computation worker is implied.
 
-| Method and route | Contract |
+| Method and suffix | Result |
 | --- | --- |
-| `GET /profiles/{id}/versions/{version}` | Return complete immutable profile, declarations and linked qualification references as distinct fields. |
-| `POST /assessments` | Accept immutable intent reference, candidate scope and pinned inputs/selection rules; `202` with assessment ID, typed task ID and authorized status URL. |
-| `GET /assessment-jobs/{id}` | Assessment-computation progress only; no infrastructure execution state. |
-| `GET /assessments/{id}` | Immutable completed findings or current compute disposition; explain blockers and input freshness. |
-| `POST /plans` | Compile from exact completed assessment and selected candidate; `202` with planning task/reference if asynchronous; explicit intent and requested action. |
-| `GET /plans/{id}` | Return immutable plan plus digest/canonicalization version and separate current validity view. |
+| `POST /assessments` | `201` immutable pinned assessment receipt, after all destinations are authorized. |
+| `GET /assessments/{id}` | Original findings, sources and candidate scope after current authority checks. |
+| `POST /plans` | `201` immutable plan and content-bound approval digest. |
+| `GET /plans/{id}` | Original plan plus a separate current validity evaluation. |
+| `POST /plans/{id}/validity` | Current direct owner checks and conservative event invalidation holds. |
+| `POST /plans/{id}/diff` | Material paths changed; both plans' destinations are currently authorized. |
 
-A reassessment or material plan change creates a new ID/version; `GET` never rewrites the reviewed plan. Plan validity is a current evaluation alongside immutable bytes. List routes use authorized pagination, and candidate comparison exposes no site/resource outside the caller's permitted scope.
+Governance alone reads `/v1/plans/{id}/revisions/1` with a distinct workload
+credential. The [owner read contract](../../contracts/openapi/planning-inputs-v1.json)
+requires each source to recheck the original request-bound delegation. Versioned
+profiles and policies are mounted in Planning custody; qualifications are read
+from Assurance custody. No list, profile mutation or native dispatch route is exposed.
 
 ## Authorization and bootstrap
 
-Require authenticated actor plus service delegation and `planning.assessment.create`, `planning.plan.create/read` scopes over both the application and candidate destinations. Fetch catalogue/inventory through scoped APIs; a broader planning service credential is not permission to expose all site data to the requester.
+Require authenticated actor plus service delegation and `plan.create` and `plan.read` scopes over both the application and candidate destinations. Fetch catalogue/inventory through scoped APIs; a broader planning service credential is not permission to expose all site data to the requester.
 
 Bootstrap uses reviewed profile versions, not an empty-registry “allow all” mode. P05 requires P03 intent and P04 provenance. All three platform profiles cover the required dimensions; only the selected path needs a feasible first execution plan. Missing real inputs may support simulation design but never an E3 claim.
 
@@ -62,7 +72,7 @@ Planning emits reservation requirements and expiry/revalidation rules. Lifecycle
 
 ## Deployment and operation
 
-Deploy API and bounded compilation workers independently under planning ownership. Isolate compilation from native credentials and mutation networks. Set input-size, graph complexity, runtime and per-tenant resource budgets to prevent a large intent blocking other tenants; values are P00/P05 decisions.
+Deploy the bounded API and confirmed fact processes independently under Planning ownership. Isolate compilation from native credentials and mutation networks. Set input-size, graph complexity, runtime and per-tenant resource budgets to prevent a large intent blocking other tenants; values are P00/P05 decisions.
 
 Measure task age, rule evaluation time, stale/unknown input rates, deterministic-digest failures and blocked candidate reasons. Preserve immutable plan/profile artifacts and canonicalization code versions under retention; restore current validity as unknown until authoritative inputs are rechecked. Record compiler artifact digests with evidence.
 

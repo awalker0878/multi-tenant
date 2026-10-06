@@ -29,7 +29,7 @@ final class PlanningQualificationController
                 $registry = json_decode(file_get_contents($path) ?: '', true, 64, JSON_THROW_ON_ERROR);
                 abort_unless(is_array($registry) && ($registry['schema_version'] ?? null) === 1 && is_array($registry['records'] ?? null), 503);
                 foreach ($registry['records'] as $record) {
-                    if (($record['scope'] ?? null) == $input['qualification_scope']) {
+                    if (is_array($record) && $this->canonical($record['scope'] ?? null) === $this->canonical($input['qualification_scope'])) {
                         // Exact record comes from Assurance custody, never a caller-supplied assertion.
                         $matches[] = $record;
                     }
@@ -43,5 +43,21 @@ final class PlanningQualificationController
             'evidence_level' => null, 'expires_at' => 0, 'revoked' => false, 'evidence_refs' => [], 'dimensions' => [], 'capabilities' => (object) []];
 
         return response()->json($result)->header('Cache-Control', 'no-store, private');
+    }
+
+    private function canonical(mixed $value): string
+    {
+        $normalize = function (mixed $v) use (&$normalize): mixed {
+            if (! is_array($v)) {
+                return $v;
+            }
+            if (! array_is_list($v)) {
+                ksort($v, SORT_STRING);
+            }
+
+            return array_map($normalize, $v);
+        };
+
+        return json_encode($normalize($value), JSON_THROW_ON_ERROR);
     }
 }

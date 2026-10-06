@@ -172,6 +172,8 @@ class InventoryBroker:
             if state.get('Health', {}).get('Status') == 'healthy':
                 break
             if not state.get('Running') or time.monotonic() >= deadline:
+                self.run(['docker', 'logs', self.name], label='broker-failure')
+                self.run(['docker', 'inspect', '--format', '{{json .State}}', self.name], label='broker-failure-state')
                 raise RuntimeError('broker_not_ready')
             time.sleep(1)
         self.run(['docker', 'exec', self.name, 'rabbitmq-diagnostics', '-q', 'check_port_connectivity', '--address', '127.0.0.1'], label='broker-ready')

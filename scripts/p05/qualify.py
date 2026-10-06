@@ -21,7 +21,7 @@ def main():
     paths = subprocess.check_output(['git', 'ls-files', '-z'], cwd=ROOT).decode().split('\0')
     bindings = {name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in paths if name and (ROOT/name).is_file() and name.startswith(('services/planning/', 'services/lifecycle/', 'services/inventory/', 'scripts/p05/', 'contracts/', 'services/governance/', 'services/catalogue/', 'services/assurance/', 'apps/console/'))}
     report = {'source_revision': source, 'environment': platform.platform(), 'evidence_level': 'E2', 'native_platforms_tested': [], 'source_bindings': bindings, 'commands': []}
-    commands = []
+    commands = [(".", ["python", "scripts/p05/generate_contracts.py", "--check"])]
     for component in ('services/planning', 'services/lifecycle'):
         commands.extend([
             (component, ['uv', 'sync', '--locked']),

@@ -10,6 +10,7 @@ import re
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
+from jsonschema import Draft202012Validator
 from openapi_schema_validator import OAS31Validator
 from openapi_spec_validator import validate_spec
 from live_fixture import InventoryContractPeer,PlanningBroker
@@ -127,6 +128,10 @@ def campaign(c):
     run(publisher,env=envs['planning'],expected=1,label='planning-broker-unavailable')
     check('planning-outbox-retained-during-outage',sql('SELECT count(*) FROM app.planning_deliveries;','planning')=='0')
     broker.start()
+    envs['catalogue'].update(broker.environment,CATALOGUE_BROKER_HOST='127.0.0.1',CATALOGUE_BROKER_PORT='5679',CATALOGUE_BROKER_CA_FILE=str(c['certificate']))
+    run(['php','artisan','catalogue:publish-events','--limit=100'],cwd=root/'services/catalogue',env=envs['catalogue'],label='catalogue-facts-to-planning')
+    run([str(root/'services/planning/.venv/bin/planning-facts'),'catalogue','--limit','100'],env=envs['planning'],label='planning-committed-catalogue-inbox')
+    check('catalogue-facts-committed-in-planning',int(sql("SELECT count(*) FROM app.planning_fact_inbox WHERE envelope->>'event_type' LIKE 'catalogue.%';",'planning'))>0)
     run([str(root/'services/inventory/.venv/bin/inventory-publish'),'--limit','100'],env=envs['inventory'],label='inventory-facts-to-planning')
     run([str(root/'services/planning/.venv/bin/planning-facts'),'inventory','--limit','100'],env=envs['planning'],label='planning-committed-inventory-inbox')
     check('inventory-events-durably-invalidate-without-refresh',int(sql('SELECT count(*) FROM app.planning_fact_inbox;','planning'))>0 and int(sql('SELECT count(*) FROM app.planning_invalidations;','planning'))>0)
@@ -135,6 +140,9 @@ def campaign(c):
     run(publisher,env=envs['planning'],label='planning-confirmed-replay')
     run([*probe,'observe',str(out/'broker-observer.json')],env=envs['planning'],label='planning-independent-broker-observer')
     events=json.loads((out/'broker-observer.json').read_text());ids=[r['body']['event_id'] for r in events]
+    fact_schema=json.loads((root/'contracts/schemas/planning/fact-v1.json').read_text())
+    for event in events:Draft202012Validator(fact_schema).validate(event['body'])
+    check('published-planning-fact-contract',True)
     check('planning-fact-lost-receipt-replays-original-event',len(ids)>1 and ids[0]==ids[1] and len(ids)-len(set(ids))==1)
     check('planning-confirmed-outbox-drained',sql('SELECT count(*) FROM app.planning_outbox o LEFT JOIN app.planning_deliveries d ON d.id=o.id WHERE d.id IS NULL;','planning')=='0')
     (out/'owner-observations.json').write_text(json.dumps({'scope':'E2 controlled Inventory contract; no native qualification','reads':peer.reads,'assessment':assessment,'plan':saved,'actual_inventory_findings':actual_view['results']},indent=2)+'\n')

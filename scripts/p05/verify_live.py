@@ -51,7 +51,7 @@ def main():
             'Controlled Inventory contract observations and synthetic qualification-shaped records test E2 integration; they confer no native or operational support.',
             'Native APIs are synthetic HTTPS peers; no installed VMware or OpenStack E3 qualification.',
             'TLS application peers terminate at disposable loopback forwarding proxies; no operated ingress qualification.',
-            'Automated browser checks do not establish representative operator, screen-reader or independent G04 receiving acceptance.']}
+            'Automated browser checks do not establish representative operator, screen-reader or independent G05 receiving acceptance.']}
     paths = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
     report['source_sha256'] = {n: hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/planning/', 'services/lifecycle/', 'services/assurance/', 'services/inventory/', 'workers/inventory/', 'services/governance/', 'services/catalogue/', 'apps/console/', 'contracts/', 'scripts/p03/seed_', 'scripts/p04/', 'scripts/p05/', '.github/workflows/p05', 'deploy/dependencies/stateful/inventory-facts.json'))}
     private_values = [os.environ['P05_ADMIN_PASSWORD']]
@@ -157,7 +157,7 @@ def main():
                         sql(contents, name, name+'_migrator', migrator)
                 app_key = 'base64:'+base64.b64encode(secrets.token_bytes(32)).decode()
                 private_values.append(app_key)
-                envs[name] = os.environ | {'APP_ENV': 'p04-verification', 'P03_TEST_POSTGRES': '1', 'APP_DEBUG': 'false', 'APP_KEY': app_key,
+                envs[name] = os.environ | {'APP_ENV': 'p05-verification', 'P03_TEST_POSTGRES': '1', 'APP_DEBUG': 'false', 'APP_KEY': app_key,
                     'DB_HOST': '127.0.0.1', 'DB_PORT': '5432', 'DB_DATABASE': name, 'DB_USERNAME': name+'_runtime', 'DB_PASSWORD': password,
                     'DB_PASSWORD_FILE': str(password_file), 'DB_SSLMODE': 'verify-full', 'DB_SSLROOTCERT': str(certificate),
                     'GOVERNANCE_URL': 'https://127.0.0.1:8442', 'GOVERNANCE_CA_FILE': str(certificate), 'GOVERNANCE_CREDENTIAL_FILE': credentials['catalogue-governance'][1],

@@ -52,3 +52,13 @@ uv run --locked --no-sync lifecycle-serve --host 127.0.0.1 --port 8080
 A clean production install must include the locked runtime dependencies, followed by the owned wheel. Installing only the wheel with `--no-deps` does not provide this HTTP runtime. The P01 package/image runners export production requirements from the committed lock and verify the installed closure.
 
 Service-local tests cover authentication ordering, malformed/rotated secrets, read-only TLS settings, schema/identity rejection, generic database failures and a real installed persistent Uvicorn process. Mocked database tests do not establish real PostgreSQL or TLS availability. The P01.02 integration runner supplies that separate fixture evidence. The retained bootstrap verification directory records the earlier command-only baseline and is not evidence for this increment.
+
+## P05 reservation and admission increment
+
+The owned `migrations/001_reservations.sql`, reservation journal and admission
+evaluator implement the [P05 contract](../../docs/implementation/p05-planning.md).
+Independent PostgreSQL owner simulations exercise competition, partial outcomes,
+lost replies, renew/confirm/release and live-resource expiry holds. No native
+allocation adapter, execution API or dispatch worker is supplied by this increment.
+See the [Planning runbook](../../docs/operations/runbooks/planning-review.md) for
+admission boundaries and P06 handoff.

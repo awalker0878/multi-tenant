@@ -23,6 +23,10 @@ src/planning/infrastructure/facts/__init__.py
 src/planning/infrastructure/facts/broker.py
 src/planning/infrastructure/facts/catalogue.json
 src/planning/infrastructure/facts/inventory.json
+src/planning/infrastructure/inputs/__init__.py
+src/planning/infrastructure/inputs/catalogue-input-v1.json
+src/planning/infrastructure/inputs/inventory-input-v1.json
+src/planning/infrastructure/inputs/qualification-v1.json
 src/planning/infrastructure/messaging/__init__.py
 src/planning/infrastructure/messaging/codec.py
 src/planning/infrastructure/messaging/consumer.py
