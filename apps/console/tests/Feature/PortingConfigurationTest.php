@@ -27,6 +27,14 @@ it('renders the API owner review with cleared encrypted history', function (): v
         ->assertInertia(fn (Assert $p) => $p->component('inventory/Configuration')->where('workspace.configuration', null)->missing('session_token'));
 });
 
+it('preserves an empty manual input object when rendering an existing review', function (): void {
+    $this->inventory->shouldReceive('call')->once()->andReturn(['configuration' => ['manual' => [], 'choices' => []]]);
+    $response = $this->get($this->base)->assertOk();
+    $wire = json_decode(json_encode($response->viewData('page'), JSON_THROW_ON_ERROR), false, 512, JSON_THROW_ON_ERROR);
+    expect($wire->props->workspace->configuration->manual)->toBeInstanceOf(stdClass::class);
+    expect($wire->props->workspace->configuration->choices)->toBeArray();
+});
+
 it('forwards manual references and override reasons through the owner API', function (): void {
     $this->inventory->shouldReceive('call')->once()->withArgs(function ($token, $tenant, $operation, $parameters, $body, $key, $revision): bool {
         return $operation === 'savePortingConfiguration' && $parameters === ['site' => $this->site]

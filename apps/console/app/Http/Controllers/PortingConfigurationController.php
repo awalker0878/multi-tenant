@@ -18,6 +18,10 @@ final class PortingConfigurationController
     public function show(Request $request, string $tenant, string $site, InventoryGateway $inventory): Response
     {
         $data = $inventory->call($this->session($request), $tenant, 'getPortingConfiguration', ['site' => $site]);
+        if (is_array($data['configuration'] ?? null)) {
+            // Associative API decoding represents an empty object as []; preserve its wire type.
+            $data['configuration']['manual'] = (object) $data['configuration']['manual'];
+        }
         Inertia::clearHistory();
 
         return Inertia::render('inventory/Configuration', ['tenantId' => $tenant, 'siteId' => $site, 'workspace' => $data, 'notice' => $request->session()->get('inventory_notice')]);
