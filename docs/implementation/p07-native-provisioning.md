@@ -32,8 +32,11 @@ layer or alternate execution path is required.
 
 ## Qualification and remaining native work
 
-Current software checks must run against the native API sources and exact contract
-snapshots. Synthetic HTTP responses establish component behavior only. The
+The [native API qualification index](../../verification/p07/native-api/qualification-index.json)
+binds 276 Lifecycle and 139 worker tests without skips, 93 preparation tests and
+43 Temporal checks with six replayed histories to source `4ee67fdd`. Original
+failures and corrections remain retained. Synthetic HTTP responses establish
+component behavior only. The
 [completion packet](p07-completion-review.md) lists the missing commissioned owner,
 guest/service/traffic/retirement integrations and actual Q05/Q06 observations.
 API requests cannot prove immediate provider-side cancellation or stale-worker

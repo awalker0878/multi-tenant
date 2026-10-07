@@ -50,6 +50,9 @@ its longer measured outage. File copying alone does not establish database consi
 
 1. Check source/destination authority, capacity, network budget, encryption,
    compatibility, application consistency and recoverability before capture.
+   Exact-snapshot cloning requires the source host's `cloneFromSnapshotSupported`
+   and the VM's `snapshotConfigSupported` capabilities. Bind encryption keys and
+   any virtual TPM handling explicitly; unknown clone capabilities hold capture.
 2. Stop the application cleanly, gracefully shut down and independently confirm
    `poweredOff`. Create a disk-only snapshot S0 with memory capture disabled and
    journal its native task/result and snapshot identity.
@@ -61,12 +64,14 @@ its longer measured outage. File copying alone does not establish database consi
    at boot. No duplicate production identity may become reachable. Unsupported
    clone-time isolation holds capture; it does not allow a briefly exposed clone.
 5. Confirm the isolated migration clone is powered off, invoke `ExportVm` once and
-   journal its `HttpNfcLease`. Wait for ready, obtain every disk URL, and generate
-   an OVF descriptor using the native OVF manager and the transferred file mapping.
+   journal its `HttpNfcLease`. Wait for ready and obtain every disk URL. An optional
+   native OVF descriptor dry run may check export compatibility before transfer.
 6. Maintain lease progress while the data mover transfers bounded, throttled chunks
    over verified TLS between approved endpoints. Retain lengths, secure digests,
    disk mappings and progress. Verify the native manifest after disk transfer and
-   complete the lease only after the complete export is captured.
+   generate the final descriptor through `OvfManager.CreateDescriptor`, using the
+   actual downloaded file names and sizes. Resolve descriptor errors and required
+   warnings before completing the lease; retain the complete descriptor and disks.
 7. Inspect the VMDK subtype and run only the plan's pinned conversion on the
    migration copy when required: VMDK → RAW or QCOW2. Validate the resulting disks,
    virtual sizes and new digests. Conversion is an explicit method step, never an
@@ -146,3 +151,13 @@ The worker's export/import component exercises part of M3/M4/M6 against syntheti
 HTTPS peers. It does not implement snapshot/clone capture, OVF generation,
 conversion, guest transformation or delta cutover, and is not a completed P08
 journey. It supplies no P07 installed-platform acceptance evidence.
+
+## Native contract references
+
+- [Clone specification and exact-snapshot capabilities](https://developer.broadcom.com/xapis/vsphere-web-services-api/latest/vim.vm.CloneSpec.html)
+- [VirtualMachine export contract](https://developer.broadcom.com/xapis/vsphere-web-services-api/latest/vim.VirtualMachine.html#exportVm)
+- [NFC lease lifecycle](https://developer.broadcom.com/xapis/vsphere-web-services-api/latest/vim.HttpNfcLease.html)
+- [OVF descriptor generation after downloaded file mapping](https://developer.broadcom.com/xapis/vsphere-web-services-api/latest/vim.OvfManager.html)
+
+Commission the installed release against these contracts; documentation for the latest
+release does not establish that an older source or target exposes the same capabilities.

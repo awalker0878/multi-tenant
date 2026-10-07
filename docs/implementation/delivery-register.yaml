@@ -278,6 +278,7 @@ phases:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-007
   - EV-P07-006
   - EV-P07-005
   - EV-P07-004
@@ -286,11 +287,12 @@ phases:
   - EV-P07-003
   blocker_ids:
   - BL-P07-001
-  delivery_note: 'Native API-only operation plans, Neutron/Cinder/Nova requests, durable request/object receipts,
-    custody generations and independent readback implement ADR-016. Current-source hosted qualification is pending.
-    Native Temporal dispatch and single-use grants remain implemented. Commissioned current-owner/caller trust,
-    provider fencing, selected guest/service/traffic/retirement adapters and actual Q05/Q06 remain outstanding.
-    P08 owns the migration design and copy-only conversion/transformation. P07 and G07 are not complete.'
+  delivery_note: Native API-only operation plans, Neutron/Cinder/Nova requests, durable receipts, custody generations
+    and independent readback implement ADR-016. Source 4ee67fdd passes 276 Lifecycle and 139 worker tests without
+    skips, 93 preparation tests and 43 real Temporal checks with six replayed histories. Original contract/browser
+    failures and metadata binding discrepancies are retained with corrections. Current-owner/caller trust, native
+    request fencing, selected guest/service/traffic/retirement adapters and actual Q05/Q06 remain outstanding. P07
+    and G07 are incomplete; migration belongs to P08.
 - id: P08
   title: VMware-to-OpenStack migration
   owner_role: Infrastructure and application owner
@@ -306,12 +308,17 @@ phases:
   - P08.06
   gate_id: G08
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P08-001
   blocker_ids: []
+  delivery_note: P08 design defines normalized profiles, explicit methods, isolated snapshot-bound clone/export,
+    copy-only conversion/transformation, native import, delta/cutover and recovery in M1–M14 order. Fourteen synthetic
+    HTTPS component tests exercise part of M3/M4/M6 only. Snapshot/clone, OVF, conversion, guest transformation
+    and delta workflows remain unimplemented; no native Q07 or G08 acceptance.
 - id: P09
   title: Platform and capability expansion
   owner_role: Infrastructure and qualification leads
@@ -1700,6 +1707,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-007
   - EV-P07-001
   - EV-P07-003
   blocker_ids:
@@ -1728,6 +1736,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-007
   - EV-P07-006
   - EV-P07-005
   - EV-P07-004
@@ -1745,10 +1754,10 @@ work_packages:
   - G07.01
   - G07.02
   - G07.03
-  delivery_note: Durable native admission/outbox, separate Temporal queue, exact grant submission and both worker
-    effect/boundary TLS routes pass component and live orchestration qualification. Current owner/workload-trust
-    implementations, provider/backend fencing, selected stage adapters and installed-tuple qualification remain
-    unfinished.
+  delivery_note: Immutable native API plans, scoped Neutron/Cinder/Nova writes, durable request/native IDs and independent
+    exact-ID readback pass the P07 PostgreSQL/TLS component campaign. Native Temporal dispatch and worker/boundary
+    transport pass 43 checks. Current owner/workload trust, native request fencing, selected stage adapters and
+    installed-tuple qualification remain unfinished.
 - id: P07.03
   phase_id: P07
   title: Guest and service integration
@@ -1779,6 +1788,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-007
   - EV-P07-006
   - EV-P07-005
   blocker_ids:
@@ -1803,6 +1813,7 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-007
   - EV-P07-006
   - EV-P07-005
   - EV-P07-004
@@ -1863,16 +1874,21 @@ work_packages:
   title: Method and data movement
   owner_role: Infrastructure
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P08-001
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p08.md
   criterion_ids:
   - G08.01
+  delivery_note: P08 design defines normalized profiles, explicit methods, isolated snapshot-bound clone/export,
+    copy-only conversion/transformation, native import, delta/cutover and recovery in M1–M14 order. Fourteen synthetic
+    HTTPS component tests exercise part of M3/M4/M6 only. Snapshot/clone, OVF, conversion, guest transformation
+    and delta workflows remain unimplemented; no native Q07 or G08 acceptance.
 - id: P08.03
   phase_id: P08
   title: Rehearsal
@@ -6751,6 +6767,57 @@ evidence:
     Isolated worker passes with all 130 inputs unchanged at the final revision. Seven original archives preserve
     the cancellation failure, correction, worker transport and complete histories; offline replay independently
     passes.
+- id: EV-P07-007
+  level: E2
+  source_revision: 4ee67fdd704f6b6c401237137e3d8e2940ba3d1a
+  artifact_revisions:
+    p07_run_id: '37577020405'
+    p05_run_id: '37577020396'
+    p06_run_id: '37577020428'
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T05:35:09.587229+00:00'
+  observer: GitHub Actions PostgreSQL, TLS, Temporal and browser campaigns; Codex verified original archive/source/log/artifact
+    hashes.
+  reviewer: Codex engineering consistency review only; designated native and receiving reviews remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: verification/p07/native-api/qualification-index.json
+  sha256: c80d5083835f846a2f1ec2c14428b407e322e6d38844cfcab0ae6bb7e1a3c135
+  environment: GitHub Actions Ubuntu 24.04, Python 3.12.14 and uv 0.12.19; real PostgreSQL/TLS/Temporal; synthetic
+    native API peers.
+  scope: 276 Lifecycle and 139 worker tests pass without skips; 14 contract/quality/build commands. Preparation
+    passes 93 tests. Native orchestration passes 43 checks and six history replays. P05/P06 browser campaigns and
+    original failures are retained with explicit generated-metadata source discrepancies. No compatibility execution
+    path is retained.
+  limitations: Synthetic native responses/current owners/stage effects establish E2 component behavior only. Current-owner/trust
+    composition, native fencing and selected guest/service/traffic/retirement integrations remain unfinished. No
+    installed OpenStack campaign, Q05/Q06, P07 completion, G07 receiving or operating acceptance.
+- id: EV-P08-001
+  level: E2
+  source_revision: 4ee67fdd704f6b6c401237137e3d8e2940ba3d1a
+  artifact_revisions:
+    p07_run_id: '37577020405'
+    p05_run_id: '37577020396'
+    p06_run_id: '37577020428'
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T05:35:09.587229+00:00'
+  observer: GitHub Actions PostgreSQL, TLS, Temporal and browser campaigns; Codex verified original archive/source/log/artifact
+    hashes.
+  reviewer: Codex engineering consistency review only; designated native and receiving reviews remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: verification/p07/native-api/qualification-index.json
+  sha256: c80d5083835f846a2f1ec2c14428b407e322e6d38844cfcab0ae6bb7e1a3c135
+  environment: GitHub Actions Ubuntu 24.04, Python 3.12.14 and uv 0.12.19; real PostgreSQL/TLS/Temporal; synthetic
+    native API peers.
+  scope: Fourteen real HTTPS component tests exercise powered-off ExportVm, NFC lease/manifest/bounded transfer
+    and Glance native import/readback, with lost replies, bad checksums, wrong scope and unsupported formats held
+    without automatic retry.
+  limitations: Partial M3/M4/M6 component only; synthetic vSphere/Glance peers. No source snapshot/isolated clone,
+    OVF descriptor, conversion, guest transformation, delta or native cutover workflow. No installed-platform migration,
+    Q07 acceptance or G08 review.
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -7110,16 +7177,16 @@ blockers:
   - R33
   owner_role: OpenStack platform, Infrastructure, security, enterprise service, SRE and qualification owners
   description: Actual installed OpenStack/API/backend/guest tuple, bounded native write campaign, scoped credentials/trust,
-    tool/provider/state/locking selections, enterprise interfaces, observer and operating/receiving evidence are
+    native API/adapter/custody selections, enterprise interfaces, observer and operating/receiving evidence are
     not supplied. P06 E2 simulation cannot replace them. These are runtime native commissioning and qualification
     inputs; independent product and adapter development continues against versioned contracts.
   unblock_condition: Pull actual API configuration through Inventory; administrators validate observations, explain
     interpretation overrides and supply non-discoverable implementation inputs in Console under the existing ADR-015/016
     baseline. Before native effects, supply exact campaign authority and complete applicable G06 receiving and OP01-OP07
     controls. Qualify the implemented adapters on that exact native scope.
-  next_action: Compose the implemented native stage/grant, Temporal outbox/queue and native API effect/boundary TLS
-    components with actual Governance/Planning/Inventory owner reads, independently administered state/provider
-    custody and verified caller trust. Implement the selected provider request fence and guest/service/traffic/retirement
+  next_action: Compose the implemented native stage/grant, Temporal outbox/queue and native API effect/boundary
+    TLS components with actual Governance/Planning/Inventory owner reads, independently administered native custody
+    and verified caller trust. Implement the selected native request fence and guest/service/traffic/retirement
     effect and observer adapters. Collect actual installed/interface/operating inputs through API-first Console,
     then execute the scoped Q05/Q06 campaign and receiving review. Existing development authorization persists;
     synthetic owners cannot supply missing native facts or service interfaces.

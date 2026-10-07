@@ -10,7 +10,7 @@ authorization and G00 approval remain effective.
 | Package | Supplied preparation | Remaining output and prerequisite |
 | --- | --- | --- |
 | P07.01 | Bounded commissioning parser, fifteen-input owner/case mapping, exact packet-binding and metadata checks | Actual site readiness and write commissioning, current scope/identity/trust, native stop/revocation rehearsal; N01–N03/N11/N14 |
-| P07.02 | Native API request adapter, exact-ID OpenStack readback, quarantined port/volume/server plans, durable Temporal outbox and worker effect/boundary TLS composition | Current owner and workload-trust implementations, selected stage adapters, commissioned backend/provider fencing and independent native apply/readback qualification; N01/N04/N05 |
+| P07.02 | Native API request adapter, exact-ID OpenStack readback, quarantined port/volume/server plans, durable Temporal outbox and worker effect/boundary TLS composition | Current owner and workload-trust implementations, selected stage adapters, commissioned native request fencing and independent native request/readback qualification; N01/N04/N05 |
 | P07.03 | Input/receipt obligations and Q05 service/restore case mapping | Native reserve/confirm/reconcile/release integrations, guest hardening and real DNS/IPAM/identity/time/trust/logging/monitoring/backup; N06/N08/N09/N10 |
 | P07.04 | Ordered durable stage control and separate Temporal queue; exact independent service/restore/application/policy prerequisites and post-effect provider-quiescence requirements | Commissioned traffic/service/policy adapters and owner composition, plus independent Q05/Q06 service, data and network observations; N07/N15 |
 | P07.05 | Durable worker claims plus Lifecycle single-use grants, unknown-effect holds, independent reconciliation, terminal stops and distinct retirement/retention/release controls | Restored-journal reconciliation with independent custody, native unknown/partial recovery, distinct retirement authority, retained data/keys and independently confirmed deletion/release; N10/N11/N12 |
@@ -29,7 +29,7 @@ interfaces, persistent Lifecycle operations, real fencing and independent readba
 
 1. Extend the delivered native-plan/readback components against the released API
    baseline independently of deployment-specific facts. Use the [Console configuration workflow](openstack-version-qualification.md) to pull and validate N01–N05's exact installed tuple,
-   destination/trust/identity scope, API/adapter artifacts, locking/custody and
+   destination/trust/identity scope, API/adapter artifacts, native custody and
    sole-writer map in the protected commissioning packet. Resolve the corresponding
    ADR-014/015/016 runtime bindings with actual references. No operational secret goes
    into Git or the chat transcript.

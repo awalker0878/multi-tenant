@@ -10,16 +10,23 @@ Use the [application walkthrough](../../product/application-walkthrough.md), [Q0
 
 ## Preparation
 
-The initial route provisions OpenStack through native APIs and migrates VMware VMs with `native_api_export_import`: approved guest preparation, application consistency and source-writer fencing, powered-off `ExportVm`/NFC disk export, verified native manifests, and native destination image/volume/compute import. The installed tuple must support the exported disks, firmware and guest drivers. Unsupported routes remain held. There is no converter, application native export/import or alternate migration path. Native provisioning and migration require separate Q05/Q06 and Q07 qualification.
+Use the [P08 migration design](../../implementation/p08-native-migration.md). Bind
+normalized source/target capability profiles, one explicit method, exact VM/disk
+identities and versions, copy-only conversion/guest transformation, data/delta
+semantics, approval/epoch, trust, capacity and outage/recovery objectives.
+For whole-VM capture, verify consistent S0, the exact isolated powered-off clone,
+production-NIC disconnection, ExportVm/NFC/OVF mapping and all disk manifests.
+Production may resume after S0 only when a qualified delta method is selected;
+cold migration retains source fencing for the authoritative export and cutover.
 
 ## Case matrix
 
 | Case | Action or injected fault | Required observation | Evidence |
 | --- | --- | --- | --- |
-| Q07.01 | Reconcile source readiness, reproducible target deployment/configuration, encryption, consistent-capture method, dataset/metadata and dependency inventory | All required scope is represented; unsupported or unknown mandatory features block migration | Source/profile reconciliation and denial cases |
+| Q07.01 | Reconcile source/target profiles, exact S0/clone isolation, encryption, disk/device/guest compatibility, consistency/delta method and dependency inventory | All required scope is represented; unsupported or unknown mandatory features block migration | Source/profile reconciliation and denial cases |
 | Q07.02 | Rehearse the exact method in isolation with production effects suppressed | Guest and application become usable without unintended mail, jobs, traffic or writers | Rehearsal topology, suppression probes and application checks |
-| Q07.03 | Import the target application and restore consistently captured datasets according to the explicitly selected method | Dataset, metadata, identity treatment and all mapped resources match declared acceptance | Deployment/restore logs, consistent-capture manifests, digests and native readback |
-| Q07.04 | Interrupt transfer or exhaust the bounded staging budget | Transfer safely resumes or restarts as declared; partial data cannot activate; budget uncertainty remains held | Fault timeline, storage observations and recovery record |
+| Q07.03 | Execute the selected capture, native export/import, planned conversion and copy-only guest transformation; apply required application/file deltas | Dataset, metadata, identity treatment and all mapped resources match declared acceptance | Native task/lease/object IDs, OVF and disk manifests, conversion artifacts, secure digests, delta receipts and independent readback |
+| Q07.04 | Interrupt transfer or exhaust the bounded staging budget | Interrupted transfer remains held until immutable source, byte ranges and renewed authority are reconciled; no blind export/import retry or partial activation | Fault timeline, storage observations and recovery record |
 | Q07.05 | Attempt cutover with stale approval, unfenced source or another active writer | Final sync/activation is denied until independent fencing and current authority are proven | Authority/fencing denial matrix |
 | Q07.06 | Quiesce/fence source and other writers, final-sync, validate target, then enable traffic/writes | Observed order prevents split brain; final accepted source data reaches target before first permitted target write | Timestamped writer/traffic observations and final integrity checks |
 | Q07.07 | Fail before any target business write and invoke approved rollback | Source resumes only after target is fenced and authoritative checks show no target divergence | Boundary proof, rollback order and application read/write check |

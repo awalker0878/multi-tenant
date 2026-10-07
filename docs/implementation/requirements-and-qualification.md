@@ -38,7 +38,7 @@ Priority `M` means mandatory for the indicated milestone; `E` means mandatory be
 | R24 | M | Pre-target-write rollback and post-target-write recovery are separate procedures; accepted target changes cannot be discarded by restarting the old source. Prove source-return or approved forward recovery. | P06, P08 | Lifecycle / application owner |
 | R25 | M | Retirement has separate authority for source deletion, identity/address release and data disposal; retain required data and keys, verify cleanup and record sanitization evidence. | P07–P08, P10 | Lifecycle / governance |
 | R26 | E | Independently qualify six directed cross-platform routes across VMware, AHV and OpenStack; same-family relocation is topology-specific. Method, guest and recovery evidence is never inferred in reverse. | P09 | Platform teams / assurance |
-| R27 | E | Windows, appliance/no-guest-mutation, whole-VM conversion and selected database synchronization profiles have explicit scope, constraints, drivers, encryption and recovery evidence. | P09 | Platform / guest / data teams |
+| R27 | E | Additional Windows, appliance/no-guest-mutation and database synchronization profiles have explicit scope, constraints, drivers, encryption and recovery evidence. | P09 | Platform / guest / data teams |
 | R28 | E | Enterprise wave scheduling obeys dependency DAGs, windows, tenant fairness, shared endpoint/risk budgets, pause/stop semantics and bounded concurrent impact. | P09–P10 | Lifecycle |
 | R29 | M | Control-plane and worker recovery covers DB, workflows, evidence, state, identities and keys; isolated restore starts read-only and reconciles epochs/accepted intent before enabling writes. | P01, P06–P07, P10 | Platform operations |
 | R30 | M | Correlated logs/traces/metrics, freshness/drift/stuck-job alerts, actual alert delivery, acknowledgements, ITSM/CMDB handoffs, incident containment and support runbooks are exercised. | P01, P06–P07, P10 | Operations / all owners |
@@ -106,7 +106,14 @@ Evidence cannot advance by editing a flag. Assurance validates provenance, scope
 | Q09 — Deployment and recovery | Clean install, restricted/disconnected delivery if required, rolling upgrade, incompatible contract rejection, DB/workflow/evidence restore, lost site and key/identity dependency recovery. | R02, R29–R32, R35–R36, P10 |
 | Q10 — Scale and pilot | Approved estate workload mix, endpoint limits and UI performance; concurrent-wave stop behavior; alert receipt/on-call exercises; role-based operator tasks and accepted production pilot. | R28, R30, R33–R35, P10/P11 |
 
-P00 must select the initial P08 offline method. The preferred proposal is **application rebuild/restore from VMware to a newly provisioned OpenStack target**, contingent on reproducible deployment/configuration and demonstrated consistent capture, restore completeness and cutover recovery for the selected profile. Cold VMware guest/disk capture, conversion and OpenStack import remains a separate P09 candidate for applications that cannot be rebuilt. A change of method needs an explicit scope decision; neither is an automatic fallback. Keep both methods in the catalogue but initially qualify only the selected one; evidence for either never proves the other. Whole-VM claims require disk-chain, boot, device, driver, encryption and imported-guest checks; application restore claims require dataset and reconstruction coverage. Warm/live movement and zero-downtime claims require separate implementation and qualification in P09 or a later release.
+P08 uses the [native migration design](p08-native-migration.md). Whole-VM migration
+captures an isolated snapshot-bound clone, exports through ExportVm/NFC and uses
+planned copy-only conversion/transformation plus native destination APIs. Application
+rebuild/restore and baseline-plus-application/file-delta are distinct methods selected
+from demonstrated requirements and capability profiles. Low downtime requires an
+explicit qualified delta mechanism; opaque VMs without one use cold export. No
+method is an automatic fallback. Full disk/device/driver/encryption, data, service,
+policy and both recovery boundaries require evidence for each route.
 
 ## 6. Scope decisions and material risks
 

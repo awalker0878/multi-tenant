@@ -21,7 +21,7 @@ The first supported release should operate a deliberately bounded application pa
 | Hosting | Fresh control plane and newly commissioned site workers | No dependency on previous runtime or live state |
 | Product users | Platform administrator, tenant administrator, application owner, planner/operator, approver, auditor and service operator | Separate permissions and separation of duties; no role name implicitly grants every action |
 | Provisioning | One selected OpenStack installation and one approved Linux guest profile | Exact platform, network, storage and guest versions selected in P00 |
-| Migration | One VMware-to-OpenStack offline application route | Prefer application rebuild/restore for reproducible applications if P00 feasibility succeeds; cold guest/disk conversion and import is a separately qualified P09 option, never equivalent proof |
+| Migration | VMware-to-OpenStack native migration in P08 | Explicit application rebuild/restore, snapshot baseline with qualified application/file delta, or cold VM export; copy-only conversion/transformation and separate method qualification |
 | Application | A small multi-workload application with a real stateful component, declared dependencies and explicit security boundaries | Freeze dataset, correctness checks, downtime window and recovery procedure before native testing |
 | Services | Real IPAM/DNS, identity, backup and observability paths needed by that application | Choose actual owners and interfaces in P00; simulated substitutes cannot satisfy a native gate |
 | Platform breadth | VMware, Nutanix and OpenStack represented by full capability dimensions and explicit unsupported/unknown states | Qualify additional tuples independently in P09 |
@@ -215,13 +215,13 @@ Lifecycle owns reservation intent, attempts and receipts; the external capacity/
 | Work package | Deliverable and owner |
 | --- | --- |
 | P08.01 Source readiness | Inventory/lifecycle: VMware discovery, application membership/dependencies, boot/storage/network compatibility, source authority and export/capture access |
-| P08.02 Method and data movement | Infrastructure: selected application rebuild/restore path, reproducible deployment/configuration, consistent capture, checksums, metadata, encryption, resumability, capacity and direct approved endpoint flow |
+| P08.02 Method and data movement | Infrastructure: immutable selected method, consistent S0/isolated clone, ExportVm/NFC/OVF, bounded data mover, copy-only conversion/guest transformation, native import and qualified delta framework |
 | P08.03 Rehearsal | Lifecycle/application owner: isolated rehearsal target, representative dataset, measured downtime, application validation and cleanup |
 | P08.04 Cutover | Lifecycle/governance: final approval, change window, data quiesce, source fencing, final transfer, target verification and controlled DNS/traffic switch |
 | P08.05 Recovery decisions | Infrastructure/application owner: pre-activation rollback, post-write recovery strategy, point of no return, split-brain prevention and explicit human decision states |
 | P08.06 Acceptance | Quality/assurance: end-to-end native dossier, data correctness, security equivalence, restore test, interruption matrix and source retirement criteria |
 
-Represent whole-VM cold conversion/import and application rebuild/restore as separate migration methods. A successful rebuild does not qualify preservation of VM identity, disks or guest configuration. The selected method must be recorded in the plan and support matrix. Data moves between approved site endpoints; the console, general event bus and central databases do not transport workload payloads.
+Use the [P08 native migration design](p08-native-migration.md) and its M1–M14 implementation sequence. Represent whole-VM cold conversion/import, snapshot baseline with application/file delta and application rebuild/restore as separate migration methods. A successful rebuild does not qualify preservation of VM identity, disks or guest configuration. The selected method must be recorded in the plan and support matrix. Data moves between approved site endpoints; the console, general event bus and central databases do not transport workload payloads.
 
 Before enabling target writes, establish source fencing and the selected rollback boundary. After target writes, do not advertise a safe source rollback without a demonstrated data reconciliation procedure. A timeout during cutover must enter an explicit held/recovery state. Source decommissioning follows verified acceptance and retention requirements, not simply completion of the last activity.
 

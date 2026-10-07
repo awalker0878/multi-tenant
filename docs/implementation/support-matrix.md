@@ -32,16 +32,21 @@ Each direction below needs its own method, guest, data and recovery qualificatio
 
 | Source → target | Planning scope | Method selection | Required qualification before a support claim |
 | --- | --- | --- | --- |
-| VMware → OpenStack | Initial candidate, P08 | `native_api_export_import` through ExportVm/NFC and destination native APIs | Q07 for exact source/target/guest/data/security/service tuple; all disks, native import, firmware/drivers, writer fencing, application checks and post-target-write recovery |
+| VMware → OpenStack | Initial candidate, P08 | One immutable method from the P08 profiles; whole-VM baseline uses ExportVm/NFC and destination native APIs | Q07 for exact source/target/guest/data/security/service tuple; all disks, native import, firmware/drivers, writer fencing, application checks and post-target-write recovery |
 | OpenStack → VMware | Expansion candidate, P09 or later | Selection needed; no reverse-method assumption | Q08 independently covering export/import or selected restore method, target policy/service realization and recovery |
-| VMware → Nutanix AHV | Expansion candidate, P09 or later | Selection needed | Q08 independently covering source/target mapping, selected method, guest/data and recovery |
+| VMware → Nutanix AHV | P08 M13 candidate after the initial route | Separate destination adapter and method selection | Q08 independently covering source/target mapping, selected method, guest/data and recovery |
 | Nutanix AHV → VMware | Expansion candidate, P09 or later | Selection needed | Q08 independently; VMware→AHV results are not evidence for this direction |
 | OpenStack → Nutanix AHV | Expansion candidate, P09 or later | Selection needed | Q08 independently covering storage/network/guest transformations and application checks |
 | Nutanix AHV → OpenStack | Expansion candidate, P09 or later | Selection needed | Q08 independently; OpenStack provisioning alone does not qualify migrated guest/data state |
 
-Same-family VMware→VMware, AHV→AHV and OpenStack→OpenStack movement are separate topology-specific candidates. A cross-site, cross-cluster, cross-version or different backend move is not automatically native live migration. Same-family routes need recorded source/target tuples, method and independent evidence when advertised.
+P08 M13 also covers a separately qualified VMware→VMware destination adapter. AHV→AHV and OpenStack→OpenStack movement remain separate topology-specific candidates. A cross-site, cross-cluster, cross-version or different backend move is not automatically native live migration. Same-family routes need recorded source/target tuples, method and independent evidence when advertised.
 
-P00 selects only one initial offline method; application rebuild/restore is preferred. Cold capture/conversion/import is separately evaluated in P09 for applications that cannot be rebuilt, with disk-chain, boot, device, driver and encryption checks. If either method is infeasible, record why and approve the changed scope explicitly before substituting the other. Neither method proves warm/live migration, zero downtime or universal guest portability.
+P08 selects one explicit method from discovered source and destination profiles:
+application rebuild/restore, snapshot baseline with application or file delta, or
+cold VM export. Optional block replication is separately entitled and qualified.
+Whole-VM copy, planned conversion and guest transformation belong to P08. No
+failed method automatically selects another, and no baseline proves warm/live
+migration, zero downtime or universal guest portability.
 
 ## 4. Guest, data and special-feature scope
 
@@ -55,8 +60,8 @@ These dimensions compose with every operation and route; a row is never a standa
 | Appliance / no guest mutation | Expansion candidate | Vendor-supported import/export, immutable guest constraints, licensing and external readiness/health contract; R27/Q08 |
 | Stateful application dataset | Initial candidate: explicitly selected application and consistency rules | Dataset inventory, transaction consistency, metadata/keys, final sync, integrity, writer fencing and divergence recovery; R22–R24 |
 | Multi-VM/disk/NIC application | Selected initial representative path | Explicit dependency/order, mappings, consistency groups and failure-domain constraints; R19; complexity bounded in P00 |
-| Rebuild / application restore | Preferred initial P08 method, conditional on P00 feasibility | Reconstruction completeness, configuration/secrets and every approved dataset; not proof of whole-VM conversion |
-| Database replication / warm synchronization | Deferred expansion | Engine/version-specific consistency, lag, writer handoff, split-brain prevention and target-write recovery |
+| Rebuild / application restore | Explicit P08 application method requiring reproducible deployment and qualification | Reconstruction completeness, configuration/secrets and every approved dataset; not proof of whole-VM conversion |
+| Application-native / file-delta synchronization | P08 M10 framework; only exact qualified methods are admitted | Engine/version-specific consistency, lag, writer handoff, split-brain prevention and target-write recovery |
 | Warm/live movement / zero downtime | Deferred | Separate implementation, topology/API support, measured outage and failure/recovery evidence |
 | UEFI / BIOS / secure boot / vTPM / encrypted disks | Only exact selected initial values | Unsupported or unassessed combinations block placement; keys, attestation and imported boot behavior need specific evidence |
 | Shared/multi-attach disks, GPU, passthrough or architecture changes | Deferred unless explicitly selected | Separate platform/guest/device feasibility, ownership, data and recovery qualification |

@@ -1,0 +1,387 @@
+{
+  "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+  "observed_at": "2026-10-07T05:19:21.766626+00:00",
+  "environment": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "evidence_level": "E1",
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "source_bindings": {
+    ".github/workflows/p07-native-readiness.yml": "0b1503b885f2d10e3b14edbfe97eab0eba0e7cc22c34e79a40e9f21d62fd8923",
+    "release/p07-native-inputs.json": "88e6e5ad2bb1ce3243d3451c9ba3e3bdcf2953d44c1d1714c9c96343c9d4facc",
+    "scripts/p07/check_native_contract.py": "9ef8ae43c363323c07f2a7ce9f5e96d885fb238cadc253f6090e7b48227fa935",
+    "scripts/p07/conftest.py": "3b78c993d865e3bf7c54be22245c7903ae2475041f489f841834fb99957bdd08",
+    "scripts/p07/native_wire_fixture.py": "29aaa52b1894ed855213fcce83bd6bc88be6033800cbfdbbb53d78e57055349a",
+    "scripts/p07/qualify.py": "88d1ec6350095e29f7cbb2d3c601ea654373ccb439ea7c9284ee6e792c39366b",
+    "scripts/p07/qualify_dispatch.py": "013a41a3e9ecd319609fa9293bfe1099fc2c52ad78103ec40a53b60068d77732",
+    "scripts/p07/qualify_native.py": "faf16b72510526d453a35684f2970f5c204469998f8060f79f49012cf328840c",
+    "scripts/p07/test_native_temporal.py": "a27c3ef3696e3011f8787d13cf35acea3c38d28bacad29009fc5af5e9cfcdd71",
+    "services/lifecycle/pyproject.toml": "72b5744652a2f0d1b443742f011206eb8c2078e957f8573439dc738b09186b6f",
+    "services/lifecycle/src/lifecycle/__init__.py": "6ef74fd0e8a102879b2b7dfea8ad56a3d8a35c5fb67561e5774aa8b986db2263",
+    "services/lifecycle/src/lifecycle/application/__init__.py": "1f5ae340d751c791e5b1bea85bdeaa0fa9cbb7a2900d7f3473f42e0c2f48047f",
+    "services/lifecycle/src/lifecycle/application/execution.py": "150cc56f122496f3e6ee149e4a8bc1b94d824a2d635c136b2e4f4b488914575c",
+    "services/lifecycle/src/lifecycle/application/execution_ports.py": "79c743901a1ddc9fb5006c69f37cc955a4c12f421baa3850ac7e2361ce6b74bb",
+    "services/lifecycle/src/lifecycle/application/foundation.py": "f3774527b6898bf92837c1607552c20f3791981e3f5fc518abf4090ed1e2dc3c",
+    "services/lifecycle/src/lifecycle/application/native_workflow.py": "051ae6d7236bb429d6a42ac34e0505588418f23b200fc77214af99571e8b7914",
+    "services/lifecycle/src/lifecycle/application/reservations.py": "49dcd1397b964866d0faea670aee56e4afd3f52c59f5dad393af358c0368bcb4",
+    "services/lifecycle/src/lifecycle/bootstrap/__init__.py": "ef6adabd1f5e063e8fc84022c413520bedb752a95eedc2181ea1fcaadbe5ec84",
+    "services/lifecycle/src/lifecycle/bootstrap/commissioning.py": "897e90df7832b7582a5b63dc3ad059267bb2b5b24852b894624c3b8d62fbb132",
+    "services/lifecycle/src/lifecycle/bootstrap/health.py": "c9d0d3a850c41373c168d85edbf35b5472d5aaedf24c5659134c7b1c6f968e67",
+    "services/lifecycle/src/lifecycle/bootstrap/native_preflight.py": "956fda7694ef05454298bd95094b6b52e0565464abafccac606c5d23e4d230bc",
+    "services/lifecycle/src/lifecycle/bootstrap/native_workflow.py": "383437110ac555ed3615e5bcb243367d82c9cde15fc303b9ee0bd92431ae5539",
+    "services/lifecycle/src/lifecycle/bootstrap/server.py": "66dd5587cc1f789bcfc23dfb1f6425d5c4900f936d9386b672a11d7ed559e38d",
+    "services/lifecycle/src/lifecycle/bootstrap/workflow.py": "3b9cbf1773fdc6e61e7ef5be73a264eeadb65d7fb2d1968738cd2691cfaf7a19",
+    "services/lifecycle/src/lifecycle/domain/__init__.py": "7dafc82e0cb8fc2d2f4a7a946ab8e24739881ec3e40ff44f7fd420a2e8ef71a7",
+    "services/lifecycle/src/lifecycle/domain/admission.py": "4e9be18bd1f96634f2553f29e17fc806edeb848c9d4b54e5b52b78660511d3fc",
+    "services/lifecycle/src/lifecycle/domain/commissioning.py": "56a0374514a5ae44eed9fe418fd3339385677b8f4bedafd04dee18e387e9ad2f",
+    "services/lifecycle/src/lifecycle/domain/execution.py": "9e08c72a3ded4bd3ffe901d2124f936215e0522f60d783f3a9b42cb60d43a2b3",
+    "services/lifecycle/src/lifecycle/domain/native_preflight.py": "1352b9d71e0e23cdcecd4c94a4f4b95a3158eb119c0e15fffff278ca9215212e",
+    "services/lifecycle/src/lifecycle/domain/native_workflow.py": "ff5c9baccf9d4934e4396d446123ebace60c1eb685b4ce817061c755b88e8acb",
+    "services/lifecycle/src/lifecycle/infrastructure/__init__.py": "ec32a7399e0c702770c6372d86b55a54ec146fe993eaff22ce17546839b06eaa",
+    "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py": "d0ea461e295298f4452d2d0d093d17415c5487ad86c45dcc5047ca18f8217d05",
+    "services/lifecycle/src/lifecycle/infrastructure/foundation.py": "3da357be9b1c77dd92682e2e9d5946a3b484062bfc0cae4fad3b44521b5ea97f",
+    "services/lifecycle/src/lifecycle/infrastructure/native_effects.py": "a10b377999b0cdf9fa5ee4c97b9a82a519a905af70c12165e74b874f58cd2547",
+    "services/lifecycle/src/lifecycle/infrastructure/native_journey.py": "49c19223cad8b8110e13e3a3b8d7a03ec4b48d74159763757a7de374b041a92f",
+    "services/lifecycle/src/lifecycle/infrastructure/native_temporal.py": "6ff4296c85ea3a126e227a59bb8f0fbf4abc89ab2a292d50c9cfa9e8adf09505",
+    "services/lifecycle/src/lifecycle/infrastructure/store.py": "9007ad53acb5b26d6b2cf0f9afbc3e46848d92f4053557af67eebb1fc8cc2ec1",
+    "services/lifecycle/src/lifecycle/infrastructure/telemetry.py": "c696d8aa49355e07825de2525c77ed3f0878ef4a7bfb32be4537e40e415b77d3",
+    "services/lifecycle/src/lifecycle/infrastructure/temporal.py": "8388c10abc659f8c9c1f6d3463edb76d4c5b949698c277f1a94795a9cdfe4c3d",
+    "services/lifecycle/src/lifecycle/infrastructure/workflows.py": "c853cfe1509d45e3c123064842d99e6573dfb2ce8f03cb65132097a0bd0c6eff",
+    "services/lifecycle/src/lifecycle/interfaces/__init__.py": "36c59f445f3f701ece7b2016379abbbfabfd269ac5f6e2dac30860791a7d6a42",
+    "services/lifecycle/src/lifecycle/interfaces/commissioning.py": "9b377eb8b8d0bd7e429db6f3de9ea193fdae974b32a1a0d55fd92ccbea7e5fd9",
+    "services/lifecycle/src/lifecycle/interfaces/execution.py": "71a6070a1972ca0379738359ce992addfc76892060ce2521e1781f395f7424af",
+    "services/lifecycle/src/lifecycle/interfaces/health.py": "2ff7d45481e2926fd48f825546d55b05b6fa5034a8afc1082fe8960ef426766c",
+    "services/lifecycle/src/lifecycle/interfaces/http.py": "2a1dddea8c58dead4324c32879627587ad3faf7eab6424a801072010b05ee937",
+    "services/lifecycle/src/lifecycle/interfaces/native.py": "884a31205a718a828b0d815f2a25e2a1341dd24b543d7235526ffe2b1ce6c8a6",
+    "services/lifecycle/src/lifecycle/interfaces/telemetry.py": "04e00f79d421c7ddf84bfd46f7457b406c5cf8f9dd92c669953a127211de0d15",
+    "services/lifecycle/src/product_lifecycle.egg-info/PKG-INFO": "fd2b027233d642a5302355fc30ecc367f8d1059cf7d33ef5ff675e00d36b78af",
+    "services/lifecycle/src/product_lifecycle.egg-info/SOURCES.txt": "433009b2204d72bfb7a0bb5232b64d4f509ed9fa7a4842e44a93373c2d66ca37",
+    "services/lifecycle/src/product_lifecycle.egg-info/dependency_links.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "services/lifecycle/src/product_lifecycle.egg-info/entry_points.txt": "144ef039878cd09a47562cdff2ed64d0a51d7150e6e8ec8ba1a1e71e63a1fd81",
+    "services/lifecycle/src/product_lifecycle.egg-info/requires.txt": "5e8559b8c57667e0ecd6e1e26064883fb630a00e1f2d7d7c561303d6c3c5c2c2",
+    "services/lifecycle/src/product_lifecycle.egg-info/top_level.txt": "6dd262f754439ce98c901214934e587fd8a00be8b2b1cdf0b62cdade3d93379b",
+    "services/lifecycle/tests/conftest.py": "b6c1917a576492597cae4046e81366eb943c8606578afcdf2cccf2ce37bb5247",
+    "services/lifecycle/tests/fixtures/synthetic-plan-v1.json": "df71e419c03c282c11b5b351f607f9596e3eec3b027e62bec5d03886f741b20c",
+    "services/lifecycle/tests/test_admission.py": "73c99083143488dc14f297bab74273d9047f627e4a5b19893d0cb634b8f35ba0",
+    "services/lifecycle/tests/test_commissioning.py": "17b825daaeb15a3f6477b92b2eb714bdb66c292b74d8b29e990dd42d36f2f620",
+    "services/lifecycle/tests/test_foundation.py": "45a192c2864ca6c4e2705a72b07460be76ca5ec5682c321a8f6d6e4f9cc193bc",
+    "services/lifecycle/tests/test_health.py": "30fe8c535732cd4a452ce1f41e07af257475f1e570aa717c7cfe95e79b018e98",
+    "services/lifecycle/tests/test_native_dispatch.py": "dde0040632848060830a1d040092a2584d3628cfb9a9aa085f98d86d66ebece8",
+    "services/lifecycle/tests/test_native_effects.py": "4727b4e5b94c8c4dd09b1e33943f04f8b76aab9c9a621dffdd6c2eb045c365e5",
+    "services/lifecycle/tests/test_native_preflight.py": "7beea8775cf8fe6d00d0c9608154b4d5ee4a99f6f0e19a3c45e525c4ff47cd8c",
+    "services/lifecycle/tests/test_native_workflow.py": "89eea84a63422776d98e6f8a1ebedf72ec218a1cf1721a239af7c3f481378f49",
+    "services/lifecycle/tests/test_reservations.py": "fd04c32947cc21fc357461eef652649632272266ab110c88231fcb46f6fb2122",
+    "services/lifecycle/tests/test_telemetry.py": "251e86303b45bf550bcfe1c9a26a445a2134b6fc317bb705d4ea854804fb9d22",
+    "services/lifecycle/uv.lock": "43fd96d9b4b5fc0347558d548d07c35d9887dd759399cc1f954a36090c135749"
+  },
+  "commands": [
+    {
+      "command": [
+        "uv",
+        "sync",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "passed": true,
+      "log": "00.log",
+      "sha256": "04c2166da4c8bc1b386fe44d89ec8d64582d7be37596463fd197e6739298c05d"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "passed": true,
+      "log": "01.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "passed": true,
+      "log": "02.log",
+      "sha256": "0760fafc4f10688940f82c60169dcd12eac4379bcf0334b2d9e31bb1fdc46bab"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "passed": true,
+      "log": "03.log",
+      "sha256": "a459b8765e4db93f08156e7d98399988a9b87243303f92178f28c9db897f6066"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "tests/test_commissioning.py",
+        "tests/test_native_preflight.py",
+        "-q",
+        "--junitxml=/home/runner/work/_temp/p07-preparation/preparation.xml"
+      ],
+      "exit_code": 0,
+      "expected_exit_codes": [
+        0
+      ],
+      "passed": true,
+      "log": "04.log",
+      "sha256": "49d996645014a62cf1b612d529b5ce6a1f976738b1b28c19ef95f7eaddb60eac"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "python",
+        "-m",
+        "lifecycle.bootstrap.commissioning",
+        "--input",
+        "/home/runner/work/multi-tenant/multi-tenant/release/p07-native-inputs.json",
+        "--require-complete"
+      ],
+      "exit_code": 2,
+      "expected_exit_codes": [
+        0,
+        2
+      ],
+      "passed": true,
+      "log": "05.log",
+      "sha256": "acaba70e2773b361d6a13670a002591d9365ba90c86d4fd33abade2d04d24bd1"
+    }
+  ],
+  "limitations": [
+    "Synthetic input metadata and native operation plans; no installed OpenStack execution.",
+    "No owner authentication, native service/restore/policy/revocation/retirement observation.",
+    "The separate P06 regression campaign owns PostgreSQL/Temporal/browser evidence."
+  ],
+  "commissioning_result": {
+    "binding_sha256": null,
+    "evaluated_at": 1791350368,
+    "holds": [
+      {
+        "case_ids": [
+          "Q05.01",
+          "Q05.03"
+        ],
+        "input_id": "N01",
+        "owner_role": "OpenStack platform owner",
+        "package_ids": [
+          "P07.01",
+          "P07.02"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.01"
+        ],
+        "input_id": "N02",
+        "owner_role": "Platform/security owners",
+        "package_ids": [
+          "P07.01"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.01",
+          "Q05.08"
+        ],
+        "input_id": "N03",
+        "owner_role": "Security/IAM owners",
+        "package_ids": [
+          "P07.01"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.03",
+          "Q05.08"
+        ],
+        "input_id": "N04",
+        "owner_role": "Infrastructure/state owners",
+        "package_ids": [
+          "P07.02"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.03",
+          "Q05.09"
+        ],
+        "input_id": "N05",
+        "owner_role": "Infrastructure/resource owners",
+        "package_ids": [
+          "P07.02"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.04"
+        ],
+        "input_id": "N06",
+        "owner_role": "Guest/application owners",
+        "package_ids": [
+          "P07.03"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.04",
+          "Q05.07"
+        ],
+        "input_id": "N07",
+        "owner_role": "Network/security owners",
+        "package_ids": [
+          "P07.04"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.02"
+        ],
+        "input_id": "N08",
+        "owner_role": "Allocation/service owners",
+        "package_ids": [
+          "P07.03"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.05"
+        ],
+        "input_id": "N09",
+        "owner_role": "Enterprise service owners",
+        "package_ids": [
+          "P07.03"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.06",
+          "Q05.08"
+        ],
+        "input_id": "N10",
+        "owner_role": "Backup/application owners",
+        "package_ids": [
+          "P07.03",
+          "P07.05"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.01",
+          "Q05.08"
+        ],
+        "input_id": "N11",
+        "owner_role": "Lifecycle/security owners",
+        "package_ids": [
+          "P07.01",
+          "P07.05"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.10"
+        ],
+        "input_id": "N12",
+        "owner_role": "Governance/retention owners",
+        "package_ids": [
+          "P07.05"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.01",
+          "Q05.10"
+        ],
+        "input_id": "N13",
+        "owner_role": "Qualification/Assurance owners",
+        "package_ids": [
+          "P07.06"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.01"
+        ],
+        "input_id": "N14",
+        "owner_role": "SRE/receiving owners",
+        "package_ids": [
+          "P07.01"
+        ],
+        "reason": "input_not_supplied"
+      },
+      {
+        "case_ids": [
+          "Q05.06",
+          "Q05.07"
+        ],
+        "input_id": "N15",
+        "owner_role": "Application/security owners",
+        "package_ids": [
+          "P07.04"
+        ],
+        "reason": "input_not_supplied"
+      }
+    ],
+    "limitations": [
+      "Metadata only; evidence bytes and reviewer identities are not authenticated.",
+      "Current authority, operating controls and native observation remain required.",
+      "This report cannot be supplied as an execution grant or a native support claim."
+    ],
+    "native_qualification_established": false,
+    "native_write_authorized": false,
+    "record_complete": false,
+    "record_sha256": "06c3a74163b779dd92edbdc5ddbaa26b5b30241fef75dc1cf9a979d054885637",
+    "record_valid": true,
+    "result": "HELD",
+    "schema_version": 1
+  },
+  "result": "PASSED"
+}

@@ -123,8 +123,7 @@ To qualify retirement, create a separate `plan_retire_01`, obtain `ap_retire_01`
 The migration deployment is distinct from fresh provisioning. Its approved plan
 binds the source VM/configuration, complete disk inventory, firmware/drivers,
 source and destination APIs, destination images, transfer custody and independent
-writer-fencing requirements. Source-operation authority covers guest preparation,
-application quiescence, shutdown and export; discovery alone grants none of it.
+writer-fencing requirements. Source-operation authority covers application quiescence, shutdown, snapshot and isolated clone capture; export and transformation operate on the copy; discovery alone grants none of it.
 
 | Step | Required action and completion condition |
 | --- | --- |
@@ -132,16 +131,16 @@ application quiescence, shutdown and export; discovery alone grants none of it.
 | Rehearse | Copy an approved representative source into an isolated target with business effects suppressed; verify boot, all data, services and policy before cleanup. |
 | Approve cutover | Bind current source configuration, destination scope, reviewed API artifacts, custody, reservation receipts and accepted rehearsal evidence. |
 | Fence source | Quiesce all application/other writers, record the last accepted transaction, power off the exact VM and independently verify the source fence. |
-| Export VM | Persist intent, invoke `ExportVm` once, record the NFC lease and transfer every approved disk using allowlisted TLS URLs and lease keepalive. |
-| Verify export | Check native manifest inventory, capacities, lengths and secure checksums; complete the lease only after all disks are captured. Retain the independent source fence. |
-| Import disks | Create private Glance images, stage the verified bytes and invoke the admitted native import method. Journal every returned ID and independently verify imported bytes and ownership. |
+| Capture and export copy | Create consistent S0 and an isolated powered-off clone bound to S0, with production NICs disconnected. Invoke `ExportVm` on the clone once, record the NFC lease/OVF mapping and transfer all approved disks through allowlisted TLS URLs with lease keepalive. |
+| Verify and transform copy | Check native manifest inventory, capacities, lengths and secure checksums. Complete the lease only after export. Execute only the planned isolated conversion and guest transformations; never modify production drivers/tools. |
+| Import disks and reconcile data | Use the selected native image/volume import and verify IDs, ownership and post-conversion digests. A source resumed after S0 requires its qualified final application/file delta before activation; cold export keeps the source stopped. |
 | Create isolated target | Execute the native volume/port/compute plan with exact imported-image mappings and disabled traffic ports. Verify boot and guest prerequisites. |
 | Validate | Independently check all data and attachments, application roles, service owners, backup recovery and allowed/denied traffic. Target writes remain blocked. |
 | Activate | Recheck current authority, source fencing and all acceptance results before target writes and traffic changes. Record the first-write boundary. |
 | Accept and retain | Review Q07 evidence for the exact route. Preserve source disks/data/keys until a separate retirement plan and authority. |
 
-A lease or import timeout holds the original attempt. There is no alternate migration
-method or converter. Recovery before target writes and recovery after possible
+A lease or import timeout holds the original attempt. The immutable plan selects its
+method and any copy-only converter; neither is replaced automatically after failure. Recovery before target writes and recovery after possible
 accepted target writes remain separate approved procedures.
 
 ## 6. Held outcomes, revocation and recovery decisions

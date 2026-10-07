@@ -5,13 +5,14 @@ per-request authority, durable API receipts and independent exact-ID readback.
 ADR-016 is the native API-only baseline; no Terraform dependency, module or
 compatibility path remains in the execution implementation.
 
-The current source needs the hosted native component, real PostgreSQL/Temporal,
-browser and repository qualification campaigns. Earlier source-bound campaign
-records establish only the exact implementation they measured.
+The native API source at `4ee67fdd704f6b6c401237137e3d8e2940ba3d1a` passes
+276 Lifecycle and 139 worker tests without skips, 93 preparation tests and 43
+Temporal checks with six replayed histories. The [qualification index](verification/p07/native-api/qualification-index.json)
+retains exact-source archives, original failures and corrections. These E2 checks
+establish component behavior, not installed-platform acceptance.
 
-1. Qualify the native API contracts, worker journal, request uncertainty, readback,
-   Temporal control and dependent Planning/Console integration without skipped
-   persistence cases. Retain originals and fix any failures.
+1. Preserve the current native-only contracts and qualified software boundaries.
+   Do not restore tool fallback, compatibility plans or automatic migration-method substitution.
 2. Compose actual current-owner and caller-trust integrations from commissioned
    Governance, Planning, Inventory and independently administered native custody.
    Do not use simulation authority or synthetic test owners for native writes.

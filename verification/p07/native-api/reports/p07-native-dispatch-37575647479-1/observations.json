@@ -1,0 +1,213 @@
+{
+  "checks": [
+    {
+      "case": "accepted-start-response-loss",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-active",
+      "result": "PASSED"
+    },
+    {
+      "case": "five-ordered-provision-effects",
+      "result": "PASSED"
+    },
+    {
+      "case": "one-dispatch-after-lost-reply",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-retired",
+      "result": "PASSED"
+    },
+    {
+      "case": "retire-before-release",
+      "result": "PASSED"
+    },
+    {
+      "case": "quiescence-missing-holds",
+      "result": "PASSED"
+    },
+    {
+      "case": "no-following-stage-without-quiescence",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-stopped",
+      "result": "PASSED"
+    },
+    {
+      "case": "queued-configuration-change-holds",
+      "result": "PASSED"
+    },
+    {
+      "case": "revocation-has-no-effect",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-stopped",
+      "result": "PASSED"
+    },
+    {
+      "case": "lost-effect-response-holds",
+      "result": "PASSED"
+    },
+    {
+      "case": "wake-does-not-clear-hold",
+      "result": "PASSED"
+    },
+    {
+      "case": "same-start-after-worker-restart",
+      "result": "PASSED"
+    },
+    {
+      "case": "held-grant-survives-restart",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-active",
+      "result": "PASSED"
+    },
+    {
+      "case": "accepted-effect-not-repeated",
+      "result": "PASSED"
+    },
+    {
+      "case": "accepted-effect-still-running",
+      "result": "PASSED"
+    },
+    {
+      "case": "temporal-cancellation-persists-hold",
+      "result": "PASSED"
+    },
+    {
+      "case": "cancellation-does-not-confirm-drain",
+      "result": "PASSED"
+    },
+    {
+      "case": "cancelled-workflow-remains-cancelled",
+      "result": "PASSED"
+    },
+    {
+      "case": "cancelled-native-hold-retained",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "six-real-native-histories-replayed",
+      "result": "PASSED"
+    },
+    {
+      "case": "two-provision-effects-crossed-real-tls",
+      "result": "PASSED"
+    },
+    {
+      "case": "eight-live-boundary-callbacks-crossed-real-tls",
+      "result": "PASSED"
+    },
+    {
+      "case": "worker-journal-retains-two-claims",
+      "result": "PASSED"
+    },
+    {
+      "case": "worker-journal-retains-two-holds",
+      "result": "PASSED"
+    },
+    {
+      "case": "worker-journal-retains-four-events",
+      "result": "PASSED"
+    },
+    {
+      "case": "worker-cannot-access-lifecycle-database",
+      "result": "PASSED"
+    },
+    {
+      "case": "duplicate-tls-submission-is-held",
+      "result": "PASSED"
+    }
+  ],
+  "histories": [
+    {
+      "workflow_id": "p07-native-v1-518cb234-e30e-4dbc-97b4-7f1b1a33da20",
+      "events": 131,
+      "replay": "PASSED"
+    },
+    {
+      "workflow_id": "p07-native-v1-5e605006-1cbf-4352-9bdf-ea9f6a702bfa",
+      "events": 59,
+      "replay": "PASSED"
+    },
+    {
+      "workflow_id": "p07-native-v1-952155b7-509c-4101-9cb5-0004eb1421c5",
+      "events": 45,
+      "replay": "PASSED"
+    },
+    {
+      "workflow_id": "p07-native-v1-df58c155-dc6a-4f26-860b-106e0f9c94e8",
+      "events": 35,
+      "replay": "PASSED"
+    },
+    {
+      "workflow_id": "p07-native-v1-072141e1-f5a6-4ef6-bb6d-2d8c4810616e",
+      "events": 136,
+      "replay": "PASSED"
+    },
+    {
+      "workflow_id": "p07-native-v1-b4e1840e-f7de-4b04-8d0c-a1d0c851a891",
+      "events": 29,
+      "replay": "PASSED"
+    }
+  ],
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "owner_and_effect_observations": "synthetic",
+  "internal_effect_and_boundary_transport": "actual_tls",
+  "worker_journal": "actual_owner_separated_postgresql"
+}
