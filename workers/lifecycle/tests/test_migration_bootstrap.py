@@ -12,6 +12,7 @@ import pytest
 from test_native import Journal
 from test_native import binding as binding
 from test_native_http import native_tls as native_tls
+from test_platform_expansion import plan_for, signed
 
 from lifecycle_worker.application.native import NativeBinding, NativeHeld, digest
 from lifecycle_worker.infrastructure.migration_bootstrap import (
@@ -98,6 +99,45 @@ def registry(tmp_path: Path, binding: NativeBinding) -> tuple[Path, NativeBindin
 
 def no_database() -> Any:
     raise AssertionError("Composition must not claim an attempt or use a database")
+
+
+def test_signed_platform_registry_composes_and_rejects_shared_observer(
+    tmp_path: Path, binding: NativeBinding
+) -> None:
+    path, binding, row = registry(tmp_path, binding)
+    plan, _ = plan_for(binding)
+    trust, envelope, artifact, manifest, _ = signed(tmp_path, plan)
+    plan["adapter_sha256"] = digest(manifest)
+    binding = replace(binding, operation_plan_sha256=digest(plan))
+    writer = row["configuration"]["endpoint"]
+    reader = writer | {"token_file": str(tmp_path / "reader.token")}
+    for connection, value in ((writer, "synthetic-writer"), (reader, "synthetic-reader")):
+        token = Path(connection["token_file"])
+        token.write_text(value)
+        token.chmod(0o600)
+    row.update(
+        binding={k: binding.document()[k] for k in row["binding"]},
+        adapter="platform_lifecycle",
+        observer=None,
+        configuration={
+            "writer": writer,
+            "reader": reader,
+            "trust_file": str(trust.trust_file),
+            "envelope_file": str(envelope),
+            "artifact_file": str(artifact),
+            "observer_id": str(uuid4()),
+            "writer_id": str(uuid4()),
+        },
+    )
+    mounted(Path(row["plan_file"]), plan)
+    mounted(path, {"schema_version": 1, "entries": [row]})
+    runtime = MountedMigrationRuntime(path, PostgresNativeJournal(no_database), lambda: 100)
+    adapter, _ = runtime.resolve(binding)
+    assert adapter.inspect(binding)["native_write_authorized"] is False
+    row["configuration"]["observer_id"] = row["configuration"]["writer_id"]
+    mounted(path, {"schema_version": 1, "entries": [row]})
+    with pytest.raises(NativeHeld, match="independent_platform_principal_required"):
+        runtime.resolve(binding)
 
 
 @pytest.mark.parametrize(

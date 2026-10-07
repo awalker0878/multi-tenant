@@ -16,6 +16,7 @@ from lifecycle_worker.application.native import (
     NativeJournal,
     decode,
     digest,
+    identity,
 )
 from lifecycle_worker.application.platform_plan import achieved, request, validate
 from lifecycle_worker.infrastructure.extension_trust import ExtensionTrust
@@ -217,18 +218,32 @@ class PlatformApi:
 
 class PlatformObserver:
     def __init__(
-        self, plan_file: Path, transport: PlatformTransport, clock: Callable[[], int]
+        self,
+        plan_file: Path,
+        transport: PlatformTransport,
+        clock: Callable[[], int],
+        observer_id: str,
+        writer_id: str,
+        require_independent_credentials: Callable[[], None],
     ) -> None:
         self.plan_file, self.transport, self.clock = plan_file, transport, clock
+        self.observer_id, self.writer_id = identity(observer_id), identity(writer_id)
+        if self.observer_id == self.writer_id:
+            raise NativeHeld("independent_platform_principal_required")
+        self.require_independent_credentials = require_independent_credentials
 
     def observe(self, binding: NativeBinding, objects: dict[str, Any]) -> dict[str, Any]:
         plan = validate(decode(protected_read(self.plan_file, 1048576)), binding)
         if objects and objects != {"vm": {"kind": "vm", "id": plan["object_id"]}}:
             raise NativeHeld("platform_receipt_identity_conflict")
+        self.require_independent_credentials()
         current, _ = self.transport.read(plan["platform"], plan["object_id"])
+        self.require_independent_credentials()
         return {
             "binding_sha256": binding.fingerprint,
             "independent": True,
+            "observer_id": self.observer_id,
+            "writer_id": self.writer_id,
             "outcome": "observed_present" if achieved(plan, current) else "held",
             "observed_at": self.clock(),
             "observation_sha256": digest(current),

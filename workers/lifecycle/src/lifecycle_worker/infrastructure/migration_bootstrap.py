@@ -245,6 +245,8 @@ class MountedMigrationRuntime:
             "trust_file",
             "envelope_file",
             "artifact_file",
+            "observer_id",
+            "writer_id",
         }:
             writer_endpoint, reader_endpoint = (
                 endpoint(config["writer"]),
@@ -260,7 +262,12 @@ class MountedMigrationRuntime:
                 self.journal,
             )
             platform_observer = PlatformObserver(
-                path, PlatformHttp(reader_endpoint, plan["platform"], read_only=True), self.clock
+                path,
+                PlatformHttp(reader_endpoint, plan["platform"], read_only=True),
+                self.clock,
+                config["observer_id"],
+                config["writer_id"],
+                lambda: distinct_credentials(writer_endpoint, reader_endpoint),
             )
             if entry["observer"] is not None:
                 raise NativeHeld("unexpected_platform_observer")

@@ -255,7 +255,9 @@ def test_response_loss_never_resubmits_and_independent_readback_recovers(tmp_pat
     journal, transport = Journal(), Transport(current)
     adapter = PlatformApi(path, envelope, artifact, trust, transport, journal)
     # Separate synthetic observer transports share only the simulated native state.
-    observer = PlatformObserver(path, Transport(current), lambda: 100)
+    observer = PlatformObserver(
+        path, Transport(current), lambda: 100, str(uuid4()), str(uuid4()), lambda: None
+    )
     executor = NativeApiExecution(Authority(), journal, adapter, observer, lambda: 100)
     transport.lose = True
     with pytest.raises(NativeHeld, match="requires_reconciliation"):
@@ -264,6 +266,31 @@ def test_response_loss_never_resubmits_and_independent_readback_recovers(tmp_pat
     with pytest.raises(NativeHeld, match="requires_reconciliation"):
         executor.execute(b)
     assert transport.sent == 1
+
+
+def test_observer_rejects_same_principal_and_rechecks_credentials(tmp_path: Path) -> None:
+    b = binding()
+    plan, current = plan_for(b)
+    b = replace(b, operation_plan_sha256=digest(plan))
+    path = write(tmp_path / "plan.json", plan)
+    principal = str(uuid4())
+    with pytest.raises(NativeHeld, match="independent_platform_principal_required"):
+        PlatformObserver(path, Transport(current), lambda: 100, principal, principal, lambda: None)
+
+    calls = 0
+
+    def credentials() -> None:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise NativeHeld("independent_platform_read_identity_required")
+
+    observer = PlatformObserver(
+        path, Transport(current), lambda: 100, principal, str(uuid4()), credentials
+    )
+    with pytest.raises(NativeHeld, match="independent_platform_read_identity_required"):
+        observer.observe(b, {})
+    assert calls == 2
 
 
 def test_revocation_between_prepare_and_send_blocks_native_request(tmp_path: Path) -> None:
