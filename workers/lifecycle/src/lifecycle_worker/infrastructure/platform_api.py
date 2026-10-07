@@ -61,6 +61,14 @@ class PlatformHttp:
         token = protected_read(self.endpoint.token_file, 4096).rstrip(b"\r\n")
         if not token or any(c < 33 or c > 126 for c in token):
             raise NativeHeld("invalid_platform_credential")
+        fingerprint = hashlib.sha256(token).digest()
+
+        def current() -> None:
+            boundary()
+            now = protected_read(self.endpoint.token_file, 4096).rstrip(b"\r\n")
+            if hashlib.sha256(now).digest() != fingerprint:
+                raise NativeHeld("platform_credential_changed")
+
         auth = "vmware-api-session-id" if self.platform == "vmware" else "X-Ntnx-Api-Key"
         headers = {
             auth: token.decode("ascii"),
@@ -79,7 +87,7 @@ class PlatformHttp:
             headers["Content-Type"] = "application/json"
         connection = PinnedConnection(self.endpoint)
         try:
-            boundary()
+            current()
             connection.request(method, path, body=payload, headers=headers)
             response = connection.getresponse()
             expected = 200 if method == "GET" else (204 if self.platform == "vmware" else 202)
@@ -97,6 +105,7 @@ class PlatformHttp:
             raw = bytearray()
             deadline = time.monotonic() + 10
             while True:
+                current()
                 if time.monotonic() >= deadline:
                     raise NativeHeld("platform_response_deadline")
                 data = response.read1(min(65536, 2097153 - len(raw)))
@@ -104,6 +113,7 @@ class PlatformHttp:
                 if len(raw) > 2097152:
                     raise NativeHeld("platform_response_bound")
                 if not data:
+                    current()
                     break
             return {
                 "document": decode(bytes(raw)) if raw else {},

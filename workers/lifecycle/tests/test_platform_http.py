@@ -59,6 +59,8 @@ def platform_peer(tmp_path: Path) -> Iterator[tuple[NativeEndpoint, dict[str, An
                     "body": self.rfile.read(int(self.headers.get("Content-Length", "0"))),
                 }
             )
+            if "after_request" in fixture:
+                fixture["after_request"]()
             self.send_response(fixture["status"])
             self.send_header("Content-Type", "application/json")
             self.send_header("Location", "https://foreign.invalid/never")
@@ -118,7 +120,7 @@ def test_vmware_read_and_write_use_session_auth_and_204(
         },
         lambda: count.append(True),
     )
-    assert count == [True]
+    assert count
     assert (
         peer["requests"][0]["headers"]["vmware-api-session-id"] == "synthetic-platform-credential"
     )
@@ -178,3 +180,29 @@ def test_observer_cannot_write_or_reuse_writer_secret(
     assert peer["requests"] == []
     with pytest.raises(NativeHeld, match="independent"):
         distinct_credentials(endpoint, endpoint)
+
+
+@pytest.mark.parametrize("when", ["before_send", "after_send"])
+def test_platform_credential_rotation_holds_without_replaying_the_effect(
+    platform_peer: tuple[NativeEndpoint, dict[str, Any]], when: str
+) -> None:
+    endpoint, peer = platform_peer
+    peer.update(status=204, body=b"")
+
+    def rotate() -> None:
+        endpoint.token_file.write_text("rotated-synthetic-platform-credential")
+
+    if when == "after_send":
+        peer["after_request"] = rotate
+    with pytest.raises(NativeHeld, match="platform_credential_changed"):
+        PlatformHttp(endpoint, "vmware").send(
+            "vmware",
+            {
+                "method": "POST",
+                "path": "/api/vcenter/vm/vm-42/power?action=start",
+                "body": None,
+                "headers": {},
+            },
+            rotate if when == "before_send" else lambda: None,
+        )
+    assert len(peer["requests"]) == (0 if when == "before_send" else 1)
