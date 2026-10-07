@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-07T02:27:43.227Z",
+  "result": "PASS",
+  "source_revisions": [
+    "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+    "dd31bed12de3133b30f0a06072ada37abd9f4961"
+  ],
+  "workflows": [
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924406,
+      "run_attempt": 1,
+      "name": "P01 foundation packages",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37560924406",
+      "updated_at": "2026-10-07T02:15:10Z"
+    },
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924182,
+      "run_attempt": 1,
+      "name": "P01 bootstrap images",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37560924182",
+      "updated_at": "2026-10-07T02:15:27Z"
+    },
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924200,
+      "run_attempt": 1,
+      "name": "P01 transactional messaging",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37560924200",
+      "updated_at": "2026-10-07T02:16:12Z"
+    },
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924236,
+      "run_attempt": 1,
+      "name": "P01 isolated Compose integration",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37560924236",
+      "updated_at": "2026-10-07T02:16:35Z"
+    },
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924170,
+      "run_attempt": 1,
+      "name": "P06 execution",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37560924170",
+      "updated_at": "2026-10-07T02:17:24Z"
+    },
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924201,
+      "run_attempt": 1,
+      "name": "P01 foundation contracts",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37560924201",
+      "updated_at": "2026-10-07T02:14:09Z"
+    },
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924234,
+      "run_attempt": 1,
+      "name": "Context policy",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37560924234",
+      "updated_at": "2026-10-07T02:13:36Z"
+    },
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924217,
+      "run_attempt": 1,
+      "name": "P07 native readiness preparation",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37560924217",
+      "updated_at": "2026-10-07T02:13:48Z"
+    },
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924178,
+      "run_attempt": 1,
+      "name": "P01 policy controls",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37560924178",
+      "updated_at": "2026-10-07T02:13:33Z"
+    },
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924224,
+      "run_attempt": 1,
+      "name": "P01 isolated Kubernetes integration",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37560924224",
+      "updated_at": "2026-10-07T02:23:58Z"
+    },
+    {
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "run_id": 37561411285,
+      "run_attempt": 1,
+      "name": "Context policy",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37561411285",
+      "updated_at": "2026-10-07T02:19:34Z"
+    },
+    {
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "run_id": 37561411298,
+      "run_attempt": 1,
+      "name": "P01 foundation contracts",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37561411298",
+      "updated_at": "2026-10-07T02:19:55Z"
+    },
+    {
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "run_id": 37561411343,
+      "run_attempt": 1,
+      "name": "P01 policy controls",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37561411343",
+      "updated_at": "2026-10-07T02:19:39Z"
+    },
+    {
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "run_id": 37561411249,
+      "run_attempt": 1,
+      "name": "P07 native readiness preparation",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37561411249",
+      "updated_at": "2026-10-07T02:19:50Z"
+    },
+    {
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "run_id": 37561411471,
+      "run_attempt": 1,
+      "name": "P01 foundation packages",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37561411471",
+      "updated_at": "2026-10-07T02:20:21Z"
+    },
+    {
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "run_id": 37561411263,
+      "run_attempt": 1,
+      "name": "P01 bootstrap images",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37561411263",
+      "updated_at": "2026-10-07T02:20:10Z"
+    },
+    {
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "run_id": 37561411275,
+      "run_attempt": 1,
+      "name": "P06 execution",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37561411275",
+      "updated_at": "2026-10-07T02:23:41Z"
+    }
+  ],
+  "limitations": [
+    "Workflow conclusions are scoped to their recorded source revisions.",
+    "Compose/Kubernetes qualify foundation deployment behavior at f63db0e; the subsequent dd31bed change touches only native readback/plan type comparisons and their worker tests.",
+    "P07's separate worker job runs all 112 tests without skips. P06 core skips eight optional native journal tests; those eight are covered by the P07 job.",
+    "No native OpenStack installation, Q05/Q06 result or operating/receiving acceptance is supplied."
+  ]
+}

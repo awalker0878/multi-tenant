@@ -1,0 +1,429 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-07T02:26:18.906539+00:00",
+  "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+  "result": "PASS",
+  "evidence_level": "E2",
+  "scope": "Native adapter software component increment and isolated regression; no native P07 execution or qualification.",
+  "p07_delivery": "INCOMPLETE",
+  "g07_decision": "NOT_REVIEWED",
+  "native_write_authorized": false,
+  "native_platforms_tested": [],
+  "native_qualified_versions": [],
+  "final": {
+    "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+    "run_id": 37561411249,
+    "artifact_id": 11456992227,
+    "archive": "final/original.zip.b64",
+    "zip_sha256": "ea69b746aecb578ddde5df09343b370ade6df9fa8082199a12d7e23f696b6aa3",
+    "report": "final/report.json",
+    "report_sha256": "29742285a3bb19551cbff7da71986101091be5802440f26e7c91ad303203c5c9",
+    "result": "PASSED",
+    "observed_at": "2026-10-07T02:19:23.252476+00:00",
+    "source_bindings_checked": 39,
+    "source_discrepancies": [],
+    "command_logs_checked": 10,
+    "test_suites": [
+      {
+        "tests": 112,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "previous_components": [
+    {
+      "source_revision": "d561a5fdd22d311bf448754e78bfd7a16d3ad4c0",
+      "run_id": 37560443093,
+      "artifact_id": 11456621374,
+      "archive": "initial/original.zip.b64",
+      "zip_sha256": "6088f0cca2a20af90cf4c3800328c6d252bf90820d60b6340fee018f1f4505ab",
+      "report": "initial/report.json",
+      "report_sha256": "4455172724fa3a11afe27e0dbed295336cf3a68a2816dcc0ccec654fc5e6dedd",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T02:07:32.015308+00:00",
+      "source_bindings_checked": 39,
+      "source_discrepancies": [],
+      "command_logs_checked": 10,
+      "test_suites": [
+        {
+          "tests": 102,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ]
+    },
+    {
+      "source_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "run_id": 37560924217,
+      "artifact_id": 11456562048,
+      "archive": "integration/original.zip.b64",
+      "zip_sha256": "3c62539dacb556bb026e838acec3ec1663a072237d18dfaaf161283eb9233b52",
+      "report": "integration/report.json",
+      "report_sha256": "9fcf41cecc3b73c2a7cf8fb93e89a9e866196e3e7baee65bfbf4491637ae797d",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T02:13:22.176342+00:00",
+      "source_bindings_checked": 39,
+      "source_discrepancies": [],
+      "command_logs_checked": 10,
+      "test_suites": [
+        {
+          "tests": 107,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ]
+    }
+  ],
+  "regressions": [
+    {
+      "artifact_id": 11457480543,
+      "run_id": 37561411275,
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "archive": "regressions/p06-live-firefox-37561411275-1.zip.b64",
+      "zip_sha256": "6c3d9500a66c093ce31ad344a51f9b7bdb4c59c3607474ae984229cf38ec92e4",
+      "report": "regressions/p06-live-firefox-37561411275-1-report.json",
+      "report_sha256": "2c3ec53f785c37d3547a84a31629b249e6f89ed022971cdd2b6bdbd169e7506b",
+      "result": "PASS",
+      "source_bindings_checked": 1052,
+      "source_discrepancies": [],
+      "command_logs_checked": 61,
+      "artifact_hashes_checked": 81,
+      "checks": 148,
+      "test_suites": [],
+      "browsers": {
+        "browser.json": {
+          "startTime": "2026-10-07T02:21:07.034Z",
+          "duration": 37339.26,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-browser.json": {
+          "startTime": "2026-10-07T02:22:30.849Z",
+          "duration": 18070.402000000002,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-07T02:23:15.086Z",
+          "duration": 3874.6189999999997,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      }
+    },
+    {
+      "artifact_id": 11457117236,
+      "run_id": 37561411275,
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "archive": "regressions/p06-live-webkit-37561411275-1.zip.b64",
+      "zip_sha256": "b4d51ef49229fff83048a74df990c4cf8aad467cf1ba1fd9014a8861ce20fdff",
+      "report": "regressions/p06-live-webkit-37561411275-1-report.json",
+      "report_sha256": "34788ed08eebcb0fc1fed4b4d1636dbb65044fb4742316f1b9d17206346f2ff0",
+      "result": "PASS",
+      "source_bindings_checked": 1052,
+      "source_discrepancies": [],
+      "command_logs_checked": 61,
+      "artifact_hashes_checked": 81,
+      "checks": 148,
+      "test_suites": [],
+      "browsers": {
+        "browser.json": {
+          "startTime": "2026-10-07T02:21:12.185Z",
+          "duration": 40866.308000000005,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-browser.json": {
+          "startTime": "2026-10-07T02:22:33.881Z",
+          "duration": 15854.306,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-07T02:23:14.577Z",
+          "duration": 2345.733,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      }
+    },
+    {
+      "artifact_id": 11456957362,
+      "run_id": 37561411275,
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "archive": "regressions/p06-core-37561411275-1.zip.b64",
+      "zip_sha256": "65562e68b8751e01d74d9ee24381270f4771799ada8327b937e5c011bd3884cf",
+      "report": "regressions/p06-core-37561411275-1-report.json",
+      "report_sha256": "92b0be88bc3162c6431529ccd4a19311dd3f9e4cbe2f8eb82b9574f5c7c0c977",
+      "result": "PASSED",
+      "source_bindings_checked": 180,
+      "source_discrepancies": [],
+      "command_logs_checked": 12,
+      "artifact_hashes_checked": 0,
+      "checks": 0,
+      "test_suites": [
+        {
+          "path": "execution.xml",
+          "tests": 49,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "services-lifecycle.xml",
+          "tests": 184,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "workers-lifecycle.xml",
+          "tests": 112,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 8
+        }
+      ],
+      "browsers": {},
+      "limitations": [
+        "P06 core runs 337 tests and skips eight optional native journal cases; all eight separately run and pass in the P07 native worker campaign. No existing P06 case is skipped."
+      ]
+    },
+    {
+      "artifact_id": 11456518206,
+      "run_id": 37561411275,
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "archive": "regressions/p06-live-chromium-37561411275-1.zip.b64",
+      "zip_sha256": "2299f7b3c00463f224e3b024029d5f848babb2fbc14e4165052ad40c1592f4f9",
+      "report": "regressions/p06-live-chromium-37561411275-1-report.json",
+      "report_sha256": "dbc92252f5b21c2eeaf8f80f49dc43392b9bc8af79fe109568fe2ce2cbbf99b8",
+      "result": "PASS",
+      "source_bindings_checked": 1052,
+      "source_discrepancies": [],
+      "command_logs_checked": 61,
+      "artifact_hashes_checked": 81,
+      "checks": 148,
+      "test_suites": [],
+      "browsers": {
+        "browser.json": {
+          "startTime": "2026-10-07T02:20:58.320Z",
+          "duration": 35540.337,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-browser.json": {
+          "startTime": "2026-10-07T02:22:18.401Z",
+          "duration": 15824.288,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-07T02:22:59.963Z",
+          "duration": 2300.4179999999997,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      }
+    },
+    {
+      "artifact_id": 11456877134,
+      "run_id": 37561411263,
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "archive": "regressions/p01-image-lifecycle-workers-dd31bed12de3133b30f0a06072ada37abd9f4961.zip.b64",
+      "zip_sha256": "2572deef73ca9180d6d01e8493acfb634a0f21c755c4fcb0902e8a58e6fbd2f4",
+      "report": "regressions/p01-image-lifecycle-workers-dd31bed12de3133b30f0a06072ada37abd9f4961-report.json",
+      "report_sha256": "2588b46da871b35fa229530536f817e0703274d007b016854a2785d8b404b109",
+      "result": "PASSED",
+      "source_bindings_checked": 34,
+      "source_discrepancies": [],
+      "command_logs_checked": 22,
+      "artifact_hashes_checked": 0,
+      "checks": 0,
+      "test_suites": [],
+      "browsers": {}
+    },
+    {
+      "artifact_id": 11456642659,
+      "run_id": 37561411263,
+      "source_revision": "dd31bed12de3133b30f0a06072ada37abd9f4961",
+      "archive": "regressions/p01-artifact-lifecycle-workers-dd31bed12de3133b30f0a06072ada37abd9f4961.zip.b64",
+      "zip_sha256": "5b5d3f900a6aef9a73b7dd11c81e39dd1d2158cb87b44b83d91734260719843d",
+      "report": "regressions/p01-artifact-lifecycle-workers-dd31bed12de3133b30f0a06072ada37abd9f4961-report.json",
+      "report_sha256": "b6cccad9d60404648d7857e1266c61d8501875253473b25e5ec6b006e86b630c",
+      "result": "PASSED_CONTROLS",
+      "source_bindings_checked": 46,
+      "source_discrepancies": [],
+      "command_logs_checked": 0,
+      "artifact_hashes_checked": 9,
+      "checks": 0,
+      "test_suites": [],
+      "browsers": {},
+      "candidate_admission": "ADMITTED_DEVELOPMENT",
+      "security_findings": [],
+      "denials": [
+        {
+          "case": "unsigned",
+          "observed": "missing_signature"
+        },
+        {
+          "case": "altered-release.json",
+          "observed": "signature_invalid"
+        },
+        {
+          "case": "altered-image-sbom.cdx.json",
+          "observed": "bundle_content_mismatch"
+        },
+        {
+          "case": "altered-image/blobs/sha256/230a922bda4b690f7587ce2098c10b613f97a51cdd158b9ff936579f8c07f188",
+          "observed": "bundle_content_mismatch"
+        },
+        {
+          "case": "wrong-source",
+          "observed": "manifest_identity_mismatch"
+        },
+        {
+          "case": "revoked-signer",
+          "observed": "revoked_signer"
+        },
+        {
+          "case": "operated-scope",
+          "observed": "operated_trust_not_configured"
+        }
+      ],
+      "transfer_integrity": "VERIFIED_DEVELOPMENT_COPY"
+    }
+  ],
+  "original_failed_campaigns": [
+    {
+      "artifact_id": 11457005605,
+      "run_id": 37560443078,
+      "source_revision": "d561a5fdd22d311bf448754e78bfd7a16d3ad4c0",
+      "name": "p06-live-webkit-37560443078-1",
+      "zip_sha256": "596183b7ed70e87740a3cf84f504926842c050362f94fe169545f9b89ad74dec",
+      "reports": [
+        "failures/p06-live-webkit-37560443078-1-report.json"
+      ],
+      "result": "FAILED",
+      "correction_revision": null,
+      "archive": "failures/p06-live-webkit-37560443078-1.zip.b64",
+      "observed_error": "broker_not_ready",
+      "disposition": "Ephemeral RabbitMQ cookie read eacces; retained as original startup failure, distinct from corrected migration defect. Later independent campaigns passed."
+    },
+    {
+      "artifact_id": 11456371847,
+      "run_id": 37560443078,
+      "source_revision": "d561a5fdd22d311bf448754e78bfd7a16d3ad4c0",
+      "name": "p06-live-firefox-37560443078-1",
+      "zip_sha256": "87a483a42a1c18f73513e177328bd065b812618a3f5dd7cb79d44f826c44b793",
+      "reports": [
+        "failures/p06-live-firefox-37560443078-1-report.json"
+      ],
+      "result": "FAILED",
+      "correction_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "archive": "failures/p06-live-firefox-37560443078-1.zip.b64",
+      "observed_error": "psql failed: ERROR:  permission denied for database simulation\n"
+    },
+    {
+      "artifact_id": 11456159380,
+      "run_id": 37560443078,
+      "source_revision": "d561a5fdd22d311bf448754e78bfd7a16d3ad4c0",
+      "name": "p06-live-chromium-37560443078-1",
+      "zip_sha256": "c0f72032fe5fdc6449bef27c5637b12ea7e7aafea2d26ef3712183565116d2f6",
+      "reports": [
+        "failures/p06-live-chromium-37560443078-1-report.json"
+      ],
+      "result": "FAILED",
+      "correction_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "archive": "failures/p06-live-chromium-37560443078-1.zip.b64",
+      "observed_error": "psql failed: ERROR:  permission denied for database simulation\n"
+    },
+    {
+      "artifact_id": 11456911714,
+      "run_id": 37560765849,
+      "source_revision": "9077e558210e7eb0817c862ff06e63f4289da3d8",
+      "name": "p06-live-webkit-37560765849-1",
+      "zip_sha256": "d926745b2e9f5671c6f617f5c51913b0af49aa3ecc38d6e183004ff24f5701f0",
+      "reports": [
+        "failures/p06-live-webkit-37560765849-1-report.json"
+      ],
+      "result": "FAILED",
+      "correction_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "archive": "failures/p06-live-webkit-37560765849-1.zip.b64",
+      "observed_error": "psql failed: ERROR:  permission denied for database simulation\n"
+    },
+    {
+      "artifact_id": 11456876411,
+      "run_id": 37560765849,
+      "source_revision": "9077e558210e7eb0817c862ff06e63f4289da3d8",
+      "name": "p06-live-firefox-37560765849-1",
+      "zip_sha256": "8018f579f052530729dc0ea1e66b636abefeb1e34000c3cc4b513664798e00a9",
+      "reports": [
+        "failures/p06-live-firefox-37560765849-1-report.json"
+      ],
+      "result": "FAILED",
+      "correction_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "archive": "failures/p06-live-firefox-37560765849-1.zip.b64",
+      "observed_error": "psql failed: ERROR:  permission denied for database simulation\n"
+    },
+    {
+      "artifact_id": 11456477198,
+      "run_id": 37560765849,
+      "source_revision": "9077e558210e7eb0817c862ff06e63f4289da3d8",
+      "name": "p06-live-chromium-37560765849-1",
+      "zip_sha256": "2499ada4379ce27be5447a3b0336bd78bc9c039cfc834dc40c3b386c729fbd7e",
+      "reports": [
+        "failures/p06-live-chromium-37560765849-1-report.json"
+      ],
+      "result": "FAILED",
+      "correction_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa",
+      "archive": "failures/p06-live-chromium-37560765849-1.zip.b64",
+      "observed_error": "psql failed: ERROR:  permission denied for database simulation\n"
+    }
+  ],
+  "original_failed_image_logs": [
+    {
+      "job_id": 112596303043,
+      "path": "failures/image-112596303043.log",
+      "sha256": "abb7dfa6567f2d5de9a0d0f777e32ee4efc1e0e081d9aa2af4f84fa2d1a099c0",
+      "failure": "Worker must match its declared runtime and owned entrypoints",
+      "correction_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa"
+    },
+    {
+      "job_id": 112597312911,
+      "path": "failures/image-112597312911.log",
+      "sha256": "29f83b7d59420caaf237d1f6c5cf6b00ecac9d0a51ffab8017172853bebceddc",
+      "failure": "Worker must match its declared runtime and owned entrypoints",
+      "correction_revision": "f63db0e886d815b5c41f45c3fbe8e1ca576895aa"
+    }
+  ],
+  "limitations": [
+    "Real PostgreSQL, TLS and subprocess boundaries use synthetic identities and provider responses.",
+    "Native grant redemption, provider request fencing and independent restored-journal recovery are not integrated.",
+    "Guest/service integration, application activation, native restore/retirement and Q05/Q06 E3 remain unfinished.",
+    "Terraform/provider versions are development schema candidates, not an installation support selection.",
+    "A passing readback never grants retry, hold release, application readiness, activation or deletion.",
+    "No operating controls, actual people or receiving decisions are inferred from these automated checks."
+  ]
+}
