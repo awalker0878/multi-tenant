@@ -30,6 +30,7 @@ it('renders the API owner review with cleared encrypted history', function (): v
 it('forwards manual references and override reasons through the owner API', function (): void {
     $this->inventory->shouldReceive('call')->once()->withArgs(function ($token, $tenant, $operation, $parameters, $body, $key, $revision): bool {
         return $operation === 'savePortingConfiguration' && $parameters === ['site' => $this->site]
+            && array_key_exists('source_endpoint', $body) && array_key_exists('target_endpoint', $body)
             && $key === $this->key && $revision === 3 && is_object($body['manual'])
             && $body['manual']->ownership_reference === 'owner-record-1'
             && $body['choices'][0]['reason'] === '';
@@ -60,6 +61,13 @@ it('keeps stale and uncertain commands reviewable', function (int $status): void
 it('rechecks administrator access on the polling endpoint', function (): void {
     $this->inventory->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->tenant, 'getPortingConfiguration', ['site' => $this->site])->andThrow(new InventoryFailure(403));
     $this->get($this->base.'/status')->assertRedirect('/account');
+});
+
+it('rejects browser attempts to replace API facts with manual fields', function (): void {
+    $this->inventory->shouldNotReceive('call');
+    $this->from($this->base)->post($this->base, ['operation' => 'save', 'command_key' => $this->key,
+        'configuration' => ['source_endpoint' => null, 'target_endpoint' => null, 'manual' => [], 'choices' => [], 'api_version' => 'forged']])
+        ->assertRedirect($this->base)->assertSessionHasErrors('configuration');
 });
 
 it('requires CSRF protection for saves pulls and confirmations', function (): void {

@@ -32,7 +32,7 @@ final class PortingConfigurationController
 
     public function command(Request $request, string $tenant, string $site, InventoryGateway $inventory): RedirectResponse
     {
-        $input = $request->validate(['operation' => ['required', 'in:save,confirm,pull'], 'command_key' => ['required', 'uuid', 'lowercase'], 'revision' => ['nullable', 'integer', 'min:1', 'max:999999999'], 'endpoint_id' => ['nullable', 'uuid', 'lowercase'], 'configuration' => ['required_if:operation,save', 'array'], 'configuration.manual' => ['sometimes', 'array', 'max:13'], 'configuration.choices' => ['sometimes', 'array', 'max:20'], 'configuration.choices.*' => ['array'], 'digest' => ['nullable', 'regex:/\A[0-9a-f]{64}\z/']]);
+        $input = $request->validate(['operation' => ['required', 'in:save,confirm,pull'], 'command_key' => ['required', 'uuid', 'lowercase'], 'revision' => ['nullable', 'integer', 'min:1', 'max:999999999'], 'endpoint_id' => ['nullable', 'uuid', 'lowercase'], 'configuration' => ['required_if:operation,save', 'array:source_endpoint,target_endpoint,manual,choices'], 'configuration.source_endpoint' => ['present_if:operation,save', 'nullable', 'uuid', 'lowercase'], 'configuration.target_endpoint' => ['present_if:operation,save', 'nullable', 'uuid', 'lowercase'], 'configuration.manual' => ['sometimes', 'array', 'max:13'], 'configuration.choices' => ['sometimes', 'array', 'max:20'], 'configuration.choices.*' => ['array'], 'digest' => ['nullable', 'regex:/\A[0-9a-f]{64}\z/']]);
         $parameters = ['site' => $site];
         $operation = match ($input['operation']) {
             'save' => 'savePortingConfiguration',
