@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "product-lifecycle-worker"
 version = "0.1.0.dev0"
-description = "Site worker bootstrap; isolated simulation effects; no native adapters"
+description = "Lifecycle worker; isolated simulation and bounded native adapter components"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0"]
@@ -13,6 +13,7 @@ dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0"]
 [project.scripts]
 lifecycle-worker-health = "lifecycle_worker.bootstrap.health:main"
 lifecycle-simulator = "lifecycle_worker.bootstrap.simulation:main"
+lifecycle-native-inspect = "lifecycle_worker.bootstrap.native_inspect:main"
 
 [dependency-groups]
 dev = ["mypy==2.4.0", "pytest==9.1.1", "ruff==0.16.10"]

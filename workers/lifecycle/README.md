@@ -1,6 +1,6 @@
-# Lifecycle simulation worker
+# Lifecycle worker
 
-This independently owned Python package contributes to P01.01. Lifecycle owns this package for future explicitly scoped execution. P06 supplies the separately owned PostgreSQL simulation effect store, sealed readback and grant redemption. The Temporal orchestrator lives in the Lifecycle service; no native effect is implemented. The intended responsibilities remain in the [Lifecycle service specification](../../docs/services/lifecycle.md).
+This independently owned Python package contributes to P01.01. Lifecycle owns explicitly scoped execution. P06 supplies the separately owned PostgreSQL simulation effect store, sealed readback and grant redemption. The Temporal orchestrator lives in the Lifecycle service. P07 adds native adapter components and read-only inspection; native product dispatch is not enabled. The intended responsibilities remain in the [Lifecycle service specification](../../docs/services/lifecycle.md).
 
 `lifecycle-worker-health liveness` exits 0 and reports only that its short-lived diagnostic process loaded, with `scope=process_bootstrap`. `lifecycle-worker-health readiness` exits 1 with `worker_dependencies_not_implemented`. Unsupported arguments exit 2 without a success payload. Native operations are absent. These diagnostics do not establish a running service, dependency readiness or a consuming worker. Worker responses identify lifecycle as the owning service and declare `task_consumption_enabled=false`.
 
@@ -36,3 +36,15 @@ against late arrivals. The Console cannot call these routes. Apply the worker-ow
 SQL migration as `simulation_owner`; runtime receives only its explicit grants.
 The default image diagnostic remains non-consuming. See the
 [simulation runbook](../../docs/operations/runbooks/durable-simulation.md).
+
+## P07 native adapter components
+
+`lifecycle-native-inspect` checks a protected native binding and pinned Terraform
+bundle; `--observe` reads exact native resource IDs using an independent scoped
+OpenStack identity. See the [native adapter runbook](../../docs/operations/runbooks/openstack-native-adapters.md)
+for the runtime export, immutable inputs, HTTP backend boundary and uncertainty
+holds. The worker owns an append-only native attempt journal and typed saved-plan
+effect protocol. It does not implement Lifecycle's native grant authority, enable
+P06 native execution or expose a CLI apply switch. The reusable module is under
+`terraform/openstack-application/`; commissioning packages it as a separately pinned
+module artifact. No sibling source or historical qualification is imported.

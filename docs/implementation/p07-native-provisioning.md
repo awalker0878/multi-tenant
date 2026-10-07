@@ -38,6 +38,20 @@ and the reviewed native support dossier are not delivered by this preparation.
 P06 continues to expose simulation only. A metadata checker is neither an OpenStack
 adapter nor a substitute for the independent Q05/Q06 campaign.
 
+## Native adapter component increment
+
+The Lifecycle worker now supplies actual saved-plan subprocess and scoped
+OpenStack readback adapters, an append-only PostgreSQL attempt journal and a
+multi-workload Terraform module. The [native adapter runbook](../operations/runbooks/openstack-native-adapters.md)
+records their exact supported boundaries and commands. Native inspection is
+composed into an installed read-only command. The effect protocol is exercised
+through its current-authority port, which still needs product native grant and
+provider-side fencing integration before native dispatch can be enabled. This
+increment supersedes the earlier statement that all adapter code is absent; it
+does not complete native infrastructure execution, service enrollment, activation,
+recovery/retirement or the Q05/Q06 dossier. Existing status and receiving criteria
+remain unchanged until their outputs and observations exist.
+
 The [check matrix](../../verification/p07/check-matrix.md) and
 [original evidence index](../../verification/p07/final/qualification-index.json)
 record 105 preparation tests, isolated installed-command checks and separately
