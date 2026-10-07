@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "evidence_level": "E2",
+  "campaigns": [
+    {
+      "archive": "archives/p08-runtime-components-first.zip",
+      "archive_sha256": "f0e746848701bf19d76b02496891e58dfae747d78eaebe233db3cf9b2464d52b",
+      "kind": "components",
+      "run_id": "37673680953",
+      "artifact_id": "11507145179",
+      "source_revision": "d7d350befb4aab531dd2dfa79a23996e5441c5ff",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37673680953",
+      "result": "PASSED",
+      "source_bindings_verified": 717,
+      "commands": 35,
+      "suites": [
+        {
+          "name": "inventory",
+          "tests": 96,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "planning",
+          "tests": 169,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "lifecycle",
+          "tests": 332,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "worker",
+          "tests": 234,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "inventory-worker",
+          "tests": 62,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "stats": null,
+      "console_tests": null,
+      "report": "reports/p08-runtime-components-first/report.json",
+      "report_sha256": "f87a0fdaf56597d6ad7be4a9c24d454e33319566cd2dec6c0e64ff5830d1f7c6"
+    },
+    {
+      "archive": "archives/p08-runtime-browser-first.zip",
+      "archive_sha256": "ed1d8b658ec51940798eca7b8cf614027d3e685c9b02d31941b9adc7f274e9d4",
+      "kind": "browser",
+      "run_id": "37673680953",
+      "artifact_id": "11506660472",
+      "source_revision": "d7d350befb4aab531dd2dfa79a23996e5441c5ff",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37673680953",
+      "screenshot_file": "migration-fleet-first.png",
+      "result": "PASSED",
+      "source_bindings_verified": 229,
+      "commands": 5,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-07T19:21:16.974Z",
+        "duration": 43119.803,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "console_tests": null,
+      "report": "reports/p08-runtime-browser-first/report.json",
+      "report_sha256": "1348f127170e4440a6ff737901bbe5d602a49c1d5614fa9cb13c1bfc4f864b39"
+    },
+    {
+      "archive": "archives/p08-runtime-console-first.zip",
+      "archive_sha256": "a5226a5512c235b19b5ae4fddd5417bbcc24bed9dedfd590fbc07a3ef33541cc",
+      "kind": "console",
+      "run_id": "37673680946",
+      "artifact_id": "11506775990",
+      "source_revision": "d7d350befb4aab531dd2dfa79a23996e5441c5ff",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37673680946",
+      "console_test_counts": [
+        7,
+        194,
+        920
+      ],
+      "result": "PASS",
+      "source_bindings_verified": 304,
+      "commands": 23,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-07T19:26:01.109Z",
+        "duration": 1471.9250000000002,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "console_tests": {
+        "skipped": 7,
+        "passed": 194,
+        "assertions": 920
+      },
+      "report": "reports/p08-runtime-console-first/report.json",
+      "report_sha256": "da3add7906c2985e400f172dd1bf0628b0a57e4cfade04e2ce0893478c76d57b"
+    },
+    {
+      "archive": "archives/p08-runtime-components.zip",
+      "archive_sha256": "07a0c9f31814d919c8c077243c2a7e696f24966d1e354a135795f9049a75e538",
+      "kind": "components",
+      "run_id": "37675525040",
+      "artifact_id": "11507412042",
+      "source_revision": "7860616293cc0be7a1983ca7bc38529aed5e5b7f",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37675525040",
+      "result": "PASSED",
+      "source_bindings_verified": 719,
+      "commands": 35,
+      "suites": [
+        {
+          "name": "inventory",
+          "tests": 96,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "planning",
+          "tests": 169,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "lifecycle",
+          "tests": 332,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "worker",
+          "tests": 234,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "inventory-worker",
+          "tests": 62,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "stats": null,
+      "console_tests": null,
+      "report": "reports/p08-runtime-components/report.json",
+      "report_sha256": "9322a1f671dd2769fcf134b86475e1b9aa64e72e902ddcd3b22eafd35eacb2f5"
+    },
+    {
+      "archive": "archives/p08-runtime-browser.zip",
+      "archive_sha256": "8297b0376c8a4fd88ed7cdcad8257d82cfbe3b92f68c1166907ab5c323ba9b7e",
+      "kind": "browser",
+      "run_id": "37675525040",
+      "artifact_id": "11506162881",
+      "source_revision": "7860616293cc0be7a1983ca7bc38529aed5e5b7f",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37675525040",
+      "screenshot_file": "migration-fleet.png",
+      "result": "PASSED",
+      "source_bindings_verified": 230,
+      "commands": 5,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-07T19:35:37.504Z",
+        "duration": 41816.932,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "console_tests": null,
+      "report": "reports/p08-runtime-browser/report.json",
+      "report_sha256": "c4ca86a50f0d5bfeed3c32aef227f6fcc759a9cce03ca2cd6984d10b64f2e540"
+    },
+    {
+      "archive": "archives/p08-runtime-console-failure.zip",
+      "archive_sha256": "350c37af77fedba3a5417935a36a98c6cfc194c2e998084fed580ae7fe6ea21c",
+      "kind": "console",
+      "run_id": "37674739577",
+      "artifact_id": "11507176831",
+      "source_revision": "2b0d25ad6e90a906b50fc3993e0fa4b4c8ea3613",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37674739577",
+      "result": "FAIL",
+      "source_bindings_verified": 304,
+      "commands": 15,
+      "suites": [],
+      "stats": null,
+      "console_tests": null,
+      "report": "reports/p08-runtime-console-failure/report.json",
+      "report_sha256": "e316e07801b1f3e89c860dff295ced8f7f58a3ef8be6baf72634b864adc8d818"
+    }
+  ],
+  "native_write_authorized": false,
+  "native_platforms_tested": [],
+  "limitations": [
+    "Real PostgreSQL/TLS and Vue/Inertia browser; synthetic native and current-owner peers.",
+    "Console's seven separate-broker-campaign skips remain skips.",
+    "Account commissioning, complete native composition, physical measurements and Q07/G08 acceptance remain open."
+  ]
+}

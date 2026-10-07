@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Verify original campaign evidence against its exact Git source and archive bytes."""
 
+import argparse
 import hashlib
 import json
 import re
@@ -28,7 +29,7 @@ def source_sha(source, name):
     return sha(subprocess.check_output(["git", "show", source + ":" + name], cwd=ROOT))
 
 
-def verify():
+def verify(screenshot_name="migration-campaign.png", console_expected=(7, 192, 911)):
     campaigns = []
     for item in json.loads((DEST / "manifest.json").read_text()):
         path = DEST / item["archive"]
@@ -102,10 +103,10 @@ def verify():
                     screenshot = next(
                         n
                         for n in archive.namelist()
-                        if n.endswith("/migration-campaign.png")
+                        if n.endswith("/" + screenshot_name)
                     )
                     require(
-                        (DEST / "migration-campaign.png").read_bytes()
+                        (DEST / item.get("screenshot_file", screenshot_name)).read_bytes()
                         == archive.read(screenshot),
                         "screenshot mismatch",
                     )
@@ -119,7 +120,9 @@ def verify():
                     "missing original failure",
                 )
             console_tests = None
-            if item["kind"] == "console":
+            if item["kind"] == "console" and any(
+                c["name"] == "pest" for c in report["commands"]
+            ):
                 command = next(c for c in report["commands"] if c["name"] == "pest")
                 stdout = re.sub(
                     r"\x1b\[[0-9;]*m", "", archive.read(command["stdout"]).decode()
@@ -133,9 +136,17 @@ def verify():
                     zip(("skipped", "passed", "assertions"), map(int, match.groups()))
                 )
                 require(
-                    console_tests == {"skipped": 7, "passed": 192, "assertions": 911},
+                    console_tests
+                    == dict(
+                        zip(
+                            ("skipped", "passed", "assertions"),
+                            item.get("console_test_counts", console_expected),
+                        )
+                    ),
                     "unexpected Console test counts",
                 )
+            if item["kind"] == "console" and passed:
+                require(console_tests is not None, "missing passing Console test run")
             output = DEST / "reports" / path.stem / "report.json"
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_bytes(raw)
@@ -167,7 +178,21 @@ def verify():
 
 
 if __name__ == "__main__":
-    result = verify()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--directory", type=Path, default=DEST)
+    parser.add_argument("--screenshot", default="migration-campaign.png")
+    parser.add_argument(
+        "--console-counts",
+        type=int,
+        nargs=3,
+        default=(7, 192, 911),
+        metavar=("SKIPPED", "PASSED", "ASSERTIONS"),
+    )
+    args = parser.parse_args()
+    DEST = args.directory.resolve()
+    if not DEST.is_relative_to(ROOT / "verification/p08"):
+        parser.error("Evidence directory must be within verification/p08")
+    result = verify(args.screenshot, tuple(args.console_counts))
     (DEST / "qualification-index.json").write_text(json.dumps(result, indent=2) + "\n")
     print(
         json.dumps(
