@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "candidate_sha256": null,
   "selected_tuples": [],
   "prerequisite_reviews": null,

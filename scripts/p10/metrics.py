@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 
-from evidence import number, require
+from evidence import number, require, sha256
 
 
 def summarize(records, tenants, start_ns, end_ns, targets=None):
@@ -83,8 +83,7 @@ def summarize(records, tenants, start_ns, end_ns, targets=None):
             "incomplete_targets",
         )
         require(
-            isinstance(targets["approved_model_sha256"], str)
-            and len(targets["approved_model_sha256"]) == 64,
+            sha256(targets["approved_model_sha256"]),
             "unbound_workload_model",
         )
         for key in (

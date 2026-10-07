@@ -16,6 +16,46 @@ held; exit 1 means an invalid record or read failure. Even a complete packet
 requires independent authentication and review and never authorizes release.
 There is no switch to omit required cases or promote E2 to E3/E4.
 
+Candidate manifests and input packets now use schema version 2. Candidate identity
+hashes the effective source bytes, Git executable modes, component registry and
+root validation lock. The observed Git revision remains provenance outside that
+identity. Committing only `release/p10-inputs.json` or retained evidence therefore
+preserves the candidate; changing source, policy, configuration or executable mode
+requires affected qualification again. Historical version 1 observations remain
+historical and are not silently reinterpreted as version 2 packets.
+
+Keep sensitive native records in a protected evidence bundle outside Git:
+
+```sh
+python scripts/p10/dossier.py --input /protected/p10/inputs.json \
+  --evidence-root /protected/p10 --output /protected/p10-result
+```
+
+Reference paths are relative to that evidence root and must remain bounded regular
+files without symlinks. Candidate source and the component registry still come from
+the clean repository. The checked-in packet has no environment bindings or secrets.
+
+Each case report requires the exact fields demonstrated by the synthetic fixtures
+in `test_qualification.py`: candidate/source/tuple identities, case/result/level/
+environment, integer `checks`, `failed`, `errors`, `skipped`, a timezone-qualified
+`observed_at`, `observer_id`, nonempty measured `scope`, and nonempty `observations`.
+Each original observation uses `{ "path": "relative-file", "sha256": "..." }`;
+the original bytes must be present and hash correctly. Zero checks, malformed
+counters, missing originals and altered originals cannot satisfy a case. A review
+meeting cannot substitute for an exercised native case.
+
+The artifact-set document maps every component ID to its exact `image_sha256`,
+`lock_sha256`, `sbom_sha256`, `provenance_sha256`, `signature_sha256` and
+`trust_root_sha256`, alongside its existing trust/install results. These fingerprints
+identify the artifacts reviewed; original Q09 verification/install observations
+and independent authentication are still required.
+
+Receiving reviews include `reviewed_input_sha256`, produced by
+`dossier.reviewed_input_digest(packet)`. This binds the entire packet except the
+receiving-review list, avoiding a circular hash. Changing selected scope, operating
+inputs or case evidence invalidates the old review even if source is unchanged.
+There is no automatic review generation for actual packets.
+
 The actual input record deliberately contains nulls. Supply content-addressed
 references to the selected qualified tuples, G07/G08/G09 decisions, approved
 workload/SLO model, exact image/lock/SBOM/provenance/signature set, versioned security

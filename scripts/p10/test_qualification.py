@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from dossier import CASES, reconcile
+from dossier import CASES, candidate_digest, reconcile, reviewed_input_digest
 from evidence import Held, bounded_file, canonical, decode, digest, reference
 from metrics import summarize
 from mirror import verify_closure
@@ -18,11 +18,23 @@ class Qualification(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
+        (self.root / "deploy/build").mkdir(parents=True)
+        registry = b'{"components":[{"id":"example"}]}'
+        (self.root / "deploy/build/components.json").write_bytes(registry)
         self.candidate = {
+            "schema_version": 2,
             "source_revision": "a" * 40,
-            "source_bindings": {"services/a.py": "b" * 64},
+            "source_bindings": {
+                "services/a.py": "b" * 64,
+                "deploy/build/components.json": digest(registry),
+            },
+            "source_modes": {
+                "services/a.py": "100644",
+                "deploy/build/components.json": "100644",
+            },
+            "component_registry_sha256": digest(registry),
         }
-        self.candidate["candidate_sha256"] = digest(canonical(self.candidate))
+        self.candidate["candidate_sha256"] = candidate_digest(self.candidate)
         self.sha = self.candidate["candidate_sha256"]
         self.sequence = 0
 
@@ -88,12 +100,8 @@ class Qualification(unittest.TestCase):
                 summarize(broken, ["first"], 0, 10000000)
 
     def packet(self):
-        (self.root / "deploy/build").mkdir(parents=True)
-        (self.root / "deploy/build/components.json").write_text(
-            '{"components":[{"id":"example"}]}'
-        )
         p = {
-            "schema_version": 1,
+            "schema_version": 2,
             "candidate_sha256": self.sha,
             "selected_tuples": ["c" * 64],
             "evidence": [],
@@ -106,12 +114,24 @@ class Qualification(unittest.TestCase):
             },
             "workload_model": {
                 "approved_by": "synthetic_owner",
-                "approved_at": "synthetic_time",
+                "approved_at": "2026-10-07T22:00:00Z",
                 "targets": {"p95": 10},
-                "scope": "fixture",
+                "scope": {"fixture": "synthetic-only"},
             },
             "artifact_set": {
-                "components": ["example"],
+                "components": {
+                    "example": {
+                        key: "d" * 64
+                        for key in (
+                            "image_sha256",
+                            "lock_sha256",
+                            "sbom_sha256",
+                            "provenance_sha256",
+                            "signature_sha256",
+                            "trust_root_sha256",
+                        )
+                    }
+                },
                 "trust_verification": "PASSED",
                 "restricted_install": "PASSED",
             },
@@ -127,8 +147,8 @@ class Qualification(unittest.TestCase):
                 "retention_review": "fixture",
                 "incident_id": "fixture",
                 "alert_id": "fixture",
-                "acknowledged_at": 2,
-                "delivered_at": 1,
+                "acknowledged_at": "2026-10-07T23:01:00Z",
+                "delivered_at": "2026-10-07T23:00:00Z",
             },
         }
         for key, value in docs.items():
@@ -143,27 +163,38 @@ class Qualification(unittest.TestCase):
                         "tuple_digests": p["selected_tuples"],
                         "native_write_authorized": False,
                         "result": "PASSED",
+                        "checks": 1,
                         "failed": 0,
+                        "errors": 0,
                         "skipped": 0,
                         "evidence_level": "E4",
                         "environment": "representative_preproduction",
+                        "observed_at": "2026-10-07T23:00:00Z",
+                        "observer_id": "synthetic-observer",
+                        "scope": {"fixture": "synthetic-only"},
+                        "observations": [self.save({"synthetic": True, "case": case})],
                     }
                 )
             )
+        self.fixture_reviews(p)
+        return p
+
+    def fixture_reviews(self, p):
+        p["receiving_reviews"] = []
         for package in CASES:
             p["receiving_reviews"].append(
                 self.save(
                     {
                         "package_id": package,
                         "candidate_sha256": self.sha,
+                        "reviewed_input_sha256": reviewed_input_digest(p),
                         "decision": "ACCEPTED",
-                        "reviewed_at": "synthetic",
+                        "reviewed_at": "2026-10-07T23:02:00Z",
                         "reviewer_id": "reviewer",
                         "implementer_id": "implementer",
                     }
                 )
             )
-        return p
 
     def test_complete_synthetic_packet_cannot_authorize_release_or_establish_authenticity(
         self,
@@ -191,12 +222,14 @@ class Qualification(unittest.TestCase):
         for change in (
             {"evidence_level": "E2"},
             {"skipped": 1},
+            {"errors": 1},
             {"result": "FAILED"},
             {"environment": "synthetic"},
         ):
             changed = copy.deepcopy(p)
             observation = reference(self.root, p["evidence"][0]) | change
             changed["evidence"][0] = self.save(observation)
+            self.fixture_reviews(changed)
             self.assertEqual(
                 reconcile(self.root, self.candidate, changed)["status"], "HELD"
             )
@@ -212,6 +245,103 @@ class Qualification(unittest.TestCase):
             reconcile(self.root, self.candidate, changed)
         p["evidence"].append(p["evidence"][0])
         with self.assertRaisesRegex(Held, "duplicate"):
+            reconcile(self.root, self.candidate, p)
+
+    def test_case_claim_requires_nonempty_originals_valid_counts_scope_and_time(self):
+        p = self.packet()
+        for change in (
+            {"checks": 0},
+            {"checks": True},
+            {"failed": None},
+            {"errors": -1},
+            {"skipped": False},
+            {"errors": 2},
+            {"observations": []},
+            {"scope": {}},
+            {"observer_id": " "},
+            {"observed_at": "2026-10-07T23:00:00"},
+        ):
+            changed = copy.deepcopy(p)
+            changed["evidence"][0] = self.save(
+                reference(self.root, p["evidence"][0]) | change
+            )
+            self.fixture_reviews(changed)
+            with self.subTest(change=change), self.assertRaises(Held):
+                reconcile(self.root, self.candidate, changed)
+        report = reference(self.root, p["evidence"][0])
+        (self.root / report["observations"][0]["path"]).write_text("changed original")
+        with self.assertRaisesRegex(Held, "changed_evidence"):
+            reconcile(self.root, self.candidate, p)
+
+    def test_receiving_review_cannot_transfer_to_replaced_evidence_or_operating_input(
+        self,
+    ):
+        p = self.packet()
+        for key in ("evidence", "workload_model"):
+            changed = copy.deepcopy(p)
+            ref = changed[key][0] if key == "evidence" else changed[key]
+            doc = reference(self.root, ref)
+            doc.update(scope={"fixture": "changed-scope"})
+            if key == "evidence":
+                changed[key][0] = self.save(doc)
+            else:
+                changed[key] = self.save(doc)
+            with self.subTest(key=key), self.assertRaisesRegex(Held, "changed_review"):
+                reconcile(self.root, self.candidate, changed)
+
+    def test_e3_operational_review_cannot_substitute_for_exercising_native_case(self):
+        p = self.packet()
+        first = reference(self.root, p["evidence"][0])
+        p["evidence"][0] = self.save(
+            first | {"evidence_level": "E3", "environment": "operational_review"}
+        )
+        self.fixture_reviews(p)
+        self.assertEqual(reconcile(self.root, self.candidate, p)["status"], "HELD")
+
+    def test_evidence_may_be_mounted_separately_from_candidate_source(self):
+        import shutil
+
+        p = self.packet()
+        with tempfile.TemporaryDirectory() as directory:
+            source_root = Path(directory)
+            shutil.move(str(self.root / "deploy"), source_root / "deploy")
+            self.assertEqual(
+                reconcile(self.root, self.candidate, p, source_root=source_root)[
+                    "status"
+                ],
+                "PACKET_COMPLETE_REQUIRES_AUTHENTICITY_REVIEW",
+            )
+
+    def test_artifact_names_without_exact_identities_cannot_complete_the_packet(self):
+        p = self.packet()
+        for components in (
+            ["example"],
+            {"example": {}},
+            {"example": {"image_sha256": "d" * 64}},
+        ):
+            changed = copy.deepcopy(p)
+            changed["artifact_set"] = self.save(
+                reference(self.root, p["artifact_set"]) | {"components": components}
+            )
+            with (
+                self.subTest(components=components),
+                self.assertRaisesRegex(Held, "artifact_set_incomplete"),
+            ):
+                reconcile(self.root, self.candidate, changed)
+        (self.root / "deploy/build/components.json").write_text('{"components":[]}')
+        with self.assertRaisesRegex(Held, "candidate_registry_changed"):
+            reconcile(self.root, self.candidate, p)
+
+    def test_alert_acknowledgement_must_follow_delivery_in_absolute_time(self):
+        p = self.packet()
+        p["operating_receipts"] = self.save(
+            reference(self.root, p["operating_receipts"])
+            | {
+                "delivered_at": "2026-10-07T23:00:00-04:00",
+                "acknowledged_at": "2026-10-07T23:30:00Z",
+            }
+        )
+        with self.assertRaisesRegex(Held, "operations_receipt_incomplete"):
             reconcile(self.root, self.candidate, p)
 
     def restore(self):

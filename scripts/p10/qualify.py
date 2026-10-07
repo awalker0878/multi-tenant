@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from dossier import ROOT, freeze, reconcile
-from evidence import canonical, digest
+from evidence import canonical, decode, digest
 from metrics import summarize
 
 
@@ -84,7 +84,7 @@ def main():
             candidate_sha256=candidate["candidate_sha256"],
         )
         (output / "candidate.json").write_bytes(canonical(candidate) + b"\n")
-        packet = json.loads((ROOT / "release/p10-inputs.json").read_bytes())
+        packet = decode((ROOT / "release/p10-inputs.json").read_bytes())
         dossier = reconcile(ROOT, candidate, packet)
         (output / "dossier.json").write_bytes(canonical(dossier) + b"\n")
         report["g10_status"] = dossier["status"]

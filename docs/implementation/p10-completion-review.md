@@ -22,6 +22,19 @@ The tools and exact execution instructions are in
 original logs, JUnit records, frozen source bindings, raw measurements and the
 held release dossier. Green engineering checks never change G10 automatically.
 
+The completion correction adds version 2 candidate and packet binding. Candidate
+identity survives evidence-only commits but includes executable modes and the
+validation dependency lock. Case reports must retain original bytes, scope,
+timestamp and valid nonzero check counts, including errors. Receiving reviews bind
+the exact input packet; replacing observations or workload scope requires a new
+review. Exact component artifact/trust fingerprints replace component-name-only
+declarations. Protected native evidence may be mounted outside the repository.
+
+Worker corrections recheck independent credentials at effect boundaries, permit
+separately enrolled native observation services, and hold VMware/AHV transport
+credential rotation before submission or during response processing. A submitted
+request remains subject to reconciliation; the transport does not replay it.
+
 ## Observed engineering result
 
 [Run 37701090761](https://github.com/awalker0878/multi-tenant/actions/runs/37701090761)

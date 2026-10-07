@@ -9,7 +9,19 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
-from evidence import Held, bounded_file, canonical, decode, digest, reference, require
+from evidence import (
+    Held,
+    bounded_file,
+    canonical,
+    decode,
+    digest,
+    number,
+    reference,
+    referenced_bytes,
+    require,
+    sha256,
+    timestamp,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 PREFIXES = (
@@ -20,9 +32,10 @@ PREFIXES = (
     "deploy/",
     "architecture/",
     "scripts/",
-    ".github/workflows/",
+    ".github/",
     "release/",
     "docs/engineering/",
+    "docs/decisions/",
     "docs/operations/",
     "docs/qualification/",
     "docs/releases/",
@@ -30,6 +43,7 @@ PREFIXES = (
     "docs/implementation/gates.md",
     "docs/implementation/support-matrix.md",
 )
+ROOT_INPUTS = {"requirements-docs.txt", ".gitignore", ".gitattributes", "CONTRIBUTING.md"}
 CASES = {
     "P10.01": ["Q10.01", "Q10.02", "Q10.03", "Q10.04", "Q10.05", "Q09.06"],
     "P10.02": ["Q09.04", "Q09.05", "Q09.07", "Q09.08", "Q09.11", "Q09.12"],
@@ -38,6 +52,20 @@ CASES = {
     "P10.05": ["Q09.01", "Q09.09", "Q09.10", "Q09.13"],
     "P10.06": ["Q10.10"],
 }
+
+
+def candidate_digest(candidate):
+    # Commit provenance is retained but is not executable content. An evidence-only
+    # commit must not invalidate the very candidate to which its reports refer.
+    return digest(
+        canonical(
+            {
+                k: v
+                for k, v in candidate.items()
+                if k not in {"candidate_sha256", "source_revision"}
+            }
+        )
+    )
 
 
 def freeze(root=ROOT):
@@ -49,26 +77,43 @@ def freeze(root=ROOT):
         "candidate_checkout_dirty",
     )
     source = git("rev-parse", "HEAD").decode().strip()
-    paths = git("ls-files", "-z").decode().rstrip("\0").split("\0")
+    entries = git("ls-files", "--stage", "-z").decode().rstrip("\0").split("\0")
+    modes = {}
+    for entry in entries:
+        metadata, path = entry.split("\t", 1)
+        mode, _, stage = metadata.split()
+        if (
+            not (path.startswith(PREFIXES) or path in ROOT_INPUTS)
+            or path == "release/p10-inputs.json"
+        ):
+            continue
+        require(
+            stage == "0" and mode in {"100644", "100755"},
+            "unsupported_candidate_source",
+        )
+        modes[path] = mode
     # Input/review packets are separately hashed; never include a candidate's own digest in its hash.
-    bindings = {
-        p: digest(bounded_file(root, p))
-        for p in paths
-        if p.startswith(PREFIXES) and p != "release/p10-inputs.json"
-    }
+    bindings = {p: digest(bounded_file(root, p)) for p in modes}
     value = {
-        "schema_version": 1,
+        "schema_version": 2,
         "source_revision": source,
         "source_bindings": bindings,
+        "source_modes": modes,
         "component_registry_sha256": digest(
             bounded_file(root, "deploy/build/components.json")
         ),
     }
-    value["candidate_sha256"] = digest(canonical(value))
+    value["candidate_sha256"] = candidate_digest(value)
     return value
 
 
-def reconcile(root, candidate, packet):
+def reviewed_input_digest(packet):
+    return digest(
+        canonical({k: v for k, v in packet.items() if k != "receiving_reviews"})
+    )
+
+
+def reconcile(root, candidate, packet, *, source_root=None):
     require(
         set(packet)
         == {
@@ -86,15 +131,39 @@ def reconcile(root, candidate, packet):
         "invalid_p10_packet",
     )
     require(
-        type(packet["schema_version"]) is int and packet["schema_version"] == 1,
+        type(packet["schema_version"]) is int and packet["schema_version"] == 2,
         "invalid_p10_version",
     )
     expected = candidate["candidate_sha256"]
     require(
-        digest(
-            canonical({k: v for k, v in candidate.items() if k != "candidate_sha256"})
+        set(candidate)
+        == {
+            "schema_version",
+            "source_revision",
+            "source_bindings",
+            "source_modes",
+            "component_registry_sha256",
+            "candidate_sha256",
+        }
+        and type(candidate["schema_version"]) is int
+        and candidate["schema_version"] == 2
+        and isinstance(candidate["source_revision"], str)
+        and re.fullmatch(r"[a-f0-9]{40}", candidate["source_revision"]) is not None
+        and isinstance(candidate["source_bindings"], dict)
+        and bool(candidate["source_bindings"])
+        and all(
+            isinstance(p, str) and sha256(s)
+            for p, s in candidate["source_bindings"].items()
         )
-        == expected,
+        and isinstance(candidate["source_modes"], dict)
+        and set(candidate["source_modes"]) == set(candidate["source_bindings"])
+        and all(
+            mode in {"100644", "100755"} for mode in candidate["source_modes"].values()
+        )
+        and candidate["component_registry_sha256"]
+        == candidate["source_bindings"].get("deploy/build/components.json")
+        and sha256(expected)
+        and candidate_digest(candidate) == expected,
         "candidate_digest_changed",
     )
     holds = []
@@ -130,16 +199,44 @@ def reconcile(root, candidate, packet):
             )
         elif key == "workload_model":
             require(
-                document["approved_by"]
-                and document["approved_at"]
+                isinstance(document["approved_by"], str)
+                and document["approved_by"].strip()
+                and isinstance(document["targets"], dict)
                 and document["targets"]
+                and isinstance(document["scope"], dict)
                 and document["scope"],
                 "unapproved_workload_model",
             )
+            timestamp(document["approved_at"])
+            for target in document["targets"].values():
+                number(target)
         elif key == "artifact_set":
-            registry = decode(bounded_file(root, "deploy/build/components.json"))
+            registry_bytes = bounded_file(
+                source_root or root, "deploy/build/components.json"
+            )
             require(
-                set(document["components"]) == {c["id"] for c in registry["components"]}
+                digest(registry_bytes) == candidate["component_registry_sha256"],
+                "candidate_registry_changed",
+            )
+            registry = decode(registry_bytes)
+            identities = {
+                "image_sha256",
+                "lock_sha256",
+                "sbom_sha256",
+                "provenance_sha256",
+                "signature_sha256",
+                "trust_root_sha256",
+            }
+            require(
+                isinstance(document["components"], dict)
+                and set(document["components"])
+                == {c["id"] for c in registry["components"]}
+                and all(
+                    isinstance(row, dict)
+                    and set(row) == identities
+                    and all(sha256(s) for s in row.values())
+                    for row in document["components"].values()
+                )
                 and document["trust_verification"] == "PASSED"
                 and document["restricted_install"] == "PASSED",
                 "candidate_artifact_set_incomplete",
@@ -148,7 +245,7 @@ def reconcile(root, candidate, packet):
             require(
                 document["verification_standard"]
                 and document["applicability_review"]
-                and not document["open_required_findings"]
+                and document["open_required_findings"] == []
                 and document["custody_review"],
                 "security_findings_open",
             )
@@ -159,13 +256,65 @@ def reconcile(root, candidate, packet):
                 and document["retention_review"]
                 and document["incident_id"]
                 and document["alert_id"]
-                and document["acknowledged_at"] >= document["delivered_at"],
+                and timestamp(document["acknowledged_at"])
+                >= timestamp(document["delivered_at"]),
                 "operations_receipt_incomplete",
             )
     observations = {}
     require(isinstance(packet["evidence"], list), "invalid_evidence_set")
     for ref in packet["evidence"]:
         report = reference(root, ref)
+        require(
+            isinstance(report, dict)
+            and set(report)
+            == {
+                "case_id",
+                "candidate_sha256",
+                "source_bindings",
+                "tuple_digests",
+                "native_write_authorized",
+                "result",
+                "checks",
+                "failed",
+                "errors",
+                "skipped",
+                "evidence_level",
+                "environment",
+                "observations",
+                "observed_at",
+                "observer_id",
+                "scope",
+            },
+            "invalid_case_report",
+        )
+        require(
+            report["case_id"] in {c for cases in CASES.values() for c in cases},
+            "unknown_case",
+        )
+        require(
+            all(
+                type(report[k]) is int and report[k] >= 0
+                for k in ("checks", "failed", "errors", "skipped")
+            )
+            and report["checks"] > 0
+            and sum(report[k] for k in ("failed", "errors", "skipped"))
+            <= report["checks"],
+            "invalid_case_counts",
+        )
+        require(
+            isinstance(report["observer_id"], str)
+            and bool(report["observer_id"].strip())
+            and isinstance(report["scope"], dict)
+            and bool(report["scope"])
+            and isinstance(report["observations"], list)
+            and bool(report["observations"]),
+            "case_observations_missing",
+        )
+        timestamp(report["observed_at"])
+        for original in report["observations"]:
+            require(
+                bool(referenced_bytes(root, original)), "empty_original_observation"
+            )
         require(report["case_id"] not in observations, "duplicate_case_observation")
         require(
             report["candidate_sha256"] == expected
@@ -186,8 +335,17 @@ def reconcile(root, candidate, packet):
         require(
             review["package_id"] in CASES
             and review["package_id"] not in reviews
-            and review["candidate_sha256"] == expected,
+            and review["candidate_sha256"] == expected
+            and review["reviewed_input_sha256"] == reviewed_input_digest(packet),
             "ambiguous_or_changed_review",
+        )
+        timestamp(review["reviewed_at"])
+        require(
+            all(
+                isinstance(review[k], str) and review[k].strip()
+                for k in ("reviewer_id", "implementer_id")
+            ),
+            "invalid_review_identity",
         )
         reviews[review["package_id"]] = review
     packages = []
@@ -201,15 +359,16 @@ def reconcile(root, candidate, packet):
             elif (
                 row["result"] != "PASSED"
                 or row["failed"]
+                or row["errors"]
                 or row["skipped"]
                 or row["evidence_level"]
                 not in ({"E4"} if minimum == "E4" else {"E3", "E4"})
                 or row["environment"]
-                not in {
-                    "representative_preproduction",
-                    "qualified_native_lab",
-                    "operational_review",
-                }
+                not in (
+                    {"representative_preproduction", "operational_review"}
+                    if minimum == "E4"
+                    else {"representative_preproduction", "qualified_native_lab"}
+                )
             ):
                 reasons.append(
                     case + ":required_native_or_operational_evidence_missing"
@@ -220,6 +379,7 @@ def reconcile(root, candidate, packet):
             or review["decision"] != "ACCEPTED"
             or not review["reviewed_at"]
             or not review["reviewer_id"]
+            or not review["implementer_id"]
             or review["reviewer_id"] == review["implementer_id"]
         ):
             reasons.append("independent_receiving_review_missing")
@@ -231,7 +391,7 @@ def reconcile(root, candidate, packet):
             }
         )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "candidate_sha256": expected,
         "source_revision": candidate["source_revision"],
         "observed_at": datetime.now(timezone.utc).isoformat(),
@@ -255,12 +415,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=ROOT / "release/p10-inputs.json")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--evidence-root",
+        type=Path,
+        default=ROOT,
+        help="Root of the protected local evidence bundle; may be outside Git",
+    )
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     try:
         candidate = freeze()
-        packet = decode(args.input.read_bytes())
-        result = reconcile(ROOT, candidate, packet)
+        packet = decode(bounded_file(args.input.absolute().parent, args.input.name))
+        result = reconcile(args.evidence_root, candidate, packet, source_root=ROOT)
         (args.output / "candidate.json").write_bytes(canonical(candidate) + b"\n")
         (args.output / "dossier.json").write_bytes(canonical(result) + b"\n")
         print(
