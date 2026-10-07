@@ -9,7 +9,12 @@ from collections.abc import Callable
 from typing import Any, Protocol
 from uuid import uuid4
 
-from lifecycle.application.campaigns import Campaigns, stage_admission, stage_complete
+from lifecycle.application.campaigns import (
+    Campaigns,
+    campaign_boundary,
+    stage_admission,
+    stage_complete,
+)
 from lifecycle.application.reservations import Database, Transaction
 from lifecycle.domain.admission import digest
 from lifecycle.domain.execution import Rejected, identity
@@ -375,6 +380,7 @@ class NativeWorkflow:
                 raise Rejected("native_grant_already_redeemed", 423)
             if binding["expires_at"] <= self.clock():
                 raise Rejected("native_grant_expired", 423)
+            campaign_boundary(tx, binding["job_id"], binding["stage"], self.clock())
             return {
                 "binding_sha256": digest(binding),
                 "epoch": row["plan"]["epoch"],

@@ -25,3 +25,11 @@ from lifecycle.domain.migration import BEFORE, AFTER
 from lifecycle_worker.application.migration_runtime import MIGRATION_STAGES
 assert set(BEFORE) == set(AFTER) == MIGRATION_STAGES
 print('Lifecycle prerequisites/results and isolated worker stage registry agree exactly.')
+
+campaign = json.loads((ROOT / 'contracts/openapi/lifecycle-migration-campaigns-v1.json').read_text())
+validate_spec(campaign)
+validator = Draft202012Validator({'$ref': '#/components/schemas/CommandRequest', 'components': campaign['components']}, format_checker=FormatChecker())
+validator.validate({'action': 'pause', 'expected_revision': 1})
+for negative in ({'action': 'force', 'expected_revision': 1}, {'action': 'schedule', 'expected_revision': True}, {'action': 'cancel', 'expected_revision': 1, 'release_allocations': True}):
+    assert list(validator.iter_errors(negative))
+print('Migration campaign contract is valid; bypass commands are denied.')

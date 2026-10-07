@@ -1,6 +1,5 @@
 """Migration schedules and measured stage admission; these rules grant no native authority."""
 
-import math
 import re
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -184,6 +183,35 @@ def performance_sample(value: Any, now: int) -> dict[str, Any]:
     return dict(value)
 
 
+def phase_estimate(
+    samples: list[dict[str, Any]], phase: str, amount: int
+) -> tuple[int | None, str | None]:
+    latest = max((s["observed_at"] for s in samples), default=-1)
+    if any(not s["production_impact_ok"] for s in samples if s["observed_at"] == latest):
+        return None, "production_impact_exceeded_" + phase
+    current = [s for s in samples if s["production_impact_ok"]]
+    if not current:
+        return None, "measurement_required_" + phase
+    if phase in BYTE_PHASES:
+        # Integer arithmetic also avoids losing byte precision on very large disks.
+        duration_ms = max(
+            (amount * s["elapsed_ms"] + s["bytes"] - 1) // s["bytes"] for s in current
+        )
+    else:
+        duration_ms = max(s["elapsed_ms"] for s in current)
+    return max(1, (duration_ms * 5 + 3999) // 4000), None
+
+
+def comparable(
+    samples: list[dict[str, Any]], route: str, now: int
+) -> dict[tuple[str, int], list[dict[str, Any]]]:
+    grouped: dict[tuple[str, int], list[dict[str, Any]]] = {}
+    for sample in samples:
+        if sample["route_sha256"] == route and sample["observed_at"] <= now < sample["expires_at"]:
+            grouped.setdefault((sample["phase"], sample["concurrency"]), []).append(sample)
+    return grouped
+
+
 def estimate(
     samples: list[dict[str, Any]], route: str, sizes: dict[str, int], now: int, concurrency: int = 1
 ) -> dict[str, Any]:
@@ -191,49 +219,61 @@ def estimate(
     checksum(route)
     bounded(concurrency, 1, 1000)
     exact(sizes, set(PHASES))
+    grouped = comparable(samples, route, now)
     phases: dict[str, int | None] = {}
     holds = []
     for phase in PHASES:
-        amount = integer(sizes[phase])
-        current = [
-            s
-            for s in samples
-            if s["route_sha256"] == route
-            and s["phase"] == phase
-            and s["concurrency"] == concurrency
-            and s["observed_at"] <= now
-            and s["expires_at"] > now
-            and s["production_impact_ok"]
-        ]
-        recent = [
-            s
-            for s in samples
-            if s["route_sha256"] == route
-            and s["phase"] == phase
-            and s["concurrency"] == concurrency
-            and s["observed_at"] <= now
-            and s["expires_at"] > now
-        ]
-        unsafe = (
-            bool(recent) and not max(recent, key=lambda s: s["observed_at"])["production_impact_ok"]
+        duration, reason = phase_estimate(
+            grouped.get((phase, concurrency), []), phase, integer(sizes[phase])
         )
-        if unsafe:
-            phases[phase] = None
-            holds.append("production_impact_exceeded_" + phase)
-        elif not current:
-            phases[phase] = None
-            holds.append("measurement_required_" + phase)
-        elif phase in BYTE_PHASES:
-            slowest = min(s["bytes"] * 1000 / s["elapsed_ms"] for s in current)
-            phases[phase] = max(1, math.ceil(amount / slowest * 1.25))
-        else:
-            phases[phase] = max(1, math.ceil(max(s["elapsed_ms"] for s in current) / 1000 * 1.25))
+        phases[phase] = duration
+        if reason:
+            holds.append(reason)
     return {
         "phases": phases,
         "total_seconds": None if holds else sum(v or 0 for v in phases.values()),
         "holds": holds,
         "margin_percent": 25,
         "concurrency": concurrency,
+    }
+
+
+def campaign_estimate(
+    samples: list[dict[str, Any]], spec: dict[str, Any], settings: dict[str, Any], now: int
+) -> dict[str, Any]:
+    """Bound each phase at every allowed occupancy; a limit alone is not a benchmark."""
+    from lifecycle.domain.migration import stages
+
+    required = {STAGE_PHASE[s] for s in stages(spec)}
+    grouped = comparable(samples, spec["route_sha256"], now)
+    phases: dict[str, int | None] = {}
+    holds = []
+    for phase in PHASES:
+        if phase not in required:
+            phases[phase] = 0
+            continue
+        values, reasons = [], []
+        for occupancy in range(1, min(settings["max_active"], settings["phase_limits"][phase]) + 1):
+            duration, reason = phase_estimate(
+                grouped.get((phase, occupancy), []), phase, spec["sizes"][phase]
+            )
+            if reason:
+                reasons.append(f"{reason}_concurrency_{occupancy}")
+            if duration is not None:
+                values.append(duration)
+        if reasons:
+            holds.append(reasons[0])
+        phases[phase] = None if reasons else max(values)
+    cold = spec["method"] == "VM_COLD_EXPORT"
+    # Capture also interrupts a warm source. A qualified restart/delta is still required.
+    outage = list(phases.values()) if cold else [phases["capture"], phases["cutover"]]
+    return {
+        "phases": phases,
+        "total_seconds": None if holds else sum(v or 0 for v in phases.values()),
+        "outage_seconds": None if any(v is None for v in outage) else sum(v or 0 for v in outage),
+        "holds": holds,
+        "margin_percent": 25,
+        "phase_limits": settings["phase_limits"],
     }
 
 

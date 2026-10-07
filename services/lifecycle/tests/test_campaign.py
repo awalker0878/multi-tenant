@@ -13,6 +13,7 @@ from lifecycle.application.native_workflow import NativeWorkflow
 from lifecycle.domain.admission import digest
 from lifecycle.domain.campaign import (
     PHASES,
+    campaign_estimate,
     capacity_holds,
     dependency_order,
     estimate,
@@ -123,6 +124,31 @@ def test_resource_admission_counts_outstanding_allocations() -> None:
     assert capacity_holds({"unknown": 1}, {"p": 10}, {}) == ["unknown"]
 
 
+def test_phase_concurrency_requires_every_occupancy_and_ignores_unused_cutover() -> None:
+    m = member(migration_plan())
+    m["mode"] = "rehearsal"
+    s = settings()
+    samples = [sample(p) for p in PHASES if p != "cutover"]
+    assert campaign_estimate(samples, m, s, 1000)["holds"] == []
+    s["phase_limits"]["transfer"] = 2
+    assert campaign_estimate(samples, m, s, 1000)["holds"] == [
+        "measurement_required_transfer_concurrency_2"
+    ]
+    samples.append(sample("transfer") | {"concurrency": 2, "elapsed_ms": 8000})
+    assert campaign_estimate(samples, m, s, 1000)["phases"]["transfer"] == 10
+    result = campaign_estimate(samples, m, s, 1000)
+    assert result["outage_seconds"] == result["total_seconds"]
+
+
+def test_same_timestamp_unsafe_measurement_always_wins() -> None:
+    good, bad = sample(), sample() | {"production_impact_ok": False}
+    for samples in ([good, bad], [bad, good]):
+        assert (
+            "production_impact_exceeded_transfer"
+            in estimate(samples, digest("route"), {p: 1 for p in PHASES}, 1000)["holds"]
+        )
+
+
 def prepared(
     database: Any, postgres: dict[str, Any]
 ) -> tuple[Campaigns, dict[str, Any], dict[str, Any], str]:
@@ -189,3 +215,91 @@ def test_cancel_keeps_active_allocations_and_stops_queued_starts(
             0,
         )
     assert campaigns.read(tenant, campaign)["members"][0]["state"] == "admitted"
+
+
+def test_pause_revokes_a_prepared_campaign_grant(database: Any, postgres: dict[str, Any]) -> None:
+    from lifecycle.domain.native_workflow import api_stage
+
+    campaigns, plan, m, campaign = prepared(database, postgres)
+    workflow = NativeWorkflow(database, MigrationOwners(plan), lambda: 1000)
+    tenant = plan["scope"]["tenant_id"]
+    job = workflow.admit(plan, str(uuid4()), (campaign, m["id"]))
+    binding = workflow.prepare(tenant, job, "source_prepare")
+    campaigns.command(tenant, campaign, plan["actor_id"], str(uuid4()), "pause", 3)
+    with pytest.raises(Rejected, match="campaign_paused"):
+        workflow.boundary(
+            tenant,
+            binding,
+            plan["executor_id"],
+            "before_api_sequence" if api_stage(plan, "source_prepare") else "before_effect",
+        )
+    with psycopg.connect(**postgres) as c:
+        assert c.execute("SELECT count(*) FROM app.native_redemptions").fetchone() == (0,)
+
+
+def test_fair_dispatch_reaches_ready_members_behind_waiting_members(
+    database: Any, postgres: dict[str, Any]
+) -> None:
+    from lifecycle.application.campaign_dispatch import CampaignDispatcher
+
+    campaigns, plan, _, old = prepared(database, postgres)
+    tenant = plan["scope"]["tenant_id"]
+    campaigns.command(tenant, old, plan["actor_id"], str(uuid4()), "cancel", 2)
+    first = member(plan) | {"not_before": 1200, "priority": 100}
+    second = member(plan)
+    scope = {k: plan["scope"][k] for k in ("site_id", "environment", "resource_id")}
+    campaign = campaigns.create(
+        tenant, plan["actor_id"], scope, settings(), [first, second], str(uuid4())
+    )["id"]
+    campaigns.command(tenant, campaign, plan["actor_id"], str(uuid4()), "schedule", 1)
+    dispatch = CampaignDispatcher(
+        campaigns,
+        NativeWorkflow(database, MigrationOwners(plan), lambda: 1000),
+        lambda tenant, ref: plan,
+    )
+    assert dispatch.tick(1) == {"admitted": 0, "waiting": 1}
+    assert dispatch.tick(1) == {"admitted": 1, "waiting": 0}
+
+
+def test_pool_pause_applies_to_prepared_work_and_release_requires_independent_cleanup(
+    database: Any, postgres: dict[str, Any]
+) -> None:
+    campaigns, plan, m, campaign = prepared(database, postgres)
+    tenant, observer = plan["scope"]["tenant_id"], str(uuid4())
+    workflow = NativeWorkflow(database, MigrationOwners(plan), lambda: 1000)
+    job = workflow.admit(plan, str(uuid4()), (campaign, m["id"]))
+    pool = next(iter(m["demands"]))
+    value = {
+        "pool_key": pool,
+        "capacity": 10000,
+        "paused": True,
+        "observed_at": 1000,
+        "expires_at": 1100,
+        "evidence_sha256": digest("pause"),
+    }
+    key = str(uuid4())
+    campaigns.capacity(tenant, observer, key, value)
+    campaigns.capacity(tenant, observer, key, value)
+    assert workflow.checkpoint(tenant, job)["reason"] == "campaign_resource_observation_required"
+    with pytest.raises(Rejected, match="capacity_observation_conflict"):
+        campaigns.capacity(tenant, observer, key, value | {"paused": False})
+    release = {
+        "member_id": m["id"],
+        "pool_key": pool,
+        "observed_at": 1000,
+        "evidence_sha256": digest("cleanup"),
+        "unused": True,
+        "provider_requests_quiescent": True,
+    }
+    with pytest.raises(Rejected, match="independent_terminal_cleanup_required"):
+        campaigns.release(tenant, observer, release)
+    with psycopg.connect(**postgres, autocommit=True) as c:
+        c.execute("UPDATE app.migration_members SET state='complete' WHERE id=%s", (m["id"],))
+    with pytest.raises(Rejected, match="independent_terminal_cleanup_required"):
+        campaigns.release(tenant, plan["executor_id"], release)
+    campaigns.release(tenant, observer, release)
+    campaigns.release(tenant, observer, release)
+    with psycopg.connect(**postgres) as c:
+        assert c.execute("SELECT count(*) FROM app.migration_allocation_releases").fetchone() == (
+            1,
+        )

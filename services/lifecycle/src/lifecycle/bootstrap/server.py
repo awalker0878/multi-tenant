@@ -7,7 +7,9 @@ from collections.abc import Sequence
 import uvicorn
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
+from lifecycle.application.campaigns import Campaigns
 from lifecycle.application.execution import Execution
+from lifecycle.infrastructure.campaign_observers import CampaignObservers
 from lifecycle.infrastructure.execution_owners import (
     EvidenceCustody,
     ExecutionOwners,
@@ -16,6 +18,8 @@ from lifecycle.infrastructure.execution_owners import (
 from lifecycle.infrastructure.foundation import database_ready
 from lifecycle.infrastructure.store import Postgres
 from lifecycle.infrastructure.telemetry import BoundedSignalBuffer
+from lifecycle.interfaces.campaign_observations import CampaignObservationApp
+from lifecycle.interfaces.campaigns import CampaignApp, plan_requirements
 from lifecycle.interfaces.execution import ExecutionApp
 from lifecycle.interfaces.http import FoundationApp
 from lifecycle.interfaces.telemetry import RequestTelemetry
@@ -34,12 +38,27 @@ def execution_service() -> Execution:
 class Router:
     def __init__(self) -> None:
         self.execution = ExecutionApp(execution_service(), ExecutionOwners())
+        owners = ExecutionOwners()
+        self.campaigns = CampaignApp(
+            Campaigns(Postgres(), lambda: int(time.time())),
+            owners,
+            lambda tenant, ref: plan_requirements(
+                owners.plan(tenant, ref["plan_id"], ref["plan_revision"]), ref, tenant
+            ),
+        )
+        self.campaign_observations = CampaignObservationApp(
+            Campaigns(Postgres(), lambda: int(time.time())), CampaignObservers().authorize
+        )
         self.foundation = FoundationApp(database_ready)
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        if scope["type"] == "http" and scope["path"].startswith(("/v1/", "/internal/")):
+        if scope["type"] == "http" and "/migration-observations/" in scope["path"]:
+            await self.campaign_observations(scope, receive, send)
+        elif scope["type"] == "http" and "/migration-campaigns" in scope["path"]:
+            await self.campaigns(scope, receive, send)
+        elif scope["type"] == "http" and scope["path"].startswith(("/v1/", "/internal/")):
             await self.execution(scope, receive, send)
         else:
             await self.foundation(scope, receive, send)

@@ -26,12 +26,55 @@ observation. Completion does not release staging/rollback retention. Cancellatio
 removes queued starts and preserves active native jobs and their custody; native
 stop/recovery remains an explicit separate operation.
 
-This increment implements the domain and transactional integration. Authenticated
-campaign endpoints, actual measured sample publication, independent capacity
-publication, connection commissioning, complete Planning composition and the
-Console journey are subsequent required integration work. Browser-supplied claims
-must never serve as measured rates, native capacity, current owner evidence or
-secret values.
+Lifecycle now exposes scoped campaign create/read/list/command endpoints and
+separate internal performance, capacity and cleanup-observation endpoints. Console
+requests resolve requirements from authenticated immutable Planning records; sizes,
+routes and resource demands cannot be supplied by the browser. Complete operational
+migration plans remain required. Existing preparation-only records cannot be scheduled.
+
+The native worker factory accepts an explicit campaign dispatcher and commissioned
+plan source. Pending members are considered fairly across dispatch passes, so a
+blocked high-priority member cannot starve ready members. Current native owners
+are still rechecked by native admission. This does not commission a writer or
+fill missing Planning/native-owner composition.
+
+Each phase requires measurements at every occupancy up to its configured limit.
+Stage limits apply across campaigns sharing the route and honor the stricter
+active limit. Redundancy/outage groups exclude simultaneous admissions across a
+tenant's campaigns. Pause, window, current measurement and pool-observation checks
+also apply at worker effect boundaries. Independent reconciliation remains readable
+after a pause. Uncertain effects retain their native operation and reservations.
+
+Observation publishers use the separately mounted
+`LIFECYCLE_CAMPAIGN_OBSERVERS_FILE` registry, re-read on every publication. Version 1
+contains `schema_version: 1` and `grants`; each grant contains `tenant_id`,
+`observer_id`, `token_file`, `expires_at`, `kind` (`performance`, `capacity` or
+`release`) and `resources` (exact route digests or pool keys). Tokens must be
+distinct per grant. Paths are trusted deployment inputs, not request fields.
+Performance reports must be measurements from the commissioned route/phase at the
+reported concurrency, with retained evidence and measured production impact. The
+ingress does not perform a benchmark or manufacture native observations.
+
+Pool capacity is a total migration budget net of unrelated usage; current
+allocations are subtracted by Lifecycle. Publishers must refresh within five
+minutes; paused or stale observations hold work. Shared pools use the minimum
+current budget across their tenant observations. Physical pools must have stable
+shared keys, while tenant quota pools must include the tenant in their identity.
+Release requires a separately scoped independent publisher, a completed member,
+fresh evidence of unused resources and drained provider requests. Cancel never
+releases active allocations. Retained artifacts stay reserved until observed cleanup.
+
+Environment/account commissioning, native measurement producers, complete Planning
+composition and the Console journey remain required integration work.
+
+## Qualification corrections
+
+Commit `9c1adaa3ade546b4f187420ee588204f128387e1` passed the hosted P08 PostgreSQL
+test command and the existing migration browser journeys, but the overall P08
+run `37650245430` failed its formatting check. The original failure remains in
+GitHub Actions. Commit `f29325f6b97c4118a3db80ca077d2659d921a388` corrects only
+the required test formatting. Subsequent results must be bound to their tested
+source; none of these component checks establish native qualification.
 
 ## Remaining scope to close
 

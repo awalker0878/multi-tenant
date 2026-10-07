@@ -15,9 +15,9 @@ from lifecycle.domain.campaign import (
     PHASES,
     STAGE_PHASE,
     bounded,
+    campaign_estimate,
     capacity_holds,
     dependency_order,
-    estimate,
     next_window,
     performance_sample,
     resource_demands,
@@ -246,10 +246,10 @@ class Campaigns:
                         "reason": m["reason"],
                         "job_id": str(m["job"]) if m["job"] else None,
                         "specification": m["specification"],
-                        "estimate": estimate(
+                        "estimate": campaign_estimate(
                             [s["sample"] for s in samples],
-                            m["specification"]["route_sha256"],
-                            m["specification"]["sizes"],
+                            m["specification"],
+                            row["settings"],
                             self.clock(),
                         ),
                     }
@@ -257,6 +257,28 @@ class Campaigns:
                 ],
                 "native_write_authorized": False,
             }
+
+    def list(self, tenant: str, scope: dict[str, Any]) -> list[dict[str, Any]]:
+        identity(tenant)
+        exact(scope, {"site_id", "environment", "resource_id"})
+        for value in scope.values():
+            identity(value)
+        with self.database.transaction() as tx:
+            rows = tx.all(
+                "SELECT id,state,revision,settings,created_at FROM app.migration_campaigns "
+                "WHERE tenant=%s AND scope=%s::jsonb ORDER BY created_at DESC,id DESC LIMIT 101",
+                (tenant, encode(scope)),
+            )
+        return [
+            {
+                "id": str(r["id"]),
+                "state": r["state"],
+                "revision": r["revision"],
+                "name": r["settings"]["name"],
+                "created_at": r["created_at"],
+            }
+            for r in rows
+        ]
 
     def sample(self, tenant: str, worker: str, key: str, value: dict[str, Any]) -> None:
         performance_sample(value, self.clock())
@@ -291,6 +313,105 @@ class Campaigns:
                 ),
             )
 
+    def capacity(self, tenant: str, observer: str, key: str, value: dict[str, Any]) -> None:
+        exact(
+            value,
+            {"pool_key", "capacity", "paused", "observed_at", "expires_at", "evidence_sha256"},
+        )
+        identity(tenant)
+        identity(observer)
+        identity(key)
+        resource_demands({value["pool_key"]: 1})
+        bounded(value["capacity"], 0, 2**60)
+        checksum(value["evidence_sha256"])
+        now = self.clock()
+        if type(value["paused"]) is not bool:
+            raise Rejected("invalid_capacity_observation", 422)
+        if (
+            not 0 <= now - integer(value["observed_at"]) <= 60
+            or not now < integer(value["expires_at"]) <= value["observed_at"] + 300
+        ):
+            raise Rejected("capacity_observation_stale", 423)
+        with self.database.transaction() as tx:
+            tx.execute("SELECT pg_advisory_xact_lock(%s)", (LOCK,))
+            row = tx.one("SELECT * FROM app.migration_pool_observations WHERE id=%s", (key,))
+            if row:
+                if (
+                    str(row["tenant"]) != tenant
+                    or str(row["observer"]) != observer
+                    or any(row[k] != v for k, v in value.items())
+                ):
+                    raise Rejected("capacity_observation_conflict", 409)
+                return
+            tx.execute(
+                "INSERT INTO app.migration_pool_observations VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (
+                    key,
+                    tenant,
+                    value["pool_key"],
+                    value["capacity"],
+                    value["paused"],
+                    value["observed_at"],
+                    value["expires_at"],
+                    value["evidence_sha256"],
+                    observer,
+                ),
+            )
+
+    def release(self, tenant: str, observer: str, value: dict[str, Any]) -> None:
+        exact(
+            value,
+            {
+                "member_id",
+                "pool_key",
+                "observed_at",
+                "evidence_sha256",
+                "unused",
+                "provider_requests_quiescent",
+            },
+        )
+        identity(tenant)
+        identity(observer)
+        identity(value["member_id"])
+        checksum(value["evidence_sha256"])
+        resource_demands({value["pool_key"]: 1})
+        if (
+            value["unused"] is not True
+            or value["provider_requests_quiescent"] is not True
+            or not 0 <= self.clock() - integer(value["observed_at"]) <= 5
+        ):
+            raise Rejected("current_unused_capacity_observation_required", 423)
+        with self.database.transaction() as tx:
+            tx.execute("SELECT pg_advisory_xact_lock(%s)", (LOCK,))
+            member = tx.one(
+                "SELECT m.*,j.plan FROM app.migration_members m JOIN app.native_jobs j "
+                "ON j.id=m.job WHERE m.id=%s AND m.tenant=%s",
+                (value["member_id"], tenant),
+            )
+            if member is None:
+                raise Rejected("not_found", 404)
+            if observer == member["plan"]["executor_id"] or member["state"] != "complete":
+                raise Rejected("independent_terminal_cleanup_required", 423)
+            allocated = tx.one(
+                "SELECT amount FROM app.migration_allocations WHERE member=%s AND pool_key=%s",
+                (value["member_id"], value["pool_key"]),
+            )
+            if allocated is None:
+                raise Rejected("not_found", 404)
+            prior = tx.one(
+                "SELECT evidence_sha256 FROM app.migration_allocation_releases "
+                "WHERE member=%s AND pool_key=%s",
+                (value["member_id"], value["pool_key"]),
+            )
+            if prior and prior["evidence_sha256"] != value["evidence_sha256"]:
+                raise Rejected("capacity_release_conflict", 409)
+            if not prior:
+                tx.execute(
+                    "INSERT INTO app.migration_allocation_releases VALUES(%s,%s,%s,%s)",
+                    (value["member_id"], value["pool_key"], value["evidence_sha256"], self.clock()),
+                )
+                self.event(tx, str(member["campaign"]), observer, "allocation_released", value)
+
     def eligible(self, tx: Transaction, tenant: str, campaign: str, member: str) -> dict[str, Any]:
         row = load_campaign(tx, tenant, campaign)
         if row["state"] != "scheduled":
@@ -313,10 +434,14 @@ class Campaigns:
         active = [m for m in members if m["state"] in {"admitted", "held"}]
         if len(active) >= settings["max_active"]:
             raise Rejected("campaign_concurrency_wait", 423)
-        if spec["outage_group"] and any(
-            m["specification"]["outage_group"] == spec["outage_group"] for m in active
-        ):
-            raise Rejected("campaign_outage_group_wait", 423)
+        if spec["outage_group"]:
+            group = tx.one(
+                "SELECT id FROM app.migration_members WHERE tenant=%s AND "
+                "specification->>'outage_group'=%s AND state IN ('admitted','held') LIMIT 1",
+                (tenant, spec["outage_group"]),
+            )
+            if group:
+                raise Rejected("campaign_outage_group_wait", 423)
         if (
             now < spec["not_before"]
             or row["last_started_at"] is not None
@@ -328,9 +453,7 @@ class Campaigns:
             "tenant=%s AND route_sha256=%s AND observed_at>%s ORDER BY observed_at DESC LIMIT 1000",
             (tenant, spec["route_sha256"], now - 7 * 86400),
         )
-        prediction = estimate(
-            [s["sample"] for s in samples], spec["route_sha256"], spec["sizes"], now
-        )
+        prediction = campaign_estimate([s["sample"] for s in samples], spec, settings, now)
         if prediction["holds"]:
             raise Rejected("campaign_measurement_required", 423)
         duration = prediction["total_seconds"]
@@ -340,10 +463,13 @@ class Campaigns:
         ):
             raise Rejected("campaign_window_wait", 423)
         observations = tx.all(
-            "SELECT DISTINCT ON(pool_key) pool_key,capacity,paused,expires_at "
-            "FROM app.migration_pool_observations WHERE tenant=%s ORDER BY "
-            "pool_key,observed_at DESC",
-            (tenant,),
+            "SELECT pool_key,min(capacity) AS capacity,bool_or(paused) AS paused,"
+            "min(expires_at) AS expires_at FROM (SELECT DISTINCT ON(tenant,pool_key) "
+            "tenant,pool_key,capacity,paused,expires_at FROM app.migration_pool_observations "
+            "WHERE pool_key=ANY(%s) ORDER BY tenant,pool_key,observed_at DESC,"
+            "paused DESC,capacity,expires_at) latest "
+            "GROUP BY pool_key HAVING bool_or(tenant=%s)",
+            (list(spec["demands"]), tenant),
         )
         capacity = {
             o["pool_key"]: o["capacity"]
@@ -403,30 +529,91 @@ class Campaigns:
         )
 
 
-def stage_admission(tx: Transaction, job: str, stage: str, operation: str | None, now: int) -> None:
+def campaign_boundary(tx: Transaction, job: str, stage: str, now: int) -> dict[str, Any] | None:
     member = tx.one(
         "SELECT m.*,c.settings,c.state AS campaign_state FROM "
         "app.migration_members m JOIN app.migration_campaigns c ON c.id=m.campaign WHERE m.job=%s",
         (job,),
     )
     if member is None:
-        return  # Standalone native plans keep their independently approved admission path.
+        return None  # Standalone plans retain their independently approved admission path.
     if member["campaign_state"] != "scheduled":
         raise Rejected("campaign_paused", 423)
     phase = STAGE_PHASE.get(stage)
     if phase is None:
         raise Rejected("campaign_stage_not_supported", 423)
-    active = tx.one(
-        "SELECT count(*) AS n FROM app.migration_stage_slots s JOIN "
-        "app.migration_members m ON m.id=s.member LEFT JOIN "
-        "app.migration_stage_releases r ON r.operation=s.operation WHERE "
-        "m.campaign=%s AND s.phase=%s AND r.operation IS NULL",
-        (member["campaign"], phase),
+    if (
+        next_window(
+            member["settings"],
+            now,
+            1,
+            phase == "cutover" or member["specification"]["method"] == "VM_COLD_EXPORT",
+        )
+        != now
+    ):
+        raise Rejected("campaign_window_closed", 423)
+    # Capacity/impact stops apply to an already prepared grant as well as new admissions.
+    samples = tx.all(
+        "SELECT sample FROM app.migration_performance_samples WHERE tenant=%s "
+        "AND route_sha256=%s AND observed_at>%s ORDER BY observed_at DESC LIMIT 1000",
+        (member["tenant"], member["specification"]["route_sha256"], now - 7 * 86400),
     )
-    if active and active["n"] >= member["settings"]["phase_limits"][phase]:
+    prediction = campaign_estimate(
+        [s["sample"] for s in samples], member["specification"], member["settings"], now
+    )
+    if prediction["phases"][phase] is None:
+        raise Rejected("campaign_stage_measurement_required", 423)
+    observations = tx.all(
+        "SELECT DISTINCT ON(tenant,pool_key) tenant,pool_key,paused,expires_at "
+        "FROM app.migration_pool_observations WHERE pool_key=ANY(%s) "
+        "ORDER BY tenant,pool_key,observed_at DESC,paused DESC,expires_at",
+        (list(member["specification"]["demands"]),),
+    )
+    if any(o["paused"] or o["expires_at"] <= now for o in observations) or {
+        o["pool_key"] for o in observations if str(o["tenant"]) == str(member["tenant"])
+    } != set(member["specification"]["demands"]):
+        raise Rejected("campaign_resource_observation_required", 423)
+    return member
+
+
+def stage_admission(tx: Transaction, job: str, stage: str, operation: str | None, now: int) -> None:
+    member = campaign_boundary(tx, job, stage, now)
+    if member is None:
+        return
+    phase = STAGE_PHASE[stage]
+    active = tx.all(
+        "SELECT m.campaign,c.settings FROM app.migration_stage_slots s JOIN "
+        "app.migration_members m ON m.id=s.member JOIN app.migration_campaigns c "
+        "ON c.id=m.campaign "
+        "LEFT JOIN "
+        "app.migration_stage_releases r ON r.operation=s.operation WHERE "
+        "m.specification->>'route_sha256'=%s AND s.phase=%s AND r.operation IS NULL",
+        (member["specification"]["route_sha256"], phase),
+    )
+    limit = min(
+        min(r["settings"]["max_active"], r["settings"]["phase_limits"][phase])
+        for r in [member, *active]
+    )
+    if len(active) >= limit:
         raise Rejected("campaign_stage_capacity_wait", 423)
-    if phase == "cutover" and next_window(member["settings"], now, 1, True) != now:
-        raise Rejected("campaign_cutover_window_wait", 423)
+    prior_phase = tx.one(
+        "SELECT operation FROM app.migration_stage_slots WHERE member=%s AND phase=%s LIMIT 1",
+        (member["id"], phase),
+    )
+    if phase == "cutover" and prior_phase is None:
+        samples = tx.all(
+            "SELECT sample FROM app.migration_performance_samples WHERE tenant=%s "
+            "AND route_sha256=%s AND observed_at>%s ORDER BY observed_at DESC LIMIT 1000",
+            (member["tenant"], member["specification"]["route_sha256"], now - 7 * 86400),
+        )
+        prediction = campaign_estimate(
+            [s["sample"] for s in samples], member["specification"], member["settings"], now
+        )
+        duration = prediction["phases"]["cutover"]
+        if duration is None:
+            raise Rejected("campaign_cutover_measurement_required", 423)
+        if next_window(member["settings"], now, duration, True) != now:
+            raise Rejected("campaign_cutover_window_wait", 423)
     if operation is not None:
         tx.execute(
             "INSERT INTO app.migration_stage_slots VALUES(%s,%s,%s,%s)",
@@ -445,5 +632,13 @@ def stage_complete(tx: Transaction, job: str, operation: str, terminal: bool, no
         tx.execute(
             "UPDATE app.migration_members SET state='complete',completed_at=%s WHERE job=%s",
             (now, job),
+        )
+        tx.execute(
+            "UPDATE app.migration_campaigns c SET state='complete',revision=revision+1 "
+            "WHERE c.state='scheduled' AND c.id IN "
+            "(SELECT campaign FROM app.migration_members WHERE job=%s) "
+            "AND NOT EXISTS (SELECT 1 FROM app.migration_members m WHERE m.campaign=c.id "
+            "AND m.state NOT IN ('complete','cancelled'))",
+            (job,),
         )
     # Storage and rollback allocations survive completion until separately observed cleanup.
