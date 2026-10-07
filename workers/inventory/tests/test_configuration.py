@@ -151,3 +151,24 @@ def test_configuration_gets_use_real_pinned_tls_without_following_response_links
     Endpoint.mode = "redirect"
     with pytest.raises(CollectionFailure, match="unsafe_destination"):
         collect(policy, 1, None, include_configuration=True)
+
+
+def test_storage_backend_options_are_pulled_without_private_extra_specs() -> None:
+    result = normalized(
+        "volume_types",
+        {
+            "volume_types": [
+                {
+                    "id": "type-a",
+                    "extra_specs": {
+                        "volume_backend_name": "fixture-rbd",
+                        "multiattach": "<is> True",
+                        "private_auth": "must-never-copy",
+                    },
+                }
+            ]
+        },
+        "p",
+    )
+    value = json.loads(result[0]["attributes"][0]["value"])
+    assert value == {"volume_backend_name": "fixture-rbd", "multiattach": "<is> True"}

@@ -25,11 +25,6 @@ QUERIES: dict[str, tuple[str, str, tuple[str, ...]]] = {
         "/subnets",
         "subnets",
         (
-            "volume_backend_name",
-            "replication_enabled",
-            "multiattach",
-            "capabilities:thin_provisioning_support",
-            "capabilities:thick_provisioning_support",
             "network_id",
             "cidr",
             "ip_version",
@@ -64,7 +59,11 @@ QUERIES: dict[str, tuple[str, str, tuple[str, ...]]] = {
     ),
     "network_trunks": ("/trunks", "trunks", ("port_id", "sub_ports", "status")),
     "network_qos": ("/qos/policies", "policies", ("rules", "is_default")),
-    "volume_types": ("/types?limit=100", "volume_types", ("is_public",)),
+    "volume_types": (
+        "/types?limit=100",
+        "volume_types",
+        ("is_public", "extra_specs", "qos_specs_id"),
+    ),
     "image_import": ("/info/import", "import-methods", ()),
     "image_stores": ("/info/stores", "stores", ("default",)),
     "identity_catalog": ("/auth/catalog", "catalog", ()),
@@ -72,6 +71,11 @@ QUERIES: dict[str, tuple[str, str, tuple[str, ...]]] = {
 }
 # Nested projections prevent metadata/extensions from smuggling arbitrary provider fields.
 NESTED = {
+    "volume_backend_name",
+    "replication_enabled",
+    "multiattach",
+    "capabilities:thin_provisioning_support",
+    "capabilities:thick_provisioning_support",
     "network_id",
     "enable_snat",
     "external_fixed_ips",
