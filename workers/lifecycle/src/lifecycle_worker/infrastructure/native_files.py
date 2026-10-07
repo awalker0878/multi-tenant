@@ -80,7 +80,10 @@ def verify_bundle(root: Path, expected_digest: str) -> dict[str, Any]:
         )
     ):
         raise NativeHeld("incomplete_native_bundle")
-    actual = {p.relative_to(root).as_posix() for p in root.rglob("*") if not p.is_dir()}
+    inventory = list(root.rglob("*"))
+    if any(p.is_symlink() for p in inventory):
+        raise NativeHeld("symlink_native_input")
+    actual = {p.relative_to(root).as_posix() for p in inventory if not p.is_dir()}
     if actual != set(files) | {"bundle.json"}:
         raise NativeHeld("unlisted_native_artifact")
     for name, expected in files.items():

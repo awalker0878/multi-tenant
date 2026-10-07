@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import Any, Protocol
 
 from lifecycle_worker.application.native import (
+    EXPECTED_FIELDS,
     RESOURCE_TYPES,
     NativeBinding,
     NativeHeld,
@@ -145,6 +146,8 @@ class OpenStackReadback:
         native: dict[str, Any],
         objects: dict[str, dict[str, Any]],
     ) -> None:
+        if set(expected) - EXPECTED_FIELDS[kind]:
+            raise NativeHeld("native_field_readback_not_implemented")
         if any(attributes.get(k) != v for k, v in expected.items()):
             raise NativeHeld("terraform_expected_fields_changed")
         project = native.get("project_id", native.get("tenant_id"))
@@ -156,6 +159,16 @@ class OpenStackReadback:
                 project = binding.project_id
         if project != binding.project_id:
             raise NativeHeld("native_project_changed")
+        if "name" in expected and native.get("name") != expected["name"]:
+            raise NativeHeld("native_name_changed")
+        if "availability_zone" in expected:
+            zone = (
+                native.get("OS-EXT-AZ:availability_zone")
+                if kind == "server"
+                else native.get("availability_zone")
+            )
+            if zone != expected["availability_zone"]:
+                raise NativeHeld("native_placement_changed")
         if kind in {"server", "volume"}:
             metadata = native.get("metadata", {})
             required = expected.get("metadata", {}) | {
@@ -167,6 +180,13 @@ class OpenStackReadback:
             ):
                 raise NativeHeld("native_ownership_changed")
         if kind == "server":
+            if "config_drive" in expected:
+                drive = native.get("config_drive")
+                if (
+                    drive not in {True, False, "True", ""}
+                    or (drive in {True, "True"}) != expected["config_drive"]
+                ):
+                    raise NativeHeld("native_config_drive_changed")
             if (
                 native.get("status") != "ACTIVE"
                 or native.get("flavor", {}).get("id") != expected.get("flavor_id")
@@ -212,6 +232,24 @@ class OpenStackReadback:
             ):
                 raise NativeHeld("native_port_mapping_or_quarantine_changed")
         else:
+            if (
+                "image_id" in expected
+                and native.get("volume_image_metadata", {}).get("image_id") != expected["image_id"]
+            ):
+                raise NativeHeld("native_image_changed")
+            servers = {
+                r["attributes"]["id"]
+                for r in objects.values()
+                if r["kind"] == "server"
+                and any(
+                    d.get("uuid") == native["id"] for d in r["attributes"].get("block_device", [])
+                )
+            }
+            if (
+                not servers
+                or {a.get("server_id") for a in native.get("attachments", [])} != servers
+            ):
+                raise NativeHeld("native_volume_attachment_changed")
             if (
                 native.get("status") != "in-use"
                 or native.get("size") != expected.get("size")

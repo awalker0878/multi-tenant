@@ -239,3 +239,18 @@ RESOURCE_TYPES: Mapping[str, ResourceKind] = {
     "openstack_networking_port_v2": "port",
     "openstack_blockstorage_volume_v3": "volume",
 }
+
+EXPECTED_FIELDS: Mapping[str, set[str]] = {
+    "server": {"name", "flavor_id", "metadata", "availability_zone", "config_drive"},
+    "port": {
+        "name",
+        "tenant_id",
+        "network_id",
+        "fixed_ip",
+        "description",
+        "admin_state_up",
+        "security_group_ids",
+        "port_security_enabled",
+    },
+    "volume": {"name", "size", "volume_type", "metadata", "availability_zone", "image_id"},
+}

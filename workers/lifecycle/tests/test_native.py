@@ -416,7 +416,7 @@ class NativeFixture:
                     device_id=ids["server"],
                 )
             else:
-                native.update(status="in-use")
+                native.update(status="in-use", attachments=[{"server_id": ids["server"]}])
             self.documents[f"/{kind}s/{ids[kind]}"] = {kind: native}
 
     def get(self, service: str, path: str, *, subject: bool = False) -> dict[str, Any]:
@@ -658,3 +658,61 @@ def test_saved_plan_adapter_runs_exact_command_and_rejects_changed_state(
     assert tool.state(bound)["serial"] == binding.state_serial + 1
     with pytest.raises(NativeHeld, match="state_changed"):
         tool.inspect(bound)
+
+
+@pytest.mark.parametrize(
+    "kind,field,native_field,value",
+    [
+        ("server", "availability_zone", "OS-EXT-AZ:availability_zone", "compute-a"),
+        ("volume", "availability_zone", "availability_zone", "storage-b"),
+        ("server", "config_drive", "config_drive", True),
+    ],
+)
+def test_optional_native_fields_are_actually_observed(
+    binding: NativeBinding,
+    kind: str,
+    field: str,
+    native_field: str,
+    value: Any,
+) -> None:
+    fixture = NativeFixture(binding)
+    contract = next(v for v in fixture.expected.values() if v["kind"] == kind)
+    contract["expected"][field] = value
+    resource = next(
+        r
+        for r in fixture.state["resources"]
+        if r["type"].startswith(
+            {"server": "openstack_compute", "volume": "openstack_blockstorage"}[kind]
+        )
+    )
+    resource["instances"][0]["attributes"][field] = value
+    native = next(v[kind] for v in fixture.documents.values() if kind in v)
+    native[native_field] = value
+    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "observed_present"
+    native[native_field] = False if value is True else "other-zone"
+    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "held"
+
+
+def test_image_and_volume_attachment_are_independently_verified(binding: NativeBinding) -> None:
+    fixture = NativeFixture(binding)
+    image_id = str(uuid4())
+    fixture.expected["openstack_blockstorage_volume_v3.root"]["expected"]["image_id"] = image_id
+    volume = fixture.state["resources"][2]["instances"][0]["attributes"]
+    volume["image_id"] = image_id
+    native = next(v["volume"] for v in fixture.documents.values() if "volume" in v)
+    native["volume_image_metadata"] = {"image_id": image_id}
+    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "observed_present"
+    native["volume_image_metadata"]["image_id"] = str(uuid4())
+    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "held"
+    native["volume_image_metadata"]["image_id"] = image_id
+    native["attachments"] = [{"server_id": str(uuid4())}]
+    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "held"
+
+
+def test_unsupported_field_cannot_be_claimed_as_native_readback(binding: NativeBinding) -> None:
+    expected = resources(binding)
+    expected["openstack_compute_instance_v2.application"]["expected"]["hypervisor_hostname"] = (
+        "unverified-host"
+    )
+    with pytest.raises(NativeHeld, match="readback_not_implemented"):
+        validate_plan(plan_for(expected), expected, binding)

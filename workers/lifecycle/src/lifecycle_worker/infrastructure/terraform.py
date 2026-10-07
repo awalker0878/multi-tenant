@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from lifecycle_worker.application.native import (
+    EXPECTED_FIELDS,
     RESOURCE_TYPES,
     NativeBinding,
     NativeHeld,
@@ -111,7 +112,6 @@ class TerraformSavedPlan:
             "OS_IDENTITY_API_VERSION",
             "OS_COMPUTE_API_VERSION",
             "OS_VOLUME_API_VERSION",
-            "TF_CLI_CONFIG_FILE",
         }
         credentials = {"OS_APPLICATION_CREDENTIAL_ID", "OS_APPLICATION_CREDENTIAL_SECRET"}
         if (
@@ -130,6 +130,7 @@ class TerraformSavedPlan:
             "TF_IN_AUTOMATION": "1",
             "TF_INPUT": "0",
             "TF_WORKSPACE": binding.workspace,
+            "TF_CLI_CONFIG_FILE": "/dev/null",
             "CHECKPOINT_DISABLE": "1",
             **self.public_environment,
         }
@@ -290,6 +291,8 @@ def validate_plan(plan: dict[str, Any], resources: Any, binding: NativeBinding) 
         ):
             raise NativeHeld("invalid_native_resource_contract")
         expected = contract["expected"]
+        if set(expected) - EXPECTED_FIELDS[contract["kind"]]:
+            raise NativeHeld("native_field_readback_not_implemented")
         after = change.get("after", {})
         unknown = change.get("after_unknown", {})
         # A review may never claim a known field when Terraform still considers it unknown.
