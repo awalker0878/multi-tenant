@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-07T00:58:29.355156+00:00",
+  "source_revision": "9f353a4de5d44dc7da84ee2298325ddd728819f1",
+  "result": "PASS",
+  "evidence_level": "E2",
+  "scope": "API-first configuration collection and administrator review software; synthetic OpenStack peer over real scoped TLS, PostgreSQL and browser boundaries.",
+  "p07_delivery": "INCOMPLETE",
+  "g07_decision": "NOT_REVIEWED",
+  "native_write_authorized": false,
+  "native_platforms_tested": [],
+  "native_qualified_versions": [],
+  "documentation_baseline": "2026.2 Hibiscus",
+  "core": {
+    "artifact_id": 11454192804,
+    "run_id": 37554391902,
+    "source_revision": "9f353a4de5d44dc7da84ee2298325ddd728819f1",
+    "archive": "archives/final-core.zip",
+    "archive_sha256": "c8ee6ad16851f4ccc2429f98ba33ced03554d0aee0e0c15c4cd218af916a3971",
+    "report": "final-core/report.json",
+    "report_sha256": "803456f41e7d26bade4cfc9ed0351a3a88f42f280a0fac2ba6e6993e0898f676",
+    "reported_result": "PASSED",
+    "source_bindings_checked": 416,
+    "source_discrepancies": [],
+    "command_logs_checked": 10,
+    "artifact_hashes_checked": 0,
+    "checks": 0,
+    "test_suites": [
+      {
+        "path": "services-inventory.xml",
+        "tests": 86,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      {
+        "path": "workers-inventory.xml",
+        "tests": 49,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    ],
+    "browser_stats": null
+  },
+  "live_campaigns": [
+    {
+      "artifact_id": 11453413407,
+      "run_id": 37554391902,
+      "source_revision": "9f353a4de5d44dc7da84ee2298325ddd728819f1",
+      "archive": "archives/final-chromium.zip",
+      "archive_sha256": "873027f717c890ca8c4b3c9c6a676ecd2784bfd8f17b69486003090df253a286",
+      "report": "final-chromium/report.json",
+      "report_sha256": "8e4de30f4fde2ff4d25061dd1c93295ea458687fc747478b2433f287816587aa",
+      "reported_result": "PASS",
+      "source_bindings_checked": 709,
+      "source_discrepancies": [],
+      "command_logs_checked": 48,
+      "artifact_hashes_checked": 55,
+      "checks": 78,
+      "test_suites": [],
+      "browser_stats": {
+        "startTime": "2026-10-07T00:56:09.917Z",
+        "duration": 20961.686,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "artifact_id": 11453433529,
+      "run_id": 37554391902,
+      "source_revision": "9f353a4de5d44dc7da84ee2298325ddd728819f1",
+      "archive": "archives/final-firefox.zip",
+      "archive_sha256": "3e8a5b39c7addc5d7a380079246c618d2cdaa09b4bf6ffa8b757f5d991ddc7a8",
+      "report": "final-firefox/report.json",
+      "report_sha256": "ec211b545974754385c53fb6532e6d634a009fa9016f7491df7a4010efda6a68",
+      "reported_result": "PASS",
+      "source_bindings_checked": 709,
+      "source_discrepancies": [],
+      "command_logs_checked": 48,
+      "artifact_hashes_checked": 55,
+      "checks": 78,
+      "test_suites": [],
+      "browser_stats": {
+        "startTime": "2026-10-07T00:56:12.104Z",
+        "duration": 23580.507999999998,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "artifact_id": 11453533269,
+      "run_id": 37554391902,
+      "source_revision": "9f353a4de5d44dc7da84ee2298325ddd728819f1",
+      "archive": "archives/final-webkit.zip",
+      "archive_sha256": "812b7f282e31904c2ed0f56f9ecf2537e8977ba2aed0f67aedaad62a2bd9effe",
+      "report": "final-webkit/report.json",
+      "report_sha256": "30bc115496e4bc21c3edd1fc0a97e32382261b49747a676ccf6a1f956d02b490",
+      "reported_result": "PASS",
+      "source_bindings_checked": 709,
+      "source_discrepancies": [],
+      "command_logs_checked": 48,
+      "artifact_hashes_checked": 55,
+      "checks": 78,
+      "test_suites": [],
+      "browser_stats": {
+        "startTime": "2026-10-07T00:56:27.714Z",
+        "duration": 31648.154000000002,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  ],
+  "superseded_behavior_passes_with_source_discrepancies": [
+    {
+      "artifact_id": 11453542837,
+      "run_id": 37554004642,
+      "source_revision": "dbc771356472e035bd3c25b62d8d5d2e702b20fe",
+      "archive": "archives/qualified-chromium.zip",
+      "archive_sha256": "60adb63db9e16df823302b89d3398149a9b2cddf7616859fb75b35f7b409b58c",
+      "report": "qualified-chromium/report.json",
+      "report_sha256": "ba7a0eae341bdbb9e4146b5956b2ac0ceaafd22d84f52b6d386a7ff982b9c9cf",
+      "reported_result": "PASS",
+      "source_bindings_checked": 709,
+      "source_discrepancies": [
+        "services/inventory/src/product_inventory.egg-info/PKG-INFO"
+      ],
+      "command_logs_checked": 48,
+      "artifact_hashes_checked": 55,
+      "checks": 78,
+      "test_suites": [],
+      "browser_stats": {
+        "startTime": "2026-10-07T00:52:00.288Z",
+        "duration": 22789.163,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "artifact_id": 11454212621,
+      "run_id": 37554004642,
+      "source_revision": "dbc771356472e035bd3c25b62d8d5d2e702b20fe",
+      "archive": "archives/qualified-firefox.zip",
+      "archive_sha256": "dc57754771077ae0c9c7a77e5dbeae377d2295cd8e99800905df5d5632f32fc8",
+      "report": "qualified-firefox/report.json",
+      "report_sha256": "0c487fa04838b3e8214e2d1d4128410a7868ef4db03300ca8df9e7dab3d754d3",
+      "reported_result": "PASS",
+      "source_bindings_checked": 709,
+      "source_discrepancies": [
+        "services/inventory/src/product_inventory.egg-info/PKG-INFO"
+      ],
+      "command_logs_checked": 48,
+      "artifact_hashes_checked": 55,
+      "checks": 78,
+      "test_suites": [],
+      "browser_stats": {
+        "startTime": "2026-10-07T00:52:24.918Z",
+        "duration": 25475.536,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "artifact_id": 11453662796,
+      "run_id": 37554004642,
+      "source_revision": "dbc771356472e035bd3c25b62d8d5d2e702b20fe",
+      "archive": "archives/qualified-webkit.zip",
+      "archive_sha256": "3d5df5333c6d8b119c96a242f70ca92c7d58c95a31ff279707adf986086b636f",
+      "report": "qualified-webkit/report.json",
+      "report_sha256": "359376ac9107dd9eed315137f28bfb96205da6d33a5592cc64a9d5e204f575f6",
+      "reported_result": "PASS",
+      "source_bindings_checked": 709,
+      "source_discrepancies": [
+        "services/inventory/src/product_inventory.egg-info/PKG-INFO"
+      ],
+      "command_logs_checked": 48,
+      "artifact_hashes_checked": 55,
+      "checks": 78,
+      "test_suites": [],
+      "browser_stats": {
+        "startTime": "2026-10-07T00:52:23.144Z",
+        "duration": 34659.788,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  ],
+  "retained_failures": [
+    {
+      "archive": "failures/2247943-chromium.zip",
+      "archive_sha256": "0c9a74f3bd4c0dbf6b68363547fc846485e349fd079a2f8d43f0898130484cee",
+      "report_in_archive": "report.json",
+      "report_sha256": "26ffcb4b16f0ed164abfac37857ba8e799171f928559ef74d1a9802d1a46f35c",
+      "source_revision": "22479431b581dbf6875c9109f6a2bff21f1d08f0",
+      "reported_result": "FAIL",
+      "error_summary": "browser failed: \nRunning 1 test using 1 worker\n\n  \u2718  1 [chromium] \u203a tests/browser-p04/inventory.spec.ts:4:1 \u203a browses scoped observations, preserves uncertain enrollment and clears revoked access (8.8"
+    },
+    {
+      "archive": "failures/2247943-contracts.zip",
+      "archive_sha256": "eb562a2a49767d5c1d1bc398c26c6f6db0624f6f305e0a03ea47244c1345df6c",
+      "report_in_archive": "report.json",
+      "report_sha256": "5be697f355244d3399921c591de6b56d9ed8151df92187199d88d51cea00d345",
+      "source_revision": "22479431b581dbf6875c9109f6a2bff21f1d08f0",
+      "reported_result": "FAIL",
+      "error_summary": "Published contract removed or changed: contracts/openapi/inventory-v1.json"
+    },
+    {
+      "archive": "failures/2a81322-manual-reload.zip",
+      "archive_sha256": "df4f2163ebf7d12538ec70da348a5bf1b3d3128975814646801216a6b9eb0f7f",
+      "report_in_archive": "report.json",
+      "report_sha256": "b8c032e6ce54bfb54943cbc6b36376b0266da679855d9005a0de13c334caefad",
+      "source_revision": "2a81322929754cf1bc80b18f362c5a30f43f60f5",
+      "reported_result": "FAIL",
+      "error_summary": "browser failed: \nRunning 1 test using 1 worker\n\n  \u2718  1 [chromium] \u203a tests/browser-p04/inventory.spec.ts:4:1 \u203a browses scoped observations, preserves uncertain enrollment and clears revoked access (9.8"
+    },
+    {
+      "archive": "failures/2a81322-p06-broker-startup.zip",
+      "archive_sha256": "3bf1480d7000342e68ead5feecf03e5d260f20ede9b61bf5fb0b77dbaa97eb9f",
+      "report_in_archive": "report.json",
+      "report_sha256": "e69cb6f3c47dc544d4b0829c1a72ca5aded0958f7129a7031a3ae788b6bb8323",
+      "source_revision": "2a81322929754cf1bc80b18f362c5a30f43f60f5",
+      "reported_result": "FAIL",
+      "error_summary": "broker_not_ready"
+    },
+    {
+      "archive": "failures/9d30746-incomplete-test-fixture.zip",
+      "archive_sha256": "108898836f25c47a1723248d10e0110c33993123425993364055424a88f04038",
+      "report_in_archive": "report.json",
+      "report_sha256": "9b9fc8cea7e7dc03b4a7ce2da4e79a74fd4a9509cfb3b04af761131196a03e89",
+      "source_revision": "9d30746cbae6bff904ce2a8253da4699cf743592",
+      "reported_result": "FAIL",
+      "error_summary": "savePortingConfiguration_expected_201_got_422:{\"error\": \"invalid_capability_choices\"}"
+    }
+  ],
+  "original_contract_compatibility": {
+    "report": "original-contract-compatibility.json",
+    "sha256": "57b57b9b8971100d9578615abbabf4022d1c8082b4a9d461f40850661c80ed94",
+    "original_contracts_preserved": 44,
+    "new_versioned_artifacts": 4
+  },
+  "workflow_status_receipt": "workflow-receipt.json",
+  "limitations": [
+    "No actual OpenStack platform, backend or native operation was qualified.",
+    "Each configuration projection is bounded below 100 items and 128 KiB; incomplete lists remain unknown.",
+    "Optional Identity, Image and Placement discovery requires separately trusted service streams.",
+    "Native provisioning, service integration, activation, recovery, retirement and Q05/Q06 remain unfinished.",
+    "Associated workflow results are recorded separately; a pending workflow is not a pass."
+  ]
+}
