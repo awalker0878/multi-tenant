@@ -1,0 +1,183 @@
+{
+  "checks": [
+    {
+      "case": "accepted-start-response-loss",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-active",
+      "result": "PASSED"
+    },
+    {
+      "case": "five-ordered-provision-effects",
+      "result": "PASSED"
+    },
+    {
+      "case": "one-dispatch-after-lost-reply",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-retired",
+      "result": "PASSED"
+    },
+    {
+      "case": "retire-before-release",
+      "result": "PASSED"
+    },
+    {
+      "case": "quiescence-missing-holds",
+      "result": "PASSED"
+    },
+    {
+      "case": "no-following-stage-without-quiescence",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-stopped",
+      "result": "PASSED"
+    },
+    {
+      "case": "queued-configuration-change-holds",
+      "result": "PASSED"
+    },
+    {
+      "case": "revocation-has-no-effect",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-stopped",
+      "result": "PASSED"
+    },
+    {
+      "case": "lost-effect-response-holds",
+      "result": "PASSED"
+    },
+    {
+      "case": "wake-does-not-clear-hold",
+      "result": "PASSED"
+    },
+    {
+      "case": "same-start-after-worker-restart",
+      "result": "PASSED"
+    },
+    {
+      "case": "held-grant-survives-restart",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-active",
+      "result": "PASSED"
+    },
+    {
+      "case": "accepted-effect-not-repeated",
+      "result": "PASSED"
+    },
+    {
+      "case": "accepted-effect-still-running",
+      "result": "PASSED"
+    },
+    {
+      "case": "temporal-cancellation-persists-hold",
+      "result": "PASSED"
+    },
+    {
+      "case": "cancellation-does-not-confirm-drain",
+      "result": "PASSED"
+    },
+    {
+      "case": "cancelled-workflow-remains-cancelled",
+      "result": "PASSED"
+    },
+    {
+      "case": "cancelled-native-hold-retained",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "every-activity-disables-retry",
+      "result": "PASSED"
+    },
+    {
+      "case": "history-redacts-private-provider-message",
+      "result": "PASSED"
+    },
+    {
+      "case": "six-real-native-histories-replayed",
+      "result": "PASSED"
+    }
+  ],
+  "histories": [
+    {
+      "workflow_id": "p07-native-v1-5f084c06-9eb5-49ef-b819-24cfc31d9dc3",
+      "events": 131,
+      "replay": "PASSED"
+    },
+    {
+      "workflow_id": "p07-native-v1-f25aa303-fd06-4f7d-b879-672e287f9d8a",
+      "events": 59,
+      "replay": "PASSED"
+    },
+    {
+      "workflow_id": "p07-native-v1-77ab5e24-1d7a-4538-9869-431f7d356017",
+      "events": 42,
+      "replay": "PASSED"
+    },
+    {
+      "workflow_id": "p07-native-v1-1b9eba84-5e34-4989-8e06-5fca90feac41",
+      "events": 35,
+      "replay": "PASSED"
+    },
+    {
+      "workflow_id": "p07-native-v1-32463807-7aae-4242-8dd0-c968dad25979",
+      "events": 141,
+      "replay": "PASSED"
+    },
+    {
+      "workflow_id": "p07-native-v1-4bf0b584-e6f3-4fdf-8072-7c5e1503e2df",
+      "events": 29,
+      "replay": "PASSED"
+    }
+  ],
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "owner_and_effect_observations": "synthetic"
+}

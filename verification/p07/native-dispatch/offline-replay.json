@@ -1,0 +1,47 @@
+{
+  "source_revision": "9b01db784ce4ceac012cc98592dd96997efc6168",
+  "reviewed_at": "2026-10-07T04:24:34.584475+00:00",
+  "archive": "archives/p07-dispatch-final-9b01db7.zip",
+  "archive_sha256": "27ef84e1551f6bde3e7a105c9e51ce360c62a2619a05923af849c74b039192bb",
+  "environment": "Locked Lifecycle Temporal SDK; offline replay without a Temporal server",
+  "native_platforms_tested": [],
+  "histories": [
+    {
+      "artifact": "history-p07-native-v1-11ecd2ce-2205-42c3-8392-e50da54273a0.json",
+      "sha256": "5c02e7be8639bfa437541255d3c400a72fe4d27664607b3832308602d7877f10",
+      "events": 131,
+      "result": "PASSED"
+    },
+    {
+      "artifact": "history-p07-native-v1-b35b3911-5ce8-4840-a8ee-d6cb31358422.json",
+      "sha256": "fdfff0ae362cd2ecabf15b5bbcbb4b8aded2f175854c4bded67dceb3d9bd8105",
+      "events": 59,
+      "result": "PASSED"
+    },
+    {
+      "artifact": "history-p07-native-v1-e89c18dc-f881-47d0-af54-bb959d4ebb8f.json",
+      "sha256": "405c11773a6d749feba0ade59a13a8d365d9c01d6712573218f14a452c6722d9",
+      "events": 42,
+      "result": "PASSED"
+    },
+    {
+      "artifact": "history-p07-native-v1-4fb59e65-57d8-469e-9e8d-b60a9afbabe0.json",
+      "sha256": "02ed70ec6a60eb85bd8c44763f17264af56aab790fbb3c8a116d3cd599fccdf3",
+      "events": 35,
+      "result": "PASSED"
+    },
+    {
+      "artifact": "history-p07-native-v1-175a44f3-5e66-470e-aeab-38a205427285.json",
+      "sha256": "a25441e3b96411244b5f9cddec180e027cb61686fa2d35ffd4898a1ad1952142",
+      "events": 141,
+      "result": "PASSED"
+    },
+    {
+      "artifact": "history-p07-native-v1-20ea53ae-6ee3-4c06-9c96-7622f945f1bf.json",
+      "sha256": "3bbbd5730411f8e1fe974f75ce3682ed387172aa39417cb5de5e9a46a6188ceb",
+      "events": 29,
+      "result": "PASSED"
+    }
+  ],
+  "result": "PASSED"
+}

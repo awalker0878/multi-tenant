@@ -1,0 +1,92 @@
+{
+  "checks": [
+    {
+      "case": "accepted-start-response-loss",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-active",
+      "result": "PASSED"
+    },
+    {
+      "case": "five-ordered-provision-effects",
+      "result": "PASSED"
+    },
+    {
+      "case": "one-dispatch-after-lost-reply",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-retired",
+      "result": "PASSED"
+    },
+    {
+      "case": "retire-before-release",
+      "result": "PASSED"
+    },
+    {
+      "case": "quiescence-missing-holds",
+      "result": "PASSED"
+    },
+    {
+      "case": "no-following-stage-without-quiescence",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-stopped",
+      "result": "PASSED"
+    },
+    {
+      "case": "queued-configuration-change-holds",
+      "result": "PASSED"
+    },
+    {
+      "case": "revocation-has-no-effect",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-stopped",
+      "result": "PASSED"
+    },
+    {
+      "case": "lost-effect-response-holds",
+      "result": "PASSED"
+    },
+    {
+      "case": "wake-does-not-clear-hold",
+      "result": "PASSED"
+    },
+    {
+      "case": "same-start-after-worker-restart",
+      "result": "PASSED"
+    },
+    {
+      "case": "held-grant-survives-restart",
+      "result": "PASSED"
+    },
+    {
+      "case": "terminal-active",
+      "result": "PASSED"
+    },
+    {
+      "case": "accepted-effect-not-repeated",
+      "result": "PASSED"
+    },
+    {
+      "case": "accepted-effect-still-running",
+      "result": "PASSED"
+    },
+    {
+      "case": "temporal-cancellation-persists-hold",
+      "result": "PASSED"
+    },
+    {
+      "case": "cancellation-does-not-confirm-drain",
+      "result": "PASSED"
+    }
+  ],
+  "histories": [],
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "owner_and_effect_observations": "synthetic"
+}
