@@ -73,9 +73,9 @@ transport is not proof that those independent controls exist.
 ## Integration and qualification still required
 
 The application interface is executable and persistence-tested independently.
-The production API/Temporal dispatcher, composite owner adapter, provider request
-fence, guest/service effect adapters and independent native observer implementations
-must be connected to the commissioned environment before dispatch can be enabled.
+The composite owner adapter, provider request fence, guest/service effect adapters
+and independent native observer implementations must be connected to the
+commissioned environment before dispatch can be enabled.
 Use API-first Inventory/Console inputs under ADR-015/016; do not introduce a second
 checked-in configuration authority. G07 still needs the original Q05/Q06 campaign,
 actual owners and receiving decisions. No native operation is enabled by this
@@ -85,3 +85,32 @@ The P07 component campaign now runs the complete Lifecycle suite with real
 PostgreSQL, in addition to the existing worker/TLS/Terraform tests. Local
 environments without PostgreSQL process/user support cannot qualify persistence;
 the hosted campaign must run without skips.
+
+## Native Temporal orchestration
+
+Migration `005_native_dispatch.sql` adds the native admission outbox. New admission
+commits its immutable job, resource hold and dispatch entry together. It does not
+enqueue historical jobs. Runtime cannot replace workflow identities or delete
+dispatch rows. `NativeDispatcher` uses a stable `p07-native-v1-<job>` identity and
+the separate `p07-native-v1` queue. Lost start replies resolve the original workflow
+only after matching type, queue, tenant, job, plan digest and version.
+
+`NativeJourneyV1` delegates preparation and every current-authority check to
+Lifecycle. Every activity has one attempt. The selected worker must redeem the
+exact grant before effects; its return value supplies no readiness evidence.
+Only independent reconciliation advances the next stage. A prepared operation
+survives worker interruption without being dispatched again; missing observations
+hold it. Wake notifications cannot clear a journal hold or authorize work.
+
+Temporal cancellation records a hold; it does not establish that the provider has
+stopped. A held job can advance only through the existing independent reconciliation
+and fresh next-stage authority checks. Custody-epoch changes still prevent restored
+journal resumption. The supplied `run_native` composition factory requires a
+verified Temporal client plus actual native owner and effect implementations. The
+simulation deployment does not register it or supply synthetic defaults.
+
+The orchestration campaign uses real pinned Temporal, TLS/JWT and PostgreSQL to
+exercise accepted start/effect response loss, restart, current-authority change,
+missing provider-quiescence evidence, cancellation, retirement ordering and history
+replay. Its owner and effect ports are synthetic; this is E2 software evidence,
+not a native Q05/Q06 result. Actual run results are retained separately.

@@ -150,7 +150,35 @@ class NativeWorkflow:
             self.event(
                 tx, job, "admitted", {"plan_sha256": fingerprint, "purpose": plan["purpose"]}
             )
+            tx.execute(
+                "INSERT INTO app.native_dispatch(job,workflow_id) VALUES(%s,%s)",
+                (job, "p07-native-v1-" + job),
+            )
         return job
+
+    def checkpoint(self, tenant: str, job: str) -> dict[str, Any]:
+        """Read the journal; queue delivery and Temporal history confer no effect authority."""
+        with self.database.transaction() as tx:
+            self.lock(tx)
+            row = self.load(tx, tenant, job)
+            result = {"state": row["state"], "revision": row["revision"], "action": "wait"}
+            if row["state"] in {"active", "retired", "stopped", "held"}:
+                return result
+            operations = tx.all(
+                "SELECT o.stage,o.binding,v.operation AS observed FROM app.native_operations o "
+                "LEFT JOIN app.native_observations v ON v.operation=o.id WHERE o.job=%s",
+                (job,),
+            )
+            pending = [o for o in operations if o["observed"] is None]
+            if pending:
+                # A worker might still be executing. Only independently observed drain can advance.
+                return result | {"action": "reconcile", "grant": pending[0]["binding"]}
+            stages = PROVISION if row["plan"]["purpose"] == "provision" else RETIRE
+            completed = {o["stage"] for o in operations}
+            for stage in stages:
+                if stage not in completed:
+                    return result | {"action": "prepare", "stage": stage}
+            raise Rejected("native_journal_inconsistent", 423)
 
     def prepare(self, tenant: str, job: str, stage: str) -> dict[str, Any]:
         with self.database.transaction() as tx:

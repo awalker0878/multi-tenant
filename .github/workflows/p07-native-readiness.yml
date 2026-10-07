@@ -2,7 +2,7 @@ name: P07 native readiness preparation
 on:
   push:
     branches: [greenfield/enterprise-microservices-plan]
-    paths: ['services/lifecycle/**', 'workers/lifecycle/**', 'release/p07-native-inputs.json', 'scripts/p07/**', '.github/workflows/p07-native-readiness.yml']
+    paths: ['services/lifecycle/**', 'workers/lifecycle/**', 'release/p07-native-inputs.json', 'scripts/p07/**', 'scripts/p06/temporal_*', 'scripts/p01/stateful/runtime.py', 'scripts/p01/local_runtime.py', 'deploy/fixtures/stateful/**', 'deploy/dependencies/stateful/inputs.lock.json', 'contracts/openapi/lifecycle-native-*', 'contracts/fixtures/lifecycle/**', '.github/workflows/p07-native-readiness.yml']
   pull_request:
     branches: [greenfield/enterprise-microservices-plan]
   workflow_dispatch:
@@ -60,5 +60,33 @@ jobs:
         with:
           name: p07-native-adapters-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/p07-native-adapters/
+          if-no-files-found: error
+          retention-days: 14
+
+  native-dispatch:
+    name: P07 native orchestration (real Temporal, synthetic effects, E2 only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - name: Qualify native dispatch, uncertainty, cancellation and history replay
+        env:
+          P07_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+        run: python scripts/p07/qualify_dispatch.py --output "$RUNNER_TEMP/p07-native-dispatch"
+      - name: Retain exact-source orchestration results including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p07-native-dispatch-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p07-native-dispatch/
           if-no-files-found: error
           retention-days: 14
