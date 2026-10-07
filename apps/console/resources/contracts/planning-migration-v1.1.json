@@ -328,6 +328,16 @@
                 }
               }
             }
+          },
+          "423": {
+            "description": "Current commissioning, qualified base plan or migration inputs are held",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         }
       }
@@ -477,6 +487,16 @@
           },
           "503": {
             "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Current commissioning, qualified base plan or migration inputs are held",
             "content": {
               "application/json": {
                 "schema": {

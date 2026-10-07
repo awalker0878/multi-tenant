@@ -78,19 +78,27 @@ it('enforces real csrf on bulk preparation', function (): void {
     $this->post($this->base.'/groups/'.$this->id.'/prepare')->assertStatus(419);
 });
 
-it('uses the migration preparation delegation header and rejects forged Planning authority', function (): void {
+it('uses migration delegation and distinguishes denied authority from a definite hold', function (int $status, array $response, int $expected): void {
     $gov = tempnam(sys_get_temp_dir(), 'p08-gov-');
     $plan = tempnam(sys_get_temp_dir(), 'p08-plan-');
     file_put_contents($gov, str_repeat('b', 64));
     file_put_contents($plan, str_repeat('c', 64));
     config(['identity.governance_url' => 'https://governance.example.test', 'identity.credential_file' => $gov, 'planning.url' => 'https://planning.example.test', 'planning.credential_file' => $plan, 'planning.ca_file' => $plan]);
     Http::preventStrayRequests();
-    Http::fake(['governance.example.test/*' => Http::response(['delegation_token' => str_repeat('d', 64), 'audience' => 'planning', 'authority_use' => 'request_bound'], 201), 'planning.example.test/*' => Http::response(['binding' => [], 'native_write_authorized' => true])]);
+    Http::fake(['governance.example.test/*' => Http::response(['delegation_token' => str_repeat('d', 64), 'audience' => 'planning', 'authority_use' => 'request_bound'], 201), 'planning.example.test/*' => Http::response($response, $status)]);
     try {
-        expect(fn () => app(PlanningClient::class)->call(str_repeat('a', 64), $this->id, $this->id, $this->id, 'POST', 'migration-preparations', [$this->id], $this->detail['members'][0]['preparation']))->toThrow(PlanningFailure::class);
+        try {
+            app(PlanningClient::class)->call(str_repeat('a', 64), $this->id, $this->id, $this->id, 'POST', 'migration-preparations', [$this->id], $this->detail['members'][0]['preparation']);
+            $this->fail('Planning must reject this response.');
+        } catch (PlanningFailure $error) {
+            expect($error->status)->toBe($expected);
+        }
         Http::assertSent(fn ($r) => str_contains($r->url(), '/migration-preparations') && $r->hasHeader('X-Actor-Delegation', str_repeat('d', 64)) && ! $r->hasHeader('X-Planning-Delegations') && ! $r->hasHeader('X-Console-Session'));
     } finally {
         unlink($gov);
         unlink($plan);
     }
-});
+})->with([
+    [200, ['binding' => [], 'native_write_authorized' => true], 503],
+    [423, ['error' => 'migration_recipe_changed'], 423],
+]);

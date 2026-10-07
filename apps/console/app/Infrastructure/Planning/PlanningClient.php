@@ -68,7 +68,7 @@ final class PlanningClient implements PlanningGateway
             $result = json_decode($raw, true, 64, JSON_THROW_ON_ERROR);
             if (! in_array($response->status(), [200, 201], true)) {
                 $reason = is_array($result) ? ($result['error'] ?? '') : '';
-                throw new PlanningFailure(in_array($response->status(), [401, 403, 404, 409, 422, 429], true) ? $response->status() : 503,
+                throw new PlanningFailure(in_array($response->status(), [401, 403, 404, 409, 422, 423, 429], true) ? $response->status() : 503,
                     is_string($reason) && preg_match('/\A[a-z_]{1,80}\z/', $reason) ? $reason : 'planning_unavailable');
             }
             if (! is_array($result) || array_is_list($result)) {
