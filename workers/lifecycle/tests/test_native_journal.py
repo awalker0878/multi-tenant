@@ -119,8 +119,9 @@ def postgres() -> Iterator[dict[str, Any]]:
         settings["dbname"] = "native_test"
         with psycopg.connect(**settings) as c:
             c.execute("SET LOCAL ROLE native_owner")
-            migration = Path(__file__).parents[1] / "migrations/native/001_attempts.sql"
-            c.execute(migration.read_text())
+            migrations = sorted((Path(__file__).parents[1] / "migrations/native").glob("*.sql"))
+            for migration in migrations:
+                c.execute(migration.read_text())
         yield settings | {"user": "native_runtime"}
     finally:
         if process:
@@ -268,3 +269,40 @@ def test_duplicate_native_receipts_never_guess_resource_identity(postgres: dict[
         )
     with pytest.raises(NativeHeld, match="ambiguous_native_receipt"):
         ledger.resources(request)
+
+
+def test_migration_stage_custody_and_monotonic_recovery_generation(
+    postgres: dict[str, Any],
+) -> None:
+    first = binding()
+    j = journal(postgres)
+    assert j.claim(first)
+    second = replace(first, operation_id=str(uuid4()), attempt_id=str(uuid4()))
+    assert j.claim(second)  # same admitted job; Lifecycle authorizes stage ordering
+    with pytest.raises(NativeHeld, match="custody_held"):
+        j.claim(
+            replace(second, job_id=str(uuid4()), operation_id=str(uuid4()), attempt_id=str(uuid4()))
+        )
+    recovery = replace(
+        second,
+        job_id=str(uuid4()),
+        operation_id=str(uuid4()),
+        attempt_id=str(uuid4()),
+        custody_generation=first.custody_generation + 1,
+    )
+    assert j.claim(recovery)
+    with pytest.raises(NativeHeld, match="custody_held"):
+        j.claim(replace(first, operation_id=str(uuid4()), attempt_id=str(uuid4())))
+    with pytest.raises(NativeHeld, match="custody_held"):
+        j.claim(
+            replace(
+                recovery,
+                tenant_id=str(uuid4()),
+                operation_id=str(uuid4()),
+                attempt_id=str(uuid4()),
+                custody_generation=recovery.custody_generation + 1,
+            )
+        )
+    with psycopg.connect(**postgres) as c:
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            c.execute("DELETE FROM native.custody_generations")

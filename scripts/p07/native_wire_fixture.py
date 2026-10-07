@@ -71,7 +71,8 @@ def native_wire(control, owners, initial, postgres, private):
     worker_settings = postgres | {'dbname': 'p07_worker', 'user': 'native_runtime'}
     with psycopg.connect(**(postgres | {'dbname': 'p07_worker'})) as admin:
         admin.execute('SET ROLE native_owner')
-        admin.execute((ROOT / 'workers/lifecycle/migrations/native/001_attempts.sql').read_text())
+        for migration in sorted((ROOT / 'workers/lifecycle/migrations/native').glob('*.sql')):
+            admin.execute(migration.read_text())
 
     def connect():
         return psycopg.connect(**worker_settings, row_factory=dict_row)

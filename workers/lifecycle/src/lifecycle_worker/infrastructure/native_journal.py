@@ -6,7 +6,7 @@ from typing import Any
 
 import psycopg
 
-from lifecycle_worker.application.native import NativeBinding, NativeHeld, native_identity
+from lifecycle_worker.application.native import NativeBinding, NativeHeld, digest, native_identity
 
 
 class PostgresNativeJournal:
@@ -25,12 +25,31 @@ class PostgresNativeJournal:
                 if prior["fingerprint"] != binding.fingerprint:
                     raise NativeHeld("native_operation_binding_conflict")
                 return False
+            scope = {
+                k: binding.document()[k]
+                for k in ("tenant_id", "site_id", "project_id", "resource_id", "ownership_digest")
+            }
             held = connection.execute(
-                "SELECT operation_id FROM native.custody_holds WHERE custody_id=%s",
+                "SELECT generation,job_id,scope FROM native.custody_generations "
+                "WHERE custody_id=%s ORDER BY generation DESC LIMIT 1",
                 (binding.custody_id,),
             ).fetchone()
-            if held:
+            if held and (
+                digest(held["scope"]) != digest(scope)
+                or held["generation"] > binding.custody_generation
+                or (
+                    held["generation"] == binding.custody_generation
+                    and str(held["job_id"]) != binding.job_id
+                )
+            ):
                 raise NativeHeld("native_custody_held")
+            # The caller has checked the commissioned Lifecycle grant immediately
+            # before claim. A new generation needs independently renewed custody.
+            connection.execute(
+                "INSERT INTO native.custody_generations VALUES(%s,%s,%s,%s::jsonb) "
+                "ON CONFLICT DO NOTHING",
+                (binding.custody_id, binding.custody_generation, binding.job_id, json.dumps(scope)),
+            )
             connection.execute(
                 "INSERT INTO native.attempts(operation_id,attempt_id,tenant_id,"
                 "fingerprint,binding) "
@@ -44,7 +63,8 @@ class PostgresNativeJournal:
                 ),
             )
             connection.execute(
-                "INSERT INTO native.custody_holds(custody_id,operation_id) VALUES(%s,%s)",
+                "INSERT INTO native.custody_holds(custody_id,operation_id) VALUES(%s,%s) "
+                "ON CONFLICT DO NOTHING",
                 (binding.custody_id, binding.operation_id),
             )
         return True
