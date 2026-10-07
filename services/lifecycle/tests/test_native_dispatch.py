@@ -8,11 +8,17 @@ from uuid import uuid4
 import psycopg
 import pytest
 from temporalio.common import WorkflowIDConflictPolicy, WorkflowIDReusePolicy
-from temporalio.exceptions import ApplicationError, WorkflowAlreadyStartedError
+from temporalio.exceptions import (
+    ActivityError,
+    ApplicationError,
+    CancelledError,
+    WorkflowAlreadyStartedError,
+)
 from test_native_workflow import admitted, complete
 from test_native_workflow import native as native
 
 from lifecycle.domain.execution import Rejected
+from lifecycle.infrastructure.native_journey import NativeJourney
 from lifecycle.infrastructure.native_temporal import NativeActivities, NativeDispatcher
 
 
@@ -196,3 +202,30 @@ def test_activity_failure_does_not_expose_owner_exception() -> None:
         activities.checkpoint({"tenant": str(uuid4()), "job": str(uuid4())})
     assert str(error.value) == "native_operation_held"
     assert error.value.non_retryable
+
+
+@pytest.mark.parametrize("wrapped", [False, True])
+def test_native_cancellation_closes_workflow_after_preserving_hold(wrapped: bool) -> None:
+    calls: list[str] = []
+    cancelled = CancelledError("synthetic_cancel")
+    error = ActivityError(
+        "synthetic_activity_cancel",
+        scheduled_event_id=1,
+        started_event_id=2,
+        identity="synthetic-worker",
+        activity_type="native_checkpoint_v1",
+        activity_id="1",
+        retry_state=None,
+    )
+    error.__cause__ = cancelled
+
+    class Journey(NativeJourney):
+        async def call(self, name: str, args: dict[str, Any]) -> dict[str, Any]:
+            calls.append(name)
+            if name == "native_hold_v1":
+                return {"state": "held"}
+            raise error if wrapped else cancelled
+
+    with pytest.raises(CancelledError):
+        asyncio.run(Journey().run({"tenant": str(uuid4()), "job": str(uuid4())}))
+    assert calls == ["native_checkpoint_v1", "native_hold_v1"]

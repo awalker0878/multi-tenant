@@ -6,7 +6,7 @@ from typing import Any
 
 from temporalio import workflow
 from temporalio.common import RetryPolicy
-from temporalio.exceptions import ActivityError, CancelledError
+from temporalio.exceptions import ActivityError, CancelledError, is_cancelled_exception
 
 
 @workflow.defn(name="NativeJourneyV1")
@@ -67,8 +67,10 @@ class NativeJourney:
                     )
                     self.progress = observed["state"]
                     continue
-            except ActivityError:
+            except ActivityError as error:
                 await self.hold(base)
+                if is_cancelled_exception(error):
+                    raise CancelledError("native_workflow_cancelled") from None
             except (CancelledError, asyncio.CancelledError):
                 # Temporal cancellation is not evidence of provider cancellation or quiescence.
                 await self.hold(base)
