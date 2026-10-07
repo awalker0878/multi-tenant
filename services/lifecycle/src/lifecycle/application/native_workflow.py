@@ -9,6 +9,7 @@ from collections.abc import Callable
 from typing import Any, Protocol
 from uuid import uuid4
 
+from lifecycle.application.campaigns import Campaigns, stage_admission, stage_complete
 from lifecycle.application.reservations import Database, Transaction
 from lifecycle.domain.admission import digest
 from lifecycle.domain.execution import Rejected, identity
@@ -88,7 +89,12 @@ class NativeWorkflow:
             (state, reason, self.clock(), job),
         )
 
-    def admit(self, plan: dict[str, Any], command_key: str) -> str:
+    def admit(
+        self,
+        plan: dict[str, Any],
+        command_key: str,
+        campaign: tuple[str, str] | None = None,
+    ) -> str:
         # Copy to exclude concurrent mutation of caller-owned objects during owner reads.
         plan = json.loads(json.dumps(plan, allow_nan=False))
         validate_plan(plan, self.clock())
@@ -104,6 +110,14 @@ class NativeWorkflow:
             if prior:
                 if prior["fingerprint"] != fingerprint:
                     raise Rejected("native_command_conflict", 409)
+                if campaign is not None:
+                    member = tx.one(
+                        "SELECT id FROM app.migration_members WHERE campaign=%s AND id=%s "
+                        "AND tenant=%s AND job=%s",
+                        (*campaign, tenant, prior["id"]),
+                    )
+                    if member is None:
+                        raise Rejected("campaign_native_job_conflict", 409)
                 return str(prior["id"])
             job = str(uuid4())
             admission = {"job_id": job, "stage": "admission", "plan_sha256": fingerprint}
@@ -137,6 +151,10 @@ class NativeWorkflow:
                 "INSERT INTO app.native_jobs VALUES(%s,%s,%s,%s,%s::jsonb,%s)",
                 (job, tenant, command_key, fingerprint, json.dumps(plan), self.clock()),
             )
+            if campaign is not None:
+                Campaigns(self.database, self.clock).attach(
+                    tx, tenant, campaign[0], campaign[1], plan, job
+                )
             tx.execute(
                 "INSERT INTO app.native_projection(job,state,updated_at) VALUES(%s,'prepared',%s)",
                 (job, self.clock()),
@@ -189,6 +207,12 @@ class NativeWorkflow:
             completed = {o["stage"] for o in operations}
             for stage in stages:
                 if stage not in completed:
+                    try:
+                        stage_admission(tx, job, stage, None, self.clock())
+                    except Rejected as error:
+                        if error.reason.startswith("campaign_"):
+                            return result | {"action": "wait", "reason": error.reason}
+                        raise
                     return result | {"action": "prepare", "stage": stage}
             raise Rejected("native_journal_inconsistent", 423)
 
@@ -267,6 +291,7 @@ class NativeWorkflow:
                 "INSERT INTO app.native_operations VALUES(%s,%s,%s,%s::jsonb,%s,%s)",
                 (operation, job, stage, json.dumps(binding), digest(binding), self.clock()),
             )
+            stage_admission(tx, job, stage, operation, self.clock())
             self.project(tx, job, "running")
             self.event(
                 tx,
@@ -405,6 +430,13 @@ class NativeWorkflow:
                 state = terminal if binding["stage"] == stages[-1] else "running"
                 if row["stopped"]:
                     state = "stopped"
+                stage_complete(
+                    tx,
+                    binding["job_id"],
+                    binding["operation_id"],
+                    state == terminal,
+                    self.clock(),
+                )
                 self.project(tx, binding["job_id"], state)
                 return state
         except Exception:
@@ -422,6 +454,10 @@ class NativeWorkflow:
             self.lock(tx)
             row = self.load(tx, tenant, job)
             self.project(tx, job, "stopped" if row["stopped"] else "held", reason)
+            tx.execute(
+                "UPDATE app.migration_members SET state='held',reason=%s WHERE job=%s",
+                (reason, job),
+            )
             self.event(tx, job, "held", {"reason": reason})
 
     def stop(self, tenant: str, job: str) -> None:

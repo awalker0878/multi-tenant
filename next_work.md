@@ -1,5 +1,9 @@
 # Next work — P08 native migration
 
+The requested operational gaps are being implemented under the existing development
+authorization. See [P08 operations](docs/implementation/p08-operations.md) for the
+campaign scheduling/capacity increment and the complete remaining integration scope.
+
 P08 development continues on the native-only baseline. Source fleet browsing, named
 groups, VM-specific review and bulk OpenStack preparation are implemented and qualified
 in the [fleet evidence](verification/p08/fleet/README.md): 785 component tests without
