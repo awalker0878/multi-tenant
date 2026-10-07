@@ -28,7 +28,7 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
-    selected = [p for p in paths if p.startswith(('workers/lifecycle/', 'scripts/p07/', '.github/workflows/p07-'))
+    selected = [p for p in paths if p.startswith(('workers/lifecycle/', 'services/lifecycle/', 'scripts/p07/', '.github/workflows/p07-'))
                 and '/verification/' not in p]
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -59,6 +59,21 @@ def main():
     try:
         if not env.get('P07_POSTGRES_BIN'):
             raise RuntimeError('P07_POSTGRES_BIN is required; skipped persistence tests cannot qualify the worker')
+        env['P05_POSTGRES_BIN'] = env['P07_POSTGRES_BIN']
+        service = ROOT / 'services/lifecycle'
+        for argv in (
+            ['uv', 'sync', '--locked', '--group', 'build'],
+            ['uv', 'run', '--frozen', 'ruff', 'check', 'src', 'tests'],
+            ['uv', 'run', '--frozen', 'ruff', 'format', '--check', 'src', 'tests'],
+            ['uv', 'run', '--frozen', 'mypy', 'src', 'tests'],
+            ['uv', 'run', '--frozen', 'pytest', '-q', '--junitxml=' + str(output / 'lifecycle.xml')],
+            ['uv', 'build', '--no-build-isolation', '--wheel'],
+        ):
+            command(service, argv)
+        lifecycle_suites = ElementTree.parse(output / 'lifecycle.xml')
+        if any(int(s.get('skipped', 0)) for s in lifecycle_suites.iter('testsuite')):
+            raise RuntimeError('native workflow tests skipped')
+        report['lifecycle_test_count'] = sum(int(s.get('tests', 0)) for s in lifecycle_suites.iter('testsuite'))
         component = ROOT / 'workers/lifecycle'
         commands = [
             ['uv', 'sync', '--locked', '--group', 'build'],
