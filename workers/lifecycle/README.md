@@ -4,6 +4,14 @@ This independently owned Python package contributes to P01.01. Lifecycle owns ex
 
 `lifecycle-worker-health liveness` exits 0 and reports only that its short-lived diagnostic process loaded, with `scope=process_bootstrap`. `lifecycle-worker-health readiness` exits 1 with `worker_dependencies_not_implemented`. Unsupported arguments exit 2 without a success payload. Native dispatch is disabled. These diagnostics do not establish a running service, dependency readiness or a consuming worker. Worker responses identify lifecycle as the owning service and declare `task_consumption_enabled=false`.
 
+P08 adds separately invoked `lifecycle-worker-native --config <protected-file>` and
+`lifecycle-migration-accounts --config <protected-file>` commands. The first composes
+the authenticated native effects server with its protected scoped registry; the
+second performs read-only source/target account commissioning checks. Both are
+declared in the owned image entrypoint registry. The default image entrypoint remains
+the diagnostic command. See [commissioning](../../docs/implementation/p08-runtime-commissioning.md)
+for configuration and the outstanding native owner/qualification requirements.
+
 ## Ownership and structure
 
 `src/lifecycle_worker/bootstrap/` composes the command; `src/lifecycle_worker/interfaces/` handles diagnostic input/output. Importing the root package has no composition side effects. Application and Infrastructure modules implement simulated effect ownership under the [Python context convention](../../docs/architecture/context-code-structure.md#7-python-services-and-site-workers). The architecture registry allows an explicit same-context owner artifact as a future build input, but this package currently has no dependency on the owner service package. It does not import an owner or sibling directory at runtime. It owns the simulation database and has no native authority.
