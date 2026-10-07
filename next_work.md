@@ -1,4 +1,19 @@
-# Next work — P07 native API qualification
+# Next work — P08 native migration
+
+P08 development continues on the native-only baseline. The [implementation record](docs/implementation/p08-execution.md)
+tracks source profiling, exact-S0 isolated capture, ordered migration/recovery
+contracts and durable first-possible-write/custody boundaries. These components
+are under qualification; P08 and G08 remain open. Preserve P07's native entry
+requirements below while completing all independently testable P08 work.
+
+1. Complete and qualify native OVF retention, bounded copy/conversion and artifact handoff.
+2. Complete source/target profile persistence and Console migration controls.
+3. Bind actual guest/service/delta/fencing/traffic/recovery owners and their adapters.
+4. Execute Q07 with the actual selected VMware/OpenStack tuples, all datasets,
+   owner-approved outage/data objectives and independent observers; retain original
+   results and real receiving decisions. Do not substitute synthetic component tests.
+
+# Retained P07 native API qualification
 
 P07 uses immutable native operation plans, direct Neutron/Cinder/Nova requests,
 per-request authority, durable API receipts and independent exact-ID readback.

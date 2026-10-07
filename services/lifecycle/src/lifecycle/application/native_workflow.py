@@ -13,10 +13,11 @@ from lifecycle.application.reservations import Database, Transaction
 from lifecycle.domain.admission import digest
 from lifecycle.domain.execution import Rejected, identity
 from lifecycle.domain.native_workflow import (
-    PROVISION,
-    RETIRE,
+    api_stage,
     current_authority,
     observations,
+    stages_for,
+    terminal_for,
     validate_plan,
 )
 
@@ -113,7 +114,9 @@ class NativeWorkflow:
                 "WHERE resource_key=%s OR custody_id=%s",
                 (key, plan["custody_id"]),
             )
-            if plan["purpose"] == "provision":
+            if plan["purpose"] == "migrate":
+                self.migration_admission(tx, plan, held)
+            elif plan["purpose"] == "provision":
                 if held:
                     raise Rejected("native_resource_held", 423)
             else:
@@ -162,7 +165,16 @@ class NativeWorkflow:
             self.lock(tx)
             row = self.load(tx, tenant, job)
             result = {"state": row["state"], "revision": row["revision"], "action": "wait"}
-            if row["state"] in {"active", "retired", "stopped", "held"}:
+            if row["state"] in {
+                "active",
+                "retired",
+                "stopped",
+                "held",
+                "rehearsed",
+                "migrated",
+                "recovered",
+                "cleaned",
+            }:
                 return result
             operations = tx.all(
                 "SELECT o.stage,o.binding,v.operation AS observed FROM app.native_operations o "
@@ -173,7 +185,7 @@ class NativeWorkflow:
             if pending:
                 # A worker might still be executing. Only independently observed drain can advance.
                 return result | {"action": "reconcile", "grant": pending[0]["binding"]}
-            stages = PROVISION if row["plan"]["purpose"] == "provision" else RETIRE
+            stages = stages_for(row["plan"])
             completed = {o["stage"] for o in operations}
             for stage in stages:
                 if stage not in completed:
@@ -185,7 +197,7 @@ class NativeWorkflow:
             self.lock(tx)
             row = self.load(tx, tenant, job)
             plan = row["plan"]
-            stages = PROVISION if plan["purpose"] == "provision" else RETIRE
+            stages = stages_for(plan)
             if stage not in stages:
                 raise Rejected("unsupported_native_stage", 422)
             if row["state"] not in {"prepared", "running"}:
@@ -215,7 +227,7 @@ class NativeWorkflow:
                 "executor_id": plan["executor_id"],
                 "expires_at": plan["expires_at"],
             }
-            if stage == "provision":
+            if api_stage(plan, stage):
                 binding["native_binding"] = {
                     **{
                         k: plan["scope"][k]
@@ -244,6 +256,9 @@ class NativeWorkflow:
                     "operation_id": operation,
                     "attempt_id": attempt,
                 }
+                if plan["purpose"] == "migrate":
+                    binding["schema_version"] = 2
+                    binding["native_binding"]["operation_plan_sha256"] = plan["intents"][stage]
             self.require(tx, row, binding)
             proof = self.owners.observe(plan, binding, "before")
             evidence_digest = observations(plan, binding, "before", proof, self.clock())
@@ -295,7 +310,7 @@ class NativeWorkflow:
                 raise Rejected("native_grant_held", 423)
             expected = (
                 {"preflight", "before_api_sequence", "during_api_sequence"}
-                if binding["stage"] == "provision"
+                if api_stage(row["plan"], binding["stage"])
                 else {"preflight", "before_effect", "during_effect"}
             )
             if boundary not in expected:
@@ -317,6 +332,11 @@ class NativeWorkflow:
                     "INSERT INTO app.native_redemptions VALUES(%s,%s,%s)",
                     (operation["id"], worker, self.clock()),
                 )
+                if row["plan"]["purpose"] == "migrate" and binding["stage"] == "admit_writes":
+                    tx.execute(
+                        "INSERT INTO app.native_migration_writes VALUES(%s,%s,%s)",
+                        (binding["job_id"], operation["id"], self.clock()),
+                    )
                 self.event(
                     tx,
                     binding["job_id"],
@@ -380,8 +400,8 @@ class NativeWorkflow:
                     "independently_observed",
                     {"operation_id": binding["operation_id"], "observations_sha256": checksum},
                 )
-                stages = PROVISION if row["plan"]["purpose"] == "provision" else RETIRE
-                terminal = "active" if row["plan"]["purpose"] == "provision" else "retired"
+                stages = stages_for(row["plan"])
+                terminal = terminal_for(row["plan"])
                 state = terminal if binding["stage"] == stages[-1] else "running"
                 if row["stopped"]:
                     state = "stopped"
@@ -443,3 +463,64 @@ class NativeWorkflow:
                 "retry_authorized": False,
                 "native_qualification": "not_established",
             }
+
+    def migration_admission(
+        self, tx: Transaction, plan: dict[str, Any], held: dict[str, Any] | None
+    ) -> None:
+        from lifecycle.domain.migration import RECOVERY, recovery_matches
+
+        migration = plan["migration"]
+        if migration["mode"] not in RECOVERY:
+            if held:
+                raise Rejected("native_resource_held", 423)
+            return
+        source = self.load(tx, plan["scope"]["tenant_id"], plan["source_job_id"])
+        original = source["plan"]
+        if (
+            held is None
+            or str(held["job"]) != plan["source_job_id"]
+            or str(held["custody_id"]) != plan["custody_id"]
+            or original["scope"] != plan["scope"]
+            or original["purpose"] != "migrate"
+            or source["fingerprint"] != migration["recovery_of_sha256"]
+            or plan["custody_generation"] <= original["custody_generation"]
+            or original["approval_id"] == plan["approval_id"]
+            or original["plan_digest"] == plan["plan_digest"]
+            or not recovery_matches(original["migration"], migration)
+        ):
+            raise Rejected("separate_migration_recovery_required", 423)
+        # Follow ancestry so a recovery or cleanup cannot erase possible target writes.
+        ancestor = source
+        visited: set[str] = set()
+        possible_writes = False
+        while True:
+            key = str(ancestor["id"])
+            if key in visited or len(visited) >= 64:
+                raise Rejected("migration_recovery_lineage_held", 423)
+            visited.add(key)
+            possible_writes |= (
+                tx.one("SELECT job FROM app.native_migration_writes WHERE job=%s", (key,))
+                is not None
+            )
+            parent = ancestor["plan"]["source_job_id"]
+            if parent is None:
+                break
+            ancestor = self.load(tx, plan["scope"]["tenant_id"], parent)
+        if migration["mode"] == "rollback" and possible_writes:
+            raise Rejected("target_writes_require_reconciliation", 423)
+        if migration["mode"] == "cleanup" and source["state"] not in {
+            "rehearsed",
+            "migrated",
+            "recovered",
+        }:
+            raise Rejected("migration_cleanup_before_acceptance", 423)
+        # New recovery authority revokes the old control path atomically. Native
+        # provider exclusion/drain is independently required before recovery effects.
+        tx.execute("UPDATE app.native_projection SET stopped=true WHERE job=%s", (source["id"],))
+        self.project(tx, str(source["id"]), "stopped", "migration_authority_superseded")
+        self.event(
+            tx,
+            str(source["id"]),
+            "migration_authority_superseded",
+            {"replacement_plan_sha256": digest(plan)},
+        )

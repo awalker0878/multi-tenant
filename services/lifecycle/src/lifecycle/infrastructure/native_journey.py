@@ -53,7 +53,15 @@ class NativeJourney:
             try:
                 checkpoint = await self.call("native_checkpoint_v1", base)
                 self.progress = checkpoint["state"]
-                if self.progress in {"active", "retired", "stopped"}:
+                if self.progress in {
+                    "active",
+                    "retired",
+                    "stopped",
+                    "rehearsed",
+                    "migrated",
+                    "recovered",
+                    "cleaned",
+                }:
                     return {"state": self.progress, "native_qualification": "not_established"}
                 if checkpoint["action"] == "prepare":
                     grant = await self.call(

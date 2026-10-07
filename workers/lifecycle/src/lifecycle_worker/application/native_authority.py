@@ -16,25 +16,34 @@ class GrantedNativeAuthority:
         self, grant: dict[str, Any], client: NativeBoundaryClient, clock: Callable[[], int]
     ) -> None:
         self.grant = json.loads(json.dumps(grant, allow_nan=False))
-        if (
-            set(self.grant)
-            != {
-                "job_id",
-                "operation_id",
-                "attempt_id",
-                "grant_id",
-                "stage",
-                "plan_sha256",
-                "intent_digest",
-                "epoch",
-                "executor_id",
-                "expires_at",
-                "native_binding",
-            }
-            or self.grant["stage"] != "provision"
+        migration = (
+            self.grant.get("schema_version") == 2 and type(self.grant.get("schema_version")) is int
+        )
+        if set(self.grant) != {
+            "job_id",
+            "operation_id",
+            "attempt_id",
+            "grant_id",
+            "stage",
+            "plan_sha256",
+            "intent_digest",
+            "epoch",
+            "executor_id",
+            "expires_at",
+            "native_binding",
+        } | ({"schema_version"} if migration else set()) or (
+            not migration and self.grant["stage"] != "provision"
         ):
             raise NativeHeld("invalid_native_stage_grant")
         self.binding = NativeBinding.parse(self.grant["native_binding"])
+        if migration:
+            from lifecycle_worker.application.migration_runtime import MIGRATION_STAGES
+
+            if (
+                self.grant["stage"] not in MIGRATION_STAGES
+                or self.grant["intent_digest"] != self.binding.operation_plan_sha256
+            ):
+                raise NativeHeld("migration_stage_intent_mismatch")
         for key in ("job_id", "operation_id", "attempt_id", "epoch", "executor_id", "expires_at"):
             if digest(self.grant[key]) != digest(self.binding.document()[key]):
                 raise NativeHeld("native_stage_binding_mismatch")

@@ -1,0 +1,80 @@
+# P08 — Native migration implementation
+
+P08.01–P08.05 implement R17/R21–R24/R31/R33 through Inventory discovery,
+Lifecycle's durable native coordinator and isolated Lifecycle workers. The accepted
+[native migration design](p08-native-migration.md) remains authoritative.
+
+## Source readiness and capture
+
+The read-only `VmwareWorkloadDiscovery` consumes an enrolled VM allowlist and a
+commissioned VI JSON endpoint. It observes immutable identity, versions, compute,
+firmware, Tools, all disks/backing chains/controllers, NIC/network fingerprints,
+snapshot tree and clone capabilities. A second configuration read detects drift.
+Application datasets, dependencies, consistency and objectives remain explicit
+owner inputs. Missing native facts produce holds; metadata does not establish
+qualification. This component still needs Inventory/Console profile persistence
+and the actual commissioned source tuple.
+
+`VmwareCapture` submits one disk-only S0 snapshot and one exact-S0 clone through
+native task APIs. It requires a stopped source, matching configuration, snapshot
+support and host clone capability. All NICs and removable media are removed in
+`CloneSpec` before creation, and the powered-off distinct clone's disk/controller
+mapping is read back. No source NIC is changed and this adapter never powers on
+production. RDM, independent/shared/encrypted disk and special-device profiles
+are held for separately qualified handling. Task receipts survive uncertainty;
+a task ID is observed rather than resubmitted after a lost outcome.
+
+## Migration control and recovery
+
+Version 2 admission binds source/target profile identities, every disk/dataset,
+exact method, conversion/guest/delta/recovery artifacts, independent approval,
+owner objectives and rehearsal/recovery references. All five design methods have
+explicit ordered contracts; admission still requires the commissioned owners'
+current qualified-method and complete-dataset evidence. A method contract is not
+an implemented or qualified application-specific adapter.
+
+Rehearsal has no business-write stage. Cutover requires independent all-writer
+fencing, final synchronization, source shutdown, target integrity, guest/services,
+backup restore, security paths and current change authority. Guest-dependent
+final delta precedes shutdown. Cold migration requires continued source shutdown
+and fencing during movement. No failed method selects another method.
+
+The append-only `native_migration_writes` row commits with activation grant
+redemption, before the first possible target write. An uncertain activation
+response therefore requires post-write recovery. A new recovery plan needs a
+separate approval, newer custody generation and the same method/datasets/native
+identities. Admission atomically stops the prior workflow. Provider-side stale
+request exclusion and independent drain remain mandatory owner observations.
+Pre-write source return requires target fencing and no divergence. Post-write
+forward/reverse recovery requires retention of accepted target changes. Cleanup
+has separate authority and cannot retire the source.
+
+Worker custody generations are append-only and bind tenant/site/project/resource/
+ownership scope. Multiple separately authorized stages share an admitted job;
+a new job requires a newer independently authorized generation. Older generations
+and cross-scope attempts are denied. Lifecycle remains the stage-order authority;
+worker journal possession does not authorize an effect.
+
+## Current qualification boundary
+
+Local static/type checks and synthetic component tests cover these invariants.
+Real PostgreSQL checks run in the established hosted campaign because this local
+container cannot create the required unprivileged database account. Tests with
+missing engines remain skipped, not passing. Exact-source hosted evidence is
+recorded after the campaign completes.
+
+Remaining implementation includes native OVF retention/conversion, target profile
+persistence, stage artifact resolution from prior native receipts, concrete guest/
+service/delta/traffic/recovery adapters, Console migration admission and a composed
+native Q07 journey. Installed tuples, scoped identities, independent owner protocols,
+application dataset/objective definitions and native fencing are not supplied.
+P08 and G08 remain incomplete; software checks cannot supply those inputs or actual
+Q07/G08 receiving decisions.
+
+## Native references
+
+Reviewed 2026-10-07 against Broadcom's VI JSON contracts:
+[CloneVM_Task](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VirtualMachine/moId/CloneVM_Task/post/),
+[CreateSnapshotEx_Task](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VirtualMachine/moId/CreateSnapshotEx_Task/post/), and
+[CreateDescriptor](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/OvfManager/moId/CreateDescriptor/post/).
+These are documentation references, not installed-release qualification.

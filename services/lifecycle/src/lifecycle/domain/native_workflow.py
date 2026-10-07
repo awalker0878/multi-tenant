@@ -65,6 +65,7 @@ def integer(value: Any, minimum: int = 0) -> int:
 
 
 def validate_plan(plan: dict[str, Any], now: int) -> None:
+    migration = plan.get("purpose") == "migrate"
     exact(
         plan,
         {
@@ -92,9 +93,10 @@ def validate_plan(plan: dict[str, Any], now: int) -> None:
             "expires_at",
             "intents",
             "policy_cases",
-        },
+        }
+        | ({"migration"} if migration else set()),
     )
-    if type(plan["schema_version"]) is not int or plan["schema_version"] != 1:
+    if type(plan["schema_version"]) is not int or plan["schema_version"] != (2 if migration else 1):
         raise Rejected("invalid_native_version", 422)
     scope = exact(
         plan["scope"],
@@ -138,13 +140,21 @@ def validate_plan(plan: dict[str, Any], now: int) -> None:
     ):
         raise Rejected("invalid_native_source", 422)
     checksum(plan["ownership_digest"])
-    if plan["purpose"] not in {"provision", "retire"}:
+    if plan["purpose"] not in {"provision", "retire", "migrate"}:
         raise Rejected("unsupported_native_purpose", 422)
-    if plan["purpose"] == "retire":
+    if migration:
+        from lifecycle.domain.migration import RECOVERY, validate
+
+        validate(plan["migration"], now)
+        if plan["migration"]["mode"] in RECOVERY:
+            identity(plan["source_job_id"])
+        elif plan["source_job_id"] is not None:
+            raise Rejected("invalid_migration_source_job", 422)
+    elif plan["purpose"] == "retire":
         identity(plan["source_job_id"])
     elif plan["source_job_id"] is not None:
         raise Rejected("invalid_native_source_job", 422)
-    stages = PROVISION if plan["purpose"] == "provision" else RETIRE
+    stages = stages_for(plan)
     if not isinstance(plan["intents"], dict) or set(plan["intents"]) != set(stages):
         raise Rejected("native_stage_contracts_required", 422)
     # Only immutable, separately resolved intent hashes enter the durable control journal.
@@ -202,6 +212,16 @@ def current_authority(
         "entitlement_current": True,
         "campaign_current": True,
     }
+    if plan["purpose"] == "migrate":
+        expected.update(
+            {
+                "migration_sha256": digest(plan["migration"]),
+                "source_profile_current": True,
+                "target_profile_current": True,
+                "migration_method_qualified": True,
+                "all_datasets_accounted": True,
+            }
+        )
     if any(digest(receipt.get(k)) != digest(v) for k, v in expected.items()):
         raise Rejected("native_authority_not_current", 423)
     evaluated = integer(receipt.get("evaluated_at"))
@@ -221,7 +241,7 @@ def observations(
 ) -> str:
     """Exact complete independent evidence; no 'not applicable' exemption for mandatory services."""
     stage = binding["stage"]
-    required = BEFORE[stage] if phase == "before" else AFTER[stage]
+    required = required_observations(plan, stage, phase)
     if not isinstance(records, list) or len(records) != len(required):
         raise Rejected("native_observations_incomplete", 423)
     seen = set()
@@ -271,3 +291,33 @@ def observations(
         elif record["policy_results"] != {}:
             raise Rejected("unexpected_native_policy_results", 422)
     return digest(records)
+
+
+def stages_for(plan: dict[str, Any]) -> tuple[str, ...]:
+    if plan["purpose"] == "migrate":
+        from lifecycle.domain.migration import stages
+
+        return stages(plan["migration"])
+    return PROVISION if plan["purpose"] == "provision" else RETIRE
+
+
+def terminal_for(plan: dict[str, Any]) -> str:
+    if plan["purpose"] == "migrate":
+        from lifecycle.domain.migration import TERMINALS
+
+        return TERMINALS[plan["migration"]["mode"]]
+    return "active" if plan["purpose"] == "provision" else "retired"
+
+
+def required_observations(plan: dict[str, Any], stage: str, phase: str) -> tuple[str, ...]:
+    if phase not in {"before", "after"}:
+        raise Rejected("invalid_native_observation_phase", 422)
+    if plan["purpose"] == "migrate":
+        from lifecycle.domain.migration import cases
+
+        return cases(plan, stage, phase)
+    return BEFORE[stage] if phase == "before" else AFTER[stage]
+
+
+def api_stage(plan: dict[str, Any], stage: str) -> bool:
+    return stage == "provision" or plan["purpose"] == "migrate"
