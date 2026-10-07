@@ -56,14 +56,30 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true')
     args = parser.parse_args()
-    path = ROOT / 'contracts/schemas/expansion/tranche-v1.json'
-    rendered = json.dumps(schema(), indent=2) + '\n'
-    if args.check:
-        if path.read_text() != rendered:
-            raise SystemExit('P09 tranche contract drift')
-    else:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(rendered)
+    sha = {'type': 'string', 'pattern': '^[a-f0-9]{64}$'}
+    integer = {'type': 'integer', 'minimum': 0}
+    label = {'type': 'string', 'minLength': 1, 'maxLength': 100}
+    capability = obj({'operation': {'enum': ['power_on', 'shutdown', 'power_off', 'resize_cpu', 'resize_memory']},
+                      'tuple_sha256': sha, 'route_sha256': sha})
+    manifest = obj({'schema_version': {'type': 'integer', 'const': 1},
+        'adapter_id': {'enum': ['vmware-lifecycle-v1', 'ahv-lifecycle-v1']}, 'version': label,
+        **{k: sha for k in ['artifact_sha256', 'release_sha256', 'constraint_sha256', 'implementation_sha256']},
+        'contracts': obj({k: {'const': v} for k, v in {'native_effect': '2', 'expansion': '1', 'journal': '1'}.items()}),
+        'capabilities': array(capability), 'owner_role': label, 'not_before': integer, 'expires_at': integer,
+        'retest_triggers': schema()['properties']['retest_triggers']})
+    package = {'$schema': 'https://json-schema.org/draft/2020-12/schema',
+               '$id': 'urn:multi-tenant:adapter-package:v1', 'title': 'Signed installed adapter package',
+               **obj({'manifest': manifest, 'key_id': label,
+                      'signature': {'type': 'string', 'pattern': '^[A-Za-z0-9+/]{86}==$'}})}
+    for name, document in [('tranche-v1', schema()), ('adapter-package-v1', package)]:
+        path = ROOT / f'contracts/schemas/expansion/{name}.json'
+        rendered = json.dumps(document, indent=2) + '\n'
+        if args.check:
+            if path.read_text() != rendered:
+                raise SystemExit('P09 contract drift: ' + name)
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(rendered)
 
 
 if __name__ == '__main__':

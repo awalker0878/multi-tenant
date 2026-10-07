@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:multi-tenant:adapter-package:v1",
+  "title": "Signed installed adapter package",
+  "type": "object",
+  "properties": {
+    "manifest": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "adapter_id": {
+          "enum": [
+            "vmware-lifecycle-v1",
+            "ahv-lifecycle-v1"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "artifact_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "release_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "constraint_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "implementation_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "contracts": {
+          "type": "object",
+          "properties": {
+            "native_effect": {
+              "const": "2"
+            },
+            "expansion": {
+              "const": "1"
+            },
+            "journal": {
+              "const": "1"
+            }
+          },
+          "required": [
+            "native_effect",
+            "expansion",
+            "journal"
+          ],
+          "additionalProperties": false
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "enum": [
+                  "power_on",
+                  "shutdown",
+                  "power_off",
+                  "resize_cpu",
+                  "resize_memory"
+                ]
+              },
+              "tuple_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "route_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "operation",
+              "tuple_sha256",
+              "route_sha256"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 512,
+          "uniqueItems": true
+        },
+        "owner_role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "not_before": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expires_at": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "retest_triggers": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "artifact",
+              "platform",
+              "api",
+              "backend",
+              "guest",
+              "method",
+              "policy",
+              "service",
+              "topology",
+              "recovery",
+              "ownership",
+              "expiry",
+              "revocation"
+            ]
+          },
+          "minItems": 13,
+          "maxItems": 13,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "schema_version",
+        "adapter_id",
+        "version",
+        "artifact_sha256",
+        "release_sha256",
+        "constraint_sha256",
+        "implementation_sha256",
+        "contracts",
+        "capabilities",
+        "owner_role",
+        "not_before",
+        "expires_at",
+        "retest_triggers"
+      ],
+      "additionalProperties": false
+    },
+    "key_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9+/]{86}==$"
+    }
+  },
+  "required": [
+    "manifest",
+    "key_id",
+    "signature"
+  ],
+  "additionalProperties": false
+}

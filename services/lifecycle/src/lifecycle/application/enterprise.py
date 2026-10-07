@@ -157,7 +157,7 @@ class Enterprise:
             )
             return result
 
-    def available(self, tx: Transaction, spec: dict[str, Any]) -> bool:
+    def available(self, tx: Transaction, spec: dict[str, Any], reserving: bool = True) -> bool:
         budgets = self.owners.budgets(sorted(spec["demands"]))
         exact(budgets, set(spec["demands"]))
         now = self.clock()
@@ -179,7 +179,8 @@ class Enterprise:
                 (pool,),
             )
             assert reserved is not None
-            if budget["external_usage"] + int(reserved["used"]) + amount > budget["limit"]:
+            added = amount if reserving else 0
+            if budget["external_usage"] + int(reserved["used"]) + added > budget["limit"]:
                 return False
         return True
 
@@ -286,6 +287,8 @@ class Enterprise:
                 raise Rejected("enterprise_effect_boundary_held", 423)
             spec = operation(row["specification"])
             self.owners.require_current(spec, "before_native_request")
+            if not self.available(tx, spec, reserving=False):
+                raise Rejected("enterprise_current_budget_held", 423)
             if row["lease_until"] <= self.clock():
                 raise Rejected("enterprise_effect_boundary_held", 423)
             return spec

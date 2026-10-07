@@ -92,7 +92,7 @@ def baseline() -> dict[str, Any]:
 
 
 @pytest.mark.parametrize(
-    ("source", "target", "guest", "method"), product(PLATFORMS, PLATFORMS, GUESTS, METHODS)
+    ("source", "target", "guest", "method"), list(product(PLATFORMS, PLATFORMS, GUESTS, METHODS))
 )
 def test_every_direction_guest_and_method_has_separate_plan(
     source: str, target: str, guest: str, method: str

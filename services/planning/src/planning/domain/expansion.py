@@ -140,6 +140,8 @@ def route(value: Any) -> dict[str, Any]:
         raise Rejected("invalid_expansion_exclusions")
     for exclusion in exclusions:
         text(exclusion)
+    if len(set(exclusions)) != len(exclusions):
+        raise Rejected("duplicate_expansion_exclusion")
     return row
 
 

@@ -19,6 +19,8 @@ subprocess.run([sys.executable, str(ROOT / 'scripts/p09/generate_contract.py'), 
 schema = json.loads((ROOT / 'contracts/schemas/expansion/tranche-v1.json').read_text())
 Draft202012Validator.check_schema(schema)
 validator = Draft202012Validator(schema, format_checker=FormatChecker())
+package = json.loads((ROOT / 'contracts/schemas/expansion/adapter-package-v1.json').read_text())
+Draft202012Validator.check_schema(package)
 value = baseline()
 validator.validate(value)
 tranche(value)
