@@ -22,6 +22,7 @@ from lifecycle_worker.application.native import (
     digest,
     sha256,
 )
+from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.native_copy import VmwareExport
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.vmware_capture import NICS, devices, moref
@@ -134,7 +135,7 @@ class MigrationArchive:
         )
         if (
             type(p["schema_version"]) is not int
-            or p["schema_version"] != 1
+            or p["schema_version"] not in {1, 2}
             or p["kind"] != "vmware_export_archive"
             or digest(p) != binding.operation_plan_sha256
             or not sha256(p["capture_plan_sha256"])
@@ -150,7 +151,7 @@ class MigrationArchive:
         moref({"type": "OvfManager", "value": p["ovf_manager_id"]}, "OvfManager")
         moref({"type": "VirtualMachine", "value": p["source_vm_id"]}, "VirtualMachine")
         for key, minimum, maximum in (
-            ("max_seconds", 1, 600),
+            ("max_seconds", 1, seconds(p)),
             ("bytes_per_second", 65536, 2**34),
             ("spool_bytes", 1, 2**50),
         ):

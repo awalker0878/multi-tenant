@@ -6,6 +6,7 @@ than invoking salvage, in-place repair or a second conversion method.
 """
 
 import hashlib
+import math
 import os
 import selectors
 import signal
@@ -150,10 +151,10 @@ class PinnedQemuSandbox:
             "n=int(sys.argv[1]); "
             "resource.setrlimit(resource.RLIMIT_FSIZE,(n,n)); "
             "resource.setrlimit(resource.RLIMIT_AS,(2**31,2**31)); "
-            "resource.setrlimit(resource.RLIMIT_CPU,(600,600)); "
+            "c=int(sys.argv[2]); resource.setrlimit(resource.RLIMIT_CPU,(c,c)); "
             "resource.setrlimit(resource.RLIMIT_NOFILE,(64,64)); "
             "resource.setrlimit(resource.RLIMIT_CORE,(0,0)); "
-            "os.execv(sys.argv[2],sys.argv[2:])"
+            "os.execv(sys.argv[3],sys.argv[3:])"
         )
         process = subprocess.Popen(
             [
@@ -163,6 +164,7 @@ class PinnedQemuSandbox:
                 "-c",
                 limiter,
                 str(max_bytes),
+                str(min(86400, max(1, math.ceil(deadline - time.monotonic())))),
                 *self.command(arguments, source, output),
             ],
             stdin=subprocess.DEVNULL,
@@ -236,7 +238,7 @@ class CopyConverter:
             ("source_bytes", 1, 2**46),
             ("virtual_bytes", 512, 2**46),
             ("max_output_bytes", 1, 2**46),
-            ("max_seconds", 1, 600),
+            ("max_seconds", 1, 86400),
             ("bytes_per_second", 65536, 2**34),
         ):
             if type(intent[k]) is not int or not low <= intent[k] <= high:

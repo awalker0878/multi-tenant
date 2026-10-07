@@ -27,12 +27,18 @@ class NativeJourney:
 
     async def call(self, name: str, args: dict[str, Any]) -> dict[str, Any]:
         effect = name == "native_effect_v1"
+        seconds = 660 if effect else 30
+        if effect and workflow.patched("p08-migration-duration-v2"):
+            grant = args.get("grant", {})
+            if grant.get("schema_version") == 2:
+                remaining = grant["expires_at"] - int(workflow.now().timestamp())
+                seconds = min(86400, max(1, remaining)) + 60
         result = await workflow.execute_activity(
             name,
             args,
             result_type=dict[str, Any],
-            start_to_close_timeout=timedelta(seconds=660 if effect else 30),
-            schedule_to_close_timeout=timedelta(seconds=720 if effect else 60),
+            start_to_close_timeout=timedelta(seconds=seconds),
+            schedule_to_close_timeout=timedelta(seconds=seconds + (60 if effect else 30)),
             retry_policy=RetryPolicy(maximum_attempts=1),
         )
         return dict(result)

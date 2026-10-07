@@ -16,6 +16,7 @@ from lifecycle_worker.application.native import (
     sha256,
 )
 from lifecycle_worker.infrastructure.image_conversion import CopyConverter
+from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.native_files import protected_read
 
 
@@ -56,7 +57,7 @@ class MigrationConversion:
         )
         if (
             type(p["schema_version"]) is not int
-            or p["schema_version"] != 1
+            or p["schema_version"] not in {1, 2}
             or p["kind"] != "migration_copy_conversion"
             or digest(p) != binding.operation_plan_sha256
             or not sha256(p["export_plan_sha256"])
@@ -65,7 +66,7 @@ class MigrationConversion:
             raise NativeHeld("conversion_plan_changed")
         if (
             type(p["max_seconds"]) is not int
-            or not 1 <= p["max_seconds"] <= 600
+            or p["max_seconds"] != seconds(p)
             or type(p["bytes_per_second"]) is not int
             or not 65536 <= p["bytes_per_second"] <= 2**34
         ):

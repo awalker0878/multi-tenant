@@ -48,8 +48,8 @@ coordinator combines it with the current native custody boundary and independent
 read Inventory records. Simulation approval receipts are rejected.
 
 The new Governance and Inventory interfaces have separately versioned OpenAPI
-contracts. Previously published contract bytes remain unchanged. Request/approval
-APIs do not accept a browser-supplied native plan or credential.
+contracts. Previously published contract bytes remain unchanged. Planning also rechecks recipe revocation on unattended execution and Governance
+binding reads. Request/approval APIs do not accept a browser-supplied native plan or credential.
 
 Inventory requires `INVENTORY_NATIVE_READERS_FILE`. It contains `schema_version: 1`
 and `grants`. Each reader grant has `reader_id`, a distinct `token_file`,
@@ -86,3 +86,23 @@ Mount actual source/target endpoint policies, protected account custody referenc
 approved recipe artifacts and the selected workload's protocols. Confirm G07 entry,
 then execute Q07.01–Q07.10 with independent native evidence and record G08 receiving.
 No configuration file or software test substitutes for those observations.
+
+## Explicit long movement budgets
+
+Export-archive, copy-conversion and image-import stage intents accept version 2
+with `max_seconds` from 1 to 86,400. Version 1 retains its existing 600-second
+maximum. The immutable intent still pins the chosen budget, and every effect/chunk
+continues to check current authority. The shorter plan, credential, profile or
+campaign expiry always wins. A larger budget does not refresh stale observations.
+
+The native worker HTTP wait and Temporal effect timeout follow the grant's remaining
+lifetime with a maximum one-day effect budget. Temporal records a patch marker so
+retained histories preserve their prior timeout commands. Automatic effect retries
+remain disabled. Converter CPU limits follow the explicit remaining budget; file,
+memory, output, rate and sandbox isolation limits remain enforced.
+
+This removes the arbitrary ten-minute software ceiling. It does not implement
+crash/byte-range transfer resumption. An interrupted NFC or Glance operation remains
+held until independently reconciled; re-running a claimed operation, discarding its
+spool or extending its expiry is not recovery. Native route-specific continuation
+still needs implementation and testing against the commissioned provider protocol.

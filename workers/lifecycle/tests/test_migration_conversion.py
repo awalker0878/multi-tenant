@@ -17,9 +17,10 @@ from lifecycle_worker.infrastructure.image_conversion import CopyConverter
 from lifecycle_worker.infrastructure.migration_conversion import MigrationConversion
 
 
+@pytest.mark.parametrize("version", [1, 2])
 @pytest.mark.parametrize("fault", ["", "mapping", "bytes", "digest", "custody", "lost"])
 def test_conversion_resolves_only_complete_archive_with_exact_bytes(
-    binding: NativeBinding, tmp_path: Path, fault: str
+    binding: NativeBinding, tmp_path: Path, fault: str, version: int
 ) -> None:
     engine = Engine()
     source_op = str(uuid4())
@@ -31,11 +32,11 @@ def test_conversion_resolves_only_complete_archive_with_exact_bytes(
     (source_dir / "disk-2000.vmdk").write_bytes(raw)
     prior = {"size": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
     plan = {
-        "schema_version": 1,
+        "schema_version": version,
         "kind": "migration_copy_conversion",
         "export_plan_sha256": digest("approved-archive"),
         "artifact_sha256": engine.artifact_sha256,
-        "max_seconds": 30,
+        "max_seconds": 30 if version == 1 else 3600,
         "bytes_per_second": 1048576,
         "disks": [
             {

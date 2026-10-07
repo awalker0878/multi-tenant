@@ -20,6 +20,7 @@ from lifecycle_worker.application.native import (
     sha256,
 )
 from lifecycle_worker.infrastructure.image_conversion import file_digest
+from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.migration_conversion import ArtifactCustody
 from lifecycle_worker.infrastructure.native_copy import GlanceImport
 from lifecycle_worker.infrastructure.native_files import protected_read
@@ -49,14 +50,14 @@ class MigrationImport:
         )
         if (
             type(p["schema_version"]) is not int
-            or p["schema_version"] != 1
+            or p["schema_version"] not in {1, 2}
             or p["kind"] != "migration_image_import"
             or p["route"] != "glance-direct"
             or not sha256(p["conversion_plan_sha256"])
             or digest(p) != binding.operation_plan_sha256
         ):
             raise NativeHeld("migration_import_plan_changed")
-        if type(p["max_seconds"]) is not int or not 1 <= p["max_seconds"] <= 600:
+        if type(p["max_seconds"]) is not int or p["max_seconds"] != seconds(p):
             raise NativeHeld("migration_import_deadline_invalid")
         if not isinstance(p["disks"], list) or not 1 <= len(p["disks"]) <= 32:
             raise NativeHeld("migration_import_disks_invalid")

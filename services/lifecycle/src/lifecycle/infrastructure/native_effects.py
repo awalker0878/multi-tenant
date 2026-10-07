@@ -82,6 +82,7 @@ class NativeWorkerEffects:
             data = json.dumps({"grant": grant}, allow_nan=False, separators=(",", ":")).encode()
             if len(data) > 16384:
                 raise Rejected("native_effect_request_bound", 423)
+            timeout = effect_seconds(grant, int(time.time()))
             token = credential(endpoint.credential_file)
             connection = NativeEffectConnection(endpoint)
             connection.request(
@@ -98,9 +99,9 @@ class NativeWorkerEffects:
             if connection.sock is None:
                 raise Rejected("native_effect_connection_lost", 423)
             # Native API execution is bounded independently. Timeout leaves the prepared grant held.
-            deadline = time.monotonic() + 620
+            deadline = time.monotonic() + timeout
             stream = connection.sock
-            stream.settimeout(620)
+            stream.settimeout(timeout)
             response = connection.getresponse()
             if (
                 response.status != 200
@@ -136,3 +137,13 @@ class NativeWorkerEffects:
         finally:
             if connection is not None:
                 connection.close()
+
+
+def effect_seconds(grant: dict[str, Any], now: int) -> int:
+    """A migration's existing expiry bounds the wait; no grant is extended here."""
+    if grant.get("schema_version") != 2:
+        return 620
+    expires = grant.get("expires_at")
+    if type(expires) is not int or expires <= now:
+        raise Rejected("native_effect_grant_expired", 423)
+    return min(86400, expires - now) + 20

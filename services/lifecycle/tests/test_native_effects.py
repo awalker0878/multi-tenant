@@ -188,3 +188,15 @@ def test_missing_ambiguous_or_truncated_framing_is_held(peer: Any, length: str) 
     with pytest.raises(Rejected):
         NativeWorkerEffects({worker: endpoint}).execute({"executor_id": worker})
     assert len(fixture["requests"]) == 1
+
+
+def test_migration_wait_is_bounded_by_grant_expiry_without_renewal() -> None:
+    from lifecycle.infrastructure.native_effects import effect_seconds
+
+    assert effect_seconds({}, 1000) == 620
+    assert effect_seconds({"schema_version": 2, "expires_at": 4600}, 1000) == 3620
+    assert effect_seconds({"schema_version": 2, "expires_at": 1001}, 1000) == 21
+    assert effect_seconds({"schema_version": 2, "expires_at": 1000000}, 1000) == 86420
+    for expiry in (1000, 999, True, "4600", None):
+        with pytest.raises(Rejected):
+            effect_seconds({"schema_version": 2, "expires_at": expiry}, 1000)

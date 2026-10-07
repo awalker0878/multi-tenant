@@ -2,6 +2,7 @@
 
 import asyncio
 from copy import deepcopy
+from datetime import UTC
 from typing import Any
 from uuid import uuid4
 
@@ -229,3 +230,26 @@ def test_native_cancellation_closes_workflow_after_preserving_hold(wrapped: bool
     with pytest.raises(CancelledError):
         asyncio.run(Journey().run({"tenant": str(uuid4()), "job": str(uuid4())}))
     assert calls == ["native_checkpoint_v1", "native_hold_v1"]
+
+
+@pytest.mark.parametrize("patched", [False, True])
+def test_long_migration_activity_keeps_single_attempt_and_replay_version(
+    monkeypatch: pytest.MonkeyPatch, patched: bool
+) -> None:
+    from datetime import datetime
+    from unittest.mock import AsyncMock
+
+    from temporalio import workflow
+
+    call = AsyncMock(return_value={"submitted": True})
+    monkeypatch.setattr(workflow, "patched", lambda key: patched)
+    monkeypatch.setattr(workflow, "now", lambda: datetime.fromtimestamp(1000, UTC))
+    monkeypatch.setattr(workflow, "execute_activity", call)
+    asyncio.run(
+        NativeJourney().call(
+            "native_effect_v1", {"grant": {"schema_version": 2, "expires_at": 4600}}
+        )
+    )
+    options = call.call_args.kwargs
+    assert options["start_to_close_timeout"].total_seconds() == (3660 if patched else 660)
+    assert options["retry_policy"].maximum_attempts == 1

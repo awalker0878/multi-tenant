@@ -16,9 +16,10 @@ from lifecycle_worker.infrastructure.migration_import import MigrationImport
 from lifecycle_worker.infrastructure.native_copy import NativeVmCopy
 
 
+@pytest.mark.parametrize("version", [1, 2])
 @pytest.mark.parametrize("fault", ["", "digest", "lost_image", "stage", "mapping", "format"])
 def test_retained_image_import_exact_method_and_custody(
-    copy_campaign: Any, tmp_path: Path, fault: str
+    copy_campaign: Any, tmp_path: Path, fault: str, version: int
 ) -> None:
     b, execution, fixture, journal = copy_campaign
     old = execution.adapter
@@ -46,11 +47,11 @@ def test_retained_image_import_exact_method_and_custody(
             }
 
     p: dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": version,
         "kind": "migration_image_import",
         "conversion_plan_sha256": digest("convert"),
         "route": "glance-direct",
-        "max_seconds": 60,
+        "max_seconds": 60 if version == 1 else 3600,
         "disks": [
             {
                 "key": "disk-2000",
