@@ -11,6 +11,12 @@ adapters, long-transfer resumption and Q07/G08 acceptance remain open. The
 source/target secret references, lab placement and application-owner protocols
 needed to make that work concrete. Existing development authorization continues.
 
+The [campaign evidence](verification/p08/campaigns/README.md) qualifies source
+`5e2b4a62f2c940bbdb06432c8922d43301e3482c`: 811 component tests without skips,
+all three migration browser journeys and all Console quality commands pass.
+Console records 192 Pest passes and seven explicit separate-campaign broker skips.
+The original formatting failure and exact final archives remain retained.
+
 P08 development continues on the native-only baseline. Source fleet browsing, named
 groups, VM-specific review and bulk OpenStack preparation are implemented and qualified
 in the [fleet evidence](verification/p08/fleet/README.md): 785 component tests without

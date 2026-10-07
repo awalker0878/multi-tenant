@@ -81,10 +81,17 @@ or approval's lifetime. Expired plans require a fresh approved campaign draft.
 
 ## Qualification corrections
 
+The [campaign evidence](../../verification/p08/campaigns/README.md) binds the final
+source `5e2b4a62f2c940bbdb06432c8922d43301e3482c` to 811 passing component tests
+without skips and all three passing migration browser journeys. The Console
+package passes all 23 quality commands, with 192 Pest passes, 911 assertions and
+seven explicit separate-campaign broker skips. Original archives, source/log hashes,
+browser artifacts and the initial formatting failure are retained and verified.
+
 Commit `9c1adaa3ade546b4f187420ee588204f128387e1` passed the hosted P08 PostgreSQL
 test command and the existing migration browser journeys, but the overall P08
-run `37650245430` failed its formatting check. The original failure remains in
-GitHub Actions. Commit `f29325f6b97c4118a3db80ca077d2659d921a388` corrects only
+run `37650245430` failed its formatting check. The original failure remains in the
+retained campaign evidence. Commit `f29325f6b97c4118a3db80ca077d2659d921a388` corrects only
 the required test formatting. Subsequent results must be bound to their tested
 source; none of these component checks establish native qualification.
 
