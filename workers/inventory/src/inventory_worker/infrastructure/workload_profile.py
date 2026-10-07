@@ -181,7 +181,12 @@ def normalize(vm: str, release: str, records: dict[str, Any], observed_at: int) 
 
 class VmwareWorkloadDiscovery:
     def __init__(
-        self, stream: dict[str, Any], allowed_vms: set[str], release: str, clock: Callable[[], int]
+        self,
+        stream: dict[str, Any],
+        allowed_vms: set[str],
+        release: str,
+        clock: Callable[[], int],
+        before_request: Callable[[], None],
     ) -> None:
         if re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+", release) is None:
             raise CollectionFailure("unsupported_api")
@@ -191,9 +196,11 @@ class VmwareWorkloadDiscovery:
             release,
             clock,
         )
+        self.before_request = before_request
 
     def read(self, kind: str, native_id: str, field: str) -> Any:
         ref({"type": kind, "value": native_id}, kind)
+        self.before_request()
         return exchange(
             self.stream,
             f"/sdk/vim25/{self.release}/{kind}/{native_id}/{field}",

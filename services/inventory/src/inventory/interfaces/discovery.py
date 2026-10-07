@@ -11,11 +11,31 @@ from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 from inventory.application.configuration import PortingConfiguration
 from inventory.application.discovery import Discovery
 from inventory.application.ports import Authority
+from inventory.application.profile_collection import authorize_read
 from inventory.application.views import InventoryViews
+from inventory.application.workload import WorkloadProfiles
 from inventory.domain.discovery import Rejected
 
 UUID = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
 ROUTES = (
+    (
+        "GET",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/migration-review",
+        "migration",
+        "inventory.admin",
+    ),
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/migration-review",
+        "migration_save",
+        "inventory.admin",
+    ),
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/migration-review/confirmations",
+        "migration_confirm",
+        "inventory.admin",
+    ),
     (
         "POST",
         rf"/v1/tenants/({UUID})/sites/({UUID})/endpoints/({UUID})/configuration-pulls",
@@ -124,6 +144,7 @@ class InventoryApp:
         self.authority = authority
         self.views = InventoryViews(discovery)
         self.configuration = PortingConfiguration(discovery)
+        self.workloads = WorkloadProfiles(discovery)
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
@@ -142,6 +163,7 @@ class InventoryApp:
             worker_route = scope["path"] in {
                 "/internal/collections/claim",
                 "/internal/collections/pages",
+                "/internal/collections/profile-reads",
             }
             selected = next(
                 (
@@ -194,6 +216,8 @@ class InventoryApp:
                     if body:
                         raise Rejected("invalid_shape")
                     payload = await asyncio.to_thread(self.discovery.claim, worker)
+                elif scope["path"].endswith("/profile-reads"):
+                    payload = await asyncio.to_thread(authorize_read, self.discovery, worker, body)
                 else:
                     payload = await asyncio.to_thread(self.discovery.submit, worker, body)
             else:
@@ -203,7 +227,11 @@ class InventoryApp:
                     raise Rejected("invalid_query")
                 target = values[2] if len(values) > 2 else None
                 if scope["method"] == "GET":
-                    if operation == "configuration":
+                    if operation == "migration":
+                        if params:
+                            raise Rejected("invalid_query")
+                        payload = await asyncio.to_thread(self.workloads.read, actor)
+                    elif operation == "configuration":
                         if params:
                             raise Rejected("invalid_query")
                         payload = await asyncio.to_thread(self.configuration.read, actor)
@@ -222,7 +250,9 @@ class InventoryApp:
                     if expected and not re.fullmatch(r'"[1-9][0-9]{0,8}"', expected):
                         raise Rejected("invalid_revision")
                     payload = await asyncio.to_thread(
-                        self.configuration.command
+                        self.workloads.command
+                        if operation in {"migration_save", "migration_confirm"}
+                        else self.configuration.command
                         if operation in {"configuration_save", "configuration_confirm"}
                         else self.discovery.command,
                         actor,

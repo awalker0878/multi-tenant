@@ -67,8 +67,41 @@ def run_page(config: dict[str, Any]) -> bool:
             or not time.time() < job["lease_until"] <= time.time() + 31
         ):
             raise CollectionFailure("permission_denied")
+        request_number = 0
+
+        def before_request() -> None:
+            nonlocal request_number
+            request_number += 1
+            while time.time() + 12 < job["lease_until"] and time.time() < p["expires_at"]:
+                permit = exchange(
+                    config,
+                    "/internal/collections/profile-reads",
+                    headers,
+                    method="POST",
+                    body={**body, "request_number": request_number},
+                )
+                if not isinstance(permit, dict) or set(permit) != {"allowed", "retry_after"}:
+                    raise CollectionFailure("invalid_response")
+                if permit["allowed"] is True and time.time() + 10 < job["lease_until"]:
+                    return
+                delay = permit["retry_after"]
+                if (
+                    permit["allowed"] is not False
+                    or type(delay) not in {int, float}
+                    or not 0 < delay <= 2
+                ):
+                    raise CollectionFailure("permission_denied")
+                time.sleep(delay)
+            raise CollectionFailure("permission_denied")
+
         body.update(
-            collect(p, job["stream"], job["cursor"], job.get("collect_configuration", False))
+            collect(
+                p,
+                job["stream"],
+                job["cursor"],
+                job.get("collect_configuration", False),
+                before_request,
+            )
         )
     except CollectionFailure as error:
         body.update(

@@ -8,6 +8,7 @@ import re
 import socket
 import ssl
 import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode, urlsplit
@@ -140,6 +141,7 @@ def collect(
     stream_index: int,
     cursor: str | None,
     include_configuration: bool = False,
+    before_request: Callable[[], None] | None = None,
 ) -> dict[str, Any]:
     platform, scope = policy["platform"], policy["native_scope"]
     from inventory_worker.infrastructure.generated_configuration_streams import (
@@ -153,6 +155,12 @@ def collect(
     )
     stream = streams[stream_index]
     kind = stream["kind"]
+    if kind in {"source_profile", "target_profile"}:
+        from inventory_worker.infrastructure.profile_collection import collect_profile
+
+        if before_request is None:
+            raise CollectionFailure("permission_denied")
+        return collect_profile(policy, stream, cursor, before_request)
     if kind.startswith("config_"):
         from inventory_worker.infrastructure.configuration import collect_configuration
 

@@ -98,7 +98,7 @@ def test_unknown_native_facts_remain_held(fault: str) -> None:
 def test_source_scope_and_configuration_change_are_denied() -> None:
     class Reader(VmwareWorkloadDiscovery):
         def __init__(self) -> None:
-            super().__init__({}, {"vm-1"}, "9.1.1.0", lambda: 1000)
+            super().__init__({}, {"vm-1"}, "9.1.1.0", lambda: 1000, lambda: None)
             self.responses = records()
             self.calls: list[str] = []
 

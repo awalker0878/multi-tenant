@@ -105,8 +105,20 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
         "vmware": {"server", "network", "datastore"},
         "ahv": set(),
     }[p["platform"]]
-    allowed = required | (
-        {"config_" + q for q in CONFIGURATION_QUERIES} if p["platform"] == "openstack" else set()
+    allowed = (
+        required
+        | (
+            {"source_profile"}
+            if p["platform"] == "vmware"
+            else {"target_profile"}
+            if p["platform"] == "openstack"
+            else set()
+        )
+        | (
+            {"config_" + q for q in CONFIGURATION_QUERIES}
+            if p["platform"] == "openstack"
+            else set()
+        )
     )
     kinds = (
         [s.get("kind") for s in streams if isinstance(s, dict)] if isinstance(streams, list) else []
@@ -120,7 +132,42 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
     ):
         raise Rejected("invalid_stream_coverage")
     for s in streams:
-        shape(s, {"kind", "base_url", "addresses", "ca_file", "credential_file", "api_version"})
+        shape(
+            s,
+            {"kind", "base_url", "addresses", "ca_file", "credential_file", "api_version"}
+            | ({"vm_ids"} if s["kind"] == "source_profile" else set()),
+        )
+        if s["kind"] == "source_profile":
+            vms = s["vm_ids"]
+            if (
+                not isinstance(vms, list)
+                or not 1 <= len(vms) <= 32
+                or not all(isinstance(v, str) and re.fullmatch(r"vm-[0-9]+", v) for v in vms)
+                or len(set(vms)) != len(vms)
+            ):
+                raise Rejected("invalid_vm_allowlist")
+            if not isinstance(s["api_version"], str) or not re.fullmatch(
+                r"[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+", s["api_version"]
+            ):
+                raise Rejected("explicit_vi_release_required")
+            if streams.index(s) < kinds.index("server") or urlsplit(s["base_url"]).path not in {
+                "",
+                "/",
+            }:
+                raise Rejected("profile_scope_not_ready")
+            server = streams[kinds.index("server")]
+            source_url, server_url = urlsplit(s["base_url"]), urlsplit(server["base_url"])
+            if (source_url.hostname, source_url.port or 443, s["addresses"], s["ca_file"]) != (
+                server_url.hostname,
+                server_url.port or 443,
+                server["addresses"],
+                server["ca_file"],
+            ):
+                raise Rejected("profile_vcenter_scope_mismatch")
+        if s["kind"] == "target_profile" and (
+            s["api_version"] != "2" or urlsplit(s["base_url"]).path.rstrip("/") != "/v2"
+        ):
+            raise Rejected("explicit_glance_v2_required")
         u = urlsplit(text(s["base_url"], 512))
         if (
             u.scheme != "https"

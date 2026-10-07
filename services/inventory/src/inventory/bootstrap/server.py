@@ -38,7 +38,9 @@ class InventoryRouter:
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        if scope["type"] == "http" and "/planning-inputs/" in scope["path"]:
+        if scope["type"] == "http" and any(
+            p in scope["path"] for p in ("/planning-inputs/", "/migration-inputs/")
+        ):
             await self.planning(scope, receive, send)
         elif scope["type"] == "http" and (
             scope["path"].startswith("/v1/") or scope["path"].startswith("/internal/")

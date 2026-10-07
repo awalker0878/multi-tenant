@@ -9,6 +9,7 @@ from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from inventory.application.discovery import Discovery
 from inventory.application.planning import planning_input
+from inventory.application.workload import WorkloadProfiles
 from inventory.domain.discovery import Rejected
 from inventory.interfaces.discovery import UUID, single
 
@@ -29,9 +30,15 @@ class PlanningInputApp:
                 rf"/v1/tenants/({UUID})/planning-inputs/({UUID})/({UUID})/({UUID})/({UUID})/({UUID})",
                 scope["path"],
             )
-            if not route or scope["method"] != "GET" or scope["query_string"]:
+            migration = re.fullmatch(
+                rf"/v1/tenants/({UUID})/migration-inputs/({UUID})/({UUID})/({UUID})/([1-9][0-9]{{0,8}})/([0-9a-f]{{64}})",
+                scope["path"],
+            )
+            if not (route or migration) or scope["method"] != "GET" or scope["query_string"]:
                 raise Rejected("not_found", 404)
-            tenant, application, environment, site, endpoint, generation = route.groups()
+            selected = migration or route
+            assert selected is not None
+            tenant, application, environment, site, endpoint, generation = selected.groups()
             headers = list(scope["headers"])
             auth = single(headers, b"authorization")
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", auth):
@@ -46,9 +53,18 @@ class PlanningInputApp:
                 environment,
                 site,
             )
-            payload = await asyncio.to_thread(
-                planning_input, self.discovery, tenant, site, endpoint, generation
-            )
+            if migration:
+                payload = await asyncio.to_thread(
+                    WorkloadProfiles(self.discovery).planning,
+                    tenant,
+                    site,
+                    int(endpoint),
+                    generation,
+                )
+            else:
+                payload = await asyncio.to_thread(
+                    planning_input, self.discovery, tenant, site, endpoint, generation
+                )
             status = 200
         except Rejected as e:
             status, payload = e.status, {"error": e.reason}

@@ -21,6 +21,7 @@ from inventory.domain.discovery import (
     shape,
     text,
 )
+from inventory.domain.workload import profile_payload
 
 
 def uid() -> str:
@@ -494,7 +495,7 @@ class Discovery:
             tx.execute(
                 (
                     "UPDATE inventory.jobs SET status='running',worker_id=%s"
-                    ",lease_token=%s,lease_until=%s,updated_at=%s WHERE "
+                    ",lease_token=%s,lease_until=%s,updated_at=%s,profile_reads=0 WHERE "
                     "id=%s"
                 ),
                 (worker.identity, lease, now + 30, now, j["id"]),
@@ -537,7 +538,7 @@ class Discovery:
                 "collected_at",
                 "error",
             },
-            {"configuration"},
+            {"configuration", "profile"},
         )
         job_id, lease = identifier(body["discovery_id"]), identifier(body["lease_token"])
         number(body["sequence"], 0, 100)
@@ -579,6 +580,7 @@ class Discovery:
                     "invalid_response",
                     "unsafe_destination",
                     "unsupported_api",
+                    "source_changed",
                 }:
                     raise Rejected("invalid_error")
                 failures = j["failures"] + 1
@@ -621,7 +623,29 @@ class Discovery:
                 if j["collect_configuration"]
                 else p.streams
             )
-            kind = streams[j["stream"]]["kind"]
+            stream_spec = streams[j["stream"]]
+            kind = stream_spec["kind"]
+            if kind in {"source_profile", "target_profile"}:
+                profile = profile_payload(body.get("profile"), stream_spec, p.native_scope)
+                if (
+                    body["observations"]
+                    or "configuration" in body
+                    or j["profile_reads"] != (8 if kind == "source_profile" else 7)
+                ):
+                    raise Rejected("incomplete_profile_collection")
+                if not int(collected) <= profile["observed_at"] <= int(now):
+                    raise Rejected("invalid_observation_time")
+                expected_cursor = None
+                if kind == "source_profile":
+                    vms = stream_spec["vm_ids"]
+                    index = vms.index(j["cursor"]) + 1 if j["cursor"] is not None else 0
+                    if index >= len(vms) or profile["vm_id"] != vms[index]:
+                        raise Rejected("foreign_profile_scope", 403)
+                    expected_cursor = vms[index] if index + 1 < len(vms) else None
+                if body["next_cursor"] != expected_cursor:
+                    raise Rejected("invalid_profile_cursor")
+            elif "profile" in body:
+                raise Rejected("unexpected_profile")
             if kind.startswith("config_"):
                 configuration_fact(body.get("configuration"), kind[7:])
                 if body["observations"] or body["terminal"] is not True:
@@ -635,7 +659,7 @@ class Discovery:
                 raise Rejected("invalid_coverage")
             if body["terminal"] != (body["next_cursor"] is None):
                 raise Rejected("invalid_pagination")
-            if body["next_cursor"] is not None:
+            if body["next_cursor"] is not None and kind != "source_profile":
                 text(body["next_cursor"])
                 if (
                     not items
@@ -723,6 +747,25 @@ class Discovery:
         generation = str(job["id"])
         observed: list[str] = []
         for page in pages:
+            if "profile" in page:
+                profile = page["profile"]
+                tx.execute(
+                    "INSERT INTO inventory.workload_profiles VALUES "
+                    "(%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s,%s)",
+                    (
+                        uid(),
+                        p.tenant,
+                        endpoint["id"],
+                        generation,
+                        profile.get("vm_id", profile.get("project_id")),
+                        profile["profile_type"],
+                        canonical(profile),
+                        digest(profile),
+                        p.policy_digest,
+                        page["collected_at"],
+                        page["collected_at"] + p.freshness_seconds,
+                    ),
+                )
             if "configuration" in page:
                 fact = page["configuration"]
                 tx.execute(
