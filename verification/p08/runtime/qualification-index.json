@@ -207,6 +207,56 @@
       "console_tests": null,
       "report": "reports/p08-runtime-console-failure/report.json",
       "report_sha256": "e316e07801b1f3e89c860dff295ced8f7f58a3ef8be6baf72634b864adc8d818"
+    },
+    {
+      "archive": "archives/p08-runtime-console-second-failure.zip",
+      "archive_sha256": "439179f8e5b05497e1c903905c46287875dc52819b9a5f54ee798ffe5e9cb08f",
+      "kind": "console",
+      "run_id": "37674971088",
+      "artifact_id": "11506174647",
+      "source_revision": "8494cba713c701de0610878622c327e5f11dc97e",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37674971088",
+      "result": "FAIL",
+      "source_bindings_verified": 304,
+      "commands": 15,
+      "suites": [],
+      "stats": null,
+      "console_tests": null,
+      "report": "reports/p08-runtime-console-second-failure/report.json",
+      "report_sha256": "8b39837bd94efb59b14e6c8a8fb533f7cccf6689bdbefa97f7605db94880bb73"
+    },
+    {
+      "archive": "archives/p08-runtime-console.zip",
+      "archive_sha256": "d833c0ab07dbf7fd2136ea2595eeff0e29f382bfc7e7287820d80ca3c40105de",
+      "kind": "console",
+      "run_id": "37675525201",
+      "artifact_id": "11507004597",
+      "source_revision": "7860616293cc0be7a1983ca7bc38529aed5e5b7f",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37675525201",
+      "console_test_counts": [
+        7,
+        195,
+        922
+      ],
+      "result": "PASS",
+      "source_bindings_verified": 305,
+      "commands": 23,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-07T19:49:16.998Z",
+        "duration": 1557.943,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "console_tests": {
+        "skipped": 7,
+        "passed": 195,
+        "assertions": 922
+      },
+      "report": "reports/p08-runtime-console/report.json",
+      "report_sha256": "6ad165ca3ab1874d088e443eb1a1b412e3b633fd569164d9cd8fde63f182e0af"
     }
   ],
   "native_write_authorized": false,

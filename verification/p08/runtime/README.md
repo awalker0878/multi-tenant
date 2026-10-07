@@ -4,6 +4,8 @@ Source `7860616293cc0be7a1983ca7bc38529aed5e5b7f` passes all 35 component
 commands and **893 tests without skips**: Inventory 96, Planning 169, Lifecycle 332,
 Lifecycle-worker 234 and Inventory-worker 62. The three actual Vue/Inertia journeys
 pass all five browser quality commands with no skips, retries or flaky results.
+The same source passes all 23 Console quality commands, with **195 Pest tests and
+922 assertions**. Seven explicitly separate broker-campaign tests remain skipped.
 
 The [verified index](qualification-index.json) retains the original hosted archives,
 source bindings, command logs, JUnit counts and browser observations. Run:
@@ -14,7 +16,8 @@ python scripts/p08/verify_campaign_retained.py \
 ```
 
 The verifier checks 719 component and 230 browser source bindings against the exact
-Git source, plus archive/log/artifact digests. The [fleet screenshot](migration-fleet.png)
+Git source and 305 Console source bindings, plus archive/log/artifact digests.
+The [fleet screenshot](migration-fleet.png)
 is copied unchanged from the browser archive and visually inspected. The hostile VM
 name is synthetic test data rendered as text. Earlier P08 evidence and its original
 failures remain intact.
@@ -23,8 +26,8 @@ The first implementation source `d7d350befb4aab531dd2dfa79a23996e5441c5ff`
 also passed these component/browser checks and all 23 Console quality commands,
 including 194 Pest tests and 920 assertions. Seven separate broker-campaign tests
 were explicitly skipped. Its original archives and
-[first screenshot](migration-fleet-first.png) remain retained. The latest source's
-Console package run is still pending; no earlier result is relabeled as that run.
+[first screenshot](migration-fleet-first.png) remain retained. No earlier result
+is relabeled as the latest source's run.
 
 ## Corrections and regression boundaries
 
@@ -33,9 +36,10 @@ Console package run is still pending; no earlier result is relabeled as that run
 - The first image run `37673681072` rejected two executable entry points absent
   from the worker's component manifest. Commit `2b0d25a` declares both commands;
   the unchanged image gate passes in run `37674739551`.
-- Console package run `37674739577` failed downloading Chromium after 300 seconds
-  with exit 124. Its original archive, all 15 attempted commands and 304 source
-  bindings are retained. No Pest run occurred and this is not a test pass.
+- Console package runs `37674739577` and `37674971088` timed out during browser
+  dependency installation after 300 seconds with exit 124. Their apt logs show
+  the Ubuntu mirror stalling. The original archives, all 15 attempted commands
+  and exact source bindings are retained. Neither reached Pest or counts as a pass.
 - Commit `8494cba` added explicit held responses to an already published migration
   v1.1 contract. The immutable-version check correctly failed in run `37674971112`.
   Commit `7860616` restores v1.1 byte for byte and adds v1.2 for the new responses.
@@ -43,6 +47,17 @@ Console package run is still pending; no earlier result is relabeled as that run
   incorrect edit. The [accepted-baseline comparison](restored-contract-compatibility.json)
   verifies compatibility with `2b0d25a` and the restored frozen versions. No
   validator was relaxed and neither failed run is described as passing.
+- The strict hosted contract gate passes at evidence commit `0a2d1cf` in run
+  `37676737472`. Its retained archive verifies all 24 command logs and 79 exact
+  source bindings, with no changed frozen contract, deterministic generation and
+  passing cross-language conformance. The product contract bytes are unchanged
+  from the restored `7860616` source.
+
+The [regression status](regression-status.json) records 12 passing source workflows,
+the separately corrected contract result and all six passing evidence-publication
+workflows. Source Kubernetes integration is still queued behind earlier branch runs
+at that observation. It is not counted as a pass. Product, contract and deployment
+tree identities are unchanged between the qualified source and evidence publication.
 
 | Surface | Verified behavior | Boundary |
 | --- | --- | --- |

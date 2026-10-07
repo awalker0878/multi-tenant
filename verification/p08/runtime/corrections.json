@@ -30,5 +30,13 @@
     "source_revision": "7860616293cc0be7a1983ca7bc38529aed5e5b7f",
     "run_id": 37675525121,
     "job_id": 112977907123
+  },
+  {
+    "kind": "restored-contract-hosted-pass",
+    "file": "archives/p08-contract-restored-pass.zip",
+    "sha256": "988cb48c60e3a560e5ba272d4a570b6266c47cc65b1acb1b79fad0579ee45aa3",
+    "source_revision": "0a2d1cfeefba9df47dbfeb9a5fed05cf90f87bd8",
+    "run_id": 37676737472,
+    "job_id": 112982070662
   }
 ]

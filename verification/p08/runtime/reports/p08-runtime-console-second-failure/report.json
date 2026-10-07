@@ -1,0 +1,1506 @@
+{
+  "schema_version": 1,
+  "result": "FAIL",
+  "component": "console",
+  "scope": "P01 independently installed foundation candidates; no service dependency readiness or native qualification",
+  "recorded_at": "2026-10-07T19:41:37.419791+00:00",
+  "source_sha": "8494cba713c701de0610878622c327e5f11dc97e",
+  "source_ref": "refs/heads/greenfield/enterprise-microservices-plan",
+  "run_id": "37674971088",
+  "run_attempt": "1",
+  "commands": [
+    {
+      "name": "php-version",
+      "command": [
+        "php",
+        "-r",
+        "echo json_encode([\"version\"=>PHP_VERSION,\"extensions\"=>get_loaded_extensions()],JSON_THROW_ON_ERROR);"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:37.647177+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "01-php-version.stdout.log",
+      "stderr": "01-php-version.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:37.711694+00:00",
+      "duration_seconds": 0.064,
+      "stdout_sha256": "78c7007ae057d38c850ca704a277e6191e0dc7f0599549c22e2614ef55030b72",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "composer-version",
+      "command": [
+        "composer",
+        "--version",
+        "--no-ansi"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:37.713185+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "02-composer-version.stdout.log",
+      "stderr": "02-composer-version.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:38.078254+00:00",
+      "duration_seconds": 0.365,
+      "stdout_sha256": "6dca12c153909313c4e7537ed657ec2f5a9f303611d5d516a9b0d4d0e3f2f472",
+      "stderr_sha256": "4acf068af6281ef9fbbc5dbd2d747263c3675e7cf932189d53b274050e7d37a4",
+      "passed": true
+    },
+    {
+      "name": "locked-install",
+      "command": [
+        "composer",
+        "install",
+        "--no-interaction",
+        "--prefer-dist",
+        "--no-scripts",
+        "--no-progress"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:38.079676+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "03-locked-install.stdout.log",
+      "stderr": "03-locked-install.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:45.312215+00:00",
+      "duration_seconds": 7.232,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "a3bf89251603ff9c88894b7d536ed25076cc2b7a8c75135529f60de733e84503",
+      "passed": true
+    },
+    {
+      "name": "composer-validate",
+      "command": [
+        "composer",
+        "validate",
+        "--strict",
+        "--no-check-all",
+        "--no-interaction"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:45.517528+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "04-composer-validate.stdout.log",
+      "stderr": "04-composer-validate.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:45.933964+00:00",
+      "duration_seconds": 0.415,
+      "stdout_sha256": "43add299dc97ecbd90ec2dc456ef5a0bd824bb9abdae2a3d7cdb520e21f8e86d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "platform-requirements",
+      "command": [
+        "composer",
+        "check-platform-reqs",
+        "--no-interaction"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:45.934886+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "05-platform-requirements.stdout.log",
+      "stderr": "05-platform-requirements.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:46.199805+00:00",
+      "duration_seconds": 0.264,
+      "stdout_sha256": "b4bd9d9d20dc985cb8d9e192a74484df738b034f20aeed027f1cb59d8f37ea93",
+      "stderr_sha256": "0fbede05e037d5229f008b1901345217d825139d02c2a1b60590c0bd7c61cdca",
+      "passed": true
+    },
+    {
+      "name": "installed-packages-initial",
+      "command": [
+        "php",
+        "-r",
+        "require \"vendor/autoload.php\"; $p=[]; foreach (Composer\\InstalledVersions::getInstalledPackages() as $name) {$p[$name]=[\"version\"=>Composer\\InstalledVersions::getPrettyVersion($name),\"reference\"=>Composer\\InstalledVersions::getReference($name)];}ksort($p); echo json_encode($p,JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:46.200771+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "06-installed-packages-initial.stdout.log",
+      "stderr": "06-installed-packages-initial.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:46.265219+00:00",
+      "duration_seconds": 0.064,
+      "stdout_sha256": "0a2b16f26a766abc33073d3a98f318d09906f2384fe0b7043a9b0e5c0aa61924",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "clean-locked-install",
+      "command": [
+        "composer",
+        "install",
+        "--no-interaction",
+        "--prefer-dist",
+        "--no-scripts",
+        "--no-progress"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:46.506964+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "07-clean-locked-install.stdout.log",
+      "stderr": "07-clean-locked-install.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:49.782809+00:00",
+      "duration_seconds": 3.275,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d2d060b355d7f7bbf54ec2a45f916db9a70622c91106769ee45d39fcda6ee1ff",
+      "passed": true
+    },
+    {
+      "name": "installed-packages-replay",
+      "command": [
+        "php",
+        "-r",
+        "require \"vendor/autoload.php\"; $p=[]; foreach (Composer\\InstalledVersions::getInstalledPackages() as $name) {$p[$name]=[\"version\"=>Composer\\InstalledVersions::getPrettyVersion($name),\"reference\"=>Composer\\InstalledVersions::getReference($name)];}ksort($p); echo json_encode($p,JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:49.784596+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "08-installed-packages-replay.stdout.log",
+      "stderr": "08-installed-packages-replay.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:49.849158+00:00",
+      "duration_seconds": 0.064,
+      "stdout_sha256": "0a2b16f26a766abc33073d3a98f318d09906f2384fe0b7043a9b0e5c0aa61924",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "node-version",
+      "command": [
+        "node",
+        "--version"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:49.850872+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "09-node-version.stdout.log",
+      "stderr": "09-node-version.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:49.855470+00:00",
+      "duration_seconds": 0.004,
+      "stdout_sha256": "b7677d3ec37ee1897ba07dc2cfe8292fe421c9ac93396cca5bbece486d1a2a41",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "npm-version",
+      "command": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:49.857431+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "10-npm-version.stdout.log",
+      "stderr": "10-npm-version.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:49.922264+00:00",
+      "duration_seconds": 0.064,
+      "stdout_sha256": "a38e383f1e9080b0dd9001481f6e56b341000de90a05061b66734350ad3adc41",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "frontend-clean-install",
+      "command": [
+        "npm",
+        "ci",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:49.936578+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "11-frontend-clean-install.stdout.log",
+      "stderr": "11-frontend-clean-install.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:52.811978+00:00",
+      "duration_seconds": 2.874,
+      "stdout_sha256": "7201d2aad676839b824fb8be2878dd4b0974f496440d585d2e4e7f7a12b0ee1d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "frontend-boundaries",
+      "command": [
+        "npm",
+        "run",
+        "test:boundaries"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:52.813409+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "12-frontend-boundaries.stdout.log",
+      "stderr": "12-frontend-boundaries.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:53.231326+00:00",
+      "duration_seconds": 0.417,
+      "stdout_sha256": "077f31b1ea766636e23edd0f6cedd307a784570935a474342b184ad16024b159",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "frontend-typecheck",
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:53.232719+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "13-frontend-typecheck.stdout.log",
+      "stderr": "13-frontend-typecheck.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:41:59.323959+00:00",
+      "duration_seconds": 6.09,
+      "stdout_sha256": "766a240d14690488a21ffefd25cd11ca772d502a037bb823b233fb6721154c98",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "frontend-build",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:41:59.325410+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "14-frontend-build.stdout.log",
+      "stderr": "14-frontend-build.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-07T19:42:00.393726+00:00",
+      "duration_seconds": 1.067,
+      "stdout_sha256": "8a1286047297d112aa7962e5e08fa58aee42f2ad9453afb815748c2a71a717a3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "chromium-install",
+      "command": [
+        "npm",
+        "run",
+        "browser:install"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-07T19:42:00.396174+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "15-chromium-install.stdout.log",
+      "stderr": "15-chromium-install.stderr.log",
+      "exit_code": 124,
+      "timed_out": true,
+      "finished_at": "2026-10-07T19:47:00.405148+00:00",
+      "duration_seconds": 300.008,
+      "stdout_sha256": "87bc577e149a165485086e92bb8fdf1a13a00122f6d02391e3dcb31ff2d2bbee",
+      "stderr_sha256": "d70a5454d7b6ceb72d7bbbc943e22614aa8a6f00d886ec8726461d6afb3dbc5f",
+      "passed": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "component-path-inside-repository",
+      "passed": true
+    },
+    {
+      "name": "component-source-present",
+      "passed": true
+    },
+    {
+      "name": "component-has-no-symlink-input",
+      "passed": true
+    },
+    {
+      "name": "replay-requires-committed-lock",
+      "passed": true
+    },
+    {
+      "name": "exact-php-version",
+      "passed": true
+    },
+    {
+      "name": "exact-composer-version",
+      "passed": true
+    },
+    {
+      "name": "replay-lock-unchanged",
+      "passed": true
+    },
+    {
+      "name": "clean-install-lock-unchanged",
+      "passed": true
+    },
+    {
+      "name": "clean-install-package-versions-references-match",
+      "passed": true
+    },
+    {
+      "name": "exact-node-version",
+      "passed": true
+    },
+    {
+      "name": "committed-npm-lock-present",
+      "passed": true
+    },
+    {
+      "name": "frontend-lock-unchanged",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "apps/console/.dockerignore": "96ef707ce3a806240a07612afb0fe8c30118b66c1f539edb7ace74e003d1b246",
+    "apps/console/.env.example": "c05e08448ca043fecd9ad499f85aec2a5e01fd1ebbea501373291c6bb713de48",
+    "apps/console/.gitignore": "1cc745d8e39aba0df89510362790818d3d0d6e5f763475482a7ab7313850c08c",
+    "apps/console/Dockerfile": "4a84b07a6e6614ca1099d74ec75cbd6c209e35506311ad99b7b0ea1594fd3193",
+    "apps/console/README.md": "3698210f05e7dc1105ec7fe9c436a8ad6c84ec5e4ed7522694985c8177e2a580",
+    "apps/console/app/Application/Catalogue/Contracts/CatalogueGateway.php": "b8b9e8a145ef45e02cf59569f497564d337dd411cd8bb59301f42f935493885f",
+    "apps/console/app/Application/Foundation/Actions/InspectDependencies.php": "019459639caec1e3d3fb397026215fe77777a3dd77c18efc41c5a1ca406ff74b",
+    "apps/console/app/Application/Foundation/Contracts/DependencyProbe.php": "b79f3e6ed6c6e08677d3c0b61f90fb382c98e96d26e807b3d119fd81a0990c66",
+    "apps/console/app/Application/Foundation/Contracts/HealthCredential.php": "7fdeb5b78e2eb9f676ab955a1f1451fd27eb2f861b2670657e3438a6babb8a93",
+    "apps/console/app/Application/Foundation/Contracts/SignalBuffer.php": "4a78c3f8413add9220d28b71112cfbc738863bed440b9a7545f72010050ac14b",
+    "apps/console/app/Application/Foundation/Data/DependencyStatus.php": "5b19fe2dee35b14359e8a4d4438185a4c77d51f25a82dc6aeb80f5a14ce465f3",
+    "apps/console/app/Application/Identity/Contracts/IdentityGateway.php": "8c63145e5d1125fc0be31cfcf61b7a6f3f11a6079da54fd51c2dd60de67b2624",
+    "apps/console/app/Application/Identity/Data/ConsoleActor.php": "047e4a89dfb0662691f492e9e5bb7c5c10cd8aee820d4ccb7268fac09ffa1bcf",
+    "apps/console/app/Application/Identity/Data/ConsoleSession.php": "57ad336cb398edd0078faf03bb6a3c22bcff40a289e966ec5ad7f07b101bdd11",
+    "apps/console/app/Application/Inventory/Contracts/InventoryGateway.php": "ec88e6ab6e19d6c1a28c12e84c01a913b7eaf1308561860e44ceb1c0e86374a1",
+    "apps/console/app/Application/Jobs/Contracts/JobsGateway.php": "fc8de325cca3ca515fc51454793f62053fb5a3e43647c17b6676c4b9bb970369",
+    "apps/console/app/Application/Notifications/Actions/ConsumeNotification.php": "51030cb709c12b8317bbc7ba0141a79c2b8d73bf74d5f210feb215adf93df8f1",
+    "apps/console/app/Application/Notifications/Actions/RecordNotification.php": "bc6650406706af34fb8f5e441842b6fa75d2d0f656a0ddd531b5cba4b6b51812",
+    "apps/console/app/Application/Notifications/Contracts/NotificationDecoder.php": "7ed09598b335253107002752c4c70ee5e30a8290b75d27171819d1c6bdc5d324",
+    "apps/console/app/Application/Notifications/Contracts/NotificationHints.php": "0c6a11772edc6a8ff71d5d9e91dadd03fdc1cf937ed43cc5322a9aa957f88be9",
+    "apps/console/app/Application/Notifications/Contracts/NotificationSource.php": "7646d82b09b5a49033a9ce36a601a69498e2d4f6fcf56271b9d290c082c23fec",
+    "apps/console/app/Application/Notifications/Data/Delivery.php": "4b8bdebebde99b6d0676d79be43b9481a40eb566ff501aa3c460892924bc2722",
+    "apps/console/app/Application/Planning/Contracts/ApprovalGateway.php": "0971baee7d8b27ec368d8a2aed4b1b161f8f327e85812b08ae6da3ace7aa7b10",
+    "apps/console/app/Application/Planning/Contracts/PlanningGateway.php": "8717bed94520c15463e114148592b0cb435e473e3ffa8715458b00063b766772",
+    "apps/console/app/Application/Tenancy/Contracts/TenantGateway.php": "70c708360216644aa20fa701a344922a373369aa412680f73fc84be685636b59",
+    "apps/console/app/Console/Commands/ConsumeNotifications.php": "a181a5071ef63183e06f13c3f3d2e139c0a81bca43cabc90e8da47358cd454f4",
+    "apps/console/app/Domain/Catalogue/CatalogueFailure.php": "5177c2b4cb12081379588e5bcef930e57010bfd4e243e7ad582868b8e8728954",
+    "apps/console/app/Domain/Identity/IdentityFailure.php": "80a62ce7e6de8879927a6cde743fc8ee0f2f8db467be2fd4fed6ba3d58339532",
+    "apps/console/app/Domain/Inventory/InventoryFailure.php": "ad441583385d92e85029ae4d6480dc115cf0c9e7883e359ef728b9f5be3b237d",
+    "apps/console/app/Domain/Jobs/JobsFailure.php": "c67e70e3dfa2f04d470d50866539059ed77391da97aac5f7c126aa37d3f1c184",
+    "apps/console/app/Domain/Notifications/CommittedNotification.php": "19328c3e5a27778659d6424c1df9431e5352ee77143e8a179583e8f540369b6c",
+    "apps/console/app/Domain/Notifications/InvalidNotification.php": "a5788a66b30dae4e7a66deb9dbf1279eeb24edd447d26201ffbe5f69c7a65d5b",
+    "apps/console/app/Domain/Planning/PlanningFailure.php": "47eb0908aebd107c25d271639bc5cd2f88d3914c337feb7e842cbe04824b5993",
+    "apps/console/app/Http/Controllers/CatalogueWorkspaceController.php": "5e45357bd56113f182c1c16f1b81bf77c0929277d644921b3bdfe49ff4835f43",
+    "apps/console/app/Http/Controllers/DependencyHealthController.php": "ee8fb3c0e8f6891749aa963ae12601bf84605be66f9aae092291aaf936998097",
+    "apps/console/app/Http/Controllers/FoundationController.php": "424bcdcf54b1132f7913fff6486d7aaab0bc358637da69cc68920541ca42d769",
+    "apps/console/app/Http/Controllers/HealthController.php": "a7dd34dea6aff50897bc3e087618c9df27aed516af6211de7766a91afe343ba6",
+    "apps/console/app/Http/Controllers/InstallationNotificationController.php": "a0a07a4eaa1010db25e69998f8cb4acfd3b4549c2561d3f6f6dbad17cb596f1d",
+    "apps/console/app/Http/Controllers/InventoryController.php": "57667f5e672380c265d9477aa83df6051e552d1cabff4d33683adc099f7ca412",
+    "apps/console/app/Http/Controllers/JobsController.php": "400b1ea135941987e92b3e060fdc37cdffd917f5a266e1b21de1836f88dd989f",
+    "apps/console/app/Http/Controllers/LocalIdentityController.php": "951b971159f856bae957d1789126882fbd1ab580b82c2ea7469b362b8424e967",
+    "apps/console/app/Http/Controllers/MigrationCampaignController.php": "db06f18cdab98783eaf1af618f52ed74faf47693506f9a2b84c9f8d9bb282738",
+    "apps/console/app/Http/Controllers/MigrationFleetController.php": "7e13cfb8e7ebb78f68130fc839d45ccaeb2b7417291362749994eecb6122d20b",
+    "apps/console/app/Http/Controllers/MigrationReviewController.php": "e9004c58ce472fc89e941e9be9c7e9f43985c508f86b55af899db1038fe9b0d9",
+    "apps/console/app/Http/Controllers/NotificationController.php": "c24c3f90b4c2a5a07487ef6018050a29dbddf85d0237135a1b8cda5ab485ecf2",
+    "apps/console/app/Http/Controllers/OidcController.php": "4c8e6e46894c9aed16508bcecc282996c57320480534566e79995fcbbb3ac936",
+    "apps/console/app/Http/Controllers/PlanningController.php": "3517991e2e0ccfa9c73ad5a40028b08eafdb982754f0f7e7e6850c5b18de69ed",
+    "apps/console/app/Http/Controllers/PortingConfigurationController.php": "2ffb4d6f378e84b76cc91a48a3894101445ad84832177f57352fb4d61983899d",
+    "apps/console/app/Http/Controllers/TenantController.php": "032ba686ee9e0eb13664f75fc49d92ec0302aa04026ef499fb772dd184d6a39f",
+    "apps/console/app/Http/Middleware/HandleInertiaRequests.php": "abd23bfa82d399043c4ff2efd4bd3ea893d056488db6d43668982d41d554d7f2",
+    "apps/console/app/Http/Middleware/PageResponseHeaders.php": "660b8b523fdbbd646880ad48436f1ceeabcb92db8f972a91a0f22652836d763d",
+    "apps/console/app/Http/Middleware/RedactIdentityCallback.php": "c0732b695aa00447c22350f3f3d1c1d6e485ce8aa359be74d7cc95e2abcd867c",
+    "apps/console/app/Http/Middleware/RequestTelemetry.php": "27908a4827a19054bf02ef4ef9c4d9cd532c08f2f7070c3035df2cee9693b267",
+    "apps/console/app/Http/Middleware/RequireConsoleHost.php": "1e042373603b9c9b4ed3750c284f7283e8240b69d6dd3f810db354d8dabdf5c8",
+    "apps/console/app/Http/Middleware/RequireIdentity.php": "bf1d8433776e4695d8a8f1519d07b13cb6bd03fdb32dfc1e09454eb841a56a78",
+    "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php": "4b62454147d59b3f1a076cbc0e032765cef65aa55fec95b666936f2207632f94",
+    "apps/console/app/Infrastructure/Catalogue/GeneratedCatalogueOperations.php": "1ed65bb9b029a48c54b6e89d0e525131225481729435757fe5ade15241b8cfa0",
+    "apps/console/app/Infrastructure/Foundation/BoundedSignalBuffer.php": "ef39f2f0e618d55bba19a94ed246e9149ee3b494d949ea26a91e18e05b8137f3",
+    "apps/console/app/Infrastructure/Foundation/MountedHealthCredential.php": "3c0a622df2f954de62f6f2864a56157394bc1d4a63788a992fabc4df7b765d86",
+    "apps/console/app/Infrastructure/Foundation/MountedSecret.php": "2e395919fe9c8d42c78e4b28bdb04a5a38d69c7a0d4fa6e6715beabb42b61162",
+    "apps/console/app/Infrastructure/Foundation/PostgresDependencyProbe.php": "e8b8cf3577392336d86cc253d9843b9403c4f1e6493f8b22466ab57ed19b21d7",
+    "apps/console/app/Infrastructure/Governance/GovernanceClient.php": "fe4d02a798c97de4699f2c2f92a513e20cdebed2d6ec1ba24672626e2575311b",
+    "apps/console/app/Infrastructure/Governance/GovernanceTenantGateway.php": "4a0e00e613ebc16e8723eec52a2c2a1aa5c73228f37ad975cdbcb72b1a7520c4",
+    "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php": "5dfa33e619b947cf62156eea61153b82e93551f47cdb86626e94ce216e8cd884",
+    "apps/console/app/Infrastructure/Inventory/GeneratedInventoryOperations.php": "4a40d41c3d8eb0808afabf0272b2346d0c7157d4069315c8608baaa1a4f2d1f0",
+    "apps/console/app/Infrastructure/Inventory/InventoryClient.php": "5ec818feeee8f941fd499990417e16d8a819dabccbc43596a5a63ad2a37dcdac",
+    "apps/console/app/Infrastructure/Jobs/JobsClient.php": "51c306e4c05d98afed8d1b7ce16aa78d4a35735fdc61cc02380e653cff021876",
+    "apps/console/app/Infrastructure/Notifications/GovernanceNotificationDecoder.php": "64358c4aab7773d28c24a67a9e449d396c0544430b75e7a3df14be4b1608b970",
+    "apps/console/app/Infrastructure/Notifications/PostgresNotificationHints.php": "f2da71402d57f1c3287bbd4b5ec97dc4d195d08f85db3816ad4694c3b04d4d62",
+    "apps/console/app/Infrastructure/Notifications/RabbitNotificationSource.php": "bd785102b36717a336aee78b47cc415f503291d54e2cf5509a1f9560dd8f417e",
+    "apps/console/app/Infrastructure/Planning/GovernanceApprovals.php": "f534abe510094b2766db2225377ce5c32122c3c1969a40311e7519c4200d9254",
+    "apps/console/app/Infrastructure/Planning/PlanningClient.php": "3b736e9bede7cb0c6b97ccfc7ac98fda2e76fcd2ad04cfc66b5084e0ed161a42",
+    "apps/console/app/Infrastructure/Session/TenantCache.php": "c2c175c694c3e8705df0ac6c47d74d69bb8c966115ad02a4e2677d5edade731d",
+    "apps/console/app/Providers/AppServiceProvider.php": "b450b2b16e8640528450476b98e337e3ffcbd58d86d919f5cb61c9c5479e3106",
+    "apps/console/artisan": "83c95e93ffda62b12bdfd605f5626762ee239fd61cf46ff56fd244dc828f609a",
+    "apps/console/bootstrap/app.php": "60c6a57b5868b6a9f0d7b1250bcb3ae0e8fe415ad98dd26448e4fab36c83c2fd",
+    "apps/console/bootstrap/cache/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/bootstrap/providers.php": "2c593cbec5439e1288dcfe52e9f67b951736fb067ee7df206030583a1f28515f",
+    "apps/console/composer.json": "878bb78b930e6890a676229442f0835c99b3d2868cbd1d200768edaefa147e05",
+    "apps/console/composer.lock": "ee6c030db0f801c9bd008e10f07f969460d3040546421e9d9052239343b24a4a",
+    "apps/console/config/app.php": "c086bdb0eee8b1cf887489396b1db2eb60546932c2b4422eb6b4c81085ee208a",
+    "apps/console/config/cache.php": "d171b4ffc6c8ecb171107620f051bdee9cf6c665122e2393d5f77f9122463e0f",
+    "apps/console/config/catalogue.php": "119eb78d75c2c86a20994d9e73b7fbd547760eb74fc5c623866234508a01340f",
+    "apps/console/config/database.php": "f0e8750f9236458390fc384c4e62045983fa78e3a8edadbfc7504fb9fe3764b7",
+    "apps/console/config/foundation.php": "0fc9a39a95f0a5cf307fc3cdcf7af0a728cb313ef9b82ab6ef5600de9b6efb6d",
+    "apps/console/config/identity.php": "b1978f77bd9d09d416aa0cee08f8701402028251524c8c8fd80f9719f3cf63be",
+    "apps/console/config/inertia.php": "5ac1ed5988b3176d400fe7da12e4285bc626befaf8904bc3138583f78a939909",
+    "apps/console/config/inventory.php": "ee403ed09100764ade72ab8d0122405a6a02384da13b8dbd3dcfc761b901e60d",
+    "apps/console/config/jobs.php": "2747af347549c1799c7306f36eac2b2f9a0b3d5a6394b0f36b7db17a16d1c624",
+    "apps/console/config/logging.php": "c154451dae662c1b268bd2820c29be58686319013c5f37590937a6a1d8ac2d74",
+    "apps/console/config/notifications.php": "2c4e01d47651d2d46c5c003ccfe184a736af4f70e7d9707851b3a268b458056b",
+    "apps/console/config/planning.php": "53ede59471857fe953ba79c2ceabd72615703a4313e1f301a0615bb81c1bb1ec",
+    "apps/console/config/session.php": "9157dca9c144131fdefee3712d28e7e9d83884cc190c771d6d6976298e4bb526",
+    "apps/console/config/telemetry.php": "a8e3ca78ee997ac95a3fa02cb0f48868b547ce24862363ba58b0e132eaacf2fb",
+    "apps/console/config/view.php": "d218f409e17b4f64d6b58ba46c08127d62c3341b360baaff63102eadca96a13c",
+    "apps/console/database/migrations/001_shared_state.sql": "55e35fcb77a63db6bb2732dfc85a411cbc74e474a9033097f231692ec1e1d041",
+    "apps/console/database/migrations/002_notifications.sql": "633491c4f9439cafa6b7c34ebf94462f26c43d3d0982c3513bbce5074cc81a00",
+    "apps/console/database/migrations/003_installation_notifications.sql": "1e3c1e76342be1cf1333ce64a524989e7de3b551f033687256795aecf5c248df",
+    "apps/console/deptrac.yaml": "abac8c22582d31761f3e449e268da4fa8962d72868baf8ce1d179ccd8fa168e8",
+    "apps/console/package-lock.json": "5e626b04d3aeb7d54eb645806130b98c7a60d12b81a744cf886869cbd3b3cc8f",
+    "apps/console/package.json": "60a8fe17aa38ad6c8d2200926f68880413631c1108beebb3f6e3ff0499f2a5c2",
+    "apps/console/phpstan.neon": "040531182713abfa15e3063d5806473131d805007ef888e0fd54c2e09f05fd84",
+    "apps/console/phpunit.xml": "e4b575acafdf68c1f4d2baa28748557e972bd0f718a764557ed63d634507c290",
+    "apps/console/pint.json": "e54acf88cddb03d9f17392c062c70b8bdf5c8426391adecaed4c3105a21d4bdb",
+    "apps/console/playwright.config.ts": "f831cbfb1a62b6ec14b218a3da2591dafefd50130610496c48c6ce9a68b89d4e",
+    "apps/console/playwright.p02.config.ts": "a7652acab05ac7c9af288bc5989f63e588abbe94dbb4a33cc5066173a5310e1e",
+    "apps/console/public/index.php": "59caa93d7583ba8fbb335d7bf0c31f3c382a7cda6c6c6915fd844af840c09c13",
+    "apps/console/resources/contracts/catalogue-v1.json": "656e124e9fceca6aad21bbb5676cdcb88f8c5d0e089e5ade3ffa7245023d2679",
+    "apps/console/resources/contracts/governance-change-v1.json": "470cb3b3472e19cfe919f67bdf5c7e23cc5442533eaf15fbef3c03c621ab9afa",
+    "apps/console/resources/contracts/identity-change-v1.json": "3e29ad64056f83e5738f09adb241bd9b4faeb00450101d27dba9b25d123946f4",
+    "apps/console/resources/contracts/inventory-v1.2.json": "504bb97f9a50c54df3193ac223e281ade0eae5135705be2aa65ffe6690e00e98",
+    "apps/console/resources/contracts/inventory-v1.3.json": "a33a26d5b7faac687db4e4389a77f01ee8e176c37db32114878e427b957bdb5b",
+    "apps/console/resources/contracts/inventory-v1.json": "97181d57ab05a4547af0695292896f11561a7d273c53d562a0deb2f5eaee9ded",
+    "apps/console/resources/contracts/lifecycle-migration-campaigns-v1.json": "06fbeacc57db6ee0453e41c78f5ade48ceb4d6b14f9bb7a795765f1186708b12",
+    "apps/console/resources/contracts/lifecycle-v1.json": "bdbd28bc7ccaf4e48c6d4ee68391e0bb22fefbc7c50f6999f0c0c11479a42935",
+    "apps/console/resources/contracts/planning-migration-v1.1.json": "1f586ea5377c054d45d919e49939cdc82e5dbb78cfd04e1a42a9e2ceb2b7beb0",
+    "apps/console/resources/contracts/planning-migration-v1.json": "473795fed19bbfb6bf85268046064e5b4920107ff357406cef0863d1f1b612a2",
+    "apps/console/resources/contracts/planning-v1.1.json": "2aad0b46e39d5cf32383bb4aadba252645d3a8c24a25ad8a126cc292c042d495",
+    "apps/console/resources/contracts/planning-v1.json": "cba61af64a5f4df2df1a88389de8c3758ba21e814e59038f03823089993a3071",
+    "apps/console/resources/css/app.css": "ed04d8ad7236e95057729066d34d1f1fc353f7bcc6abee710bf0bfc21a0c0d37",
+    "apps/console/resources/js/app/bootstrap.ts": "41b33459be7723e6b29a4c6a7fec192aabcf7272a2f67889088a0eaa663a79ce",
+    "apps/console/resources/js/app/identity-lifecycle.ts": "a1dd434ebe5703d94ff05e099651d01713a81ed18fd1537b0de14cfa0b876beb",
+    "apps/console/resources/js/app.ts": "e8e3b4209dd38ab67f3bd6081b8b1fd5b95a36b34eb857983f2ce9312916cebb",
+    "apps/console/resources/js/features/catalogue/RequirementsEditor.vue": "42c270c37afdf2bea2b8a9ee7c2e7f8f3e57fee45cae79fbd5425ffa8bedcd15",
+    "apps/console/resources/js/features/catalogue/WorkloadEditor.vue": "f657a023e3d24026b625960a985ba8739e7e56cab8ebd729b4e44912c43e2c3f",
+    "apps/console/resources/js/features/catalogue/contracts.ts": "5a34206edd7c13e90a27b4855b36c9653fc07b74167c86243cf78cac69a21246",
+    "apps/console/resources/js/features/catalogue/defaults.ts": "9e7733469c1382bb0156b8065af01c324491fed73390519b4e2d8218660427ca",
+    "apps/console/resources/js/features/inventory/contracts.ts": "82384978b600645544b0d32f1be86498519117a11601d82947727c2f05e5a0a0",
+    "apps/console/resources/js/features/inventory/useAccess.ts": "b48fcc2cb61743ceec1abbba2485785081d6f0e5a3d51990c4f66488c82e6dd1",
+    "apps/console/resources/js/features/jobs/campaigns.ts": "5d7697b51f76afd5125de13e7695d3f16a7286e77acee2c898dd36bbefd8fc61",
+    "apps/console/resources/js/features/jobs/contracts.ts": "3157f904b1013a500dd27d803d06958b292f7d27b0f98979dc52784ce0411038",
+    "apps/console/resources/js/features/jobs/useJob.ts": "b728d77b86867fdd1822869e88edcc41004bdceb5eea508b92c55edd4cd4b96c",
+    "apps/console/resources/js/features/planning/contracts.ts": "35d8aa1ecee4f08aab5d0674a79e59f3be0dca751a6267cc5b2c2cb2eefe047b",
+    "apps/console/resources/js/features/planning/useAccess.ts": "af0e0a09679822fdbafb148e9a07fec439cedce5fc9d14d8d7930d64e551dc4f",
+    "apps/console/resources/js/pages/Foundation.vue": "8be61901b6cf207f2cf0330a97c5ac4912790f5d45d278d46c32ec8139f0cc83",
+    "apps/console/resources/js/pages/catalogue/Application.vue": "ca0fe3ef237c172f374cc66323e7434fa2287fe01efa7616a777e713868dd0d4",
+    "apps/console/resources/js/pages/catalogue/Editor.vue": "6f1ca17e7f3b138ad9b1fb65c0818ba67ec4d0e125b8ea6cdbf62c3c3729065b",
+    "apps/console/resources/js/pages/catalogue/Index.vue": "380a2f6842c232cf40dc182dd31154d74319bbd6589f5074935d1b4cfce1f023",
+    "apps/console/resources/js/pages/catalogue/References.vue": "8c2200d56c4652366eb312f5bb619b1c171637127fd7b86a9b3aef9da85fe75c",
+    "apps/console/resources/js/pages/identity/Account.vue": "4c8a3c6a05346b61b6d8930641841be56a5bed7d92c9218dbdcdf8ae071eff17",
+    "apps/console/resources/js/pages/identity/Login.vue": "50be0237fc8014a579baf0e394332732be49427c2676408c9c48d32286aedcbc",
+    "apps/console/resources/js/pages/identity/Password.vue": "79945c0d73f57b81a0f74a2b9d1eec8d824faacac39a679cd690307992acd8df",
+    "apps/console/resources/js/pages/identity/Setup.vue": "9a431bf9ee9403fb7baad6a7d25ebcffe48cab313a30644cdc2692c1f57b7101",
+    "apps/console/resources/js/pages/inventory/Configuration.vue": "87de2474b8638833a84cfea218cea6676455345b801a0ea9e4ea8b4c9513aae5",
+    "apps/console/resources/js/pages/inventory/Fleet.vue": "461023025484e4a0b7f6fb0d5a1c9c0979dab42b3b1f651105acfaa2a2228fa2",
+    "apps/console/resources/js/pages/inventory/Index.vue": "f8bf5f875a358bf9813526e9b8de80a1d72551ef11ac7aa2d1087654f8e40694",
+    "apps/console/resources/js/pages/inventory/Migration.vue": "168d24ada9b751485ea76c6241b903450b4e86c050665159286f8dc7c738c143",
+    "apps/console/resources/js/pages/inventory/Resources.vue": "b4684c694e861e7597d0b1d8b29fc61142285f60e8f967732e069d5e10452347",
+    "apps/console/resources/js/pages/inventory/Site.vue": "20a916d126d9665257169ed10dcb4cf0d2a80f40b80b0d6ec5c87de4be2d1166",
+    "apps/console/resources/js/pages/jobs/Admit.vue": "e69ba9198f53ab850f4fee8848c1e44405c0338f3f821ba40ff331c5e7a3147c",
+    "apps/console/resources/js/pages/jobs/Campaigns.vue": "0be1e6e538b5b90946945913164096deb89a5ebab0d1217593fe853d1866047a",
+    "apps/console/resources/js/pages/jobs/Evidence.vue": "d0001324749af49767a6a72c03bcf12ccee2a9b402e8bc1ffd27651bec15c942",
+    "apps/console/resources/js/pages/jobs/Timeline.vue": "57fad8cd92b11e14722a80f98630484a00a774be0687e057b4669c72d606d5ab",
+    "apps/console/resources/js/pages/planning/Workspace.vue": "aeddfc7715d68c4553c16b52d7a2e27e4138b894a29ce3b613056becacdfb9f9",
+    "apps/console/resources/js/pages/tenancy/Tenant.vue": "da317cada843a5e1eaeceec98e787b9ecdc3d490b5ec849a9b38750b91c4fbb8",
+    "apps/console/resources/js/shared/ui/CatalogueLayout.vue": "5e3fcaf828f9c6d6b0fb20602055e1784b4f5920599245a58de2f2daf14da4ac",
+    "apps/console/resources/js/shared/ui/ChangeNotice.vue": "4691be1f22de703a8389f6cfba14efe513960839f62409c0b8caab9106c80437",
+    "apps/console/resources/js/shared/ui/IdentityLayout.vue": "b700ba826d7afe27d9d098ee003d792d3354d513955f83b8563edb3880b3b87c",
+    "apps/console/resources/views/app.blade.php": "135f549bdd66ce6712e9d9b7d75f9895948ab2f37222f2e068919716488ee41c",
+    "apps/console/routes/health.php": "bcf6f4d435274ad8b8d1244e8a998ebd30c3fd13caabac00bcd60eef48559421",
+    "apps/console/routes/web.php": "c8e45700034259ddf44ef212c0f8ef115a1c4dacd30eff13c37c9cfe5117ca6a",
+    "apps/console/storage/framework/cache/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/storage/framework/phpstan/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/storage/framework/sessions/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/storage/framework/views/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/storage/logs/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "apps/console/tests/Architecture/FoundationTest.php": "b9d32981d522bd2e80fffedfbe981e992107a6ca7225337f1267e35206de29aa",
+    "apps/console/tests/Architecture/verify_quality_canaries.php": "9f2340f9af9ed2c30989e72e45908e3332134ae05eff99462281ed86d7504c60",
+    "apps/console/tests/Feature/CatalogueWorkspaceTest.php": "89bafda30341a9975340ef2c01d42c4f87a74551182ab2e9a9b48514230070a4",
+    "apps/console/tests/Feature/DependencyHealthTest.php": "2bb0eb08f874b0ced644d7241e2ef3e6f3c211072b39af029a6df42c25d96c01",
+    "apps/console/tests/Feature/DirectoryTest.php": "e0efdbef088d5d7a79fa8742664572d02b01290ea4e98962b99cf618f287813c",
+    "apps/console/tests/Feature/FoundationTest.php": "571d49cbd547b95bf1a09e3a1c39c04a735546b020361c2d83c1e83c186ea355",
+    "apps/console/tests/Feature/HealthTest.php": "9ecc370523fea55d77ddfd572c4b69f4fe319401c53042e4016e7c6674658649",
+    "apps/console/tests/Feature/InstallationNotificationTest.php": "385233710cd94cee46f4f3608ef20e36cad8ac4f990f17c7f61558585bee74e7",
+    "apps/console/tests/Feature/InventoryWorkspaceTest.php": "62f5e92091646c793420ad25475fc6fb40c77543957613ad0b6eac1154a14c5e",
+    "apps/console/tests/Feature/LocalIdentityTest.php": "0d83ef80ac03022b990630121d717b9e0d1e87186aaeb61e611c308db39edffe",
+    "apps/console/tests/Feature/MigrationCampaignTest.php": "d19fc87d3145ef61d958b8573c2b0a253ba83c63a19e2fb649b9cb23dda40fa8",
+    "apps/console/tests/Feature/MigrationFleetTest.php": "585d453e58755255372bbc8eaf7eaee8dc65d2abff7d18a2fcf2442634256971",
+    "apps/console/tests/Feature/MigrationReviewTest.php": "a26395ffb14531cc3e1075181b55c466c8e04d247a6f25e9078b89563774f609",
+    "apps/console/tests/Feature/NotificationAccessTest.php": "3fee9a98326d8ccf758b5014e1f23b7cc75a09005ab3f5fbc427a32e08f590d0",
+    "apps/console/tests/Feature/NotificationBrokerTest.php": "d69ce5b5c308d556c244b828a8e31aff263dcabdeff2c27157d0d60db2a928cd",
+    "apps/console/tests/Feature/NotificationContractTest.php": "3f9a36d2ce8c20121ed70a2c3c8867a53587b62e41e784a13ff954775b85cf7f",
+    "apps/console/tests/Feature/NotificationInboxTest.php": "19512cb42ab1c7ab95146190e72b068fade2aaa7af21e5ec87417d1ef950e6f2",
+    "apps/console/tests/Feature/OidcTest.php": "fa4979e835d2deafc323a2e6030584fb4fa633ed34eb4dd3134f999b7d740ebd",
+    "apps/console/tests/Feature/PlanningWorkspaceTest.php": "5240ae03edabe469defa5d62106d39f74111a50315f40d7d64654ceb335a8c65",
+    "apps/console/tests/Feature/PortingConfigurationTest.php": "59b19dcceacec853641f4b349253e44fe28923fb13d02628b0469ecea418280b",
+    "apps/console/tests/Feature/RequestForgeryTest.php": "fe82c8a5ecd0b11329376f2cf4974cfe5e6a1a445946f0c60f5a3bca65778d4e",
+    "apps/console/tests/Feature/TelemetryTest.php": "ddf9bf45f2f563f1c5bab2494df1132a82aa557d57c87ac075e0d240b665de51",
+    "apps/console/tests/Feature/TenancyTest.php": "acca33bf0040ba5e9b588228af19f48b5d1f1501d60e323c95c0e5ef2f924f3a",
+    "apps/console/tests/Pest.php": "3ede35d2893b0aeb4ca32ff8d004ebf2c547b6f80a7e74f6088b850387a68893",
+    "apps/console/tests/Support/NotificationFixture.php": "a6d0d7752cfdf67e4740ab73776b59274a92b3e6c75e44c5af6a5d545bdd59f5",
+    "apps/console/tests/TestCase.php": "b402b9a2ae198746af82193620514620c4ca52f1fd67cdab3723457d5c19ca5f",
+    "apps/console/tests/architecture/frontend-boundaries.ts": "0633c837c0cb2426f86d7b2c954e16dc3a9f5bd088e4839bfa5d2c11712df35d",
+    "apps/console/tests/browser/foundation.spec.ts": "9e7c07c8a4b2485c77fd0ee3a5774b175c0f86ddd65932fa00fdd0e42eedf41a",
+    "apps/console/tests/browser/identity.spec.ts": "87a60c24aff808807db724d7bf7459580a1856ae3bc4bf352295bd41305b9f45",
+    "apps/console/tests/browser-p02/identity.spec.ts": "e15a83820b185c8d46323e147cc671b1d28543b380d750b4b5c03ab4fed510dc",
+    "apps/console/tests/browser-p03/catalogue.spec.ts": "0b5406de49e6215e6ee21d56f0e4e2ae95dd568bf20357cdeff2f9a2b077eb0e",
+    "apps/console/tests/browser-p03/playwright.config.ts": "0c34f379004c172b5c2409827cba8c1c668716417dc74ae4c85954316fc2651d",
+    "apps/console/tests/browser-p04/inventory.spec.ts": "855d9bb1726509a4a745a67addbfe5afc4a8f1e8e42061f22b29ba8760e33bc0",
+    "apps/console/tests/browser-p04/playwright.config.ts": "f9376e2cf750c8eeec6e3f992eaee9e6112d480d1dd5e01ea33a81549ab26d6f",
+    "apps/console/tests/browser-p05/planning.spec.ts": "bc571e8da6ea745f62936e5cd455f57548adaf90e2b4419bb8dc29d5492e3e9c",
+    "apps/console/tests/browser-p05/playwright.config.ts": "89826d36e89ac2550c16f7abfbd81cd11ce2199350a7b44802bb19472bb71762",
+    "apps/console/tests/browser-p06/evidence.spec.ts": "fccef5c73734ee0b7a6aef155b68bb73de1cf614f90679c8a12fe86dcb0dbe4a",
+    "apps/console/tests/browser-p06/jobs.spec.ts": "9b4a2dc83422d3573be21bc82847b6defbb12f7f32d7175a9932e8204966bfcb",
+    "apps/console/tests/browser-p06/playwright.config.ts": "d7882e833cc62ffba16fa0ec303b6c466d9b1862aa8a3abe8863f967c39dd858",
+    "apps/console/tests/browser-p06/playwright.evidence.config.ts": "1a30252de523755879f304d44026551dacb777083e4c3c2cee3e1aece87220da",
+    "apps/console/tests/browser-p08/campaign-fixture.ts": "ad249e34344112f091a78d4676b8ae9b555858194eb68d25c0650e50b6e2c3cd",
+    "apps/console/tests/browser-p08/campaign.spec.ts": "c79c4114700d9628592f6526791d88437a822f234b4fd2aef40aae5c7f9e1d44",
+    "apps/console/tests/browser-p08/entry.ts": "60863227073549df1a8a5a323bbc9ec23a24f14b880746a91bce0d0fd8a3cd9a",
+    "apps/console/tests/browser-p08/fleet-fixture.ts": "70df283cc0bf51278ccce2d895a575c5fd83cfd91d38ac88be93d6002974c308",
+    "apps/console/tests/browser-p08/fleet.spec.ts": "7f662e15cd47e6d37c90e5ef1bc79f129589dfa44c9542925046d051ddd75ce0",
+    "apps/console/tests/browser-p08/migration.spec.ts": "f08c415ec81cf329391f850533c819068b135e21caf716e16d704fc6ee5724b5",
+    "apps/console/tests/browser-p08/playwright.config.ts": "34cd77ee9cf479a12c1940cc7fc62f5b19c32566fd4c8ba1ab88fb68408e32e3",
+    "apps/console/tests/browser-p08/vite.config.ts": "9c1eeb422fb119f0b18eeb4d39e07e10047295c8d726689bbf70abf33e4ca90c",
+    "apps/console/tsconfig.json": "9adad6963b95103691ff1c3336a824691f0e23780569772a9fdfa171e312ba92",
+    "apps/console/vite.config.ts": "df9065a949f3905c2e92c5671b0d9d592594546278114aaaf0d42e0e4b6a7318",
+    "scripts/p01/README.md": "c43804617f0f238bb226742ffefecf8f3f2c2131aa688b6ae4e0bfbf989c1812",
+    "scripts/p01/admission/check_pr.py": "fccf26880698beaf5869521f0461d7cfacc32296e3890792eb106162ae4cb20f",
+    "scripts/p01/admission/check_sources.py": "1b46352ff62eba4034bfd6b2cbdffa8813f73d336ad52ecf86b36cab5e86598a",
+    "scripts/p01/admission/exclusions.py": "fd9b27990a3efeaa99efdf5f9a23300f7c118c42b594558a5934b28c271905d6",
+    "scripts/p01/admission/operating_inputs.py": "f4a38a27f9bfdda3aecdbd303fa3b770504b3861547f8c863c8ade38f6ad3d71",
+    "scripts/p01/admission/policy.py": "25658e8505bbfa3916c16a0eaa6819847e7df08157724e61017a1c0e7bd56a3b",
+    "scripts/p01/admission/probe_pr.py": "240478eaa98075393956a77a0950aab8f71ce94869f761b53651f4cf9ea0284f",
+    "scripts/p01/admission/test_check_sources.py": "5d70a18179e5667b267b0d6c328326f7fcc43dfe4759de5d7d9cec42e75e8af4",
+    "scripts/p01/admission/test_exclusions.py": "3f1641b9d54c6cf927d4041c03c5c79700a8ad2b1a881dff996e6559e068e462",
+    "scripts/p01/admission/test_operating_inputs.py": "73ec0043b02a3de18bcbd37d26ca014d53eda90e981f46132905ad8ce2e11b70",
+    "scripts/p01/admission/test_policy.py": "5a31b724c4d4a785778e364341204eeac4fca8350b938cc7588877e9b79dba5a",
+    "scripts/p01/alert_delivery.py": "0994c34c5072d39a5eb2c2c209f6f00668dab01be81b76313273b8a996b82405",
+    "scripts/p01/alpine_inputs.py": "92953d65a0332638263fa9dbad6ba65a913e3f902b2c1d7fcee813ebb13138b0",
+    "scripts/p01/artifacts/bundle.py": "1213a73198af682611e68773052801c2bdd45aab24a87284c36ca3f5a1a7ee2c",
+    "scripts/p01/artifacts/campaign.py": "166c18f6a822cb56674f418217740a8aeb22b74f96312d9cbde4db125e947129",
+    "scripts/p01/artifacts/observe_remediation.py": "49a90d29962831dcf7e8318bcf06d83d09564e6daea1ef3f4d572ced8a5de712",
+    "scripts/p01/artifacts/release_set.py": "dc009f7a65282d1b6740b1f902026ac6a6c75cafa7618e0aa2551f500f067bf1",
+    "scripts/p01/artifacts/repository_scan.py": "13eed3db230a99756d435acbc61e58c318e6eb13ccd02c346988d27b084dc212",
+    "scripts/p01/artifacts/resolve_alpine.py": "09e4cd917e1bf039453760305bae2c787e58fb2e7fda33f2e7d7ead1af6558e6",
+    "scripts/p01/artifacts/test_bundle.py": "6346ba2b00b8b4c5a1a35eee55ec3f3e2f294d40fedfc7e472e456a9cb551162",
+    "scripts/p01/artifacts/test_campaign.py": "62c26deaec6ab35a88d64e0c95eaadd5064fdad525202d3b8db9994224b03a56",
+    "scripts/p01/artifacts/test_release_set.py": "70931a0098ed4d040dd2d274a6a288205067f4da5f3dd0d3cabb67acbcb404f6",
+    "scripts/p01/artifacts/tools.py": "829c6cb1a9b769e79b0f69b2ed3e8c41e689206d3bc6cb042dc747b51dda339c",
+    "scripts/p01/candidates.json": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+    "scripts/p01/check_jobs.py": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+    "scripts/p01/console_shared_state.php": "09f147e8a5c6722302440a4ec3aef1fba471b7854b19d8c5a0d89e1335f7ae9c",
+    "scripts/p01/contracts/compatibility.py": "ea1176fbf8bff363fb4f1cef82fe674d62ab9155e1c21802287533ceee38fdde",
+    "scripts/p01/contracts/config-php.json": "12cb6d61d4661117692300d84fbc4c117ee5f252f06306813375523a9cadcf40",
+    "scripts/p01/contracts/config-python.json": "57fccb73fe13bb0c2c17b88db04c0892345a54f2845be6194e2721406caedf99",
+    "scripts/p01/contracts/config-typescript-fetch.json": "dfbc7aed787a9a529de03db50c9e7915dafe6fec71e0573457c8f7c78adb40cb",
+    "scripts/p01/contracts/package-lock.json": "b45c3b6ade5daf81de9b086060f6a631638e52d46a2083f34ab4e75094e76742",
+    "scripts/p01/contracts/package.json": "fbdb858ce3725ffc47879326382a88052d0304e26d492c706f9dce870fb43ae1",
+    "scripts/p01/contracts/pyproject.toml": "eff306f45a1d4d4dc1ecf21f36eba2daf20be160b938a87928af4e8e6655f315",
+    "scripts/p01/contracts/run.py": "b7b647933bdb5518e4bf9e2dd54330868f29cf5b5ec234e7beec25835b56df0a",
+    "scripts/p01/contracts/test_compatibility.py": "bf5b7e1a0437a564cf1fada63a81aed9abdd235cf3e8094bfd6d4588ec78f71d",
+    "scripts/p01/contracts/uv.lock": "6afd3e92a837772ab2edf0a61abb912d4e5d0917e2ebae03f0bbcbf21fe7951c",
+    "scripts/p01/kubernetes_runtime.py": "2a896b580f5a0785281620d1e16d5d156b8d2572ed463191864cefeacc52d0c5",
+    "scripts/p01/local_runtime.py": "8e4b276f804dfdd5a6dbcb4af3c31c58e56f04affbfd858391e0c4425241df4d",
+    "scripts/p01/messaging/consumer.py": "e6745fbeaf529b6e631ecaecb1fd200a326e50e35abd1f99d75eeb833c69c30a",
+    "scripts/p01/messaging/generate.py": "248b9d8e1ae6e9dd7bdc0d260b27146dafdd7185ef66070440550b0030f5b704",
+    "scripts/p01/messaging/producer.php": "c43a863653e8fc90af26cadb3736b220a3b6e84b8d702d3de2e9f8e95ccaa313",
+    "scripts/p01/messaging/runtime.py": "47b7cf5ae90daade091ae3ab5ef52b6d3f863750a04dd09c8113fb0f941b3dfd",
+    "scripts/p01/permit_desk/Dockerfile": "d4c5ee38d43c97dc7eaa993aa045b1c3fe7774cb17ce4d83575dc61dbd2cdb80",
+    "scripts/p01/permit_desk/app.py": "fcd4165742fffce4c2f12a91ce7e30c35f91896553b60f8ab878b6efbf621cb6",
+    "scripts/p01/permit_desk/bundle.py": "ddb9eb23cbb5526435e070b2efbcb786f0e704f049b5e0d52ef59f36f6886524",
+    "scripts/p01/permit_desk/requirements.txt": "c287ec994d02e304dfa3e8a83bf7813faa2f6cf624edb02cab247d8752fd9955",
+    "scripts/p01/permit_desk/state.py": "c1002207716bef5d7cb46805b1e4712fc8eb6c9dbc76619499d685f17aae1311",
+    "scripts/p01/php_image_probe.php": "b145f43daf40e678275c54bcadb17a32aa18db6d529042dd29bbac849ccee032",
+    "scripts/p01/python_lock.py": "05b4074482edb8899c95da980b4886975a9ce36adb19c2894bd4e42b40d76769",
+    "scripts/p01/record_check_source.py": "e1441efa3477ed0db9e845547aa81e7a75b2227ce0b946ed1bcab4d0ebe3bd7b",
+    "scripts/p01/resolve_dependencies.py": "5bf284a7bff395bd29a344dfc311c4e2b97ad814da58f373c4a0703dc16e9210",
+    "scripts/p01/resource_observation.py": "271a4192d1246ebd6befebc67c5c99f2033a9d3bdd99586b42cae8f26291568b",
+    "scripts/p01/run_images.py": "4703a40df2ab4a1c6645214098099c9046da2663575b6dad3f4b96890aee8baa",
+    "scripts/p01/run_kubernetes.py": "0f07666a436b8371158c7ab8e26b084b3e88fc612e95a18251f3a5e720331bb0",
+    "scripts/p01/run_local.py": "7b204f022119609ecbe4aa3b02701d0b693014f4544d72838f5a5423145576e1",
+    "scripts/p01/run_messaging.py": "390279417c8f8a8ea0a8fcea1cf33802f72d471d0b64428c717c31bef2498a8b",
+    "scripts/p01/run_permit_desk.py": "875c65d49a45dce549d678cdeae5d3dbf586ef529387d6d00912f8e0a6e40d7b",
+    "scripts/p01/run_policy_controls.py": "8755b293fe919cccd8dcf54deee64eff2de388992ec275ac38d0ea71ab20d27a",
+    "scripts/p01/run_quality.py": "a1ba38d3e97028f9ddfe0c361690cbf13c892201077e2d1b0af05fe1a04b48cd",
+    "scripts/p01/run_stateful.py": "21d040012d8ce9360ec3e2df9e451ca80f7bb1fe4d8d71939da3ffd28d1706ae",
+    "scripts/p01/select_components.py": "9806b65f0faf745fe5f43451953b9d3432cd7baa106649ab0f65128cbf54f3ab",
+    "scripts/p01/stateful/Dockerfile": "c94f8ad1e12642cab4cb75e4342513d23117d9ab48d7d89001383dead91ab7c0",
+    "scripts/p01/stateful/Minio.Dockerfile": "e678385f2be94be3d9a07d0a7031be6669a9e709dc644382b8be4281583295d4",
+    "scripts/p01/stateful/probe.py": "be12ef04c62356b427f2bbc10440b79a134778031cc0bcb8b54c1676a25e4998",
+    "scripts/p01/stateful/requirements.in": "337f840ef121d68a09c39a7e0f3cb6249e90a6a16716b7b56927b247f184f33a",
+    "scripts/p01/stateful/requirements.txt": "8502a23321ac4444a5033774030d7ae3ccd1e4de21412c59bc2a1e316b90cdad",
+    "scripts/p01/stateful/resolve.py": "df470b2534427e43dd1b351e55cf4d48765aa7abfb2d9a9d53649259d22f4ffb",
+    "scripts/p01/stateful/runtime.py": "def6b44b6deba5cf6b429877587f76f81cce49759fcc62dcc102b2f29f90b2a6",
+    "scripts/p01/stateful/workflow.py": "3ff476ff222706766a5b6dcb5b5a62d7fe58724fd5317335ac054e71c9e3491d",
+    "scripts/p01/telemetry.py": "ff515376e284541f47d388cd33800798ef0eab3b7c8dbb889df0bb5f62bfba69",
+    "scripts/p01/telemetry_campaign.py": "888220985a6b3d2e93ee1064d6b65d2b76c5494172f8ff52c4e74b6a4abe2988",
+    "scripts/p01/test_alert_delivery.py": "fd9187d058e14533237a55085b784223e88b325493a5a295a4f2ef41702aa414",
+    "scripts/p01/test_alpine_inputs.py": "b65bb27c4bfec9067ec1a3e9b81a3b6972a3c2d8f6924aa22d216113fcc285b7",
+    "scripts/p01/test_jobs.py": "b103af1562f26ceb28e13e36fa13a09fb131333bc8cf4144e071d05b7c23bbf5",
+    "scripts/p01/test_kubernetes_campaign.py": "07c16af7ae660f365ce19b66bcb5697457a9ae0b8e0cb899d8fc20c787fbf267",
+    "scripts/p01/test_kubernetes_runtime.py": "19d19f8548bec14c3fdecb589e14d6cfd3c5c884082f87fba45f4ebfd12512ef",
+    "scripts/p01/test_local_campaign.py": "18d60c06c69792b9e0255e82dcd62654fc93bce6c6e44d74a38a9c67ea7cb03c",
+    "scripts/p01/test_local_runtime.py": "ef7b21f9821e19f5233ab6f163f33f851df9539fb830947be0854c1576d96972",
+    "scripts/p01/test_permit_desk.py": "13a522274de07e953e4490491b821644fc3719902d6182d9c225530ffc7b3d92",
+    "scripts/p01/test_python_lock.py": "0440ddb26d9ac8a163d2e3e44ddb9ff6865bcd44d749949c6ee507259ae46ce2",
+    "scripts/p01/test_recorder.py": "afc5002982dfb8d1d71a71974fdf5a2d3471854c6cfccc91f31f06b0d3bbe56f",
+    "scripts/p01/test_resource_observation.py": "a7eeea2c945e93efeb0b8ac0430853f2f64f49a6ac653494ad465aa8a8673d2c",
+    "scripts/p01/test_retained.py": "12e1248f65212da103e2c92bbc98f58cdd45be0af103d7874077782eddafd07f",
+    "scripts/p01/test_selection.py": "d6122c2ac881b206f4871e3f77dda8e5f0194f3f1b790864154cd6bf20367ab6",
+    "scripts/p01/test_stateful.py": "b60a35e81d054d91b6132b1252d095151c89ab5c26c3e2b0ae6e3a85b0fbf61c",
+    "scripts/p01/test_telemetry.py": "46905d01b1df4585c22f64a18d3026e6a33c74c0132f8485f83c300fe7254389",
+    "scripts/p01/verify_retained.py": "872344688ead3abc56eff37d825f147576eb57e156eff397e8e825cd426fcbbf",
+    ".github/workflows/p01-foundations.yml": "4360982a4243ac60a6e133dbf2a32646270f52cc9e656553da2e430c191bd9a7"
+  },
+  "input_lock_sha256": "ee6c030db0f801c9bd008e10f07f969460d3040546421e9d9052239343b24a4a",
+  "dependency_mode": "replay",
+  "resolved_lock_sha256": "ee6c030db0f801c9bd008e10f07f969460d3040546421e9d9052239343b24a4a",
+  "installed_packages": {
+    "brianium/paratest": {
+      "version": "v7.20.0",
+      "reference": "81c80677c9ec0ed4ef16b246167f11dec81a6e3d"
+    },
+    "brick/math": {
+      "version": "1.0.0",
+      "reference": "2effe05d2177c451b86c6a073196a4034c02f211"
+    },
+    "carbonphp/carbon-doctrine-types": {
+      "version": "3.2.1",
+      "reference": "5fa5eacafd9ef47c8c6ab9143fc901ba0194d3dc"
+    },
+    "composer/pcre": {
+      "version": "3.4.0",
+      "reference": "d5a341b3fb61f3001970940afb1d332968a183ed"
+    },
+    "composer/xdebug-handler": {
+      "version": "3.0.5",
+      "reference": "6c1925561632e83d60a44492e0b344cf48ab85ef"
+    },
+    "cordoval/hamcrest-php": {
+      "version": null,
+      "reference": null
+    },
+    "davedevelopment/hamcrest-php": {
+      "version": null,
+      "reference": null
+    },
+    "deptrac/deptrac": {
+      "version": "4.7.2",
+      "reference": "060c7edca50331129c866e6c5d5687edfea03c5f"
+    },
+    "dflydev/dot-access-data": {
+      "version": "v3.0.3",
+      "reference": "a23a2bf4f31d3518f3ecb38660c95715dfead60f"
+    },
+    "doctrine/deprecations": {
+      "version": "1.1.6",
+      "reference": "d4fe3e6fd9bb9e72557a19674f44d8ac7db4c6ca"
+    },
+    "doctrine/inflector": {
+      "version": "2.1.0",
+      "reference": "6d6c96277ea252fc1304627204c3d5e6e15faa3b"
+    },
+    "doctrine/lexer": {
+      "version": "3.0.3",
+      "reference": "71d305eaa6480d3d3460c7d053d1da7749fa9cca"
+    },
+    "dragonmantank/cron-expression": {
+      "version": "v3.6.0",
+      "reference": "d61a8a9604ec1f8c3d150d09db6ce98b32675013"
+    },
+    "egulias/email-validator": {
+      "version": "4.0.4",
+      "reference": "d42c8731f0624ad6bdc8d3e5e9a4524f68801cfa"
+    },
+    "fidry/cpu-core-counter": {
+      "version": "1.4.1",
+      "reference": "d384a7d0d6e67aa497327260ca95023e92dc2032"
+    },
+    "filp/whoops": {
+      "version": "2.18.6",
+      "reference": "7d0a2cde892089bb09372f4366e9b960eb3001a9"
+    },
+    "fruitcake/php-cors": {
+      "version": "v1.4.0",
+      "reference": "38aaa6c3fd4c157ffe2a4d10aa8b9b16ba8de379"
+    },
+    "graham-campbell/result-type": {
+      "version": "v1.2.0",
+      "reference": "adccca3324eece92ca35463648c12b9e6293c05b"
+    },
+    "guzzlehttp/guzzle": {
+      "version": "8.2.0",
+      "reference": "93939470950a9b11e2e84204166ef5e048c55fe4"
+    },
+    "guzzlehttp/promises": {
+      "version": "3.0.2",
+      "reference": "42118e66a53c492effaf92bc357e931985d5c6f9"
+    },
+    "guzzlehttp/psr7": {
+      "version": "3.1.0",
+      "reference": "a3059ba1a84c9139c4ae03cf0f45bea276c97c74"
+    },
+    "guzzlehttp/uri-template": {
+      "version": "v2.0.1",
+      "reference": "7a466ad606491eb6528c717482f7cca77f1851f3"
+    },
+    "hamcrest/hamcrest-php": {
+      "version": "v3.0.0",
+      "reference": "b61cd040da1a4925bc90a51c074f5297e7c0fa52"
+    },
+    "iamcal/sql-parser": {
+      "version": "v0.7",
+      "reference": "610392f38de49a44dab08dc1659960a29874c4b8"
+    },
+    "illuminate/auth": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/broadcasting": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/bus": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/cache": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/collections": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/concurrency": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/conditionable": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/config": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/console": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/container": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/contracts": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/cookie": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/database": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/encryption": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/events": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/filesystem": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/hashing": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/http": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/image": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/json-schema": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/log": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/macroable": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/mail": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/notifications": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/pagination": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/pipeline": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/process": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/queue": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/redis": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/reflection": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/routing": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/session": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/support": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/testing": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/translation": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/validation": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/view": {
+      "version": null,
+      "reference": null
+    },
+    "inertiajs/inertia-laravel": {
+      "version": "v3.5.1",
+      "reference": "35a27ea62b8a53ec40269c4c675db5d9d0e02426"
+    },
+    "jean85/pretty-package-versions": {
+      "version": "2.1.1",
+      "reference": "4d7aa5dab42e2a76d99559706022885de0e18e1a"
+    },
+    "jetbrains/phpstorm-stubs": {
+      "version": "v2026.2",
+      "reference": "709e512210784a7c0a677b3a89d35def844a59b9"
+    },
+    "kodova/hamcrest-php": {
+      "version": null,
+      "reference": null
+    },
+    "larastan/larastan": {
+      "version": "v3.12.2",
+      "reference": "c328727e6103c1147d1c64cc96b3aedfda26bc20"
+    },
+    "laravel/framework": {
+      "version": "v13.34.0",
+      "reference": "c829b4982d29344cbcf1d7ad78eb5d2bb8ae66c4"
+    },
+    "laravel/pint": {
+      "version": "v1.32.1",
+      "reference": "006bd7825eb01daf92959d060b89cd9514fe4253"
+    },
+    "laravel/prompts": {
+      "version": "v0.3.24",
+      "reference": "5d3cdef29e93ca3b62b1871359db3078cd99908b"
+    },
+    "laravel/serializable-closure": {
+      "version": "v2.1.0",
+      "reference": "2d5869a838bbcf37e0d8b0568fc41914e81374b5"
+    },
+    "league/commonmark": {
+      "version": "2.10.3",
+      "reference": "6efbd9c472b91db0a3350fcd601c8332c2382e1f"
+    },
+    "league/config": {
+      "version": "v1.2.0",
+      "reference": "754b3604fb2984c71f4af4a9cbe7b57f346ec1f3"
+    },
+    "league/flysystem": {
+      "version": "3.36.0",
+      "reference": "f7fb152932f30072d573510cbd4dd657d6475b25"
+    },
+    "league/flysystem-local": {
+      "version": "3.35.3",
+      "reference": "a099b24dce160f3b2239043d13d47c4a1a214ea4"
+    },
+    "league/mime-type-detection": {
+      "version": "1.17.0",
+      "reference": "f5f47eff7c48ed1003069a2ca67f316fb4021c76"
+    },
+    "league/uri": {
+      "version": "7.8.1",
+      "reference": "08cf38e3924d4f56238125547b5720496fac8fd4"
+    },
+    "league/uri-interfaces": {
+      "version": "7.8.1",
+      "reference": "85d5c77c5d6d3af6c54db4a78246364908f3c928"
+    },
+    "mockery/mockery": {
+      "version": "1.6.15",
+      "reference": "967a801bd188989a5669bd280f252d51c0fdc9ee"
+    },
+    "monolog/monolog": {
+      "version": "3.12.1",
+      "reference": "d7059e4c691d05ea1222b5124bed0f961be46e15"
+    },
+    "mtdowling/cron-expression": {
+      "version": null,
+      "reference": null
+    },
+    "myclabs/deep-copy": {
+      "version": "1.14.0",
+      "reference": "8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae"
+    },
+    "nesbot/carbon": {
+      "version": "3.14.2",
+      "reference": "94cfc34887f07ab5c0efa07914c8f527544e3224"
+    },
+    "nette/schema": {
+      "version": "v1.3.6",
+      "reference": "c54350438cd6914616f790a49cb424605f421562"
+    },
+    "nette/utils": {
+      "version": "v4.1.5",
+      "reference": "b043439dbdf954e6c28b5ea7e34b0100f83165e0"
+    },
+    "nikic/php-parser": {
+      "version": "v5.9.0",
+      "reference": "9e33da9553fe7786f0962b35f4e4ecf01be89def"
+    },
+    "nunomaduro/collision": {
+      "version": "v8.9.5",
+      "reference": "fb53eacd509a1d303858e2d20cfebf2d630254ec"
+    },
+    "nunomaduro/termwind": {
+      "version": "v2.4.0",
+      "reference": "712a31b768f5daea284c2169a7d227031001b9a8"
+    },
+    "opis/json-schema": {
+      "version": "2.6.0",
+      "reference": "8458763e0dd0b6baa310e04f1829fc73da4e8c8a"
+    },
+    "opis/string": {
+      "version": "2.1.0",
+      "reference": "3e4d2aaff518ac518530b89bb26ed40f4503635e"
+    },
+    "opis/uri": {
+      "version": "1.1.0",
+      "reference": "0f3ca49ab1a5e4a6681c286e0b2cc081b93a7d5a"
+    },
+    "paragonie/constant_time_encoding": {
+      "version": "v3.1.3",
+      "reference": "d5b01a39b3415c2cd581d3bd3a3575c1ebbd8e77"
+    },
+    "pestphp/pest": {
+      "version": "v4.7.8",
+      "reference": "5b2293f67adcf1b2320b33f521b94a692d18f360"
+    },
+    "pestphp/pest-plugin": {
+      "version": "v4.0.0",
+      "reference": "9d4b93d7f73d3f9c3189bb22c220fef271cdf568"
+    },
+    "pestphp/pest-plugin-arch": {
+      "version": "v4.0.2",
+      "reference": "3fb0d02a91b9da504b139dc7ab2a31efb7c3215c"
+    },
+    "pestphp/pest-plugin-laravel": {
+      "version": "v4.1.0",
+      "reference": "3057a36669ff11416cc0dc2b521b3aec58c488d0"
+    },
+    "pestphp/pest-plugin-mutate": {
+      "version": "v4.0.1",
+      "reference": "d9b32b60b2385e1688a68cc227594738ec26d96c"
+    },
+    "pestphp/pest-plugin-profanity": {
+      "version": "v4.2.1",
+      "reference": "343cfa6f3564b7e35df0ebb77b7fa97039f72b27"
+    },
+    "phar-io/manifest": {
+      "version": "2.0.4",
+      "reference": "54750ef60c58e43759730615a392c31c80e23176"
+    },
+    "phar-io/version": {
+      "version": "3.2.1",
+      "reference": "4f7fd7836c6f332bb2933569e566a0d6c4cbed74"
+    },
+    "php-amqplib/php-amqplib": {
+      "version": "v3.7.5",
+      "reference": "96da6d97b5a2da782be3234631ef64ac2c912298"
+    },
+    "phpdocumentor/graphviz": {
+      "version": "2.1.0",
+      "reference": "115999dc7f31f2392645aa825a94a6b165e1cedf"
+    },
+    "phpdocumentor/reflection-common": {
+      "version": "2.2.1",
+      "reference": "ee15a5a2022c8383906b225055e9496a6a5e6e3b"
+    },
+    "phpdocumentor/reflection-docblock": {
+      "version": "6.0.3",
+      "reference": "7bae67520aa9f5ecc506d646810bd40d9da54582"
+    },
+    "phpdocumentor/type-resolver": {
+      "version": "2.1.0",
+      "reference": "dbe2133bb23e2e33a6834f4ed417f24a1b167769"
+    },
+    "phpoption/phpoption": {
+      "version": "1.10.0",
+      "reference": "67b192b6a42ec03944b972d6e633ddec78ad2c6d"
+    },
+    "phpseclib/phpseclib": {
+      "version": "4.0.1",
+      "reference": "bb7b959c8159957edae6f5084ebbac765d310e16"
+    },
+    "phpstan/phpdoc-parser": {
+      "version": "2.3.6",
+      "reference": "1427af4647235b4a73b13940b1f1258d3584f36e"
+    },
+    "phpstan/phpstan": {
+      "version": "2.2.16",
+      "reference": "46a6d9060e5a7763adfcc21ebcb8b504ebdbcb92"
+    },
+    "phpunit/php-code-coverage": {
+      "version": "12.5.8",
+      "reference": "7440368d94738d54f2c1de24dbd3871793bbb0dd"
+    },
+    "phpunit/php-file-iterator": {
+      "version": "6.0.2",
+      "reference": "a248d1640ab059b075f53a2ef0f9856e864e06b5"
+    },
+    "phpunit/php-invoker": {
+      "version": "6.0.0",
+      "reference": "12b54e689b07a25a9b41e57736dfab6ec9ae5406"
+    },
+    "phpunit/php-text-template": {
+      "version": "5.0.1",
+      "reference": "babab73b7ef9fae406f2eb3ee11323a61caa63d5"
+    },
+    "phpunit/php-timer": {
+      "version": "8.0.0",
+      "reference": "f258ce36aa457f3aa3339f9ed4c81fc66dc8c2cc"
+    },
+    "phpunit/phpunit": {
+      "version": "12.5.33",
+      "reference": "b98e028a26c5c5ba7e4a54be96ccf35f2914d184"
+    },
+    "product/console": {
+      "version": "1.0.0+no-version-set",
+      "reference": null
+    },
+    "psr/clock": {
+      "version": "1.0.0",
+      "reference": "e41a24703d4560fd0acb709162f73b8adfc3aa0d"
+    },
+    "psr/clock-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/container": {
+      "version": "2.0.2",
+      "reference": "c71ecc56dfe541dbd90c5360474fbc405f8d5963"
+    },
+    "psr/container-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/event-dispatcher": {
+      "version": "1.0.0",
+      "reference": "dbefd12671e8a14ec7f180cab83036ed26714bb0"
+    },
+    "psr/event-dispatcher-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/http-client": {
+      "version": "1.0.3",
+      "reference": "bb5906edc1c324c9a05aa0873d40117941e5fa90"
+    },
+    "psr/http-client-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/http-factory": {
+      "version": "1.1.0",
+      "reference": "2b4765fddfe3b508ac62f829e852b1501d3f6e8a"
+    },
+    "psr/http-factory-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/http-message": {
+      "version": "2.0",
+      "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71"
+    },
+    "psr/http-message-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/log": {
+      "version": "3.0.2",
+      "reference": "f16e1d5863e37f8d8c2a01719f5b34baa2b714d3"
+    },
+    "psr/log-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/simple-cache": {
+      "version": "3.0.0",
+      "reference": "764e0b3939f5ca87cb904f570ef9be2d78a07865"
+    },
+    "psr/simple-cache-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "ramsey/collection": {
+      "version": "2.1.1",
+      "reference": "344572933ad0181accbf4ba763e85a0306a8c5e2"
+    },
+    "ramsey/uuid": {
+      "version": "4.9.4",
+      "reference": "75d73f48d02797c2c285a7e9f348fadc0102ffe2"
+    },
+    "rhumsaa/uuid": {
+      "version": null,
+      "reference": null
+    },
+    "sebastian/cli-parser": {
+      "version": "4.2.1",
+      "reference": "7d05781b13f7dec9043a629a21d086ed74582a15"
+    },
+    "sebastian/comparator": {
+      "version": "7.1.8",
+      "reference": "7c65c1e79836812819705b473a90c12399542485"
+    },
+    "sebastian/complexity": {
+      "version": "5.0.0",
+      "reference": "bad4316aba5303d0221f43f8cee37eb58d384bbb"
+    },
+    "sebastian/diff": {
+      "version": "7.0.1",
+      "reference": "cd4cabe39f8a4e8ee6818ba99f10a05561ea4ad6"
+    },
+    "sebastian/environment": {
+      "version": "8.1.2",
+      "reference": "9d32c685773823b1983e256ae4ecd48a10d6e439"
+    },
+    "sebastian/exporter": {
+      "version": "7.0.3",
+      "reference": "c5e21b5de653ce0a769fb36f5cdfcb5e7a32cf23"
+    },
+    "sebastian/global-state": {
+      "version": "8.0.3",
+      "reference": "b164d3274d6537ab462591c5755f76a8f5b1aae9"
+    },
+    "sebastian/lines-of-code": {
+      "version": "4.0.1",
+      "reference": "d543b8ef219dcd8da262cbb958639a96bedba10e"
+    },
+    "sebastian/object-enumerator": {
+      "version": "7.0.0",
+      "reference": "1effe8e9b8e068e9ae228e542d5d11b5d16db894"
+    },
+    "sebastian/object-reflector": {
+      "version": "5.0.0",
+      "reference": "4bfa827c969c98be1e527abd576533293c634f6a"
+    },
+    "sebastian/recursion-context": {
+      "version": "7.0.1",
+      "reference": "0b01998a7d5b1f122911a66bebcb8d46f0c82d8c"
+    },
+    "sebastian/type": {
+      "version": "6.0.4",
+      "reference": "82ff822c2edc46724be9f7411d3163021f602773"
+    },
+    "sebastian/version": {
+      "version": "6.0.1",
+      "reference": "9e935a16187e14f39b0e79910dabd614972cdb26"
+    },
+    "spatie/once": {
+      "version": null,
+      "reference": null
+    },
+    "staabm/side-effects-detector": {
+      "version": "1.0.5",
+      "reference": "d8334211a140ce329c13726d4a715adbddd0a163"
+    },
+    "symfony/clock": {
+      "version": "v8.1.0",
+      "reference": "701ef4de9705d6c32292ebee5e8044094a09fbf6"
+    },
+    "symfony/config": {
+      "version": "v8.1.5",
+      "reference": "ec711a6c14ae287d9618fbd2c9de4e223a1a4b02"
+    },
+    "symfony/console": {
+      "version": "v8.1.8",
+      "reference": "4b81146e3ee248ea969186f85499b54fbc78db08"
+    },
+    "symfony/css-selector": {
+      "version": "v8.1.6",
+      "reference": "08e2905152a39cf3fd1745d83f8c483e258887d9"
+    },
+    "symfony/dependency-injection": {
+      "version": "v8.1.8",
+      "reference": "e375617d3f132059bd096f41951b527c2eb60cd0"
+    },
+    "symfony/deprecation-contracts": {
+      "version": "v3.7.1",
+      "reference": "f3202fa1b5097b0af062dc978b32ecf63404e31d"
+    },
+    "symfony/error-handler": {
+      "version": "v8.1.8",
+      "reference": "c146daceccd5d4f864c051b233c276641cec527b"
+    },
+    "symfony/event-dispatcher": {
+      "version": "v8.1.5",
+      "reference": "7458da64220376b2e0dc2d8451bf43382c1ad297"
+    },
+    "symfony/event-dispatcher-contracts": {
+      "version": "v3.7.1",
+      "reference": "c7de7a00ffb67842132da02ea92988a39ccd9f4e"
+    },
+    "symfony/event-dispatcher-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "symfony/filesystem": {
+      "version": "v8.1.6",
+      "reference": "7599ebb855fede59413ddb7f15198d67bfcae7ba"
+    },
+    "symfony/finder": {
+      "version": "v8.1.8",
+      "reference": "bd4fed193a3132c91c5c93595cbfc78988915822"
+    },
+    "symfony/http-foundation": {
+      "version": "v8.1.8",
+      "reference": "662f5257658d4f60deff1bc790e9f2c68cb391bf"
+    },
+    "symfony/http-kernel": {
+      "version": "v8.1.8",
+      "reference": "51c014e881d8b4ce61e56c0d4105f65b50df786a"
+    },
+    "symfony/mailer": {
+      "version": "v8.1.7",
+      "reference": "8783380ecdafa23d36fc90c5873fd44b635c6e10"
+    },
+    "symfony/mime": {
+      "version": "v8.1.7",
+      "reference": "773ac57f20e2795bdadb65b5b1b5f4850d498283"
+    },
+    "symfony/polyfill-ctype": {
+      "version": "v1.37.0",
+      "reference": "141046a8f9477948ff284fa65be2095baafb94f2"
+    },
+    "symfony/polyfill-deepclone": {
+      "version": "v1.43.0",
+      "reference": "8db92c5508a3f7f82d8688d32f0a4868a26e58ad"
+    },
+    "symfony/polyfill-intl-grapheme": {
+      "version": "v1.43.0",
+      "reference": "5cac8f4db97208823aa353f59a01faad2da52c75"
+    },
+    "symfony/polyfill-intl-idn": {
+      "version": "v1.43.0",
+      "reference": "533d68cf99c8f8ee2e8893c59ed59192e92cfd74"
+    },
+    "symfony/polyfill-intl-normalizer": {
+      "version": "v1.43.0",
+      "reference": "ebd57ccc7edb93d632e184efbe7693d2517bab3b"
+    },
+    "symfony/polyfill-mbstring": {
+      "version": "v1.43.0",
+      "reference": "4d5d331bf731e0aedbc6b2f5e61135b7b7996a72"
+    },
+    "symfony/polyfill-php80": {
+      "version": "v1.43.0",
+      "reference": "9c6a5d6b01ca51d486c813e9a9c0ed55f208bb74"
+    },
+    "symfony/polyfill-php82": {
+      "version": "v1.43.0",
+      "reference": "843bbe8b2a7934307b749751eede0f111f5d1cfc"
+    },
+    "symfony/polyfill-php84": {
+      "version": "v1.43.0",
+      "reference": "22c6548499cbe5c5bb072fc0c42312dff062a015"
+    },
+    "symfony/polyfill-php85": {
+      "version": "v1.43.0",
+      "reference": "86a42cbcc07adc331481a5ab310a4024bfc227f6"
+    },
+    "symfony/polyfill-php86": {
+      "version": "v1.43.0",
+      "reference": "8840df45b24f33a49dc419fa18dc0057231ae1d8"
+    },
+    "symfony/polyfill-uuid": {
+      "version": "v1.43.0",
+      "reference": "b23ff8245cc5c4479ea2be3d0132d2e6dd433993"
+    },
+    "symfony/process": {
+      "version": "v8.1.7",
+      "reference": "10823b09358e690df4ff943e24e8492bb1019fc3"
+    },
+    "symfony/routing": {
+      "version": "v8.1.8",
+      "reference": "e46d741c56485441f37104a3e7eace4e17ed91f9"
+    },
+    "symfony/service-contracts": {
+      "version": "v3.7.3",
+      "reference": "15e6a07ec2a2c75ceb1b21dd98105ee8456d2257"
+    },
+    "symfony/service-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "symfony/string": {
+      "version": "v8.1.7",
+      "reference": "d950140b5f56f31901e5b7a0c04ffc3a3deb943c"
+    },
+    "symfony/translation": {
+      "version": "v8.1.5",
+      "reference": "d9e1caba0d6b6f9a26710af8a2f88d37f001215a"
+    },
+    "symfony/translation-contracts": {
+      "version": "v3.7.1",
+      "reference": "ccb206b98faccc511ebae8e5fad50f2dc0b30621"
+    },
+    "symfony/translation-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "symfony/uid": {
+      "version": "v8.1.8",
+      "reference": "f412a0b5edd75eb3104a93bd0d11fd2ea3da34e4"
+    },
+    "symfony/var-dumper": {
+      "version": "v8.1.7",
+      "reference": "741a8c4c948b0bb9bd3653daacd3644c73c40ea5"
+    },
+    "symfony/var-exporter": {
+      "version": "v8.1.6",
+      "reference": "802362f41128c430fd6685491e1fb72127fae78a"
+    },
+    "symfony/yaml": {
+      "version": "v8.1.8",
+      "reference": "030e96eed0303223bfca3af9109e9e64830b6ec3"
+    },
+    "ta-tikoma/phpunit-architecture-test": {
+      "version": "0.8.7",
+      "reference": "1248f3f506ca9641d4f68cebcd538fa489754db8"
+    },
+    "theseer/tokenizer": {
+      "version": "2.0.1",
+      "reference": "7989e43bf381af0eac72e4f0ca5bcbfa81658be4"
+    },
+    "tijsverkoyen/css-to-inline-styles": {
+      "version": "v2.4.0",
+      "reference": "f0292ccf0ec75843d65027214426b6b163b48b41"
+    },
+    "videlalvaro/php-amqplib": {
+      "version": null,
+      "reference": null
+    },
+    "vlucas/phpdotenv": {
+      "version": "v5.7.0",
+      "reference": "301c07936b16d88628b126b01d082ba153cf4c40"
+    },
+    "voku/portable-ascii": {
+      "version": "2.1.1",
+      "reference": "8e1051fe39379367aecf014f41744ce7539a856f"
+    },
+    "webmozart/assert": {
+      "version": "2.4.1",
+      "reference": "2ccb7c2e821038c03a3e6e1700c570c158c55f70"
+    }
+  },
+  "failure": "RuntimeError: chromium-install: exit 124 (expected 0); see retained logs",
+  "artifact_sha256": {
+    "01-php-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-php-version.stdout.log": "78c7007ae057d38c850ca704a277e6191e0dc7f0599549c22e2614ef55030b72",
+    "02-composer-version.stderr.log": "4acf068af6281ef9fbbc5dbd2d747263c3675e7cf932189d53b274050e7d37a4",
+    "02-composer-version.stdout.log": "6dca12c153909313c4e7537ed657ec2f5a9f303611d5d516a9b0d4d0e3f2f472",
+    "03-locked-install.stderr.log": "a3bf89251603ff9c88894b7d536ed25076cc2b7a8c75135529f60de733e84503",
+    "03-locked-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-composer-validate.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-composer-validate.stdout.log": "43add299dc97ecbd90ec2dc456ef5a0bd824bb9abdae2a3d7cdb520e21f8e86d",
+    "05-platform-requirements.stderr.log": "0fbede05e037d5229f008b1901345217d825139d02c2a1b60590c0bd7c61cdca",
+    "05-platform-requirements.stdout.log": "b4bd9d9d20dc985cb8d9e192a74484df738b034f20aeed027f1cb59d8f37ea93",
+    "06-installed-packages-initial.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-installed-packages-initial.stdout.log": "0a2b16f26a766abc33073d3a98f318d09906f2384fe0b7043a9b0e5c0aa61924",
+    "07-clean-locked-install.stderr.log": "d2d060b355d7f7bbf54ec2a45f916db9a70622c91106769ee45d39fcda6ee1ff",
+    "07-clean-locked-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-installed-packages-replay.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-installed-packages-replay.stdout.log": "0a2b16f26a766abc33073d3a98f318d09906f2384fe0b7043a9b0e5c0aa61924",
+    "09-node-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "09-node-version.stdout.log": "b7677d3ec37ee1897ba07dc2cfe8292fe421c9ac93396cca5bbece486d1a2a41",
+    "10-npm-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "10-npm-version.stdout.log": "a38e383f1e9080b0dd9001481f6e56b341000de90a05061b66734350ad3adc41",
+    "11-frontend-clean-install.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "11-frontend-clean-install.stdout.log": "7201d2aad676839b824fb8be2878dd4b0974f496440d585d2e4e7f7a12b0ee1d",
+    "12-frontend-boundaries.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "12-frontend-boundaries.stdout.log": "077f31b1ea766636e23edd0f6cedd307a784570935a474342b184ad16024b159",
+    "13-frontend-typecheck.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "13-frontend-typecheck.stdout.log": "766a240d14690488a21ffefd25cd11ca772d502a037bb823b233fb6721154c98",
+    "14-frontend-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "14-frontend-build.stdout.log": "8a1286047297d112aa7962e5e08fa58aee42f2ad9453afb815748c2a71a717a3",
+    "15-chromium-install.stderr.log": "d70a5454d7b6ceb72d7bbbc943e22614aa8a6f00d886ec8726461d6afb3dbc5f",
+    "15-chromium-install.stdout.log": "87bc577e149a165485086e92bb8fdf1a13a00122f6d02391e3dcb31ff2d2bbee",
+    "application-logs/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "composer.json": "878bb78b930e6890a676229442f0835c99b3d2868cbd1d200768edaefa147e05",
+    "composer.lock": "ee6c030db0f801c9bd008e10f07f969460d3040546421e9d9052239343b24a4a",
+    "package-lock.json": "5e626b04d3aeb7d54eb645806130b98c7a60d12b81a744cf886869cbd3b3cc8f",
+    "package.json": "60a8fe17aa38ad6c8d2200926f68880413631c1108beebb3f6e3ff0499f2a5c2"
+  },
+  "completed_at": "2026-10-07T19:47:00.410574+00:00"
+}
