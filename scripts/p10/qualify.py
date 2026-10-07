@@ -117,6 +117,7 @@ def main():
         ):
             raise RuntimeError("component_evidence_incomplete")
         report["component_suites"] = components["suites"]
+        print("P10_SUITES=" + canonical(components["suites"]).decode(), flush=True)
         command("scripts/p01/contracts", ["uv", "sync", "--locked"])
         command(
             ".",

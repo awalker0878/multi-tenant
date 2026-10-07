@@ -255,6 +255,14 @@ class Qualification(unittest.TestCase):
                 }
             )
         ]
+        packet["native_inventory"] = self.save(
+            {
+                "candidate_sha256": self.sha,
+                "reconciled_epoch": "new",
+                "inventory_complete": True,
+                "operation_ids": ["fixture"],
+            }
+        )
         packet["upgrade"] = self.save(
             {
                 "candidate_sha256": self.sha,
@@ -277,6 +285,10 @@ class Qualification(unittest.TestCase):
             del broken["dependencies"][dependency]
             with self.subTest(dependency=dependency), self.assertRaises(Held):
                 assess_restore(self.root, broken)
+        omitted = copy.deepcopy(packet)
+        omitted["native_effects"] = []
+        with self.assertRaisesRegex(Held, "inventory_incomplete"):
+            assess_restore(self.root, omitted)
 
     def test_restore_holds_stale_epochs_unknown_effects_keys_and_undrained_workers(
         self,

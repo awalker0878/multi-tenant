@@ -22,6 +22,13 @@ PREFIXES = (
     "scripts/",
     ".github/workflows/",
     "release/",
+    "docs/engineering/",
+    "docs/operations/",
+    "docs/qualification/",
+    "docs/releases/",
+    "docs/implementation/phases/",
+    "docs/implementation/gates.md",
+    "docs/implementation/support-matrix.md",
 )
 CASES = {
     "P10.01": ["Q10.01", "Q10.02", "Q10.03", "Q10.04", "Q10.05", "Q09.06"],

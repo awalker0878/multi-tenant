@@ -25,6 +25,7 @@ def assess_restore(root, packet):
             "old_epoch",
             "new_epoch",
             "native_effects",
+            "native_inventory",
             "upgrade",
         },
         "invalid_restore_packet",
@@ -70,6 +71,16 @@ def assess_restore(root, packet):
             and effect["reconciled_epoch"] == packet["new_epoch"],
             "native_outcome_unreconciled",
         )
+    inventory = reference(root, packet["native_inventory"])
+    require(
+        inventory["candidate_sha256"] == packet["candidate_sha256"]
+        and inventory["reconciled_epoch"] == packet["new_epoch"]
+        and inventory["inventory_complete"] is True
+        and isinstance(inventory["operation_ids"], list)
+        and len(inventory["operation_ids"]) == len(set(inventory["operation_ids"]))
+        and set(inventory["operation_ids"]) == seen,
+        "native_effect_inventory_incomplete",
+    )
     upgrade = reference(root, packet["upgrade"])
     require(
         upgrade["candidate_sha256"] == packet["candidate_sha256"]
