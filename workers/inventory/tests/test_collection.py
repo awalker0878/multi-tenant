@@ -33,9 +33,25 @@ class Endpoint(BaseHTTPRequestHandler):
         code = {"forbidden": 403, "throttle": 429}.get(mode, 200)
         path = urlsplit(self.path)
         query = parse_qs(path.query)
-        if path.path.startswith("/api/vcenter"):
+        if mode == "configuration":
+            code = 300 if path.path == "/" else 200
+            data: Any = (
+                {
+                    "versions": [
+                        {
+                            "id": "v2.1",
+                            "min_version": "2.1",
+                            "version": "2.104",
+                            "status": "CURRENT",
+                        }
+                    ]
+                }
+                if path.path == "/"
+                else {"extensions": [{"alias": "port-security", "name": "Port security"}]}
+            )
+        elif path.path.startswith("/api/vcenter"):
             key = path.path.split("/")[-1]
-            data: Any = [{key: key + "-1", "name": "<script>inert</script>"}]
+            data = [{key: key + "-1", "name": "<script>inert</script>"}]
             if mode == "too_many":
                 data *= 101
         else:

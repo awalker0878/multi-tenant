@@ -8,7 +8,7 @@ This record develops the existing baseline for review. No accountable-owner acce
 
 ## Context
 
-Infrastructure execution must apply the reviewed resource change and prevent overlapping ownership between Terraform, direct provider APIs and other tools. The proposed baseline uses reviewed saved plans with explicit resource/field ownership. Tool versions, backend, workspace structure and lock behavior remain unresolved.
+Infrastructure execution must apply the reviewed resource change and prevent overlapping ownership between Terraform, direct provider APIs and other tools. The proposed baseline uses reviewed saved plans with explicit resource/field ownership. Tool versions, backend, workspace structure and lock behavior are deployment inputs: discover them through owner APIs where available and collect remaining choices and evidence references through Console administration. These inputs bind native execution and qualification without blocking independent product development.
 
 ## Decision and scope
 

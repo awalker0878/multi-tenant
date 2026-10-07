@@ -8,8 +8,9 @@ const props = defineProps<{ tenantId: string; siteId: string; workspace: Porting
 const base = `/tenants/${props.tenantId}/inventory/sites/${props.siteId}/configuration`;
 const { unavailable, now } = useInventoryAccess(base + '/status');
 const saved = props.workspace.configuration;
+const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
 const initial: PortingInput = { source_endpoint: saved?.source_endpoint ?? null, target_endpoint: saved?.target_endpoint ?? null,
-  manual: structuredClone(saved?.manual ?? {}), choices: structuredClone(saved?.choices ?? props.workspace.capabilities.map(c => ({ id: c.id as PortingInput['choices'][number]['id'], required: false, interpretation: 'observed' as const, reason: '' }))) };
+  manual: clone(saved?.manual ?? {}), choices: clone(saved?.choices ?? props.workspace.capabilities.map(c => ({ id: c.id as PortingInput['choices'][number]['id'], required: false, interpretation: 'observed' as const, reason: '' }))) };
 const form = useForm({ operation: 'save', command_key: crypto.randomUUID(), revision: saved?.revision ?? null,
   endpoint_id: null as string | null, digest: saved?.digest ?? null, configuration: initial });
 const initialJson = JSON.stringify(initial);

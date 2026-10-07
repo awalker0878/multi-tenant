@@ -8,17 +8,9 @@ unimplemented. The [implementation record](docs/implementation/p07-native-provis
 delivered increment and its limits. The [input record](release/p07-native-inputs.json)
 still correctly reports all fifteen input groups missing.
 
-1. **BL-P07-001:** supply the installed OpenStack tuple, exact campaign scope,
-   scoped identity/trust, tool/provider/backend/locking choices, service interfaces
-   and independent observers in the protected packet using the
-   [commissioning runbook](docs/operations/runbooks/openstack-commissioning.md).
-   Use actual G06 receiving and OP01–OP07 controls from their existing authorities.
-2. Implement and qualify the selected native infrastructure, allocation and guest/
-   service adapters, activation, failure recovery, retirement and support dossier
-   against those concrete interfaces. The
-   [remaining implementation and receiving packet](docs/implementation/p07-completion-review.md)
-   identifies every package output and criterion. Q05/Q06 E3 remains mandatory
-   for G07; the packet contains no invented approval or reviewer identity.
+1. Continue native adapter development against the [released OpenStack API baseline](docs/implementation/openstack-version-qualification.md). API pulls and Console administrator review own implementation-specific inputs; they are runtime configuration, not a prerequisite for independent engineering.
+2. Exercise the Console source/destination pulls, validate configured options and installed/advertised features, explain interpretation overrides, and supply inputs unavailable through APIs. Bind confirmed revisions to the actual campaign when commissioning.
+3. **BL-P07-001** remains a native execution/qualification hold: actual current scope, protected identity/trust, campaign authority, independent observers and applicable receiving controls are necessary for Q05/Q06 E3. Complete the native infrastructure, allocation, guest/service, activation, recovery, retirement and support dossier outputs in the [remaining packet](docs/implementation/p07-completion-review.md).
 
 Development authorization persists. P06 simulation and complete input metadata
 do not authorize native effects. P07 remains incomplete until its scoped outputs

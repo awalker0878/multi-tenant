@@ -24,7 +24,7 @@ interfaces, persistent Lifecycle operations, real fencing and independent readba
 
 ## Next inputs and implementation order
 
-1. The platform/Infrastructure owners supply N01–N05's exact installed tuple,
+1. Implement the released OpenStack API baseline independently of deployment-specific facts. Use the [Console configuration workflow](openstack-version-qualification.md) to pull and validate N01–N05's exact installed tuple,
    destination/trust/identity scope, artifact/toolchain, state/locking/custody and
    sole-writer map in the protected commissioning packet. Resolve the corresponding
    ADR-014/015/016 selections with actual references. No operational secret goes
@@ -33,7 +33,7 @@ interfaces, persistent Lifecycle operations, real fencing and independent readba
    service and reservation protocols, recovery objectives/datasets, policy probes,
    activation/retention/deletion criteria and response ownership. Vendor names or
    fixture JSON alone do not supply these contracts.
-3. Implement those selected adapters within Lifecycle's registered worker pool.
+3. Continue implementing versioned adapters independently; bind and qualify those selected adapters within Lifecycle's registered worker pool.
    Keep one writer per native resource/field; persist attempts before effects;
    redeem current exact-scope authority at the boundary; reconcile unknown
    acceptance before retry. Qualify the actual backend's stale-worker exclusion

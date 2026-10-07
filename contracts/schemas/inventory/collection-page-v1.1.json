@@ -1,0 +1,220 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "discovery_id",
+    "lease_token",
+    "sequence",
+    "observations",
+    "next_cursor",
+    "terminal",
+    "coverage",
+    "collected_at",
+    "error"
+  ],
+  "properties": {
+    "discovery_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "lease_token": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "observations": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/$defs/Observation"
+      }
+    },
+    "next_cursor": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 255
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "terminal": {
+      "type": "boolean"
+    },
+    "coverage": {
+      "type": "boolean"
+    },
+    "collected_at": {
+      "type": "number"
+    },
+    "error": {
+      "anyOf": [
+        {
+          "enum": [
+            "transport_unavailable",
+            "throttled",
+            "permission_denied",
+            "invalid_response",
+            "unsafe_destination",
+            "unsupported_api"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "query",
+        "status",
+        "items"
+      ],
+      "properties": {
+        "query": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "permission_denied",
+            "unsupported_api",
+            "transport_unavailable",
+            "throttled",
+            "invalid_response"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "name": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "attributes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 80
+                    },
+                    "value": {
+                      "type": "string",
+                      "maxLength": 2000
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "value"
+                  ]
+                },
+                "maxItems": 20
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "attributes"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://multi-tenant.invalid/contracts/inventory/collection-page-v1.1",
+  "$defs": {
+    "Observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "native_id",
+        "incarnation",
+        "name",
+        "scope",
+        "facts"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "server",
+            "network",
+            "volume",
+            "datastore"
+          ]
+        },
+        "native_id": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "incarnation": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 255
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "scope": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "facts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "power": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "cpu": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "memory_mib": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "size_gib": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "status": {
+              "type": "string",
+              "maxLength": 255
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -11,6 +11,17 @@ Use the [canonical register](../../implementation/delivery-register.yaml) for
 receiving decisions and [operating inputs](../../../release/operating-inputs.json)
 for OP01–OP07. No additional baseline/G00 approval is requested.
 
+## Collect and validate deployment inputs in Console
+
+Use the [API-first configuration workflow](../../implementation/openstack-version-qualification.md)
+to select approved source/destination connections and pull configured options and
+features. Save the API findings with administrator validation, reasoned overrides,
+and remaining manual references. Configuration is stored by Inventory, not by
+editing the repository's all-unknown commissioning template. Native credentials
+remain protected. A confirmed review supplies input provenance; E3 observations,
+current authority and independent native acceptance must still come from their
+actual owners. Missing runtime inputs do not block product development.
+
 ## Collect the commissioning packet
 
 The repository's [input record](../../../release/p07-native-inputs.json) records

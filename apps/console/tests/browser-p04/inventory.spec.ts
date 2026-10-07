@@ -7,7 +7,7 @@ test('browses scoped observations, preserves uncertain enrollment and clears rev
   await context.addCookies([fixture.admin_cookie]);
   const page = await context.newPage();
   const errors: string[] = [];
-  page.on('pageerror', error => errors.push(error.message));
+  page.on('pageerror', error => { errors.push(error.message); console.error(error.message); });
   const base = `/tenants/${fixture.tenant}/inventory/sites/${fixture.site}`;
   await page.goto(base);
   await expect(page.getByRole('heading', { name: 'Site inventory', exact: true })).toBeVisible();

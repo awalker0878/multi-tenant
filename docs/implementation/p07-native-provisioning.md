@@ -17,7 +17,7 @@ omitted obligations, wildcard scope, changed packet/plan bindings, unbound evide
 future/expired metadata and unreviewed/self-reviewed observations. Native-scope
 and stop/revocation inputs cannot inherit E2 evidence. Parsing rejects duplicate
 keys, nonfinite values, oversized files and final-component symlinks/nonregular
-files, with value-free errors. No new runtime dependency or HTTP surface is added.
+files, with value-free errors. That offline preparation adds no runtime dependency or HTTP surface.
 
 The second increment adds saved-plan byte comparison and P05/commissioning binding
 checks. It holds changed native tuples, artifacts, state lineage/serial/workspace,
@@ -45,3 +45,20 @@ bounded P06 regression results. The
 [remaining implementation and review packet](p07-completion-review.md) identifies
 the actual inputs and native outputs still required for each package. No P07
 package or G07 criterion is marked complete by the preparation campaign.
+
+
+## API-first Console configuration
+
+The Inventory/Console increment implements the existing ADR-015 baseline: API
+pulls determine available options, installed/advertised features and configured
+resources; administrators validate findings, explain interpretation overrides,
+and supply non-discoverable inputs. Immutable revisions and confirmations bind
+the selected source/destination generations. Raw observations never become
+editable declarations or native support evidence. The [version register](openstack-version-qualification.md)
+starts with 2026.2 Hibiscus and documents each API, collection boundary and remaining
+native qualification. No new decision or approval is introduced.
+
+Deployment inputs are runtime commissioning data. BL-P07-001 blocks native effects
+and qualification that need an actual environment, not independent product or
+adapter development. Existing N01–N15 preparation evidence remains original;
+the checked-in unknown record is a template, not the Console configuration store.

@@ -6951,14 +6951,14 @@ blockers:
   owner_role: OpenStack platform, Infrastructure, security, enterprise service, SRE and qualification owners
   description: Actual installed OpenStack/API/backend/guest tuple, bounded native write campaign, scoped credentials/trust,
     tool/provider/state/locking selections, enterprise interfaces, observer and operating/receiving evidence are
-    not supplied. P06 E2 simulation cannot replace them. Native adapters and Q05/Q06 implementation depend on these
-    concrete interfaces.
-  unblock_condition: Supply the actual tuple and selected interfaces in the protected N01-N15 packet for native
-    adapter implementation and resolve ADR-015/016 selections. Before native effects, supply exact campaign authority
+    not supplied. P06 E2 simulation cannot replace them. These are runtime native commissioning and qualification
+    inputs; independent product and adapter development continues against versioned contracts.
+  unblock_condition: Pull actual API configuration through Inventory; administrators validate observations, explain interpretation
+    overrides and supply non-discoverable implementation inputs in Console under the existing ADR-015/016 baseline. Before native effects, supply exact campaign authority
     and complete applicable G06 receiving and OP01-OP07 controls. Qualify the implemented adapters on that exact
     native scope.
-  next_action: Supply the actual site and service/interface inputs in the protected N01-N15 packet so selected native
-    adapters can be implemented. Complete campaign authority and applicable G06/operating receiving before Q05/Q06
+  next_action: Continue adapter implementation against the released API baseline. Collect actual site and service/interface
+    inputs through API-first Console configuration for the protected N01-N15 native campaign. Complete campaign authority and applicable G06/operating receiving before Q05/Q06
     native effects. Independent input/saved-plan preparation and bounded E1/E2 regression are delivered; no renewed
     G00 approval is needed.
   state: OPEN

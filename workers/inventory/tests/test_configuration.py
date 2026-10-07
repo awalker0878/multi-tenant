@@ -4,10 +4,13 @@ import json
 from typing import Any
 
 import pytest
+from test_collection import Endpoint
 
 from inventory_worker.infrastructure.configuration import QUERIES, collect_configuration, normalized
 from inventory_worker.infrastructure.generated_configuration_streams import configuration_streams
-from inventory_worker.infrastructure.native import CollectionFailure
+from inventory_worker.infrastructure.native import CollectionFailure, collect
+
+pytest_plugins = ["test_collection"]
 
 
 def test_version_discovery_keeps_ranges_and_discards_secrets() -> None:
@@ -129,3 +132,22 @@ def test_denied_pull_is_unknown_with_no_provider_data(monkeypatch: pytest.Monkey
         "items": [],
     }
     assert result["terminal"] is True and result["observations"] == []
+
+
+def test_configuration_gets_use_real_pinned_tls_without_following_response_links(
+    endpoint: dict[str, Any],
+) -> None:
+    Endpoint.mode = "configuration"
+    policy = {
+        "platform": "openstack",
+        "native_scope": "project-a",
+        "coverage_reference": "test-only",
+        "streams": [{**endpoint, "base_url": endpoint["base_url"] + "/v2.1"}],
+    }
+    result = collect(policy, 1, None, include_configuration=True)
+    assert result["configuration"]["status"] == "observed"
+    assert result["configuration"]["items"][0]["id"] == "v2.1"
+    assert Endpoint.calls == [("GET", "/")]
+    Endpoint.mode = "redirect"
+    with pytest.raises(CollectionFailure, match="unsafe_destination"):
+        collect(policy, 1, None, include_configuration=True)

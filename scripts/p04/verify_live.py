@@ -103,7 +103,7 @@ def main():
                     (out/'browser.json').write_text(redact(browser_file.read_text()))
 
     try:
-        api = json.loads((root/'contracts/openapi/inventory-v1.json').read_text())
+        api = json.loads((root/'contracts/openapi/inventory-v1.1.json').read_text())
         validate_spec(api)
         check('independent-openapi-specification-validation', True)
         run(['python', 'scripts/p04/generate_clients.py', '--check'], label='generated-clients')
@@ -335,7 +335,7 @@ def main():
             events_file = out/'broker-observer.json'
             run([*probe, 'observe', str(events_file)], env=envs['inventory'], label='independent-broker-observer')
             events = json.loads(events_file.read_text())
-            schema = json.loads((root/'contracts/schemas/inventory/fact-v1.json').read_text())
+            schema = json.loads((root/'contracts/schemas/inventory/fact-v1.1.json').read_text())
             for event in events:
                 Draft202012Validator(schema).validate(event['body'])
                 check('broker-confirmed-wire-contract', event['message_id'] == event['body']['event_id'] and event['user_id'] == 'inventory' and event['routing_key'] == 'inventory.facts.v1' and event['delivery_mode'] == 2)
