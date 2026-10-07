@@ -8,7 +8,11 @@ version = "0.1.0.dev0"
 description = "Lifecycle worker; isolated simulation and bounded native adapter components"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
-dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0"]
+dependencies = [
+    "cryptography==50.0.2",
+    "psycopg[binary]==3.3.6",
+    "uvicorn==0.53.0",
+]
 
 [project.scripts]
 lifecycle-worker-health = "lifecycle_worker.bootstrap.health:main"

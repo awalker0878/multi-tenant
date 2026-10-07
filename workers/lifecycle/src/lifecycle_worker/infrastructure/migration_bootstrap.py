@@ -19,6 +19,7 @@ from lifecycle_worker.application.native import (
     digest,
     identity,
 )
+from lifecycle_worker.infrastructure.extension_trust import ExtensionTrust
 from lifecycle_worker.infrastructure.image_conversion import CopyConverter, PinnedQemuSandbox
 from lifecycle_worker.infrastructure.migration_archive import MigrationArchive
 from lifecycle_worker.infrastructure.migration_conversion import MigrationConversion
@@ -39,6 +40,12 @@ from lifecycle_worker.infrastructure.native_http import NativeEndpoint
 from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
 from lifecycle_worker.infrastructure.native_runtime import MountedNativeRuntime, endpoints
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites
+from lifecycle_worker.infrastructure.platform_api import (
+    PlatformApi,
+    PlatformHttp,
+    PlatformObserver,
+    distinct_credentials,
+)
 from lifecycle_worker.infrastructure.vmware_capture import VmwareCapture
 
 
@@ -232,6 +239,33 @@ class MountedMigrationRuntime:
                 raise NativeHeld("unexpected_image_observer")
             adapter.inspect(binding)
             return self.bound(adapter, binding, entry), observer
+        elif kind == "platform_lifecycle" and set(config) == {
+            "writer",
+            "reader",
+            "trust_file",
+            "envelope_file",
+            "artifact_file",
+        }:
+            writer_endpoint, reader_endpoint = (
+                endpoint(config["writer"]),
+                endpoint(config["reader"]),
+            )
+            distinct_credentials(writer_endpoint, reader_endpoint)
+            adapter = PlatformApi(
+                path,
+                Path(config["envelope_file"]),
+                Path(config["artifact_file"]),
+                ExtensionTrust(Path(config["trust_file"]), self.clock),
+                PlatformHttp(writer_endpoint, plan["platform"]),
+                self.journal,
+            )
+            platform_observer = PlatformObserver(
+                path, PlatformHttp(reader_endpoint, plan["platform"], read_only=True), self.clock
+            )
+            if entry["observer"] is not None:
+                raise NativeHeld("unexpected_platform_observer")
+            adapter.inspect(binding)
+            return self.bound(adapter, binding, entry), platform_observer
         elif kind == "openstack_resources" and set(config) == {"runtime_file"}:
             adapter, native_observer = MountedNativeRuntime(
                 Path(config["runtime_file"]), self.journal, self.clock
