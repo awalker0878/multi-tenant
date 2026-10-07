@@ -8,7 +8,7 @@ import tempfile
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, Protocol
 from urllib.parse import urlsplit
 
 from lifecycle_worker.application.api_plan import name, shape
@@ -24,6 +24,12 @@ from lifecycle_worker.application.native import (
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites
+
+
+class DownloadSink(Protocol):
+    def write(self, data: bytes) -> int: ...
+    def flush(self) -> None: ...
+    def seek(self, offset: int, whence: int = 0) -> int: ...
 
 
 def copy_plan(document: dict[str, Any], binding: NativeBinding) -> dict[str, Any]:
@@ -245,7 +251,7 @@ class VmwareExport:
             time.sleep(0.1)
 
     def download(
-        self, url: str, limit: int, target: BinaryIO, heartbeat: Callable[[], None]
+        self, url: str, limit: int, target: DownloadSink, heartbeat: Callable[[], None]
     ) -> dict[str, Any]:
         parsed = urlsplit(url)
         origin = f"https://{parsed.netloc}"
@@ -323,14 +329,18 @@ class GlanceImport:
         self.api.expected_token_sha256 = self.scope.subject_token_sha256
         boundary()
 
-    def preflight(self, binding: NativeBinding, boundary: Callable[[], None]) -> None:
+    def preflight(
+        self, binding: NativeBinding, boundary: Callable[[], None], disk_format: str = "vmdk"
+    ) -> None:
         def current() -> None:
             self.current(binding, boundary)
 
         schema = self.api.request("GET", "/v2/schemas/image", current)
         methods = self.api.request("GET", "/v2/info/import", current)
         if (
-            "vmdk" not in schema.get("properties", {}).get("disk_format", {}).get("enum", [])
+            disk_format not in {"vmdk", "raw", "qcow2"}
+            or disk_format
+            not in schema.get("properties", {}).get("disk_format", {}).get("enum", [])
             or "bare"
             not in schema.get("properties", {}).get("container_format", {}).get("enum", [])
             or "glance-direct" not in methods.get("import-methods", {}).get("value", [])
@@ -343,7 +353,7 @@ class GlanceImport:
         payload = {key: disk[key] for key in ("name", "hw_firmware_type", "hw_disk_bus")}
         payload.update(
             id=disk["image_id"],
-            disk_format="vmdk",
+            disk_format=disk.get("disk_format", "vmdk"),
             container_format="bare",
             visibility="private",
             product_tenant_id=binding.tenant_id,
@@ -433,7 +443,7 @@ class GlanceImport:
                     algorithm not in {"sha256", "sha512"}
                     or image.get("os_hash_value") != receipt[algorithm]
                     or image.get("size") != receipt["size"]
-                    or image.get("disk_format") != "vmdk"
+                    or image.get("disk_format") != disk.get("disk_format", "vmdk")
                 ):
                     raise NativeHeld("native_image_integrity_changed")
                 return
@@ -610,7 +620,7 @@ class GlanceReadback:
                 "id": disk["image_id"],
                 "owner": binding.project_id,
                 "status": "active",
-                "disk_format": "vmdk",
+                "disk_format": disk.get("disk_format", "vmdk"),
                 "container_format": "bare",
                 "visibility": "private",
                 "product_tenant_id": binding.tenant_id,

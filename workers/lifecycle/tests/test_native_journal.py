@@ -306,3 +306,60 @@ def test_migration_stage_custody_and_monotonic_recovery_generation(
     with psycopg.connect(**postgres) as c:
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
             c.execute("DELETE FROM native.custody_generations")
+
+
+def test_capture_receipt_resolution_cannot_cross_job_or_approved_plan(
+    postgres: dict[str, Any],
+) -> None:
+    capture = binding()
+    j = journal(postgres)
+    assert j.claim(capture)
+    facts = {
+        "source_vm_id": "vm-1",
+        "clone_vm_id": "vm-2",
+        "snapshot_id": "snapshot-1",
+        "clone_config_sha256": "c" * 64,
+        "disks_sha256": "d" * 64,
+        "power_state": "poweredOff",
+        "network_devices": 0,
+    }
+    j.record(capture, "clone_bound", facts)
+    export = replace(
+        capture, operation_id=str(uuid4()), attempt_id=str(uuid4()), operation_plan_sha256="e" * 64
+    )
+    assert j.capture(export, capture.operation_plan_sha256) == facts
+    for changed in (
+        replace(export, job_id=str(uuid4())),
+        replace(export, tenant_id=str(uuid4())),
+        replace(export, plan_digest="f" * 64),
+    ):
+        with pytest.raises(NativeHeld):
+            j.capture(changed, capture.operation_plan_sha256)
+    j.record(capture, "clone_bound", facts)
+    with pytest.raises(NativeHeld, match="ambiguous"):
+        j.capture(export, capture.operation_plan_sha256)
+
+
+def test_partial_artifact_is_not_a_conversion_or_import_source(postgres: dict[str, Any]) -> None:
+    export = binding()
+    j = journal(postgres)
+    assert j.claim(export)
+    disk = {"resource_key": "disk-2000", "size": 512, "sha256": "a" * 64, "sha512": "b" * 128}
+    j.record(export, "disk_transferred", disk)
+    conversion = replace(
+        export, operation_id=str(uuid4()), attempt_id=str(uuid4()), operation_plan_sha256="e" * 64
+    )
+    with pytest.raises(NativeHeld, match="incomplete"):
+        j.artifact(conversion, export.operation_plan_sha256, "archive")
+    j.record(
+        export, "export_complete", {"descriptor_sha256": "c" * 64, "manifest_sha256": "d" * 64}
+    )
+    result = j.artifact(conversion, export.operation_plan_sha256, "archive")
+    assert result["operation_id"] == export.operation_id
+    assert result["disks"] == {"disk-2000": disk}
+    with pytest.raises(NativeHeld):
+        j.artifact(
+            replace(conversion, job_id=str(uuid4())), export.operation_plan_sha256, "archive"
+        )
+    with pytest.raises(NativeHeld):
+        j.artifact(conversion, export.operation_plan_sha256, "conversion")

@@ -62,7 +62,9 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
     config = {
         "uuid": str(uuid4()),
         "firmware": "bios",
-        "hardware": {"device": [{"key": 2000, "capacityInBytes": 1048576}]},
+        "hardware": {
+            "device": [{"_typeName": "VirtualDisk", "key": 2000, "capacityInBytes": 1048576}]
+        },
     }
     data = b"synthetic-vmdk-stream" * 8000
     fixture: dict[str, Any] = {"fault": "", "calls": [], "images": {}}
@@ -146,7 +148,11 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
                     200,
                     {
                         "properties": {
-                            "disk_format": {"enum": ["raw"] if fault == "format" else ["vmdk"]},
+                            "disk_format": {
+                                "enum": ["raw"]
+                                if fault == "format"
+                                else fixture.get("formats", ["vmdk"])
+                            },
                             "container_format": {"enum": ["bare"]},
                         }
                     },
@@ -189,6 +195,31 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
                         }
                     ],
                 )
+            elif self.path.endswith("/CreateDescriptor"):
+                files = json.loads(raw)["cdp"]["ovfFiles"]
+                from xml.sax.saxutils import quoteattr
+
+                references = "".join(
+                    f'<File ovf:id="f{i}" ovf:href={quoteattr(f["path"])} ovf:size="{f["size"]}"/>'
+                    for i, f in enumerate(files)
+                )
+                disks = "".join(
+                    f'<Disk ovf:diskId="d{i}" ovf:fileRef="f{i}" ovf:capacity="{f["capacity"]}"/>'
+                    for i, f in enumerate(files)
+                )
+                self.answer(
+                    200,
+                    {
+                        "ovfDescriptor": '<Envelope xmlns="http://schemas.dmtf.org/ovf/envelope/1" '
+                        'xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/1"><References>'
+                        + references
+                        + "</References><DiskSection>"
+                        + disks
+                        + "</DiskSection></Envelope>",
+                        "error": [],
+                        "warning": [],
+                    },
+                )
             elif self.path.endswith(("/HttpNfcLeaseProgress", "/HttpNfcLeaseComplete")):
                 self.answer(200)
             elif self.path == "/v2/images":
@@ -207,7 +238,7 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
                     size=len(data),
                     os_hash_algo="sha512",
                     os_hash_value=hashlib.sha512(data).hexdigest(),
-                    disk_format="raw" if fault == "converted" else "vmdk",
+                    disk_format="raw" if fault == "converted" else image["disk_format"],
                 )
                 self.answer(202)
             else:

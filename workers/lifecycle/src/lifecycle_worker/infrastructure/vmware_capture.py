@@ -17,6 +17,7 @@ from lifecycle_worker.application.native import (
     NativeJournal,
     decode,
     digest,
+    identity,
 )
 from lifecycle_worker.infrastructure.native_copy import NativeJson
 from lifecycle_worker.infrastructure.native_files import protected_read
@@ -66,6 +67,8 @@ def devices(config: dict[str, Any]) -> list[dict[str, Any]]:
     # Unknown connectable/passthrough hardware cannot silently escape clone isolation.
     for d in rows:
         kind = d.get("_typeName", "")
+        if not isinstance(kind, str) or not kind:
+            raise NativeHeld("vmware_device_type_unknown")
         if (
             ("connectable" in d or "Ethernet" in kind)
             and kind not in NICS
@@ -149,6 +152,8 @@ class VmwareCapture:
             p["source"], {"vm_id", "instance_uuid", "vcenter_uuid", "api_version", "config_sha256"}
         )
         source = p["source"]
+        identity(source["instance_uuid"])
+        identity(source["vcenter_uuid"])
         moref(reference("VirtualMachine", source["vm_id"]), "VirtualMachine")
         if not re.fullmatch(
             r"[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+", source["api_version"]

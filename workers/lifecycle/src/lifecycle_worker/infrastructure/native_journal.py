@@ -124,3 +124,83 @@ class PostgresNativeJournal:
                 raise NativeHeld("ambiguous_native_transfer_receipt")
             result[key] = row["facts"]
         return result
+
+    def capture(self, binding: NativeBinding, plan_sha256: str) -> dict[str, Any]:
+        """Resolve a prior immutable capture intent only inside the same tenant/job/plan."""
+        with self.connect() as connection:
+            rows = connection.execute(
+                "SELECT a.binding,e.facts FROM native.attempts a JOIN native.events e "
+                "ON e.operation_id=a.operation_id WHERE a.tenant_id=%s "
+                "AND a.binding->>'job_id'=%s AND a.binding->>'operation_plan_sha256'=%s "
+                "AND e.kind='clone_bound'",
+                (binding.tenant_id, binding.job_id, plan_sha256),
+            ).fetchall()
+        if len(rows) != 1:
+            raise NativeHeld("migration_capture_receipt_ambiguous")
+        prior = rows[0]["binding"]
+        fields = (
+            "tenant_id",
+            "site_id",
+            "project_id",
+            "resource_id",
+            "job_id",
+            "plan_digest",
+            "ownership_digest",
+            "custody_id",
+            "custody_generation",
+            "epoch",
+        )
+        if any(digest(prior.get(k)) != digest(binding.document()[k]) for k in fields):
+            raise NativeHeld("migration_capture_receipt_scope_changed")
+        return dict(rows[0]["facts"])
+
+    def artifact(self, binding: NativeBinding, plan_sha256: str, kind: str) -> dict[str, Any]:
+        if kind not in {"archive", "conversion"}:
+            raise NativeHeld("invalid_migration_artifact_kind")
+        with self.connect() as connection:
+            rows = connection.execute(
+                "SELECT operation_id,binding FROM native.attempts WHERE tenant_id=%s "
+                "AND binding->>'job_id'=%s AND binding->>'operation_plan_sha256'=%s",
+                (binding.tenant_id, binding.job_id, plan_sha256),
+            ).fetchall()
+            if len(rows) != 1:
+                raise NativeHeld("migration_artifact_ambiguous")
+            prior = rows[0]["binding"]
+            fields = (
+                "tenant_id",
+                "site_id",
+                "project_id",
+                "resource_id",
+                "job_id",
+                "plan_digest",
+                "ownership_digest",
+                "custody_id",
+                "custody_generation",
+                "epoch",
+            )
+            if any(digest(prior.get(k)) != digest(binding.document()[k]) for k in fields):
+                raise NativeHeld("migration_artifact_scope_changed")
+            events = connection.execute(
+                "SELECT kind,facts FROM native.events WHERE operation_id=%s ORDER BY sequence",
+                (rows[0]["operation_id"],),
+            ).fetchall()
+        terminal = "export_complete" if kind == "archive" else "conversion_complete"
+        completed = [e["facts"] for e in events if e["kind"] == terminal]
+        if len(completed) != 1:
+            raise NativeHeld("migration_artifact_incomplete")
+        disk_event = "disk_transferred" if kind == "archive" else "conversion_observed"
+        disks: dict[str, dict[str, Any]] = {}
+        for event in events:
+            if event["kind"] != disk_event:
+                continue
+            key = event["facts"]["resource_key"]
+            if key in disks:
+                raise NativeHeld("migration_artifact_ambiguous")
+            disks[key] = event["facts"]
+        if not disks:
+            raise NativeHeld("migration_artifact_incomplete")
+        return {
+            "operation_id": str(rows[0]["operation_id"]),
+            "disks": disks,
+            "completion": completed[0],
+        }
