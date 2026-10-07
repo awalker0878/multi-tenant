@@ -31,8 +31,8 @@ class NativeJourney:
             name,
             args,
             result_type=dict[str, Any],
-            start_to_close_timeout=timedelta(seconds=600 if effect else 30),
-            schedule_to_close_timeout=timedelta(seconds=660 if effect else 60),
+            start_to_close_timeout=timedelta(seconds=660 if effect else 30),
+            schedule_to_close_timeout=timedelta(seconds=720 if effect else 60),
             retry_policy=RetryPolicy(maximum_attempts=1),
         )
         return dict(result)

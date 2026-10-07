@@ -28,7 +28,7 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
-    selected = [p for p in paths if p.startswith(('workers/lifecycle/', 'services/lifecycle/', 'contracts/openapi/lifecycle-native-', 'contracts/fixtures/lifecycle/', 'scripts/p07/', '.github/workflows/p07-'))
+    selected = [p for p in paths if p.startswith(('workers/lifecycle/', 'services/lifecycle/', 'contracts/openapi/lifecycle-native-', 'contracts/openapi/worker-native-', 'contracts/fixtures/lifecycle/', 'scripts/p07/', '.github/workflows/p07-'))
                 and '/verification/' not in p]
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),

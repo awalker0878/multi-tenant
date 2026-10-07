@@ -23,6 +23,7 @@ src/lifecycle/domain/native_workflow.py
 src/lifecycle/infrastructure/__init__.py
 src/lifecycle/infrastructure/execution_owners.py
 src/lifecycle/infrastructure/foundation.py
+src/lifecycle/infrastructure/native_effects.py
 src/lifecycle/infrastructure/native_journey.py
 src/lifecycle/infrastructure/native_temporal.py
 src/lifecycle/infrastructure/store.py
@@ -47,6 +48,7 @@ tests/test_commissioning.py
 tests/test_foundation.py
 tests/test_health.py
 tests/test_native_dispatch.py
+tests/test_native_effects.py
 tests/test_native_preflight.py
 tests/test_native_workflow.py
 tests/test_reservations.py

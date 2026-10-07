@@ -112,5 +112,31 @@ simulation deployment does not register it or supply synthetic defaults.
 The orchestration campaign uses real pinned Temporal, TLS/JWT and PostgreSQL to
 exercise accepted start/effect response loss, restart, current-authority change,
 missing provider-quiescence evidence, cancellation, retirement ordering and history
-replay. Its owner and effect ports are synthetic; this is E2 software evidence,
-not a native Q05/Q06 result. Actual run results are retained separately.
+replay. Provision crosses the real worker effect TLS route, returns over the real
+Lifecycle boundary TLS route and writes a separate worker-owned PostgreSQL journal.
+Its current authority, saved-plan process, provider observations and other stage
+effects are synthetic; this is E2 software evidence, not a native Q05/Q06 result.
+Actual run results are retained separately.
+
+## Saved-plan effect submission
+
+`NativeWorkerEffects` implements the dispatch port through one registered executor
+endpoint with a fixed IP, verified TLS hostname/CA and protected workload credential.
+It makes one POST, follows no redirect and performs no retry. The bounded receipt
+must bind the exact grant and explicitly deny readiness and retry authority.
+Uncertain transport outcomes enter the same reconciliation hold.
+
+The [worker effect contract](../../../contracts/openapi/worker-native-effect-v1.json)
+is implemented by `NativeEffectApp` and `NativeSavedPlanEffect`. Caller trust supplies
+tenant and worker independently from JSON. The use case checks current authority
+before resolving tooling, then uses the existing saved-plan journal and one-time
+grant redemption. Only the provision stage is supported; other stages require
+their selected service adapters and remain held. `MountedNativeTooling` resolves
+the existing protected tooling/observer packet, validates actual bound artifact
+bytes and uses the independently scoped OpenStack observer. That packet conveys
+no native authority and does not replace confirmed Inventory/Console configuration.
+
+The effect handler is not registered by the simulation server or inspection CLI.
+Production composition still requires the native current-owner implementation,
+verified per-link caller trust, actual provider/state fencing, and each remaining
+stage's commissioned effect/observer interfaces.

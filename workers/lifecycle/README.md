@@ -48,3 +48,12 @@ effect protocol. It does not implement Lifecycle's native grant authority, enabl
 P06 native execution or expose a CLI apply switch. The reusable module is under
 `terraform/openstack-application/`; commissioning packages it as a separately pinned
 module artifact. No sibling source or historical qualification is imported.
+
+`NativeEffectApp` exposes the separately composed internal saved-plan effect
+contract. `NativeSavedPlanEffect` resolves tenant/worker from verified caller trust,
+checks Lifecycle authority before artifact access, and uses the native claim,
+single-use redemption and independent readback path. `MountedNativeTooling`
+resolves the same protected runtime packet as inspection. The simulation command
+does not register this route. Commissioned owner authority, caller trust and
+provider fencing remain required; see the
+[native control runbook](../../docs/operations/runbooks/native-workflow-control.md).

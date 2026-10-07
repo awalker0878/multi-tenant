@@ -32,3 +32,16 @@ negatives.append(case)
 for case in negatives:
     assert list(validator.iter_errors(case)), 'unsafe contract accepted'
 print('Native contract: OpenAPI and golden provision request pass; seven unsafe variants denied.')
+
+effect = json.loads((ROOT / 'contracts/openapi/worker-native-effect-v1.json').read_text())
+validate_spec(effect)
+expected_grant = copy.deepcopy(spec['components']['schemas']['BoundaryRequest']['properties']['grant'])
+expected_grant['properties']['stage'] = {'type': 'string', 'const': 'provision'}
+expected_grant['required'].append('native_binding')
+assert effect['components']['schemas']['EffectRequest']['properties']['grant'] == expected_grant
+effect_validator = Draft202012Validator(effect['components']['schemas']['EffectRequest'], format_checker=FormatChecker())
+effect_validator.validate({'grant': fixture['grant']})
+for case in negatives:
+    request = {k: v for k, v in case.items() if k != 'boundary'}
+    assert list(effect_validator.iter_errors(request)), 'unsafe worker request accepted'
+print('Native effect contract: same exact provision grant; unsafe variants denied.')

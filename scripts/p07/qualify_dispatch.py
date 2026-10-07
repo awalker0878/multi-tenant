@@ -27,7 +27,9 @@ def main():
     redactions = []
     fixture = None
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
-    prefixes = ('services/lifecycle/', 'scripts/p07/', 'scripts/p06/temporal_', 'scripts/p01/stateful/runtime.py',
+    prefixes = ('services/lifecycle/', 'workers/lifecycle/', 'contracts/openapi/lifecycle-native-',
+                'contracts/openapi/worker-native-', 'contracts/fixtures/lifecycle/',
+                'scripts/p07/', 'scripts/p06/temporal_', 'scripts/p01/stateful/runtime.py',
                 'scripts/p01/local_runtime.py', 'deploy/fixtures/stateful/', 'deploy/dependencies/stateful/inputs.lock.json',
                 '.github/workflows/p07-native-readiness.yml')
     report = {
@@ -36,12 +38,13 @@ def main():
         'evidence_level': 'E2', 'native_platforms_tested': [], 'native_write_authorized': False,
         'source_bindings': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in paths if p.startswith(prefixes)},
         'commands': [], 'limitations': [
-            'Actual Temporal/TLS/JWT and PostgreSQL with synthetic native authority, effects and observations.',
+            'Actual Temporal/TLS/JWT, internal effect/boundary TLS and separate worker PostgreSQL journal.',
+            'Native authority, saved-plan process, provider observations and other stage effects remain synthetic.',
             'No provider, guest, enterprise service, native fence, Q05/Q06 or receiving acceptance is established.',
         ],
     }
     env = {k: v for k, v in os.environ.items() if not k.startswith(('OS_', 'TF_')) and k != 'PYTHONPATH'}
-    env['PYTHONPATH'] = ':'.join(str(ROOT / p) for p in ['services/lifecycle/src', 'services/lifecycle/tests'])
+    env['PYTHONPATH'] = ':'.join(str(ROOT / p) for p in ['services/lifecycle/src', 'services/lifecycle/tests', 'workers/lifecycle/src'])
     env['P05_POSTGRES_BIN'] = os.environ.get('P07_POSTGRES_BIN', '')
     env['P07_DISPATCH_OBSERVATIONS'] = str(out / 'observations.json')
 

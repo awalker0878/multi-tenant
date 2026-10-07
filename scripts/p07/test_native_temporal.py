@@ -9,20 +9,21 @@ from pathlib import Path
 from threading import Event
 from uuid import uuid4
 
+import psycopg
 from temporalio.client import Client, WorkflowFailureError
-from temporalio.common import WorkflowIDConflictPolicy, WorkflowIDReusePolicy
 from temporalio.service import TLSConfig
 from temporalio.worker import Worker, Replayer
 
-from lifecycle.application.native_workflow import NativeWorkflow
 from lifecycle.domain.admission import digest
+from lifecycle.domain.execution import Rejected
 from lifecycle.domain.native_workflow import PROVISION, RETIRE
 from lifecycle.infrastructure.native_journey import NativeJourney
 from lifecycle.infrastructure.native_temporal import NativeActivities, NativeDispatcher
 from test_native_workflow import native, plan
+from native_wire_fixture import native_wire
 
 
-def test_native_durable_orchestration(native):
+def test_native_durable_orchestration(native, postgres, tmp_path):
     control, owners, initial = native
     checks = []
     histories = []
@@ -39,6 +40,10 @@ def test_native_durable_orchestration(native):
             self.release = Event()
 
         def execute(self, grant):
+            if grant['stage'] == 'provision':
+                transport.execute(grant)
+                self.grants.append(deepcopy(grant))
+                return
             tenant = documents[grant['job_id']]['scope']['tenant_id']
             boundary = 'before_saved_plan_apply' if grant['stage'] == 'provision' else 'before_effect'
             control.boundary(tenant, grant, grant['executor_id'], boundary)
@@ -64,6 +69,8 @@ def test_native_durable_orchestration(native):
     def document():
         p = plan()
         p['epoch'] = initial['epoch']
+        p['scope']['tenant_id'] = initial['scope']['tenant_id']
+        p['executor_id'] = initial['executor_id']
         return p
 
     def admit(p):
@@ -185,6 +192,26 @@ def test_native_durable_orchestration(native):
                 check('history-redacts-private-provider-message', 'private_synthetic_provider_reply' not in history.to_json())
                 histories.append({'workflow_id': handle.id, 'events': len(history.events), 'replay': 'PASSED'})
             check('six-real-native-histories-replayed', len(histories) == 6)
+            check('two-provision-effects-crossed-real-tls', calls['effect'] == 2 and len(calls['applies']) == 2)
+            check('eight-live-boundary-callbacks-crossed-real-tls', calls['boundary'] == 8)
+            with worker_connect() as database:
+                check('worker-journal-retains-two-claims', database.execute('SELECT count(*) AS total FROM native.attempts').fetchone()['total'] == 2)
+                check('worker-journal-retains-two-holds', database.execute('SELECT count(*) AS total FROM native.workspace_holds').fetchone()['total'] == 2)
+                check('worker-journal-retains-eight-events', database.execute('SELECT count(*) AS total FROM native.events').fetchone()['total'] == 8)
+            try:
+                with psycopg.connect(**(postgres | {'user': 'native_runtime'})) as database:
+                    database.execute('SELECT * FROM app.native_jobs')
+            except psycopg.errors.InsufficientPrivilege:
+                check('worker-cannot-access-lifecycle-database', True)
+            else:
+                raise AssertionError('worker_cross_owner_access')
+            provision = next(g for g in effects.grants if g['stage'] == 'provision')
+            try:
+                await asyncio.to_thread(transport.execute, provision)
+            except Rejected:
+                check('duplicate-tls-submission-is-held', len(calls['applies']) == 2)
+            else:
+                raise AssertionError('native_effect_repeated')
         finally:
             effects.release.set()
             for handle in handles:
@@ -195,9 +222,13 @@ def test_native_durable_orchestration(native):
             executor.shutdown(wait=True)
 
     try:
-        asyncio.run(scenario())
+        with native_wire(control, owners, initial, postgres, tmp_path / 'native-wire') as wire:
+            transport, calls, worker_connect = wire
+            asyncio.run(scenario())
     finally:
         Path(os.environ['P07_DISPATCH_OBSERVATIONS']).write_text(json.dumps({
             'checks': checks, 'histories': histories, 'native_platforms_tested': [],
             'native_write_authorized': False, 'owner_and_effect_observations': 'synthetic',
+            'internal_effect_and_boundary_transport': 'actual_tls',
+            'worker_journal': 'actual_owner_separated_postgresql',
         }, indent=2)+'\n')
