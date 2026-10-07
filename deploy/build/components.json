@@ -169,9 +169,9 @@
       "language": "python",
       "runtime_mode": "cli",
       "runtime_requirements": [
+        "cryptography==50.0.2",
         "psycopg[binary]==3.3.6",
-        "uvicorn==0.53.0",
-        "cryptography==50.0.2"
+        "uvicorn==0.53.0"
       ],
       "additional_scripts": {
         "lifecycle-simulator": "lifecycle_worker.bootstrap.simulation:main",

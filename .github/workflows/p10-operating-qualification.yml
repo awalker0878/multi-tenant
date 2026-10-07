@@ -1,0 +1,39 @@
+name: P10 operating qualification engineering
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: ['services/**', 'workers/**', 'apps/**', 'contracts/**', 'deploy/**', 'architecture/**', 'scripts/**', 'release/**', '.github/workflows/p10-operating-qualification.yml']
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qualification:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - name: Install repository validation dependencies
+        run: python -m pip install --requirement requirements-docs.txt
+      - name: Freeze candidate, exercise safety controls and retain measured scope
+        env:
+          P05_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+        run: python scripts/p10/qualify.py --output "$RUNNER_TEMP/p10-qualification"
+      - name: Retain original passing and failed observations with candidate bindings
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p10-qualification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p10-qualification/
+          if-no-files-found: error
+          retention-days: 90

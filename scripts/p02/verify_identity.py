@@ -70,8 +70,16 @@ def main() -> int:
         if not condition:
             raise RuntimeError(name)
 
-    def run(command: list[str], *, cwd: Path = root, env: dict | None = None, data: str | None = None, expected: int = 0, label: str | None = None) -> str:
-        completed = subprocess.run(command, cwd=cwd, env=env, input=data, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=120)
+    def run(command: list[str], *, cwd: Path = root, env: dict | None = None, data: str | None = None, expected: int = 0, label: str | None = None, timeout: int = 120) -> str:
+        try:
+            completed = subprocess.run(command, cwd=cwd, env=env, input=data, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
+        except subprocess.TimeoutExpired as error:
+            if label:
+                partial = error.stdout or b''
+                if isinstance(partial, bytes):
+                    partial = partial.decode('utf-8', errors='replace')
+                (output / f'{label}.log').write_text(redact(partial))
+            raise
         if label:
             (output / f'{label}.log').write_text(redact(completed.stdout))
         if completed.returncode != expected:
@@ -127,7 +135,7 @@ def main() -> int:
         report['postgres'] = sql('SHOW server_version;').strip()
         report['node'] = run(['node', '--version']).strip()
         check('exact-php-runtime', report['php'] == '8.5.11')
-        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/IdentityAdmissionTest.php', 'tests/Feature/IdentityRecoveryTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', 'tests/Feature/SupportTrustTest.php', 'tests/Feature/SupportAccessTest.php', 'tests/Feature/SupportContractTest.php', 'tests/Feature/SupportOutboxTest.php', 'tests/Feature/SupportConcurrencyTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features')
+        run(['php', 'vendor/bin/pest', 'tests/Feature/LocalIdentityTest.php', 'tests/Feature/IdentityAdmissionTest.php', 'tests/Feature/IdentityRecoveryTest.php', 'tests/Feature/OidcIdentityTest.php', 'tests/Feature/TenancyTest.php', 'tests/Feature/DirectoryTest.php', 'tests/Feature/ApprovalTest.php', 'tests/Feature/GovernanceOutboxTest.php', 'tests/Feature/IdentityOutboxTest.php', 'tests/Feature/ActorDelegationTest.php', 'tests/Feature/SupportTrustTest.php', 'tests/Feature/SupportAccessTest.php', 'tests/Feature/SupportContractTest.php', 'tests/Feature/SupportOutboxTest.php', 'tests/Feature/SupportConcurrencyTest.php', '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'], cwd=root / 'services/governance', env=os.environ.copy(), label='postgres-features', timeout=300)
         check('postgres-feature-suite', True)
 
         with tempfile.TemporaryDirectory(prefix='p02-identity-') as private:

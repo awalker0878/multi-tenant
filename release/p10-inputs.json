@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "candidate_sha256": null,
+  "selected_tuples": [],
+  "prerequisite_reviews": null,
+  "workload_model": null,
+  "artifact_set": null,
+  "security_findings": null,
+  "operating_receipts": null,
+  "evidence": [],
+  "receiving_reviews": []
+}
