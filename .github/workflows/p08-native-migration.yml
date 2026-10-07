@@ -36,3 +36,30 @@ jobs:
           path: ${{ runner.temp }}/p08-components/
           if-no-files-found: error
           retention-days: 14
+
+  review-ui:
+    name: P08 migration review browser (isolated HTTP fixture)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24.19.0'
+      - name: Install exact Console lock and Chromium
+        run: |
+          npm ci --prefix apps/console --ignore-scripts --no-audit --no-fund
+          cd apps/console
+          npx playwright install --with-deps --only-shell chromium
+      - name: Verify all-disk review, uncertain retry, confirmation and stale/revoked access
+        run: python scripts/p08/qualify_browser.py --output "$RUNNER_TEMP/p08-browser"
+      - name: Retain source-bound UI observations including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p08-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p08-browser/
+          if-no-files-found: error
+          retention-days: 14

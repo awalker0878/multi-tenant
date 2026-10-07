@@ -23,7 +23,7 @@ def main():
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
     prefixes = ('services/lifecycle/', 'services/inventory/', 'services/planning/', 'workers/lifecycle/', 'workers/inventory/', 'apps/console/',
                 'scripts/p08/', 'scripts/p04/generate_clients.py', 'contracts/schemas/inventory/', 'contracts/schemas/planning/migration-', 'contracts/openapi/inventory-v1.2', 'contracts/openapi/lifecycle-migration-',
-                'contracts/openapi/worker-migration-', 'contracts/fixtures/lifecycle/migration-', 'contracts/fixtures/inventory/migration-',
+                'contracts/openapi/worker-migration-', 'contracts/openapi/planning-migration-', 'contracts/fixtures/lifecycle/migration-', 'contracts/fixtures/inventory/migration-',
                 '.github/workflows/p08-')
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
