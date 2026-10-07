@@ -9,10 +9,12 @@ from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from planning.application.planning import Planning
 from planning.infrastructure.foundation import database_ready
+from planning.infrastructure.migration import prepare_migration
 from planning.infrastructure.owners import GovernanceAuthority, OwnerSources
 from planning.infrastructure.store import Postgres
 from planning.infrastructure.telemetry import BoundedSignalBuffer
 from planning.interfaces.http import FoundationApp
+from planning.interfaces.migration import MigrationPreparationApp
 from planning.interfaces.planning import PlanningApp
 from planning.interfaces.telemetry import RequestTelemetry
 
@@ -23,11 +25,14 @@ class PlanningRouter:
             Planning(Postgres(), OwnerSources(), lambda: int(time.time())), GovernanceAuthority()
         )
         self.foundation = FoundationApp(database_ready)
+        self.migration = MigrationPreparationApp(self.planning.authority, prepare_migration)
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        if scope["type"] == "http" and scope["path"].startswith("/v1/"):
+        if scope["type"] == "http" and scope["path"].endswith("/migration-preparations"):
+            await self.migration(scope, receive, send)
+        elif scope["type"] == "http" and scope["path"].startswith("/v1/"):
             await self.planning(scope, receive, send)
         else:
             await self.foundation(scope, receive, send)

@@ -82,7 +82,7 @@ final class InventoryClient implements InventoryGateway
                 throw new InventoryFailure(in_array($response->status(), [403, 404, 409, 412, 413, 422, 428, 429], true) ? $response->status() : 503,
                     is_string($reason) && preg_match('/\A[a-z_]{1,80}\z/', $reason) ? $reason : 'inventory_unavailable');
             }
-            $source = file_get_contents(resource_path('contracts/inventory-v1.1.json'));
+            $source = file_get_contents(resource_path('contracts/inventory-v1.2.json'));
             if ($source === false) {
                 throw new InventoryFailure;
             }

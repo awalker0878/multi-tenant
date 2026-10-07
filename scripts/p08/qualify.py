@@ -21,9 +21,9 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
-    prefixes = ('services/lifecycle/', 'workers/lifecycle/', 'workers/inventory/',
-                'scripts/p08/', 'contracts/openapi/lifecycle-migration-',
-                'contracts/openapi/worker-migration-', 'contracts/fixtures/lifecycle/migration-',
+    prefixes = ('services/lifecycle/', 'services/inventory/', 'services/planning/', 'workers/lifecycle/', 'workers/inventory/', 'apps/console/',
+                'scripts/p08/', 'scripts/p04/generate_clients.py', 'contracts/schemas/inventory/', 'contracts/schemas/planning/migration-', 'contracts/openapi/inventory-v1.2', 'contracts/openapi/lifecycle-migration-',
+                'contracts/openapi/worker-migration-', 'contracts/fixtures/lifecycle/migration-', 'contracts/fixtures/inventory/migration-',
                 '.github/workflows/p08-')
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -40,6 +40,7 @@ def main():
     }
     env = {k: v for k, v in os.environ.items() if not k.startswith(('OS_', 'TF_')) and k != 'PYTHONPATH'}
     env['P05_POSTGRES_BIN'] = env.get('P07_POSTGRES_BIN', '')
+    env['P04_POSTGRES_BIN'] = env['P05_POSTGRES_BIN']
 
     def command(directory, argv):
         index = len(report['commands'])
@@ -57,7 +58,7 @@ def main():
     try:
         if not env['P05_POSTGRES_BIN']:
             raise RuntimeError('P07_POSTGRES_BIN required; no skipped database qualification')
-        for directory, suite in (('services/lifecycle', 'lifecycle'), ('workers/lifecycle', 'worker'), ('workers/inventory', 'inventory-worker')):
+        for directory, suite in (('services/inventory', 'inventory'), ('services/planning', 'planning'), ('services/lifecycle', 'lifecycle'), ('workers/lifecycle', 'worker'), ('workers/inventory', 'inventory-worker')):
             for argv in (['uv', 'sync', '--locked', '--group', 'build'],
                          ['uv', 'run', '--frozen', 'ruff', 'check', 'src', 'tests'],
                          ['uv', 'run', '--frozen', 'ruff', 'format', '--check', 'src', 'tests'],
@@ -70,8 +71,10 @@ def main():
             report['suites'].append({'name': suite, **totals})
             if totals['tests'] == 0 or any(totals[k] for k in ('failures', 'errors', 'skipped')):
                 raise RuntimeError(suite + ' not fully passing')
+        command('.', ['python', 'scripts/p04/generate_clients.py', '--check'])
         command('scripts/p01/contracts', ['uv', 'sync', '--locked'])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_contract.py')])
+        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_profiles.py')])
     except Exception as error:
         report['error'] = str(error)
     report['result'] = 'PASSED' if report['commands'] and not report.get('error') and all(c['exit_code'] == 0 for c in report['commands']) else 'FAILED'

@@ -258,6 +258,8 @@ def validate(m: dict[str, Any], now: int) -> None:
         m,
         {
             "schema_version",
+            "review",
+            "owner_inputs_sha256",
             "mode",
             "method",
             "source",
@@ -271,8 +273,12 @@ def validate(m: dict[str, Any], now: int) -> None:
             "recovery_of_sha256",
         },
     )
-    if type(m["schema_version"]) is not int or m["schema_version"] != 1:
+    if type(m["schema_version"]) is not int or m["schema_version"] != 2:
         raise Rejected("invalid_migration_version", 422)
+    review = exact(m["review"], {"revision", "digest"})
+    integer(review["revision"], 1)
+    checksum(review["digest"])
+    checksum(m["owner_inputs_sha256"])
     if m["method"] not in METHODS or m["mode"] not in MODES:
         raise Rejected("migration_method_or_mode_not_selected", 422)
     for side in ("source", "target"):
@@ -367,3 +373,52 @@ def recovery_matches(original: dict[str, Any], replacement: dict[str, Any]) -> b
         for side in ("source", "target")
         for key in ("native_identity_sha256", "tuple_sha256")
     )
+
+
+def current_profiles(plan: dict[str, Any], evidence: Any, now: int) -> None:
+    """Check the actual authenticated Inventory input, not just a current=true assertion."""
+    m = plan["migration"]
+    if not isinstance(evidence, dict):
+        raise Rejected("current_migration_review_required", 423)
+    expected = {
+        "tenant_id": plan["scope"]["tenant_id"],
+        "site_id": plan["scope"]["site_id"],
+        "revision": m["review"]["revision"],
+        "digest": m["review"]["digest"],
+        "method": m["method"],
+        "source": m["source"],
+        "target": m["target"],
+        "objectives": m["objectives"],
+        "current": True,
+        "native_write_authorized": False,
+    }
+    if any(digest(evidence.get(k)) != digest(v) for k, v in expected.items()):
+        raise Rejected("migration_review_binding_changed", 423)
+    if digest(evidence.get("owner_inputs")) != m["owner_inputs_sha256"]:
+        raise Rejected("migration_owner_inputs_changed", 423)
+    for side in ("source", "target"):
+        if m[side]["expires_at"] <= now:
+            raise Rejected("migration_profile_stale", 423)
+    datasets, disks = evidence.get("datasets"), evidence.get("disks")
+    if (
+        not isinstance(datasets, list)
+        or not isinstance(disks, list)
+        or not all(isinstance(d, dict) for d in [*datasets, *disks])
+    ):
+        raise Rejected("migration_inventory_incomplete", 423)
+    if len(datasets) != len(m["datasets"]) or {d.get("id") for d in datasets} != set(m["datasets"]):
+        raise Rejected("migration_datasets_incomplete", 423)
+    observed = {d.get("native_sha256"): d for d in disks}
+    if len(observed) != len(disks) or set(observed) != {
+        d["source_disk_sha256"] for d in m["disks"]
+    }:
+        raise Rejected("migration_disks_incomplete", 423)
+    for d in m["disks"]:
+        native = observed[d["source_disk_sha256"]]
+        covered = {v["id"] for v in datasets if native.get("key") in v.get("disk_keys", [])}
+        if (
+            native.get("capacity_bytes") != d["capacity_bytes"]
+            or covered != set(d["datasets"])
+            or d["format"] not in evidence.get("target_disk_formats", [])
+        ):
+            raise Rejected("migration_disk_mapping_changed", 423)

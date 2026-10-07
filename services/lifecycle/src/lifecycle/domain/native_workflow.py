@@ -213,6 +213,9 @@ def current_authority(
         "campaign_current": True,
     }
     if plan["purpose"] == "migrate":
+        from lifecycle.domain.migration import current_profiles
+
+        current_profiles(plan, receipt.get("migration_input"), now)
         expected.update(
             {
                 "migration_sha256": digest(plan["migration"]),

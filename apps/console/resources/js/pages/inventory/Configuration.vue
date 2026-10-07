@@ -33,6 +33,7 @@ const overrideChanged = (index: number) => { if (form.configuration.choices[inde
 <template>
   <CatalogueLayout title="Environment configuration and porting review" :tenant-id="tenantId">
     <Link :href="`/tenants/${tenantId}/inventory`" class="text-teal-800 underline">Inventory sites</Link>
+    <div class="mt-3"><Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}/migration`" class="text-teal-800 underline">Review workload profiles and migration datasets</Link></div>
     <p class="my-4 max-w-4xl">Pull the configured options and installed features from each environment. Review the findings, select what must be ported, and explain any interpretation that differs from the API. Original observations remain visible.</p>
     <p v-if="notice" role="status" class="my-4 rounded border border-teal-600 bg-teal-50 p-4">{{ notice }}</p>
     <div v-if="Object.keys(errors).length" id="configuration-errors" role="alert" tabindex="-1" class="my-4 border border-red-600 p-4"><p v-for="(error, key) in errors" :key="key">{{ key === 'inventory_status' ? '' : error }}</p></div>

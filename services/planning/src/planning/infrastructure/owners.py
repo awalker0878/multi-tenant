@@ -27,6 +27,7 @@ def request(
     body: dict[str, Any] | None = None,
     delegation: str | None = None,
     action: str | None = None,
+    schema_name: str | None = None,
 ) -> dict[str, Any]:
     try:
         u = urlsplit(os.environ[owner + "_URL"])
@@ -77,6 +78,10 @@ def request(
                     "INVENTORY": "inventory-input-v1",
                     "ASSURANCE": "qualification-v1",
                 }[owner]
+                if schema_name is not None:
+                    if owner != "INVENTORY" or schema_name != "migration-input-v1":
+                        raise ValueError
+                    name = schema_name
                 schema = json.loads(
                     files("planning.infrastructure.inputs").joinpath(name + ".json").read_text()
                 )

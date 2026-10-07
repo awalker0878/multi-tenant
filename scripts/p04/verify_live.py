@@ -103,7 +103,7 @@ def main():
                     (out/'browser.json').write_text(redact(browser_file.read_text()))
 
     try:
-        api = json.loads((root/'contracts/openapi/inventory-v1.1.json').read_text())
+        api = json.loads((root/'contracts/openapi/inventory-v1.2.json').read_text())
         validate_spec(api)
         check('independent-openapi-specification-validation', True)
         run(['python', 'scripts/p04/generate_clients.py', '--check'], label='generated-clients')

@@ -18,7 +18,9 @@ from lifecycle.domain.native_workflow import observations, validate_plan
 def migration(mode: str = "cutover", method: str = "VM_COLD_EXPORT") -> dict[str, Any]:
     dataset = str(uuid4())
     return {
-        "schema_version": 1,
+        "schema_version": 2,
+        "review": {"revision": 1, "digest": digest("review")},
+        "owner_inputs_sha256": digest({"fixture": "owner"}),
         "mode": mode,
         "method": method,
         **{
@@ -79,9 +81,68 @@ def migration_plan(mode: str = "cutover", method: str = "VM_COLD_EXPORT") -> dic
     return p
 
 
+def migration_input(p: dict[str, Any]) -> dict[str, Any]:
+    m = p["migration"]
+    return {
+        "tenant_id": p["scope"]["tenant_id"],
+        "site_id": p["scope"]["site_id"],
+        **m["review"],
+        "method": m["method"],
+        "source": m["source"],
+        "target": m["target"],
+        "objectives": m["objectives"],
+        "current": True,
+        "native_write_authorized": False,
+        "owner_inputs": {"fixture": "owner"},
+        "target_disk_formats": ["raw", "qcow2"],
+        "datasets": [{"id": d, "disk_keys": [2000]} for d in m["datasets"]],
+        "disks": [
+            {
+                "native_sha256": d["source_disk_sha256"],
+                "capacity_bytes": d["capacity_bytes"],
+                "key": 2000,
+            }
+            for d in m["disks"]
+        ],
+    }
+
+
+@pytest.mark.parametrize(
+    "fault",
+    ["missing", "stale", "tenant", "review", "disk", "dataset", "capacity", "owner", "format"],
+)
+def test_current_profile_booleans_cannot_replace_exact_inventory_bindings(fault: str) -> None:
+    from lifecycle.domain.migration import current_profiles
+
+    p = migration_plan()
+    evidence = migration_input(p)
+    current_profiles(p, evidence, 1000)
+    if fault == "missing":
+        evidence = {}
+    elif fault == "stale":
+        evidence["current"] = False
+    elif fault == "tenant":
+        evidence["tenant_id"] = str(uuid4())
+    elif fault == "review":
+        evidence["revision"] += 1
+    elif fault == "disk":
+        evidence["disks"] = []
+    elif fault == "dataset":
+        evidence["datasets"][0]["disk_keys"] = [2001]
+    elif fault == "capacity":
+        evidence["disks"][0]["capacity_bytes"] += 1
+    elif fault == "owner":
+        evidence["owner_inputs"] = {"fixture": "changed"}
+    else:
+        evidence["target_disk_formats"] = []
+    with pytest.raises(Rejected):
+        current_profiles(p, evidence, 1000)
+
+
 class MigrationOwners(Owners):
     def current(self, p: dict[str, Any], binding: dict[str, Any]) -> dict[str, Any]:
         return super().current(p, binding) | {
+            "migration_input": migration_input(p),
             "migration_sha256": digest(p["migration"]),
             "source_profile_current": True,
             "target_profile_current": True,
