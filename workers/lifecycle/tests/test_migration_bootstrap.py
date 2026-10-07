@@ -13,6 +13,8 @@ from test_native import Journal
 from test_native import binding as binding
 from test_native_http import native_tls as native_tls
 from test_platform_expansion import plan_for, signed
+from test_vmware_capture import Api
+from test_vmware_capture import capture as capture
 
 from lifecycle_worker.application.native import NativeBinding, NativeHeld, digest
 from lifecycle_worker.infrastructure.migration_bootstrap import (
@@ -26,6 +28,7 @@ from lifecycle_worker.infrastructure.migration_protocol import (
 )
 from lifecycle_worker.infrastructure.native_http import NativeReads
 from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
+from lifecycle_worker.infrastructure.vmware_capture import VmwareCapture
 
 
 def mounted(path: Path, data: Any) -> Path:
@@ -320,5 +323,56 @@ def test_native_owner_stage_registry_and_independent_credentials_are_enforced(
     assert adapter.inspect(binding)["native_write_authorized"] is False
     assert isinstance(observer, OwnerProtocolObserver) and observer.family == "native"
     Path(row["observer"]["endpoint"]["token_file"]).write_text("w" * 64)
-    with pytest.raises(NativeHeld, match="independent_platform_read_identity_required"):
+    with pytest.raises(NativeHeld, match="independent_owner_read_identity_required"):
         runtime.resolve(binding)
+
+
+@pytest.mark.parametrize("when", ["before_inspection", "before_execution", "at_boundary"])
+@pytest.mark.parametrize("family", ["migration_owner_protocol", "native_owner_protocol"])
+def test_owner_identity_rotation_is_rejected_before_any_effect(
+    tmp_path: Path, binding: NativeBinding, when: str, family: str
+) -> None:
+    path, binding, row = registry(tmp_path, binding)
+    plan = json.loads(Path(row["plan_file"]).read_text())
+    plan.update(
+        kind=family, stage="enroll_services" if family == "native_owner_protocol" else "final_sync"
+    )
+    binding = replace(binding, operation_plan_sha256=digest(plan))
+    row.update(adapter=family, binding={k: binding.document()[k] for k in row["binding"]})
+    mounted(Path(row["plan_file"]), plan)
+    mounted(path, {"schema_version": 1, "entries": [row]})
+    runtime = MountedMigrationRuntime(path, PostgresNativeJournal(no_database), lambda: 100)
+    adapter, _ = runtime.resolve(binding)
+
+    def collide() -> None:
+        Path(row["observer"]["endpoint"]["token_file"]).write_text("w" * 64)
+
+    if when != "at_boundary":
+        collide()
+    with pytest.raises(NativeHeld, match="independent_owner_read_identity_required"):
+        if when == "before_inspection":
+            adapter.inspect(binding)
+        else:
+            adapter.execute(binding, collide if when == "at_boundary" else lambda: None)
+
+
+def test_capture_accepts_separately_enrolled_observer_origin_but_not_shared_credentials(
+    tmp_path: Path, capture: tuple[NativeBinding, VmwareCapture, Api, Journal]
+) -> None:
+    original, capture_adapter, _, _ = capture
+    path, _, row = registry(tmp_path, original)
+    row.update(
+        binding={k: original.document()[k] for k in row["binding"]},
+        adapter="vmware_capture",
+        plan_file=str(capture_adapter.plan_file),
+        configuration={
+            "source": row["configuration"]["endpoint"] | {"base_url": "https://vcenter.invalid"}
+        },
+    )
+    mounted(path, {"schema_version": 1, "entries": [row]})
+    runtime = MountedMigrationRuntime(path, PostgresNativeJournal(no_database), lambda: 100)
+    adapter, _ = runtime.resolve(original)
+    assert adapter.inspect(original)["native_write_authorized"] is False
+    Path(row["observer"]["endpoint"]["token_file"]).write_text("w" * 64)
+    with pytest.raises(NativeHeld, match="independent_owner_read_identity_required"):
+        adapter.execute(original, lambda: None)

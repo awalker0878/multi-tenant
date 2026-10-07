@@ -28,6 +28,7 @@ from lifecycle_worker.infrastructure.migration_protocol import (
     OwnerProtocolClient,
     OwnerProtocolEffect,
     OwnerProtocolObserver,
+    distinct_owner_credentials,
 )
 from lifecycle_worker.infrastructure.native_copy import (
     GlanceImport,
@@ -156,7 +157,11 @@ class MountedMigrationRuntime:
         return row | {"plan": plan}
 
     def bound(
-        self, adapter: NativeApiAdapter, binding: NativeBinding, entry: dict[str, Any]
+        self,
+        adapter: NativeApiAdapter,
+        binding: NativeBinding,
+        entry: dict[str, Any],
+        identity_check: Callable[[], None] = lambda: None,
     ) -> NativeApiAdapter:
         registry = self
         fingerprint = digest(entry)
@@ -165,6 +170,7 @@ class MountedMigrationRuntime:
             def current(self) -> None:
                 if digest(registry.entry(binding)) != fingerprint:
                     raise NativeHeld("migration_commissioning_changed")
+                identity_check()
 
             def inspect(self, supplied: NativeBinding) -> dict[str, Any]:
                 if supplied.fingerprint != binding.fingerprint:
@@ -179,6 +185,7 @@ class MountedMigrationRuntime:
                 def current() -> None:
                     self.current()
                     boundary()
+                    self.current()
 
                 current()
                 adapter.execute(supplied, current)
@@ -272,7 +279,15 @@ class MountedMigrationRuntime:
             if entry["observer"] is not None:
                 raise NativeHeld("unexpected_platform_observer")
             adapter.inspect(binding)
-            return self.bound(adapter, binding, entry), platform_observer
+            return (
+                self.bound(
+                    adapter,
+                    binding,
+                    entry,
+                    lambda: distinct_credentials(writer_endpoint, reader_endpoint),
+                ),
+                platform_observer,
+            )
         elif kind == "openstack_resources" and set(config) == {"runtime_file"}:
             adapter, native_observer = MountedNativeRuntime(
                 Path(config["runtime_file"]), self.journal, self.clock
@@ -308,7 +323,7 @@ class MountedMigrationRuntime:
 
         def independent_credentials() -> None:
             if owner_writer_endpoint is not None:
-                distinct_credentials(owner_writer_endpoint, reader_endpoint)
+                distinct_owner_credentials(owner_writer_endpoint, reader_endpoint)
 
         independent_credentials()
         independent_observer = OwnerProtocolObserver(
@@ -320,4 +335,4 @@ class MountedMigrationRuntime:
             identity_check=independent_credentials,
         )
         adapter.inspect(binding)
-        return self.bound(adapter, binding, entry), independent_observer
+        return self.bound(adapter, binding, entry, independent_credentials), independent_observer

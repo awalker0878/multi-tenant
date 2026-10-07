@@ -27,6 +27,19 @@ from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection
 
 
+def distinct_owner_credentials(writer: NativeEndpoint, reader: NativeEndpoint) -> None:
+    # An independent observation service need not share the native provider's origin.
+    # Each connection retains its own enrolled TLS/address policy.
+    writer_token = protected_read(writer.token_file, 4096).strip()
+    reader_token = protected_read(reader.token_file, 4096).strip()
+    if (
+        not writer_token
+        or not reader_token
+        or (hashlib.sha256(writer_token).digest() == hashlib.sha256(reader_token).digest())
+    ):
+        raise NativeHeld("independent_owner_read_identity_required")
+
+
 class OwnerProtocolClient:
     def __init__(self, endpoint: NativeEndpoint, *, read_only: bool = False) -> None:
         self.endpoint, self.read_only = endpoint, read_only

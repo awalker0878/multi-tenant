@@ -30,6 +30,13 @@ credentials. Effects recheck credentials and current authority during requests;
 read clients reject write routes. Rotated or shared credentials hold the operation.
 These mechanisms do not implement the external enterprise owner or native fence.
 
+The worker rechecks writer/observer credential separation before inspection and
+at every effect boundary, including after the current-authority callback. Rotation
+cannot defer detection until after a native request. Independently enrolled owner
+observers can use a different origin from vCenter or the service writer; their
+own pinned address and TLS policy still apply. Direct VMware/AHV lifecycle
+readback continues to require the same enrolled provider origin.
+
 Published additive interfaces are in `contracts/openapi/planning-native-v1.json`
 and `contracts/openapi/lifecycle-native-jobs-v1.json`. The compiler/resolver
 composition check is `scripts/p07/check_composition.py`; PostgreSQL persistence,
