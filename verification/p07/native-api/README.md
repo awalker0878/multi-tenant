@@ -47,6 +47,11 @@ package metadata from version control and repeats affected qualification.
    ignores future generated copies. Verification requires every current-source
    binding to match Git.
 
+The [regression completion receipt](regression-completion.json) records all 12
+qualified-source workflows and all six publication workflows passing. It resolves
+the pending Kubernetes result in the earlier status snapshot and binds 13 unchanged
+runtime/campaign Git objects between source and evidence commits.
+
 ## Acceptance limits
 
 This is E2 engineering evidence. Actual current-owner/caller-trust composition,

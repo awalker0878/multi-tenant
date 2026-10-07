@@ -6774,6 +6774,7 @@ evidence:
     p07_run_id: '37577020405'
     p05_run_id: '37577020396'
     p06_run_id: '37577020428'
+    retained_artifact_commit: 4e4958bd52686750295986b5585bbc88fad85c84
   campaign_ids: []
   criterion_ids: []
   observed_at: '2026-10-07T05:35:09.587229+00:00'
@@ -6782,7 +6783,7 @@ evidence:
   reviewer: Codex engineering consistency review only; designated native and receiving reviews remain open.
   valid_until: null
   invalidated_at: null
-  artifact_uri: verification/p07/native-api/qualification-index.json
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/4e4958bd52686750295986b5585bbc88fad85c84/verification/p07/native-api/qualification-index.json
   sha256: c80d5083835f846a2f1ec2c14428b407e322e6d38844cfcab0ae6bb7e1a3c135
   environment: GitHub Actions Ubuntu 24.04, Python 3.12.14 and uv 0.12.19; real PostgreSQL/TLS/Temporal; synthetic
     native API peers.
@@ -6800,6 +6801,7 @@ evidence:
     p07_run_id: '37577020405'
     p05_run_id: '37577020396'
     p06_run_id: '37577020428'
+    retained_artifact_commit: 4e4958bd52686750295986b5585bbc88fad85c84
   campaign_ids: []
   criterion_ids: []
   observed_at: '2026-10-07T05:35:09.587229+00:00'
@@ -6808,7 +6810,7 @@ evidence:
   reviewer: Codex engineering consistency review only; designated native and receiving reviews remain open.
   valid_until: null
   invalidated_at: null
-  artifact_uri: verification/p07/native-api/qualification-index.json
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/4e4958bd52686750295986b5585bbc88fad85c84/verification/p07/native-api/qualification-index.json
   sha256: c80d5083835f846a2f1ec2c14428b407e322e6d38844cfcab0ae6bb7e1a3c135
   environment: GitHub Actions Ubuntu 24.04, Python 3.12.14 and uv 0.12.19; real PostgreSQL/TLS/Temporal; synthetic
     native API peers.

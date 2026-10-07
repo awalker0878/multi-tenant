@@ -10,6 +10,8 @@ The native API source at `4ee67fdd704f6b6c401237137e3d8e2940ba3d1a` passes
 Temporal checks with six replayed histories. The [qualification index](verification/p07/native-api/qualification-index.json)
 retains exact-source archives, original failures and corrections. These E2 checks
 establish component behavior, not installed-platform acceptance.
+The [completion receipt](verification/p07/native-api/regression-completion.json)
+records all 12 source workflows and six publication workflows passing.
 
 1. Preserve the current native-only contracts and qualified software boundaries.
    Do not restore tool fallback, compatibility plans or automatic migration-method substitution.
