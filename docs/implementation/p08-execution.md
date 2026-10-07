@@ -175,6 +175,12 @@ optimistic revision checks and exact-command retries. The UI pauses on access lo
 stale group or unavailable owners. No bulk operation submits native migration effects.
 Complete native-plan composition and Q07/G08 obligations remain as recorded above.
 
+The [fleet qualification](../../verification/p08/fleet/README.md) retains 785 passing
+component tests without skips, both browser journeys and the independent Console
+package at `74ab8e4`. Original failures and their corrections remain separately
+recorded. These checks use real PostgreSQL and Chromium with synthetic native and
+owner peers; they do not establish a completed native migration.
+
 Current bounds are 50 VMs per saved group, 100 groups and 50 target profiles per site;
 the source list is paginated in 50-row pages. Existing native collector scope, API list,
 profile allowlist, freshness and request-budget bounds remain enforced. The vCenter

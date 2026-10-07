@@ -1,16 +1,16 @@
 # Next work — P08 native migration
 
 P08 development continues on the native-only baseline. Source fleet browsing, named
-groups, VM-specific review and bulk OpenStack preparation are implemented; validate
-the current fleet increment with the P08 component/browser and Console suites.
+groups, VM-specific review and bulk OpenStack preparation are implemented and qualified
+in the [fleet evidence](verification/p08/fleet/README.md): 785 component tests without
+skips, both browser journeys and all Console quality commands pass at `74ab8e4`.
+Console records 187 passed tests and seven explicit separate-campaign broker skips.
 Bulk preparation grants no native write authority. The [implementation record](docs/implementation/p08-execution.md)
 now covers scoped leased profile collection, immutable review/confirmation,
 Console dataset mapping, authenticated Planning preparation and current Lifecycle
 admission, alongside exact-S0 isolated capture, NFC/OVF archives, copy conversion,
-Glance import and durable recovery. The [profile evidence](verification/p08/profiles/qualification-index.json)
-passes 779 tests without skips (90 Inventory, 119 Planning, 304 Lifecycle, 204
-worker, 62 Inventory-worker), 34 quality commands and the actual Vue/Inertia browser
-journey. Original failures, corrections and historical component evidence remain recorded.
+Glance import and durable recovery. The earlier [profile evidence](verification/p08/profiles/qualification-index.json)
+and all original failures and corrections remain recorded with their exact source.
 
 **P08 remains incomplete and G08 NOT_REVIEWED.** The [completion packet](docs/implementation/p08-completion-review.md)
 separates unfinished software (BL-P08-001) from actual native/owner inputs

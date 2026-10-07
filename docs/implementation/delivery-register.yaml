@@ -317,16 +317,17 @@ phases:
   - EV-P08-002
   - EV-P08-003
   - EV-P08-004
+  - EV-P08-005
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
-  delivery_note: Scoped leased profile collection, immutable Inventory review/confirmation, Console dataset review,
-    authenticated Planning preparation and current Lifecycle admission are implemented alongside the native data
-    components and durable recovery. Source 497c660 passes 779 tests without skips, all 34 component commands and
-    the actual Vue/Inertia browser journey; every final artifact hash is verified and all nine final-source
-    workflows pass. Complete native-plan and owner/trust/stage composition, actual converter/guest qualification
-    and selected application/service/fencing/traffic/recovery/cleanup protocols remain. No native Q07, G08 or
-    operating acceptance.
+  delivery_note: API-discovered source fleet, persisted named groups, independent VM reviews and bulk OpenStack
+    preparation are implemented alongside scoped leased profiles, authenticated Planning and current Lifecycle
+    admission. Source 74ab8e4 passes 785 component tests without skips, 35 component commands, both Vue/Inertia
+    browser journeys and all Console quality commands; Console records 187 passed tests and seven separate-campaign
+    broker skips. Original failures remain retained. Complete native-plan and owner/trust/stage composition,
+    actual converter/guest qualification and selected application/service/fencing/traffic/recovery/cleanup protocols
+    remain. No native Q07, G08 or operating acceptance is inferred.
 - id: P09
   title: Platform and capability expansion
   owner_role: Infrastructure and qualification leads
@@ -1874,6 +1875,7 @@ work_packages:
   - EV-P08-002
   - EV-P08-003
   - EV-P08-004
+  - EV-P08-005
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
@@ -1885,10 +1887,12 @@ work_packages:
   criterion_ids:
   - G08.01
   - G08.02
-  delivery_note: API-first VMware/OpenStack profiles now have leased per-read authority/budgets, immutable complete-generation
-    persistence, Console all-disk/owner-only review and confirmation, authenticated Planning preparation and exact
-    current-profile Lifecycle admission. E2 database/browser checks pass. Complete native-plan composition and
-    actual installed workload/owner/native qualification remain; preparation grants no execution authority.
+  delivery_note: API-first VMware/OpenStack profiles and source fleet have leased per-read authority/budgets,
+    immutable complete-generation persistence, paged GUI listing/grouping/selection, append-only named migration
+    groups and independent per-VM review/confirmation. Bulk preparation rechecks saved members and derives exact
+    native mappings through Planning. E2 database/browser/Console checks pass with explicit collection/group bounds.
+    Complete native-plan composition and actual installed workload/owner/native qualification remain; preparation
+    grants no execution authority.
 - id: P08.02
   phase_id: P08
   title: Method and data movement
@@ -3242,6 +3246,7 @@ requirements:
   - EV-P08-002
   - EV-P08-003
   - EV-P08-004
+  - EV-P08-005
   blocker_ids:
   - BL-P06-001
   - BL-P08-001
@@ -6994,6 +6999,34 @@ evidence:
   limitations: E2 only. Preparation does not compose or approve a complete native MigrationPlan. Actual owner/trust/stage
     composition, converter rootfs/copied guest, application/service/delta/fencing/traffic/recovery/cleanup protocols
     and long-transfer reconciliation remain required. No native Q07, G07/G08 review, P08 completion or operating acceptance.
+- id: EV-P08-005
+  level: E2
+  source_revision: 74ab8e41e2d1da90bb47f1b2794c9c7bf3778d66
+  artifact_revisions:
+    p08_run_id: '37640141788'
+    console_run_id: '37640141936'
+    retained_artifact_commit: 6a7f1d28234a74a6fdf68f80cd15937bf2ccc45c
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T14:55:04.040071+00:00'
+  observer: GitHub Actions PostgreSQL/TLS, Laravel and Chromium campaigns; Codex verified original archive/source/log
+    hashes and visually inspected the retained source fleet screenshot.
+  reviewer: Codex engineering consistency review only; designated native and receiving reviewers remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/6a7f1d28234a74a6fdf68f80cd15937bf2ccc45c/verification/p08/fleet/qualification-index.json
+  sha256: 309c713a0149228508adf314e7f82bf511d8b2ca888f249162d5a5052405057c
+  environment: GitHub Actions Ubuntu 24.04, PostgreSQL 16, Python 3.12.14, uv 0.12.19, PHP 8.5.11, Node 24.19.0
+    and pinned Chromium; synthetic native/current-owner and browser HTTP peers.
+  scope: API-discovered VM list, pagination, filters/grouping/bulk selection, persisted named groups, independent
+    VM reviews and server-derived bulk OpenStack preparation. All 35 component commands and 785 tests pass with
+    no skips; five browser commands and both journeys pass. All 23 Console commands pass with 187 Pest passes,
+    894 assertions and seven explicit separate-campaign broker skips. Final reports verify 682/218/295 source
+    bindings. Original Inventory assertion, selector, Pint and Larastan failures remain retained with corrections.
+  limitations: E2 only; actual database, Laravel and browser with synthetic native/owner peers. Existing REST
+    listing and profile allowlist bounds remain. Bulk preparation is not complete-plan composition, approval or
+    native execution. Native owner/trust/stage composition, copied-guest/converter qualification and Q07/G07/G08
+    receiving remain open; no VM migration, P08 completion or operating acceptance is claimed.
 blockers:
 - id: BL-P00-001
   scope_ids:
