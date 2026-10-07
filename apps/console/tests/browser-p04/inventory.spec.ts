@@ -46,6 +46,8 @@ test('browses scoped observations, preserves uncertain enrollment and clears rev
   await page.getByRole('link', { name: 'Configure porting', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Environment configuration and porting review' })).toBeVisible();
   await expect(page.getByText('2026.2 Hibiscus', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('Compute flavors required', { exact: true })).toBeChecked();
+  await expect(page.getByRole('checkbox')).toHaveCount(20);
   await expect(page.getByRole('button', { name: 'Confirm this revision and its disclosed gaps' })).toBeDisabled();
   await page.getByLabel('Application and integration owners reference', { exact: true }).fill('browser-owner-record');
   await page.getByLabel('Compute flavors interpretation', { exact: true }).selectOption('include');
