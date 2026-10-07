@@ -242,7 +242,7 @@ def campaign_estimate(
     samples: list[dict[str, Any]], spec: dict[str, Any], settings: dict[str, Any], now: int
 ) -> dict[str, Any]:
     """Bound each phase at every allowed occupancy; a limit alone is not a benchmark."""
-    from lifecycle.domain.migration import stages
+    from lifecycle.domain.migration import DELTA, stages
 
     required = {STAGE_PHASE[s] for s in stages(spec)}
     grouped = comparable(samples, spec["route_sha256"], now)
@@ -264,7 +264,7 @@ def campaign_estimate(
         if reasons:
             holds.append(reasons[0])
         phases[phase] = None if reasons else max(values)
-    cold = spec["method"] == "VM_COLD_EXPORT"
+    cold = spec["method"] not in DELTA
     # Capture also interrupts a warm source. A qualified restart/delta is still required.
     outage = list(phases.values()) if cold else [phases["capture"], phases["cutover"]]
     return {

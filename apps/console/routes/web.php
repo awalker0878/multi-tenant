@@ -8,6 +8,7 @@ use App\Http\Controllers\InstallationNotificationController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\JobsController;
 use App\Http\Controllers\LocalIdentityController;
+use App\Http\Controllers\MigrationCampaignController;
 use App\Http\Controllers\MigrationFleetController;
 use App\Http\Controllers\MigrationReviewController;
 use App\Http\Controllers\NotificationController;
@@ -98,4 +99,15 @@ Route::prefix('/tenants/{tenant}/sites/{site}/applications/{application}/environ
     Route::get('/{job}/evidence/{evidence}/status', [$c, 'evidenceStatus'])->whereUuid(['job', 'evidence']);
     Route::get('/{job}/evidence/{evidence}', [$c, 'evidence'])->whereUuid(['job', 'evidence']);
     Route::post('/{job}/commands', [$c, 'command'])->whereUuid('job');
+});
+
+Route::prefix('/tenants/{tenant}/sites/{site}/applications/{application}/environments/{environment}/migration-campaigns')->whereUuid(['tenant', 'site', 'application', 'environment'])->middleware(RequireIdentity::class)->group(function (): void {
+    $c = MigrationCampaignController::class;
+    Route::get('/', [$c, 'show']);
+    Route::get('/status', [$c, 'status']);
+    Route::post('/', [$c, 'create']);
+    Route::get('/plans/{plan}', [$c, 'plan'])->whereUuid('plan');
+    Route::get('/{campaign}', [$c, 'show'])->whereUuid('campaign');
+    Route::get('/{campaign}/status', [$c, 'status'])->whereUuid('campaign');
+    Route::post('/{campaign}/commands', [$c, 'command'])->whereUuid('campaign');
 });

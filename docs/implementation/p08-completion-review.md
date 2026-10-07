@@ -6,6 +6,13 @@ identify the delivered software and its limits. This packet preserves every
 [P08 package](phases/p08.md) and [G08 criterion](gates.md#g08--vmware-to-openstack-migration).
 Existing development authorization continues; this is not a request to repeat G00.
 
+The [migration operations increment](p08-operations.md) adds durable campaign
+schedules and Console controls, current measured-concurrency admission, shared
+capacity reservations, separate outage estimates and authenticated observation
+publication. These are software capabilities. No native source/target accounts have
+been configured and no throughput numbers or migration dates have been invented.
+Complete native Planning/runtime composition and physical benchmarking remain open.
+
 ## Remaining implementation
 
 | Package | Delivered software | Remaining output |
@@ -39,6 +46,29 @@ Pull API-available facts through Inventory before asking administrators to fill
 fields. A declaration, profile digest, mounted plan or CI fixture is not native
 support evidence. Keep operational secrets in the commissioned custody system,
 not the repository, Console payloads or chat.
+
+### First commissioning inputs
+
+For each approved source and target environment, supply its tenant/site/environment
+binding, approved API origin/trust reference, scoped secret-custody references and
+the worker placement allowed to reach it. The source needs its vCenter scope;
+the target needs its OpenStack project scope. Readers, writers and independent
+observers require distinct identities and separately scoped grants. Provide the
+custody references, not secret values. Installed versions, VM hardware, disks,
+networks, target capabilities and quota facts must then be collected through APIs.
+
+Select the first representative application and its authoritative consistency,
+fencing, restore and recovery protocol. Its owner supplies correctness criteria,
+outage/data-loss objectives, business-effect suppression and retention decisions.
+Those choices determine the remaining guest/delta/service/recovery adapters and
+the approved copy-only lab test. They cannot be inferred from a VM inventory.
+
+Physical performance qualification must measure capture, transfer, conversion,
+import, validation and cutover at each proposed concurrency on the exact route,
+including shared datastore/network/worker contention and production impact. Publish
+the retained results through the observation interface, then derive wave durations
+and select real windows. The scheduler holds unmeasured or stale routes and never
+uses an administrator-entered transfer rate as benchmark evidence.
 
 ## Native execution and receiving sequence
 

@@ -1,8 +1,15 @@
 # Next work — P08 native migration
 
-The requested operational gaps are being implemented under the existing development
-authorization. See [P08 operations](docs/implementation/p08-operations.md) for the
-campaign scheduling/capacity increment and the complete remaining integration scope.
+P08 operations now include authenticated campaign APIs, a Console schedule/control
+page, staggered windows/blackouts, dependency and outage-group admission, measured
+phase-concurrency limits and independently published resource observations. See
+[P08 operations](docs/implementation/p08-operations.md) for semantics and tested
+limits. Actual account commissioning, complete approved native plan/runtime
+composition, native measurement producers, selected guest/data/service/recovery
+adapters, long-transfer resumption and Q07/G08 acceptance remain open. The
+[completion packet](docs/implementation/p08-completion-review.md) identifies the
+source/target secret references, lab placement and application-owner protocols
+needed to make that work concrete. Existing development authorization continues.
 
 P08 development continues on the native-only baseline. Source fleet browsing, named
 groups, VM-specific review and bulk OpenStack preparation are implemented and qualified

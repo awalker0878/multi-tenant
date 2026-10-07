@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { fleetFixture } from './fleet-fixture.ts';
+import { campaignFixture } from './campaign-fixture.ts';
 
 const fixture = JSON.parse(readFileSync('../../contracts/fixtures/inventory/migration-profile-v1.json', 'utf8'));
 export const tenant = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -18,7 +19,7 @@ function reset() {
 }
 reset();
 export default defineConfig({
-  plugins: [vue(), tailwindcss(), fleetFixture(), { name: 'p08-isolated-observations', configureServer(server) {
+  plugins: [vue(), tailwindcss(), fleetFixture(), campaignFixture(), { name: 'p08-isolated-observations', configureServer(server) {
     server.middlewares.use(async (req, res, next) => {
       const path = req.url?.split('?')[0];
       if (path !== route && path !== route + '/status' && path !== '/__fixture' && path !== '/account') return next();

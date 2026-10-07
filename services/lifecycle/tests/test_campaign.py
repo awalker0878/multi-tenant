@@ -124,6 +124,24 @@ def test_resource_admission_counts_outstanding_allocations() -> None:
     assert capacity_holds({"unknown": 1}, {"p": 10}, {}) == ["unknown"]
 
 
+@pytest.mark.parametrize("method", ["APPLICATION_REBUILD_RESTORE", "EXTERNAL_BLOCK_REPLICATION"])
+def test_methods_without_a_source_restart_count_the_entire_outage(method: str) -> None:
+    m = member(migration_plan()) | {"method": method}
+    result = campaign_estimate([sample(p) for p in PHASES], m, settings(), 1000)
+    assert result["outage_seconds"] == result["total_seconds"]
+
+
+def test_measured_outage_cannot_exceed_approved_application_objective(
+    database: Any, postgres: dict[str, Any]
+) -> None:
+    campaigns, plan, m, campaign = prepared(database, postgres)
+    plan["migration"]["objectives"]["max_outage_seconds"] = 1
+    workflow = NativeWorkflow(database, MigrationOwners(plan), lambda: 1000)
+    with pytest.raises(Rejected, match="campaign_outage_objective_exceeded"):
+        workflow.admit(plan, str(uuid4()), (campaign, m["id"]))
+    assert campaigns.read(plan["scope"]["tenant_id"], campaign)["members"][0]["job_id"] is None
+
+
 def test_phase_concurrency_requires_every_occupancy_and_ignores_unused_cutover() -> None:
     m = member(migration_plan())
     m["mode"] = "rehearsal"

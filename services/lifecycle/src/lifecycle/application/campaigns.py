@@ -24,6 +24,7 @@ from lifecycle.domain.campaign import (
     schedule,
 )
 from lifecycle.domain.execution import Rejected, identity
+from lifecycle.domain.migration import DELTA
 from lifecycle.domain.native_workflow import checksum, exact, integer
 
 LOCK = 7707002  # Same lock as native admission: queue assignment and admission cannot race.
@@ -458,7 +459,9 @@ class Campaigns:
             raise Rejected("campaign_measurement_required", 423)
         duration = prediction["total_seconds"]
         if (
-            next_window(settings, now, duration, spec["method"] == "VM_COLD_EXPORT") != now
+            next_window(settings, now, duration) != now
+            or spec["method"] not in DELTA
+            and next_window(settings, now, duration, True) != now
             or now + duration > spec["deadline"]
         ):
             raise Rejected("campaign_window_wait", 423)
@@ -511,6 +514,19 @@ class Campaigns:
             or any(plan["migration"][k] != spec[k] for k in ("mode", "method"))
         ):
             raise Rejected("campaign_native_plan_changed", 423)
+        samples = tx.all(
+            "SELECT sample FROM app.migration_performance_samples WHERE tenant=%s "
+            "AND route_sha256=%s AND observed_at>%s ORDER BY observed_at DESC LIMIT 1000",
+            (tenant, spec["route_sha256"], self.clock() - 7 * 86400),
+        )
+        prediction = campaign_estimate(
+            [s["sample"] for s in samples], spec, row["settings"], self.clock()
+        )
+        if (
+            prediction["outage_seconds"] is None
+            or prediction["outage_seconds"] > plan["migration"]["objectives"]["max_outage_seconds"]
+        ):
+            raise Rejected("campaign_outage_objective_exceeded", 423)
         for pool, amount in spec["demands"].items():
             tx.execute(
                 "INSERT INTO app.migration_allocations VALUES(%s,%s,%s,%s)",
@@ -547,10 +563,12 @@ def campaign_boundary(tx: Transaction, job: str, stage: str, now: int) -> dict[s
             member["settings"],
             now,
             1,
-            phase == "cutover" or member["specification"]["method"] == "VM_COLD_EXPORT",
+            phase == "cutover" or member["specification"]["method"] not in DELTA,
         )
         != now
     ):
+        raise Rejected("campaign_window_closed", 423)
+    if next_window(member["settings"], now, 1) != now:
         raise Rejected("campaign_window_closed", 423)
     # Capacity/impact stops apply to an already prepared grant as well as new admissions.
     samples = tx.all(

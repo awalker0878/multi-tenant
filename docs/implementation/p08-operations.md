@@ -64,8 +64,20 @@ Release requires a separately scoped independent publisher, a completed member,
 fresh evidence of unused resources and drained provider requests. Cancel never
 releases active allocations. Retained artifacts stay reserved until observed cleanup.
 
-Environment/account commissioning, native measurement producers, complete Planning
-composition and the Console journey remain required integration work.
+The Console campaign page creates drafts from owner-resolved complete plans and
+provides schedule/resume, pause, queued cancellation and live member/estimate
+views. It supports UTC windows with an explicit display zone, separate cutover
+windows, blackouts, dependencies, outage groups, priorities, stagger, phase limits
+and failure limits. Lost command replies retain the exact body/key; current access
+is polled and revoked access clears the view. Read access does not grant controls.
+The API contract and generated Console types are versioned independently of the
+existing simulation job contract.
+
+Environment/account commissioning, native measurement producers and complete
+Planning/native runtime composition remain required integration work. Planning's
+existing migration preparation does not yet emit the full operational native plan;
+the new page holds those records. A future schedule does not extend a plan/profile
+or approval's lifetime. Expired plans require a fresh approved campaign draft.
 
 ## Qualification corrections
 
@@ -84,7 +96,9 @@ source; none of these component checks establish native qualification.
    service/fencing/traffic/recovery adapters and the native runtime bootstrap.
 3. Implement reconciled large-transfer continuation beyond the 600-second activity.
 4. Publish authenticated performance and pool observations and integrate resource
-   reservation, dynamic stage admission, wave dispatch, monitoring and Console controls.
+   measurements from actual native producers. The authenticated ingress, durable
+   allocation/stage admission, wave dispatch and Console controls are implemented;
+   observed physical capacity, production impact and native composition are still required.
 5. Qualify fleet partitioning and group scale without silently widening endpoint scope.
 6. Run software, PostgreSQL, browser and workflow campaigns; retain original failures
    and corrections. Then execute Q05/Q06/Q07 on the actual commissioned VMware and
