@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "evidence_level": "E2",
+  "scope": "Native workflow/control and worker components with synthetic owner/provider observations.",
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "production_native_dispatch_enabled": false,
+  "campaigns": [
+    {
+      "archive": "archives/p07-workflows-fcef1a0.zip",
+      "archive_sha256": "1f3b8afe2988d210ec01990e06894c1a8f13a88ba21d76dcdf6ef1b3011b0ba3",
+      "run_id": "37565893111",
+      "artifact_id": "11457709060",
+      "source_revision": "fcef1a0ee8afc5be70b527ba14385545af84c542",
+      "result": "PASSED",
+      "source_bindings_verified": 98,
+      "command_logs_verified": 16,
+      "test_suites": {
+        "lifecycle.xml": {
+          "tests": 245,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "native.xml": {
+          "tests": 112,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-workflows-fcef1a0/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37565893111"
+    },
+    {
+      "archive": "archives/p07-boundary-initial-62a1099.zip",
+      "archive_sha256": "f3002e9881bdd5d50c380f98f55edc17e97714298b2ffe194f89c7fc9ea103d4",
+      "run_id": "37566533633",
+      "artifact_id": "11459091336",
+      "source_revision": "62a10992ea09677092c289ec3972f1646b7883f7",
+      "result": "FAILED",
+      "source_bindings_verified": 104,
+      "command_logs_verified": 18,
+      "test_suites": {
+        "lifecycle.xml": {
+          "tests": 253,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        },
+        "native.xml": {
+          "tests": 142,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-boundary-initial-62a1099/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37566533633"
+    },
+    {
+      "archive": "archives/p07-isolated-worker-initial-62a1099.zip",
+      "archive_sha256": "fbce5104b595bab20cc5cc12d066256e0c1ef95ba34afaa34920379b5a758dbf",
+      "run_id": "37566533558",
+      "artifact_id": "11458892427",
+      "source_revision": "62a10992ea09677092c289ec3972f1646b7883f7",
+      "result": "FAIL",
+      "source_bindings_verified": 125,
+      "command_logs_verified": 18,
+      "test_suites": {},
+      "report": "reports/p07-isolated-worker-initial-62a1099/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37566533558"
+    },
+    {
+      "archive": "archives/p07-boundary-corrected-e4ce3f4.zip",
+      "archive_sha256": "4345741f6c0c498c438f27d91d7445d92686f061d9f5219f3e1a37b245517a2a",
+      "run_id": "37566708341",
+      "artifact_id": "11458877481",
+      "source_revision": "e4ce3f4b1416845aa35735315d0f758ef845bf7a",
+      "result": "PASSED",
+      "source_bindings_verified": 104,
+      "command_logs_verified": 18,
+      "test_suites": {
+        "lifecycle.xml": {
+          "tests": 253,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "native.xml": {
+          "tests": 142,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-boundary-corrected-e4ce3f4/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37566708341"
+    },
+    {
+      "archive": "archives/p07-native-workflows-final-880db14.zip",
+      "archive_sha256": "bbd449469f95f092c77d00bd110df4f2c52facabf8a3b0897bc79a0fee521172",
+      "run_id": "37567040254",
+      "artifact_id": "11459002453",
+      "source_revision": "880db145e2d90e0be6b23f7a744f592cf6af233f",
+      "result": "PASSED",
+      "source_bindings_verified": 105,
+      "command_logs_verified": 18,
+      "test_suites": {
+        "lifecycle.xml": {
+          "tests": 253,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "native.xml": {
+          "tests": 142,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-native-workflows-final-880db14/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37567040254"
+    },
+    {
+      "archive": "archives/p07-isolated-worker-final-880db14.zip",
+      "archive_sha256": "5a123acdf9e61f0f33ca2f04fbaa4108165285323f180bf83e6edca929706be3",
+      "run_id": "37567040242",
+      "artifact_id": "11459660367",
+      "source_revision": "880db145e2d90e0be6b23f7a744f592cf6af233f",
+      "result": "PASS",
+      "source_bindings_verified": 126,
+      "command_logs_verified": 42,
+      "test_suites": {},
+      "report": "reports/p07-isolated-worker-final-880db14/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37567040242"
+    }
+  ],
+  "limitations": [
+    "No actual OpenStack site, provider-side request fencing, enterprise service or native policy/application/restore/retirement campaign.",
+    "NativeOwners and native workload-trust/Temporal composition remain unimplemented for the commissioned environment.",
+    "Declared independent synthetic observers exercise validation; they do not appoint native observers or prove operational separation.",
+    "Ordinary isolated package and P06 campaigns can skip optional worker persistence tests; the dedicated P07 campaign requires no skips.",
+    "No P07 completion, G07 decision, operational acceptance or supported native tuple is claimed."
+  ],
+  "source_revision": "880db145e2d90e0be6b23f7a744f592cf6af233f",
+  "verified_at": "2026-10-07T03:34:31.766091+00:00",
+  "reviewer": "Codex source/artifact consistency review only; designated native and receiving reviews remain open.",
+  "additional_tool_input_hashes": {
+    "scripts/p01/contracts/pyproject.toml": "eff306f45a1d4d4dc1ecf21f36eba2daf20be160b938a87928af4e8e6655f315",
+    "scripts/p01/contracts/uv.lock": "6afd3e92a837772ab2edf0a61abb912d4e5d0917e2ebae03f0bbcbf21fe7951c"
+  }
+}
