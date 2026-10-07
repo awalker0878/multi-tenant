@@ -12,8 +12,31 @@ firmware, Tools, all disks/backing chains/controllers, NIC/network fingerprints,
 snapshot tree and clone capabilities. A second configuration read detects drift.
 Application datasets, dependencies, consistency and objectives remain explicit
 owner inputs. Missing native facts produce holds; metadata does not establish
-qualification. This component still needs Inventory/Console profile persistence
-and the actual commissioned source tuple.
+qualification. The actual commissioned source tuple remains required.
+
+Inventory now persists immutable source/target profiles only after a complete
+leased generation. Each of the eight source reads and seven target reads requires
+current worker, lease, enrollment and Governance authority plus its collection
+budget. A source VM must have appeared in that generation's scoped server listing;
+the explicit VI JSON release and enrolled host/trust remain fixed. Revocation,
+expired leases, replayed read permits and incomplete profile reads deny publication.
+
+The Console migration review displays original API facts separately from owner-only
+application references and reasoned interpretations. It requires an explicit method,
+every disk's dataset coverage, consistency/mount/check references and owner objectives.
+Inventory stores append-only revisions and confirmations with exact digests,
+idempotency and optimistic concurrency. A changed generation, expired profile,
+revoked enrollment or changed authority invalidates current confirmation.
+
+Planning's authenticated migration-preparation route re-reads that exact confirmed
+Inventory revision and derives native identity/profile bindings, capacities and
+all datasets. Callers supply only target disk keys and supported formats. Lifecycle
+admission compares the full current owner receipt with the immutable plan, including
+review digest, owner-input digest, method, objectives, capacities and every disk/
+dataset mapping. Preparation is not a persisted or approved complete MigrationPlan;
+composition with commissioned stage intents, independent qualification and approval
+remains required. Inventory v1.2 and Planning migration v1 carry the additions;
+previously published canonical contracts retain their original bytes.
 
 `VmwareCapture` submits one disk-only S0 snapshot and one exact-S0 clone through
 native task APIs. It requires a stopped source, matching configuration, snapshot
@@ -113,8 +136,10 @@ cancellation are tested; a QEMU/bubblewrap rootfs and guest remain unqualified.
 
 The [completion packet](p08-completion-review.md) and
 [custody runbook](../operations/runbooks/native-migration.md) give the concrete
-remaining obligations and recovery procedure. Remaining implementation includes profile persistence and Console admission,
-commissioned capture/conversion/native-readback composition, concrete guest/service/
+remaining obligations and recovery procedure. The newer profile/review integration
+is qualified separately in the [profile evidence](../../verification/p08/profiles/qualification-index.json).
+Remaining implementation includes complete native-plan and authenticated
+capture/conversion/native-readback composition, concrete guest/service/
 delta/traffic/recovery adapters and a composed native Q07 journey. Source and target
 profile components distinguish observed facts from further capability evidence;
 only genuinely API-unavailable values should become manual administrator inputs. Installed tuples, scoped identities, independent owner protocols,

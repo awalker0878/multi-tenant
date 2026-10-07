@@ -52,6 +52,15 @@ from Assurance custody. No list, profile mutation or native dispatch route is ex
 
 ## Authorization and bootstrap
 
+P08's [migration preparation API](../../contracts/openapi/planning-migration-v1.json)
+re-reads an exact current confirmed Inventory review under the request's `plan.create`
+delegation. It derives native identities, profile digests, capacities, method,
+owner-input digest and complete datasets, and accepts only explicit target keys and
+supported disk formats. The result is a binding for subsequent native plan composition,
+not a persisted, approved or executable MigrationPlan. Lifecycle independently checks
+the same current owner receipt before admission; no client-supplied native fact or
+preparation response can confer write authority.
+
 Require authenticated actor plus service delegation and `plan.create` and `plan.read` scopes over both the application and candidate destinations. Fetch catalogue/inventory through scoped APIs; a broader planning service credential is not permission to expose all site data to the requester.
 
 Bootstrap uses reviewed profile versions, not an empty-registry “allow all” mode. P05 requires P03 intent and P04 provenance. All three platform profiles cover the required dimensions; only the selected path needs a feasible first execution plan. Missing real inputs may support simulation design but never an E3 claim.

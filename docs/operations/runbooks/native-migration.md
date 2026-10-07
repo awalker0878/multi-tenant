@@ -6,6 +6,32 @@ It does not enable a native deployment. Use the
 [P08 completion packet](../../implementation/p08-completion-review.md) for the
 remaining integration and native acceptance work.
 
+## Collect and confirm migration profiles
+
+Apply Inventory migrations through `005_workload_profiles.sql` with its schema
+owner. Enable the enrolled `source_profile` stream after scoped server discovery,
+with the exact four-part VI JSON release and approved VM allowlist. The detailed
+source stream and listing must use the same host, addresses and trust. Enable the
+OpenStack `target_profile` with the explicitly approved Glance v2 root alongside
+the enrolled Nova/Cinder/Neutron version/configuration streams. Every native GET
+requires a fresh worker read permit under the collection lease and endpoint budget.
+Only a complete generation publishes immutable profiles; partial/changed/revoked
+collection remains held. This setup supplies no native write credential.
+
+Open **Configure porting → Migration readiness review**. Select current source and
+target observations and one explicit method, map every disk into owner-defined
+datasets, and supply the application references and objectives the APIs cannot
+discover. Save and confirm the exact revision. API facts cannot be overridden.
+A lost response offers the same command key/payload; a changed or expired profile
+requires a fresh collection and review. A confirmation is not migration approval.
+
+The [Planning preparation contract](../../../contracts/openapi/planning-migration-v1.json)
+requires current scoped `plan.create` delegation. It re-reads the confirmed Inventory
+revision and validates each target disk key/format against observed source disks and
+target formats. Preserve the returned review and owner-input digests in the complete
+native plan. Lifecycle rechecks the full Inventory receipt at admission. Commissioned
+stage intents, qualification, separate approval and native custody are still required.
+
 ## Control and worker setup
 
 Apply Lifecycle migrations through `006_migration_boundaries.sql` with the schema
@@ -86,8 +112,14 @@ Run `python scripts/p08/qualify.py --output /absolute/private/report-directory`
 from a clean source checkout with locked uv/Python dependencies and
 `P07_POSTGRES_BIN` pointing to PostgreSQL 16 executables. A suitable unprivileged
 process account is required; missing/skipped PostgreSQL checks are not passing.
-The command runs static/type/build/schema checks and all three Python test suites.
+The command runs static/type/build/schema checks and all five Python test suites.
 It records exact source and command-log digests, original JUnit results and failures.
+
+After installing the exact Console lock and Chromium, run
+`python scripts/p08/qualify_browser.py --output /absolute/private/browser-report`.
+This exercises the actual Vue/Inertia page with an isolated HTTP fixture. It checks
+disk mapping, confirmation, unchanged uncertain retry, stale/revoked access and
+narrow viewport behavior; service persistence and authority have separate tests.
 
 The [retained index](../../../verification/p08/qualification-index.json) is E2 only.
 Its native responses and application/owner peers are synthetic; converter command

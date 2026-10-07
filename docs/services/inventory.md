@@ -74,6 +74,16 @@ Test partial page sets, hidden permissions, rate-limited endpoints, stale clocks
 
 ## Context source ownership and code control
 
+P08 adds immutable workload profiles and administrator migration reviews under
+[Inventory v1.2](../../contracts/openapi/inventory-v1.2.json). The scoped leased
+collector authorizes and budgets every profile read, and publishes only a complete
+generation. Review revisions separate observed API facts from complete dataset maps,
+explicit method, owner-only references/objectives and reasoned interpretations.
+Confirmation rechecks profile freshness and authority and grants no native write.
+Planning alone reads the exact confirmed migration input through its authenticated
+owner route; stale generations, scope mismatches and revoked policies remain held.
+See the [P08 record](../implementation/p08-execution.md) for qualified boundaries.
+
 Owned source root: `services/inventory/src/inventory/`. Site/endpoint registration, observed resource identity, collection provenance and freshness capabilities. Platform collectors are Infrastructure adapters under inventory authority.
 
 Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). This Python service retains `domain/`, `application/`, `infrastructure/` and `interfaces/` with the documented dependency direction. Its capability modules may collaborate within the same owning context. Composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages. The pragmatic Laravel convention in ADR-024 applies to PHP services and does not relocate this Python source.

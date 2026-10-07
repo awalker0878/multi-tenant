@@ -1,19 +1,24 @@
 # Next work — P08 native migration
 
 P08 development continues on the native-only baseline. The [implementation record](docs/implementation/p08-execution.md)
-now covers source/target normalization, exact-S0 isolated capture, retained NFC/OVF
-archives, copy conversion, explicit Glance import and durable migration/recovery.
-The [retained evidence](verification/p08/qualification-index.json) at `a72d0e8`
-passes 295 Lifecycle, 204 worker and 59 Inventory-worker tests without skips, plus
-all static/type/build/contract commands. Original failures remain recorded.
+now covers scoped leased profile collection, immutable review/confirmation,
+Console dataset mapping, authenticated Planning preparation and current Lifecycle
+admission, alongside exact-S0 isolated capture, NFC/OVF archives, copy conversion,
+Glance import and durable recovery. The [profile evidence](verification/p08/profiles/qualification-index.json)
+passes 779 tests without skips (90 Inventory, 119 Planning, 304 Lifecycle, 204
+worker, 62 Inventory-worker), 34 quality commands and the actual Vue/Inertia browser
+journey. Original failures, corrections and historical component evidence remain recorded.
 
 **P08 remains incomplete and G08 NOT_REVIEWED.** The [completion packet](docs/implementation/p08-completion-review.md)
 separates unfinished software (BL-P08-001) from actual native/owner inputs
 (BL-P08-002). Continue in this order under the existing development authorization:
 
-1. Persist immutable workload profiles in Inventory and bind Planning/Console
-   review and migration admission to the current profiles and all datasets.
-2. Compose the selected stage effects with authenticated owner/trust and independent
+1. Enroll the actual authorized source/target policies and read identities, collect
+   API-visible profiles and confirm the owner-only workload inputs in the delivered
+   Console review. Preserve the accepted rebuild/restore baseline; its concrete
+   guest, data, service and recovery protocols still need their actual owner records.
+2. Compose the exact Planning preparation into a complete approved native plan and
+   bind the selected stage effects with authenticated owner/trust and independent
    readback; qualify the actual converter rootfs and copied-guest profile. Bind the
    selected application/file delta, service, native writer-fence, traffic, recovery
    and cleanup protocols. Extend transfer continuation only with reconciled byte

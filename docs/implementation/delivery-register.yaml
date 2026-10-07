@@ -316,15 +316,17 @@ phases:
   - EV-P08-001
   - EV-P08-002
   - EV-P08-003
+  - EV-P08-004
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
-  delivery_note: Read-only workload/target profile components, exact-S0 isolated capture, retained NFC/OVF archives,
-    pinned copy conversion, explicit Glance import and durable migration/recovery contracts are implemented. Source
-    a72d0e8 passes 295 Lifecycle, 204 worker and 59 Inventory-worker tests without skips and all 20 quality/build/schema
-    commands. Profile persistence and Console/Planning integration, commissioned owner/trust/stage composition,
-    real converter/guest qualification and selected guest/service/delta/fencing/traffic/recovery/cleanup adapters
-    remain unfinished. No native Q07, G08 or operating acceptance.
+  delivery_note: Scoped leased profile collection, immutable Inventory review/confirmation, Console dataset review,
+    authenticated Planning preparation and current Lifecycle admission are implemented alongside the native data
+    components and durable recovery. Source 497c660 passes 779 tests without skips, all 34 component commands and
+    the actual Vue/Inertia browser journey; every final artifact hash is verified and all nine final-source
+    workflows pass. Complete native-plan and owner/trust/stage composition, actual converter/guest qualification
+    and selected application/service/fencing/traffic/recovery/cleanup protocols remain. No native Q07, G08 or
+    operating acceptance.
 - id: P09
   title: Platform and capability expansion
   owner_role: Infrastructure and qualification leads
@@ -1871,6 +1873,7 @@ work_packages:
   evidence_ids:
   - EV-P08-002
   - EV-P08-003
+  - EV-P08-004
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
@@ -1882,9 +1885,10 @@ work_packages:
   criterion_ids:
   - G08.01
   - G08.02
-  delivery_note: API-first VMware workload and observed OpenStack target normalization, identity/configuration drift
-    and all-disk/unsupported-feature holds pass E2 tests. Inventory profile persistence and Console/Planning admission
-    still need integration; actual datasets, owner definitions and installed/native qualification are not supplied.
+  delivery_note: API-first VMware/OpenStack profiles now have leased per-read authority/budgets, immutable complete-generation
+    persistence, Console all-disk/owner-only review and confirmation, authenticated Planning preparation and exact
+    current-profile Lifecycle admission. E2 database/browser checks pass. Complete native-plan composition and
+    actual installed workload/owner/native qualification remain; preparation grants no execution authority.
 - id: P08.02
   phase_id: P08
   title: Method and data movement
@@ -1951,6 +1955,7 @@ work_packages:
   evidence_ids:
   - EV-P08-002
   - EV-P08-003
+  - EV-P08-004
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
@@ -3196,6 +3201,7 @@ requirements:
   - EV-P05-003
   - EV-P08-002
   - EV-P08-003
+  - EV-P08-004
   blocker_ids:
   - BL-P05-001
   - BL-P07-001
@@ -3235,6 +3241,7 @@ requirements:
   - EV-P06-003
   - EV-P08-002
   - EV-P08-003
+  - EV-P08-004
   blocker_ids:
   - BL-P06-001
   - BL-P08-001
@@ -6958,6 +6965,35 @@ evidence:
   limitations: Synthetic native/current-owner/QEMU engine peers; actual PostgreSQL/TLS/subprocess bounds only. Inventory/Planning/Console
     integration and commissioned owner/trust/stage adapters remain unfinished. No real converter rootfs, guest boot/transform,
     native fencing, data/delta/recovery, Q07, G07/G08 review, P08 completion or operating acceptance.
+- id: EV-P08-004
+  level: E2
+  source_revision: 497c660670130654f62a73987755d69c6b444641
+  artifact_revisions:
+    p08_run_id: '37617605574'
+    p03_regression_run_id: '37617605608'
+    p04_regression_run_id: '37617605566'
+    p06_regression_run_id: '37617605699'
+    retained_artifact_commit: c38de0a861ecc5b9f7932dbde554b286f279890c
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T11:57:34.593394+00:00'
+  observer: GitHub Actions PostgreSQL/TLS and Chromium campaigns; Codex verified original source/log/artifact hashes
+    and visually inspected the retained migration review screenshot.
+  reviewer: Codex engineering consistency review only; actual native and independent receiving reviews remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/c38de0a861ecc5b9f7932dbde554b286f279890c/verification/p08/profiles/qualification-index.json
+  sha256: 5fb27391d1c6656c49b7db4700afc638c78b79b07db9e1a34b57f4bc2a1704af
+  environment: GitHub Actions Ubuntu 24.04, PostgreSQL 16, Python 3.12.14, uv 0.12.19, Node 24.19.0 and pinned Chromium;
+    synthetic native/current-owner and browser HTTP peers.
+  scope: Leased per-read source/target collection, immutable profiles/reviews/confirmations, scoped Planning preparation,
+    exact current Lifecycle admission and actual Vue/Inertia all-disk review. All 34 component commands and 779
+    tests pass without skips; five browser quality commands and the full journey pass with no flaky/skipped tests.
+    Final component/browser reports verify 667/209 source bindings and all retained artifacts. All nine final-source
+    workflows pass; original contract, UI and broker/Temporal regression failures remain separately recorded.
+  limitations: E2 only. Preparation does not compose or approve a complete native MigrationPlan. Actual owner/trust/stage
+    composition, converter rootfs/copied guest, application/service/delta/fencing/traffic/recovery/cleanup protocols
+    and long-transfer reconciliation remain required. No native Q07, G07/G08 review, P08 completion or operating acceptance.
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -7351,16 +7387,18 @@ blockers:
   - R31
   - R33
   owner_role: Inventory, Planning, Console, Lifecycle and Infrastructure engineering leads
-  description: P08 software is not complete. Workload profile components are not yet persisted/composed into Inventory/Planning/Console
-    migration admission. Actual stage writer/independent-observer composition, qualified real converter and copied-guest
+  description: P08 software is not complete. Profile persistence, Console review/confirmation, authenticated Planning
+    preparation and current-profile admission are delivered. Complete native-plan and stage writer/independent-observer
+    composition, qualified real converter and copied-guest
     preparation, selected delta/service/traffic/recovery/cleanup implementations and reconciled long-transfer continuation
     remain outstanding. E2 components do not close those outputs.
   unblock_condition: Deliver the remaining outputs in docs/implementation/p08-completion-review.md, bind supplied
     actual owner protocols, qualify the complete selected method including uncertainty/recovery and retain exact-source
     results without simulation authority or fallback.
-  next_action: Persist immutable source/target profiles and current-revision admission through the owning service
-    and Console contracts. Compose explicit adapters and independent readers against the commissioned interfaces;
-    keep unregistered effects held. Existing development authorization continues.
+  next_action: Commission actual endpoint policies and owner-only application/guest/service protocols using the
+    delivered Console review. Compose the exact preparation into a complete native plan and bind explicit adapters
+    and independent readers to those protocols; keep unregistered effects held. Existing development authorization
+    continues; accepted baseline decisions do not need renewed permission.
   state: OPEN
   resolution_evidence_ids: []
 - id: BL-P08-002

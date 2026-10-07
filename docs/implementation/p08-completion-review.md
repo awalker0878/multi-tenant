@@ -10,7 +10,7 @@ Existing development authorization continues; this is not a request to repeat G0
 
 | Package | Delivered software | Remaining output |
 | --- | --- | --- |
-| P08.01 | Read-only VMware workload normalization, drift checks, all-disk/device holds and observed OpenStack target normalization | Persist immutable workload profiles through Inventory; bind the multi-read VI JSON profile collector to enrolled VM scope, current authorization, explicit API release and per-request collection budgets/leases; expose API findings, reasoned overrides and owner-only inputs in Console; bind Planning admission to current profile revisions |
+| P08.01 | Scoped leased API collection with per-read authority/budget checks; immutable source/target profiles; Console all-disk/dataset and owner-only review; exact confirmation; authenticated Planning preparation and current Lifecycle profile admission | Commission actual endpoint policies/read identities and observe the installed tuple; supply owner-only datasets/objectives/guest-method requirements; compose the bound preparation into the complete approved native plan and qualify actual readiness |
 | P08.02 | Native S0/isolated clone, retained NFC/OVF archive, bounded pinned conversion, artifact handoff and explicit Glance-direct import | Compose the commissioned writer/independent-reader adapters; qualify the real converter rootfs; implement the selected copied-guest preparation and application/file delta protocol; commission Cinder/Nova mappings and quarantine; qualify reconciled resumption for transfers exceeding the current ten-minute activity bound |
 | P08.03 | Durable rehearsal stage contract with no write-admission stage | Complete the selected guest/service/suppression adapters, compose the native journey and measure a representative all-dataset rehearsal |
 | P08.04 | Current profile/method/dataset checks, ordered final synchronization/shutdown/validation and atomic first-possible-write marker | Bind native all-writer fencing and stale-request exclusion, guest/application validation, backup restore, service/policy and traffic adapters; execute and independently observe actual cutover |
@@ -42,8 +42,8 @@ not the repository, Console payloads or chat.
 
 ## Native execution and receiving sequence
 
-1. Finish the first row's Inventory/Planning/Console integration independently of
-   operational activation. Commission the selected stage effects and independent
+1. Use the delivered Inventory/Console review and Planning preparation to bind current
+   profiles and complete datasets. Compose the complete native plan with the selected stage effects and independent
    readers against the supplied protocols; do not enable simulation owners for writes.
 2. Verify G07 entry and the installed tuple, profile revisions, method, all disks/
    datasets and approved objectives. Complete Q07.01 denials for missing, stale or
