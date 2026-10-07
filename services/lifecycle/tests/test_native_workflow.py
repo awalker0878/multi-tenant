@@ -515,7 +515,7 @@ def test_native_http_identity_is_independent_of_body(native: Any) -> None:
     status, reply = native_http(
         service, tenant, p["executor_id"], body | {"worker_id": p["executor_id"]}
     )
-    assert status == 409
+    assert status == 422
     status, reply = native_http(service, tenant, p["executor_id"], body)
     assert status == 200 and reply["binding_sha256"] == digest(binding)
     status, reply = native_http(service, tenant, p["executor_id"], body)
