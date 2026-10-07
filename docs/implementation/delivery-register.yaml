@@ -7461,8 +7461,9 @@ blockers:
   - R33
   owner_role: Inventory, Planning, Console, Lifecycle and Infrastructure engineering leads
   description: P08 software is not complete. Profile persistence, Console review/confirmation, authenticated Planning
-    preparation, current-profile admission and campaign scheduling/Console/observation controls are delivered.
-    Complete native-plan and stage writer/independent-observer composition, actual performance/capacity producers,
+    preparation, immutable recipe-based proposals, bulk Console plan creation, six-account commissioning checks,
+    protected worker/stage composition, current-profile admission and campaign scheduling/Console/observation controls are delivered.
+    Complete native owner authority and execution-plan resolver integration, actual performance/capacity producers,
     qualified real converter and copied-guest
     preparation, selected delta/service/traffic/recovery/cleanup implementations and reconciled long-transfer continuation
     remain outstanding. E2 components do not close those outputs.
@@ -7470,8 +7471,8 @@ blockers:
     actual owner protocols, qualify the complete selected method including uncertainty/recovery and retain exact-source
     results without simulation authority or fallback.
   next_action: Commission actual endpoint policies and owner-only application/guest/service protocols using the
-    delivered Console review. Compose the exact preparation into a complete native plan and bind explicit adapters
-    and independent readers to those protocols; keep unregistered effects held. Existing development authorization
+    delivered Console review and protected account probe. Bind the recipe-composed proposal to native owner authority,
+    the execution-plan resolver, explicit adapters and independent readers; keep unregistered effects held. Existing development authorization
     continues; accepted baseline decisions do not need renewed permission.
   state: OPEN
   resolution_evidence_ids: []

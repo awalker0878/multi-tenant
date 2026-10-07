@@ -127,12 +127,7 @@ class NativeWorkflow:
             job = str(uuid4())
             admission = {"job_id": job, "stage": "admission", "plan_sha256": fingerprint}
             self.require(tx, {"plan": plan, "stopped": False}, admission)
-            key = digest({k: plan["scope"][k] for k in ("tenant_id", "resource_id")})
-            held = tx.one(
-                "SELECT job,custody_id FROM app.native_resource_holds "
-                "WHERE resource_key=%s OR custody_id=%s",
-                (key, plan["custody_id"]),
-            )
+            key, held = self.resource_hold(tx, plan)
             if plan["purpose"] == "migrate":
                 self.migration_admission(tx, plan, held)
             elif plan["purpose"] == "provision":
@@ -166,7 +161,8 @@ class NativeWorkflow:
             )
             if held:
                 tx.execute(
-                    "UPDATE app.native_resource_holds SET job=%s WHERE resource_key=%s", (job, key)
+                    "UPDATE app.native_resource_holds SET job=%s WHERE resource_key=%s",
+                    (job, held["resource_key"]),
                 )
             else:
                 tx.execute(
@@ -181,6 +177,46 @@ class NativeWorkflow:
                 (job, "p07-native-v1-" + job),
             )
         return job
+
+    def resource_hold(
+        self, tx: Transaction, plan: dict[str, Any]
+    ) -> tuple[str, dict[str, Any] | None]:
+        """VM identity serializes migrations across applications and target projects.
+
+        An application can contain several VMs. Custody still has to be distinct for
+        each VM. Join retained jobs so pre-existing application-keyed holds remain
+        authoritative after upgrade, including recovery of those older journeys.
+        Application-wide provision/retire authority conflicts with every member.
+        The caller holds the global native admission transaction lock.
+        """
+        scope = plan["scope"]
+        migration = plan["purpose"] == "migrate"
+        source = plan["migration"]["source"]["native_identity_sha256"] if migration else None
+        key = digest(
+            {"tenant_id": scope["tenant_id"], "migration_source_sha256": source}
+            if migration
+            else {k: scope[k] for k in ("tenant_id", "resource_id")}
+        )
+        matches = tx.all(
+            "SELECT h.resource_key,h.job,h.custody_id FROM app.native_resource_holds h "
+            "JOIN app.native_jobs j ON j.id=h.job WHERE h.custody_id=%s OR h.resource_key=%s "
+            "OR (j.tenant=%s AND ((j.plan->'scope'->>'resource_id'=%s "
+            "AND (NOT %s OR j.plan->>'purpose'<>'migrate')) OR "
+            "(%s AND j.plan->>'purpose'='migrate' AND "
+            "j.plan->'migration'->'source'->>'native_identity_sha256'=%s)))",
+            (
+                plan["custody_id"],
+                key,
+                scope["tenant_id"],
+                scope["resource_id"],
+                migration,
+                migration,
+                source,
+            ),
+        )
+        if len(matches) > 1:
+            raise Rejected("native_resource_held", 423)
+        return key, matches[0] if matches else None
 
     def checkpoint(self, tenant: str, job: str) -> dict[str, Any]:
         """Read the journal; queue delivery and Temporal history confer no effect authority."""

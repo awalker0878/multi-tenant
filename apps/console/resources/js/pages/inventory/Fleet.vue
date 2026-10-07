@@ -20,6 +20,12 @@ const running = ref(false);
 const message = ref('');
 const results = ref<Record<string, { status: string; reason: string }>>({});
 const bindings = ref<Record<string, unknown>>({});
+type PlanOption = { recipe_id: string; base_plan_id: string; mode: string; method: string; expires_at: number; stages: number };
+const planOptions = ref<Record<string, PlanOption[]>>({});
+const choices = ref<Record<string, string>>({});
+const plans = ref<Record<string, string>>({});
+const pending = ref<Record<string, { command_key: string; base_plan_id: string; recipe_id: string }>>({});
+const planSelectionReady = computed(() => Object.entries(choices.value).some(([id, recipe]) => recipe && !plans.value[id]));
 const controller = new AbortController();
 onUnmounted(() => controller.abort());
 const form = useForm({ command_key: crypto.randomUUID(), revision: group?.revision ?? null,
@@ -105,6 +111,48 @@ async function prepareGroup() {
   } catch { message.value = 'Preparation interrupted. Refresh and retry; preparation does not submit a migration job.'; }
   finally { running.value = false; }
 }
+function planUrl(id: string) {
+  return `/tenants/${props.tenantId}/applications/${group!.input.application_id}/environments/${group!.input.environment_id}/planning/plans/${id}?sites=${props.siteId}`;
+}
+async function completeGroup(operation: 'options' | 'compose') {
+  if (blocked.value || dirty.value || !group || !props.detail) return;
+  running.value = true; message.value = '';
+  try {
+    for (const member of props.detail.members) {
+      const id = member.candidate.resource_id;
+      if (controller.signal.aborted) break;
+      if (plans.value[id] || (operation === 'compose' && !choices.value[id])) continue;
+      if (operation === 'compose' && !pending.value[id]) {
+        const choice = planOptions.value[id]?.find(o => o.recipe_id === choices.value[id] && o.expires_at > now.value);
+        if (!choice) { results.value[id] = { status: 'Held', reason: 'Refresh current plan choices.' }; continue; }
+        pending.value[id] = { command_key: crypto.randomUUID(), base_plan_id: choice.base_plan_id, recipe_id: choice.recipe_id };
+      }
+      results.value[id] = { status: operation === 'options' ? 'Finding plans' : 'Creating plan', reason: '' };
+      const token = document.cookie.split('; ').find(c => c.startsWith('XSRF-TOKEN='))?.slice('XSRF-TOKEN='.length) ?? '';
+      const response = await fetch(`${base}/groups/${group.id}/prepare`, { method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'manual', signal: controller.signal,
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-XSRF-TOKEN': decodeURIComponent(token) },
+        body: JSON.stringify({ operation, revision: group.revision, digest: group.digest, resource_id: id, ...(operation === 'compose' ? pending.value[id] : {}) }) });
+      if (accessLost(response)) break;
+      const result = await response.json() as { items?: PlanOption[]; id?: string; kind?: string; binding?: unknown; native_write_authorized?: boolean; error?: string; holds?: string[] };
+      if (response.ok && result.native_write_authorized === false && operation === 'options' && Array.isArray(result.items)) {
+        planOptions.value[id] = result.items;
+        if (!pending.value[id]) choices.value[id] = result.items.length === 1 ? result.items[0].recipe_id : '';
+        results.value[id] = { status: result.items.length ? 'Choose plan' : 'Held', reason: result.items.length ? 'Select the migration mode to create for review.' : 'No current commissioned recipe and base plan match this VM. Complete platform commissioning and Planning assessment.' };
+      } else if (response.ok && result.native_write_authorized === false && operation === 'compose' && result.id && result.kind === 'plan' && result.binding) {
+        plans.value[id] = result.id; bindings.value[id] = result.binding; delete pending.value[id];
+        results.value[id] = { status: 'Plan created', reason: 'Review the complete plan and request independent approval.' };
+      } else {
+        results.value[id] = { status: 'Held', reason: (result.holds ?? [result.error ?? 'planning_unavailable']).join(', ').replaceAll('_', ' ') };
+        if (response.status >= 500 || response.status === 412 || response.ok) {
+          message.value = operation === 'compose' ? 'Batch paused. Retry plan creation unchanged to resolve an uncertain result.' : 'Batch paused. Refresh current findings before finding plans again.'; break;
+        }
+        // An explicit rejection committed no plan; an uncertain response retains the same command.
+        if (operation === 'compose') delete pending.value[id];
+      }
+    }
+  } catch { message.value = operation === 'compose' ? 'Plan creation interrupted. Retry unchanged; completed plans are preserved.' : 'Plan lookup interrupted. Refresh current findings and retry.'; }
+  finally { running.value = false; }
+}
 </script>
 
 <template>
@@ -165,6 +213,19 @@ async function prepareGroup() {
       <table class="w-full text-left text-sm"><thead><tr><th class="p-2">VM</th><th class="p-2">Outcome</th><th class="p-2">Details</th></tr></thead><tbody><tr v-for="member in detail.members" :key="member.candidate.resource_id" class="border-t"><td class="p-2">{{ member.candidate.name }}<p><Link v-if="member.candidate.profile_id && !running" :href="reviewUrl(member.candidate.profile_id)" class="text-teal-800 underline">Review this VM</Link></p></td><td class="p-2">{{ results[member.candidate.resource_id]?.status ?? (member.holds.length ? 'Held' : 'Ready to prepare') }}</td><td class="p-2">{{ results[member.candidate.resource_id]?.reason ?? member.holds.map(h => h.replaceAll('_', ' ')).join(', ') }}</td></tr></tbody></table>
       <p class="mt-3" role="status">{{ Object.values(results).filter(r => r.status === 'Prepared').length }} prepared · {{ Object.values(results).filter(r => r.status === 'Held').length }} held</p>
       <details v-if="Object.keys(bindings).length" class="mt-4"><summary>Inspect prepared VM bindings</summary><pre class="mt-3 max-h-96 overflow-auto text-xs">{{ JSON.stringify(bindings, null, 2) }}</pre></details>
+      <div class="mt-6 border-t pt-5" aria-label="Complete migration plans">
+        <h3 class="text-lg font-semibold">Create complete plans</h3>
+        <p class="my-3">Find current commissioned plans for each VM, choose rehearsal, cutover or recovery, then create immutable proposals for independent review. Approved plans can be added to a migration campaign.</p>
+        <div class="flex flex-wrap gap-3"><button class="secondary" :disabled="blocked || dirty || Object.keys(pending).length > 0" @click="completeGroup('options')">Find plan choices</button><button :disabled="blocked || dirty || !planSelectionReady" @click="completeGroup('compose')">{{ Object.keys(pending).length ? 'Retry plan creation unchanged' : 'Create selected plans' }}</button></div>
+        <ul class="my-4 space-y-3"><li v-for="member in detail.members" :key="member.candidate.resource_id" class="flex flex-wrap items-center gap-3">
+          <span>{{ member.candidate.name }}</span>
+          <Link v-if="plans[member.candidate.resource_id]" :href="planUrl(plans[member.candidate.resource_id])" class="text-teal-800 underline">Review complete plan</Link>
+          <select v-else-if="planOptions[member.candidate.resource_id]?.length" v-model="choices[member.candidate.resource_id]" :disabled="blocked || !!pending[member.candidate.resource_id]" :aria-label="`Plan for ${member.candidate.name}`" class="w-auto">
+            <option value="">Choose a plan</option><option v-for="option in planOptions[member.candidate.resource_id]" :key="option.recipe_id" :value="option.recipe_id" :disabled="option.expires_at <= now">{{ option.mode.replaceAll('_', ' ') }} · {{ option.method.replaceAll('_', ' ') }} · {{ option.stages }} stages · expires {{ observedTime(option.expires_at) }}</option>
+          </select>
+        </li></ul>
+        <Link :href="`/tenants/${tenantId}/sites/${siteId}/applications/${group.input.application_id}/environments/${group.input.environment_id}/migration-campaigns`" class="text-teal-800 underline">Open migration campaigns</Link>
+      </div>
     </section>
   </CatalogueLayout>
 </template>

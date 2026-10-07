@@ -17,7 +17,12 @@ def prepare_migration(
     content_digest: str,
     delegation: str,
     mapping: list[dict[str, Any]],
+    action: str = "plan.create",
 ) -> dict[str, Any]:
+    if action not in {"plan.create", "plan.read"}:
+        from planning.domain.model import Rejected
+
+        raise Rejected("migration_read_action_denied", 403)
     path = (
         f"/v1/tenants/{identifier(tenant)}/migration-inputs/{identifier(application)}/"
         f"{identifier(environment)}/{identifier(site)}/{integer(revision, 1)}/{sha(content_digest)}"
@@ -27,7 +32,7 @@ def prepare_migration(
         "GET",
         path,
         delegation=delegation,
-        action="plan.create",
+        action=action,
         schema_name="migration-input-v1",
     )
     if (inputs["tenant_id"], inputs["site_id"], inputs["revision"], inputs["digest"]) != (

@@ -4,8 +4,11 @@ P08 operations now include authenticated campaign APIs, a Console schedule/contr
 page, staggered windows/blackouts, dependency and outage-group admission, measured
 phase-concurrency limits and independently published resource observations. See
 [P08 operations](docs/implementation/p08-operations.md) for semantics and tested
-limits. Actual account commissioning, complete approved native plan/runtime
-composition, native measurement producers, selected guest/data/service/recovery
+limits. The [runtime/commissioning increment](docs/implementation/p08-runtime-commissioning.md)
+adds six-account read-only checks, protected native worker composition, immutable
+recipe-based Planning proposals, bulk Console plan creation and VM-scoped custody.
+Actual account commissioning, complete native owner/approval and execution-plan
+resolver integration, native measurement producers, selected guest/data/service/recovery
 adapters, long-transfer resumption and Q07/G08 acceptance remain open. The
 [completion packet](docs/implementation/p08-completion-review.md) identifies the
 source/target secret references, lab placement and application-owner protocols
@@ -37,8 +40,9 @@ separates unfinished software (BL-P08-001) from actual native/owner inputs
    API-visible profiles and confirm the owner-only workload inputs in the delivered
    Console review. Preserve the accepted rebuild/restore baseline; its concrete
    guest, data, service and recovery protocols still need their actual owner records.
-2. Compose the exact Planning preparation into a complete approved native plan and
-   bind the selected stage effects with authenticated owner/trust and independent
+2. Commission the protected recipes and create complete proposals from the current
+   Planning assessment and exact VM review. Bind the native execution-plan resolver,
+   current owner/approval/custody interfaces and selected stage effects with independent
    readback; qualify the actual converter rootfs and copied-guest profile. Bind the
    selected application/file delta, service, native writer-fence, traffic, recovery
    and cleanup protocols. Extend transfer continuation only with reconciled byte

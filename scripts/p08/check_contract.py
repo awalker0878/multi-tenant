@@ -26,6 +26,19 @@ from lifecycle_worker.application.migration_runtime import MIGRATION_STAGES
 assert set(BEFORE) == set(AFTER) == MIGRATION_STAGES
 print('Lifecycle prerequisites/results and isolated worker stage registry agree exactly.')
 
+sys.path.insert(0, str(ROOT / 'services/planning/src'))
+from planning.domain.migration_plan import DELTA, stage_order
+from lifecycle.domain.migration import stages
+for method in DELTA:
+    for mode in ('rehearsal', 'cutover', 'rollback', 'forward_recovery', 'reverse_recovery', 'cleanup'):
+        assert stage_order(mode, method) == stages({'mode': mode, 'method': method})
+composition = json.loads((ROOT / 'contracts/openapi/planning-migration-v1.1.json').read_text())
+validate_spec(composition)
+for name in ('planning-v1.1.json', 'planning-migration-v1.1.json'):
+    validate_spec(json.loads((ROOT / 'contracts/openapi' / name).read_text()))
+    assert (ROOT / 'contracts/openapi' / name).read_bytes() == (ROOT / 'apps/console/resources/contracts' / name).read_bytes()
+print('All thirty Planning method/mode stage orders match Lifecycle; composition v1.1 validates.')
+
 campaign = json.loads((ROOT / 'contracts/openapi/lifecycle-migration-campaigns-v1.json').read_text())
 validate_spec(campaign)
 validator = Draft202012Validator({'$ref': '#/components/schemas/CommandRequest', 'components': campaign['components']}, format_checker=FormatChecker())

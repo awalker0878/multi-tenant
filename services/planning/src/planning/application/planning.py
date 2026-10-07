@@ -15,6 +15,9 @@ from planning.domain.model import Actor, Rejected, canonical, digest, identifier
 class Planning:
     def __init__(self, database: Database, sources: Sources, clock: Callable[[], int]) -> None:
         self.database, self.sources, self.clock = database, sources, clock
+        self.migration_current: Callable[[Actor, dict[str, Any], dict[str, str]], None] | None = (
+            None
+        )
 
     def get(
         self, tenant: str, application: str, environment: str, identity: str, kind: str
@@ -208,6 +211,13 @@ class Planning:
     ) -> dict[str, Any]:
         content = plan["content"]
         holds = list(content["holds"])
+        if "native_migration" in content:
+            try:
+                if self.migration_current is None:
+                    raise Rejected("migration_owners_unavailable", 503)
+                self.migration_current(actor, plan, delegations)
+            except Rejected as error:
+                holds.append(error.reason)
         try:
             intent, inputs = self.sources.resolve(
                 actor,

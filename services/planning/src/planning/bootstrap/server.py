@@ -7,9 +7,11 @@ from collections.abc import Sequence
 import uvicorn
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
+from planning.application.migration_plans import MigrationPlans
 from planning.application.planning import Planning
 from planning.infrastructure.foundation import database_ready
 from planning.infrastructure.migration import prepare_migration
+from planning.infrastructure.migration_recipes import recipe_for, visible_recipes
 from planning.infrastructure.owners import GovernanceAuthority, OwnerSources
 from planning.infrastructure.store import Postgres
 from planning.infrastructure.telemetry import BoundedSignalBuffer
@@ -25,12 +27,20 @@ class PlanningRouter:
             Planning(Postgres(), OwnerSources(), lambda: int(time.time())), GovernanceAuthority()
         )
         self.foundation = FoundationApp(database_ready)
-        self.migration = MigrationPreparationApp(self.planning.authority, prepare_migration)
+        migrations = MigrationPlans(
+            self.planning.planning, prepare_migration, recipe_for, visible_recipes
+        )
+        self.planning.planning.migration_current = migrations.current
+        self.migration = MigrationPreparationApp(
+            self.planning.authority, prepare_migration, migrations
+        )
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        if scope["type"] == "http" and scope["path"].endswith("/migration-preparations"):
+        if scope["type"] == "http" and scope["path"].endswith(
+            ("/migration-preparations", "/migration-plans", "/migration-plan-options")
+        ):
             await self.migration(scope, receive, send)
         elif scope["type"] == "http" and scope["path"].startswith("/v1/"):
             await self.planning(scope, receive, send)

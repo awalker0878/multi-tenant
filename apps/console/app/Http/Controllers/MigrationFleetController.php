@@ -77,7 +77,13 @@ final class MigrationFleetController
 
     public function prepare(Request $request, string $tenant, string $site, string $group, InventoryGateway $inventory, PlanningGateway $planning): JsonResponse
     {
-        $input = $request->validate(['revision' => ['required', 'integer', 'min:1'], 'digest' => ['required', 'regex:/\A[0-9a-f]{64}\z/'], 'resource_id' => ['required', 'uuid', 'lowercase']]);
+        $input = $request->validate([
+            'revision' => ['required', 'integer', 'min:1'], 'digest' => ['required', 'regex:/\A[0-9a-f]{64}\z/'], 'resource_id' => ['required', 'uuid', 'lowercase'],
+            'operation' => ['sometimes', 'in:prepare,options,compose'],
+            'base_plan_id' => ['required_if:operation,compose', 'uuid', 'lowercase'],
+            'recipe_id' => ['required_if:operation,compose', 'uuid', 'lowercase'],
+            'command_key' => ['required_if:operation,compose', 'uuid', 'lowercase'],
+        ]);
         try {
             $session = $this->session($request);
             $detail = $inventory->call($session, $tenant, 'getMigrationGroup', ['site' => $site, 'group' => $group]);
@@ -100,7 +106,10 @@ final class MigrationFleetController
                 return response()->json(['error' => 'migration_member_held', 'holds' => $member['holds']], 409)->header('Cache-Control', 'no-store, private');
             }
             $selection = $detail['group']['input'];
-            $result = $planning->call($session, $tenant, $selection['application_id'], $selection['environment_id'], 'POST', 'migration-preparations', [$site], $member['preparation']);
+            $operation = $input['operation'] ?? 'prepare';
+            $result = $operation === 'compose'
+                ? $planning->call($session, $tenant, $selection['application_id'], $selection['environment_id'], 'POST', 'migration-plans', [$site], $member['preparation'] + ['base_plan_id' => $input['base_plan_id'], 'recipe_id' => $input['recipe_id']], $input['command_key'])
+                : $planning->call($session, $tenant, $selection['application_id'], $selection['environment_id'], 'POST', $operation === 'options' ? 'migration-plan-options' : 'migration-preparations', [$site], $member['preparation']);
 
             return response()->json($result)->header('Cache-Control', 'no-store, private');
         } catch (InventoryFailure|PlanningFailure $error) {

@@ -35,8 +35,17 @@ admission compares the full current owner receipt with the immutable plan, inclu
 review digest, owner-input digest, method, objectives, capacities and every disk/
 dataset mapping. Preparation is not a persisted or approved complete MigrationPlan;
 composition with commissioned stage intents, independent qualification and approval
-remains required. Inventory v1.2 and Planning migration v1 carry the additions;
+remains required. Inventory v1.2 and Planning migration v1 carry that preparation;
 previously published canonical contracts retain their original bytes.
+
+The subsequent [runtime/commissioning increment](p08-runtime-commissioning.md)
+adds Planning migration v1.1 recipe options and immutable complete proposals,
+bulk Console plan creation with unchanged-command retry, the native worker process
+and protected stage/observer registry, and six-account read-only commissioning.
+Distinct source VMs can share an application while duplicate-source and shared-custody
+admission remains held. Complete proposals still require an authenticated native
+owner/approval/custody path and execution-plan resolver; existing simulation approval
+checks cannot supply native authority.
 
 `VmwareCapture` submits one disk-only S0 snapshot and one exact-S0 clone through
 native task APIs. It requires a stopped source, matching configuration, snapshot

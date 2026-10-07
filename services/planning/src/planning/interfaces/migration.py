@@ -8,14 +8,21 @@ from typing import Any
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
+from planning.application.migration_plans import MigrationPlans
 from planning.application.ports import Authority
 from planning.domain.model import Rejected, decode, identifier, integer, sha, shape
 from planning.interfaces.planning import UUID, single
 
 
 class MigrationPreparationApp:
-    def __init__(self, authority: Authority, prepare: Callable[..., dict[str, Any]]) -> None:
+    def __init__(
+        self,
+        authority: Authority,
+        prepare: Callable[..., dict[str, Any]],
+        plans: MigrationPlans | None = None,
+    ) -> None:
         self.authority, self.prepare = authority, prepare
+        self.plans = plans
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
@@ -24,7 +31,7 @@ class MigrationPreparationApp:
             return
         try:
             route = re.fullmatch(
-                rf"/v1/tenants/({UUID})/applications/({UUID})/environments/({UUID})/migration-preparations",
+                rf"/v1/tenants/({UUID})/applications/({UUID})/environments/({UUID})/(migration-preparations|migration-plans|migration-plan-options)",
                 scope["path"],
             )
             if route is None or scope["method"] != "POST" or scope["query_string"]:
@@ -49,12 +56,17 @@ class MigrationPreparationApp:
                         raise Rejected("request_bound", 413)
                     if not event.get("more_body", False):
                         break
-            body = shape(decode(bytes(chunks)), {"site_id", "review", "disks"})
+            complete = route[4] == "migration-plans"
+            body = shape(
+                decode(bytes(chunks)),
+                {"site_id", "review", "disks"}
+                | ({"base_plan_id", "recipe_id"} if complete else set()),
+            )
             review = shape(body["review"], {"revision", "digest"})
             site = identifier(body["site_id"])
-            tenant, application, environment = route.groups()
+            tenant, application, environment = route.groups()[:3]
             delegation = single(headers, b"x-actor-delegation")
-            await asyncio.to_thread(
+            actor = await asyncio.to_thread(
                 self.authority.actor,
                 auth[7:],
                 delegation,
@@ -64,19 +76,36 @@ class MigrationPreparationApp:
                 environment,
                 site,
             )
-            binding = await asyncio.to_thread(
-                self.prepare,
-                tenant,
-                application,
-                environment,
-                site,
-                integer(review["revision"], 1),
-                sha(review["digest"]),
-                delegation,
-                body["disks"],
-            )
-            payload = {"binding": binding, "native_write_authorized": False}
-            status = 200
+            if route[4] == "migration-plan-options":
+                if self.plans is None:
+                    raise Rejected("migration_plan_composition_unavailable", 503)
+                payload = await asyncio.to_thread(self.plans.options, actor, body, delegation)
+                status = 200
+            elif complete:
+                if self.plans is None:
+                    raise Rejected("migration_plan_composition_unavailable", 503)
+                payload = await asyncio.to_thread(
+                    self.plans.create,
+                    actor,
+                    body,
+                    identifier(single(headers, b"idempotency-key")),
+                    delegation,
+                )
+                status = 201
+            else:
+                binding = await asyncio.to_thread(
+                    self.prepare,
+                    tenant,
+                    application,
+                    environment,
+                    site,
+                    integer(review["revision"], 1),
+                    sha(review["digest"]),
+                    delegation,
+                    body["disks"],
+                )
+                payload = {"binding": binding, "native_write_authorized": False}
+                status = 200
         except Rejected as e:
             status, payload = e.status, {"error": e.reason}
         except Exception:

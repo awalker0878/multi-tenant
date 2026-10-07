@@ -57,6 +57,20 @@ it('queues scoped native API collection without starting a migration', function 
     $this->post($this->base.'/refresh', ['endpoint_id' => $this->id, 'command_key' => $this->id])->assertRedirect($this->base);
 });
 
+it('finds scoped complete plan choices using the server reviewed member', function (): void {
+    $this->inventory->shouldReceive('call')->once()->andReturn($this->detail);
+    $this->planning->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->id, $this->id, $this->id, 'POST', 'migration-plan-options', [$this->id], $this->detail['members'][0]['preparation'])->andReturn(['items' => [], 'native_write_authorized' => false]);
+    $this->postJson($this->base.'/groups/'.$this->id.'/prepare', ['operation' => 'options', 'revision' => 1, 'digest' => str_repeat('b', 64), 'resource_id' => $this->member])->assertOk()->assertJsonPath('items', []);
+});
+
+it('creates a complete proposal with the exact retry key and ignores browser native facts', function (): void {
+    $this->inventory->shouldReceive('call')->twice()->andReturn($this->detail);
+    $this->planning->shouldReceive('call')->twice()->with(str_repeat('a', 64), $this->id, $this->id, $this->id, 'POST', 'migration-plans', [$this->id], $this->detail['members'][0]['preparation'] + ['base_plan_id' => $this->id, 'recipe_id' => $this->member], $this->id)->andReturn(['id' => $this->id, 'kind' => 'plan', 'native_write_authorized' => false]);
+    $command = ['operation' => 'compose', 'revision' => 1, 'digest' => str_repeat('b', 64), 'resource_id' => $this->member, 'base_plan_id' => $this->id, 'recipe_id' => $this->member, 'command_key' => $this->id, 'native_write_authorized' => true, 'disks' => ['forged']];
+    $this->postJson($this->base.'/groups/'.$this->id.'/prepare', $command)->assertOk()->assertJsonPath('native_write_authorized', false);
+    $this->postJson($this->base.'/groups/'.$this->id.'/prepare', $command)->assertOk();
+});
+
 it('enforces real csrf on bulk preparation', function (): void {
     $this->app['env'] = 'csrf-check';
     $this->inventory->shouldNotReceive('call');

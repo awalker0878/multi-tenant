@@ -19,7 +19,7 @@ final class PlanningClient implements PlanningGateway
 
     public function call(string $session, string $tenant, string $application, string $environment, string $method, string $tail, array $sites, array $body = [], ?string $key = null): array
     {
-        $migration = $tail === 'migration-preparations';
+        $migration = in_array($tail, ['migration-preparations', 'migration-plans', 'migration-plan-options'], true);
         if (($migration && ($method !== 'POST' || count($sites) !== 1)) || count($sites) < 1 || count($sites) > 3 || ! in_array($method, ['GET', 'POST'], true)
             || (! $migration && ! preg_match('/\A(?:assessments|plans)(?:\/[0-9a-f-]{36})?(?:\/(?:validity|diff))?\z/', $tail))) {
             throw new PlanningFailure(422, 'invalid_scope');
@@ -75,8 +75,12 @@ final class PlanningClient implements PlanningGateway
                 throw new PlanningFailure;
             }
 
-            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v1.json' : 'contracts/planning-v1.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
-            $schemaName = $migration ? 'Preparation' : ($response->status() === 201 ? 'Receipt' : (str_ends_with($tail, '/validity') ? 'Validity' : (str_ends_with($tail, '/diff') ? 'Diff' : (str_starts_with($tail, 'plans/') ? 'Plan' : 'Assessment'))));
+            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v1.1.json' : 'contracts/planning-v1.1.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
+            $schemaName = $migration ? match ($tail) {
+                'migration-plans' => 'Receipt',
+                'migration-plan-options' => 'MigrationOptions',
+                default => 'Preparation',
+            } : ($response->status() === 201 ? 'Receipt' : (str_ends_with($tail, '/validity') ? 'Validity' : (str_ends_with($tail, '/diff') ? 'Diff' : (str_starts_with($tail, 'plans/') ? 'Plan' : 'Assessment'))));
             $schema = ['$ref' => '#/components/schemas/'.$schemaName, 'components' => $api['components']];
             if (! (new Validator)->validate(json_decode($raw), json_decode(json_encode($schema, JSON_THROW_ON_ERROR)))->isValid()) {
                 throw new PlanningFailure;

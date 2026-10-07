@@ -346,3 +346,47 @@ def test_migration_proof_is_independent_and_exact() -> None:
     proof[0]["observer_id"] = p["executor_id"]
     with pytest.raises(Rejected):
         observations(p, binding, "after", proof, 1000)
+
+
+def test_distinct_vm_members_share_an_application_but_cannot_share_source_or_custody(
+    control: Any,
+) -> None:
+    service, _, first = control
+    service.admit(first, str(uuid4()))
+    second = deepcopy(first)
+    second.update(
+        plan_id=str(uuid4()),
+        plan_digest=digest("second"),
+        approval_id=str(uuid4()),
+        custody_id=str(uuid4()),
+    )
+    second["migration"]["source"]["native_identity_sha256"] = digest("another-native-vm")
+    assert service.admit(second, str(uuid4()))
+    duplicate = deepcopy(first)
+    duplicate["scope"]["resource_id"] = str(uuid4())
+    duplicate.update(custody_id=str(uuid4()), plan_id=str(uuid4()), plan_digest=digest("duplicate"))
+    with pytest.raises(Rejected, match="native_resource_held"):
+        service.admit(duplicate, str(uuid4()))
+    duplicate["migration"]["source"]["native_identity_sha256"] = digest("third-native-vm")
+    duplicate["custody_id"] = first["custody_id"]
+    with pytest.raises(Rejected, match="native_resource_held"):
+        service.admit(duplicate, str(uuid4()))
+
+
+def test_legacy_application_hold_is_retained_when_recovery_takes_over(
+    control: Any, postgres: dict[str, Any]
+) -> None:
+    service, _, p = control
+    job = service.admit(p, str(uuid4()))
+    legacy_key = digest({k: p["scope"][k] for k in ("tenant_id", "resource_id")})
+    with psycopg.connect(**postgres) as connection:
+        connection.execute(
+            "UPDATE app.native_resource_holds SET resource_key=%s WHERE job=%s", (legacy_key, job)
+        )
+    new = recovery(p, job, "rollback")
+    successor = service.admit(new, str(uuid4()))
+    with psycopg.connect(**postgres) as connection:
+        held = connection.execute(
+            "SELECT resource_key,job FROM app.native_resource_holds"
+        ).fetchall()
+    assert len(held) == 1 and held[0][0] == legacy_key and str(held[0][1]) == successor
