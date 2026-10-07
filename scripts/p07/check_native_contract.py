@@ -10,6 +10,8 @@ from openapi_spec_validator import validate_spec
 ROOT = Path(__file__).resolve().parents[2]
 spec = json.loads((ROOT / 'contracts/openapi/lifecycle-native-boundary-v1.json').read_text())
 fixture = json.loads((ROOT / 'contracts/fixtures/lifecycle/native-stage-grant-v1.json').read_text())
+worker_fixture = json.loads((ROOT / 'workers/lifecycle/tests/fixtures/native-stage-grant-v1.json').read_text())
+assert worker_fixture == fixture, 'isolated worker fixture differs from the published contract'
 validate_spec(spec)
 validator = Draft202012Validator(spec['components']['schemas']['BoundaryRequest'], format_checker=FormatChecker())
 validator.validate(fixture)

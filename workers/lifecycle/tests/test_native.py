@@ -859,9 +859,8 @@ def test_lost_native_redemption_response_never_launches_or_retries(binding: Nati
 def test_published_native_grant_fixture_is_consumed_without_field_translation() -> None:
     from lifecycle_worker.application.native_authority import GrantedNativeAuthority
 
-    root = Path(__file__).resolve().parents[3]
     fixture = json.loads(
-        (root / "contracts/fixtures/lifecycle/native-stage-grant-v1.json").read_text()
+        (Path(__file__).parent / "fixtures/native-stage-grant-v1.json").read_text()
     )
     authority = GrantedNativeAuthority(fixture["grant"], GrantClient(), lambda: 100)
     authority.require_current(authority.binding, fixture["boundary"])
