@@ -320,17 +320,18 @@ phases:
   - EV-P08-005
   - EV-P08-006
   - EV-P08-007
+  - EV-P08-008
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
-  delivery_note: Six-account read-only probes, protected native worker/stage composition, immutable
-    recipe-based Planning proposals, bulk Console plan creation and VM-scoped custody extend the delivered
-    fleet and campaign controls. Source 7860616 passes 893 component tests without skips, all three
-    migration browser journeys and all 23 Console quality commands with 195 Pest passes, 922 assertions and
-    seven separate broker-campaign skips. Original failures, the restored frozen-contract pass and exact
-    regression states are retained. Actual account commissioning, native owner authority/execution-plan
-    resolver, physical measurement producers, converter/guest qualification, selected
-    data/service/fencing/traffic/recovery/cleanup protocols and reconciled long-transfer continuation
+  delivery_note: Native Lifecycle TLS service/dispatcher, exact Planning resolver, live Governance operational
+    approval and scoped current Inventory reads are delivered, including unattended recipe revocation and
+    explicit version 2 movement budgets up to one day within current authority. Source f765eb9 passes
+    all 36 component commands and 951 tests without skips plus all three migration browser journeys.
+    Unchanged Governance owner source 576643e passes 219 PostgreSQL tests, 5919 assertions and 160 campaign
+    checks. Original architecture failure/correction and exact source/archive bindings are retained.
+    Actual account/provider-custody commissioning, native measurements, converter/guest qualification,
+    selected data/service/fencing/traffic/recovery/cleanup protocols and interrupted-transfer reconciliation
     remain. No native Q07, G08 or operating acceptance is inferred.
 - id: P09
   title: Platform and capability expansion
@@ -1882,6 +1883,7 @@ work_packages:
   - EV-P08-005
   - EV-P08-006
   - EV-P08-007
+  - EV-P08-008
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
@@ -1889,6 +1891,7 @@ work_packages:
   - docs/implementation/phases/p08.md
   - docs/implementation/p08-execution.md
   - docs/implementation/p08-runtime-commissioning.md
+  - docs/implementation/p08-native-control.md
   - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
@@ -1900,8 +1903,9 @@ work_packages:
     proposals from current actor-owned qualified bases and exact confirmed profiles; bulk Console creation
     retains uncertain commands and handles definite commissioning holds. Six-account probes check distinct
     identities, current scope and explicit permissions. E2 PostgreSQL, TLS, Laravel and browser checks pass.
-    Current native owner/approval/custody and execution-plan resolver integration, actual account
-    commissioning and installed workload qualification remain; proposals grant no native execution
+    Native control supplies current Planning/Governance/Inventory clients, an immutable resolver and
+    unattended recipe revocation. Actual owner account/provider-custody commissioning and installed workload
+    qualification remain; proposals grant no native execution
     authority.
 - id: P08.02
   phase_id: P08
@@ -1918,6 +1922,7 @@ work_packages:
   - EV-P08-003
   - EV-P08-006
   - EV-P08-007
+  - EV-P08-008
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
@@ -1925,6 +1930,7 @@ work_packages:
   - docs/implementation/phases/p08.md
   - docs/implementation/p08-execution.md
   - docs/implementation/p08-runtime-commissioning.md
+  - docs/implementation/p08-native-control.md
   - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
@@ -1933,7 +1939,8 @@ work_packages:
   delivery_note: Snapshot-bound isolated capture, retained NFC/manifest/OVF archives, copy-only conversion
     and Glance-direct image import have protected executable worker composition with a fixed adapter
     registry and independent readers. Immutable scope, intent, custody and in-flight registry revocation are
-    checked. Actual converter rootfs/guest qualification, selected delta/restore/block implementations,
+    checked. Explicit version 2 movement budgets allow up to one day within current authority, while
+    version 1 retains 600 seconds. Actual converter rootfs/guest qualification, selected delta/restore/block implementations,
     native Cinder/Nova mappings and reconciled long-transfer continuation remain. Owner-protocol transport
     does not implement an unspecified guest or data protocol.
 - id: P08.03
@@ -1950,6 +1957,7 @@ work_packages:
   - EV-P08-003
   - EV-P08-006
   - EV-P08-007
+  - EV-P08-008
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
@@ -1957,6 +1965,7 @@ work_packages:
   - docs/implementation/phases/p08.md
   - docs/implementation/p08-execution.md
   - docs/implementation/p08-runtime-commissioning.md
+  - docs/implementation/p08-native-control.md
   - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
@@ -1983,6 +1992,7 @@ work_packages:
   - EV-P08-004
   - EV-P08-006
   - EV-P08-007
+  - EV-P08-008
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
@@ -1990,6 +2000,7 @@ work_packages:
   - docs/implementation/phases/p08.md
   - docs/implementation/p08-execution.md
   - docs/implementation/p08-runtime-commissioning.md
+  - docs/implementation/p08-native-control.md
   - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
@@ -1998,8 +2009,9 @@ work_packages:
   - G08.04
   delivery_note: Version 2 migration admission binds current profiles/method/datasets and orders final sync,
     source shutdown, integrity and activation. First possible write is committed with grant redemption.
-    Complete immutable cutover proposals and VM-scoped custody are delivered. Independent native all-writer
-    fencing, provider drain, current owner/approval/resolver and actual guest/service/traffic composition
+    Complete immutable cutover proposals, native resolver/current approval reads and VM-scoped custody
+    are delivered. Independent native all-writer
+    fencing, provider drain and actual guest/service/traffic composition
     remain required.
 - id: P08.05
   phase_id: P08
@@ -2015,6 +2027,7 @@ work_packages:
   - EV-P08-003
   - EV-P08-006
   - EV-P08-007
+  - EV-P08-008
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
@@ -2022,6 +2035,7 @@ work_packages:
   - docs/implementation/phases/p08.md
   - docs/implementation/p08-execution.md
   - docs/implementation/p08-runtime-commissioning.md
+  - docs/implementation/p08-native-control.md
   - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
@@ -7118,6 +7132,38 @@ evidence:
     authority and execution-plan resolver, performance/capacity producers, selected copied-guest/data/service/fencing/traffic/recovery/cleanup
     protocols, real converter qualification and long-transfer reconciliation remain unfinished. No physical throughput,
     native migration, Q05/Q06/Q07, G07/G08 receiving, P08 completion or operating acceptance is claimed.
+- id: EV-P08-008
+  level: E2
+  source_revision: f765eb9fba61a16565d4085d8e51a4e0ec681ddd
+  artifact_revisions:
+    p08_run_id: '37684992865'
+    governance_run_id: '37684327893'
+    governance_source: 576643e3102ab02a8fd0fc23edd2f2e90d2ec74e
+    architecture_correction_run_id: '37684992982'
+    retained_artifact_commit: c801a13e4b172e6b307303a4c7eccb6e1511e8c6
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T20:50:09.907720+00:00'
+  observer: GitHub Actions PostgreSQL/TLS and Chromium campaigns; Codex verified original archives,
+    exact source/log/artifact hashes, JUnit and Governance test summaries and visually inspected the retained screenshot.
+  reviewer: Codex engineering consistency review only; designated native and receiving reviewers remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/c801a13e4b172e6b307303a4c7eccb6e1511e8c6/verification/p08/control/qualification-index.json
+  sha256: fd9f046e64ccbfd2f5849702537040ee52d0daacd1afe852c7a85a22b5a4c582
+  environment: GitHub Actions Ubuntu 24.04, component PostgreSQL 16, Governance PostgreSQL 18.6,
+    Python 3.12.14, uv 0.12.19, PHP 8.5.11, Node 24.19.0 and pinned Chromium; synthetic native/custody peers.
+  scope: Native Lifecycle process/dispatcher, protected owner/worker assignments, immutable Planning resolver,
+    live operational consent and scoped Inventory reads, unattended recipe revocation and bounded version 2
+    movement. All 36 component commands and 951 tests pass without skips, including 30 real compiler-to-resolver
+    method/mode combinations. All five browser commands and three migration journeys pass. Separate unchanged
+    Governance service/contract source passes 219 PostgreSQL tests, 5919 assertions, 160 campaign checks and two
+    Chromium journeys. Verifier checks 943/231/474 source bindings and retains the original architecture failure
+    with its unrelaxed domain-layer correction. Running or queued regressions remain explicitly unpassed.
+  limitations: E2 only. Provider custody/fencing, actual account and runtime commissioning, physical measurement
+    producers, selected guest/data/service/traffic/recovery/cleanup implementations, converter qualification
+    and interrupted-transfer reconciliation remain required. Extended budgets do not renew authority or supply
+    resumption. No native Q05/Q06/Q07, G07/G08 receiving, P08 completion or operating acceptance is claimed.
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -7514,16 +7560,17 @@ blockers:
   description: P08 software is not complete. Profile persistence, Console review/confirmation, authenticated Planning
     preparation, immutable recipe-based proposals, bulk Console plan creation, six-account commissioning checks,
     protected worker/stage composition, current-profile admission and campaign scheduling/Console/observation controls are delivered.
-    Complete native owner authority and execution-plan resolver integration, actual performance/capacity producers,
-    qualified real converter and copied-guest
+    Native control now composes live Planning/Governance/Inventory reads, immutable resolution, unattended recipe
+    revocation and explicit long movement budgets. Independent provider custody/fencing, actual performance/capacity
+    producers, qualified real converter and copied-guest
     preparation, selected delta/service/traffic/recovery/cleanup implementations and reconciled long-transfer continuation
     remain outstanding. E2 components do not close those outputs.
   unblock_condition: Deliver the remaining outputs in docs/implementation/p08-completion-review.md, bind supplied
     actual owner protocols, qualify the complete selected method including uncertainty/recovery and retain exact-source
     results without simulation authority or fallback.
   next_action: Commission actual endpoint policies and owner-only application/guest/service protocols using the
-    delivered Console review and protected account probe. Bind the recipe-composed proposal to native owner authority,
-    the execution-plan resolver, explicit adapters and independent readers; keep unregistered effects held. Existing development authorization
+    delivered Console review and protected account probe. Configure the delivered native owner clients/resolver with
+    commissioned provider custody, explicit adapters and independent readers; keep unregistered effects held. Existing development authorization
     continues; accepted baseline decisions do not need renewed permission.
   state: OPEN
   resolution_evidence_ids: []

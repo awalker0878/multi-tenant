@@ -43,9 +43,10 @@ adds Planning migration v1.1 recipe options and immutable complete proposals,
 bulk Console plan creation with unchanged-command retry, the native worker process
 and protected stage/observer registry, and six-account read-only commissioning.
 Distinct source VMs can share an application while duplicate-source and shared-custody
-admission remains held. Complete proposals still require an authenticated native
-owner/approval/custody path and execution-plan resolver; existing simulation approval
-checks cannot supply native authority.
+admission remains held. The [native control increment](p08-native-control.md) now
+supplies the separate Lifecycle process/dispatcher, live Planning/Governance/Inventory
+clients and immutable execution-plan resolver. Provider custody/fencing and selected
+owner protocols still require commissioning; simulation approvals grant no native authority.
 
 The [runtime qualification](../../verification/p08/runtime/README.md), registered
 as EV-P08-007, retains 893 component tests without skips, all three browser journeys
@@ -99,9 +100,16 @@ worker resolves native clone/operation identities from its journal under the sam
 job, tenant, source plan, epoch, scope and custody generation. Unknown, duplicate,
 partial or cross-job receipts hold the next stage. Completion binds the aggregate
 all-disk digest; additional disk events after completion are rejected. No payload crosses the control
-API, Console or event bus. The current single activity is bounded to ten minutes;
-large transfers need separately qualified chunk/range reconciliation rather than
-an implicit longer timeout or blind restart.
+API, Console or event bus. Explicit version 2 archive/conversion/import intents
+allow movement budgets up to one day, bounded by current profile/plan/credential
+expiry; version 1 retains its ten-minute limit. Interrupted transfers still need
+separately implemented and qualified reconciliation. A longer timeout is not resumption.
+
+The [native control evidence](../../verification/p08/control/README.md) records 951 passing component tests
+without skips, all 30 real compiler-to-resolver combinations and three passing
+migration browser journeys at `f765eb9`. Separate unchanged Governance source passes
+219 PostgreSQL tests and 160 campaign checks. The original architecture failure and
+its passing correction remain retained. These results do not supply native acceptance.
 
 ## Migration control and recovery
 
@@ -157,10 +165,12 @@ The [completion packet](p08-completion-review.md) and
 remaining obligations and recovery procedure. The newer profile/review integration
 is qualified separately in the [profile evidence](../../verification/p08/profiles/qualification-index.json).
 The newer worker/proposal increment above supplies protected composition and
-immutable complete proposals. Remaining implementation includes native owner
-authority and the execution-plan resolver, concrete guest/service/delta/traffic/
-recovery protocols, physical observation producers, long-transfer continuation
-and a composed native Q07 journey. Source and target
+immutable complete proposals. Native control now resolves those proposals against
+current approval and Inventory owners and rechecks revoked Planning recipes. Remaining
+implementation includes independently administered provider custody/fencing, concrete
+guest/service/delta/traffic/recovery protocols, physical observation producers and
+interrupted-transfer continuation. The composed native journey still requires actual
+commissioning and Q07 qualification. Source and target
 profile components distinguish observed facts from further capability evidence;
 only genuinely API-unavailable values should become manual administrator inputs. Installed tuples, scoped identities, independent owner protocols,
 application dataset/objective definitions and native fencing are not supplied.

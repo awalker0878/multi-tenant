@@ -48,8 +48,8 @@ coordinator combines it with the current native custody boundary and independent
 read Inventory records. Simulation approval receipts are rejected.
 
 The new Governance and Inventory interfaces have separately versioned OpenAPI
-contracts. Previously published contract bytes remain unchanged. Planning also rechecks recipe revocation on unattended execution and Governance
-binding reads. Request/approval APIs do not accept a browser-supplied native plan or credential.
+contracts. Previously published contract bytes remain unchanged. Planning also rechecks
+recipe revocation on unattended execution and Governance binding reads. Request/approval APIs do not accept a browser-supplied native plan or credential.
 
 Inventory requires `INVENTORY_NATIVE_READERS_FILE`. It contains `schema_version: 1`
 and `grants`. Each reader grant has `reader_id`, a distinct `token_file`,

@@ -14,8 +14,10 @@ been configured and no throughput numbers or migration dates have been invented.
 The [runtime and commissioning increment](p08-runtime-commissioning.md) adds
 read-only six-account checks, a protected native worker entry point, explicit stage
 adapter/observer composition, immutable Planning recipe proposals and bulk Console
-plan creation. Complete native-owner authority integration and physical benchmarking
-remain open.
+plan creation. The [native control increment](p08-native-control.md) adds the Lifecycle service and
+dispatcher, exact Planning resolver, live Governance approval and scoped current
+Inventory reads. Provider custody/fencing, physical benchmarking and the selected
+application implementations remain open.
 
 The [retained runtime qualification](../../verification/p08/runtime/README.md)
 binds the complete proposal and worker increment to 893 passing component tests,
@@ -23,13 +25,19 @@ three browser journeys and all 23 Console quality commands. Console records
 195 passing tests and seven explicit separate broker-campaign skips. These results
 do not close the native or owner-specific obligations below.
 
+The [native control evidence](../../verification/p08/control/README.md) records 951 passing component tests
+without skips, all 30 real compiler-to-resolver combinations and three passing
+migration browser journeys at `f765eb9`. Separate unchanged Governance source passes
+219 PostgreSQL tests and 160 campaign checks. The original architecture failure and
+its passing correction remain retained. These results do not supply native acceptance.
+
 ## Remaining implementation
 
 | Package | Delivered software | Remaining output |
 | --- | --- | --- |
-| P08.01 | Scoped leased API collection with per-read authority/budget checks; immutable source/target profiles; Console all-disk/dataset and owner-only review; exact confirmation; authenticated preparation and immutable recipe-based Planning proposals; bulk Console plan choices/creation; six-account identity/scope/permission probe | Commission actual endpoint policies/read identities and observe the installed tuple; supply owner-only datasets/objectives/guest-method requirements; bind current native approval/custody and the execution-plan resolver; qualify actual readiness |
-| P08.02 | Native S0/isolated clone, retained NFC/OVF archive, bounded pinned conversion, artifact handoff and explicit Glance-direct import; protected worker process and fixed adapter/independent-reader registry with in-flight rechecks | Commission the actual writers/readers; qualify the real converter rootfs; implement the selected copied-guest preparation and application/file delta protocol; commission Cinder/Nova mappings and quarantine; qualify reconciled resumption for transfers exceeding the current ten-minute activity bound |
-| P08.03 | Durable rehearsal stage contract with no write-admission stage | Complete the selected guest/service/suppression adapters, compose the native journey and measure a representative all-dataset rehearsal |
+| P08.01 | Scoped leased API collection with per-read authority/budget checks; immutable source/target profiles; Console all-disk/dataset and owner-only review; exact confirmation; authenticated preparation and immutable recipe-based Planning proposals; bulk Console plan choices/creation; six-account identity/scope/permission probe; native Lifecycle service/dispatcher, live approval and scoped Inventory reads, immutable resolver and unattended recipe revocation | Commission actual endpoint policies/read identities and observe the installed tuple; supply owner-only datasets/objectives/guest-method requirements; commission distinct owner identities and actual provider custody/fencing; qualify actual readiness |
+| P08.02 | Native S0/isolated clone, retained NFC/OVF archive, bounded pinned conversion, artifact handoff and explicit Glance-direct import; protected worker process and fixed adapter/independent-reader registry with in-flight rechecks; explicit version 2 movement budgets up to one day within current authority | Commission the actual writers/readers; qualify the real converter rootfs; implement the selected copied-guest preparation and application/file delta protocol; commission Cinder/Nova mappings and quarantine; implement and qualify reconciled continuation after interruption; measure actual route capacity and authority freshness constraints |
+| P08.03 | Durable rehearsal stage contract with no write-admission stage | Complete the selected guest/service/suppression adapters, commission the delivered native journey and measure a representative all-dataset rehearsal |
 | P08.04 | Current profile/method/dataset checks, ordered final synchronization/shutdown/validation and atomic first-possible-write marker | Bind native all-writer fencing and stale-request exclusion, guest/application validation, backup restore, service/policy and traffic adapters; execute and independently observe actual cutover |
 | P08.05 | Separate pre-write and post-write recovery plans, monotonic custody, predecessor stop and retained write ancestry | Implement selected application recovery/reverse-sync adapters and cleanup/consolidation/access revocation; prove accepted target changes survive recovery and only one writer returns |
 | P08.06 | Source-bound E2 evidence and concrete receiving checklist | Original Q07.01–Q07.10 native dossier, applicable Q05/Q06 results, measured objectives, exact support scope and actual G08 receiving decisions |
@@ -84,7 +92,7 @@ uses an administrator-entered transfer rate as benchmark evidence.
 
 1. Use the delivered Inventory/Console review and Planning recipe composition to bind
    current profiles, complete datasets and the selected stage intents. Commission the
-   native approval/custody owner path and execution-plan resolver, then bind actual
+   delivered native approval/Inventory/resolver path and independent provider custody, then bind actual
    effects/readers against the supplied protocols; do not enable simulation owners for writes.
 2. Verify G07 entry and the installed tuple, profile revisions, method, all disks/
    datasets and approved objectives. Complete Q07.01 denials for missing, stale or

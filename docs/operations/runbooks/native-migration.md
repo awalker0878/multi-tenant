@@ -76,10 +76,11 @@ synthetic observer. The simulation deployment does not activate this runtime.
    or QCOW2 format, firmware and disk bus. All disks are checked before image creation.
    A failed image import never selects another import method automatically.
 
-The activity deadline is at most 600 seconds. Budget whole-transfer hashing and
-conversion as well as payload movement. Larger workloads require implemented,
-qualified reconciled range/chunk continuation; increasing a timeout or restarting
-an unknown lease is not that capability. Staging failures retain partial files
+Version 1 movement intents retain a 600-second limit. Explicit version 2
+archive/conversion/import intents accept up to 86,400 seconds; shorter plan, profile,
+credential or campaign expiry still wins. Budget hashing and conversion as well as
+payload movement. Interrupted workloads require implemented, qualified reconciliation;
+a longer budget or restarting an unknown lease is not resumption. Staging failures retain partial files
 and task/lease/object identities. Secure the spool and retain readable keys under
 owner policy until separately authorized cleanup.
 

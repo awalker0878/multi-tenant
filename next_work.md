@@ -7,12 +7,23 @@ phase-concurrency limits and independently published resource observations. See
 limits. The [runtime/commissioning increment](docs/implementation/p08-runtime-commissioning.md)
 adds six-account read-only checks, protected native worker composition, immutable
 recipe-based Planning proposals, bulk Console plan creation and VM-scoped custody.
-Actual account commissioning, complete native owner/approval and execution-plan
-resolver integration, native measurement producers, selected guest/data/service/recovery
-adapters, long-transfer resumption and Q07/G08 acceptance remain open. The
+The [native control increment](docs/implementation/p08-native-control.md) now supplies
+the Lifecycle process/dispatcher, live Planning/Governance/Inventory owner reads, an
+immutable resolver, unattended recipe revocation and explicit long movement budgets.
+Actual account/provider-custody commissioning, native measurement producers, selected
+guest/data/service/recovery adapters, interrupted-transfer reconciliation and Q07/G08
+acceptance remain open. The
 [completion packet](docs/implementation/p08-completion-review.md) identifies the
 source/target secret references, lab placement and application-owner protocols
 needed to make that work concrete. Existing development authorization continues.
+
+The [native control evidence](verification/p08/control/README.md) qualifies source
+`f765eb9fba61a16565d4085d8e51a4e0ec681ddd`: all 36 commands and 951 component tests
+without skips, all 30 compiler-to-resolver combinations and three migration browser
+journeys pass. Separate unchanged Governance source passes 219 PostgreSQL tests,
+5,919 assertions and 160 campaign checks. Original archives and the architecture
+failure/correction are retained at `c801a13e4b172e6b307303a4c7eccb6e1511e8c6`.
+EV-P08-008 records these boundaries without closing either P08 blocker.
 
 The [runtime evidence](verification/p08/runtime/README.md) qualifies source
 `7860616293cc0be7a1983ca7bc38529aed5e5b7f`: 893 component tests without skips,
@@ -51,12 +62,13 @@ separates unfinished software (BL-P08-001) from actual native/owner inputs
    Console review. Preserve the accepted rebuild/restore baseline; its concrete
    guest, data, service and recovery protocols still need their actual owner records.
 2. Commission the protected recipes and create complete proposals from the current
-   Planning assessment and exact VM review. Bind the native execution-plan resolver,
-   current owner/approval/custody interfaces and selected stage effects with independent
+   Planning assessment and exact VM review. Configure the delivered native resolver,
+   current approval/Inventory interfaces, independent provider-custody and selected stage effects with independent
    readback; qualify the actual converter rootfs and copied-guest profile. Bind the
    selected application/file delta, service, native writer-fence, traffic, recovery
    and cleanup protocols. Extend transfer continuation only with reconciled byte
-   ranges/custody and renewed authority; the current activity has a ten-minute bound.
+   ranges/custody and renewed authority. Version 2 movement now allows up to one day;
+   shorter profile/plan/credential expiry still wins and interruption remains held.
 3. Obtain the packet's exact VMware/OpenStack tuple, guest/data/method/objectives,
    scoped identities, service/fencing protocols and authorized native lab. Complete
    the G07 path and its Q05/Q06 obligations before native P08 acceptance.

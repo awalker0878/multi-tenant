@@ -8,8 +8,9 @@ the operation. No registry entry can select a simulation adapter or a Python imp
 
 This supplies a product runtime, not actual source/target accounts or a qualified
 native migration. Planning can now compose complete immutable proposals. Lifecycle
-native-owner integration and the selected application/guest/service implementation
-are still required. P08/G08 remain
+now composes live Planning/Governance/Inventory reads through the
+[native control service](p08-native-control.md). Commissioned provider custody/fencing
+and the selected application/guest/service implementation are still required. P08/G08 remain
 open until their original obligations are met.
 
 ## Complete Planning proposals and bulk Console
@@ -67,10 +68,11 @@ The same source VM cannot evade that hold by changing applications or destinatio
 projects. Application-wide provision/retire holds still conflict. Existing retained
 application-keyed jobs remain visible and recoverable across the upgrade.
 
-The native owner port still needs real Governance/Inventory/custody reads and a
-commissioned execution-plan resolver. The simulation approval endpoint remains
-unsuitable for this purpose. This increment supplies proposal construction and worker
-composition; it does not establish the missing end-to-end native authority path.
+The subsequent [native control increment](p08-native-control.md) supplies live
+Governance/Inventory/Planning clients and an immutable execution-plan resolver. It
+checks native consent separately from provider custody/fencing; simulation approval
+receipts are rejected. Independent native custody and observation endpoints must be
+commissioned against the actual installation before native effects can be admitted.
 
 ## Worker process
 
