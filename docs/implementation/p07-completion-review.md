@@ -5,6 +5,11 @@ concrete; it does not replace [G07](gates.md#g07--native-openstack-provisioning)
 claim a review occurred, or reduce the required native scope. Existing development
 authorization and G00 approval remain effective.
 
+The [P07 product-control increment](p07-native-control.md) adds immutable provision/retire
+composition, authenticated native job admission/read/stop, and independent owner
+credential checks. The [P10 engineering campaign](p10-completion-review.md) exercises
+candidate-bound regressions and recovery preparation. Native acceptance remains open.
+
 ## Supplied preparation and remaining outputs
 
 | Package | Supplied preparation | Remaining output and prerequisite |

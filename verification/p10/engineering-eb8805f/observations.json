@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "source_revision": "eb8805ff74fa780b6ab0ba021322253c62a7d37f",
+  "run_id": 37700591172,
+  "job_id": 113062827911,
+  "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591172",
+  "result": "PASSED_ENGINEERING_CHECKS",
+  "evidence_level": "E2",
+  "g10_status": "HELD",
+  "native_write_authorized": false,
+  "release_authorized": false,
+  "artifacts": [
+    {
+      "id": 11517127973,
+      "name": "p10-qualification-37700591172-1",
+      "size_in_bytes": 108501,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11517127973",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11517127973/zip",
+      "expired": false,
+      "created_at": "2026-10-07T23:11:58Z",
+      "expires_at": "2027-01-05T23:09:18Z",
+      "updated_at": "2026-10-07T23:11:58Z",
+      "digest": "sha256:c6f719fb66981a5f918787c49686e7cbad49c99d2378be38e4f5a64e137e0a54",
+      "workflow_run": {
+        "id": 37700591172,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "eb8805ff74fa780b6ab0ba021322253c62a7d37f"
+      }
+    }
+  ],
+  "measurements": {
+    "capacity_claim": false,
+    "error_fraction": 0,
+    "jain_fairness": 1,
+    "latency_ms": {
+      "max": 19.449634,
+      "p50": 17.070183,
+      "p95": 18.6622,
+      "p99": 19.449634
+    },
+    "measurement_seconds": 3.394591451,
+    "non_success": 0,
+    "percentile_method": "nearest_rank_all_attempts_no_warmup_exclusion",
+    "samples": 48,
+    "slo_result": "NOT_EVALUATED",
+    "succeeded": 48,
+    "tenant_attempts": {
+      "1d1eab4b-445c-457f-9ee0-60efa3fa7ec4": 4,
+      "3d115f13-fdb0-4c67-b0ce-3fdbced23600": 4,
+      "55399730-a187-4966-acff-b769bde5d850": 4,
+      "5bfed23b-c424-44f3-b1b3-9aa865529701": 4,
+      "5f3f7d89-06e5-431a-8deb-23fc4d9a248c": 4,
+      "8feb40b5-2fbf-4887-8f3e-a8d278fb426b": 4,
+      "b9608e81-17c3-4dcb-b993-2759abe0ecd5": 4,
+      "bccdaca4-ab4e-48aa-8df7-f36cbffde7a7": 4,
+      "d0d3a863-fb06-4f5f-9e69-58d7ba993230": 4,
+      "f40e75b0-ca08-4cc6-9d25-03e0eccfc974": 4,
+      "fce24c5a-116e-4549-af46-d25cfcf9dd46": 4,
+      "fe4416cd-bf47-4f6d-9432-16b95bb346ba": 4
+    },
+    "tenant_successes": {
+      "1d1eab4b-445c-457f-9ee0-60efa3fa7ec4": 4,
+      "3d115f13-fdb0-4c67-b0ce-3fdbced23600": 4,
+      "55399730-a187-4966-acff-b769bde5d850": 4,
+      "5bfed23b-c424-44f3-b1b3-9aa865529701": 4,
+      "5f3f7d89-06e5-431a-8deb-23fc4d9a248c": 4,
+      "8feb40b5-2fbf-4887-8f3e-a8d278fb426b": 4,
+      "b9608e81-17c3-4dcb-b993-2759abe0ecd5": 4,
+      "bccdaca4-ab4e-48aa-8df7-f36cbffde7a7": 4,
+      "d0d3a863-fb06-4f5f-9e69-58d7ba993230": 4,
+      "f40e75b0-ca08-4cc6-9d25-03e0eccfc974": 4,
+      "fce24c5a-116e-4549-af46-d25cfcf9dd46": 4,
+      "fe4416cd-bf47-4f6d-9432-16b95bb346ba": 4
+    },
+    "throughput_per_second": 14.140140483138216,
+    "unserved_tenants": []
+  },
+  "restore": {
+    "scope": "single_lifecycle_database_real_pg_dump_restore_synthetic_custody",
+    "restore_and_denial_ms": 285.988129,
+    "old_grant_denied": true,
+    "accepted_synthetic_effects": 1,
+    "native_write_authorized": false,
+    "full_control_plane_rto_claim": false
+  },
+  "retrieval": {
+    "job_log": "Connected GitHub API, original decoded job log retained verbatim",
+    "artifact_bytes_downloaded": false,
+    "artifact_note": "Artifact metadata is reported by GitHub; signed download returned HTTP 403 in this workspace. ZIP bytes not independently rehashed.",
+    "job_log_sha256": "b681e847a9a8398a87d322f6d6e4d7eaaa68fa1aacea15d45a83641794548b07"
+  },
+  "limitations": [
+    "Synthetic native owners with real PostgreSQL and TLS; no native throughput claim.",
+    "Single Lifecycle database restore with synthetic independent custody; no coordinated control-plane RTO claim.",
+    "Local TLS alert receiver; no receiving-team acknowledgement or G10 decision."
+  ]
+}

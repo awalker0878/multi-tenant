@@ -3,23 +3,20 @@
 P09 remains IN_PROGRESS; G09 remains NOT_REVIEWED. This packet identifies the
 concrete publication step, unexecuted qualification and remaining exact-tuple work.
 
-## Prepared publication
+## Published development work
 
-| Item | Concrete scope |
-| --- | --- |
-| Repository | `https://github.com/awalker0878/multi-tenant` |
-| Observed visibility | Public, as reported by the GitHub repository API during this task |
-| Prepared branch | `implementation/p09-expansion-20261007` |
-| Baseline | `8b26bc81af3c3102b7d2d73653359bd0aae93f48` from `greenfield/enterprise-microservices-plan` |
-| Payload | P09 Planning contracts/schema; Lifecycle adoption/enterprise API and SQL migration; VMware/AHV worker adapters and signed package validation; tests/workflow; implementation/runbook/register/handoff updates |
-| Immediate effect | Publish the commits on the named branch and run its P09 GitHub Actions workflow |
-| Approval boundary | Automatic approval review rejected `git push -u origin implementation/p09-expansion-20261007`, stating that the payload and external destination need explicit authorization. No alternate publication route was used. |
+The user approved public publication and selected
+`greenfield/enterprise-microservices-plan`. All nine P09 commits were published
+there, ending at `f7001d3e75cffa13b28701f184c076a1bd1854af`. The published tree
+matches the prepared local tree exactly; the original local branch is preserved.
 
-The commit list is available with `git log --oneline
-8b26bc81af3c3102b7d2d73653359bd0aae93f48..HEAD`; the reviewable changes are available
-with `git diff 8b26bc81af3c3102b7d2d73653359bd0aae93f48..HEAD`. This publication does
-not authorize main-branch merging, deployment or native changes. Earlier private
-repository intent cannot establish permission to publish new work publicly.
+The full PostgreSQL-backed P09 campaign passed at that source in
+[run 37697578952](https://github.com/awalker0878/multi-tenant/actions/runs/37697578952).
+It also passed with the P07/P08 product-control changes at `58807949bca43c46bbee77bd3fda382f983351a5`
+in [run 37699712413](https://github.com/awalker0878/multi-tenant/actions/runs/37699712413).
+The original local skips below are historical observations, not current unexecuted
+component cases. BL-P09-001 is resolved. Actual tuple qualification and receiving
+acceptance remain open.
 
 ## Reviewable local verification
 
@@ -36,7 +33,7 @@ matches. The original artifacts are in local commit
 | Native worker | 277 passed; 15 PostgreSQL cases skipped |
 | All three components | Locked installs, lint, format, strict typing and wheel builds passed |
 | Schema / architecture | Schema passed; original generated-build-copy architecture failure retained and corrected without weakening the gate |
-| Full P09 / native qualification | Not passed / not executed |
+| Original local P09 / native qualification | Incomplete locally / not executed; full hosted component conformance subsequently passed above |
 
 Publishing alone will not complete P09. The workflow must run and the selected
 integration and actual native/receiving obligations below must also be fulfilled.
@@ -45,7 +42,7 @@ integration and actual native/receiving obligations below must also be fulfilled
 
 | Blocker | Owner | Unblock condition and next executable work |
 | --- | --- | --- |
-| BL-P09-001: complete verification/publication | Requesting user and quality | Approve the exact public branch publication above. Run P09 conformance with real PostgreSQL; repair any failure, retain original outputs, then repeat only affected checks. Local PostgreSQL skips remain unexecuted until this passes. |
+| BL-P09-001: complete verification/publication | Requesting user and quality | RESOLVED: approved publication to the selected greenfield branch and passing full hosted PostgreSQL conformance. Original local limitations remain in their historical evidence. |
 | BL-P09-002: exact tranche and selected integrations | Product/architecture, platform, service and SRE owners | Select actual source/target instances, API/backend/network/storage/guest versions and operations. Supply API-observed profile revisions, owner-only constraints, selected service/HA/patch/rotation/scaling protocols, native exclusion and independent readback. Implement/compose those selected effects and dispatcher/worker boundary connections; qualify them against the common controls. |
 | BL-P09-003: native and receiving qualification | Platform/security/qualification owners and independent observers | Supply scoped lab authority, actual read/write identities and custody, accepted impact budgets, guest/data/recovery objectives and receiving reviewers. Execute Q02/Q04–Q08/Q10 obligations for every advertised tuple; retain positive, denied, drift, response-loss, recovery, pause/stop and upgrade outcomes. Record real G09 decisions. |
 

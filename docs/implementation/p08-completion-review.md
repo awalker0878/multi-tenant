@@ -31,6 +31,11 @@ migration browser journeys at `f765eb9`. Separate unchanged Governance source pa
 219 PostgreSQL tests and 160 campaign checks. The original architecture failure and
 its passing correction remain retained. These results do not supply native acceptance.
 
+The [P07 product-control increment](p07-native-control.md) adds immutable provision/retire
+composition, authenticated native job admission/read/stop, and independent owner
+credential checks. The [P10 engineering campaign](p10-completion-review.md) exercises
+candidate-bound regressions and recovery preparation. Native acceptance remains open.
+
 ## Remaining implementation
 
 | Package | Delivered software | Remaining output |

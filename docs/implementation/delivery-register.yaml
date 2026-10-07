@@ -293,6 +293,8 @@ phases:
     failures and metadata binding discrepancies are retained with corrections. Current-owner/caller trust, native
     request fencing, selected guest/service/traffic/retirement adapters and actual Q05/Q06 remain outstanding. P07
     and G07 are incomplete; migration belongs to P08.
+  doc_refs:
+  - docs/implementation/p07-native-control.md
 - id: P08
   title: VMware-to-OpenStack migration
   owner_role: Infrastructure and application owner
@@ -324,15 +326,16 @@ phases:
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
-  delivery_note: Native Lifecycle TLS service/dispatcher, exact Planning resolver, live Governance operational
-    approval and scoped current Inventory reads are delivered, including unattended recipe revocation and
-    explicit version 2 movement budgets up to one day within current authority. Source f765eb9 passes
-    all 36 component commands and 951 tests without skips plus all three migration browser journeys.
-    Unchanged Governance owner source 576643e passes 219 PostgreSQL tests, 5919 assertions and 160 campaign
-    checks. Original architecture failure/correction and exact source/archive bindings are retained.
-    Actual account/provider-custody commissioning, native measurements, converter/guest qualification,
-    selected data/service/fencing/traffic/recovery/cleanup protocols and interrupted-transfer reconciliation
-    remain. No native Q07, G08 or operating acceptance is inferred.
+  delivery_note: Native Lifecycle TLS service/dispatcher, exact Planning resolver, live Governance operational approval
+    and scoped current Inventory reads are delivered, including unattended recipe revocation and explicit version
+    2 movement budgets up to one day within current authority. Source f765eb9 passes all 36 component commands and
+    951 tests without skips plus all three migration browser journeys. Unchanged Governance owner source 576643e
+    passes 219 PostgreSQL tests, 5919 assertions and 160 campaign checks. Original architecture failure/correction
+    and exact source/archive bindings are retained. Actual account/provider-custody commissioning, native measurements,
+    converter/guest qualification, selected data/service/fencing/traffic/recovery/cleanup protocols and interrupted-transfer
+    reconciliation remain. No native Q07, G08 or operating acceptance is inferred.
+  doc_refs:
+  - docs/implementation/p07-native-control.md
 - id: P09
   title: Platform and capability expansion
   owner_role: Infrastructure and qualification leads
@@ -356,16 +359,13 @@ phases:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P09-001
+  - EV-P09-002
   blocker_ids:
-  - BL-P09-001
   - BL-P09-002
   - BL-P09-003
-  delivery_note: Exact tranche/migration contracts, durable adoption and enterprise controls, signed VMware/AHV
-    lifecycle adapters and conformance tooling are locally committed on implementation/p09-expansion-20261007. Partial
-    local evidence records 881 passing tests and 79 unexecuted PostgreSQL cases, with the original architecture
-    failure and correction retained. Public branch publication was blocked by automatic approval review. Real tranche
-    selection, selected enterprise/native integrations, complete database qualification and independent native/receiving
-    campaigns remain; P09 and G09 are not complete.
+  delivery_note: Published with explicit user approval to greenfield/enterprise-microservices-plan. Full hosted
+    PostgreSQL conformance passes; exact native tranche, selected owner/native integrations and independent receiving
+    campaigns remain open.
 - id: P10
   title: Enterprise operating qualification
   owner_role: Platform/SRE and security leads
@@ -382,12 +382,24 @@ phases:
   - P10.06
   gate_id: G10
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P10-001
+  - EV-P10-002
+  blocker_ids:
+  - BL-P10-001
+  - BL-P10-002
+  doc_refs:
+  - docs/implementation/p10-completion-review.md
+  - scripts/p10/README.md
+  delivery_note: Candidate-bound engineering tools and campaign implemented. E2 checks cover synthetic scheduler
+    load, actual single-database stale restore, artifact/alert controls and held dossier checks; actual native operating
+    and receiving acceptance remains unavailable. Hosted source eb8805f passes all engineering commands; G10 remains
+    HELD with explicit missing records. Final b741159 refinement passes 990 component tests with zero skips and
+    all campaign commands.
 - id: P11
   title: Pilot and supported release
   owner_role: Product and service owner
@@ -1774,6 +1786,7 @@ work_packages:
   - docs/implementation/p07-native-provisioning.md
   - docs/operations/runbooks/openstack-commissioning.md
   - docs/implementation/p07-completion-review.md
+  - docs/implementation/p07-native-control.md
   criterion_ids:
   - G07.01
   - G07.02
@@ -1821,6 +1834,7 @@ work_packages:
   - docs/operations/runbooks/native-workflow-control.md
   - docs/implementation/phases/p07.md
   - docs/implementation/p07-completion-review.md
+  - docs/implementation/p07-native-control.md
   criterion_ids:
   - G07.01
   - G07.02
@@ -1848,6 +1862,7 @@ work_packages:
   - docs/operations/runbooks/openstack-native-adapters.md
   - docs/implementation/phases/p07.md
   - docs/implementation/p07-completion-review.md
+  - docs/implementation/p07-native-control.md
   criterion_ids:
   - G07.03
   - G07.04
@@ -1905,18 +1920,17 @@ work_packages:
   - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
+  - docs/implementation/p07-native-control.md
   criterion_ids:
   - G08.01
   - G08.02
-  delivery_note: API-first leased profiles and fleet discovery support paged GUI selection, immutable groups
-    and independent per-VM review/confirmation. Planning now composes complete immutable recipe-based
-    proposals from current actor-owned qualified bases and exact confirmed profiles; bulk Console creation
-    retains uncertain commands and handles definite commissioning holds. Six-account probes check distinct
-    identities, current scope and explicit permissions. E2 PostgreSQL, TLS, Laravel and browser checks pass.
-    Native control supplies current Planning/Governance/Inventory clients, an immutable resolver and
-    unattended recipe revocation. Actual owner account/provider-custody commissioning and installed workload
-    qualification remain; proposals grant no native execution
-    authority.
+  delivery_note: API-first leased profiles and fleet discovery support paged GUI selection, immutable groups and
+    independent per-VM review/confirmation. Planning now composes complete immutable recipe-based proposals from
+    current actor-owned qualified bases and exact confirmed profiles; bulk Console creation retains uncertain commands
+    and handles definite commissioning holds. Six-account probes check distinct identities, current scope and explicit
+    permissions. E2 PostgreSQL, TLS, Laravel and browser checks pass. Native control supplies current Planning/Governance/Inventory
+    clients, an immutable resolver and unattended recipe revocation. Actual owner account/provider-custody commissioning
+    and installed workload qualification remain; proposals grant no native execution authority.
 - id: P08.02
   phase_id: P08
   title: Method and data movement
@@ -1944,15 +1958,16 @@ work_packages:
   - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
+  - docs/implementation/p07-native-control.md
   criterion_ids:
   - G08.01
-  delivery_note: Snapshot-bound isolated capture, retained NFC/manifest/OVF archives, copy-only conversion
-    and Glance-direct image import have protected executable worker composition with a fixed adapter
-    registry and independent readers. Immutable scope, intent, custody and in-flight registry revocation are
-    checked. Explicit version 2 movement budgets allow up to one day within current authority, while
-    version 1 retains 600 seconds. Actual converter rootfs/guest qualification, selected delta/restore/block implementations,
-    native Cinder/Nova mappings and reconciled long-transfer continuation remain. Owner-protocol transport
-    does not implement an unspecified guest or data protocol.
+  delivery_note: Snapshot-bound isolated capture, retained NFC/manifest/OVF archives, copy-only conversion and Glance-direct
+    image import have protected executable worker composition with a fixed adapter registry and independent readers.
+    Immutable scope, intent, custody and in-flight registry revocation are checked. Explicit version 2 movement
+    budgets allow up to one day within current authority, while version 1 retains 600 seconds. Actual converter
+    rootfs/guest qualification, selected delta/restore/block implementations, native Cinder/Nova mappings and reconciled
+    long-transfer continuation remain. Owner-protocol transport does not implement an unspecified guest or data
+    protocol.
 - id: P08.03
   phase_id: P08
   title: Rehearsal
@@ -1982,11 +1997,11 @@ work_packages:
   criterion_ids:
   - G08.01
   - G08.04
-  delivery_note: Immutable recipe composition preserves each explicit rehearsal stage set, omits
-    business-write admission and requires independent suppression, guest, data, service/policy and retention
-    observations. Worker composition accepts only explicitly commissioned adapters/readers. The actual
-    selected protocols and a measured all-dataset native rehearsal remain unfinished; E2 component and
-    browser checks do not establish business-effect suppression.
+  delivery_note: Immutable recipe composition preserves each explicit rehearsal stage set, omits business-write
+    admission and requires independent suppression, guest, data, service/policy and retention observations. Worker
+    composition accepts only explicitly commissioned adapters/readers. The actual selected protocols and a measured
+    all-dataset native rehearsal remain unfinished; E2 component and browser checks do not establish business-effect
+    suppression.
 - id: P08.04
   phase_id: P08
   title: Cutover
@@ -2017,12 +2032,10 @@ work_packages:
   criterion_ids:
   - G08.02
   - G08.04
-  delivery_note: Version 2 migration admission binds current profiles/method/datasets and orders final sync,
-    source shutdown, integrity and activation. First possible write is committed with grant redemption.
-    Complete immutable cutover proposals, native resolver/current approval reads and VM-scoped custody
-    are delivered. Independent native all-writer
-    fencing, provider drain and actual guest/service/traffic composition
-    remain required.
+  delivery_note: Version 2 migration admission binds current profiles/method/datasets and orders final sync, source
+    shutdown, integrity and activation. First possible write is committed with grant redemption. Complete immutable
+    cutover proposals, native resolver/current approval reads and VM-scoped custody are delivered. Independent native
+    all-writer fencing, provider drain and actual guest/service/traffic composition remain required.
 - id: P08.05
   phase_id: P08
   title: Recovery decisions
@@ -2051,11 +2064,10 @@ work_packages:
   - docs/operations/runbooks/native-migration.md
   criterion_ids:
   - G08.03
-  delivery_note: Separately composed pre-write and post-write recovery plans, monotonic custody, atomic
-    predecessor stop and retained write ancestry pass real PostgreSQL checks. VM-scoped holds permit
-    distinct source VMs in one application while preserving duplicate-VM exclusion and legacy
-    application-keyed recovery. Actual forward/reverse data recovery, single-writer restoration,
-    cleanup/consolidation and owner-objective measurements remain unfinished.
+  delivery_note: Separately composed pre-write and post-write recovery plans, monotonic custody, atomic predecessor
+    stop and retained write ancestry pass real PostgreSQL checks. VM-scoped holds permit distinct source VMs in
+    one application while preserving duplicate-VM exclusion and legacy application-keyed recovery. Actual forward/reverse
+    data recovery, single-writer restoration, cleanup/consolidation and owner-objective measurements remain unfinished.
 - id: P08.06
   phase_id: P08
   title: Acceptance
@@ -2092,8 +2104,8 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P09-001
+  - EV-P09-002
   blocker_ids:
-  - BL-P09-001
   - BL-P09-002
   - BL-P09-003
   doc_refs:
@@ -2104,10 +2116,9 @@ work_packages:
   criterion_ids:
   - G09.01
   - G09.02
-  delivery_note: Five VMware/AHV lifecycle operation components and exact eleven-dimension profile/tranche constraints
-    are implemented. Native API transports, plan drift and denied package admission have local synthetic checks.
-    Business-selected installed tuples, additional selected operations and native conformance remain open; no platform-wide
-    parity is claimed.
+  delivery_note: Published with explicit user approval to greenfield/enterprise-microservices-plan. Full hosted
+    PostgreSQL conformance passes; exact native tranche, selected owner/native integrations and independent receiving
+    campaigns remain open.
 - id: P09.02
   phase_id: P09
   title: Migration matrix
@@ -2119,8 +2130,8 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P09-001
+  - EV-P09-002
   blocker_ids:
-  - BL-P09-001
   - BL-P09-002
   - BL-P09-003
   doc_refs:
@@ -2131,10 +2142,9 @@ work_packages:
   criterion_ids:
   - G09.01
   - G09.02
-  delivery_note: Six directed cross-platform and three same-family route choices are represented independently with
-    Linux/Windows/appliance and five-method qualification plans. Exact source/target, guest, data, policy, service,
-    recovery and artifact bindings prevent acceptance inheritance. Actual selected rows, method implementations
-    and independently measured direction/guest recovery outcomes remain open.
+  delivery_note: Published with explicit user approval to greenfield/enterprise-microservices-plan. Full hosted
+    PostgreSQL conformance passes; exact native tranche, selected owner/native integrations and independent receiving
+    campaigns remain open.
 - id: P09.03
   phase_id: P09
   title: Brownfield adoption
@@ -2146,8 +2156,8 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P09-001
+  - EV-P09-002
   blocker_ids:
-  - BL-P09-001
   - BL-P09-002
   - BL-P09-003
   doc_refs:
@@ -2157,10 +2167,9 @@ work_packages:
   - docs/operations/runbooks/platform-expansion.md
   criterion_ids:
   - G09.03
-  delivery_note: PostgreSQL adoption journal and authenticated owner-backed API implement observation, no-change
-    import, separate transfer, collision/drift holds, reconciliation and controlled detach. PostgreSQL integration
-    tests are retained but unexecuted locally. Native field collectors, principal mapping, old-writer exclusion
-    and Q02/Q08 brownfield qualification remain open.
+  delivery_note: Published with explicit user approval to greenfield/enterprise-microservices-plan. Full hosted
+    PostgreSQL conformance passes; exact native tranche, selected owner/native integrations and independent receiving
+    campaigns remain open.
 - id: P09.04
   phase_id: P09
   title: Enterprise capabilities
@@ -2172,8 +2181,8 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P09-001
+  - EV-P09-002
   blocker_ids:
-  - BL-P09-001
   - BL-P09-002
   - BL-P09-003
   doc_refs:
@@ -2184,11 +2193,9 @@ work_packages:
   criterion_ids:
   - G09.02
   - G09.04
-  delivery_note: Enterprise contracts, dependency/window scheduling, shared tenant/endpoint/correlated budgets,
-    fair dispatch, object claims, pause/stop and independent reconciliation are implemented. Database race/restart
-    checks remain unexecuted locally. Selected HA/policy/patch/rotation/scale effects, current owner producers and
-    dispatcher/worker boundary composition still require implementation and qualification; generic contracts do
-    not complete these operations.
+  delivery_note: Published with explicit user approval to greenfield/enterprise-microservices-plan. Full hosted
+    PostgreSQL conformance passes; exact native tranche, selected owner/native integrations and independent receiving
+    campaigns remain open.
 - id: P09.05
   phase_id: P09
   title: Extension contract
@@ -2200,8 +2207,8 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P09-001
+  - EV-P09-002
   blocker_ids:
-  - BL-P09-001
   - BL-P09-002
   - BL-P09-003
   doc_refs:
@@ -2212,40 +2219,54 @@ work_packages:
   criterion_ids:
   - G09.01
   - G09.04
-  delivery_note: Ed25519 signed package admission binds exact artifact and installed implementation bytes, capabilities,
-    interface versions, expiry, revocation and retest triggers. Native registry composition, independent reader
-    checks and upgrade/recovery transition validation have local checks. Real signing custody, accepted compatibility
-    transitions and complete/native conformance remain open.
+  delivery_note: Published with explicit user approval to greenfield/enterprise-microservices-plan. Full hosted
+    PostgreSQL conformance passes; exact native tranche, selected owner/native integrations and independent receiving
+    campaigns remain open.
 - id: P10.01
   phase_id: P10
   title: Resilience and performance
   owner_role: SRE/quality
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P10-001
+  - EV-P10-002
+  blocker_ids:
+  - BL-P10-001
+  - BL-P10-002
   doc_refs:
   - docs/implementation/phases/p10.md
   - docs/engineering/coverage.md
   - docs/engineering/data-and-messaging.md
   - docs/operations/observability.md
   - docs/engineering/testing-and-ci.md
+  - docs/implementation/p10-completion-review.md
+  - scripts/p10/README.md
   criterion_ids:
   - G10.01
+  delivery_note: Candidate-bound engineering tools and campaign implemented. E2 checks cover synthetic scheduler
+    load, actual single-database stale restore, artifact/alert controls and held dossier checks; actual native operating
+    and receiving acceptance remains unavailable. Hosted source eb8805f passes all engineering commands; G10 remains
+    HELD with explicit missing records. Final b741159 refinement passes 990 component tests with zero skips and
+    all campaign commands.
 - id: P10.02
   phase_id: P10
   title: Recovery and upgrades
   owner_role: SRE
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P10-001
+  - EV-P10-002
+  blocker_ids:
+  - BL-P10-001
+  - BL-P10-002
   doc_refs:
   - docs/implementation/phases/p10.md
   - docs/engineering/coverage.md
@@ -2253,75 +2274,119 @@ work_packages:
   - docs/operations/runbooks/upgrade.md
   - docs/contracts/README.md
   - docs/engineering/laravel-conventions.md
+  - docs/implementation/p10-completion-review.md
+  - scripts/p10/README.md
   criterion_ids:
   - G10.01
   - G10.02
+  delivery_note: Candidate-bound engineering tools and campaign implemented. E2 checks cover synthetic scheduler
+    load, actual single-database stale restore, artifact/alert controls and held dossier checks; actual native operating
+    and receiving acceptance remains unavailable. Hosted source eb8805f passes all engineering commands; G10 remains
+    HELD with explicit missing records. Final b741159 refinement passes 990 component tests with zero skips and
+    all campaign commands.
 - id: P10.03
   phase_id: P10
   title: Security assurance
   owner_role: Security
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P10-001
+  - EV-P10-002
+  blocker_ids:
+  - BL-P10-001
+  - BL-P10-002
   doc_refs:
   - docs/implementation/phases/p10.md
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
   - docs/engineering/developer-workflow.md
+  - docs/implementation/p10-completion-review.md
+  - scripts/p10/README.md
   criterion_ids:
   - G10.03
+  delivery_note: Candidate-bound engineering tools and campaign implemented. E2 checks cover synthetic scheduler
+    load, actual single-database stale restore, artifact/alert controls and held dossier checks; actual native operating
+    and receiving acceptance remains unavailable. Hosted source eb8805f passes all engineering commands; G10 remains
+    HELD with explicit missing records. Final b741159 refinement passes 990 component tests with zero skips and
+    all campaign commands.
 - id: P10.04
   phase_id: P10
   title: Operations
   owner_role: SRE/service owner
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P10-001
+  - EV-P10-002
+  blocker_ids:
+  - BL-P10-001
+  - BL-P10-002
   doc_refs:
   - docs/implementation/phases/p10.md
   - docs/engineering/coverage.md
   - docs/operations/observability.md
   - docs/engineering/testing-and-ci.md
+  - docs/implementation/p10-completion-review.md
+  - scripts/p10/README.md
   criterion_ids:
   - G10.04
+  delivery_note: Candidate-bound engineering tools and campaign implemented. E2 checks cover synthetic scheduler
+    load, actual single-database stale restore, artifact/alert controls and held dossier checks; actual native operating
+    and receiving acceptance remains unavailable. Hosted source eb8805f passes all engineering commands; G10 remains
+    HELD with explicit missing records. Final b741159 refinement passes 990 component tests with zero skips and
+    all campaign commands.
 - id: P10.05
   phase_id: P10
   title: Installation qualification
   owner_role: SRE/quality
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P10-001
+  - EV-P10-002
+  blocker_ids:
+  - BL-P10-001
+  - BL-P10-002
   doc_refs:
   - docs/implementation/phases/p10.md
   - docs/engineering/coverage.md
   - docs/operations/deployment-model.md
   - docs/operations/runbooks/install.md
+  - docs/implementation/p10-completion-review.md
+  - scripts/p10/README.md
   criterion_ids:
   - G10.02
   - G10.03
+  delivery_note: Candidate-bound engineering tools and campaign implemented. E2 checks cover synthetic scheduler
+    load, actual single-database stale restore, artifact/alert controls and held dossier checks; actual native operating
+    and receiving acceptance remains unavailable. Hosted source eb8805f passes all engineering commands; G10 remains
+    HELD with explicit missing records. Final b741159 refinement passes 990 component tests with zero skips and
+    all campaign commands.
 - id: P10.06
   phase_id: P10
   title: Release dossier
   owner_role: Quality/product
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P10-001
+  - EV-P10-002
+  blocker_ids:
+  - BL-P10-001
+  - BL-P10-002
   doc_refs:
   - docs/implementation/phases/p10.md
   - docs/engineering/coverage.md
@@ -2332,11 +2397,18 @@ work_packages:
   - architecture/context-map.yaml
   - docs/architecture/context-code-structure.md
   - docs/decisions/adr-024-pragmatic-laravel-domain-convention.md
+  - docs/implementation/p10-completion-review.md
+  - scripts/p10/README.md
   criterion_ids:
   - G10.01
   - G10.02
   - G10.03
   - G10.04
+  delivery_note: Candidate-bound engineering tools and campaign implemented. E2 checks cover synthetic scheduler
+    load, actual single-database stale restore, artifact/alert controls and held dossier checks; actual native operating
+    and receiving acceptance remains unavailable. Hosted source eb8805f passes all engineering commands; G10 remains
+    HELD with explicit missing records. Final b741159 refinement passes 990 component tests with zero skips and
+    all campaign commands.
 - id: P11.01
   phase_id: P11
   title: Production commissioning
@@ -4171,7 +4243,6 @@ gates:
   evidence_ids:
   - EV-P09-001
   blocker_ids:
-  - BL-P09-001
   - BL-P09-002
   - BL-P09-003
 - id: G10
@@ -4179,8 +4250,12 @@ gates:
   decision: NOT_REVIEWED
   reviewer: null
   reviewed_at: null
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P10-001
+  - EV-P10-002
+  blocker_ids:
+  - BL-P10-001
+  - BL-P10-002
 - id: G11
   phase_id: P11
   decision: NOT_REVIEWED
@@ -6646,12 +6721,12 @@ evidence:
   artifact_revisions:
     retained_artifact_commit: 3a1ca27112c77ad32540f8057584839d724c2988
     php_console_source: 8ad4e85d5c0ab416d8e864de54758c16201e3a15
-  environment: Managed local Python 3.12.14 and PHP 8.5.11; locked component dependencies; PostgreSQL cases
-    explicitly skipped locally.
-  scope: Strict Python lint/format/types and 180 unit cases pass with nine explicit PostgreSQL-only skips.
-    Four PHP components pass formatting, types, architecture and 524 tests with 34 database-only skips. Console
-    typecheck/build pass. PHP/Console source is byte-identical from 8ad4e85 to the final source; current-source
-    Python observations are retained separately.
+  environment: Managed local Python 3.12.14 and PHP 8.5.11; locked component dependencies; PostgreSQL cases explicitly
+    skipped locally.
+  scope: Strict Python lint/format/types and 180 unit cases pass with nine explicit PostgreSQL-only skips. Four
+    PHP components pass formatting, types, architecture and 524 tests with 34 database-only skips. Console typecheck/build
+    pass. PHP/Console source is byte-identical from 8ad4e85 to the final source; current-source Python observations
+    are retained separately.
   campaign_ids:
   - Q03
   criterion_ids:
@@ -6660,14 +6735,14 @@ evidence:
   - G05.03
   - G05.04
   observed_at: '2026-10-06T13:56:47.831094+00:00'
-  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently verified
-    retained source/archive/report/log bytes.
-  reviewer: Codex engineering consistency review only; designated G05 receiving and representative operator
-    review remain open.
-  limitations: Controlled source and allocation peers supply E1/E2 only. Synthetic E3-shaped dossiers confer
-    no native support. Actual P04 observations remain held. Loopback TLS and automated keyboard/reflow checks
-    do not establish operated ingress, native E3, representative comprehension or assistive support. P06 owns
-    actual admission/dispatch and immediate effect rechecks.
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently verified retained
+    source/archive/report/log bytes.
+  reviewer: Codex engineering consistency review only; designated G05 receiving and representative operator review
+    remain open.
+  limitations: Controlled source and allocation peers supply E1/E2 only. Synthetic E3-shaped dossiers confer no
+    native support. Actual P04 observations remain held. Loopback TLS and automated keyboard/reflow checks do not
+    establish operated ingress, native E3, representative comprehension or assistive support. P06 owns actual admission/dispatch
+    and immediate effect rechecks.
   valid_until: null
   invalidated_at: null
   artifact_uri: https://github.com/awalker0878/multi-tenant/blob/3a1ca27112c77ad32540f8057584839d724c2988/verification/p05/final/local/report.json
@@ -6678,12 +6753,11 @@ evidence:
   artifact_revisions:
     retained_artifact_commit: 3a1ca27112c77ad32540f8057584839d724c2988
     core_archive_sha256: a695c919960ce8346bcd93a2242e6630c036d0949c70ba5a69019e54c5a27b56
-  environment: GitHub Actions Ubuntu 24.04; real PostgreSQL 16 with verified TLS and separate owner/runtime
-    identities.
-  scope: All 110 Planning and 79 Lifecycle tests pass without skips, errors or failures. Includes immutable
-    persistence, tenant/actor command races, current validity, event-ID conflicts, separate authoritative
-    allocation competition, lost reply reconciliation, partial compensation, renew/confirm and live-resource
-    expiry holds. Strict lint, format, typing and exact consumer contract/fixture drift checks pass.
+  environment: GitHub Actions Ubuntu 24.04; real PostgreSQL 16 with verified TLS and separate owner/runtime identities.
+  scope: All 110 Planning and 79 Lifecycle tests pass without skips, errors or failures. Includes immutable persistence,
+    tenant/actor command races, current validity, event-ID conflicts, separate authoritative allocation competition,
+    lost reply reconciliation, partial compensation, renew/confirm and live-resource expiry holds. Strict lint,
+    format, typing and exact consumer contract/fixture drift checks pass.
   campaign_ids:
   - Q03
   criterion_ids:
@@ -6692,14 +6766,14 @@ evidence:
   - G05.03
   - G05.04
   observed_at: '2026-10-06T13:56:47.831094+00:00'
-  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently verified
-    retained source/archive/report/log bytes.
-  reviewer: Codex engineering consistency review only; designated G05 receiving and representative operator
-    review remain open.
-  limitations: Controlled source and allocation peers supply E1/E2 only. Synthetic E3-shaped dossiers confer
-    no native support. Actual P04 observations remain held. Loopback TLS and automated keyboard/reflow checks
-    do not establish operated ingress, native E3, representative comprehension or assistive support. P06 owns
-    actual admission/dispatch and immediate effect rechecks.
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently verified retained
+    source/archive/report/log bytes.
+  reviewer: Codex engineering consistency review only; designated G05 receiving and representative operator review
+    remain open.
+  limitations: Controlled source and allocation peers supply E1/E2 only. Synthetic E3-shaped dossiers confer no
+    native support. Actual P04 observations remain held. Loopback TLS and automated keyboard/reflow checks do not
+    establish operated ingress, native E3, representative comprehension or assistive support. P06 owns actual admission/dispatch
+    and immediate effect rechecks.
   valid_until: null
   invalidated_at: null
   artifact_uri: https://github.com/awalker0878/multi-tenant/blob/3a1ca27112c77ad32540f8057584839d724c2988/verification/p05/final/core/report.json
@@ -6714,12 +6788,11 @@ evidence:
     webkit_archive_sha256: f0b2e09a691a4d8a73562a633daf9d94f57ae4f714355e1353c01a202e65baa2
   environment: GitHub Actions Ubuntu 24.04; separate owner services over verified TLS; PostgreSQL 18.6, confirmed
     AMQPS; compiled Chromium/Firefox/WebKit.
-  scope: Each of three live campaigns passes 73 checks, with zero browser skips, retries or failures. Current
-    actor/source scope, real P04 declaration holds, two controlled destinations, canonical compilation, actual
-    independent Governance approval/digest validation, restart, qualification revocation, unchanged command
-    retry and protected history pass. Real Catalogue/Inventory facts commit in Planning; Planning confirmed
-    delivery replays the same event after lost receipt. Archive, source, report and raw-log bytes are independently
-    matched.
+  scope: Each of three live campaigns passes 73 checks, with zero browser skips, retries or failures. Current actor/source
+    scope, real P04 declaration holds, two controlled destinations, canonical compilation, actual independent Governance
+    approval/digest validation, restart, qualification revocation, unchanged command retry and protected history
+    pass. Real Catalogue/Inventory facts commit in Planning; Planning confirmed delivery replays the same event
+    after lost receipt. Archive, source, report and raw-log bytes are independently matched.
   campaign_ids:
   - Q03
   criterion_ids:
@@ -6728,14 +6801,14 @@ evidence:
   - G05.03
   - G05.04
   observed_at: '2026-10-06T13:56:47.831094+00:00'
-  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently verified
-    retained source/archive/report/log bytes.
-  reviewer: Codex engineering consistency review only; designated G05 receiving and representative operator
-    review remain open.
-  limitations: Controlled source and allocation peers supply E1/E2 only. Synthetic E3-shaped dossiers confer
-    no native support. Actual P04 observations remain held. Loopback TLS and automated keyboard/reflow checks
-    do not establish operated ingress, native E3, representative comprehension or assistive support. P06 owns
-    actual admission/dispatch and immediate effect rechecks.
+  observer: GitHub Actions executed hosted campaigns; Codex executed local checks and independently verified retained
+    source/archive/report/log bytes.
+  reviewer: Codex engineering consistency review only; designated G05 receiving and representative operator review
+    remain open.
+  limitations: Controlled source and allocation peers supply E1/E2 only. Synthetic E3-shaped dossiers confer no
+    native support. Actual P04 observations remain held. Loopback TLS and automated keyboard/reflow checks do not
+    establish operated ingress, native E3, representative comprehension or assistive support. P06 owns actual admission/dispatch
+    and immediate effect rechecks.
   valid_until: null
   invalidated_at: null
   artifact_uri: https://github.com/awalker0878/multi-tenant/blob/3a1ca27112c77ad32540f8057584839d724c2988/verification/p05/final/qualification-index.json
@@ -6950,24 +7023,24 @@ evidence:
   campaign_ids: []
   criterion_ids: []
   observed_at: '2026-10-07T02:19:23.252476+00:00'
-  observer: GitHub Actions hosted PostgreSQL/TLS/process/Terraform component and isolated browser campaigns;
-    Codex compared every retained archive, source binding, command log and artifact digest.
+  observer: GitHub Actions hosted PostgreSQL/TLS/process/Terraform component and isolated browser campaigns; Codex
+    compared every retained archive, source binding, command log and artifact digest.
   reviewer: Codex engineering consistency review only; designated native and receiving reviews remain open.
-  limitations: Synthetic provider responses and mocked Terraform plans only. No actual OpenStack environment,
-    native apply, provider-side fencing, guest/service integration, activation, restore or retirement is qualified.
-    Product native grant redemption and dispatch remain disabled. P06 core skips eight optional native journal
-    tests that separately run without skips in the P07 job. No P07 completion, G07 decision or operating acceptance.
+  limitations: Synthetic provider responses and mocked Terraform plans only. No actual OpenStack environment, native
+    apply, provider-side fencing, guest/service integration, activation, restore or retirement is qualified. Product
+    native grant redemption and dispatch remain disabled. P06 core skips eight optional native journal tests that
+    separately run without skips in the P07 job. No P07 completion, G07 decision or operating acceptance.
   valid_until: null
   invalidated_at: null
   artifact_uri: https://github.com/awalker0878/multi-tenant/blob/a0ee61dfbdf5d03ede3cda6932084e6ef5b90771/verification/p07/native-components/qualification-index.json
   sha256: 5e344f6548625da4ba79ccbda9ddcd0f7e46efece6901e2e352b6eaa014ad9f7
-  environment: GitHub Actions Ubuntu 24.04/Python 3.12.14/uv 0.12.19; real PostgreSQL and TLS peers;
-    pinned Terraform 1.13.5/provider 3.4.0 development schema candidates; compiled Chromium/Firefox/WebKit.
+  environment: GitHub Actions Ubuntu 24.04/Python 3.12.14/uv 0.12.19; real PostgreSQL and TLS peers; pinned Terraform
+    1.13.5/provider 3.4.0 development schema candidates; compiled Chromium/Firefox/WebKit.
   scope: 112 worker tests pass without skips; ten quality/build/Terraform commands pass and all 39 source bindings
     match. Each of three P06 browser campaigns passes 148 checks; all 1052 source bindings, 61 logs and 81 artifact
-    hashes match per campaign. Worker development image admission, signature/SBOM/denial/transfer checks pass.
-    Original failed image/migration/broker observations remain retained; the separate receipt records 17 workflow
-    passes at their own revisions, including Compose and Kubernetes.
+    hashes match per campaign. Worker development image admission, signature/SBOM/denial/transfer checks pass. Original
+    failed image/migration/broker observations remain retained; the separate receipt records 17 workflow passes
+    at their own revisions, including Compose and Kubernetes.
 - id: EV-P07-005
   level: E2
   source_revision: 880db145e2d90e0be6b23f7a744f592cf6af233f
@@ -7008,25 +7081,24 @@ evidence:
   campaign_ids: []
   criterion_ids: []
   observed_at: '2026-10-07T04:22:31.399329+00:00'
-  observer: GitHub Actions real Temporal/TLS and owner-separated PostgreSQL campaigns; Codex verified original
-    archive/source/log/artifact hashes and replayed six retained histories offline.
+  observer: GitHub Actions real Temporal/TLS and owner-separated PostgreSQL campaigns; Codex verified original archive/source/log/artifact
+    hashes and replayed six retained histories offline.
   reviewer: Codex engineering consistency review only; designated native and receiving reviews remain open.
   limitations: Native current authority, saved-plan tool and provider observations in the orchestration campaign
     are synthetic. Production current-owner/caller-trust composition, provider request fencing and selected guest/service/traffic/retirement
-    adapters remain unfinished. No actual OpenStack provisioning, Q05/Q06 native campaign, P07 completion, G07
-    decision or operating acceptance is established.
+    adapters remain unfinished. No actual OpenStack provisioning, Q05/Q06 native campaign, P07 completion, G07 decision
+    or operating acceptance is established.
   valid_until: null
   invalidated_at: null
   artifact_uri: https://github.com/awalker0878/multi-tenant/blob/5fd577fe63d3d1118d37ebf912a799e449684270/verification/p07/native-dispatch/qualification-index.json
   sha256: b05f1e79e9c93cec48a4426f945369c4227aa7c89cb540ef36e9357df0a1d96f
   environment: GitHub Actions Ubuntu 24.04/Python 3.12.14/uv 0.12.19; actual pinned Temporal, TLS/JWT, internal
-    TLS and PostgreSQL. Separate component campaign uses pinned Terraform 1.13.5/provider 3.4.0 with synthetic
-    native responses.
-  scope: 288 Lifecycle and 157 worker tests pass without skips; 18 component commands and 121 source bindings
-    match. Live orchestration passes 43 checks, six history replays, 207 source bindings and 19 artifact hashes.
-    Isolated worker passes with all 130 inputs unchanged at the final revision. Seven original archives preserve
-    the cancellation failure, correction, worker transport and complete histories; offline replay independently
-    passes.
+    TLS and PostgreSQL. Separate component campaign uses pinned Terraform 1.13.5/provider 3.4.0 with synthetic native
+    responses.
+  scope: 288 Lifecycle and 157 worker tests pass without skips; 18 component commands and 121 source bindings match.
+    Live orchestration passes 43 checks, six history replays, 207 source bindings and 19 artifact hashes. Isolated
+    worker passes with all 130 inputs unchanged at the final revision. Seven original archives preserve the cancellation
+    failure, correction, worker transport and complete histories; offline replay independently passes.
 - id: EV-P07-007
   level: E2
   source_revision: 4ee67fdd704f6b6c401237137e3d8e2940ba3d1a
@@ -7154,7 +7226,8 @@ evidence:
     workflows pass; original contract, UI and broker/Temporal regression failures remain separately recorded.
   limitations: E2 only. Preparation does not compose or approve a complete native MigrationPlan. Actual owner/trust/stage
     composition, converter rootfs/copied guest, application/service/delta/fencing/traffic/recovery/cleanup protocols
-    and long-transfer reconciliation remain required. No native Q07, G07/G08 review, P08 completion or operating acceptance.
+    and long-transfer reconciliation remain required. No native Q07, G07/G08 review, P08 completion or operating
+    acceptance.
 - id: EV-P08-005
   level: E2
   source_revision: 74ab8e41e2d1da90bb47f1b2794c9c7bf3778d66
@@ -7176,13 +7249,13 @@ evidence:
     and pinned Chromium; synthetic native/current-owner and browser HTTP peers.
   scope: API-discovered VM list, pagination, filters/grouping/bulk selection, persisted named groups, independent
     VM reviews and server-derived bulk OpenStack preparation. All 35 component commands and 785 tests pass with
-    no skips; five browser commands and both journeys pass. All 23 Console commands pass with 187 Pest passes,
-    894 assertions and seven explicit separate-campaign broker skips. Final reports verify 682/218/295 source
-    bindings. Original Inventory assertion, selector, Pint and Larastan failures remain retained with corrections.
-  limitations: E2 only; actual database, Laravel and browser with synthetic native/owner peers. Existing REST
-    listing and profile allowlist bounds remain. Bulk preparation is not complete-plan composition, approval or
-    native execution. Native owner/trust/stage composition, copied-guest/converter qualification and Q07/G07/G08
-    receiving remain open; no VM migration, P08 completion or operating acceptance is claimed.
+    no skips; five browser commands and both journeys pass. All 23 Console commands pass with 187 Pest passes, 894
+    assertions and seven explicit separate-campaign broker skips. Final reports verify 682/218/295 source bindings.
+    Original Inventory assertion, selector, Pint and Larastan failures remain retained with corrections.
+  limitations: E2 only; actual database, Laravel and browser with synthetic native/owner peers. Existing REST listing
+    and profile allowlist bounds remain. Bulk preparation is not complete-plan composition, approval or native execution.
+    Native owner/trust/stage composition, copied-guest/converter qualification and Q07/G07/G08 receiving remain
+    open; no VM migration, P08 completion or operating acceptance is claimed.
 - id: EV-P08-006
   level: E2
   source_revision: 5e2b4a62f2c940bbdb06432c8922d43301e3482c
@@ -7205,9 +7278,9 @@ evidence:
     and pinned Chromium; synthetic native/current-owner and browser HTTP peers.
   scope: Durable campaign scheduling, shared allocations, measured phase/concurrency admission, approved outage
     objectives, current authority/observation endpoints and Console controls. All 35 component commands and 811
-    tests pass without skips; all three migration browser journeys pass. All 23 Console commands pass with 192
-    Pest passes, 911 assertions and seven explicit separate-campaign broker skips. Final reports verify 701/226/302
-    source bindings. All 14 source workflows pass. Original formatting failure and correction remain retained.
+    tests pass without skips; all three migration browser journeys pass. All 23 Console commands pass with 192 Pest
+    passes, 911 assertions and seven explicit separate-campaign broker skips. Final reports verify 701/226/302 source
+    bindings. All 14 source workflows pass. Original formatting failure and correction remain retained.
   limitations: E2 only. No source/target account commissioning, physical throughput measurement or dated native
     migration schedule. Preparation does not emit a complete operational native plan. Native runtime/owner/adapters,
     converter/guest qualification, large-transfer continuation and actual Q05/Q06/Q07/G07/G08 remain open.
@@ -7233,13 +7306,13 @@ evidence:
     and pinned Chromium; synthetic native/current-owner and browser HTTP peers.
   scope: Six-account identity/permission probes, protected TLS worker/stage composition with revocation checks,
     complete immutable Planning proposals, bulk Console plan choices/creation and VM-scoped custody with legacy
-    hold recovery. All 35 component commands and 893 tests pass without skips. All three browser journeys and
-    five browser commands pass. All 23 Console commands pass with 195 Pest passes, 922 assertions and seven explicit
+    hold recovery. All 35 component commands and 893 tests pass without skips. All three browser journeys and five
+    browser commands pass. All 23 Console commands pass with 195 Pest passes, 922 assertions and seven explicit
     separate broker-campaign skips. Exact component/browser/Console reports verify 719/230/305 source bindings.
     Original image-manifest, frozen-version and apt-mirror failures remain retained. Strict frozen-contract correction
     passes at 0a2d1cf; source Kubernetes is queued at the retained regression observation.
-  limitations: E2 only; no actual native account or application protocol is commissioned. Current native owner
-    authority and execution-plan resolver, performance/capacity producers, selected copied-guest/data/service/fencing/traffic/recovery/cleanup
+  limitations: E2 only; no actual native account or application protocol is commissioned. Current native owner authority
+    and execution-plan resolver, performance/capacity producers, selected copied-guest/data/service/fencing/traffic/recovery/cleanup
     protocols, real converter qualification and long-transfer reconciliation remain unfinished. No physical throughput,
     native migration, Q05/Q06/Q07, G07/G08 receiving, P08 completion or operating acceptance is claimed.
 - id: EV-P08-008
@@ -7254,26 +7327,26 @@ evidence:
   campaign_ids: []
   criterion_ids: []
   observed_at: '2026-10-07T20:50:09.907720+00:00'
-  observer: GitHub Actions PostgreSQL/TLS and Chromium campaigns; Codex verified original archives,
-    exact source/log/artifact hashes, JUnit and Governance test summaries and visually inspected the retained screenshot.
+  observer: GitHub Actions PostgreSQL/TLS and Chromium campaigns; Codex verified original archives, exact source/log/artifact
+    hashes, JUnit and Governance test summaries and visually inspected the retained screenshot.
   reviewer: Codex engineering consistency review only; designated native and receiving reviewers remain open.
   valid_until: null
   invalidated_at: null
   artifact_uri: https://github.com/awalker0878/multi-tenant/blob/c801a13e4b172e6b307303a4c7eccb6e1511e8c6/verification/p08/control/qualification-index.json
   sha256: fd9f046e64ccbfd2f5849702537040ee52d0daacd1afe852c7a85a22b5a4c582
-  environment: GitHub Actions Ubuntu 24.04, component PostgreSQL 16, Governance PostgreSQL 18.6,
-    Python 3.12.14, uv 0.12.19, PHP 8.5.11, Node 24.19.0 and pinned Chromium; synthetic native/custody peers.
-  scope: Native Lifecycle process/dispatcher, protected owner/worker assignments, immutable Planning resolver,
-    live operational consent and scoped Inventory reads, unattended recipe revocation and bounded version 2
-    movement. All 36 component commands and 951 tests pass without skips, including 30 real compiler-to-resolver
-    method/mode combinations. All five browser commands and three migration journeys pass. Separate unchanged
-    Governance service/contract source passes 219 PostgreSQL tests, 5919 assertions, 160 campaign checks and two
-    Chromium journeys. Verifier checks 943/231/474 source bindings and retains the original architecture failure
-    with its unrelaxed domain-layer correction. Running or queued regressions remain explicitly unpassed.
+  environment: GitHub Actions Ubuntu 24.04, component PostgreSQL 16, Governance PostgreSQL 18.6, Python 3.12.14,
+    uv 0.12.19, PHP 8.5.11, Node 24.19.0 and pinned Chromium; synthetic native/custody peers.
+  scope: Native Lifecycle process/dispatcher, protected owner/worker assignments, immutable Planning resolver, live
+    operational consent and scoped Inventory reads, unattended recipe revocation and bounded version 2 movement.
+    All 36 component commands and 951 tests pass without skips, including 30 real compiler-to-resolver method/mode
+    combinations. All five browser commands and three migration journeys pass. Separate unchanged Governance service/contract
+    source passes 219 PostgreSQL tests, 5919 assertions, 160 campaign checks and two Chromium journeys. Verifier
+    checks 943/231/474 source bindings and retains the original architecture failure with its unrelaxed domain-layer
+    correction. Running or queued regressions remain explicitly unpassed.
   limitations: E2 only. Provider custody/fencing, actual account and runtime commissioning, physical measurement
-    producers, selected guest/data/service/traffic/recovery/cleanup implementations, converter qualification
-    and interrupted-transfer reconciliation remain required. Extended budgets do not renew authority or supply
-    resumption. No native Q05/Q06/Q07, G07/G08 receiving, P08 completion or operating acceptance is claimed.
+    producers, selected guest/data/service/traffic/recovery/cleanup implementations, converter qualification and
+    interrupted-transfer reconciliation remain required. Extended budgets do not renew authority or supply resumption.
+    No native Q05/Q06/Q07, G07/G08 receiving, P08 completion or operating acceptance is claimed.
 - id: EV-P09-001
   level: E2
   artifact_uri: git:eca275f98c7aca9774d4a20b2174a7c017c878ce:verification/p09/local/qualification-index.json
@@ -7301,6 +7374,83 @@ evidence:
     explicit approval. Actual tranche selection, native account/custody commissioning, selected enterprise/service
     effects and boundary composition, separate direction/guest recovery campaigns and independent receiving remain.
     No E3 native support, G09 approval, operational acceptance, P08 or P09 completion is claimed.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P10-001
+  level: E2
+  artifact_uri: verification/p10/engineering-eb8805f/observations.json
+  sha256: 5ff0ab3c0eb4e69aaff09d09aad28027d33d0e8933e811df3f1c6f9333ad14bf
+  source_revision: eb8805ff74fa780b6ab0ba021322253c62a7d37f
+  artifact_revisions:
+    workflow_run: '37700591172'
+    artifact_id: '11517127973'
+    artifact_sha256: c6f719fb66981a5f918787c49686e7cbad49c99d2378be38e4f5a64e137e0a54
+  environment: GitHub Actions Ubuntu 24.04/Python 3.12.14, actual PostgreSQL 16/TLS/Cosign; synthetic native owners
+    and local alert receiver.
+  scope: Nine campaign commands pass, including full component conformance with database skips forbidden; twelve-tenant
+    48-operation scheduler workload passes saturation, revocation and fairness checks; actual stale database restore
+    denies old authority. All six G10 packages remain held.
+  campaign_ids: &id003
+  - Q09
+  - Q10
+  criterion_ids: &id004
+  - G10.01
+  - G10.02
+  - G10.03
+  - G10.04
+  observed_at: '2026-10-07T23:11:57Z'
+  observer: GitHub Actions campaign; original decoded job log and artifact metadata retrieved through authenticated
+    GitHub API.
+  reviewer: Engineering consistency only; no designated G10 receiving review.
+  limitations: Synthetic native owner/custody/load/alert scope only. No native throughput, coordinated control-plane
+    RTO, actual restricted install, real recipient or operational acceptance. Artifact ZIP is retained on GitHub;
+    its signed download returned HTTP 403 here, so local archive integrity is not claimed.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P09-002
+  level: E2
+  artifact_uri: verification/p09/hosted/qualification-index.json
+  sha256: d21e70d36e2fa1c95e099f19d40b1ed3843d64195cc51313c3311b4430272164
+  source_revision: f7001d3e75cffa13b28701f184c076a1bd1854af
+  artifact_revisions:
+    workflow_run: '37697578952'
+    artifact_id: '11516266465'
+    artifact_sha256: 8a72e59de59099bbbcc2d2daca0ac14814518871ee0afa38f9a2d5ec3215b246
+  environment: GitHub Actions Ubuntu 24.04, Python 3.12.14, real PostgreSQL/TLS and synthetic native owner responses.
+  scope: Published P09 full PostgreSQL-backed component conformance; runner forbids skipped database cases. Native
+    owner/platform responses remain synthetic.
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T22:41:55Z'
+  observer: GitHub Actions; run and artifact metadata inspected through connected GitHub API.
+  reviewer: Engineering consistency only; designated native/receiving reviewers remain open.
+  limitations: No native qualification or G09 acceptance. Original local skips are preserved as historical observations;
+    hosted conformance subsequently passes. Artifact ZIP not independently rehashed here.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P10-002
+  level: E2
+  artifact_uri: verification/p10/engineering-b741159/observations.json
+  sha256: 0b9291a02861fe90293c98efa0d37aabb07798f6135caa9f6f1aaaef1f8684b3
+  source_revision: b7411590868138ce2e240658ddbd2c167607a300
+  artifact_revisions:
+    workflow_run: '37701090761'
+    artifact_id: '11517676711'
+    artifact_sha256: 17a1141acdfdfedc75e3c51211ac99c36094741e811496d48b1ebf9cd934d8e2
+  environment: GitHub Actions Ubuntu 24.04/Python 3.12.14, actual PostgreSQL 16/TLS/Cosign; synthetic native owners
+    and local alert receiver.
+  scope: 'Final candidate-policy/native-inventory refinement passes all nine campaign commands and 990 real-PostgreSQL
+    component tests with zero failures/errors/skips: Planning 325, Lifecycle 371, worker 294. Twelve-tenant workload,
+    stale restore, local TLS acknowledgement and artifact controls pass. G10 remains held.'
+  campaign_ids: *id003
+  criterion_ids: *id004
+  observed_at: '2026-10-07T23:16:45Z'
+  observer: GitHub Actions campaign; original decoded job log and artifact metadata retrieved through authenticated
+    GitHub API.
+  reviewer: Engineering consistency only; no designated G10 receiving review.
+  limitations: Synthetic native/owner/load/alert scope only. No native throughput, full control-plane RTO, restricted
+    install, real recipient or G10 acceptance. Original decoded job log and GitHub-reported artifact metadata retained;
+    ZIP not independently downloaded or rehashed here.
   valid_until: null
   invalidated_at: null
 blockers:
@@ -7589,7 +7739,6 @@ blockers:
     approval from development authorization.
   state: OPEN
   resolution_evidence_ids: []
-
 - id: BL-P05-001
   scope_ids:
   - P05
@@ -7613,7 +7762,6 @@ blockers:
     now consume the delivered contracts; P07.01 readiness preparation is the next engineering package.
   state: OPEN
   resolution_evidence_ids: []
-
 - id: BL-P06-001
   scope_ids:
   - P06
@@ -7636,7 +7784,6 @@ blockers:
     inputs; native effects remain held until exact campaign authority, scope and operating inputs exist.
   state: OPEN
   resolution_evidence_ids: []
-
 - id: BL-P07-001
   scope_ids:
   - P07
@@ -7677,7 +7824,6 @@ blockers:
     synthetic owners cannot supply missing native facts or service interfaces.
   state: OPEN
   resolution_evidence_ids: []
-
 - id: BL-P08-001
   scope_ids:
   - P08
@@ -7698,19 +7844,19 @@ blockers:
   owner_role: Inventory, Planning, Console, Lifecycle and Infrastructure engineering leads
   description: P08 software is not complete. Profile persistence, Console review/confirmation, authenticated Planning
     preparation, immutable recipe-based proposals, bulk Console plan creation, six-account commissioning checks,
-    protected worker/stage composition, current-profile admission and campaign scheduling/Console/observation controls are delivered.
-    Native control now composes live Planning/Governance/Inventory reads, immutable resolution, unattended recipe
-    revocation and explicit long movement budgets. Independent provider custody/fencing, actual performance/capacity
-    producers, qualified real converter and copied-guest
-    preparation, selected delta/service/traffic/recovery/cleanup implementations and reconciled long-transfer continuation
-    remain outstanding. E2 components do not close those outputs.
+    protected worker/stage composition, current-profile admission and campaign scheduling/Console/observation controls
+    are delivered. Native control now composes live Planning/Governance/Inventory reads, immutable resolution, unattended
+    recipe revocation and explicit long movement budgets. Independent provider custody/fencing, actual performance/capacity
+    producers, qualified real converter and copied-guest preparation, selected delta/service/traffic/recovery/cleanup
+    implementations and reconciled long-transfer continuation remain outstanding. E2 components do not close those
+    outputs.
   unblock_condition: Deliver the remaining outputs in docs/implementation/p08-completion-review.md, bind supplied
     actual owner protocols, qualify the complete selected method including uncertainty/recovery and retain exact-source
     results without simulation authority or fallback.
   next_action: Commission actual endpoint policies and owner-only application/guest/service protocols using the
-    delivered Console review and protected account probe. Configure the delivered native owner clients/resolver with
-    commissioned provider custody, explicit adapters and independent readers; keep unregistered effects held. Existing development authorization
-    continues; accepted baseline decisions do not need renewed permission.
+    delivered Console review and protected account probe. Configure the delivered native owner clients/resolver
+    with commissioned provider custody, explicit adapters and independent readers; keep unregistered effects held.
+    Existing development authorization continues; accepted baseline decisions do not need renewed permission.
   state: OPEN
   resolution_evidence_ids: []
 - id: BL-P08-002
@@ -7764,17 +7910,15 @@ blockers:
   - R27
   - R28
   - R31
-  owner_role: Requesting user for public publication; quality for complete conformance
-  description: Automatic approval review rejected publishing the new P09 commits to the public awalker0878/multi-tenant
-    repository because the payload and external destination need explicit approval. No push occurred. The local
-    environment cannot run PostgreSQL; 79 database tests remain unexecuted.
-  unblock_condition: Approve publication of the reviewed P09 code/tests/docs/evidence on implementation/p09-expansion-20261007
-    in the public repository. Then execute the prepared PostgreSQL-backed P09 workflow and retain original results.
-  next_action: Review docs/implementation/p09-completion-review.md, obtain that exact publication approval, push
-    only the prepared branch, repair any hosted failure and rerun affected checks. Do not infer native acceptance
-    or merge/deploy permission.
-  state: OPEN
-  resolution_evidence_ids: []
+  owner_role: Requesting user and quality
+  description: The initial public-publication approval rejection and local PostgreSQL limitation are resolved. The
+    user approved and selected the active greenfield branch. Full hosted P09 conformance passed at f7001d3 and 5880794.
+  unblock_condition: Satisfied by explicit user publication approval and full PostgreSQL-backed hosted conformance.
+  next_action: Continue exact native tranche/integration and independent qualification work under BL-P09-002 and
+    BL-P09-003; retain historical local failures/skips.
+  state: RESOLVED
+  resolution_evidence_ids:
+  - EV-P09-002
 - id: BL-P09-002
   scope_ids:
   - P09
@@ -7835,5 +7979,44 @@ blockers:
   next_action: Follow the P09 completion packet and operating runbook; retain actual source/artifact/environment
     identities and measurements. Record real G09 criteria decisions and any later E4 operating acceptance without
     promoting synthetic component checks.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P10-001
+  scope_ids:
+  - P10
+  - P10.01
+  - P10.02
+  - P10.03
+  - P10.04
+  - P10.05
+  - P10.06
+  - G10
+  owner_role: Platform, application, security and SRE owners
+  description: No selected accepted P08/P09 release tuple, commissioned native owner/custody topology, approved
+    workload/recovery objectives or installed operating artifact/trust/mirror scope has been supplied. Native and
+    operating input records remain UNKNOWN.
+  unblock_condition: Complete actual N01-N15 and applicable OP01-OP07 records; implement/commission selected P07/P08/P09
+    methods and obtain their native entry decisions.
+  next_action: Bind the selected protocols and exact native/account/trust scope; complete native campaigns before
+    representative Q09/Q10 execution.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P10-002
+  scope_ids:
+  - P10
+  - P10.01
+  - P10.02
+  - P10.03
+  - P10.04
+  - P10.05
+  - P10.06
+  - G10
+  owner_role: Qualification, security, SRE and receiving service owners
+  description: No original representative-preproduction Q09/Q10 records or authenticated independent receiving-team
+    decisions exist. E2 software checks cannot satisfy G10.
+  unblock_condition: Execute required native operating measurements, restore/upgrade/install/security/alert/handover
+    cases and obtain receiving decisions against the frozen installed candidate.
+  next_action: Populate release/p10-inputs.json with original content-addressed records and submit the held dossier
+    to designated G10 reviewers.
   state: OPEN
   resolution_evidence_ids: []
