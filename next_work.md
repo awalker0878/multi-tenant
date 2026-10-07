@@ -4,20 +4,30 @@ P07 is incomplete. Lifecycle now supplies durable native stage control,
 configuration/plan/epoch-bound grants, one-time worker redemption, independent
 readiness checks, unknown-outcome reconciliation and separate retirement controls.
 The saved-plan worker consumes the exact native grant through the internal
-TLS boundary contract. The [control runbook](docs/operations/runbooks/native-workflow-control.md)
+TLS effect and boundary contracts. Native admission now commits a durable Temporal
+outbox, and the separate native queue advances only after independent reconciliation.
+The [control runbook](docs/operations/runbooks/native-workflow-control.md)
 and [implementation record](docs/implementation/p07-native-provisioning.md)
-describe the implemented component boundary. Production native dispatch and the
-actual Q05/Q06 campaign are still absent; a synthetic owner is not a native owner.
+describe the implemented component boundary. Enabling production dispatch still
+requires commissioned current-owner, caller-trust, provider-fencing and selected
+stage adapters. The actual Q05/Q06 campaign remains absent.
 
-The [workflow evidence](verification/p07/native-workflows/qualification-index.json)
+The [dispatch and worker evidence](verification/p07/native-dispatch/qualification-index.json)
 retains original passing and failed campaigns and their exact source bindings.
-At `880db145e2d90e0be6b23f7a744f592cf6af233f`, all 253 Lifecycle tests and 142
+At `9b01db784ce4ceac012cc98592dd96997efc6168`, all 288 Lifecycle tests and 157
 worker tests pass without skips, along with 18 contract/quality/build/Terraform
-commands and the isolated worker package.
-The [regression receipt](verification/p07/native-workflows/regression-completion.json)
-records 13 passing workflow types with exact revisions and the limited source
-comparison for the earlier-source Kubernetes, messaging, Catalogue and Inventory
-results. Earlier failed runs remain recorded as failures.
+commands. The isolated worker package passes at `ad32c16` with all 130 inputs
+unchanged at the final revision. The actual Temporal/TLS/PostgreSQL
+campaign passes 43 checks and replays six histories, including both internal TLS
+routes and the separate worker journal. All six retained histories also replay
+offline. Native authority, tooling and observations
+in that orchestration campaign remain synthetic.
+Earlier [workflow evidence](verification/p07/native-workflows/qualification-index.json)
+remains unchanged.
+The [regression receipt](verification/p07/native-dispatch/regression-completion.json)
+records 13 passing workflow types with exact revisions, including Kubernetes and
+P06 execution. Only the two P07 history-retention scripts differ between the
+runtime source and final campaign source. Earlier failed runs remain failures.
 Earlier [worker component](verification/p07/native-components/qualification-index.json)
 and [API configuration](verification/p07/configuration/qualification-index.json)
 evidence remains unchanged. The installed native inspection command remains
@@ -28,9 +38,11 @@ closed by these component tests.
    `NativeOwners` adapter against live Governance approval, immutable Planning,
    Inventory's confirmed Console revision, installed tuple, entitlement/campaign
    scope and independently administered state/provider custody. Resolve the
-   authenticated worker identity from workload trust, compose the native boundary
-   handler and connect the durable coordinator to the registered Temporal worker
-   pool. Do not route native work through P06 simulation or use test owners.
+   authenticated worker identity from workload trust and compose the implemented
+   native boundary/effect handlers and Temporal dispatcher with actual registered
+   stage adapters. Durable dispatch, cancellation holds and saved-plan submission
+   are implemented; commissioning their authority is still outstanding.
+   Do not route native work through P06 simulation or use test owners.
    The existing Governance execution-approval API returns `simulation_boundary`
    with `native_write_authorized: false`; it cannot supply the native receipt.
 2. **P07.02/P07.05 — actual provider exclusion and recovery:** implement and qualify

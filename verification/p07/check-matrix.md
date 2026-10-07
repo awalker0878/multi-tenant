@@ -21,6 +21,13 @@ configuration changes, complete activation evidence, safe reconciliation, distin
 retirement and worker TLS grant binding. Its synthetic owner responses do not
 supply provider fencing, enterprise service integration or any native qualification.
 
+The [dispatch increment](native-dispatch/README.md) adds the actual Temporal queue,
+outbox, lost-response/restart/cancellation and replay campaign. Its 43 checks include
+the real saved-plan effect and boundary TLS routes, separately owned worker journal,
+cross-owner database denial and duplicate submission hold. All 288 Lifecycle and
+157 worker component tests pass without skips. The native tool and provider/owner
+observations used by orchestration remain synthetic.
+
 | Boundary | Measured checks | Scope |
 | --- | --- | --- |
 | Commissioning packet | 55 passing cases: every missing obligation, exact binding, contradictory observations, stale/rejected/unreviewed evidence, reviewer/observer independence, E2 rejection for native observations and bounded/redacted parsing | Synthetic metadata and local files only |

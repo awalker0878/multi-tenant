@@ -31,6 +31,11 @@ The final archive retains all six complete synthetic histories. The separate
 passes without the disposable Temporal server. History hashes and event counts
 match the hosted observations.
 
+The [regression receipt](regression-completion.json) records 13 passing workflow
+types with their exact revisions, including Kubernetes and all P06 browser jobs.
+The final-source change only retains histories and checks their presence; runtime
+service/worker and deployment inputs are unchanged from the broad regression run.
+
 Native authority, saved-plan effects and provider observations in the orchestration
 fixture are explicitly synthetic. The separate component campaign exercises the
 actual Terraform subprocess, protected artifact and independent OpenStack readback

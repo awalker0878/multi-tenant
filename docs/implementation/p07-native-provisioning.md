@@ -127,7 +127,32 @@ and golden fixture are checked with the locked contract tools.
 
 The [retained workflow qualification](../../verification/p07/native-workflows/qualification-index.json)
 is E2 software evidence. The production composite owner adapter, workload-trust
-composition, native Temporal dispatch, actual provider fencing and selected
+composition, commissioned dispatch, actual provider fencing and selected
 service/effect/observer adapters remain unfinished. The simulation router does
 not expose the native handler. Native commissioning and Q05/Q06 must still occur
 on the selected environment. P07 remains IN_PROGRESS and G07 NOT_REVIEWED.
+
+## Durable dispatch and saved-plan effect transport
+
+Native admission commits the job and outbox atomically. `NativeDispatcher` starts
+one stable workflow identity on the separate native queue; an accepted start with
+a lost reply resolves the original execution. `NativeJourneyV1` has single-attempt
+activities, recovers prepared operations through read-only reconciliation, and
+persists a hold before propagating cancellation. Wake signals provide no authority.
+
+`NativeWorkerEffects` submits the exact grant once to a registered executor over
+fixed-address verified TLS. `NativeEffectApp` obtains tenant/worker identity from
+its separate trusted-caller interface. `NativeSavedPlanEffect` checks current
+Lifecycle authority before protected artifact resolution, commits the worker claim,
+redeems once before apply and records independent readback. The response denies
+readiness/retry authority; only Lifecycle's separate owner observations advance.
+The existing simulation router and read-only inspection command do not register
+the native effect route.
+
+The [dispatch qualification](../../verification/p07/native-dispatch/qualification-index.json)
+retains the original failed cancellation campaign, its correction, the complete
+445-test component campaign, 43 orchestration checks and isolated worker build.
+The orchestration uses actual Temporal/TLS and separate owner databases. Provision
+crosses both real internal TLS routes; its authority, saved-plan tool and provider
+observations are synthetic. Actual native provider requests, enterprise effects,
+commissioned owner/trust/fencing integration and Q05/Q06 remain unfinished.

@@ -79,3 +79,29 @@ All six original component/package archives remain retained with verified source
 command and artifact hashes. The [regression receipt](native-workflows/regression-completion.json)
 records the remaining workflow passes and each run's actual source. No failed
 record is relabelled and no P07 native result follows from these regression passes.
+
+## Native Temporal dispatch and worker transport
+
+The initial real Temporal campaign at `440ada2a2d9c649c9c73d97cc0ce125cf6c54088`
+passed 21 behavioral checks and persisted the cancellation hold, but the workflow
+remained open. Temporal wrapped activity cancellation in `ActivityError`; checking
+only the outer exception did not propagate cancellation after the hold.
+`f3a5f798857f7e903688bf96d44fac16295f336c` uses the SDK cancellation predicate and
+raises cancellation after durable hold recording. Both direct and wrapped cases
+have unit coverage. The corrected live campaign passes 36 checks and six history
+replays. The initial FAILED archive and corrected PASSED archive remain distinct
+in the [dispatch index](native-dispatch/qualification-index.json).
+
+`ad32c166da60e815c03ed3633b0a43ed7fbdb801` additionally qualifies the actual internal
+worker effect/boundary TLS composition and worker PostgreSQL journal: 43 checks,
+six replays, 288 Lifecycle and 157 worker tests without skips, all 18 component
+commands and the independently installed worker package pass. Local TLS response
+tests found that HTTP/1.0 closes its socket once the final declared body byte is
+read. The client now reads exactly the bounded Content-Length and rejects missing,
+ambiguous or truncated framing; it does not reset the already closed socket for
+an unnecessary EOF read. This correction was made before publication.
+
+Complete synthetic Temporal histories are also retained by the follow-up campaign
+at `9b01db784ce4ceac012cc98592dd96997efc6168`, allowing replay after the disposable
+server is gone. This evidence is separate from actual provider-side exclusion,
+commissioned owner/caller trust and native Q05/Q06 results, which are still absent.
