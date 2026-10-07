@@ -8,6 +8,7 @@ import uvicorn
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from planning.application.migration_plans import MigrationPlans
+from planning.application.native_plans import NativePlans
 from planning.application.planning import Planning
 from planning.infrastructure.foundation import database_ready
 from planning.infrastructure.migration import prepare_migration
@@ -17,6 +18,7 @@ from planning.infrastructure.store import Postgres
 from planning.infrastructure.telemetry import BoundedSignalBuffer
 from planning.interfaces.http import FoundationApp
 from planning.interfaces.migration import MigrationPreparationApp
+from planning.interfaces.native_plans import NativePlansApp
 from planning.interfaces.planning import PlanningApp
 from planning.interfaces.telemetry import RequestTelemetry
 
@@ -35,11 +37,21 @@ class PlanningRouter:
         self.migration = MigrationPreparationApp(
             self.planning.authority, prepare_migration, migrations
         )
+        native = NativePlans(
+            self.planning.planning,
+            lambda actor, site, recipe: recipe_for(
+                actor, site, recipe, file_variable="PLANNING_NATIVE_RECIPES_FILE"
+            ),
+        )
+        self.planning.planning.native_execution_current = native.current
+        self.native = NativePlansApp(self.planning.authority, native)
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        if scope["type"] == "http" and scope["path"].endswith(
+        if scope["type"] == "http" and scope["path"].endswith("/native-plans"):
+            await self.native(scope, receive, send)
+        elif scope["type"] == "http" and scope["path"].endswith(
             ("/migration-preparations", "/migration-plans", "/migration-plan-options")
         ):
             await self.migration(scope, receive, send)

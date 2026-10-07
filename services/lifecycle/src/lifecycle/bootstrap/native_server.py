@@ -37,6 +37,7 @@ from lifecycle.interfaces.campaign_observations import CampaignObservationApp
 from lifecycle.interfaces.campaigns import CampaignApp
 from lifecycle.interfaces.http import FoundationApp
 from lifecycle.interfaces.native import NativeBoundaryApp
+from lifecycle.interfaces.native_jobs import NativeJobsApp
 
 
 def configuration(path: Path) -> dict[str, Any]:
@@ -74,6 +75,9 @@ class NativeControl:
         self.campaigns = Campaigns(database, self.clock)
         self.dispatcher = CampaignDispatcher(self.campaigns, self.workflow, self.owners.resolve)
         self.boundary = NativeBoundaryApp(self.workflow, self.authorize_worker)
+        self.native_jobs = NativeJobsApp(
+            self.workflow, NativeRequestAuthority(), self.owners.resolve
+        )
         self.campaign_app = CampaignApp(
             self.campaigns,
             NativeRequestAuthority(),
@@ -108,6 +112,8 @@ class NativeControl:
     ) -> None:
         if scope["type"] == "http" and scope["path"] == "/internal/native-grants/checks":
             await self.boundary(scope, receive, send)
+        elif scope["type"] == "http" and "/native-jobs" in scope["path"]:
+            await self.native_jobs(scope, receive, send)
         elif scope["type"] == "http" and "/migration-observations/" in scope["path"]:
             await self.observation_app(scope, receive, send)
         elif scope["type"] == "http" and "/migration-campaigns" in scope["path"]:

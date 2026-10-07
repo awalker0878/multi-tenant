@@ -8,9 +8,11 @@ from typing import Any
 from planning.domain.model import Actor, Rejected, decode, identifier, shape
 
 
-def visible_recipes(actor: Actor, site: str) -> list[dict[str, Any]]:
+def visible_recipes(
+    actor: Actor, site: str, *, file_variable: str = "PLANNING_MIGRATION_RECIPES_FILE"
+) -> list[dict[str, Any]]:
     try:
-        path = Path(os.environ["PLANNING_MIGRATION_RECIPES_FILE"])
+        path = Path(os.environ[file_variable])
         if not path.is_absolute() or any(p.is_symlink() for p in [path, *path.parents]):
             raise ValueError
         fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
@@ -53,8 +55,18 @@ def visible_recipes(actor: Actor, site: str) -> list[dict[str, Any]]:
         raise Rejected("migration_recipes_unavailable", 503) from None
 
 
-def recipe_for(actor: Actor, site: str, recipe_id: str) -> dict[str, Any]:
-    matches = [r["recipe"] for r in visible_recipes(actor, site) if r["id"] == recipe_id]
+def recipe_for(
+    actor: Actor,
+    site: str,
+    recipe_id: str,
+    *,
+    file_variable: str = "PLANNING_MIGRATION_RECIPES_FILE",
+) -> dict[str, Any]:
+    matches = [
+        r["recipe"]
+        for r in visible_recipes(actor, site, file_variable=file_variable)
+        if r["id"] == recipe_id
+    ]
     if len(matches) != 1:
         # Absence and foreign scope are deliberately indistinguishable.
         raise Rejected("migration_recipe_unavailable", 423)

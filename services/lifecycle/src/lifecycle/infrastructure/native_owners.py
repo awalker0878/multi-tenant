@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from lifecycle.domain.admission import digest
-from lifecycle.domain.campaign_plan import plan_requirements
+from lifecycle.domain.campaign_plan import native_plan_record, plan_requirements
 from lifecycle.domain.execution import Rejected, decode, identity
 from lifecycle.domain.migration import current_profiles
 from lifecycle.domain.native_workflow import (
@@ -256,22 +256,26 @@ class NativeOwners:
         config_digest = digest(self.configuration.load())
         assignment = self.configuration.assignment(tenant, ref)
         record = self.plan(tenant, ref)
-        requirements = plan_requirements(record, ref, tenant)
+        requirements = native_plan_record(record, ref, tenant)
         content, binding = record["content"], record["binding"]
-        native = content["native_migration"]
+        migrating = content["action"] == "application.migrate"
+        key = "native_migration" if migrating else "native_provisioning"
+        if ("native_migration" in content) == ("native_provisioning" in content):
+            raise Rejected("one_native_composition_required", 423)
+        native = content[key]
         exact(
             native,
             {
                 "schema_version",
                 "scope",
-                "migration",
                 "intents",
                 "native",
                 "source_job_id",
                 "recipe_sha256",
                 "recipe_id",
                 "base_plan_id",
-            },
+            }
+            | ({"migration"} if migrating else {"purpose"}),
         )
         checksum(native["recipe_sha256"])
         identity(native["recipe_id"])
@@ -288,8 +292,14 @@ class NativeOwners:
                 for k in ("tenant_id", "site_id", "environment", "resource_id")
             )
             or content["scope"].get("native_scope") != "project:" + native["scope"]["project_id"]
-            or requirements["requirements"]["mode"] != native["migration"]["mode"]
-            or requirements["requirements"]["method"] != native["migration"]["method"]
+        ):
+            raise Rejected("native_proposal_binding_changed", 423)
+        if migrating:
+            campaign = plan_requirements(record, ref, tenant)["requirements"]
+            if any(campaign[k] != native["migration"][k] for k in ("mode", "method")):
+                raise Rejected("native_proposal_binding_changed", 423)
+        elif native["purpose"] not in {"provision", "retire"} or content["action"] != (
+            "application." + native["purpose"]
         ):
             raise Rejected("native_proposal_binding_changed", 423)
         approval = self.approval(assignment)
@@ -317,7 +327,7 @@ class NativeOwners:
         ):
             raise Rejected("native_proposal_custody_changed", 423)
         plan = {
-            "schema_version": 2,
+            "schema_version": 2 if migrating else 1,
             "scope": native["scope"],
             **{
                 k: assignment[k]
@@ -334,12 +344,11 @@ class NativeOwners:
             },
             "requester_id": approval["requester_id"],
             "approver_id": approval["approval"]["approver_id"],
-            "purpose": "migrate",
+            "purpose": "migrate" if migrating else native["purpose"],
             "source_job_id": native["source_job_id"],
             **selected,
             "operation_plan_sha256": digest(native),
             "intents": native["intents"],
-            "migration": native["migration"],
             "expires_at": min(
                 integer(binding["valid_until"]),
                 integer(content["valid_until"]),
@@ -348,6 +357,8 @@ class NativeOwners:
                 self.configuration.load()["expires_at"],
             ),
         }
+        if migrating:
+            plan["migration"] = native["migration"]
         validate_plan(plan, self.clock())
         if config_digest != digest(self.configuration.load()):
             raise Rejected("native_owner_configuration_changed", 423)
@@ -368,35 +379,29 @@ class NativeOwners:
         tenant, scope = plan["scope"]["tenant_id"], plan["scope"]
         if digest(self.resolve(tenant, plan)) != digest(plan):
             raise Rejected("native_plan_changed", 423)
-        review = plan["migration"]["review"]
-        inputs = self.transport.request(
-            "inventory",
-            "GET",
-            f"/internal/tenants/{tenant}/migration-inputs/{scope['resource_id']}/"
-            f"{scope['environment']}/{scope['site_id']}/{review['revision']}/{review['digest']}",
-        )
-        current_profiles(plan, inputs, self.clock())
+        verified: dict[str, Any] = {"approval_current": True, "plan_current": True}
+        if plan["purpose"] == "migrate":
+            review = plan["migration"]["review"]
+            inputs = self.transport.request(
+                "inventory",
+                "GET",
+                f"/internal/tenants/{tenant}/migration-inputs/{scope['resource_id']}/"
+                f"{scope['environment']}/{scope['site_id']}/{review['revision']}/{review['digest']}",
+            )
+            current_profiles(plan, inputs, self.clock())
+            verified.update(
+                migration_input=inputs,
+                source_profile_current=True,
+                target_profile_current=True,
+                all_datasets_accounted=True,
+            )
         receipt = self.transport.request(
             "custody", "POST", "/v1/native-custody/checks", {"plan": plan, "binding": binding}
         )
-        locally_verified = (
-            "approval_current",
-            "plan_current",
-            "source_profile_current",
-            "target_profile_current",
-            "all_datasets_accounted",
-        )
-        if any(k in receipt and receipt[k] is not True for k in locally_verified):
+        if any(k in receipt and digest(receipt[k]) != digest(v) for k, v in verified.items()):
             raise Rejected("native_owner_held", 423)
         # Custody cannot substitute a different confirmed review or supply human consent.
-        receipt = receipt | {
-            "migration_input": inputs,
-            "approval_current": True,
-            "plan_current": True,
-            "source_profile_current": True,
-            "target_profile_current": True,
-            "all_datasets_accounted": True,
-        }
+        receipt = receipt | verified
         current_authority(plan, binding, receipt, self.clock())
         if self.epoch() != plan["epoch"] or self.clock() - checked_at > 5:
             raise Rejected("native_custody_changed", 423)

@@ -1,0 +1,145 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Planning immutable native provisioning and retirement",
+    "version": "1.0.0",
+    "description": "Protected internal interface. Maximum request 4096 bytes. Workload and delegated actor authority are independently current. Plans and responses never grant provider write authority."
+  },
+  "security": [
+    {
+      "Workload": []
+    }
+  ],
+  "paths": {
+    "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/native-plans": {
+      "post": {
+        "operationId": "createNativePlan",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "application",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "environment",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-Actor-Delegation",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Current tenant-scoped result; Cache-Control: no-store, private."
+          },
+          "400": {
+            "description": "Denied or held; no native write permission."
+          },
+          "401": {
+            "description": "Denied or held; no native write permission."
+          },
+          "403": {
+            "description": "Denied or held; no native write permission."
+          },
+          "404": {
+            "description": "Denied or held; no native write permission."
+          },
+          "409": {
+            "description": "Denied or held; no native write permission."
+          },
+          "413": {
+            "description": "Denied or held; no native write permission."
+          },
+          "415": {
+            "description": "Denied or held; no native write permission."
+          },
+          "422": {
+            "description": "Denied or held; no native write permission."
+          },
+          "423": {
+            "description": "Denied or held; no native write permission."
+          },
+          "503": {
+            "description": "Denied or held; no native write permission."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NativeProposal"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Workload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "NativeProposal": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "site_id",
+          "base_plan_id",
+          "recipe_id"
+        ],
+        "properties": {
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "base_plan_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recipe_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    }
+  }
+}

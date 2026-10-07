@@ -502,10 +502,12 @@ class NativeWorkflow:
             )
             self.event(tx, job, "held", {"reason": reason})
 
-    def stop(self, tenant: str, job: str) -> None:
+    def stop(self, tenant: str, job: str, expected_revision: int | None = None) -> None:
         with self.database.transaction() as tx:
             self.lock(tx)
-            self.load(tx, tenant, job)
+            row = self.load(tx, tenant, job)
+            if expected_revision is not None and row["revision"] != expected_revision:
+                raise Rejected("native_job_revision_changed", 409)
             tx.execute("UPDATE app.native_projection SET stopped=true WHERE job=%s", (job,))
             self.project(tx, job, "stopped", "native_stop_requested")
             self.event(tx, job, "stop_requested", {"provider_drain_required": True})

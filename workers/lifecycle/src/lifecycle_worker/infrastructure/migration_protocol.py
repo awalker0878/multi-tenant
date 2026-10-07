@@ -5,6 +5,7 @@ assertion that an application-specific protocol has been implemented. The peer m
 enforce the exact immutable operation, custody generation and single-writer fence.
 """
 
+import hashlib
 import http.client
 import json
 import re
@@ -27,24 +28,39 @@ from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedCo
 
 
 class OwnerProtocolClient:
-    def __init__(self, endpoint: NativeEndpoint) -> None:
-        self.endpoint = endpoint
+    def __init__(self, endpoint: NativeEndpoint, *, read_only: bool = False) -> None:
+        self.endpoint, self.read_only = endpoint, read_only
+
+    def credential(self) -> str:
+        token = protected_read(self.endpoint.token_file, 4096).decode("ascii").rstrip("\r\n")
+        if not re.fullmatch(r"[A-Za-z0-9_-]{32,4096}", token):
+            raise NativeHeld("invalid_migration_protocol_credential")
+        return token
 
     def call(self, path: str, body: dict[str, Any], current: Callable[[], None]) -> dict[str, Any]:
         if path not in {
             "/v1/migration/effects",
             "/v1/migration/observations",
+            "/v1/native/effects",
+            "/v1/native/observations",
         }:
             raise NativeHeld("migration_protocol_route_denied")
-        token = protected_read(self.endpoint.token_file, 4096).decode("ascii").rstrip("\r\n")
-        if not re.fullmatch(r"[A-Za-z0-9_-]{32,4096}", token):
-            raise NativeHeld("invalid_migration_protocol_credential")
+        if self.read_only and not path.endswith("/observations"):
+            raise NativeHeld("observer_effect_denied")
+        token = self.credential()
+        fingerprint = hashlib.sha256(token.encode()).hexdigest()
+
+        def recheck() -> None:
+            current()
+            if hashlib.sha256(self.credential().encode()).hexdigest() != fingerprint:
+                raise NativeHeld("owner_protocol_credential_changed")
+
         raw = json.dumps(body, allow_nan=False, separators=(",", ":")).encode()
         if len(raw) > 131072:
             raise NativeHeld("migration_protocol_request_bound")
         connection = PinnedConnection(self.endpoint)
         try:
-            current()
+            recheck()
             connection.request(
                 "POST",
                 urlsplit(self.endpoint.base_url).path.rstrip("/") + path,
@@ -67,7 +83,7 @@ class OwnerProtocolClient:
             data = bytearray()
             deadline = time.monotonic() + 10
             while True:
-                current()
+                recheck()
                 if time.monotonic() >= deadline:
                     raise NativeHeld("migration_protocol_deadline")
                 chunk = response.read1(min(16384, 131073 - len(data)))
@@ -75,6 +91,7 @@ class OwnerProtocolClient:
                 if len(data) > 131072:
                     raise NativeHeld("migration_protocol_response_bound")
                 if not chunk:
+                    recheck()
                     return decode(bytes(data), 131072)
         except (OSError, http.client.HTTPException):
             raise NativeHeld("migration_protocol_outcome_unknown") from None
@@ -91,13 +108,25 @@ class OwnerProtocolEffect:
     def inspect(self, binding: NativeBinding) -> dict[str, Any]:
         from lifecycle_worker.application.migration_runtime import MIGRATION_STAGES
 
+        native_stages = {
+            "reserve",
+            "configure_guest",
+            "enroll_services",
+            "activate",
+            "retire",
+            "release",
+        }
+        stages = (
+            native_stages
+            if self.plan.get("kind") == "native_owner_protocol"
+            else MIGRATION_STAGES - {"capture", "export_copy", "convert_copy", "import_target"}
+        )
         if (
             set(self.plan) != {"schema_version", "kind", "stage", "protocol_sha256", "parameters"}
             or type(self.plan["schema_version"]) is not int
             or self.plan["schema_version"] != 1
-            or self.plan["kind"] != "migration_owner_protocol"
-            or self.plan["stage"] not in MIGRATION_STAGES
-            or self.plan["stage"] in {"capture", "export_copy", "convert_copy", "import_target"}
+            or self.plan["kind"] not in {"migration_owner_protocol", "native_owner_protocol"}
+            or self.plan["stage"] not in stages
             or not sha256(self.plan["protocol_sha256"])
             or not isinstance(self.plan["parameters"], dict)
             or digest(self.plan) != binding.operation_plan_sha256
@@ -113,7 +142,9 @@ class OwnerProtocolEffect:
             {"kind": "owner_protocol", "protocol_sha256": self.plan["protocol_sha256"]},
         )
         result = self.client.call(
-            "/v1/migration/effects",
+            "/v1/native/effects"
+            if self.plan["kind"] == "native_owner_protocol"
+            else "/v1/migration/effects",
             {"schema_version": 1, "binding": binding.document(), "intent": self.plan},
             boundary,
         )
@@ -143,18 +174,24 @@ class OwnerProtocolObserver:
         observer_id: str,
         writer_id: str,
         clock: Callable[[], int],
+        *,
+        family: str = "migration",
+        identity_check: Callable[[], None] = lambda: None,
     ) -> None:
         self.observer_id, self.writer_id = identity(observer_id), identity(writer_id)
         if observer_id == writer_id:
             raise NativeHeld("independent_native_identity_required")
+        if family not in {"native", "migration"}:
+            raise NativeHeld("invalid_owner_protocol_family")
+        self.family, self.identity_check = family, identity_check
         self.client, self.clock = client, clock
 
     def observe(self, binding: NativeBinding, objects: dict[str, Any]) -> dict[str, Any]:
         # Reads remain available after a pause or expiry; they cannot authorize effects.
         result = self.client.call(
-            "/v1/migration/observations",
+            "/v1/" + self.family + "/observations",
             {"schema_version": 1, "binding": binding.document(), "objects": objects},
-            lambda: None,
+            self.identity_check,
         )
         if (
             set(result)

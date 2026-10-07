@@ -10,6 +10,8 @@ from uuid import uuid4
 import pytest
 from test_migration import MigrationOwners, migration_input, migration_plan
 from test_native_effects import peer  # noqa: F401
+from test_native_workflow import Owners as ProvisionOwners
+from test_native_workflow import plan as provision_plan
 
 from lifecycle.bootstrap.native_server import NativeControl, configuration
 from lifecycle.domain.admission import digest
@@ -200,6 +202,52 @@ def test_complete_proposal_resolves_then_checks_every_current_owner(tmp_path: Pa
         state["fault"] = fault
         with pytest.raises(Rejected):
             owners.current(p, admission)
+
+
+@pytest.mark.parametrize("purpose", ["provision", "retire"])
+def test_native_proposal_resolves_without_migration_assumptions(
+    tmp_path: Path, purpose: str
+) -> None:
+    owners, ref, state, config = fixture(tmp_path)
+    record = state["record"]
+    content = record["content"]
+    native = content.pop("native_migration")
+    del native["migration"]
+    native["purpose"] = purpose
+    native["intents"] = (
+        provision_plan()["intents"]
+        if purpose == "provision"
+        else {s: digest(s) for s in ("retire", "release")}
+    )
+    native["source_job_id"] = str(uuid4()) if purpose == "retire" else None
+    content["native_provisioning"] = native
+    content["action"] = "application." + purpose
+    del content["migration_campaign"]
+    binding = record["binding"]
+    binding["content_digest"] = digest(content)
+    binding["digest"] = digest({k: v for k, v in binding.items() if k != "digest"})
+    ref["plan_digest"] = binding["digest"]
+    config["assignments"][0]["plan_digest"] = binding["digest"]
+    state["path"].write_text(json.dumps(config))
+    state["approval"]["plan_digest"] = binding["digest"]
+    state["approval"]["approval"]["plan_digest"] = binding["digest"]
+    state["plan"] = p = owners.resolve(ref["tenant_id"], ref)
+    assert p["purpose"] == purpose and "migration" not in p
+    transport: Any = owners.transport
+    original = transport.request.side_effect
+    custody = ProvisionOwners(p)
+
+    def request(owner: str, method: str, route: str, body: Any = None) -> dict[str, Any]:
+        if route == "/v1/native-custody/checks":
+            return custody.current(p, body["binding"])
+        return dict(original(owner, method, route, body))
+
+    transport.request.side_effect = request
+    admission = {"job_id": str(uuid4()), "stage": "admission", "plan_sha256": digest(p)}
+    assert owners.current(p, admission)["native_write_authorized"] is True
+    custody.authority_changes["configuration_current"] = False
+    with pytest.raises(Rejected, match="native_authority_not_current"):
+        owners.current(p, admission)
 
 
 @pytest.mark.parametrize(

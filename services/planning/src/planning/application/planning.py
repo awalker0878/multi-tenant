@@ -16,6 +16,7 @@ class Planning:
     def __init__(self, database: Database, sources: Sources, clock: Callable[[], int]) -> None:
         self.database, self.sources, self.clock = database, sources, clock
         self.migration_execution_current: Callable[[dict[str, Any]], None] | None = None
+        self.native_execution_current: Callable[[dict[str, Any]], None] | None = None
         self.migration_current: Callable[[Actor, dict[str, Any], dict[str, str]], None] | None = (
             None
         )
@@ -212,6 +213,11 @@ class Planning:
     ) -> dict[str, Any]:
         content = plan["content"]
         holds = list(content["holds"])
+        if "native_provisioning" in content:
+            try:
+                self.check_native_recipe(plan)
+            except Rejected as error:
+                holds.append(error.reason)
         if "native_migration" in content:
             try:
                 if self.migration_current is None:
@@ -275,6 +281,10 @@ class Planning:
         }
 
     def check_native_recipe(self, record: dict[str, Any]) -> None:
+        if "native_provisioning" in record["content"]:
+            if self.native_execution_current is None:
+                raise Rejected("native_recipe_authority_unavailable", 423)
+            self.native_execution_current(record)
         if "native_migration" in record["content"]:
             if self.migration_execution_current is None:
                 raise Rejected("migration_recipe_authority_unavailable", 423)

@@ -280,7 +280,11 @@ class MountedMigrationRuntime:
             if entry["observer"] is not None:
                 raise NativeHeld("unexpected_resource_observer")
             return self.bound(adapter, binding, entry), native_observer
-        elif kind == "migration_owner_protocol" and set(config) == {"endpoint"}:
+        elif kind in {"migration_owner_protocol", "native_owner_protocol"} and set(config) == {
+            "endpoint"
+        }:
+            if plan.get("kind") != kind:
+                raise NativeHeld("owner_protocol_kind_changed")
             adapter = OwnerProtocolEffect(
                 plan, OwnerProtocolClient(endpoint(config["endpoint"])), self.journal
             )
@@ -293,11 +297,27 @@ class MountedMigrationRuntime:
             "writer_id",
         }:
             raise NativeHeld("migration_independent_observer_required")
+        reader_endpoint = endpoint(observed["endpoint"])
+        owner_writer_endpoint = (
+            endpoint(config["endpoint"])
+            if "endpoint" in config
+            else endpoint(config["source"])
+            if "source" in config
+            else None
+        )
+
+        def independent_credentials() -> None:
+            if owner_writer_endpoint is not None:
+                distinct_credentials(owner_writer_endpoint, reader_endpoint)
+
+        independent_credentials()
         independent_observer = OwnerProtocolObserver(
-            OwnerProtocolClient(endpoint(observed["endpoint"])),
+            OwnerProtocolClient(reader_endpoint, read_only=True),
             observed["observer_id"],
             observed["writer_id"],
             self.clock,
+            family="native" if kind == "native_owner_protocol" else "migration",
+            identity_check=independent_credentials,
         )
         adapter.inspect(binding)
         return self.bound(adapter, binding, entry), independent_observer

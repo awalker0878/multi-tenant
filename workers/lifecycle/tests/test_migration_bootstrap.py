@@ -82,13 +82,22 @@ def registry(tmp_path: Path, binding: NativeBinding) -> tuple[Path, NativeBindin
         "ca_file": str(tmp_path / "ca.pem"),
         "token_file": str(tmp_path / "owner.token"),
     }
+    reader_endpoint = endpoint | {"token_file": str(tmp_path / "observer.token")}
+    for connection, value in ((endpoint, "w" * 64), (reader_endpoint, "r" * 64)):
+        token = Path(connection["token_file"])
+        token.write_text(value)
+        token.chmod(0o600)
     row = {
         "binding": {k: binding.document()[k] for k in fields},
         "expires_at": 200,
         "plan_file": str(mounted(tmp_path / "plan.json", plan)),
         "adapter": "migration_owner_protocol",
         "configuration": {"endpoint": endpoint},
-        "observer": {"endpoint": endpoint, "observer_id": str(uuid4()), "writer_id": str(uuid4())},
+        "observer": {
+            "endpoint": reader_endpoint,
+            "observer_id": str(uuid4()),
+            "writer_id": str(uuid4()),
+        },
     }
     return (
         mounted(tmp_path / "registry.json", {"schema_version": 1, "entries": [row]}),
@@ -274,3 +283,42 @@ def test_owner_protocol_real_tls_binds_receipt_and_keeps_observer_independent(
     observer.clock = lambda: 106
     with pytest.raises(NativeHeld):
         observer.observe(binding, {})
+
+
+def test_owner_rotation_and_readonly_identity_cannot_cross_effect_boundary(
+    native_tls: tuple[NativeReads, dict[str, Any]], binding: NativeBinding
+) -> None:
+    reads, peer = native_tls
+    endpoint = reads.endpoints["identity"]
+    reader = OwnerProtocolClient(endpoint, read_only=True)
+    with pytest.raises(NativeHeld, match="observer_effect_denied"):
+        reader.call("/v1/native/effects", {}, lambda: None)
+    writer = OwnerProtocolClient(endpoint)
+
+    def rotate() -> None:
+        endpoint.token_file.write_text("z" * 64)
+
+    with pytest.raises(NativeHeld, match="credential_changed"):
+        writer.call("/v1/native/effects", {}, rotate)
+    assert peer["requests"] == []
+
+
+def test_native_owner_stage_registry_and_independent_credentials_are_enforced(
+    tmp_path: Path, binding: NativeBinding
+) -> None:
+    path, binding, row = registry(tmp_path, binding)
+    plan = json.loads(Path(row["plan_file"]).read_text())
+    plan.update(kind="native_owner_protocol", stage="enroll_services")
+    binding = replace(binding, operation_plan_sha256=digest(plan))
+    row.update(
+        adapter="native_owner_protocol", binding={k: binding.document()[k] for k in row["binding"]}
+    )
+    mounted(Path(row["plan_file"]), plan)
+    mounted(path, {"schema_version": 1, "entries": [row]})
+    runtime = MountedMigrationRuntime(path, PostgresNativeJournal(no_database), lambda: 100)
+    adapter, observer = runtime.resolve(binding)
+    assert adapter.inspect(binding)["native_write_authorized"] is False
+    assert isinstance(observer, OwnerProtocolObserver) and observer.family == "native"
+    Path(row["observer"]["endpoint"]["token_file"]).write_text("w" * 64)
+    with pytest.raises(NativeHeld, match="independent_platform_read_identity_required"):
+        runtime.resolve(binding)
