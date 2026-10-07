@@ -34,7 +34,7 @@ for method in DELTA:
         assert stage_order(mode, method) == stages({'mode': mode, 'method': method})
 composition = json.loads((ROOT / 'contracts/openapi/planning-migration-v1.1.json').read_text())
 validate_spec(composition)
-for name in ('planning-v1.1.json', 'planning-migration-v1.1.json'):
+for name in ('planning-v1.1.json', 'planning-migration-v1.1.json', 'planning-migration-v1.2.json'):
     validate_spec(json.loads((ROOT / 'contracts/openapi' / name).read_text()))
     assert (ROOT / 'contracts/openapi' / name).read_bytes() == (ROOT / 'apps/console/resources/contracts' / name).read_bytes()
 print('All thirty Planning method/mode stage orders match Lifecycle; composition v1.1 validates.')

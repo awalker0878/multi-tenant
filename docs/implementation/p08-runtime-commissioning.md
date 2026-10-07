@@ -50,6 +50,10 @@ reads recheck the recipe and current Inventory inputs. Recipe changes or revocat
 hold the proposal. `planning-v1.1` adds the complete composition and campaign fields;
 published v1 contracts remain unchanged.
 
+The Console uses migration v1.2 to preserve an explicit HTTP 423 commissioning hold
+as a definite rejection. Such a response lets the user refresh plan choices; only
+an uncertain outcome retains the unchanged retry command. The v1.1 bytes are retained.
+
 For a saved fleet group, use **Find plan choices**, select the mode for each VM, and
 **Create selected plans**. Each successful member links to Planning review and
 independent approval. Held members keep their reasons. An uncertain reply retains

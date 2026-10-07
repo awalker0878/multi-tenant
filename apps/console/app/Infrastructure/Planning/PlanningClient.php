@@ -75,7 +75,7 @@ final class PlanningClient implements PlanningGateway
                 throw new PlanningFailure;
             }
 
-            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v1.1.json' : 'contracts/planning-v1.1.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
+            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v1.2.json' : 'contracts/planning-v1.1.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
             $schemaName = $migration ? match ($tail) {
                 'migration-plans' => 'Receipt',
                 'migration-plan-options' => 'MigrationOptions',
