@@ -351,5 +351,6 @@ class MigrationArchive:
                 "manifest_sha256": digest(manifest),
                 "descriptor_sha256": hashlib.sha256(raw).hexdigest(),
                 "bytes": transferred,
+                "disks_sha256": digest(receipts),
             },
         )

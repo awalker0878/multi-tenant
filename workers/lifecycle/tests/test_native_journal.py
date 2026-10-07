@@ -17,7 +17,7 @@ import psycopg
 import pytest
 from psycopg.rows import dict_row
 
-from lifecycle_worker.application.native import NativeBinding, NativeHeld
+from lifecycle_worker.application.native import NativeBinding, NativeHeld, digest
 from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
 
 
@@ -352,7 +352,15 @@ def test_partial_artifact_is_not_a_conversion_or_import_source(postgres: dict[st
     with pytest.raises(NativeHeld, match="incomplete"):
         j.artifact(conversion, export.operation_plan_sha256, "archive")
     j.record(
-        export, "export_complete", {"descriptor_sha256": "c" * 64, "manifest_sha256": "d" * 64}
+        export,
+        "export_complete",
+        {
+            "descriptor_sha256": "c" * 64,
+            "manifest_sha256": "d" * 64,
+            "disks_sha256": digest(
+                {"disk-2000": {k: v for k, v in disk.items() if k != "resource_key"}}
+            ),
+        },
     )
     result = j.artifact(conversion, export.operation_plan_sha256, "archive")
     assert result["operation_id"] == export.operation_id
@@ -363,3 +371,21 @@ def test_partial_artifact_is_not_a_conversion_or_import_source(postgres: dict[st
         )
     with pytest.raises(NativeHeld):
         j.artifact(conversion, export.operation_plan_sha256, "conversion")
+
+
+@pytest.mark.parametrize("fault", ["wrong_digest", "late_disk"])
+def test_completed_artifact_cannot_gain_unbound_disks(postgres: dict[str, Any], fault: str) -> None:
+    export = binding()
+    j = journal(postgres)
+    assert j.claim(export)
+    receipt = {"size": 512, "sha256": "a" * 64, "sha512": "b" * 128}
+    j.record(export, "disk_transferred", {"resource_key": "disk-2000", **receipt})
+    j.record(
+        export,
+        "export_complete",
+        {"disks_sha256": "c" * 64 if fault == "wrong_digest" else digest({"disk-2000": receipt})},
+    )
+    if fault == "late_disk":
+        j.record(export, "disk_transferred", {"resource_key": "disk-2001", **receipt})
+    with pytest.raises(NativeHeld):
+        j.artifact(export, export.operation_plan_sha256, "archive")

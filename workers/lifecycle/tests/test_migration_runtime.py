@@ -26,9 +26,9 @@ class Client:
 
 def grant() -> dict[str, Any]:
     # Owning worker fixture is isolated from the repository root in package tests.
-    g = json.loads((Path(__file__).parent / "fixtures/native-stage-grant-v1.json").read_text())[
-        "grant"
-    ]
+    g: dict[str, Any] = json.loads(
+        (Path(__file__).parent / "fixtures/native-stage-grant-v1.json").read_text()
+    )["grant"]
     g.update(schema_version=2, stage="capture")
     g["intent_digest"] = g["native_binding"]["operation_plan_sha256"]
     return g

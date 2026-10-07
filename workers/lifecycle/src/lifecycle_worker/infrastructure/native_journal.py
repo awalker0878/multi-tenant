@@ -190,15 +190,23 @@ class PostgresNativeJournal:
             raise NativeHeld("migration_artifact_incomplete")
         disk_event = "disk_transferred" if kind == "archive" else "conversion_observed"
         disks: dict[str, dict[str, Any]] = {}
+        closed = False
         for event in events:
+            if event["kind"] == terminal:
+                closed = True
             if event["kind"] != disk_event:
                 continue
             key = event["facts"]["resource_key"]
-            if key in disks:
+            if closed or key in disks:
                 raise NativeHeld("migration_artifact_ambiguous")
             disks[key] = event["facts"]
         if not disks:
             raise NativeHeld("migration_artifact_incomplete")
+        payloads = {
+            k: {f: v for f, v in d.items() if f != "resource_key"} for k, d in disks.items()
+        }
+        if completed[0].get("disks_sha256") != digest(payloads):
+            raise NativeHeld("migration_artifact_digest_changed")
         return {
             "operation_id": str(rows[0]["operation_id"]),
             "disks": disks,
