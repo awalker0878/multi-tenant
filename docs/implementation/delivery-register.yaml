@@ -350,12 +350,22 @@ phases:
   - P09.05
   gate_id: G09
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
+  delivery_note: Exact tranche/migration contracts, durable adoption and enterprise controls, signed VMware/AHV
+    lifecycle adapters and conformance tooling are locally committed on implementation/p09-expansion-20261007. Partial
+    local evidence records 881 passing tests and 79 unexecuted PostgreSQL cases, with the original architecture
+    failure and correction retained. Public branch publication was blocked by automatic approval review. Real tranche
+    selection, selected enterprise/native integrations, complete database qualification and independent native/receiving
+    campaigns remain; P09 and G09 are not complete.
 - id: P10
   title: Enterprise operating qualification
   owner_role: Platform/SRE and security leads
@@ -2076,80 +2086,136 @@ work_packages:
   title: Platform tranches
   owner_role: Infrastructure
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
   doc_refs:
   - docs/implementation/phases/p09.md
+  - docs/implementation/p09-expansion.md
+  - docs/implementation/p09-completion-review.md
+  - docs/operations/runbooks/platform-expansion.md
   criterion_ids:
   - G09.01
   - G09.02
+  delivery_note: Five VMware/AHV lifecycle operation components and exact eleven-dimension profile/tranche constraints
+    are implemented. Native API transports, plan drift and denied package admission have local synthetic checks.
+    Business-selected installed tuples, additional selected operations and native conformance remain open; no platform-wide
+    parity is claimed.
 - id: P09.02
   phase_id: P09
   title: Migration matrix
   owner_role: Infrastructure/quality
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
   doc_refs:
   - docs/implementation/phases/p09.md
+  - docs/implementation/p09-expansion.md
+  - docs/implementation/p09-completion-review.md
+  - docs/operations/runbooks/platform-expansion.md
   criterion_ids:
   - G09.01
   - G09.02
+  delivery_note: Six directed cross-platform and three same-family route choices are represented independently with
+    Linux/Windows/appliance and five-method qualification plans. Exact source/target, guest, data, policy, service,
+    recovery and artifact bindings prevent acceptance inheritance. Actual selected rows, method implementations
+    and independently measured direction/guest recovery outcomes remain open.
 - id: P09.03
   phase_id: P09
   title: Brownfield adoption
   owner_role: Inventory/lifecycle
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
   doc_refs:
   - docs/implementation/phases/p09.md
+  - docs/implementation/p09-expansion.md
+  - docs/implementation/p09-completion-review.md
+  - docs/operations/runbooks/platform-expansion.md
   criterion_ids:
   - G09.03
+  delivery_note: PostgreSQL adoption journal and authenticated owner-backed API implement observation, no-change
+    import, separate transfer, collision/drift holds, reconciliation and controlled detach. PostgreSQL integration
+    tests are retained but unexecuted locally. Native field collectors, principal mapping, old-writer exclusion
+    and Q02/Q08 brownfield qualification remain open.
 - id: P09.04
   phase_id: P09
   title: Enterprise capabilities
   owner_role: Planning/workers
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
   doc_refs:
   - docs/implementation/phases/p09.md
+  - docs/implementation/p09-expansion.md
+  - docs/implementation/p09-completion-review.md
+  - docs/operations/runbooks/platform-expansion.md
   criterion_ids:
   - G09.02
   - G09.04
+  delivery_note: Enterprise contracts, dependency/window scheduling, shared tenant/endpoint/correlated budgets,
+    fair dispatch, object claims, pause/stop and independent reconciliation are implemented. Database race/restart
+    checks remain unexecuted locally. Selected HA/policy/patch/rotation/scale effects, current owner producers and
+    dispatcher/worker boundary composition still require implementation and qualification; generic contracts do
+    not complete these operations.
 - id: P09.05
   phase_id: P09
   title: Extension contract
   owner_role: Architecture
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
   doc_refs:
   - docs/implementation/phases/p09.md
+  - docs/implementation/p09-expansion.md
+  - docs/implementation/p09-completion-review.md
+  - docs/operations/runbooks/platform-expansion.md
   criterion_ids:
   - G09.01
   - G09.04
+  delivery_note: Ed25519 signed package admission binds exact artifact and installed implementation bytes, capabilities,
+    interface versions, expiry, revocation and retest triggers. Native registry composition, independent reader
+    checks and upgrade/recovery transition validation have local checks. Real signing custody, accepted compatibility
+    transitions and complete/native conformance remain open.
 - id: P10.01
   phase_id: P10
   title: Resilience and performance
@@ -2727,10 +2793,14 @@ requirements:
   - EV-P05-002
   - EV-P05-003
   - EV-P07-001
+  - EV-P09-001
   blocker_ids:
   - BL-P03-002
   - BL-P05-001
   - BL-P07-001
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: R08
   package_ids:
   - P04.01
@@ -2770,9 +2840,13 @@ requirements:
   - EV-P05-002
   - EV-P05-003
   - EV-P07-003
+  - EV-P09-001
   blocker_ids:
   - BL-P05-001
   - BL-P07-001
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: R09
   package_ids:
   - P04.02
@@ -2794,12 +2868,16 @@ requirements:
   - G04
   - G09
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: R10
   package_ids:
   - P04.01
@@ -2860,8 +2938,12 @@ requirements:
   - EV-P05-001
   - EV-P05-002
   - EV-P05-003
+  - EV-P09-001
   blocker_ids:
   - BL-P05-001
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: R12
   package_ids:
   - P05.01
@@ -2932,9 +3014,13 @@ requirements:
   - EV-P06-001
   - EV-P06-002
   - EV-P06-003
+  - EV-P09-001
   blocker_ids:
   - BL-P05-001
   - BL-P06-001
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: R14
   package_ids:
   - P05.04
@@ -3211,9 +3297,13 @@ requirements:
   - EV-P05-001
   - EV-P05-002
   - EV-P05-003
+  - EV-P09-001
   blocker_ids:
   - BL-P05-001
   - BL-P07-001
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: R21
   package_ids:
   - P05.02
@@ -3424,12 +3514,16 @@ requirements:
   gate_ids:
   - G09
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: R27
   package_ids:
   - P09.02
@@ -3450,12 +3544,16 @@ requirements:
   gate_ids:
   - G09
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: R28
   package_ids:
   - P09.04
@@ -3477,12 +3575,16 @@ requirements:
   - G09
   - G10
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: R29
   package_ids:
   - P01.05
@@ -3664,6 +3766,7 @@ requirements:
   - EV-P06-003
   - EV-P08-002
   - EV-P08-003
+  - EV-P09-001
   blocker_ids:
   - BL-P01-001
   - BL-P01-002
@@ -3672,6 +3775,9 @@ requirements:
   - BL-P07-001
   - BL-P08-001
   - BL-P08-002
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: R32
   package_ids:
   - P00.05
@@ -4062,8 +4168,12 @@ gates:
   decision: NOT_REVIEWED
   reviewer: null
   reviewed_at: null
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P09-001
+  blocker_ids:
+  - BL-P09-001
+  - BL-P09-002
+  - BL-P09-003
 - id: G10
   phase_id: P10
   decision: NOT_REVIEWED
@@ -7164,6 +7274,35 @@ evidence:
     producers, selected guest/data/service/traffic/recovery/cleanup implementations, converter qualification
     and interrupted-transfer reconciliation remain required. Extended budgets do not renew authority or supply
     resumption. No native Q05/Q06/Q07, G07/G08 receiving, P08 completion or operating acceptance is claimed.
+- id: EV-P09-001
+  level: E2
+  artifact_uri: git:eca275f98c7aca9774d4a20b2174a7c017c878ce:verification/p09/local/qualification-index.json
+  sha256: acc430bfeb657d47a97226164882b42bec0c3c74ce99b29710570c0da37fa531
+  source_revision: 1a9fd01f23a40f148467eacefffb0befadb5469d
+  artifact_revisions:
+    retained_artifact_commit: eca275f98c7aca9774d4a20b2174a7c017c878ce
+    component_tests_source: 86fb17a7154caa23dd4f67728bc6b068f518d111
+    publication: Local branch only; public push rejected by automatic approval review
+  environment: Local Linux x86-64; Python 3.12.14 and locked uv environments; synthetic native/owner data and actual
+    local TLS connections; PostgreSQL unavailable.
+  scope: Tranche/matrix domain checks, adoption/enterprise contract and authenticated API components, signed VMware/AHV
+    lifecycle admission and native request/readback transports. Planning 303, Lifecycle 301 and worker 277 tests
+    pass; 79 PostgreSQL-dependent tests are explicitly skipped. All three locked installs, lint/format/type checks
+    and wheels plus schema conformance pass. Original architecture failure after wheel-generated source copies is
+    retained; unchanged validator passes after generated copies are moved out, and campaign ordering is corrected.
+    All component source hashes match the original tests.
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T21:58:30.521973+00:00'
+  observer: Codex local automated checks with original command logs, JUnit and source/log hashes retained.
+  reviewer: Codex engineering consistency review only; designated independent G09 and operating reviewers remain
+    open.
+  limitations: PARTIAL E2 evidence only. Full PostgreSQL qualification has not passed; public publication requires
+    explicit approval. Actual tranche selection, native account/custody commissioning, selected enterprise/service
+    effects and boundary composition, separate direction/guest recovery campaigns and independent receiving remain.
+    No E3 native support, G09 approval, operational acceptance, P08 or P09 completion is claimed.
+  valid_until: null
+  invalidated_at: null
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -7604,5 +7743,97 @@ blockers:
   next_action: Platform/application/service owners provide the packet input rows and the exact authorized native
     campaign scope through protected custody. Complete native G07 entry, then run the selected P08 method with independent
     observation. No renewed G00/development permission is required.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P09-001
+  scope_ids:
+  - P09
+  - P09.01
+  - P09.02
+  - P09.03
+  - P09.04
+  - P09.05
+  - G09
+  - R07
+  - R08
+  - R09
+  - R11
+  - R13
+  - R20
+  - R26
+  - R27
+  - R28
+  - R31
+  owner_role: Requesting user for public publication; quality for complete conformance
+  description: Automatic approval review rejected publishing the new P09 commits to the public awalker0878/multi-tenant
+    repository because the payload and external destination need explicit approval. No push occurred. The local
+    environment cannot run PostgreSQL; 79 database tests remain unexecuted.
+  unblock_condition: Approve publication of the reviewed P09 code/tests/docs/evidence on implementation/p09-expansion-20261007
+    in the public repository. Then execute the prepared PostgreSQL-backed P09 workflow and retain original results.
+  next_action: Review docs/implementation/p09-completion-review.md, obtain that exact publication approval, push
+    only the prepared branch, repair any hosted failure and rerun affected checks. Do not infer native acceptance
+    or merge/deploy permission.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P09-002
+  scope_ids:
+  - P09
+  - P09.01
+  - P09.02
+  - P09.03
+  - P09.04
+  - P09.05
+  - G09
+  - R07
+  - R08
+  - R09
+  - R11
+  - R13
+  - R20
+  - R26
+  - R27
+  - R28
+  - R31
+  owner_role: Product/architecture, platform, service and SRE owners; implementation owners
+  description: Exact native tranche and enterprise operation selections have not been supplied. The local generic
+    contracts/scheduler and five lifecycle adapters do not supply native field collectors, selected HA/policy/patch/rotation/scaling
+    effects, current owner evidence producers or full dispatcher/worker composition.
+  unblock_condition: Review selected actual source/target/API/backend/network/storage/guest tuples and operation
+    scope, with observed profile revisions, owner-only constraints and exact service, recovery and native exclusion
+    protocols.
+  next_action: Freeze the reviewed tranche and explicit exclusions under ADR-022, implement/compose the selected
+    effects and owner producers, bind each to current worker authority, then execute full integration checks. Preserve
+    all R26 directions and guest/method obligations unless separately reviewed.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P09-003
+  scope_ids:
+  - P09
+  - P09.01
+  - P09.02
+  - P09.03
+  - P09.04
+  - P09.05
+  - G09
+  - R07
+  - R08
+  - R09
+  - R11
+  - R13
+  - R20
+  - R26
+  - R27
+  - R28
+  - R31
+  owner_role: Platform/security/qualification owners and actual independent receiving reviewers
+  description: No P09 native lab authority, verified read/write account mappings and custody, accepted shared risk
+    budgets, actual workload recovery bounds, or independent Q02/Q04-Q08/Q10 campaign/receiving evidence has been
+    supplied. Existing P07/P08 native blockers persist.
+  unblock_condition: Supply the scoped native campaign inputs and independently execute every selected direction,
+    guest, method, adoption and enterprise operation, including denial, drift, uncertainty, restore, pause/stop
+    and package transitions.
+  next_action: Follow the P09 completion packet and operating runbook; retain actual source/artifact/environment
+    identities and measurements. Record real G09 criteria decisions and any later E4 operating acceptance without
+    promoting synthetic component checks.
   state: OPEN
   resolution_evidence_ids: []

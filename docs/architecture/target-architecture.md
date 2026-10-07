@@ -199,3 +199,13 @@ P01 establishes delivery foundations. P02 delivers governance and P03 the catalo
 Security, deployability, evidence and recovery begin with the foundations and develop throughout delivery. P10 is a final readiness gate rather than the point where those concerns first appear.
 
 Support publications distinguish planned, implemented, simulator-verified and native-qualified capabilities. Qualification is specific to platform/version, operation, migration direction, method, guest profile and material storage/network/security conditions. One successful migration never establishes blanket support for another direction or method.
+## P09 expansion components
+
+The [P09 implementation](../implementation/p09-expansion.md) preserves context
+ownership: Planning owns exact tranche/route contracts; Lifecycle owns no-change
+adoption, current field authority and durable shared-budget scheduling; workers own
+signed native adapter execution and independent readback. The explicit expansion
+control process uses authenticated owner ports rather than sibling databases.
+Native support remains bound to each release/tuple/method and receiving evidence.
+The [completion packet](../implementation/p09-completion-review.md) records the
+unexecuted PostgreSQL campaign and native/service integration scope still required.

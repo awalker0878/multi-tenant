@@ -1,4 +1,47 @@
-# Next work — P08 native migration
+# Next work — P09 platform expansion
+
+P09 now has locally committed tranche and directed-matrix contracts, VMware/AHV
+lifecycle adapters, durable adoption and enterprise controls, signed adapter
+admission, an operator runbook and a source-bound conformance campaign. See the
+[implementation record](docs/implementation/p09-expansion.md) and concrete
+[completion/publication packet](docs/implementation/p09-completion-review.md).
+The work is on `implementation/p09-expansion-20261007`, based on active upstream
+`8b26bc81af3c3102b7d2d73653359bd0aae93f48`.
+
+**P09 remains IN_PROGRESS and G09 NOT_REVIEWED.** The
+[partial local evidence](verification/p09/local/README.md) records 881 passing
+tests and 79 skipped PostgreSQL cases. All three components pass locked installs,
+lint, format, strict typing and wheel builds. Schema conformance passes. The
+original architecture failure caused by generated wheel-build copies and the
+unrelaxed correction are retained. Component source `86fb17a` is unchanged at
+campaign-order correction `1a9fd01`; evidence is retained at `eca275f`.
+
+Continue in this order:
+
+1. **BL-P09-001:** Automatic approval review rejected the public GitHub push because
+   it needs explicit approval for the payload and destination. Ask the user to
+   approve publishing these P09 commits to public `awalker0878/multi-tenant` on
+   `implementation/p09-expansion-20261007`. The exact review scope is prepared in
+   the completion packet. Do not retry or use another publication path before that
+   approval. Then push the branch, run the prepared PostgreSQL-backed P09 workflow,
+   repair failures and retain exact-source results. No main merge or deployment
+   is authorized by that publication request.
+2. **BL-P09-002:** Obtain the actual business-selected tranche and exact installed
+   profiles, fields, guest/data/owner constraints and selected enterprise operations.
+   Compose the required current owner producers, native/service effects and
+   dispatcher-to-worker boundaries. The generic scheduler and five lifecycle
+   operations do not complete HA, policy, patch/rotation, scaling or every migration
+   method. Do not silently remove the remaining phase-card or R26 obligations.
+3. **BL-P09-003:** Commission separately scoped native campaign authority, actual
+   read/write identities, custody/fencing, shared impact budgets and owner recovery
+   objectives. Run every advertised direction/guest/method/adoption/enterprise and
+   package transition independently, including denied and interrupted cases. Retain
+   measured outcomes and real receiving decisions before updating G09 or support.
+
+P07/P08 native and unfinished integration obligations below remain open. P10 has
+not been promoted past P09's required acceptance boundaries.
+
+# Retained P08 native migration handoff
 
 P08 operations now include authenticated campaign APIs, a Console schedule/control
 page, staggered windows/blackouts, dependency and outage-group admission, measured
