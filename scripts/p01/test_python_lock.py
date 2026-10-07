@@ -44,6 +44,9 @@ class PythonLockTest(unittest.TestCase):
                 expected = {"product-" + worker + "-worker": "0.1.0.dev0"}
                 if worker == "lifecycle":
                     expected.update({"psycopg": "3.3.6", "psycopg-binary": "3.3.6", "typing-extensions": "4.16.0", "uvicorn": "0.53.0", "click": "8.5.0", "h11": "0.16.0"})
+                    # Signed P09 adapters verify Ed25519 envelopes in the worker.
+                    # Keep the independently expected production closure exact.
+                    expected.update({"cryptography": "50.0.2", "cffi": "2.1.1", "pycparser": "3.0"})
                 self.assertEqual(production_inventory(project, lock), expected)
 
     def test_platform_markers_select_only_accepted_linux_cpython_runtime(self):
