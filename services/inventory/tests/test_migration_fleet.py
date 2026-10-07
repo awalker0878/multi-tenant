@@ -117,7 +117,7 @@ def test_group_binds_source_identity_and_rejects_manual_fact_injection(campaign:
     confirm(app, c, sources[0], target)
     body = group_body(fleet, c, target)
     for mutation in ({"native_write_authorized": True}, {"source_identity_sha256": "a" * 64}):
-        with pytest.raises(Rejected, match="invalid_shape"):
+        with pytest.raises(Rejected, match="unknown_field"):
             fleet.command(c.actor, "migration_group_save", body | mutation, uid())
     with pytest.raises(Rejected, match="duplicate_migration_member"):
         fleet.command(

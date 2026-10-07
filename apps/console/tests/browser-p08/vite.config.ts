@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue';
 import tailwindcss from '@tailwindcss/vite';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
-import { fleetFixture } from './fleet-fixture';
+import { fleetFixture } from './fleet-fixture.ts';
 
 const fixture = JSON.parse(readFileSync('../../contracts/fixtures/inventory/migration-profile-v1.json', 'utf8'));
 export const tenant = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';

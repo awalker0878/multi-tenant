@@ -84,7 +84,15 @@ final class MigrationFleetController
             if ($detail['group']['revision'] !== (int) $input['revision'] || $detail['group']['digest'] !== $input['digest']) {
                 return response()->json(['error' => 'stale_group'], 412)->header('Cache-Control', 'no-store, private');
             }
-            $member = collect($detail['members'])->first(fn (array $m): bool => $m['candidate']['resource_id'] === $input['resource_id']);
+            $member = null;
+            /** @var list<array<string, mixed>> $members */
+            $members = $detail['members'];
+            foreach ($members as $candidate) {
+                if ($candidate['candidate']['resource_id'] === $input['resource_id']) {
+                    $member = $candidate;
+                    break;
+                }
+            }
             if ($member === null) {
                 return response()->json(['error' => 'member_not_found'], 404)->header('Cache-Control', 'no-store, private');
             }
