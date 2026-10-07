@@ -1,4 +1,0 @@
-[console_scripts]
-lifecycle-health = lifecycle.bootstrap.health:main
-lifecycle-serve = lifecycle.bootstrap.server:main
-lifecycle-workflows = lifecycle.bootstrap.workflow:main

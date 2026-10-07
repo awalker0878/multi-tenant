@@ -1,3 +1,6 @@
 __pycache__/
 *.py[cod]
 .venv/
+
+# Python build metadata is regenerated from pyproject.toml and source.
+*.egg-info/
