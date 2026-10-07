@@ -9,6 +9,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\JobsController;
 use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\MigrationReviewController;
+use App\Http\Controllers\MigrationFleetController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OidcController;
 use App\Http\Controllers\PlanningController;
@@ -55,6 +56,17 @@ Route::prefix('/tenants/{tenant}')->whereUuid('tenant')->middleware(RequireIdent
 
 Route::prefix('/tenants/{tenant}/inventory')->whereUuid('tenant')->middleware(RequireIdentity::class)->group(function (): void {
     $c = InventoryController::class;
+    Route::get('/sites/{site}/migration-fleet', [MigrationFleetController::class, 'show'])->whereUuid('site');
+    Route::get('/sites/{site}/migration-fleet/page', [MigrationFleetController::class, 'page'])->whereUuid('site');
+    Route::get('/sites/{site}/migration-fleet/status', [MigrationFleetController::class, 'status'])->whereUuid('site');
+    Route::post('/sites/{site}/migration-fleet/refresh', [MigrationFleetController::class, 'refresh'])->whereUuid('site');
+    Route::post('/sites/{site}/migration-fleet/groups', [MigrationFleetController::class, 'save'])->whereUuid('site');
+    Route::get('/sites/{site}/migration-fleet/groups/{group}', [MigrationFleetController::class, 'show'])->whereUuid(['site', 'group']);
+    Route::post('/sites/{site}/migration-fleet/groups/{group}', [MigrationFleetController::class, 'save'])->whereUuid(['site', 'group']);
+    Route::post('/sites/{site}/migration-fleet/groups/{group}/prepare', [MigrationFleetController::class, 'prepare'])->whereUuid(['site', 'group']);
+    Route::get('/sites/{site}/migration/profiles/{profile}', [MigrationReviewController::class, 'show'])->whereUuid(['site', 'profile']);
+    Route::get('/sites/{site}/migration/profiles/{profile}/status', [MigrationReviewController::class, 'status'])->whereUuid(['site', 'profile']);
+    Route::post('/sites/{site}/migration/profiles/{profile}', [MigrationReviewController::class, 'command'])->whereUuid(['site', 'profile']);
     Route::get('/sites/{site}/migration', [MigrationReviewController::class, 'show'])->whereUuid('site');
     Route::get('/sites/{site}/migration/status', [MigrationReviewController::class, 'status'])->whereUuid('site');
     Route::post('/sites/{site}/migration', [MigrationReviewController::class, 'command'])->whereUuid('site');

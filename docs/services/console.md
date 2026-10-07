@@ -124,3 +124,20 @@ The retained Chromium/Firefox/WebKit journeys exercise real APIs, transactions a
 accepted-response loss. Keyboard focus and zoom checks are automated observations;
 the [representative-user task sheet](../implementation/p03-completion-review.md)
 remains necessary for declared accessibility and independent G03 acceptance.
+
+## P08 source selection and bulk OpenStack preparation
+
+Site inventory links to **Migrate to OpenStack**. The Console lists API-discovered VMs,
+loads additional pages, filters loaded names/native IDs/guest/power/source scope and
+groups by connection, guest OS, power or readiness. Checkboxes select individual VMs,
+visible groups or all filtered loaded rows; selection survives filtering and paging.
+The selected CPU/memory/disk totals exclude unknown values and reserve no capacity.
+
+Named groups persist in Inventory with a catalogue application/environment and an
+observed OpenStack target. Each VM links to its own dataset/method/owner review. Bulk
+preparation processes saved group members sequentially, re-reading the exact group
+revision and current member before requesting the existing authenticated Planning
+preparation. Every member reports prepared or held; stale group, lost access or an
+unavailable owner pauses the batch. Preparation results remain inspectable in the
+current page; saved membership persists independently. A preparation is not a complete
+approved migration plan or a submitted Lifecycle job.

@@ -1,6 +1,9 @@
 # Next work — P08 native migration
 
-P08 development continues on the native-only baseline. The [implementation record](docs/implementation/p08-execution.md)
+P08 development continues on the native-only baseline. Source fleet browsing, named
+groups, VM-specific review and bulk OpenStack preparation are implemented; validate
+the current fleet increment with the P08 component/browser and Console suites.
+Bulk preparation grants no native write authority. The [implementation record](docs/implementation/p08-execution.md)
 now covers scoped leased profile collection, immutable review/confirmation,
 Console dataset mapping, authenticated Planning preparation and current Lifecycle
 admission, alongside exact-S0 isolated capture, NFC/OVF archives, copy conversion,

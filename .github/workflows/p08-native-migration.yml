@@ -2,7 +2,7 @@ name: P08 native migration components
 on:
   push:
     branches: [greenfield/enterprise-microservices-plan]
-    paths: ['services/inventory/**', 'services/planning/**', 'apps/console/**', 'contracts/schemas/**', 'contracts/openapi/inventory-v1.2.json', 'services/lifecycle/**', 'workers/lifecycle/**', 'workers/inventory/**', 'scripts/p08/**', 'contracts/openapi/*migration*', 'contracts/fixtures/lifecycle/migration-*', '.github/workflows/p08-native-migration.yml']
+    paths: ['services/inventory/**', 'services/planning/**', 'apps/console/**', 'contracts/schemas/**', 'contracts/openapi/inventory-v1.*.json', 'services/lifecycle/**', 'workers/lifecycle/**', 'workers/inventory/**', 'scripts/p08/**', 'contracts/openapi/*migration*', 'contracts/fixtures/lifecycle/migration-*', '.github/workflows/p08-native-migration.yml']
   pull_request:
     branches: [greenfield/enterprise-microservices-plan]
   workflow_dispatch:

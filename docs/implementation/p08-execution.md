@@ -158,3 +158,28 @@ These are documentation references, not installed-release qualification.
 The converter options were checked against the [QEMU image utility documentation](https://www.qemu.org/docs/master/tools/qemu-img.html)
 and [bubblewrap command reference](https://github.com/containers/bubblewrap/blob/main/bwrap.xml).
 These references do not select or qualify an installed runtime.
+
+## API source fleet and bulk selection
+
+Inventory v1.3 exposes API-discovered VMware machines independently of detailed-profile
+availability. The Console's Migrate to OpenStack page supports source API refresh,
+paged browsing, text/readiness filters, grouping by source/guest/power/readiness,
+individual/group selection and observed resource totals. Inventory persists named
+application/environment groups with exact OpenStack target profiles and immutable
+member identity bindings. Each VM retains an independent review/confirmation.
+
+Bulk preparation revalidates saved group membership and per-VM profiles and uses the
+existing authenticated Planning preparation endpoint. It reports each VM separately;
+a held member never becomes an implicitly accepted migration. Group updates use
+optimistic revision checks and exact-command retries. The UI pauses on access loss,
+stale group or unavailable owners. No bulk operation submits native migration effects.
+Complete native-plan composition and Q07/G08 obligations remain as recorded above.
+
+Current bounds are 50 VMs per saved group, 100 groups and 50 target profiles per site;
+the source list is paginated in 50-row pages. Existing native collector scope, API list,
+profile allowlist, freshness and request-budget bounds remain enforced. The vCenter
+REST collector currently holds lists over 100 entries and detailed collection requires
+the enrolled VM allowlist (up to 32 per connection); the fleet projection does not
+silently truncate or expand those scopes. The native list reference is
+[Broadcom Vcenter VM list](https://developer.broadcom.com/xapis/vsphere-automation-api/latest/api/vcenter/vm/get/).
+This documentation reference supplies no installed-platform qualification.

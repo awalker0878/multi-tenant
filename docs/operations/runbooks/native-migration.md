@@ -125,3 +125,23 @@ The [retained index](../../../verification/p08/qualification-index.json) is E2 o
 Its native responses and application/owner peers are synthetic; converter command
 fixtures do not boot a guest or qualify a QEMU rootfs. Real subprocess limit tests
 exercise only launcher containment. Follow Q07 and G08 for actual native acceptance.
+
+## Discover and group source machines in the Console
+
+1. Open Site inventory → Migrate to OpenStack. Choose an enrolled VMware connection
+   and Refresh from API. After collection completes, Refresh findings. A failed or
+   partial discovery does not publish a new current generation.
+2. Filter and group the discovered list; Load more source VMs as needed. Select VMs
+   individually or by visible group/filter. Filters do not discard existing selections.
+3. Save a named group with its catalogue application/environment, observed OpenStack
+   target and supported disk format. Group selection can include held machines for
+   review; a source with no detailed profile cannot prepare. Enable its detailed
+   profile stream within the commissioned enrollment scope and recollect.
+4. Use Review VM for each member, account for every disk/dataset and supply the
+   application inputs the native APIs cannot determine. Save and confirm each review.
+   A newly collected profile requires fresh confirmation and, if identity changed,
+   explicit group resaving after review.
+5. Reopen the group and Prepare group for OpenStack. Inspect each prepared binding or
+   hold. An unavailable owner or changed group pauses the batch; refresh before retry.
+   Preparation performs no native writes and can be rerun with current inputs. The
+   complete-plan, approval, rehearsal, cutover and recovery procedures still apply.

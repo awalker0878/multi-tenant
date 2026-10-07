@@ -15,22 +15,22 @@ use Inertia\Response;
 
 final class MigrationReviewController
 {
-    public function show(Request $request, string $tenant, string $site, InventoryGateway $inventory): Response
+    public function show(Request $request, string $tenant, string $site, InventoryGateway $inventory, ?string $profile = null): Response
     {
-        $workspace = $inventory->call($this->session($request), $tenant, 'getMigrationReview', ['site' => $site]);
+        $workspace = $inventory->call($this->session($request), $tenant, ($profile === null ? 'getMigrationReview' : 'getVmMigrationReview'), ['site' => $site, ...($profile === null ? [] : ['profile' => $profile])]);
         Inertia::clearHistory();
 
-        return Inertia::render('inventory/Migration', ['tenantId' => $tenant, 'siteId' => $site, 'workspace' => $workspace, 'notice' => $request->session()->get('inventory_notice')]);
+        return Inertia::render('inventory/Migration', ['tenantId' => $tenant, 'siteId' => $site, 'profileId' => $profile, 'workspace' => $workspace, 'notice' => $request->session()->get('inventory_notice')]);
     }
 
-    public function status(Request $request, string $tenant, string $site, InventoryGateway $inventory): JsonResponse
+    public function status(Request $request, string $tenant, string $site, InventoryGateway $inventory, ?string $profile = null): JsonResponse
     {
-        $inventory->call($this->session($request), $tenant, 'getMigrationReview', ['site' => $site]);
+        $inventory->call($this->session($request), $tenant, ($profile === null ? 'getMigrationReview' : 'getVmMigrationReview'), ['site' => $site, ...($profile === null ? [] : ['profile' => $profile])]);
 
         return response()->json(['available' => true])->header('Cache-Control', 'no-store, private');
     }
 
-    public function command(Request $request, string $tenant, string $site, InventoryGateway $inventory): RedirectResponse
+    public function command(Request $request, string $tenant, string $site, InventoryGateway $inventory, ?string $profile = null): RedirectResponse
     {
         $input = $request->validate([
             'operation' => ['required', 'in:save,confirm'], 'command_key' => ['required', 'uuid', 'lowercase'],
@@ -47,8 +47,8 @@ final class MigrationReviewController
         ]);
         try {
             $inventory->call($this->session($request), $tenant,
-                $input['operation'] === 'save' ? 'saveMigrationReview' : 'confirmMigrationReview',
-                ['site' => $site], $input['operation'] === 'save' ? $input['review'] : ['digest' => $input['digest']],
+                $input['operation'] === 'save' ? ($profile === null ? 'saveMigrationReview' : 'saveVmMigrationReview') : ($profile === null ? 'confirmMigrationReview' : 'confirmVmMigrationReview'),
+                ['site' => $site, ...($profile === null ? [] : ['profile' => $profile])], $input['operation'] === 'save' ? $input['review'] : ['digest' => $input['digest']],
                 $input['command_key'], isset($input['revision']) ? (int) $input['revision'] : null);
         } catch (InventoryFailure $error) {
             if (in_array($error->status, [403, 404], true)) {
@@ -61,7 +61,7 @@ final class MigrationReviewController
             }, 'inventory_status' => (string) $error->status]);
         }
 
-        return redirect('/tenants/'.$tenant.'/inventory/sites/'.$site.'/migration')->with('inventory_notice',
+        return redirect('/tenants/'.$tenant.'/inventory/sites/'.$site.'/migration'.($profile === null ? '' : '/profiles/'.$profile))->with('inventory_notice',
             $input['operation'] === 'save' ? 'Migration review saved. Check all disks and owner inputs before confirming.' : 'This migration review is confirmed. Execution requires current approval and qualification.');
     }
 

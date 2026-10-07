@@ -105,3 +105,13 @@ The [transactional messaging foundation](../implementation/p01-messaging.md) add
 service-owned reference fact/outbox (Catalogue) and inbox/projection (Planning).
 It exposes no product API or authorization decision. See that record for the exact
 contract, retry, isolation and verification scope.
+
+## P08 fleet preparation consumer
+
+The Console's group preparation uses the existing migration-preparations operation
+once per VM, with a fresh plan.create delegation for the saved group's application,
+environment and site. Inventory supplies the current confirmed VM review, full disk
+mapping and deterministic target disk keys derived from group revision/member/disk.
+The browser supplies only the group revision/digest and member resource ID. Planning
+re-reads the authenticated exact review before creating bindings. Bulk selection does
+not bypass per-VM owner inputs, policy, qualification, approval or Lifecycle admission.

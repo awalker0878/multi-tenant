@@ -89,3 +89,24 @@ Owned source root: `services/inventory/src/inventory/`. Site/endpoint registrati
 Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). This Python service retains `domain/`, `application/`, `infrastructure/` and `interfaces/` with the documented dependency direction. Its capability modules may collaborate within the same owning context. Composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages. The pragmatic Laravel convention in ADR-024 applies to PHP services and does not relocate this Python source.
 
 The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.
+
+## P08 source fleet and migration groups
+
+Inventory v1.3 adds a paged projection of VMware machines from completed native API
+collection generations, including names, native scope, power, CPU/memory and current
+workload-profile facts. A missing profile stays visible with its hold; manual entries
+cannot replace native identities or device facts. The Console can request another
+scoped discovery through the existing leased worker and endpoint budget.
+
+Inventory owns append-only named migration groups of up to 50 resource identities,
+one catalogue application/environment and one observed OpenStack project/format.
+Creation binds each member's observed immutable source identity. Updates require the
+exact group revision and a replay-safe command key. A newly discovered or reused VM
+identity requires explicit group review; it cannot silently replace the selected VM.
+Tenant/site checks apply to lists, group membership, target profiles and preparation.
+
+VM review routes select the current review for that source endpoint/native VM, while
+revision numbers remain unique within the site. Planning can consume multiple current
+confirmed VM reviews together; saving another VM no longer invalidates the first.
+Updating a VM's own review or source/target observations invalidates its earlier input.
+Groups provide current per-member preparation requests; they grant no native authority.

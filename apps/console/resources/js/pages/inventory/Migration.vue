@@ -4,12 +4,12 @@ import { Link, router, useForm } from '@inertiajs/vue3';
 import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 import type { MigrationReviewInput, MigrationWorkspace } from '../../features/inventory/contracts';
 import { observedTime, useInventoryAccess } from '../../features/inventory/useAccess';
-const props = defineProps<{ tenantId: string; siteId: string; workspace: MigrationWorkspace; notice: string | null }>();
-const base = `/tenants/${props.tenantId}/inventory/sites/${props.siteId}/migration`;
+const props = defineProps<{ tenantId: string; siteId: string; profileId?: string | null; workspace: MigrationWorkspace; notice: string | null }>();
+const base = `/tenants/${props.tenantId}/inventory/sites/${props.siteId}/migration${props.profileId ? `/profiles/${props.profileId}` : ''}`;
 const { unavailable, now } = useInventoryAccess(base + '/status');
 const saved = props.workspace.review;
-const initial = saved?.input ?? {
-  source_profile_id: '', target_profile_id: '', method: '', datasets: [],
+const initial = saved?.input && (!props.profileId || saved.input.source_profile_id === props.profileId) ? saved.input : {
+  source_profile_id: props.profileId ?? '', target_profile_id: '', method: '', datasets: [],
   owner_inputs: Object.fromEntries(props.workspace.owner_fields.map(field => [field, ''])) as MigrationReviewInput['owner_inputs'],
   objectives: { owner_id: '', acceptance_sha256: '', max_outage_seconds: 0, max_data_loss_bytes: 0 }, overrides: [],
 };
@@ -32,6 +32,7 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
 <template>
   <CatalogueLayout title="Migration readiness review" :tenant-id="tenantId">
     <Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}/configuration`" class="text-teal-800 underline">Environment configuration and API collection</Link>
+    <Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}/migration-fleet`" class="ml-4 text-teal-800 underline">Source inventory and migration groups</Link>
     <p class="my-4">Review discovered source and destination facts, account for every disk, and select one migration method. Enter application information and references that the platform APIs cannot determine.</p>
     <p v-if="notice" role="status" class="my-4 border border-teal-600 p-4">{{ notice }}</p>
     <div v-if="Object.keys(errors).length" id="migration-errors" role="alert" tabindex="-1" class="my-4 border border-red-600 p-4"><p v-for="(error, key) in errors" :key="key">{{ key === 'inventory_status' ? '' : error }}</p></div>
@@ -41,7 +42,7 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
     <form @submit.prevent="act('save')"><fieldset :disabled="blocked" class="space-y-5">
       <legend class="text-xl font-semibold">Source, destination and method</legend>
       <div class="grid gap-4 md:grid-cols-2">
-        <label>Source VM profile<select v-model="form.review.source_profile_id" required><option value="">Select observed source</option><option v-if="saved && !workspace.profiles.some(p => p.id === saved?.source.id)" :value="saved.source.id">{{ saved.source.native_id }} — refresh required</option><option v-for="p in workspace.profiles.filter(p => p.profile_type === 'SourceWorkloadProfile')" :key="p.id" :value="p.id">{{ p.native_id }} · {{ observedTime(p.collected_at) }}{{ p.current ? '' : ' · stale' }}</option></select></label>
+        <label>Source VM profile<select v-model="form.review.source_profile_id" :disabled="!!profileId" required><option value="">Select observed source</option><option v-if="saved && !workspace.profiles.some(p => p.id === saved?.source.id)" :value="saved.source.id">{{ saved.source.native_id }} — refresh required</option><option v-for="p in workspace.profiles.filter(p => p.profile_type === 'SourceWorkloadProfile')" :key="p.id" :value="p.id">{{ p.native_id }} · {{ observedTime(p.collected_at) }}{{ p.current ? '' : ' · stale' }}</option></select></label>
         <label>OpenStack target profile<select v-model="form.review.target_profile_id" required><option value="">Select observed destination</option><option v-if="saved && !workspace.profiles.some(p => p.id === saved?.target.id)" :value="saved.target.id">{{ saved.target.native_id }} — refresh required</option><option v-for="p in workspace.profiles.filter(p => p.profile_type === 'TargetCapabilityProfile')" :key="p.id" :value="p.id">{{ p.native_id }} · {{ observedTime(p.collected_at) }}{{ p.current ? '' : ' · stale' }}</option></select></label>
       </div>
       <label>Explicit migration method<select v-model="form.review.method" required><option value="">Select a method</option><option v-for="method in workspace.methods" :key="method" :value="method">{{ method.replaceAll('_', ' ') }}</option></select></label>

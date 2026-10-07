@@ -51,3 +51,8 @@ it('rechecks access on polling and applies csrf to migration writes', function (
     $this->app['env'] = 'csrf-check';
     $this->post($this->base, ['operation' => 'save'])->assertStatus(419);
 });
+
+it('opens a VM-specific review without a site-wide latest review collision', function (): void {
+    $this->inventory->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->tenant, 'getVmMigrationReview', ['site' => $this->site, 'profile' => $this->key])->andReturn(['review' => null]);
+    $this->get($this->base.'/profiles/'.$this->key)->assertOk()->assertInertia(fn (Assert $p) => $p->component('inventory/Migration')->where('profileId', $this->key));
+});
