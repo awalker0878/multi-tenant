@@ -136,9 +136,7 @@ def prepared(
     for phase in PHASES:
         campaigns.sample(tenant, plan["executor_id"], str(uuid4()), sample(phase))
     with psycopg.connect(**postgres, autocommit=True) as c:
-        c.execute(
-            "INSERT INTO app.native_control VALUES(1,%s,false)", (plan["epoch"],)
-        )
+        c.execute("INSERT INTO app.native_control VALUES(1,%s,false)", (plan["epoch"],))
         c.execute(
             "INSERT INTO app.migration_pool_observations "
             "VALUES(%s,%s,%s,10000,false,1000,1900,%s,%s)",
