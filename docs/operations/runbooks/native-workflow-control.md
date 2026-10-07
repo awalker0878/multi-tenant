@@ -118,7 +118,7 @@ Its current authority, native-plan process, provider observations and other stag
 effects are synthetic; this is E2 software evidence, not a native Q05/Q06 result.
 Actual run results are retained separately.
 
-## Saved-plan effect submission
+## Native API effect submission
 
 `NativeWorkerEffects` implements the dispatch port through one registered executor
 endpoint with a fixed IP, verified TLS hostname/CA and protected workload credential.
@@ -127,12 +127,13 @@ must bind the exact grant and explicitly deny readiness and retry authority.
 Uncertain transport outcomes enter the same reconciliation hold.
 
 The [worker effect contract](../../../contracts/openapi/worker-native-effect-v1.json)
-is implemented by `NativeEffectApp` and `NativeSavedPlanEffect`. Caller trust supplies
+is implemented by `NativeEffectApp` and `NativeApiEffect`. Caller trust supplies
 tenant and worker independently from JSON. The use case checks current authority
 before resolving tooling, then uses the existing native-plan journal and one-time
-grant redemption. Only the provision stage is supported; other stages require
-their selected service adapters and remain held. `MountedNativeTooling` resolves
-the existing protected tooling/observer packet, validates actual bound artifact
+grant redemption. Version 1 supports the provision stage. Version 2 migration grants require the
+explicit registered stage/intent composition described in the
+[native migration runbook](native-migration.md). Uncommissioned stages remain held.
+`MountedNativeRuntime` resolves protected native API plans, validates exact intent
 bytes and uses the independently scoped OpenStack observer. That packet conveys
 no native authority and does not replace confirmed Inventory/Console configuration.
 

@@ -314,11 +314,17 @@ phases:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P08-001
-  blocker_ids: []
-  delivery_note: P08 design defines normalized profiles, explicit methods, isolated snapshot-bound clone/export,
-    copy-only conversion/transformation, native import, delta/cutover and recovery in M1–M14 order. Fourteen synthetic
-    HTTPS component tests exercise part of M3/M4/M6 only. Snapshot/clone, OVF, conversion, guest transformation
-    and delta workflows remain unimplemented; no native Q07 or G08 acceptance.
+  - EV-P08-002
+  - EV-P08-003
+  blocker_ids:
+  - BL-P08-001
+  - BL-P08-002
+  delivery_note: Read-only workload/target profile components, exact-S0 isolated capture, retained NFC/OVF archives,
+    pinned copy conversion, explicit Glance import and durable migration/recovery contracts are implemented. Source
+    a72d0e8 passes 295 Lifecycle, 204 worker and 59 Inventory-worker tests without skips and all 20 quality/build/schema
+    commands. Profile persistence and Console/Planning integration, commissioned owner/trust/stage composition,
+    real converter/guest qualification and selected guest/service/delta/fencing/traffic/recovery/cleanup adapters
+    remain unfinished. No native Q07, G08 or operating acceptance.
 - id: P09
   title: Platform and capability expansion
   owner_role: Infrastructure and qualification leads
@@ -1858,17 +1864,27 @@ work_packages:
   title: Source readiness
   owner_role: Inventory/lifecycle
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P08-002
+  - EV-P08-003
+  blocker_ids:
+  - BL-P08-001
+  - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
+  - docs/implementation/p08-execution.md
+  - docs/implementation/p08-completion-review.md
+  - docs/operations/runbooks/native-migration.md
   criterion_ids:
   - G08.01
   - G08.02
+  delivery_note: API-first VMware workload and observed OpenStack target normalization, identity/configuration drift
+    and all-disk/unsupported-feature holds pass E2 tests. Inventory profile persistence and Console/Planning admission
+    still need integration; actual datasets, owner definitions and installed/native qualification are not supplied.
 - id: P08.02
   phase_id: P08
   title: Method and data movement
@@ -1880,62 +1896,101 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P08-001
-  blocker_ids: []
+  - EV-P08-002
+  - EV-P08-003
+  blocker_ids:
+  - BL-P08-001
+  - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
+  - docs/implementation/p08-execution.md
+  - docs/implementation/p08-completion-review.md
+  - docs/operations/runbooks/native-migration.md
   criterion_ids:
   - G08.01
-  delivery_note: P08 design defines normalized profiles, explicit methods, isolated snapshot-bound clone/export,
-    copy-only conversion/transformation, native import, delta/cutover and recovery in M1–M14 order. Fourteen synthetic
-    HTTPS component tests exercise part of M3/M4/M6 only. Snapshot/clone, OVF, conversion, guest transformation
-    and delta workflows remain unimplemented; no native Q07 or G08 acceptance.
+  delivery_note: Snapshot-bound isolated capture, retained NFC/manifest/OVF archives, explicit copy-only conversion
+    and Glance-direct image import are implemented and component-tested. Same-job artifact custody is digest-bound
+    and rejects incomplete/late receipts. QEMU command engine is synthetic; the real rootfs/guest is unqualified.
+    Reconciled long-transfer continuation, copied-guest preparation, selected deltas and composed native object/readback
+    integration remain unfinished.
 - id: P08.03
   phase_id: P08
   title: Rehearsal
   owner_role: Lifecycle/application owner
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P08-002
+  - EV-P08-003
+  blocker_ids:
+  - BL-P08-001
+  - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
+  - docs/implementation/p08-execution.md
+  - docs/implementation/p08-completion-review.md
+  - docs/operations/runbooks/native-migration.md
   criterion_ids:
   - G08.01
   - G08.04
+  delivery_note: The durable rehearsal contract omits target business-write admission and requires independent suppression,
+    guest, data, service/policy and retention observations. Concrete adapters and a measured native representative
+    rehearsal remain unfinished; component checks do not establish business-effect suppression.
 - id: P08.04
   phase_id: P08
   title: Cutover
   owner_role: Lifecycle/governance
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P08-002
+  - EV-P08-003
+  blocker_ids:
+  - BL-P08-001
+  - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
+  - docs/implementation/p08-execution.md
+  - docs/implementation/p08-completion-review.md
+  - docs/operations/runbooks/native-migration.md
   criterion_ids:
   - G08.02
   - G08.04
+  delivery_note: Version 2 migration admission binds current profiles/method/datasets and orders final sync, source
+    shutdown, integrity and activation. First possible write is committed with grant redemption. Independent native
+    source/other-writer fencing, provider drain and actual guest/service/traffic effect/observer composition remain
+    required.
 - id: P08.05
   phase_id: P08
   title: Recovery decisions
   owner_role: Infrastructure/application owner
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P08-002
+  - EV-P08-003
+  blocker_ids:
+  - BL-P08-001
+  - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
+  - docs/implementation/p08-execution.md
+  - docs/implementation/p08-completion-review.md
+  - docs/operations/runbooks/native-migration.md
   criterion_ids:
   - G08.03
+  delivery_note: Separately approved pre-write and post-write recovery contracts, monotonic custody, atomic predecessor
+    stop and retained write ancestry pass real PostgreSQL tests. Actual forward/reverse data recovery, single-writer
+    restoration, cleanup/consolidation and owner-objective measurements remain unfinished.
 - id: P08.06
   phase_id: P08
   title: Acceptance
@@ -1946,14 +2001,21 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P08-001
+  - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
+  - docs/implementation/p08-execution.md
+  - docs/implementation/p08-completion-review.md
+  - docs/operations/runbooks/native-migration.md
   criterion_ids:
   - G08.01
   - G08.02
   - G08.03
   - G08.04
+  delivery_note: The component evidence and remaining implementation/receiving packet are prepared. Actual Q07 native
+    dossier, G08 review and bounded supported-tuple acceptance are not started.
 - id: P09.01
   phase_id: P09
   title: Platform tranches
@@ -2969,10 +3031,14 @@ requirements:
   - EV-P06-001
   - EV-P06-002
   - EV-P06-003
+  - EV-P08-002
+  - EV-P08-003
   blocker_ids:
   - BL-P05-001
   - BL-P06-001
   - BL-P07-001
+  - BL-P08-001
+  - BL-P08-002
 - id: R18
   package_ids:
   - P07.01
@@ -3128,9 +3194,13 @@ requirements:
   - EV-P05-001
   - EV-P05-002
   - EV-P05-003
+  - EV-P08-002
+  - EV-P08-003
   blocker_ids:
   - BL-P05-001
   - BL-P07-001
+  - BL-P08-001
+  - BL-P08-002
 - id: R22
   package_ids:
   - P06.02
@@ -3155,16 +3225,20 @@ requirements:
   - G06
   - G08
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P06-001
   - EV-P06-002
   - EV-P06-003
+  - EV-P08-002
+  - EV-P08-003
   blocker_ids:
   - BL-P06-001
+  - BL-P08-001
+  - BL-P08-002
 - id: R23
   package_ids:
   - P06.02
@@ -3190,16 +3264,20 @@ requirements:
   - G06
   - G08
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P06-001
   - EV-P06-002
   - EV-P06-003
+  - EV-P08-002
+  - EV-P08-003
   blocker_ids:
   - BL-P06-001
+  - BL-P08-001
+  - BL-P08-002
 - id: R24
   package_ids:
   - P06.02
@@ -3221,16 +3299,20 @@ requirements:
   - G06
   - G08
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P06-001
   - EV-P06-002
   - EV-P06-003
+  - EV-P08-002
+  - EV-P08-003
   blocker_ids:
   - BL-P06-001
+  - BL-P08-001
+  - BL-P08-002
 - id: R25
   package_ids:
   - P07.05
@@ -3522,12 +3604,16 @@ requirements:
   - EV-P06-001
   - EV-P06-002
   - EV-P06-003
+  - EV-P08-002
+  - EV-P08-003
   blocker_ids:
   - BL-P01-001
   - BL-P01-002
   - BL-P02-002
   - BL-P06-001
   - BL-P07-001
+  - BL-P08-001
+  - BL-P08-002
 - id: R32
   package_ids:
   - P00.05
@@ -3629,12 +3715,16 @@ requirements:
   - EV-P06-002
   - EV-P06-003
   - EV-P07-003
+  - EV-P08-002
+  - EV-P08-003
   blocker_ids:
   - BL-P03-001
   - BL-P03-002
   - BL-P05-001
   - BL-P06-001
   - BL-P07-001
+  - BL-P08-001
+  - BL-P08-002
 - id: R34
   package_ids:
   - P00.05
@@ -3906,7 +3996,9 @@ gates:
   reviewer: null
   reviewed_at: null
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P08-001
+  - BL-P08-002
 - id: G09
   phase_id: P09
   decision: NOT_REVIEWED
@@ -6820,6 +6912,52 @@ evidence:
   limitations: Partial M3/M4/M6 component only; synthetic vSphere/Glance peers. No source snapshot/isolated clone,
     OVF descriptor, conversion, guest transformation, delta or native cutover workflow. No installed-platform migration,
     Q07 acceptance or G08 review.
+- id: EV-P08-002
+  level: E2
+  source_revision: e850ea258e85ae7a2020eaab5ee967cffc6b8931
+  artifact_revisions:
+    p08_run_id: '37588926432'
+    retained_artifact_commit: bde88cd01fd171c82fb9fdbf1a715958401b8d11
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T07:42:23.746685+00:00'
+  observer: GitHub Actions PostgreSQL/TLS/component campaigns; Codex verified original archive/source/log hashes.
+  reviewer: Codex engineering consistency review only; designated native and receiving reviewers remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/bde88cd01fd171c82fb9fdbf1a715958401b8d11/verification/p08/reports/p08-components-37588926432-1/report.json
+  sha256: b8370785933d21e61de9cb41f882a0d1509e8d13706e0d1202a63170dad8bb06
+  environment: GitHub Actions Ubuntu 24.04, Python 3.12.14, uv 0.12.19 and PostgreSQL 16; native API/current-owner
+    peers are synthetic.
+  scope: Read-only VMware profiling, isolated exact-S0 capture and durable version 2 migration/recovery control.
+    All 20 commands pass; 295 Lifecycle, 155 worker and 58 Inventory-worker tests pass without skips. All 14 selected
+    source workflows passed. Original source/log bindings are retained.
+  limitations: Real PostgreSQL and TLS; synthetic native/current-owner fixtures. No native capture, guest transform,
+    data recovery, installed-platform Q07 or G08 receiving. Later data-path components are separately evidenced.
+- id: EV-P08-003
+  level: E2
+  source_revision: a72d0e88b3626b6912cf189c46ce45cf2fc4878c
+  artifact_revisions:
+    p08_run_id: '37592736006'
+    retained_artifact_commit: bde88cd01fd171c82fb9fdbf1a715958401b8d11
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T08:17:13.542244+00:00'
+  observer: GitHub Actions PostgreSQL/TLS/component campaigns; Codex verified original archive/source/log hashes.
+  reviewer: Codex engineering consistency review only; designated native and receiving reviewers remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/bde88cd01fd171c82fb9fdbf1a715958401b8d11/verification/p08/qualification-index.json
+  sha256: fc4e28862364f812a4f7deb9894117b1141a5eabf829a630e7079c0d960823bc
+  environment: GitHub Actions Ubuntu 24.04, Python 3.12.14, uv 0.12.19 and PostgreSQL 16; native API/current-owner
+    peers are synthetic.
+  scope: Observed target profile normalization, retained NFC/OVF archives, bounded pinned copy conversion, exact
+    Glance import, completed artifact custody and safe threaded subprocess limits. All 20 commands pass; 295 Lifecycle,
+    204 worker and 59 Inventory-worker tests pass with no skips/failures. 262 source bindings and all command logs
+    match; all eight final-source workflows pass. Original failures and corrections are retained.
+  limitations: Synthetic native/current-owner/QEMU engine peers; actual PostgreSQL/TLS/subprocess bounds only. Inventory/Planning/Console
+    integration and commissioned owner/trust/stage adapters remain unfinished. No real converter rootfs, guest boot/transform,
+    native fencing, data/delta/recovery, Q07, G07/G08 review, P08 completion or operating acceptance.
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -7192,5 +7330,68 @@ blockers:
     effect and observer adapters. Collect actual installed/interface/operating inputs through API-first Console,
     then execute the scoped Q05/Q06 campaign and receiving review. Existing development authorization persists;
     synthetic owners cannot supply missing native facts or service interfaces.
+  state: OPEN
+  resolution_evidence_ids: []
+
+- id: BL-P08-001
+  scope_ids:
+  - P08
+  - P08.01
+  - P08.02
+  - P08.03
+  - P08.04
+  - P08.05
+  - P08.06
+  - G08
+  - R17
+  - R21
+  - R22
+  - R23
+  - R24
+  - R31
+  - R33
+  owner_role: Inventory, Planning, Console, Lifecycle and Infrastructure engineering leads
+  description: P08 software is not complete. Workload profile components are not yet persisted/composed into Inventory/Planning/Console
+    migration admission. Actual stage writer/independent-observer composition, qualified real converter and copied-guest
+    preparation, selected delta/service/traffic/recovery/cleanup implementations and reconciled long-transfer continuation
+    remain outstanding. E2 components do not close those outputs.
+  unblock_condition: Deliver the remaining outputs in docs/implementation/p08-completion-review.md, bind supplied
+    actual owner protocols, qualify the complete selected method including uncertainty/recovery and retain exact-source
+    results without simulation authority or fallback.
+  next_action: Persist immutable source/target profiles and current-revision admission through the owning service
+    and Console contracts. Compose explicit adapters and independent readers against the commissioned interfaces;
+    keep unregistered effects held. Existing development authorization continues.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P08-002
+  scope_ids:
+  - P08
+  - P08.01
+  - P08.02
+  - P08.03
+  - P08.04
+  - P08.05
+  - P08.06
+  - G08
+  - R17
+  - R21
+  - R22
+  - R23
+  - R24
+  - R31
+  - R33
+  owner_role: VMware/OpenStack platform, application/data, guest, service/security, SRE and independent qualification
+    owners
+  description: No actual qualified G07 path, VMware/OpenStack/guest tuple, scoped native authority/trust/fencing,
+    complete datasets and chosen owner delta/recovery/service protocols, conversion custody runtime, authorized
+    native lab, Q07 observations or G08 receiving decisions have been supplied. Software fixtures cannot invent
+    these native and application inputs.
+  unblock_condition: Collect API-visible facts through Inventory, validate them in Console and supply the concrete
+    owner-only inputs listed in docs/implementation/p08-completion-review.md. Commission the implementations, execute
+    Q07.01-Q07.10 and applicable Q05/Q06 with both recovery boundaries, verify measured owner objectives and record
+    actual receiving decisions.
+  next_action: Platform/application/service owners provide the packet input rows and the exact authorized native
+    campaign scope through protected custody. Complete native G07 entry, then run the selected P08 method with independent
+    observation. No renewed G00/development permission is required.
   state: OPEN
   resolution_evidence_ids: []

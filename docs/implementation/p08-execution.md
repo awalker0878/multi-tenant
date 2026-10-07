@@ -56,7 +56,8 @@ bytes; it does not boot a guest or qualify an installed image backend.
 Artifact handoffs are references to prior immutable stage-intent digests. The
 worker resolves native clone/operation identities from its journal under the same
 job, tenant, source plan, epoch, scope and custody generation. Unknown, duplicate,
-partial or cross-job receipts hold the next stage. No payload crosses the control
+partial or cross-job receipts hold the next stage. Completion binds the aggregate
+all-disk digest; additional disk events after completion are rejected. No payload crosses the control
 API, Console or event bus. The current single activity is bounded to ten minutes;
 large transfers need separately qualified chunk/range reconciliation rather than
 an implicit longer timeout or blind restart.
@@ -94,13 +95,25 @@ worker journal possession does not authorize an effect.
 
 ## Current qualification boundary
 
-Local static/type checks and synthetic component tests cover these invariants.
-Real PostgreSQL checks run in the established hosted campaign because this local
-container cannot create the required unprivileged database account. Tests with
-missing engines remain skipped, not passing. Exact-source hosted evidence is
-recorded after the campaign completes.
+The [retained index](../../verification/p08/qualification-index.json) verifies
+original source-bound archives, reports and command logs. At source
+`a72d0e88b3626b6912cf189c46ce45cf2fc4878c`, the hosted campaign passes all 20
+static/type/build/schema/test commands: 295 Lifecycle, 204 worker and 59
+Inventory-worker tests, with no skips or failures. It verifies 262 source bindings.
+The [check matrix](../../verification/p08/check-matrix.md) separates real
+PostgreSQL/TLS/subprocess checks from synthetic native and current-owner peers.
+The earlier strict-type failure remains FAILED in the original evidence, with
+its correction and rerun recorded separately.
 
-Remaining implementation includes profile persistence and Console admission,
+Real PostgreSQL checks run in the established hosted campaign because this local
+container cannot create the required unprivileged database account. Missing-engine
+local skips are not passing. The converter launcher sets limits in a fresh isolated
+interpreter instead of a multithreaded-fork hook. Actual subprocess bounds and
+cancellation are tested; a QEMU/bubblewrap rootfs and guest remain unqualified.
+
+The [completion packet](p08-completion-review.md) and
+[custody runbook](../operations/runbooks/native-migration.md) give the concrete
+remaining obligations and recovery procedure. Remaining implementation includes profile persistence and Console admission,
 commissioned capture/conversion/native-readback composition, concrete guest/service/
 delta/traffic/recovery adapters and a composed native Q07 journey. Source and target
 profile components distinguish observed facts from further capability evidence;

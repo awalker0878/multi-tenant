@@ -1,17 +1,33 @@
 # Next work — P08 native migration
 
 P08 development continues on the native-only baseline. The [implementation record](docs/implementation/p08-execution.md)
-tracks source profiling, exact-S0 isolated capture, ordered migration/recovery
-contracts and durable first-possible-write/custody boundaries. These components
-are under qualification; P08 and G08 remain open. Preserve P07's native entry
-requirements below while completing all independently testable P08 work.
+now covers source/target normalization, exact-S0 isolated capture, retained NFC/OVF
+archives, copy conversion, explicit Glance import and durable migration/recovery.
+The [retained evidence](verification/p08/qualification-index.json) at `a72d0e8`
+passes 295 Lifecycle, 204 worker and 59 Inventory-worker tests without skips, plus
+all static/type/build/contract commands. Original failures remain recorded.
 
-1. Complete and qualify native OVF retention, bounded copy/conversion and artifact handoff.
-2. Complete source/target profile persistence and Console migration controls.
-3. Bind actual guest/service/delta/fencing/traffic/recovery owners and their adapters.
-4. Execute Q07 with the actual selected VMware/OpenStack tuples, all datasets,
-   owner-approved outage/data objectives and independent observers; retain original
-   results and real receiving decisions. Do not substitute synthetic component tests.
+**P08 remains incomplete and G08 NOT_REVIEWED.** The [completion packet](docs/implementation/p08-completion-review.md)
+separates unfinished software (BL-P08-001) from actual native/owner inputs
+(BL-P08-002). Continue in this order under the existing development authorization:
+
+1. Persist immutable workload profiles in Inventory and bind Planning/Console
+   review and migration admission to the current profiles and all datasets.
+2. Compose the selected stage effects with authenticated owner/trust and independent
+   readback; qualify the actual converter rootfs and copied-guest profile. Bind the
+   selected application/file delta, service, native writer-fence, traffic, recovery
+   and cleanup protocols. Extend transfer continuation only with reconciled byte
+   ranges/custody and renewed authority; the current activity has a ten-minute bound.
+3. Obtain the packet's exact VMware/OpenStack tuple, guest/data/method/objectives,
+   scoped identities, service/fencing protocols and authorized native lab. Complete
+   the G07 path and its Q05/Q06 obligations before native P08 acceptance.
+4. Execute all Q07 cases with independent observers, both data recovery boundaries,
+   policy/services/restore and measured owner objectives. Retain original results
+   and record real G08 receiving decisions. Software tests cannot supply these.
+
+Use the [native migration runbook](docs/operations/runbooks/native-migration.md).
+No native environment, commissioned owner protocols or Q07/G08 outcomes were supplied.
+No migration effect is enabled by this evidence publication.
 
 # Retained P07 native API qualification
 
@@ -47,8 +63,8 @@ checks cannot establish installed-platform acceptance or complete those outcomes
 P08 follows [the native migration design](docs/implementation/p08-native-migration.md):
 explicit method selection, isolated snapshot-bound clone/export, copy-only conversion
 and guest changes, delta strategies, native import, validation and recovery. The
-export/import component covers only part of M3/M4/M6 and is not a complete P08
-workflow or evidence of P07 native acceptance.
+newer P08 components and their remaining work are recorded above; they do not
+establish P07 native acceptance or a completed P08 journey.
 
 # Retained P06 engineering handoff
 

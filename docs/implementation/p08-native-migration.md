@@ -147,10 +147,14 @@ Successful migration never implicitly retires the source.
 | M13 | Separately qualified VMware → Nutanix / VMware destinations |
 | M14 | Optional approved external block-replication adapters; VDDK only if entitled |
 
-The worker's export/import component exercises part of M3/M4/M6 against synthetic
-HTTPS peers. It does not implement snapshot/clone capture, OVF generation,
-conversion, guest transformation or delta cutover, and is not a completed P08
-journey. It supplies no P07 installed-platform acceptance evidence.
+The [implementation record](p08-execution.md) now covers read-only profile
+components, disk-only S0/isolated exact-S0 capture, retained NFC/OVF archives,
+copy-only conversion, explicit Glance import and durable migration/recovery
+control. Component qualification uses synthetic native peers; the conversion
+engine/guest, owner protocols and composed Q07 journey remain unqualified.
+The [completion packet](p08-completion-review.md) separates unfinished software
+from actual commissioning/receiving inputs. P08 and G08 remain incomplete; these
+components supply no P07 installed-platform acceptance evidence.
 
 ## Native contract references
 
