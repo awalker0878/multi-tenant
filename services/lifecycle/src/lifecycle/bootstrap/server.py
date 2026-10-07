@@ -9,6 +9,7 @@ from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from lifecycle.application.campaigns import Campaigns
 from lifecycle.application.execution import Execution
+from lifecycle.domain.campaign_plan import plan_requirements
 from lifecycle.infrastructure.campaign_observers import CampaignObservers
 from lifecycle.infrastructure.execution_owners import (
     EvidenceCustody,
@@ -19,7 +20,7 @@ from lifecycle.infrastructure.foundation import database_ready
 from lifecycle.infrastructure.store import Postgres
 from lifecycle.infrastructure.telemetry import BoundedSignalBuffer
 from lifecycle.interfaces.campaign_observations import CampaignObservationApp
-from lifecycle.interfaces.campaigns import CampaignApp, plan_requirements
+from lifecycle.interfaces.campaigns import CampaignApp
 from lifecycle.interfaces.execution import ExecutionApp
 from lifecycle.interfaces.http import FoundationApp
 from lifecycle.interfaces.telemetry import RequestTelemetry

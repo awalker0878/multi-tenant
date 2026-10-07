@@ -15,10 +15,11 @@ from uvicorn._types import ASGIReceiveEvent, ASGISendEvent, HTTPScope
 
 from lifecycle.application.campaigns import Campaigns
 from lifecycle.domain.admission import digest
+from lifecycle.domain.campaign_plan import plan_requirements
 from lifecycle.domain.execution import Rejected
 from lifecycle.infrastructure.campaign_observers import CampaignObservers
 from lifecycle.interfaces.campaign_observations import CampaignObservationApp
-from lifecycle.interfaces.campaigns import CampaignApp, plan_requirements
+from lifecycle.interfaces.campaigns import CampaignApp
 
 TOKEN = "a" * 64
 

@@ -21,8 +21,8 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
-    prefixes = ('services/lifecycle/', 'services/inventory/', 'services/planning/', 'workers/lifecycle/', 'workers/inventory/', 'apps/console/',
-                'scripts/p08/', 'scripts/p04/generate_clients.py', 'contracts/schemas/inventory/', 'contracts/schemas/planning/migration-', 'contracts/openapi/inventory-v1.', 'contracts/openapi/lifecycle-migration-',
+    prefixes = ('services/lifecycle/', 'services/inventory/', 'services/planning/', 'services/governance/', 'workers/lifecycle/', 'workers/inventory/', 'apps/console/',
+                'scripts/p08/', 'scripts/p04/generate_clients.py', 'contracts/schemas/inventory/', 'contracts/schemas/planning/migration-', 'contracts/openapi/inventory-v1.', 'contracts/openapi/inventory-native-', 'contracts/openapi/governance-native-', 'contracts/openapi/lifecycle-migration-',
                 'contracts/openapi/worker-migration-', 'contracts/openapi/planning-migration-', 'contracts/openapi/planning-v1.1.json', 'contracts/fixtures/lifecycle/migration-', 'contracts/fixtures/inventory/migration-',
                 '.github/workflows/p08-')
     report = {
@@ -35,7 +35,7 @@ def main():
             'Synthetic vSphere/owner fixtures do not qualify an installed VMware/OpenStack tuple.',
             'No application dataset, guest transform, production writer fencing or native Q07 acceptance.',
             'Conversion command tests use a synthetic engine; no QEMU/bubblewrap rootfs or guest boot is qualified.',
-            'Current owner/trust composition and site-specific effect integrations remain required.',
+            'Commissioned owner identities, provider custody/fencing and site-specific effect integrations remain required.',
         ],
     }
     env = {k: v for k, v in os.environ.items() if not k.startswith(('OS_', 'TF_')) and k != 'PYTHONPATH'}

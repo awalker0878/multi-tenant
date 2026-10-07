@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from lifecycle.domain.admission import digest
+from lifecycle.domain.campaign_plan import plan_requirements
 from lifecycle.domain.execution import Rejected, decode, identity
 from lifecycle.domain.migration import current_profiles
 from lifecycle.domain.native_workflow import (
@@ -29,7 +30,6 @@ from lifecycle.infrastructure.native_effects import (
     NativeWorkerEndpoint,
     credential,
 )
-from lifecycle.interfaces.campaigns import plan_requirements
 
 
 def endpoint(value: Any) -> NativeWorkerEndpoint:

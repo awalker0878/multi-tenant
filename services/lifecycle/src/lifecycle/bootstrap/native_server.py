@@ -19,6 +19,7 @@ from lifecycle.application.campaigns import Campaigns
 from lifecycle.application.native_workflow import NativeWorkflow
 from lifecycle.bootstrap.native_workflow import run_native
 from lifecycle.domain.admission import digest
+from lifecycle.domain.campaign_plan import plan_requirements
 from lifecycle.domain.execution import Rejected, decode
 from lifecycle.domain.native_workflow import exact
 from lifecycle.infrastructure.campaign_observers import CampaignObservers, protected
@@ -33,7 +34,7 @@ from lifecycle.infrastructure.native_owners import (
 )
 from lifecycle.infrastructure.store import Postgres
 from lifecycle.interfaces.campaign_observations import CampaignObservationApp
-from lifecycle.interfaces.campaigns import CampaignApp, plan_requirements
+from lifecycle.interfaces.campaigns import CampaignApp
 from lifecycle.interfaces.http import FoundationApp
 from lifecycle.interfaces.native import NativeBoundaryApp
 
