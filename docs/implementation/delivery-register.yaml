@@ -278,15 +278,16 @@ phases:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-004
   - EV-P07-001
   - EV-P07-002
   - EV-P07-003
   blocker_ids:
   - BL-P07-001
-  delivery_note: API-first OpenStack configuration pulls and Console administrator review pass E2 software qualification;
-    commissioning-input and saved-plan preparation retain their original E1 evidence. Actual native configuration
-    is supplied at runtime through API discovery and Console validation. Native provisioning/service/recovery/retirement
-    adapters and Q05/Q06 E3 remain unfinished, so P07 and G07 are not complete.
+  delivery_note: API-first configuration and Console review retain E2 evidence; protected saved-plan execution,
+    OpenStack readback, durable attempt holds and quarantined Terraform modules now pass component qualification
+    at dd31bed12de3133b30f0a06072ada37abd9f4961. Native grant/fencing integration, service/guest workflows,
+    activation, recovery/retirement and Q05/Q06 E3 remain unfinished. P07 and G07 are not complete.
 - id: P08
   title: VMware-to-OpenStack migration
   owner_role: Infrastructure and application owner
@@ -1724,10 +1725,12 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-004
   - EV-P07-001
   blocker_ids:
   - BL-P07-001
   doc_refs:
+  - docs/operations/runbooks/openstack-native-adapters.md
   - docs/implementation/phases/p07.md
   - docs/implementation/p07-native-provisioning.md
   - docs/operations/runbooks/openstack-commissioning.md
@@ -1736,9 +1739,9 @@ work_packages:
   - G07.01
   - G07.02
   - G07.03
-  delivery_note: Offline saved-plan byte, toolchain, state/lock and ownership comparisons implemented. No Terraform
-    apply, authenticated native adapter or native readback is supplied; actual tuple/interface/tool selections are
-    required.
+  delivery_note: Actual tool/bundle/plan verification, saved-plan subprocess control, scoped TLS OpenStack readback
+    and quarantined multi-workload Terraform modules pass E2 component checks. The installed command is read-only;
+    native grant redemption, dispatch and provider/backend fencing integration and native qualification remain.
 - id: P07.03
   phase_id: P07
   title: Guest and service integration
@@ -1784,21 +1787,24 @@ work_packages:
   title: Failure and retirement
   owner_role: Lifecycle
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P07-004
   blocker_ids:
   - BL-P07-001
   doc_refs:
+  - docs/operations/runbooks/openstack-native-adapters.md
   - docs/implementation/phases/p07.md
   - docs/implementation/p07-completion-review.md
   criterion_ids:
   - G07.03
   - G07.04
-  delivery_note: Native implementation is not started; the exact interface and campaign prerequisites are recorded
-    in BL-P07-001 and the remaining implementation packet.
+  delivery_note: Append-only PostgreSQL attempt/state-lineage claims, reconnect persistence, process interruption
+    and uncertain/drifted readback holds pass component checks. Runtime cannot release claims or retry unknown effects.
+    Independently reconciled state recovery and native partial-provision/retirement workflows remain unfinished.
 - id: P07.06
   phase_id: P07
   title: Native support dossier
@@ -2564,6 +2570,7 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-004
   - EV-P03-001
   - EV-P03-002
   - EV-P03-003
@@ -2879,6 +2886,7 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-004
   - EV-P06-001
   - EV-P06-002
   - EV-P06-003
@@ -2959,6 +2967,7 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-004
   - EV-P07-001
   - EV-P07-003
   blocker_ids:
@@ -2996,6 +3005,7 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-004
   - EV-P03-001
   - EV-P03-002
   - EV-P03-003
@@ -3331,6 +3341,7 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids:
+  - EV-P07-004
   - EV-P01-013
   - EV-P01-014
   - EV-P01-016
@@ -6628,6 +6639,35 @@ evidence:
     78 checks. Collection, immutable facts, scoped revisions, explained overrides, empty manual object preservation,
     reload persistence, choice ordering, fresh confirmation, access revocation and original-contract compatibility
     are verified. All archive/source/log/artifact hashes match; original failed observations remain retained.
+- id: EV-P07-004
+  level: E2
+  source_revision: dd31bed12de3133b30f0a06072ada37abd9f4961
+  artifact_revisions:
+    retained_artifact_commit: a0ee61dfbdf5d03ede3cda6932084e6ef5b90771
+    run_id: '37561411249'
+    execution_regression_run_id: '37561411275'
+    image_regression_run_id: '37561411263'
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T02:19:23.252476+00:00'
+  observer: GitHub Actions hosted PostgreSQL/TLS/process/Terraform component and isolated browser campaigns;
+    Codex compared every retained archive, source binding, command log and artifact digest.
+  reviewer: Codex engineering consistency review only; designated native and receiving reviews remain open.
+  limitations: Synthetic provider responses and mocked Terraform plans only. No actual OpenStack environment,
+    native apply, provider-side fencing, guest/service integration, activation, restore or retirement is qualified.
+    Product native grant redemption and dispatch remain disabled. P06 core skips eight optional native journal
+    tests that separately run without skips in the P07 job. No P07 completion, G07 decision or operating acceptance.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/a0ee61dfbdf5d03ede3cda6932084e6ef5b90771/verification/p07/native-components/qualification-index.json
+  sha256: 5e344f6548625da4ba79ccbda9ddcd0f7e46efece6901e2e352b6eaa014ad9f7
+  environment: GitHub Actions Ubuntu 24.04/Python 3.12.14/uv 0.12.19; real PostgreSQL and TLS peers;
+    pinned Terraform 1.13.5/provider 3.4.0 development schema candidates; compiled Chromium/Firefox/WebKit.
+  scope: 112 worker tests pass without skips; ten quality/build/Terraform commands pass and all 39 source bindings
+    match. Each of three P06 browser campaigns passes 148 checks; all 1052 source bindings, 61 logs and 81 artifact
+    hashes match per campaign. Worker development image admission, signature/SBOM/denial/transfer checks pass.
+    Original failed image/migration/broker observations remain retained; the separate receipt records 17 workflow
+    passes at their own revisions, including Compose and Kubernetes.
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -6994,9 +7034,10 @@ blockers:
     overrides and supply non-discoverable implementation inputs in Console under the existing ADR-015/016 baseline. Before native effects, supply exact campaign authority
     and complete applicable G06 receiving and OP01-OP07 controls. Qualify the implemented adapters on that exact
     native scope.
-  next_action: Continue adapter implementation against the released API baseline. Collect actual site and service/interface
-    inputs through API-first Console configuration for the protected N01-N15 native campaign. Complete campaign authority and applicable G06/operating receiving before Q05/Q06
-    native effects. Independent input/saved-plan preparation and bounded E1/E2 regression are delivered; no renewed
-    G00 approval is needed.
+  next_action: Integrate current native grants, Inventory/Console bindings and provider/backend fencing with the
+    delivered saved-plan/readback/journal components. Continue the selected guest/service, activation, recovery
+    and retirement workflows. Collect actual site/service/custody inputs through API-first Console configuration
+    for N01-N15; complete exact campaign authority and applicable G06/operating receiving before Q05/Q06 effects.
+    E1/E2 preparation, configuration and component checks are delivered; no renewed G00 approval is needed.
   state: OPEN
   resolution_evidence_ids: []

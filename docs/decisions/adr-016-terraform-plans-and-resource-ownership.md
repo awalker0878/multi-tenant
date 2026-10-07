@@ -76,3 +76,19 @@ contracts; they do not authenticate owners, select a native provider/backend,
 enforce its lock, or issue a grant. Actual tool-byte verification, state custody,
 fencing and native readback remain part of the selected P07.02 integration. This
 refinement does not change the decision register's receiving disposition.
+
+## P07 adapter component increment — 2026-10-07
+
+The [worker components](../operations/runbooks/openstack-native-adapters.md) now
+verify actual protected executable, provider, module and saved-plan bytes; compare
+workspace/state lineage/serial; invoke only the reviewed saved plan with locking;
+and independently read exact OpenStack object IDs. Durable PostgreSQL claims
+exclude a second launch on the same held state lineage. Initial plans admit only
+owned, quarantined creates. The installed command remains read-only.
+
+The [E2 component evidence](../../verification/p07/native-components/qualification-index.json)
+does not establish native lock custody or provider fencing. Product native grant
+redemption, exclusion of stale provider requests and independently reconciled
+recovery remain required before dispatch. Actual backend/tool selections remain
+Console-managed commissioning inputs under the existing baseline. No new baseline
+decision, native support claim or receiving disposition is introduced.

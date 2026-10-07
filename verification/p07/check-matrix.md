@@ -8,6 +8,13 @@ has its own E1/E2 [qualification index](configuration/qualification-index.json).
 Its results supplement this original preparation record; they do not turn the
 unknown commissioning template into a native readiness observation.
 
+The later [native component increment](native-components/README.md) has a separate
+[E2 index](native-components/qualification-index.json): 112 worker tests and ten
+quality/build/Terraform commands pass. It adds real protected-byte/process,
+PostgreSQL and TLS behavior with synthetic platform responses. It supplies no
+Q05/Q06 native or G07 receiving result; the original preparation table below is
+unchanged.
+
 | Boundary | Measured checks | Scope |
 | --- | --- | --- |
 | Commissioning packet | 55 passing cases: every missing obligation, exact binding, contradictory observations, stale/rejected/unreviewed evidence, reviewer/observer independence, E2 rejection for native observations and bounded/redacted parsing | Synthetic metadata and local files only |

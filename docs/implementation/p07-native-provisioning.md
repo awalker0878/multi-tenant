@@ -31,10 +31,10 @@ binary, fetch dependencies or enforce native fencing. The future adapter must
 obtain and verify actual owner/tool bytes under current authority. Full local
 commissioning/preflight tests are part of the owned Lifecycle suite.
 
-Actual installed tuples, interfaces and tooling remain unsupplied in ADR-015/016
-and the retained feasibility/operating inputs. Native infrastructure, allocation,
-guest/service adapters, quarantine activation, native failure/restore/retirement
-and the reviewed native support dossier are not delivered by this preparation.
+Actual installed tuples, interfaces and tooling remain runtime commissioning inputs
+under ADR-015/016. Native infrastructure, allocation, guest/service adapters,
+quarantine activation, native failure/restore/retirement and the reviewed native
+support dossier were not delivered by those two preparation increments.
 P06 continues to expose simulation only. A metadata checker is neither an OpenStack
 adapter nor a substitute for the independent Q05/Q06 campaign.
 
@@ -51,6 +51,19 @@ increment supersedes the earlier statement that all adapter code is absent; it
 does not complete native infrastructure execution, service enrollment, activation,
 recovery/retirement or the Q05/Q06 dossier. Existing status and receiving criteria
 remain unchanged until their outputs and observations exist.
+
+The [component qualification index](../../verification/p07/native-components/qualification-index.json)
+binds the final `dd31bed12de3133b30f0a06072ada37abd9f4961` worker source to 112 passing
+tests without skips and ten passing quality/build/Terraform commands. Tests use
+real PostgreSQL privilege/competition/reconnect boundaries, real TLS and subprocess
+termination with synthetic platform responses. Terraform validates the module and
+plans multiple workloads/NICs, quarantine and retained boot disks with a mocked
+provider. No native installation, service enrollment or backup restore is claimed.
+Earlier component results, failed image registration and simulation migration
+integration runs remain retained. The image manifest now registers the read-only
+entrypoint; native migrations reside under their own directory and database owner.
+Strict JSON comparisons distinguish booleans from numbers, and observer expiry
+requires an explicit timezone.
 
 The [check matrix](../../verification/p07/check-matrix.md) and
 [original evidence index](../../verification/p07/final/qualification-index.json)

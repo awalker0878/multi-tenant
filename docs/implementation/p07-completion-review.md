@@ -10,30 +10,37 @@ authorization and G00 approval remain effective.
 | Package | Supplied preparation | Remaining output and prerequisite |
 | --- | --- | --- |
 | P07.01 | Bounded commissioning parser, fifteen-input owner/case mapping, exact packet-binding and metadata checks | Actual site readiness and write commissioning, current scope/identity/trust, native stop/revocation rehearsal; N01–N03/N11/N14 |
-| P07.02 | Saved-plan byte and envelope comparison; pinned toolchain metadata, current state/lock/ownership comparisons and uncertainty holds | Selected OpenStack adapters/Terraform modules, actual tool-byte verification, backend locking/fencing, native apply and independent readback; N01/N04/N05 |
+| P07.02 | Saved-plan process adapter verifies actual tool/bundle/plan bytes, workspace and state; exact-ID OpenStack readback; quarantined multi-workload Terraform module; installed read-only inspection | Product native grant redemption/dispatch, commissioned backend/provider fencing and independent native apply/readback qualification; N01/N04/N05 |
 | P07.03 | Input/receipt obligations and Q05 service/restore case mapping | Native reserve/confirm/reconcile/release integrations, guest hardening and real DNS/IPAM/identity/time/trust/logging/monitoring/backup; N06/N08/N09/N10 |
 | P07.04 | Explicit quarantine/policy/service/application readiness inputs and denied preflight cases | Quarantine-to-active orchestration and independent Q05/Q06 service, data and network observations; N07/N15 |
-| P07.05 | Offline preflight holds any outstanding effect and rejects reuse for retirement | Native unknown/partial outcome recovery, drift holds, distinct retirement authorization, retained data/keys and independently confirmed deletion/release; N10/N11/N12 |
+| P07.05 | Durable append-only attempt/state-lineage claims prevent duplicate launch; process interruption and uncertain/drifted readback retain holds; no runtime hold-release privilege | Restored-journal reconciliation with independent custody, native unknown/partial recovery, distinct retirement authority, retained data/keys and independently confirmed deletion/release; N10/N11/N12 |
 | P07.06 | Evidence identity, scope, expiry and independent-review metadata checks | Original native campaign records and reviewed tuple/operation support dossier with recovery timings; N13 and all earlier native outputs |
 
-The offline commands cannot establish lock possession, current authorization,
-resource ownership, provider acceptance, service readiness or deletion. An empty
+The offline preparation commands cannot establish lock possession, current authorization,
+resource ownership, provider acceptance, service readiness or deletion. The
+[native component command](../operations/runbooks/openstack-native-adapters.md)
+can inspect actual protected bytes and independently read configured native objects;
+it does not enable product dispatch or establish provider-side fencing. An empty
 unknown-operation list supplied in a file is not proof of a reconciled native
 journal. Native integration must resolve these through authenticated owner
 interfaces, persistent Lifecycle operations, real fencing and independent readback.
 
 ## Next inputs and implementation order
 
-1. Implement the released OpenStack API baseline independently of deployment-specific facts. Use the [Console configuration workflow](openstack-version-qualification.md) to pull and validate N01–N05's exact installed tuple,
+1. Extend the delivered saved-plan/readback components against the released API
+   baseline independently of deployment-specific facts. Use the [Console configuration workflow](openstack-version-qualification.md) to pull and validate N01–N05's exact installed tuple,
    destination/trust/identity scope, artifact/toolchain, state/locking/custody and
    sole-writer map in the protected commissioning packet. Resolve the corresponding
-   ADR-014/015/016 selections with actual references. No operational secret goes
+   ADR-014/015/016 runtime bindings with actual references. No operational secret goes
    into Git or the chat transcript.
 2. Service/application/security owners supply N06–N10/N12/N15's concrete guest,
    service and reservation protocols, recovery objectives/datasets, policy probes,
    activation/retention/deletion criteria and response ownership. Vendor names or
    fixture JSON alone do not supply these contracts.
-3. Continue implementing versioned adapters independently; bind and qualify those selected adapters within Lifecycle's registered worker pool.
+3. Implement product native grant redemption and connect these components to
+   Lifecycle's registered worker pool only after the current scope, stop/epoch and
+   provider request fencing boundaries are enforced. Continue versioned service
+   adapters independently and bind the selected interfaces during commissioning.
    Keep one writer per native resource/field; persist attempts before effects;
    redeem current exact-scope authority at the boundary; reconcile unknown
    acceptance before retry. Qualify the actual backend's stale-worker exclusion

@@ -1,8 +1,12 @@
 # Next work — P07 native commissioning
 
-P07 is incomplete. Commissioning-input and saved-plan comparison preparation is
-implemented and qualified at E1; native adapters and Q05/Q06 execution remain
-unimplemented. The [implementation record](docs/implementation/p07-native-provisioning.md),
+P07 is incomplete. The worker now implements guarded saved-plan execution,
+scoped OpenStack readback, an append-only PostgreSQL attempt journal and a
+multi-workload Terraform module. All 112 worker tests and ten component quality,
+build and Terraform commands pass at `dd31bed12de3133b30f0a06072ada37abd9f4961`.
+The [component evidence](verification/p07/native-components/qualification-index.json)
+is E2 software evidence; product native dispatch and Q05/Q06 remain unfinished.
+The [implementation record](docs/implementation/p07-native-provisioning.md),
 [check matrix](verification/p07/check-matrix.md) and
 [qualification index](verification/p07/final/qualification-index.json) record the
 delivered increment and its limits. The [input record](release/p07-native-inputs.json)
@@ -16,9 +20,32 @@ starts with 2026.2 Hibiscus and distinguishes documentation review from native
 qualification. The repository's unknown input record remains a template; deployed
 configuration belongs in Inventory and the Console.
 
-1. Continue native adapter development against the [released OpenStack API baseline](docs/implementation/openstack-version-qualification.md). API pulls and Console administrator review own implementation-specific inputs; they are runtime configuration, not a prerequisite for independent engineering.
-2. Exercise the Console source/destination pulls, validate configured options and installed/advertised features, explain interpretation overrides, and supply inputs unavailable through APIs. Bind confirmed revisions to the actual campaign when commissioning.
-3. **BL-P07-001** remains a native execution/qualification hold: actual current scope, protected identity/trust, campaign authority, independent observers and applicable receiving controls are necessary for Q05/Q06 E3. Complete the native infrastructure, allocation, guest/service, activation, recovery, retirement and support dossier outputs in the [remaining packet](docs/implementation/p07-completion-review.md).
+1. **P07.02 — current native authority and fencing:** connect the worker protocol
+   to Lifecycle/Governance native grant redemption, the confirmed Inventory/Console
+   revisions and actual state-custody epoch. Implement and independently qualify
+   exclusion of stale provider requests before enabling dispatch. P06's simulation
+   receipts cannot be reused as native grants; heartbeat/process cancellation alone
+   does not fence already accepted provider operations. The
+   [adapter runbook](docs/operations/runbooks/openstack-native-adapters.md) specifies
+   the delivered interfaces and current supported boundary.
+2. **P07.03–P07.05 — remaining native workflows:** implement the selected allocation,
+   guest and enterprise service contracts, quarantine-to-active observations,
+   partial/unknown recovery and separately authorized retirement. Obtain actual
+   interface versions and ownership/retention requirements through API discovery
+   and Console administration. Do not substitute generic fixture receipts for
+   DNS/IPAM/identity/time/trust/logging/monitoring/backup enrollment or data restore.
+3. **P07.01/P07.06 — native commissioning and dossier:** exercise the Console
+   source/destination pulls, validate configured options and installed features,
+   explain interpretation overrides, and supply inputs unavailable through APIs.
+   Bind confirmed revisions, protected identities/trust, exact campaign scope and
+   independent observers to Q05/Q06. Retain original native results and receiving
+   decisions. **BL-P07-001** holds the native effects and qualification that need
+   those actual inputs; it does not block independent versioned implementation.
+
+The [remaining packet](docs/implementation/p07-completion-review.md) maps each
+unfinished output to its required inputs. The new journal permanently holds a
+claimed state lineage until a separate recovery workflow exists. No retry, release,
+activation or retirement is authorized by a successful readback.
 
 Development authorization persists. P06 simulation and complete input metadata
 do not authorize native effects. P07 remains incomplete until its scoped outputs

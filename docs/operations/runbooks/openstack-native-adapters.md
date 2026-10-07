@@ -127,6 +127,10 @@ Terraform 1.13.5 binary and OpenStack provider 3.4.0 dependency lock, validates 
 module and exercises a mocked multi-workload plan. Those are development test
 artifacts, not a selected or E3-qualified installation tuple. The hosted P07
 workflow requires persistence tests to run without skips and retains original logs.
+The [verified component index](../../../verification/p07/native-components/qualification-index.json)
+retains 112 passing worker tests, all ten command logs, three P06 browser regression
+campaigns and development image admission. Original failed observations and their
+corrections remain separately identified.
 
 References: [saved-plan apply semantics](https://developer.hashicorp.com/terraform/cli/commands/apply),
 [plan JSON](https://developer.hashicorp.com/terraform/internals/json-format),
