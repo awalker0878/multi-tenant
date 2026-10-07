@@ -18,7 +18,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | P05 | Capabilities and immutable plans | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | G05: NOT_REVIEWED | 3 / 1 |
 | P06 | Durable execution in simulation | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | G06: NOT_REVIEWED | 3 / 1 |
 | P07 | Native OpenStack provisioning | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G07: NOT_REVIEWED | 7 / 1 |
-| P08 | VMware-to-OpenStack migration | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G08: NOT_REVIEWED | 5 / 2 |
+| P08 | VMware-to-OpenStack migration | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G08: NOT_REVIEWED | 6 / 2 |
 | P09 | Platform and capability expansion | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G09: NOT_REVIEWED | 0 / 0 |
 | P10 | Enterprise operating qualification | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G10: NOT_REVIEWED | 0 / 0 |
 | P11 | Pilot and supported release | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G11: NOT_REVIEWED | 0 / 0 |
@@ -74,11 +74,11 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P07.04 | Activation and verification | Lifecycle/quality | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P07.05 | Failure and retirement | Lifecycle | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 1 |
 | P07.06 | Native support dossier | Assurance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
-| P08.01 | Source readiness | Inventory/lifecycle | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 2 |
-| P08.02 | Method and data movement | Infrastructure | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
-| P08.03 | Rehearsal | Lifecycle/application owner | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
-| P08.04 | Cutover | Lifecycle/governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
-| P08.05 | Recovery decisions | Infrastructure/application owner | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
+| P08.01 | Source readiness | Inventory/lifecycle | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 5 / 2 |
+| P08.02 | Method and data movement | Infrastructure | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 2 |
+| P08.03 | Rehearsal | Lifecycle/application owner | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
+| P08.04 | Cutover | Lifecycle/governance | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 2 |
+| P08.05 | Recovery decisions | Infrastructure/application owner | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
 | P08.06 | Acceptance | Quality/assurance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 2 |
 | P09.01 | Platform tranches | Infrastructure | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P09.02 | Migration matrix | Infrastructure/quality | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **92**. Blocker records: **17**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **93**. Blocker records: **17**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -195,6 +195,7 @@ Evidence records: **92**. Blocker records: **17**. Planning inputs awaiting sele
 | EV-P08-003 | E2 | GitHub Actions Ubuntu 24.04, Python 3.12.14, uv 0.12.19 and PostgreSQL 16; native API/current-owner peers are synthetic. | a72d0e88b3626b6912cf189c46ce45cf2fc4878c | Synthetic native/current-owner/QEMU engine peers; actual PostgreSQL/TLS/subprocess bounds only. Inventory/Planning/Console integration and commissioned owner/trust/stage adapters remain unfinished. No real converter rootfs, guest boot/transform, native fencing, data/delta/recovery, Q07, G07/G08 review, P08 completion or operating acceptance. |
 | EV-P08-004 | E2 | GitHub Actions Ubuntu 24.04, PostgreSQL 16, Python 3.12.14, uv 0.12.19, Node 24.19.0 and pinned Chromium; synthetic native/current-owner and browser HTTP peers. | 497c660670130654f62a73987755d69c6b444641 | E2 only. Preparation does not compose or approve a complete native MigrationPlan. Actual owner/trust/stage composition, converter rootfs/copied guest, application/service/delta/fencing/traffic/recovery/cleanup protocols and long-transfer reconciliation remain required. No native Q07, G07/G08 review, P08 completion or operating acceptance. |
 | EV-P08-005 | E2 | GitHub Actions Ubuntu 24.04, PostgreSQL 16, Python 3.12.14, uv 0.12.19, PHP 8.5.11, Node 24.19.0 and pinned Chromium; synthetic native/current-owner and browser HTTP peers. | 74ab8e41e2d1da90bb47f1b2794c9c7bf3778d66 | E2 only; actual database, Laravel and browser with synthetic native/owner peers. Existing REST listing and profile allowlist bounds remain. Bulk preparation is not complete-plan composition, approval or native execution. Native owner/trust/stage composition, copied-guest/converter qualification and Q07/G07/G08 receiving remain open; no VM migration, P08 completion or operating acceptance is claimed. |
+| EV-P08-006 | E2 | GitHub Actions Ubuntu 24.04, PostgreSQL 16, Python 3.12.14, uv 0.12.19, PHP 8.5.11, Node 24.19.0 and pinned Chromium; synthetic native/current-owner and browser HTTP peers. | 5e2b4a62f2c940bbdb06432c8922d43301e3482c | E2 only. No source/target account commissioning, physical throughput measurement or dated native migration schedule. Preparation does not emit a complete operational native plan. Native runtime/owner/adapters, converter/guest qualification, large-transfer continuation and actual Q05/Q06/Q07/G07/G08 remain open. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
 | BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, P01, P01.02, P01.04, P01.05, P01.06, G01, R29, R30 | Requesting user for baseline decisions; actual integration, operating and records owners at their affected checkpoints | OPEN | Supply the concrete runtime, registry/signer, trust, operating or records input before the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward checkpoints; do not request baseline approval again. | Complete the exact OP01–OP07 receiving inputs in release/operating-inputs.json with actual identities and immutable evidence. Run operating_inputs.py --require-complete, then integrate and qualify the affected trust/runtime/operations path. Preserve the accepted G00 decision and later P08/P10/P11 receiving checkpoints. |

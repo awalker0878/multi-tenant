@@ -318,16 +318,18 @@ phases:
   - EV-P08-003
   - EV-P08-004
   - EV-P08-005
+  - EV-P08-006
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
-  delivery_note: API-discovered source fleet, persisted named groups, independent VM reviews and bulk OpenStack
-    preparation are implemented alongside scoped leased profiles, authenticated Planning and current Lifecycle
-    admission. Source 74ab8e4 passes 785 component tests without skips, 35 component commands, both Vue/Inertia
-    browser journeys and all Console quality commands; Console records 187 passed tests and seven separate-campaign
-    broker skips. Original failures remain retained. Complete native-plan and owner/trust/stage composition,
-    actual converter/guest qualification and selected application/service/fencing/traffic/recovery/cleanup protocols
-    remain. No native Q07, G08 or operating acceptance is inferred.
+  delivery_note: Source fleet/review/preparation now has durable campaign controls, measured concurrency admission,
+    shared capacity allocations, windows/blackouts/stagger, outage objectives, authenticated observation publication
+    and a Console schedule/control page. Source 5e2b4a6 passes 811 component tests without skips, all three migration
+    browser journeys and all 23 Console quality commands; Console records 192 passes and seven separate-campaign
+    broker skips. All 14 source workflows pass; original failures remain retained. Actual account commissioning,
+    complete native-plan/owner/runtime composition, physical measurement producers, converter/guest qualification,
+    selected data/service/fencing/traffic/recovery/cleanup adapters and long-transfer continuation remain. No native
+    Q07, G08 or operating acceptance is inferred.
 - id: P09
   title: Platform and capability expansion
   owner_role: Infrastructure and qualification leads
@@ -1876,12 +1878,14 @@ work_packages:
   - EV-P08-003
   - EV-P08-004
   - EV-P08-005
+  - EV-P08-006
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
   - docs/implementation/p08-execution.md
+  - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
   criterion_ids:
@@ -1906,12 +1910,14 @@ work_packages:
   - EV-P08-001
   - EV-P08-002
   - EV-P08-003
+  - EV-P08-006
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
   - docs/implementation/p08-execution.md
+  - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
   criterion_ids:
@@ -1933,12 +1939,14 @@ work_packages:
   evidence_ids:
   - EV-P08-002
   - EV-P08-003
+  - EV-P08-006
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
   - docs/implementation/p08-execution.md
+  - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
   criterion_ids:
@@ -1960,12 +1968,14 @@ work_packages:
   - EV-P08-002
   - EV-P08-003
   - EV-P08-004
+  - EV-P08-006
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
   - docs/implementation/p08-execution.md
+  - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
   criterion_ids:
@@ -1987,12 +1997,14 @@ work_packages:
   evidence_ids:
   - EV-P08-002
   - EV-P08-003
+  - EV-P08-006
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
   doc_refs:
   - docs/implementation/phases/p08.md
   - docs/implementation/p08-execution.md
+  - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
   criterion_ids:
@@ -7027,6 +7039,34 @@ evidence:
     listing and profile allowlist bounds remain. Bulk preparation is not complete-plan composition, approval or
     native execution. Native owner/trust/stage composition, copied-guest/converter qualification and Q07/G07/G08
     receiving remain open; no VM migration, P08 completion or operating acceptance is claimed.
+- id: EV-P08-006
+  level: E2
+  source_revision: 5e2b4a62f2c940bbdb06432c8922d43301e3482c
+  artifact_revisions:
+    p08_run_id: '37656060398'
+    console_run_id: '37656060087'
+    original_failure_run_id: '37650245430'
+    retained_artifact_commit: 8464e6e73a9a9a3a9993a9b1ed60fb07ca51592b
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-07T17:08:24.771028+00:00'
+  observer: GitHub Actions PostgreSQL/TLS, Laravel and Chromium campaigns; Codex verified original archive/source/log
+    hashes, JUnit and Console summaries and visually inspected the retained migration campaign screenshot.
+  reviewer: Codex engineering consistency review only; designated native and receiving reviewers remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/8464e6e73a9a9a3a9993a9b1ed60fb07ca51592b/verification/p08/campaigns/qualification-index.json
+  sha256: a3ca8e3cba7c07bcf5fe32853f6142a7dd1f68a92020a08f807366ac7f7a52ad
+  environment: GitHub Actions Ubuntu 24.04, PostgreSQL 16, Python 3.12.14, uv 0.12.19, PHP 8.5.11, Node 24.19.0
+    and pinned Chromium; synthetic native/current-owner and browser HTTP peers.
+  scope: Durable campaign scheduling, shared allocations, measured phase/concurrency admission, approved outage
+    objectives, current authority/observation endpoints and Console controls. All 35 component commands and 811
+    tests pass without skips; all three migration browser journeys pass. All 23 Console commands pass with 192
+    Pest passes, 911 assertions and seven explicit separate-campaign broker skips. Final reports verify 701/226/302
+    source bindings. All 14 source workflows pass. Original formatting failure and correction remain retained.
+  limitations: E2 only. No source/target account commissioning, physical throughput measurement or dated native
+    migration schedule. Preparation does not emit a complete operational native plan. Native runtime/owner/adapters,
+    converter/guest qualification, large-transfer continuation and actual Q05/Q06/Q07/G07/G08 remain open.
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -7421,8 +7461,9 @@ blockers:
   - R33
   owner_role: Inventory, Planning, Console, Lifecycle and Infrastructure engineering leads
   description: P08 software is not complete. Profile persistence, Console review/confirmation, authenticated Planning
-    preparation and current-profile admission are delivered. Complete native-plan and stage writer/independent-observer
-    composition, qualified real converter and copied-guest
+    preparation, current-profile admission and campaign scheduling/Console/observation controls are delivered.
+    Complete native-plan and stage writer/independent-observer composition, actual performance/capacity producers,
+    qualified real converter and copied-guest
     preparation, selected delta/service/traffic/recovery/cleanup implementations and reconciled long-transfer continuation
     remain outstanding. E2 components do not close those outputs.
   unblock_condition: Deliver the remaining outputs in docs/implementation/p08-completion-review.md, bind supplied
