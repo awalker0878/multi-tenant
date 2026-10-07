@@ -25,7 +25,8 @@ class NativePeer:
             'networks': [{'id': 'net-1', 'name': 'Application network', 'project_id': 'project-a', 'created_at': '2026-01-01T00:00:00Z', 'status': 'ACTIVE'}],
             'volumes': [{'id': 'vol-1', 'name': 'Application data', 'created_at': '2026-01-01T00:00:00Z', 'size': 20}],
         }
-        self.before = hashlib.sha256(json.dumps(self.state, sort_keys=True).encode()).hexdigest()
+        self.configuration = json.loads((Path(__file__).resolve().parents[2] / 'contracts/fixtures/inventory/configuration-v1.1.json').read_text())['responses']
+        self.before = hashlib.sha256(json.dumps([self.state, self.configuration], sort_keys=True).encode()).hexdigest()
 
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, *_):
@@ -36,7 +37,14 @@ class NativePeer:
                 query = parse_qs(u.query)
                 collection = {'/v2.1/servers/detail': 'servers', '/v2.0/networks': 'networks', '/v3/project-a/volumes/detail': 'volumes'}.get(u.path)
                 status, body = 200, {}
-                if self.headers.get('X-Auth-Token') != token or collection is None:
+                if self.headers.get('X-Auth-Token') != token:
+                    status = 403
+                elif u.path in peer.configuration:
+                    if u.path.startswith('/v2.0/') and u.path != '/v2.0/extensions' and query.get('project_id') != ['project-a']:
+                        status = 403
+                    else:
+                        body = peer.configuration[u.path]
+                elif collection is None:
                     status = 403
                 elif collection == 'networks' and (query.get('project_id') != ['project-a'] or peer.mode == 'permission_gap'):
                     status = 403
@@ -66,7 +74,7 @@ class NativePeer:
         self.thread.start()
 
     def unchanged(self):
-        return self.before == hashlib.sha256(json.dumps(self.state, sort_keys=True).encode()).hexdigest()
+        return self.before == hashlib.sha256(json.dumps([self.state, self.configuration], sort_keys=True).encode()).hexdigest()
 
     def close(self):
         self.server.shutdown()

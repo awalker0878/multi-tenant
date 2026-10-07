@@ -56,6 +56,9 @@ test('browses scoped observations, preserves uncertain enrollment and clears rev
   await page.reload();
   await expect(page.getByLabel('Application and integration owners reference', { exact: true })).toHaveValue('browser-owner-record');
   await expect(page.getByLabel('Compute flavors interpretation', { exact: true })).toHaveValue('include');
+  await expect(page.getByRole('button', { name: 'Confirm this revision and its disclosed gaps' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Confirm this revision and its disclosed gaps' }).click();
+  await expect(page.getByRole('status')).toContainText('Configuration review confirmed');
   await expect(page.getByRole('button', { name: 'Confirm this revision and its disclosed gaps' })).toBeDisabled();
   await page.setViewportSize({ width: 640, height: 800 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2)).toBe(true);

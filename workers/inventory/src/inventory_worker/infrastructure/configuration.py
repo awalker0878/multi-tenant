@@ -192,6 +192,10 @@ def collect_configuration(policy: dict[str, Any], stream: dict[str, Any]) -> dic
         route += "?" + urlencode({"project_id": policy["native_scope"], "limit": "100"})
     try:
         headers = {"X-Auth-Token": secret(stream["credential_file"])}
+        if query.startswith("compute_") and not query.endswith("_versions"):
+            headers["OpenStack-API-Version"] = "compute 2.1"
+        if query == "volume_types":
+            headers["OpenStack-API-Version"] = "volume 3.0"
         result = exchange(stream, route, headers, version_discovery=query.endswith("_versions"))
         fact = {
             "query": query,

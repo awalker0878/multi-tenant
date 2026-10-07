@@ -283,8 +283,8 @@ def main():
                 time.sleep(.11)
                 run([str(root/'workers/inventory/.venv/bin/inventory-worker-collect'), '--pages', '1'], env=worker_env, label=label)
 
-            def finish(job, label):
-                for index in range(15):
+            def finish(job, label, page_limit=15):
+                for index in range(page_limit):
                     if sql("SELECT status FROM inventory.jobs WHERE id='"+job+"';", 'inventory') in {'complete', 'partial'}:
                         break
                     collect_page(label+'-'+str(index))
@@ -318,6 +318,23 @@ def main():
             check('stable-native-identities-across-generations', stable == {r['observation']['native_id']: r['resource_id'] for r in newest['items']})
             historical = inventory('listResources', params={'generation': first})
             check('historical-generation-held', all('historical_generation' in r['holds'] for r in historical['items']))
+            # API-first configuration uses the same leases, live authority and pinned TLS worker.
+            current = inventory('pullPortingConfiguration', {}, {'endpoint': endpoint})['discovery_id']
+            finish(current, 'configuration-page', page_limit=40)
+            workspace = inventory('getPortingConfiguration')
+            review = {'source_endpoint': endpoint, 'target_endpoint': endpoint, 'manual': {},
+                      'choices': [{'id': c['id'], 'required': c['id'] == 'compute', 'interpretation': 'observed', 'reason': ''} for c in workspace['capabilities']]}
+            saved = inventory('savePortingConfiguration', review)
+            workspace = inventory('getPortingConfiguration')
+            check('configuration-core-api-queries-pulled', len(workspace['source']['queries']) == 12 and workspace['source']['current'])
+            features = {c['id']: c for c in workspace['capabilities']}
+            check('configuration-distinguishes-configured-advertised-unknown', features['compute']['source_state'] == 'configured' and features['port_security']['source_state'] == 'advertised' and features['qos']['source_state'] == 'unknown' and features['trunks']['source_state'] == 'not_observed')
+            check('configuration-strips-provider-secret-fields', 'must-never-copy' not in json.dumps(workspace))
+            inventory('confirmPortingConfiguration', {'digest': saved['digest']}, revision=saved['revision'])
+            reviewed = inventory('getPortingConfiguration')
+            check('configuration-review-is-not-native-authority', reviewed['configuration']['confirmation_current'] and reviewed['native_write_authorized'] is False and all(v['native_qualification'] == 'not_qualified' for v in reviewed['versions']))
+            inventory('savePortingConfiguration', {**review, 'api_version': 'forged'}, revision=saved['revision'], expected=422)
+            inventory('confirmPortingConfiguration', {'digest': '0'*64}, revision=saved['revision'], expected=412)
             inventory('listDiscoveries', params={'endpoint': endpoint})
             check('independent-native-state-unchanged', native.unchanged() and all(r['method'] == 'GET' and '169.254' not in r['path'] for r in native.requests))
             (out/'native-observer.json').write_text(json.dumps({'synthetic_only': True, 'before_sha256': native.before, 'unchanged': native.unchanged(), 'requests': native.requests}, indent=2)+'\n')
