@@ -115,3 +115,27 @@ def test_source_scope_and_configuration_change_are_denied() -> None:
     assert reader.calls == []
     with pytest.raises(CollectionFailure, match="source_changed"):
         reader.collect("vm-1")
+
+
+def test_target_formats_and_import_routes_are_observed_not_inferred() -> None:
+    from inventory_worker.infrastructure.workload_profile import target_profile
+
+    r: dict[str, Any] = {
+        "image_schema": {"properties": {"disk_format": {"enum": ["raw", "qcow2"]}}},
+        "image_import": {"import-methods": {"value": ["glance-direct"]}},
+        "flavors": {"flavors": [{"id": "small", "vcpus": 2, "ram": 4096, "disk": 0}]},
+        "volume_types": {"volume_types": [{"id": "type-1", "is_public": False}]},
+        "network_extensions": {"extensions": [{"alias": "security-group"}]},
+        "compute_version": {"min_version": "2.1", "version": "2.100"},
+        "volume_version": {"min_version": "3.0", "version": "3.75"},
+    }
+    p = target_profile("project-1", r, 1000)
+    assert p["disk_formats"] == ["qcow2", "raw"]
+    assert "vmdk" not in p["disk_formats"]
+    assert p["native_qualification"] == "not_established"
+    assert "guest_driver_profile" in p["required_capability_evidence"]
+    r["image_schema"] = {}
+    assert target_profile("project-1", r, 1000)["holds"] == ["image_formats_unobserved"]
+    r["flavors"]["flavors_links"] = [{"rel": "next", "href": "https://untrusted.invalid"}]
+    with pytest.raises(CollectionFailure):
+        target_profile("project-1", r, 1000)
