@@ -119,7 +119,7 @@ def postgres() -> Iterator[dict[str, Any]]:
         settings["dbname"] = "native_test"
         with psycopg.connect(**settings) as c:
             c.execute("SET LOCAL ROLE native_owner")
-            migration = Path(__file__).parents[1] / "migrations/002_native_attempts.sql"
+            migration = Path(__file__).parents[1] / "migrations/native/001_attempts.sql"
             c.execute(migration.read_text())
         yield settings | {"user": "native_runtime"}
     finally:

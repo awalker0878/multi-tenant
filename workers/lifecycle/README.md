@@ -2,7 +2,7 @@
 
 This independently owned Python package contributes to P01.01. Lifecycle owns explicitly scoped execution. P06 supplies the separately owned PostgreSQL simulation effect store, sealed readback and grant redemption. The Temporal orchestrator lives in the Lifecycle service. P07 adds native adapter components and read-only inspection; native product dispatch is not enabled. The intended responsibilities remain in the [Lifecycle service specification](../../docs/services/lifecycle.md).
 
-`lifecycle-worker-health liveness` exits 0 and reports only that its short-lived diagnostic process loaded, with `scope=process_bootstrap`. `lifecycle-worker-health readiness` exits 1 with `worker_dependencies_not_implemented`. Unsupported arguments exit 2 without a success payload. Native operations are absent. These diagnostics do not establish a running service, dependency readiness or a consuming worker. Worker responses identify lifecycle as the owning service and declare `task_consumption_enabled=false`.
+`lifecycle-worker-health liveness` exits 0 and reports only that its short-lived diagnostic process loaded, with `scope=process_bootstrap`. `lifecycle-worker-health readiness` exits 1 with `worker_dependencies_not_implemented`. Unsupported arguments exit 2 without a success payload. Native dispatch is disabled. These diagnostics do not establish a running service, dependency readiness or a consuming worker. Worker responses identify lifecycle as the owning service and declare `task_consumption_enabled=false`.
 
 ## Ownership and structure
 
@@ -23,7 +23,7 @@ uv run --locked --no-sync lifecycle-worker-health liveness
 uv run --locked --no-sync lifecycle-worker-health readiness
 ```
 
-The last command intentionally exits 1. The owned `uv.lock` resolves exact Ruff 0.16.10, mypy 2.4.0, pytest 9.1.1, setuptools 84.0.0 and wheel 0.48.0. Runtime dependencies are empty. The backend and wheel helper have matching exact pins in the build-system requirements and the locked build group. Build with `--no-build-isolation` after installing that group.
+The last command intentionally exits 1. The owned `uv.lock` resolves exact Ruff 0.16.10, mypy 2.4.0, pytest 9.1.1, setuptools 84.0.0 and wheel 0.48.0. Runtime dependencies remain the locked psycopg and Uvicorn closure used by the simulator and read-only inspection. The backend and wheel helper have matching exact pins in the build-system requirements and the locked build group. Build with `--no-build-isolation` after installing that group.
 
 Install the wheel into an empty Python 3.12 environment using `uv pip install --python <environment-python> --no-index --no-deps <wheel-path>`, then run the installed command outside this checkout with `PYTHONPATH` unset. The [Python foundations report](../../docs/implementation/p01-python-foundations.md) records the four packages' isolated builds and runtime checks. Tests also verify that sibling Python service and worker modules are absent in the independent installed environment. The diagnostic command does not start the separate P06 simulator. Install its complete hash-locked runtime requirements before installing the owned wheel, as the Dockerfile does.
 

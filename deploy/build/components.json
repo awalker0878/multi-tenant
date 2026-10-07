@@ -170,7 +170,8 @@
         "uvicorn==0.53.0"
       ],
       "additional_scripts": {
-        "lifecycle-simulator": "lifecycle_worker.bootstrap.simulation:main"
+        "lifecycle-simulator": "lifecycle_worker.bootstrap.simulation:main",
+        "lifecycle-native-inspect": "lifecycle_worker.bootstrap.native_inspect:main"
       }
     },
     {

@@ -91,7 +91,7 @@ readiness, safe absence, permission to retry or traffic activation.
 
 ## Durable effects and recovery limits
 
-Apply `workers/lifecycle/migrations/002_native_attempts.sql` as a separately
+Apply `workers/lifecycle/migrations/native/001_attempts.sql` as a separately
 administered `native_owner` to its owned database after creating a login-only
 `native_runtime` role. Runtime receives only INSERT/SELECT and sequence usage.
 It cannot update/delete claims, remove workspace holds or rewrite observations.
