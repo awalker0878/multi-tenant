@@ -47,6 +47,15 @@ admission remains held. Complete proposals still require an authenticated native
 owner/approval/custody path and execution-plan resolver; existing simulation approval
 checks cannot supply native authority.
 
+The [runtime qualification](../../verification/p08/runtime/README.md), registered
+as EV-P08-007, retains 893 component tests without skips, all three browser journeys
+and all 23 Console quality commands at `7860616`. Console records 195 tests and
+922 assertions, with seven separate broker-campaign skips. The protected worker,
+proposal creation and VM custody checks use real PostgreSQL/TLS and synthetic native
+owners. Planning migration v1.2 adds explicit commissioning-hold responses while
+preserving published v1.1 bytes. Neither this evidence nor a proposal supplies the
+missing native approval, selected application protocols or actual Q07/G08 outcomes.
+
 `VmwareCapture` submits one disk-only S0 snapshot and one exact-S0 clone through
 native task APIs. It requires a stopped source, matching configuration, snapshot
 support and host clone capability. All NICs and removable media are removed in
@@ -147,9 +156,11 @@ The [completion packet](p08-completion-review.md) and
 [custody runbook](../operations/runbooks/native-migration.md) give the concrete
 remaining obligations and recovery procedure. The newer profile/review integration
 is qualified separately in the [profile evidence](../../verification/p08/profiles/qualification-index.json).
-Remaining implementation includes complete native-plan and authenticated
-capture/conversion/native-readback composition, concrete guest/service/
-delta/traffic/recovery adapters and a composed native Q07 journey. Source and target
+The newer worker/proposal increment above supplies protected composition and
+immutable complete proposals. Remaining implementation includes native owner
+authority and the execution-plan resolver, concrete guest/service/delta/traffic/
+recovery protocols, physical observation producers, long-transfer continuation
+and a composed native Q07 journey. Source and target
 profile components distinguish observed facts from further capability evidence;
 only genuinely API-unavailable values should become manual administrator inputs. Installed tuples, scoped identities, independent owner protocols,
 application dataset/objective definitions and native fencing are not supplied.
@@ -182,7 +193,8 @@ existing authenticated Planning preparation endpoint. It reports each VM separat
 a held member never becomes an implicitly accepted migration. Group updates use
 optimistic revision checks and exact-command retries. The UI pauses on access loss,
 stale group or unavailable owners. No bulk operation submits native migration effects.
-Complete native-plan composition and Q07/G08 obligations remain as recorded above.
+The subsequent complete-proposal increment is described above; native execution
+and Q07/G08 obligations remain open.
 
 The [fleet qualification](../../verification/p08/fleet/README.md) retains 785 passing
 component tests without skips, both browser journeys and the independent Console

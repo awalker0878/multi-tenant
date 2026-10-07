@@ -17,6 +17,12 @@ adapter/observer composition, immutable Planning recipe proposals and bulk Conso
 plan creation. Complete native-owner authority integration and physical benchmarking
 remain open.
 
+The [retained runtime qualification](../../verification/p08/runtime/README.md)
+binds the complete proposal and worker increment to 893 passing component tests,
+three browser journeys and all 23 Console quality commands. Console records
+195 passing tests and seven explicit separate broker-campaign skips. These results
+do not close the native or owner-specific obligations below.
+
 ## Remaining implementation
 
 | Package | Delivered software | Remaining output |

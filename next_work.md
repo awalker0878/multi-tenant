@@ -14,6 +14,16 @@ adapters, long-transfer resumption and Q07/G08 acceptance remain open. The
 source/target secret references, lab placement and application-owner protocols
 needed to make that work concrete. Existing development authorization continues.
 
+The [runtime evidence](verification/p08/runtime/README.md) qualifies source
+`7860616293cc0be7a1983ca7bc38529aed5e5b7f`: 893 component tests without skips,
+all three browser journeys and all 23 Console quality commands pass. Console
+records 195 Pest passes, 922 assertions and seven separate broker-campaign skips.
+The evidence is retained at `dd5450138ca29bb07468177d56165d3e6a136dd0`.
+Original image-manifest, contract-version and apt-mirror failures are retained;
+the corrected image and strict restored-contract checks pass. Source Kubernetes
+is still queued at the [regression observation](verification/p08/runtime/regression-status.json).
+EV-P08-007 records these measured boundaries without closing either P08 blocker.
+
 The [campaign evidence](verification/p08/campaigns/README.md) qualifies source
 `5e2b4a62f2c940bbdb06432c8922d43301e3482c`: 811 component tests without skips,
 all three migration browser journeys and all Console quality commands pass.
