@@ -1,0 +1,202 @@
+Building wheel...
+running bdist_wheel
+running build
+running build_py
+creating build/lib/lifecycle
+copying src/lifecycle/__init__.py -> build/lib/lifecycle
+creating build/lib/lifecycle/interfaces
+copying src/lifecycle/interfaces/http.py -> build/lib/lifecycle/interfaces
+copying src/lifecycle/interfaces/expansion.py -> build/lib/lifecycle/interfaces
+copying src/lifecycle/interfaces/campaign_observations.py -> build/lib/lifecycle/interfaces
+copying src/lifecycle/interfaces/commissioning.py -> build/lib/lifecycle/interfaces
+copying src/lifecycle/interfaces/__init__.py -> build/lib/lifecycle/interfaces
+copying src/lifecycle/interfaces/health.py -> build/lib/lifecycle/interfaces
+copying src/lifecycle/interfaces/native.py -> build/lib/lifecycle/interfaces
+copying src/lifecycle/interfaces/campaigns.py -> build/lib/lifecycle/interfaces
+copying src/lifecycle/interfaces/execution.py -> build/lib/lifecycle/interfaces
+copying src/lifecycle/interfaces/telemetry.py -> build/lib/lifecycle/interfaces
+creating build/lib/lifecycle/domain
+copying src/lifecycle/domain/expansion.py -> build/lib/lifecycle/domain
+copying src/lifecycle/domain/native_preflight.py -> build/lib/lifecycle/domain
+copying src/lifecycle/domain/commissioning.py -> build/lib/lifecycle/domain
+copying src/lifecycle/domain/__init__.py -> build/lib/lifecycle/domain
+copying src/lifecycle/domain/native_workflow.py -> build/lib/lifecycle/domain
+copying src/lifecycle/domain/campaign.py -> build/lib/lifecycle/domain
+copying src/lifecycle/domain/migration.py -> build/lib/lifecycle/domain
+copying src/lifecycle/domain/execution.py -> build/lib/lifecycle/domain
+copying src/lifecycle/domain/admission.py -> build/lib/lifecycle/domain
+copying src/lifecycle/domain/campaign_plan.py -> build/lib/lifecycle/domain
+creating build/lib/lifecycle/application
+copying src/lifecycle/application/foundation.py -> build/lib/lifecycle/application
+copying src/lifecycle/application/__init__.py -> build/lib/lifecycle/application
+copying src/lifecycle/application/campaign_dispatch.py -> build/lib/lifecycle/application
+copying src/lifecycle/application/reservations.py -> build/lib/lifecycle/application
+copying src/lifecycle/application/native_workflow.py -> build/lib/lifecycle/application
+copying src/lifecycle/application/execution_ports.py -> build/lib/lifecycle/application
+copying src/lifecycle/application/enterprise_dispatch.py -> build/lib/lifecycle/application
+copying src/lifecycle/application/adoption.py -> build/lib/lifecycle/application
+copying src/lifecycle/application/campaigns.py -> build/lib/lifecycle/application
+copying src/lifecycle/application/execution.py -> build/lib/lifecycle/application
+copying src/lifecycle/application/enterprise.py -> build/lib/lifecycle/application
+creating build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/foundation.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/campaign_observers.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/__init__.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/native_temporal.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/store.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/execution_owners.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/temporal.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/workflows.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/telemetry.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/native_journey.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/expansion_owners.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/native_effects.py -> build/lib/lifecycle/infrastructure
+copying src/lifecycle/infrastructure/native_owners.py -> build/lib/lifecycle/infrastructure
+creating build/lib/lifecycle/bootstrap
+copying src/lifecycle/bootstrap/expansion.py -> build/lib/lifecycle/bootstrap
+copying src/lifecycle/bootstrap/native_preflight.py -> build/lib/lifecycle/bootstrap
+copying src/lifecycle/bootstrap/commissioning.py -> build/lib/lifecycle/bootstrap
+copying src/lifecycle/bootstrap/__init__.py -> build/lib/lifecycle/bootstrap
+copying src/lifecycle/bootstrap/workflow.py -> build/lib/lifecycle/bootstrap
+copying src/lifecycle/bootstrap/health.py -> build/lib/lifecycle/bootstrap
+copying src/lifecycle/bootstrap/native_server.py -> build/lib/lifecycle/bootstrap
+copying src/lifecycle/bootstrap/native_workflow.py -> build/lib/lifecycle/bootstrap
+copying src/lifecycle/bootstrap/server.py -> build/lib/lifecycle/bootstrap
+running egg_info
+writing src/product_lifecycle.egg-info/PKG-INFO
+writing dependency_links to src/product_lifecycle.egg-info/dependency_links.txt
+writing entry points to src/product_lifecycle.egg-info/entry_points.txt
+writing requirements to src/product_lifecycle.egg-info/requires.txt
+writing top-level names to src/product_lifecycle.egg-info/top_level.txt
+reading manifest file 'src/product_lifecycle.egg-info/SOURCES.txt'
+writing manifest file 'src/product_lifecycle.egg-info/SOURCES.txt'
+installing to build/bdist.linux-x86_64/wheel
+running install
+running install_lib
+creating build/bdist.linux-x86_64/wheel
+creating build/bdist.linux-x86_64/wheel/lifecycle
+copying build/lib/lifecycle/__init__.py -> build/bdist.linux-x86_64/wheel/./lifecycle
+creating build/bdist.linux-x86_64/wheel/lifecycle/interfaces
+copying build/lib/lifecycle/interfaces/http.py -> build/bdist.linux-x86_64/wheel/./lifecycle/interfaces
+copying build/lib/lifecycle/interfaces/expansion.py -> build/bdist.linux-x86_64/wheel/./lifecycle/interfaces
+copying build/lib/lifecycle/interfaces/campaign_observations.py -> build/bdist.linux-x86_64/wheel/./lifecycle/interfaces
+copying build/lib/lifecycle/interfaces/commissioning.py -> build/bdist.linux-x86_64/wheel/./lifecycle/interfaces
+copying build/lib/lifecycle/interfaces/__init__.py -> build/bdist.linux-x86_64/wheel/./lifecycle/interfaces
+copying build/lib/lifecycle/interfaces/health.py -> build/bdist.linux-x86_64/wheel/./lifecycle/interfaces
+copying build/lib/lifecycle/interfaces/native.py -> build/bdist.linux-x86_64/wheel/./lifecycle/interfaces
+copying build/lib/lifecycle/interfaces/campaigns.py -> build/bdist.linux-x86_64/wheel/./lifecycle/interfaces
+copying build/lib/lifecycle/interfaces/execution.py -> build/bdist.linux-x86_64/wheel/./lifecycle/interfaces
+copying build/lib/lifecycle/interfaces/telemetry.py -> build/bdist.linux-x86_64/wheel/./lifecycle/interfaces
+creating build/bdist.linux-x86_64/wheel/lifecycle/domain
+copying build/lib/lifecycle/domain/expansion.py -> build/bdist.linux-x86_64/wheel/./lifecycle/domain
+copying build/lib/lifecycle/domain/native_preflight.py -> build/bdist.linux-x86_64/wheel/./lifecycle/domain
+copying build/lib/lifecycle/domain/commissioning.py -> build/bdist.linux-x86_64/wheel/./lifecycle/domain
+copying build/lib/lifecycle/domain/__init__.py -> build/bdist.linux-x86_64/wheel/./lifecycle/domain
+copying build/lib/lifecycle/domain/native_workflow.py -> build/bdist.linux-x86_64/wheel/./lifecycle/domain
+copying build/lib/lifecycle/domain/campaign.py -> build/bdist.linux-x86_64/wheel/./lifecycle/domain
+copying build/lib/lifecycle/domain/migration.py -> build/bdist.linux-x86_64/wheel/./lifecycle/domain
+copying build/lib/lifecycle/domain/execution.py -> build/bdist.linux-x86_64/wheel/./lifecycle/domain
+copying build/lib/lifecycle/domain/admission.py -> build/bdist.linux-x86_64/wheel/./lifecycle/domain
+copying build/lib/lifecycle/domain/campaign_plan.py -> build/bdist.linux-x86_64/wheel/./lifecycle/domain
+creating build/bdist.linux-x86_64/wheel/lifecycle/application
+copying build/lib/lifecycle/application/foundation.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+copying build/lib/lifecycle/application/__init__.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+copying build/lib/lifecycle/application/campaign_dispatch.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+copying build/lib/lifecycle/application/reservations.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+copying build/lib/lifecycle/application/native_workflow.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+copying build/lib/lifecycle/application/execution_ports.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+copying build/lib/lifecycle/application/enterprise_dispatch.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+copying build/lib/lifecycle/application/adoption.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+copying build/lib/lifecycle/application/campaigns.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+copying build/lib/lifecycle/application/execution.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+copying build/lib/lifecycle/application/enterprise.py -> build/bdist.linux-x86_64/wheel/./lifecycle/application
+creating build/bdist.linux-x86_64/wheel/lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/foundation.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/campaign_observers.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/__init__.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/native_temporal.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/store.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/execution_owners.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/temporal.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/workflows.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/telemetry.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/native_journey.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/expansion_owners.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/native_effects.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+copying build/lib/lifecycle/infrastructure/native_owners.py -> build/bdist.linux-x86_64/wheel/./lifecycle/infrastructure
+creating build/bdist.linux-x86_64/wheel/lifecycle/bootstrap
+copying build/lib/lifecycle/bootstrap/expansion.py -> build/bdist.linux-x86_64/wheel/./lifecycle/bootstrap
+copying build/lib/lifecycle/bootstrap/native_preflight.py -> build/bdist.linux-x86_64/wheel/./lifecycle/bootstrap
+copying build/lib/lifecycle/bootstrap/commissioning.py -> build/bdist.linux-x86_64/wheel/./lifecycle/bootstrap
+copying build/lib/lifecycle/bootstrap/__init__.py -> build/bdist.linux-x86_64/wheel/./lifecycle/bootstrap
+copying build/lib/lifecycle/bootstrap/workflow.py -> build/bdist.linux-x86_64/wheel/./lifecycle/bootstrap
+copying build/lib/lifecycle/bootstrap/health.py -> build/bdist.linux-x86_64/wheel/./lifecycle/bootstrap
+copying build/lib/lifecycle/bootstrap/native_server.py -> build/bdist.linux-x86_64/wheel/./lifecycle/bootstrap
+copying build/lib/lifecycle/bootstrap/native_workflow.py -> build/bdist.linux-x86_64/wheel/./lifecycle/bootstrap
+copying build/lib/lifecycle/bootstrap/server.py -> build/bdist.linux-x86_64/wheel/./lifecycle/bootstrap
+running install_egg_info
+Copying src/product_lifecycle.egg-info to build/bdist.linux-x86_64/wheel/./product_lifecycle-0.1.0.dev0-py3.12.egg-info
+running install_scripts
+creating build/bdist.linux-x86_64/wheel/product_lifecycle-0.1.0.dev0.dist-info/WHEEL
+creating '/workspace/scratch/86d322ce5558/multi-tenant/services/lifecycle/dist/.tmp-b91wwzd6/product_lifecycle-0.1.0.dev0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+adding 'lifecycle/__init__.py'
+adding 'lifecycle/application/__init__.py'
+adding 'lifecycle/application/adoption.py'
+adding 'lifecycle/application/campaign_dispatch.py'
+adding 'lifecycle/application/campaigns.py'
+adding 'lifecycle/application/enterprise.py'
+adding 'lifecycle/application/enterprise_dispatch.py'
+adding 'lifecycle/application/execution.py'
+adding 'lifecycle/application/execution_ports.py'
+adding 'lifecycle/application/foundation.py'
+adding 'lifecycle/application/native_workflow.py'
+adding 'lifecycle/application/reservations.py'
+adding 'lifecycle/bootstrap/__init__.py'
+adding 'lifecycle/bootstrap/commissioning.py'
+adding 'lifecycle/bootstrap/expansion.py'
+adding 'lifecycle/bootstrap/health.py'
+adding 'lifecycle/bootstrap/native_preflight.py'
+adding 'lifecycle/bootstrap/native_server.py'
+adding 'lifecycle/bootstrap/native_workflow.py'
+adding 'lifecycle/bootstrap/server.py'
+adding 'lifecycle/bootstrap/workflow.py'
+adding 'lifecycle/domain/__init__.py'
+adding 'lifecycle/domain/admission.py'
+adding 'lifecycle/domain/campaign.py'
+adding 'lifecycle/domain/campaign_plan.py'
+adding 'lifecycle/domain/commissioning.py'
+adding 'lifecycle/domain/execution.py'
+adding 'lifecycle/domain/expansion.py'
+adding 'lifecycle/domain/migration.py'
+adding 'lifecycle/domain/native_preflight.py'
+adding 'lifecycle/domain/native_workflow.py'
+adding 'lifecycle/infrastructure/__init__.py'
+adding 'lifecycle/infrastructure/campaign_observers.py'
+adding 'lifecycle/infrastructure/execution_owners.py'
+adding 'lifecycle/infrastructure/expansion_owners.py'
+adding 'lifecycle/infrastructure/foundation.py'
+adding 'lifecycle/infrastructure/native_effects.py'
+adding 'lifecycle/infrastructure/native_journey.py'
+adding 'lifecycle/infrastructure/native_owners.py'
+adding 'lifecycle/infrastructure/native_temporal.py'
+adding 'lifecycle/infrastructure/store.py'
+adding 'lifecycle/infrastructure/telemetry.py'
+adding 'lifecycle/infrastructure/temporal.py'
+adding 'lifecycle/infrastructure/workflows.py'
+adding 'lifecycle/interfaces/__init__.py'
+adding 'lifecycle/interfaces/campaign_observations.py'
+adding 'lifecycle/interfaces/campaigns.py'
+adding 'lifecycle/interfaces/commissioning.py'
+adding 'lifecycle/interfaces/execution.py'
+adding 'lifecycle/interfaces/expansion.py'
+adding 'lifecycle/interfaces/health.py'
+adding 'lifecycle/interfaces/http.py'
+adding 'lifecycle/interfaces/native.py'
+adding 'lifecycle/interfaces/telemetry.py'
+adding 'product_lifecycle-0.1.0.dev0.dist-info/METADATA'
+adding 'product_lifecycle-0.1.0.dev0.dist-info/WHEEL'
+adding 'product_lifecycle-0.1.0.dev0.dist-info/entry_points.txt'
+adding 'product_lifecycle-0.1.0.dev0.dist-info/top_level.txt'
+adding 'product_lifecycle-0.1.0.dev0.dist-info/RECORD'
+removing build/bdist.linux-x86_64/wheel
+Successfully built dist/product_lifecycle-0.1.0.dev0-py3-none-any.whl
