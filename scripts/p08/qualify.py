@@ -34,6 +34,7 @@ def main():
         'commands': [], 'suites': [], 'limitations': [
             'Synthetic vSphere/owner fixtures do not qualify an installed VMware/OpenStack tuple.',
             'No application dataset, guest transform, production writer fencing or native Q07 acceptance.',
+            'Conversion command tests use a synthetic engine; no QEMU/bubblewrap rootfs or guest boot is qualified.',
             'Current owner/trust composition and site-specific effect integrations remain required.',
         ],
     }

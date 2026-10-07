@@ -24,6 +24,43 @@ production. RDM, independent/shared/encrypted disk and special-device profiles
 are held for separately qualified handling. Task receipts survive uncertainty;
 a task ID is observed rather than resubmitted after a lost outcome.
 
+## Retained archive, conversion and native image import
+
+`MigrationArchive` resolves the isolated clone from the same tenant/job/approved
+capture intent in the worker's append-only journal. It transfers every disk into
+private retained custody with byte/rate/deadline limits and verifies the native
+manifest. It calls `OvfManager.CreateDescriptor` using the downloaded filenames and
+sizes, rejects descriptor findings, external entities and incomplete/unsafe file
+or disk references, and retains the descriptor before completing the NFC lease.
+A failure keeps the partial archive and original lease identity; no new lease or
+range resumption is attempted automatically.
+
+`MigrationConversion` resolves only a completed archive. `CopyConverter` runs a
+pinned QEMU artifact inside a pinned bubblewrap sandbox with a read-only rootfs
+mount, isolated network/namespaces, no inherited credentials, read-only source and
+one new output directory. Only explicitly selected RAW/QCOW2 conversion of
+self-contained streamOptimized/monolithicSparse VMDK is admitted. The worker checks
+virtual sizes, output metadata, QCOW2 consistency and guest-visible sector equality,
+then hashes the original and converted files. It has no salvage, repair, in-place
+conversion or method fallback. The current tests exercise a synthetic engine and
+command contracts; they do **not** qualify the actual QEMU/bubblewrap runtime.
+
+`MigrationImport` resolves the same job's completed conversion receipt, verifies
+all disks before creating any image, and uses the explicitly selected Glance-direct
+route. Image UUIDs, format, firmware and disk bus are fixed in the immutable intent.
+The existing native OpenStack creation adapter can consume those image identities
+for Cinder/Nova. Target guest readiness, quarantine readback, activation and native
+acceptance remain independent requirements. The TLS campaign uses synthetic image
+bytes; it does not boot a guest or qualify an installed image backend.
+
+Artifact handoffs are references to prior immutable stage-intent digests. The
+worker resolves native clone/operation identities from its journal under the same
+job, tenant, source plan, epoch, scope and custody generation. Unknown, duplicate,
+partial or cross-job receipts hold the next stage. No payload crosses the control
+API, Console or event bus. The current single activity is bounded to ten minutes;
+large transfers need separately qualified chunk/range reconciliation rather than
+an implicit longer timeout or blind restart.
+
 ## Migration control and recovery
 
 Version 2 admission binds source/target profile identities, every disk/dataset,
@@ -63,10 +100,11 @@ container cannot create the required unprivileged database account. Tests with
 missing engines remain skipped, not passing. Exact-source hosted evidence is
 recorded after the campaign completes.
 
-Remaining implementation includes native OVF retention/conversion, target profile
-persistence, stage artifact resolution from prior native receipts, concrete guest/
-service/delta/traffic/recovery adapters, Console migration admission and a composed
-native Q07 journey. Installed tuples, scoped identities, independent owner protocols,
+Remaining implementation includes profile persistence and Console admission,
+commissioned capture/conversion/native-readback composition, concrete guest/service/
+delta/traffic/recovery adapters and a composed native Q07 journey. Source and target
+profile components distinguish observed facts from further capability evidence;
+only genuinely API-unavailable values should become manual administrator inputs. Installed tuples, scoped identities, independent owner protocols,
 application dataset/objective definitions and native fencing are not supplied.
 P08 and G08 remain incomplete; software checks cannot supply those inputs or actual
 Q07/G08 receiving decisions.
@@ -78,3 +116,7 @@ Reviewed 2026-10-07 against Broadcom's VI JSON contracts:
 [CreateSnapshotEx_Task](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VirtualMachine/moId/CreateSnapshotEx_Task/post/), and
 [CreateDescriptor](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/OvfManager/moId/CreateDescriptor/post/).
 These are documentation references, not installed-release qualification.
+
+The converter options were checked against the [QEMU image utility documentation](https://www.qemu.org/docs/master/tools/qemu-img.html)
+and [bubblewrap command reference](https://github.com/containers/bubblewrap/blob/main/bwrap.xml).
+These references do not select or qualify an installed runtime.
