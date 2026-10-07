@@ -1,0 +1,481 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Planning current migration preparation",
+    "version": "1.0.0",
+    "description": "Binds an independently re-read Inventory confirmation to exact migration profiles, method, owner inputs and all disk/dataset mappings. Native stage composition, qualification, approval and admission remain separate requirements. Maximum request 32768 bytes."
+  },
+  "security": [
+    {
+      "Workload": []
+    }
+  ],
+  "paths": {
+    "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-preparations": {
+      "post": {
+        "operationId": "prepareCurrentMigration",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "application",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "environment",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-Actor-Delegation",
+            "in": "header",
+            "required": true,
+            "description": "Current plan.create actor delegation for the exact tenant/application/environment/site; independently checked by Planning and Inventory.",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrepareMigration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exact current review binding. This preparation is not a persisted, approved or executable MigrationPlan. Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preparation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Workload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "PrepareMigration": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "site_id",
+          "review",
+          "disks"
+        ],
+        "properties": {
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "review": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "revision",
+              "digest"
+            ],
+            "properties": {
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "disks": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "source_disk_sha256",
+                "target_key",
+                "format"
+              ],
+              "properties": {
+                "source_disk_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "target_key": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "format": {
+                  "type": "string",
+                  "enum": [
+                    "raw",
+                    "qcow2",
+                    "vmdk"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Preparation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "binding",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "binding": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "review",
+              "method",
+              "source",
+              "target",
+              "datasets",
+              "disks",
+              "objectives",
+              "owner_inputs_sha256"
+            ],
+            "properties": {
+              "review": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "revision",
+                  "digest"
+                ],
+                "properties": {
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              },
+              "method": {
+                "enum": [
+                  "APPLICATION_REBUILD_RESTORE",
+                  "VM_SNAPSHOT_BASELINE_APP_DELTA",
+                  "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+                  "VM_COLD_EXPORT",
+                  "EXTERNAL_BLOCK_REPLICATION"
+                ]
+              },
+              "source": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "profile_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "native_identity_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "tuple_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "observed_at": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "expires_at": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "profile_sha256",
+                  "native_identity_sha256",
+                  "tuple_sha256",
+                  "observed_at",
+                  "expires_at"
+                ]
+              },
+              "target": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "profile_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "native_identity_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "tuple_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "observed_at": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "expires_at": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "profile_sha256",
+                  "native_identity_sha256",
+                  "tuple_sha256",
+                  "observed_at",
+                  "expires_at"
+                ]
+              },
+              "datasets": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 256,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "disks": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 32,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "source_disk_sha256",
+                    "target_key",
+                    "format",
+                    "capacity_bytes",
+                    "datasets"
+                  ],
+                  "properties": {
+                    "source_disk_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "target_key": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "format": {
+                      "type": "string",
+                      "enum": [
+                        "raw",
+                        "qcow2",
+                        "vmdk"
+                      ]
+                    },
+                    "capacity_bytes": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740991
+                    },
+                    "datasets": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 256,
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    }
+                  }
+                }
+              },
+              "objectives": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "owner_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "acceptance_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "max_outage_seconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 31536000
+                  },
+                  "max_data_loss_bytes": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "owner_id",
+                  "acceptance_sha256",
+                  "max_outage_seconds",
+                  "max_data_loss_bytes"
+                ]
+              },
+              "owner_inputs_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "native_write_authorized": {
+            "type": "boolean",
+            "const": false
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,100}$"
+          }
+        }
+      }
+    }
+  }
+}

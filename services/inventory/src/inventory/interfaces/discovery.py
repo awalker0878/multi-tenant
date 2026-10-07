@@ -10,6 +10,7 @@ from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from inventory.application.configuration import PortingConfiguration
 from inventory.application.discovery import Discovery
+from inventory.application.fleet import MigrationFleet
 from inventory.application.ports import Authority
 from inventory.application.profile_collection import authorize_read
 from inventory.application.views import InventoryViews
@@ -18,6 +19,48 @@ from inventory.domain.discovery import Rejected
 
 UUID = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
 ROUTES = (
+    (
+        "GET",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/migration-inventory",
+        "migration_fleet",
+        "inventory.admin",
+    ),
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/migration-groups",
+        "migration_group_save",
+        "inventory.admin",
+    ),
+    (
+        "GET",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/migration-groups/({UUID})",
+        "migration_group",
+        "inventory.admin",
+    ),
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/migration-groups/({UUID})",
+        "migration_group_save",
+        "inventory.admin",
+    ),
+    (
+        "GET",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/migration-reviews/({UUID})",
+        "migration",
+        "inventory.admin",
+    ),
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/migration-reviews/({UUID})",
+        "migration_save",
+        "inventory.admin",
+    ),
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/migration-reviews/({UUID})/confirmations",
+        "migration_confirm",
+        "inventory.admin",
+    ),
     (
         "GET",
         rf"/v1/tenants/({UUID})/sites/({UUID})/migration-review",
@@ -145,6 +188,7 @@ class InventoryApp:
         self.views = InventoryViews(discovery)
         self.configuration = PortingConfiguration(discovery)
         self.workloads = WorkloadProfiles(discovery)
+        self.fleet = MigrationFleet(discovery)
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
@@ -227,10 +271,18 @@ class InventoryApp:
                     raise Rejected("invalid_query")
                 target = values[2] if len(values) > 2 else None
                 if scope["method"] == "GET":
-                    if operation == "migration":
+                    if operation == "migration_fleet":
+                        payload = await asyncio.to_thread(
+                            self.fleet.read, actor, params.get("cursor", [None])[0]
+                        )
+                    elif operation == "migration_group":
                         if params:
                             raise Rejected("invalid_query")
-                        payload = await asyncio.to_thread(self.workloads.read, actor)
+                        payload = await asyncio.to_thread(self.fleet.detail, actor, target or "")
+                    elif operation == "migration":
+                        if params:
+                            raise Rejected("invalid_query")
+                        payload = await asyncio.to_thread(self.workloads.read, actor, target)
                     elif operation == "configuration":
                         if params:
                             raise Rejected("invalid_query")
@@ -250,7 +302,9 @@ class InventoryApp:
                     if expected and not re.fullmatch(r'"[1-9][0-9]{0,8}"', expected):
                         raise Rejected("invalid_revision")
                     payload = await asyncio.to_thread(
-                        self.workloads.command
+                        self.fleet.command
+                        if operation == "migration_group_save"
+                        else self.workloads.command
                         if operation in {"migration_save", "migration_confirm"}
                         else self.configuration.command
                         if operation in {"configuration_save", "configuration_confirm"}
