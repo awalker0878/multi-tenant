@@ -22,10 +22,11 @@ class InventoryViews:
             if operation == "sites":
                 rows = tx.all(
                     (
-                        "SELECT DISTINCT site FROM inventory.endpoints WHERE "
-                        "tenant=%s AND site>%s ORDER BY site LIMIT 51"
+                        "SELECT site FROM inventory.endpoints WHERE tenant=%s AND site>%s "
+                        "UNION SELECT site FROM inventory.porting_revisions WHERE tenant=%s "
+                        "AND site>%s ORDER BY site LIMIT 51"
                     ),
-                    (actor.tenant, after),
+                    (actor.tenant, after, actor.tenant, after),
                 )
                 return {
                     "items": [{"site_id": str(r["site"])} for r in rows[:50]],

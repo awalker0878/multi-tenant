@@ -11,6 +11,7 @@ use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OidcController;
 use App\Http\Controllers\PlanningController;
+use App\Http\Controllers\PortingConfigurationController;
 use App\Http\Controllers\TenantController;
 use App\Http\Middleware\RequireIdentity;
 use Illuminate\Support\Facades\Route;
@@ -53,6 +54,9 @@ Route::prefix('/tenants/{tenant}')->whereUuid('tenant')->middleware(RequireIdent
 
 Route::prefix('/tenants/{tenant}/inventory')->whereUuid('tenant')->middleware(RequireIdentity::class)->group(function (): void {
     $c = InventoryController::class;
+    Route::get('/sites/{site}/configuration', [PortingConfigurationController::class, 'show'])->whereUuid('site');
+    Route::get('/sites/{site}/configuration/status', [PortingConfigurationController::class, 'status'])->whereUuid('site');
+    Route::post('/sites/{site}/configuration', [PortingConfigurationController::class, 'command'])->whereUuid('site');
     Route::get('/', [$c, 'index']);
     Route::get('/sites/{site}', [$c, 'site'])->whereUuid('site');
     Route::get('/sites/{site}/status', [$c, 'status'])->whereUuid('site');

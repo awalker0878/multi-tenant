@@ -38,7 +38,7 @@ def run_page(config: dict[str, Any]) -> bool:
     job = received["job"]
     if job is None:
         return False
-    if not isinstance(job, dict) or set(job) != {
+    if not isinstance(job, dict) or set(job) - {"collect_configuration"} != {
         "discovery_id",
         "endpoint_id",
         "policy_id",
@@ -67,7 +67,9 @@ def run_page(config: dict[str, Any]) -> bool:
             or not time.time() < job["lease_until"] <= time.time() + 31
         ):
             raise CollectionFailure("permission_denied")
-        body.update(collect(p, job["stream"], job["cursor"]))
+        body.update(
+            collect(p, job["stream"], job["cursor"], job.get("collect_configuration", False))
+        )
     except CollectionFailure as error:
         body.update(
             observations=[],

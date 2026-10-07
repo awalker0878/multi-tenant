@@ -6,6 +6,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from inventory.application.ports import Database, Policies, Transaction
+from inventory.domain.configuration import configuration_fact
 from inventory.domain.discovery import (
     Actor,
     EnrollmentPolicy,
@@ -42,7 +43,10 @@ class Discovery:
         policies: Policies,
         collection_authority: Callable[[EnrollmentPolicy], None],
         clock: Callable[[], float] = time.time,
+        configuration_streams: Callable[[list[dict[str, Any]], str], list[dict[str, Any]]]
+        | None = None,
     ) -> None:
+        self.configuration_streams = configuration_streams or (lambda streams, platform: streams)
         self.collection_authority = collection_authority
         self.database = database
         self.policies = policies
@@ -100,6 +104,7 @@ class Discovery:
             "renew": "inventory.admin",
             "revoke": "inventory.admin",
             "discover": "inventory.discover",
+            "configuration_pull": "inventory.admin",
             "match": "inventory.match",
         }
         if actor.action != required.get(operation) or actor.site is None:
@@ -129,7 +134,7 @@ class Discovery:
                         raise Rejected("revision_required", 428)
                     if row["revision"] != expected:
                         raise Rejected("stale_revision", 412)
-                if operation == "discover":
+                if operation in {"discover", "configuration_pull"}:
                     shape(body, set())
                     p = self.policy(row)
                     if p.platform == "ahv":
@@ -184,6 +189,11 @@ class Discovery:
                         job,
                         {"endpoint_id": endpoint},
                     )
+                    if operation == "configuration_pull":
+                        tx.execute(
+                            "UPDATE inventory.jobs SET collect_configuration=true WHERE id=%s",
+                            (job,),
+                        )
                     result = {
                         "discovery_id": job,
                         "status": "queued",
@@ -508,6 +518,7 @@ class Discovery:
                     "cursor": j["cursor"],
                     "lease_token": lease,
                     "lease_until": now + 30,
+                    **({"collect_configuration": True} if j["collect_configuration"] else {}),
                 },
                 "retry_after": 0,
             }
@@ -526,6 +537,7 @@ class Discovery:
                 "collected_at",
                 "error",
             },
+            {"configuration"},
         )
         job_id, lease = identifier(body["discovery_id"]), identifier(body["lease_token"])
         number(body["sequence"], 0, 100)
@@ -604,6 +616,18 @@ class Discovery:
                 or not j["updated_at"] - 2 <= collected <= now + 2
             ):
                 raise Rejected("invalid_observation_time")
+            streams = (
+                self.configuration_streams(p.streams, p.platform)
+                if j["collect_configuration"]
+                else p.streams
+            )
+            kind = streams[j["stream"]]["kind"]
+            if kind.startswith("config_"):
+                configuration_fact(body.get("configuration"), kind[7:])
+                if body["observations"] or body["terminal"] is not True:
+                    raise Rejected("invalid_configuration_page")
+            elif "configuration" in body:
+                raise Rejected("unexpected_configuration")
             items = body["observations"]
             if not isinstance(items, list) or len(items) > 100:
                 raise Rejected("page_bound")
@@ -628,7 +652,7 @@ class Discovery:
             for item in items:
                 valid = observation(item, p.native_scope, p.platform)
                 key = (valid["kind"], valid["native_id"])
-                if key in seen or valid["kind"] != p.streams[j["stream"]]["kind"]:
+                if key in seen or valid["kind"] != streams[j["stream"]]["kind"]:
                     raise Rejected("duplicate_or_wrong_stream")
                 seen.add(key)
             tx.execute(
@@ -640,7 +664,7 @@ class Discovery:
             status, reason = "queued", None
             if not body["coverage"] or not p.coverage_reference:
                 status, reason = "partial", "privilege_coverage_unknown"
-            elif stream == len(p.streams):
+            elif stream == len(streams):
                 accepted = [r["payload"] for r in previous] + [body]
                 if any(page["collected_at"] + p.freshness_seconds <= now for page in accepted):
                     status, reason = "partial", "generation_expired"
@@ -699,6 +723,21 @@ class Discovery:
         generation = str(job["id"])
         observed: list[str] = []
         for page in pages:
+            if "configuration" in page:
+                fact = page["configuration"]
+                tx.execute(
+                    "INSERT INTO inventory.configuration_facts VALUES "
+                    "(%s,%s,%s,%s,%s::jsonb,%s,%s)",
+                    (
+                        generation,
+                        p.tenant,
+                        endpoint["id"],
+                        fact["query"],
+                        canonical(fact),
+                        page["collected_at"],
+                        page["collected_at"] + p.freshness_seconds,
+                    ),
+                )
             for item in page["observations"]:
                 rid = resource_identity(
                     str(endpoint["id"]), p.epoch, item["kind"], item["native_id"]

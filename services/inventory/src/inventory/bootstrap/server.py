@@ -9,6 +9,7 @@ from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 from inventory.application.discovery import Discovery
 from inventory.infrastructure.authority import GovernanceAuthority, planning_actor
 from inventory.infrastructure.foundation import database_ready
+from inventory.infrastructure.generated_configuration_streams import configuration_streams
 from inventory.infrastructure.policies import MountedPolicies
 from inventory.infrastructure.store import Postgres
 from inventory.infrastructure.telemetry import BoundedSignalBuffer
@@ -23,7 +24,13 @@ class InventoryRouter:
         policies = MountedPolicies()
         authority = GovernanceAuthority(policies)
         self.inventory = InventoryApp(
-            Discovery(Postgres(), policies, authority.collection), authority
+            Discovery(
+                Postgres(),
+                policies,
+                authority.collection,
+                configuration_streams=configuration_streams,
+            ),
+            authority,
         )
         self.planning = PlanningInputApp(self.inventory.discovery, planning_actor)
         self.foundation = FoundationApp(database_ready)

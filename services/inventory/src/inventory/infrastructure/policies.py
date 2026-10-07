@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from inventory.domain.configuration import CONFIGURATION_QUERIES
 from inventory.domain.discovery import (
     EnrollmentPolicy,
     Rejected,
@@ -104,10 +105,18 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
         "vmware": {"server", "network", "datastore"},
         "ahv": set(),
     }[p["platform"]]
+    allowed = required | (
+        {"config_" + q for q in CONFIGURATION_QUERIES} if p["platform"] == "openstack" else set()
+    )
+    kinds = (
+        [s.get("kind") for s in streams if isinstance(s, dict)] if isinstance(streams, list) else []
+    )
     if (
         not isinstance(streams, list)
-        or {s.get("kind") for s in streams if isinstance(s, dict)} != required
-        or len(streams) != len(required)
+        or not required <= set(kinds)
+        or set(kinds) - allowed
+        or len(kinds) != len(streams)
+        or len(kinds) != len(set(kinds))
     ):
         raise Rejected("invalid_stream_coverage")
     for s in streams:

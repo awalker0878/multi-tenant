@@ -75,6 +75,7 @@ def exchange(
     *,
     method: str = "GET",
     body: dict[str, Any] | None = None,
+    version_discovery: bool = False,
 ) -> Any:
     u = urlsplit(stream["base_url"])
     if u.scheme != "https" or not u.hostname or u.username or u.password or u.query or u.fragment:
@@ -98,18 +99,22 @@ def exchange(
             },
         )
         response = connection.getresponse()
-        if 300 <= response.status < 400:
+        allowed_version = (
+            version_discovery and response.status == 300 and not response.getheader("Location")
+        )
+        if 300 <= response.status < 400 and not allowed_version:
             raise CollectionFailure("unsafe_destination")
         if response.status in {401, 403}:
             raise CollectionFailure("permission_denied")
+        if response.status == 404 and version_discovery:
+            raise CollectionFailure("unsupported_api")
         if response.status == 429:
             raise CollectionFailure("throttled")
         if response.status >= 500:
             raise CollectionFailure("transport_unavailable")
-        if (
-            response.status != 200
-            or response.getheader("Content-Encoding", "identity") != "identity"
-        ):
+        if (response.status != 200 and not allowed_version) or response.getheader(
+            "Content-Encoding", "identity"
+        ) != "identity":
             raise CollectionFailure("invalid_response")
         if not response.getheader("Content-Type", "").lower().startswith("application/json"):
             raise CollectionFailure("invalid_response")
@@ -130,10 +135,30 @@ def exchange(
         connection.close()
 
 
-def collect(policy: dict[str, Any], stream_index: int, cursor: str | None) -> dict[str, Any]:
+def collect(
+    policy: dict[str, Any],
+    stream_index: int,
+    cursor: str | None,
+    include_configuration: bool = False,
+) -> dict[str, Any]:
     platform, scope = policy["platform"], policy["native_scope"]
-    stream = policy["streams"][stream_index]
+    from inventory_worker.infrastructure.generated_configuration_streams import (
+        configuration_streams,
+    )
+
+    streams = (
+        configuration_streams(policy["streams"], platform)
+        if include_configuration
+        else policy["streams"]
+    )
+    stream = streams[stream_index]
     kind = stream["kind"]
+    if kind.startswith("config_"):
+        from inventory_worker.infrastructure.configuration import collect_configuration
+
+        if cursor is not None:
+            raise CollectionFailure("invalid_response")
+        return collect_configuration(policy, stream)
     if not re.fullmatch(r"[A-Za-z0-9_.:-]{1,200}", scope) or (
         cursor is not None and not re.fullmatch(r"[A-Za-z0-9_.:-]{1,200}", cursor)
     ):

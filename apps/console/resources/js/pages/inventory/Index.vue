@@ -15,11 +15,12 @@ const open = () => { if (/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3
         <Link :href="`/tenants/${tenantId}/inventory/sites/${item.site_id}`" class="break-all font-semibold text-teal-800 underline">Site {{ item.site_id }}</Link>
       </li>
     </ul>
-    <p v-if="!sites.items.length" class="my-6">No enrolled sites on this page. A site owner can open an approved site below to enroll its endpoint.</p>
+    <p v-if="!sites.items.length" class="my-6">No configured sites on this page. Open an approved site or start its porting configuration below.</p>
     <Link v-if="sites.next_cursor" :href="`/tenants/${tenantId}/inventory?cursor=${sites.next_cursor}`" class="action secondary">Next sites</Link>
     <form class="mt-8 max-w-xl" @submit.prevent="open">
       <label for="inventory-site">Approved site ID<input id="inventory-site" v-model="site" required maxlength="36" pattern="[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}" /></label>
       <button type="submit">Open site</button>
+      <Link v-if="/^[0-9a-f-]{36}$/.test(site)" :href="`/tenants/${tenantId}/inventory/sites/${site}/configuration`" class="action secondary ml-4">Configure porting</Link>
     </form>
   </CatalogueLayout>
 </template>

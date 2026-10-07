@@ -8,6 +8,7 @@ from urllib.parse import parse_qs
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
+from inventory.application.configuration import PortingConfiguration
 from inventory.application.discovery import Discovery
 from inventory.application.ports import Authority
 from inventory.application.views import InventoryViews
@@ -15,6 +16,30 @@ from inventory.domain.discovery import Rejected
 
 UUID = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
 ROUTES = (
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/endpoints/({UUID})/configuration-pulls",
+        "configuration_pull",
+        "inventory.admin",
+    ),
+    (
+        "GET",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/porting-configuration",
+        "configuration",
+        "inventory.admin",
+    ),
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/porting-configuration",
+        "configuration_save",
+        "inventory.admin",
+    ),
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/porting-configuration/confirmations",
+        "configuration_confirm",
+        "inventory.admin",
+    ),
     ("GET", rf"/v1/tenants/({UUID})/sites", "sites", "inventory.read"),
     ("GET", rf"/v1/tenants/({UUID})/sites/({UUID})/policies", "policies", "inventory.admin"),
     ("GET", rf"/v1/tenants/({UUID})/sites/({UUID})/endpoints", "endpoints", "inventory.read"),
@@ -98,6 +123,7 @@ class InventoryApp:
         self.discovery = discovery
         self.authority = authority
         self.views = InventoryViews(discovery)
+        self.configuration = PortingConfiguration(discovery)
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
@@ -105,8 +131,6 @@ class InventoryApp:
         if scope["type"] != "http":
             return
         status = 200
-        headers = list(scope["headers"])
-        headers = list(scope["headers"])
         headers = list(scope["headers"])
         try:
             if len(scope["query_string"]) > 200 or len(headers) > 40:
@@ -179,9 +203,18 @@ class InventoryApp:
                     raise Rejected("invalid_query")
                 target = values[2] if len(values) > 2 else None
                 if scope["method"] == "GET":
-                    payload = await asyncio.to_thread(
-                        self.views.read, actor, operation, target, params.get("cursor", [None])[0]
-                    )
+                    if operation == "configuration":
+                        if params:
+                            raise Rejected("invalid_query")
+                        payload = await asyncio.to_thread(self.configuration.read, actor)
+                    else:
+                        payload = await asyncio.to_thread(
+                            self.views.read,
+                            actor,
+                            operation,
+                            target,
+                            params.get("cursor", [None])[0],
+                        )
                 else:
                     if params:
                         raise Rejected("invalid_query")
@@ -189,7 +222,9 @@ class InventoryApp:
                     if expected and not re.fullmatch(r'"[1-9][0-9]{0,8}"', expected):
                         raise Rejected("invalid_revision")
                     payload = await asyncio.to_thread(
-                        self.discovery.command,
+                        self.configuration.command
+                        if operation in {"configuration_save", "configuration_confirm"}
+                        else self.discovery.command,
                         actor,
                         operation,
                         body,
@@ -197,7 +232,7 @@ class InventoryApp:
                         target,
                         int(expected[1:-1]) if expected else None,
                     )
-                    status = 202 if operation == "discover" else 201
+                    status = 202 if operation in {"discover", "configuration_pull"} else 201
         except Rejected as error:
             status, payload = error.status, {"error": error.reason}
         except (TimeoutError, UnicodeError, ValueError):
