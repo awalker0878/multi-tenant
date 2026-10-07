@@ -1,0 +1,56 @@
+[
+  {
+    "archive": "archives/p08-fleet-components-first.zip",
+    "archive_sha256": "942b97ff5aa5de8b89b65cdf84abbf38ebacbbad4071f376e30a33b1da678eda",
+    "kind": "components",
+    "run_id": "37639180297",
+    "artifact_id": "11491063628",
+    "source_revision": "4d9984b02c7411faf677e67e7f3d3041aa5f2a18",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37639180297"
+  },
+  {
+    "archive": "archives/p08-fleet-browser-first.zip",
+    "archive_sha256": "e0d41918361f34f73f8a04c62e3c627e85ae3137bcaf7eb1654dbfcf2d261863",
+    "kind": "browser",
+    "run_id": "37639180297",
+    "artifact_id": "11491625850",
+    "source_revision": "4d9984b02c7411faf677e67e7f3d3041aa5f2a18",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37639180297"
+  },
+  {
+    "archive": "archives/p08-fleet-browser-pass.zip",
+    "archive_sha256": "dcf2bc5d576eb207b0aeaa295cae92f6f4c887697587ace80106603868bc5118",
+    "kind": "browser",
+    "run_id": "37640141788",
+    "artifact_id": "11491861490",
+    "source_revision": "74ab8e41e2d1da90bb47f1b2794c9c7bf3778d66",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37640141788"
+  },
+  {
+    "archive": "archives/p08-fleet-console-first.zip",
+    "archive_sha256": "fdb4972b4d9b091eee78876d63f7700df28653f1e2b9fb198e7b2e7e89355ce1",
+    "kind": "console",
+    "run_id": "37639180323",
+    "artifact_id": "11491144246",
+    "source_revision": "4d9984b02c7411faf677e67e7f3d3041aa5f2a18",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37639180323"
+  },
+  {
+    "archive": "archives/p08-fleet-components-pass.zip",
+    "archive_sha256": "097fa73d8e17186eec595b25650a703c23617c9350706ea5bad21582452cac6c",
+    "kind": "components",
+    "run_id": "37640141788",
+    "artifact_id": "11492875143",
+    "source_revision": "74ab8e41e2d1da90bb47f1b2794c9c7bf3778d66",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37640141788"
+  },
+  {
+    "archive": "archives/p08-fleet-console-pass.zip",
+    "archive_sha256": "859c7d95c991e4faa6aeafc4784459d96b7eddef226e8fbf73cd39aa58bc8c9e",
+    "kind": "console",
+    "run_id": "37640141936",
+    "artifact_id": "11492155901",
+    "source_revision": "74ab8e41e2d1da90bb47f1b2794c9c7bf3778d66",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37640141936"
+  }
+]
