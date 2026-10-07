@@ -52,6 +52,14 @@ def campaign(c, extension=None):
     a=copy.deepcopy(model['destination']);a.update(tenant_id=tenant,site_id=c['site'],endpoint_id=c['endpoint'],generation_id=c['current'])
     b=copy.deepcopy(a);b.update(site_id=str(uuid.uuid4()),endpoint_id=str(uuid.uuid4()),generation_id=str(uuid.uuid4()));b['capacity']['vcpus']=1
     policy=model['policy'];p=model['profile']
+    # Fixture IDs are rebound to the actual isolated application before compilation.
+    # Rebind the exact ownership and operation digests, just as the plan producer does.
+    def canonical_digest(value):
+        return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=True,
+            allow_nan=False,separators=(',',':')).encode()).hexdigest()
+    native=policy['native_api']
+    native['operation_plan']['ownership_digest']=canonical_digest(policy['ownership'])
+    native['operation_plan_sha256']=canonical_digest(native['operation_plan'])
     registry={'schema_version':1,'profiles':{'synthetic':{'platform':p['platform'],'version':p['version'],'declarations':{r['dimension']:r['declaration'] for r in p['dimensions']}}},'policies':{'synthetic':policy},'assignments':[{'tenant_id':tenant,'site_id':d['site_id'],'endpoint_id':d['endpoint_id'],'profile':'synthetic','policy':'synthetic'} for d in [a,b]]}
     registry_file=private/'planning-registry.json';registry_file.write_text(json.dumps(registry))
     quals={'schema_version':1,'records':[]}

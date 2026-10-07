@@ -212,3 +212,59 @@ def test_unknown_effect_event_and_hold_survive_reconnect(postgres: dict[str, Any
         ).fetchone()
         assert row and row["facts"] == {"reason": "lost_reply"}
     assert not journal(postgres).claim(request)
+
+
+def test_accepted_ids_and_transfer_hashes_survive_new_journal_instance(
+    postgres: dict[str, Any],
+) -> None:
+    request = binding()
+    original = journal(postgres)
+    assert original.claim(request)
+    object_id = str(uuid4())
+    original.record(request, "request_started", {"resource_key": "boot", "kind": "image"})
+    original.record(
+        request,
+        "request_accepted",
+        {
+            "resource_key": "boot",
+            "kind": "image",
+            "native_id": object_id,
+            "response_sha256": "a" * 64,
+        },
+    )
+    original.record(
+        request,
+        "disk_transferred",
+        {
+            "resource_key": "boot",
+            "size": 4096,
+            "sha256": "b" * 64,
+            "sha512": "c" * 128,
+        },
+    )
+    recovered = journal(postgres)
+    assert not recovered.claim(request)
+    assert recovered.resources(request) == {"boot": {"kind": "image", "id": object_id}}
+    assert recovered.transfers(request)["boot"]["sha256"] == "b" * 64
+    with pytest.raises(NativeHeld, match="not_bound"):
+        recovered.resources(replace(request, operation_plan_sha256="d" * 64))
+    with pytest.raises(NativeHeld, match="not_bound"):
+        recovered.transfers(replace(request, custody_generation=2))
+
+
+def test_duplicate_native_receipts_never_guess_resource_identity(postgres: dict[str, Any]) -> None:
+    request = binding()
+    ledger = journal(postgres)
+    assert ledger.claim(request)
+    for _ in range(2):
+        ledger.record(
+            request,
+            "request_accepted",
+            {
+                "resource_key": "vm",
+                "kind": "server",
+                "native_id": str(uuid4()),
+            },
+        )
+    with pytest.raises(NativeHeld, match="ambiguous_native_receipt"):
+        ledger.resources(request)
