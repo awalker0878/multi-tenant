@@ -39,7 +39,7 @@ def main():
         'source_bindings': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in paths if p.startswith(prefixes)},
         'commands': [], 'limitations': [
             'Actual Temporal/TLS/JWT, internal effect/boundary TLS and separate worker PostgreSQL journal.',
-            'Native authority, saved-plan process, provider observations and other stage effects remain synthetic.',
+            'Native authority, native API requests, provider observations and other stage effects remain synthetic.',
             'No provider, guest, enterprise service, native fence, Q05/Q06 or receiving acceptance is established.',
         ],
     }

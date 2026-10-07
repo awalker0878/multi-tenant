@@ -35,7 +35,7 @@ Use E1 for profile/normalization checks, E2 for controlled endpoint faults and E
 
 Run Q02.01–Q02.07 before native provisioning consumes discovery. Independently compare the endpoint's permitted object set with collected scope, including hidden privilege boundaries and tombstones. An empty response cannot establish an empty site when access may be incomplete.
 
-Run Q02.08–Q02.10 only for the adoption capability selected in P09. Record the Terraform state identity or equivalent management binding separately from native object identity. A successful import command is not evidence that the plan is no-change or that an old writer lost authority.
+Run Q02.08–Q02.10 only for the adoption capability selected in P09. Record the native resource custody identity or equivalent management binding separately from native object identity. A successful import command is not evidence that the plan is no-change or that an old writer lost authority.
 
 Stop adoption when ownership, old-writer fencing or outcome is uncertain. Preserve native resources and state for reconciliation; do not attempt destructive cleanup to make the run appear clean.
 

@@ -87,7 +87,7 @@ Task polling can make worker-initiated site connectivity practical; callback, gu
 | Native endpoint/worker enrolment | Inventory/site commissioning with IAM scope | Protected endpoint records and trust bootstrap; no implicit management ownership |
 | Profiles, policies and qualification | Planning/assurance | Version/digest binding; changed material inputs invalidate affected plans/claims |
 | Credentials and encryption/signing keys | Approved secret/key owner | Out-of-band bootstrap, scoped runtime fetch, rotation/revocation and tested recovery |
-| Terraform state and native bindings | Declared state owner plus lifecycle ledger | Locked state, explicit field ownership and recovery reconciliation; no competing API writer |
+| native resource custody and native bindings | Declared state owner plus lifecycle ledger | Locked state, explicit field ownership and recovery reconciliation; no competing API writer |
 
 Run secrets through an approved mounted/in-memory or broker mechanism selected in ADR-010. Do not bake them into images, source, fixtures, evidence or logs. Environment-variable use, if selected, requires exposure/redaction review. Rotation procedures establish overlap, expiry, affected running work and safe continuation; a new credential does not automatically reauthorize an old job.
 
@@ -143,7 +143,7 @@ Recovery procedure design must establish this order:
 
 1. Contain new admission and isolate restored workers from native mutation paths; revoke/fence old execution authority through mechanisms that prevent an old partitioned worker continuing writes.
 2. Restore required identities/keys/trust and persistent systems into an isolated environment at recorded recovery points. Keep dispatch and mutating workers disabled.
-3. Reconcile database/outbox/inbox watermarks, Temporal histories, job/operation records, broker events, evidence objects and Terraform/native bindings. Report gaps rather than inventing missing success records.
+3. Reconcile database/outbox/inbox watermarks, Temporal histories, job/operation records, broker events, evidence objects and native API/native bindings. Report gaps rather than inventing missing success records.
 4. Independently observe native operations that may have completed after the recovery point. Classify every affected operation as known-not-started, confirmed failure, confirmed success or outcome unknown. Unknown effects remain held.
 5. Revalidate current grants, revocations, qualification, plan freshness, reservations and resource ownership; old approvals and restored leases are not current authority. Establish a new effective fencing epoch before enabling writes.
 6. Resume only reviewed compatible workflows, reconstruct safe projections and verify application/service checks. Release admission gradually under operator observation and preserve the incident/evidence record.

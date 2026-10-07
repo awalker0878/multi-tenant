@@ -23,7 +23,7 @@ A decision record is not implementation evidence. Update an ADR and the register
 | [ADR-013](adr-013-product-aggregate-invariants.md) | Product aggregate invariants |
 | [ADR-014](adr-014-first-native-provisioning-and-migration-slice.md) | First native provisioning and migration slice |
 | [ADR-015](adr-015-platform-and-enterprise-integration-tuples.md) | Platform and enterprise integration tuples |
-| [ADR-016](adr-016-terraform-plans-and-resource-ownership.md) | Terraform plans and resource ownership |
+| [ADR-016](adr-016-native-api-plans-and-resource-ownership.md) | Native API plans and resource ownership |
 | [ADR-017](adr-017-service-and-application-objectives.md) | Service and application objectives |
 | [ADR-018](adr-018-qualification-lane-and-operational-admission.md) | Qualification lane and operational admission |
 | [ADR-019](adr-019-console-rendering-and-session-model.md) | Console rendering and session model |

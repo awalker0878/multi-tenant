@@ -240,12 +240,12 @@
                   "campaign_id",
                   "executor_id",
                   "epoch",
-                  "state_lineage",
+                  "custody_id",
                   "project_id",
                   "plan_digest",
-                  "bundle_sha256",
-                  "workspace",
-                  "state_serial",
+                  "operation_plan_sha256",
+                  "ownership_digest",
+                  "custody_generation",
                   "expires_at"
                 ],
                 "properties": {
@@ -294,7 +294,7 @@
                     "format": "uuid",
                     "pattern": "^[a-f0-9-]{36}$"
                   },
-                  "state_lineage": {
+                  "custody_id": {
                     "type": "string",
                     "format": "uuid",
                     "pattern": "^[a-f0-9-]{36}$"
@@ -307,15 +307,15 @@
                     "type": "string",
                     "pattern": "^[a-f0-9]{64}$"
                   },
-                  "bundle_sha256": {
+                  "operation_plan_sha256": {
                     "type": "string",
                     "pattern": "^[a-f0-9]{64}$"
                   },
-                  "workspace": {
+                  "ownership_digest": {
                     "type": "string",
-                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                    "pattern": "^[a-f0-9]{64}$"
                   },
-                  "state_serial": {
+                  "custody_generation": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 9223372036854775807
@@ -356,8 +356,8 @@
             "type": "string",
             "enum": [
               "preflight",
-              "before_saved_plan_apply",
-              "during_saved_plan_apply",
+              "before_api_sequence",
+              "during_api_sequence",
               "before_effect",
               "during_effect"
             ]
@@ -390,8 +390,8 @@
             "type": "string",
             "enum": [
               "preflight",
-              "before_saved_plan_apply",
-              "during_saved_plan_apply",
+              "before_api_sequence",
+              "during_api_sequence",
               "before_effect",
               "during_effect"
             ]

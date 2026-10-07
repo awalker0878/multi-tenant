@@ -13,7 +13,7 @@ and automated test passes are not reviewer signatures.
 | Reviewer role | Concrete record to examine | Decision to record |
 | --- | --- | --- |
 | Planning and quality | Two authorized candidates, original owner inputs, requirement findings and remediation; actual P04 owner holds versus controlled positive E2 inputs. | G05.01 reproducibility and explanation. |
-| Architecture and Governance | Canonical content/binding digests, exact mappings/artifacts, saved-plan/state/sole-writer choice, changed-plan denial, effect graph and target-first-write boundary. | G05.02 integrity and ADR-016 receiving disposition. |
+| Architecture and Governance | Canonical content/binding digests, exact mappings/artifacts, native-plan/state/sole-writer choice, changed-plan denial, effect graph and target-first-write boundary. | G05.02 integrity and ADR-016 receiving disposition. |
 | Security and Assurance | Current source authority, tenant/custody/isolation denials, dossier custody and exact-scope matching, separate campaign endpoint/credential/data/cleanup limits. | G05.03 lane and safety acceptance. |
 | Lifecycle and quality | Independent owner receipts, concurrent allocation, unknown outcomes, partial compensation and live-resource expiry hold. | G05.04 journal and failure acceptance. |
 
@@ -44,7 +44,7 @@ Preserve stable command identity, unknown-outcome reconciliation and separate la
 scope. A plan, approval or timer never authorizes a native effect by itself.
 
 Before native operations, the accountable owners must select and qualify actual
-Terraform backend/tool/provider/state custody, compiler/adapter/automation images,
+native API contracts, adapter artifacts and custody, compiler/adapter/automation images,
 source policy and Assurance evidence custody, authenticated allocation owners,
 endpoint/data scope, capacity/retention budgets and operating controls. These are
 P06/P07 and carried P00/P04 inputs; the P05 synthetic packet appoints no people or

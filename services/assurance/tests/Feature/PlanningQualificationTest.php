@@ -9,7 +9,7 @@ beforeEach(function (): void {
     $authority = Mockery::mock(PlanningInputAuthority::class);
     $authority->shouldReceive('check')->andReturn([]);
     $this->app->instance(PlanningInputAuthority::class, $authority);
-    $this->body = ['action' => 'plan.read', 'scope' => ['site_id' => $this->id, 'environment' => $this->id, 'resource_id' => $this->id], 'qualification_scope' => ['tenant_id' => $this->id, 'site_id' => $this->id, 'endpoint_id' => $this->id, 'native_scope' => 'fixture', 'installed_tuple' => ['api' => 1], 'action' => 'application.provision', 'method' => 'saved_plan', 'profile_digest' => str_repeat('a', 64), 'artifacts' => []]];
+    $this->body = ['action' => 'plan.read', 'scope' => ['site_id' => $this->id, 'environment' => $this->id, 'resource_id' => $this->id], 'qualification_scope' => ['tenant_id' => $this->id, 'site_id' => $this->id, 'endpoint_id' => $this->id, 'native_scope' => 'fixture', 'installed_tuple' => ['api' => 1], 'action' => 'application.provision', 'method' => 'native_api', 'profile_digest' => str_repeat('a', 64), 'artifacts' => []]];
     $this->path = '/v1/tenants/'.$this->id.'/planning-qualification';
 });
 

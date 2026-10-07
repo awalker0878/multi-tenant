@@ -1,6 +1,5 @@
 """Byte, state, scope and uncertainty comparisons for the first native campaign."""
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -12,42 +11,26 @@ from test_commissioning import NOW, record
 from lifecycle.bootstrap.native_preflight import main
 from lifecycle.domain.admission import digest
 from lifecycle.domain.execution import Rejected
-from lifecycle.domain.native_preflight import STATE_KEYS, assess_saved_plan
-
-SAVED = b"synthetic opaque saved plan; not a Terraform plan or native evidence"
+from lifecycle.domain.native_preflight import CUSTODY_KEYS, assess_native_plan
 
 
 def inputs() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
     envelope = json.loads((Path(__file__).parent / "fixtures/synthetic-plan-v1.json").read_text())
     plan = {key: envelope[key] for key in ("content", "binding")}
     content = plan["content"]
-    toolchain = {
+    api_contracts = {
         "schema_version": 1,
-        "terraform": {"version": "1.0.0", "sha256": digest("fixture-terraform")},
-        "providers": [
-            {
-                "source": "registry.invalid/fixture/openstack",
-                "version": "1.0.0",
-                "sha256": digest("fixture-provider"),
-            }
-        ],
-        "modules": [
-            {
-                "id": "fixture-module",
-                "uri": "evidence://fixture/modules/v1",
-                "revision": "fixture-v1",
-                "sha256": digest("fixture-module"),
-            }
-        ],
-        "dependency_lock_sha256": digest("fixture-lock"),
+        "api_versions": {"compute": "2.1", "network": "2.0", "volume": "3.0"},
+        "adapter_sha256": content["artifacts"]["adapter"],
         "worker_image_digest": "sha256:" + digest("fixture-worker"),
     }
     content["lane"] = "isolated_campaign"
-    content["terraform"]["backend_ref"] = "evidence://fixture/backend"
-    content["terraform"]["toolchain_sha256"] = digest(toolchain)
-    content["terraform"]["saved_plan_sha256"] = hashlib.sha256(SAVED).hexdigest()
+    content["native_api"]["custody_ref"] = "evidence://fixture/backend"
+    content["native_api"]["api_contracts_sha256"] = digest(api_contracts)
     for owner in content["ownership"]:
-        owner["state_ref"] = content["terraform"]["backend_ref"]
+        owner["custody_ref"] = content["native_api"]["custody_ref"]
+    content["native_api"]["operation_plan"]["ownership_digest"] = digest(content["ownership"])
+    content["native_api"]["operation_plan_sha256"] = digest(content["native_api"]["operation_plan"])
     commissioning = record()
     rebind(plan, commissioning)
     snapshot = {
@@ -55,20 +38,20 @@ def inputs() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, 
             key: deepcopy(content[key])
             for key in ("scope", "installed_tuple", "artifacts", "ownership")
         },
-        "terraform": {
-            **{key: content["terraform"][key] for key in STATE_KEYS},
+        "native_api": {
+            **{key: content["native_api"][key] for key in CUSTODY_KEYS},
             "lock_id": "fixture-lock",
             "fence": 7,
             "lease_expires_at": NOW + 60,
             "held": True,
         },
-        "toolchain_sha256": digest(toolchain),
+        "api_contracts_sha256": digest(api_contracts),
         "observed_at": NOW,
         "observer_id": "fixture-observer",
         "executor_id": content["executor_ids"][0],
         "outstanding_operation_ids": [],
     }
-    return plan, commissioning, toolchain, snapshot
+    return plan, commissioning, api_contracts, snapshot
 
 
 def rebind(plan: dict[str, Any], commissioning: dict[str, Any]) -> None:
@@ -84,8 +67,8 @@ def rebind(plan: dict[str, Any], commissioning: dict[str, Any]) -> None:
             "installed_tuple_sha256": digest(content["installed_tuple"]),
             "artifact_set_sha256": digest(content["artifacts"]),
             "ownership_sha256": digest(content["ownership"]),
-            "toolchain_sha256": content["terraform"]["toolchain_sha256"],
-            "state_binding_sha256": digest({k: content["terraform"][k] for k in STATE_KEYS}),
+            "api_contracts_sha256": content["native_api"]["api_contracts_sha256"],
+            "custody_binding_sha256": digest({k: content["native_api"][k] for k in CUSTODY_KEYS}),
         }
     )
     for cell in commissioning["inputs"]:
@@ -94,9 +77,11 @@ def rebind(plan: dict[str, Any], commissioning: dict[str, Any]) -> None:
 
 def check(
     values: tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]],
-    raw: bytes = SAVED,
+    raw: str | None = None,
 ) -> dict[str, Any]:
-    return assess_saved_plan(*values, hashlib.sha256(raw).hexdigest(), NOW)
+    return assess_native_plan(
+        *values, raw or values[0]["content"]["native_api"]["operation_plan_sha256"], NOW
+    )
 
 
 def test_matching_preflight_never_authorizes_apply_or_retry() -> None:
@@ -110,16 +95,16 @@ def test_matching_preflight_never_authorizes_apply_or_retry() -> None:
     assert "evidence://" not in json.dumps(result) and "fixture-observer" not in json.dumps(result)
 
 
-@pytest.mark.parametrize("field", sorted(STATE_KEYS))
-def test_changed_backend_workspace_lineage_serial_or_owner_is_held(field: str) -> None:
+@pytest.mark.parametrize("field", sorted(CUSTODY_KEYS))
+def test_changed_backend_ownership_digest_lineage_serial_or_owner_is_held(field: str) -> None:
     values = inputs()
-    state = values[3]["terraform"]
+    state = values[3]["native_api"]
     state[field] = (
         2
-        if field == "state_serial"
-        else ("evidence://fixture/other" if field == "backend_ref" else "changed")
+        if field == "custody_generation"
+        else ("evidence://fixture/other" if field == "custody_ref" else "changed")
     )
-    assert "terraform_state_changed" in check(values)["holds"]
+    assert "native_custody_changed" in check(values)["holds"]
 
 
 @pytest.mark.parametrize("field", ["scope", "installed_tuple", "artifacts", "ownership"])
@@ -135,15 +120,15 @@ def test_changed_native_owner_records_are_held(field: str) -> None:
 @pytest.mark.parametrize(
     "fault,reason",
     [
-        ("changed_bytes", "saved_plan_bytes_changed"),
-        ("manifest", "toolchain_changed"),
-        ("observed_toolchain", "toolchain_changed"),
+        ("changed_bytes", "native_operation_plan_changed"),
+        ("manifest", "api_contracts_changed"),
+        ("observed_api_contracts", "api_contracts_changed"),
         ("stale", "native_snapshot_stale"),
         ("future", "native_snapshot_stale"),
-        ("lock_expiry", "current_state_lock_missing"),
-        ("not_locked", "current_state_lock_missing"),
-        ("bool_fence", "current_state_lock_missing"),
-        ("missing_lock", "current_state_lock_missing"),
+        ("lock_expiry", "current_custody_lock_missing"),
+        ("not_locked", "current_custody_lock_missing"),
+        ("bool_fence", "current_custody_lock_missing"),
+        ("missing_lock", "current_custody_lock_missing"),
         ("unknown", "outstanding_effect_requires_reconciliation"),
         ("observer", "independent_native_observer_missing"),
         ("executor", "executor_changed"),
@@ -159,27 +144,27 @@ def test_changed_native_owner_records_are_held(field: str) -> None:
 )
 def test_preflight_denials(fault: str, reason: str) -> None:
     values = inputs()
-    plan, commissioning, toolchain, snapshot = values
-    raw = SAVED
+    plan, commissioning, api_contracts, snapshot = values
+    raw = None
     match fault:
         case "changed_bytes":
-            raw += b"altered"
+            raw = digest("altered")
         case "manifest":
-            toolchain["terraform"]["sha256"] = digest("other")
-        case "observed_toolchain":
-            snapshot["toolchain_sha256"] = digest("other")
+            api_contracts["adapter_sha256"] = digest("other")
+        case "observed_api_contracts":
+            snapshot["api_contracts_sha256"] = digest("other")
         case "stale":
             snapshot["observed_at"] = NOW - 6
         case "future":
             snapshot["observed_at"] = NOW + 1
         case "lock_expiry":
-            snapshot["terraform"]["lease_expires_at"] = NOW
+            snapshot["native_api"]["lease_expires_at"] = NOW
         case "not_locked":
-            snapshot["terraform"]["held"] = False
+            snapshot["native_api"]["held"] = False
         case "bool_fence":
-            snapshot["terraform"]["fence"] = True
+            snapshot["native_api"]["fence"] = True
         case "missing_lock":
-            snapshot["terraform"]["lock_id"] = ""
+            snapshot["native_api"]["lock_id"] = ""
         case "unknown":
             snapshot["outstanding_operation_ids"] = ["accepted-response-lost"]
         case "observer":
@@ -226,77 +211,36 @@ def test_preflight_denials(fault: str, reason: str) -> None:
 @pytest.mark.parametrize(
     "fault",
     [
-        "changed_unapproved_content",
-        "changed_envelope_digest",
+        "changed_content",
         "bool_version",
-        "missing_pin",
-        "mutable_tool",
-        "mutable_provider",
-        "duplicate_provider",
-        "empty_providers",
-        "mutable_module",
-        "duplicate_module",
-        "empty_modules",
+        "mutable_api",
+        "missing_adapter",
         "tagged_worker",
-        "bad_lock_digest",
-        "overlap",
-        "duplicate_field",
-        "wildcard_field",
-        "other_state",
-        "negative_serial",
-        "bool_serial",
+        "extra",
+        "ownership",
+        "bool_generation",
     ],
 )
-def test_malformed_and_colliding_records_are_rejected(fault: str) -> None:
+def test_invalid_native_contracts_are_rejected(fault: str) -> None:
     values = inputs()
-    plan, commissioning, toolchain, _ = values
-    match fault:
-        case "changed_unapproved_content":
-            plan["content"]["artifacts"]["adapter"] = digest("other")
-        case "changed_envelope_digest":
-            plan["binding"]["digest"] = digest("other")
-        case "bool_version":
-            toolchain["schema_version"] = True
-        case "missing_pin":
-            del toolchain["terraform"]["sha256"]
-        case "mutable_tool":
-            toolchain["terraform"]["version"] = ">=1.0.0"
-        case "mutable_provider":
-            toolchain["providers"][0]["version"] = "latest"
-        case "duplicate_provider":
-            toolchain["providers"].append(deepcopy(toolchain["providers"][0]))
-        case "empty_providers":
-            toolchain["providers"] = []
-        case "mutable_module":
-            toolchain["modules"][0]["revision"] = "main"
-        case "duplicate_module":
-            toolchain["modules"].append(deepcopy(toolchain["modules"][0]))
-        case "empty_modules":
-            toolchain["modules"] = []
-        case "tagged_worker":
-            toolchain["worker_image_digest"] = "worker:latest"
-        case "bad_lock_digest":
-            toolchain["dependency_lock_sha256"] = "missing"
-        case "overlap":
-            plan["content"]["ownership"].append(deepcopy(plan["content"]["ownership"][0]))
-        case "duplicate_field":
-            plan["content"]["ownership"][0]["fields"] *= 2
-        case "wildcard_field":
-            plan["content"]["ownership"][0]["fields"] = ["*"]
-        case "other_state":
-            plan["content"]["ownership"][0]["state_ref"] = "evidence://other/state"
-        case "negative_serial":
-            plan["content"]["terraform"]["state_serial"] = -1
-        case "bool_serial":
-            plan["content"]["terraform"]["state_serial"] = True
-    if fault in {
-        "overlap",
-        "duplicate_field",
-        "wildcard_field",
-        "other_state",
-        "negative_serial",
-        "bool_serial",
-    }:
+    plan, commissioning, contracts, _ = values
+    if fault == "changed_content":
+        plan["content"]["artifacts"]["adapter"] = digest("other")
+    elif fault == "bool_version":
+        contracts["schema_version"] = True
+    elif fault == "mutable_api":
+        contracts["api_versions"]["compute"] = "latest"
+    elif fault == "missing_adapter":
+        del contracts["adapter_sha256"]
+    elif fault == "tagged_worker":
+        contracts["worker_image_digest"] = "worker:latest"
+    elif fault == "extra":
+        contracts["command"] = "arbitrary"
+    elif fault == "ownership":
+        plan["content"]["ownership"] *= 2
+        rebind(plan, commissioning)
+    else:
+        plan["content"]["native_api"]["custody_generation"] = True
         rebind(plan, commissioning)
     with pytest.raises(Rejected):
         check(values)
@@ -308,19 +252,19 @@ def test_cli_hashes_actual_bytes_and_redacts_errors(
     monkeypatch.setattr("lifecycle.bootstrap.native_preflight.time.time", lambda: NOW)
     arguments = []
     for name, value in zip(
-        ("plan", "commissioning", "toolchain", "snapshot"), inputs(), strict=True
+        ("plan", "commissioning", "api-contracts", "snapshot"), inputs(), strict=True
     ):
         path = tmp_path / (name + ".json")
         path.write_text(json.dumps(value))
         arguments += ["--" + name, str(path)]
-    saved = tmp_path / "protected-saved-plan"
-    saved.write_bytes(SAVED)
-    arguments += ["--saved-plan", str(saved)]
+    saved = tmp_path / "operation.json"
+    saved.write_text(json.dumps(inputs()[0]["content"]["native_api"]["operation_plan"]))
+    arguments += ["--operation-plan", str(saved)]
     assert main(arguments) == 0
     assert not json.loads(capsys.readouterr().out)["native_write_authorized"]
-    saved.write_bytes(SAVED + b"changed")
+    saved.write_text(json.dumps({"changed": True}))
     assert main(arguments) == 2
-    assert "saved_plan_bytes_changed" in json.loads(capsys.readouterr().out)["holds"]
+    assert "native_operation_plan_changed" in json.loads(capsys.readouterr().out)["holds"]
     (tmp_path / "snapshot.json").write_text('{"secret":"must-not-escape",')
     assert main(arguments) == 1
     error = capsys.readouterr().out

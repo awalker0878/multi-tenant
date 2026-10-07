@@ -24,7 +24,7 @@ def main():
     prefixes = ('services/lifecycle/src/', 'services/lifecycle/tests/', 'scripts/p07/',
                 '.github/workflows/p07-', 'release/p07-native-inputs.json',
                 'services/lifecycle/pyproject.toml', 'services/lifecycle/uv.lock')
-    selected = [p for p in paths if p.startswith(prefixes)]
+    selected = [p for p in paths if p.startswith(prefixes) and (ROOT / p).is_file()]
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'observed_at': datetime.now(timezone.utc).isoformat(),
@@ -35,7 +35,7 @@ def main():
         'source_bindings': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in selected},
         'commands': [],
         'limitations': [
-            'Synthetic input metadata and opaque saved-plan bytes; no Terraform/OpenStack execution.',
+            'Synthetic input metadata and native operation plans; no installed OpenStack execution.',
             'No owner authentication, native service/restore/policy/revocation/retirement observation.',
             'The separate P06 regression campaign owns PostgreSQL/Temporal/browser evidence.',
         ],

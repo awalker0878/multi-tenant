@@ -16,7 +16,7 @@ validate_spec(spec)
 validator = Draft202012Validator(spec['components']['schemas']['BoundaryRequest'], format_checker=FormatChecker())
 validator.validate(fixture)
 negatives = []
-for field, value in [('state_serial', True), ('project_id', '*'), ('expires_at', 0), ('plan_digest', 'short')]:
+for field, value in [('custody_generation', True), ('project_id', '*'), ('expires_at', 0), ('plan_digest', 'short')]:
     case = copy.deepcopy(fixture)
     case['grant']['native_binding'][field] = value
     negatives.append(case)

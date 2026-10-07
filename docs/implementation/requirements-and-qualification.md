@@ -29,7 +29,7 @@ Priority `M` means mandatory for the indicated milestone; `E` means mandatory be
 | R15 | M | Durable workflow admission, transactional outbox, idempotent consumers, replay-safe orchestration, cancellation and independent effect reconciliation survive process and network failures. | P06 | Lifecycle |
 | R16 | M | One writer per owned resource/field scope; worker identity, leases/epochs, revocation and qualifications rechecked immediately before effects; unknown completion holds further mutation. | P06–P07 | Lifecycle / execution |
 | R17 | M | Capacity, IPAM, snapshot, staging, target and retained-source budgets use a lifecycle-owned atomic local journal and idempotent reserve/renew/confirm/release operations at each authoritative owner, with reconciliation/compensation for partial outcomes. Expiry cannot release observed live resources. P05 tests contracts/simulation; native effects begin P07. | P05–P07, P08 | Lifecycle / adapters |
-| R18 | M | OpenStack provisioning completes prepare, saved plan, approval, apply, independent observation, readiness, guest configuration, service checks and controlled activation through the console. | P07 | Lifecycle / execution |
+| R18 | M | OpenStack provisioning completes prepare, native operation plan, approval, apply, independent observation, readiness, guest configuration, service checks and controlled activation through the console. | P07 | Lifecycle / execution |
 | R19 | M | Explicit multi-VM/disk/NIC ordering, boot/firmware, address, storage and failure-domain mappings; selected Linux guest/image hardening and readiness are qualified, with unsupported features rejected before writes. | P03, P05, P07 | Catalogue / execution |
 | R20 | M | Portable policy covers required flows and deny rules; native realization proves equivalent outcomes, protected selectors, mandatory precedence and no same-host, same-subnet or transit bypass. | P05, P07–P09 | Planning / assurance |
 | R21 | M | DNS, IPAM, identity, time, trust, logging, monitoring and backup integrate through named owner contracts and receipts; activation requires usable service, reply paths and verified restore. | P05, P07–P08 | Lifecycle / adapters |
@@ -51,7 +51,7 @@ Priority `M` means mandatory for the indicated milestone; `E` means mandatory be
 
 ## 2. Domain invariants
 
-A **Tenant** is an administrative allocation with membership, entitlements and quotas. A **Workload Security Domain (WSD)** groups resources by service owner, lifecycle and security/recovery requirements; it is not an application microservice or necessarily one Terraform state. A **logical Security Domain** names zone class and security authority; a **Domain Instance** realizes that domain in an actual site/platform routing and enforcement context. One network belongs to one domain instance. Independent tenants retain independent contexts even where both use the same OZ or RZ label.
+A **Tenant** is an administrative allocation with membership, entitlements and quotas. A **Workload Security Domain (WSD)** groups resources by service owner, lifecycle and security/recovery requirements; it is not an application microservice or necessarily one native resource custody. A **logical Security Domain** names zone class and security authority; a **Domain Instance** realizes that domain in an actual site/platform routing and enforcement context. One network belongs to one domain instance. Independent tenants retain independent contexts even where both use the same OZ or RZ label.
 
 The model must support PAZ, OZ, RZ and HRZ requirements, with management scope explicit. A **Zone Interface Point (ZIP)** is a controlled interface between zones, not a workload zone. Required inspection, stateful policy, logging and forward/reply paths must exist in the qualified realization. A router, firewall licence or diagram alone proves none of these outcomes. Shared security/edge hardware is possible only where logical isolation, administration, finite capacity and correlated-failure implications are accepted.
 
@@ -75,7 +75,7 @@ Every VMware, AHV and OpenStack profile must contain every dimension below, incl
 | Resilience and operations | Control/data-plane failure behavior, surviving eligible capacity, fail-secure paths, degraded mode, rate limits, pagination, upgrade compatibility, observability and recovery dependencies. |
 | Assurance and sovereignty | Information/availability impacts, location, administrative and key custody, privilege boundaries, evidence retention, approved exceptions and authorization scope. |
 
-Compare actual operation outcomes, including alternate qualified integrations; do not assume identical topology, identical provider coverage or that one Terraform provider provisions an entire platform. Separate virtual disk I/O, guest file/object access, backup transfer, replication and their control planes.
+Compare actual operation outcomes, including alternate qualified integrations; do not assume identical topology, identical provider coverage or that one API covers an entire platform. Separate virtual disk I/O, guest file/object access, backup transfer, replication and their control planes.
 
 ## 4. Qualification tuple and evidence levels
 

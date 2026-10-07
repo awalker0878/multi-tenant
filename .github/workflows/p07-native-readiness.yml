@@ -10,7 +10,7 @@ permissions:
   contents: read
 jobs:
   preparation:
-    name: P07 commissioning and saved-plan comparisons (E1 only)
+    name: P07 commissioning and native API comparisons (E1 only)
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:

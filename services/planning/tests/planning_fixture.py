@@ -45,25 +45,81 @@ def inputs() -> tuple[
         "reservation_owners": {
             k: "synthetic-" + k for k in ("vcpus", "memory_mib", "storage_gib", "addresses")
         },
-        "terraform": {
-            "saved_plan_sha256": digest("saved"),
-            "toolchain_sha256": digest("tool"),
-            "backend_ref": "fixture://state",
-            "workspace": "fixture",
-            "state_lineage": "lineage",
-            "state_serial": 1,
-            "lock_owner": "lifecycle",
-        },
         "ownership": [
             {
                 "resource": w["id"],
                 "fields": ["infrastructure"],
-                "writer": "terraform",
-                "state_ref": "fixture://state",
+                "writer": "lifecycle",
+                "custody_ref": "evidence://fixture/custody",
                 "native_identity": None,
             }
             for w in intent["workloads"]
         ],
+    }
+    project = "10000000-0000-4000-8000-000000000020"
+    custody = "10000000-0000-4000-8000-000000000021"
+    resources = []
+    for index, _workload in enumerate(intent["workloads"]):
+        prefix = "workload" + str(index)
+        resources.extend(
+            [
+                {
+                    "key": prefix + "_port",
+                    "kind": "port",
+                    "spec": {
+                        "name": prefix + "-port",
+                        "network_id": SITE,
+                        "security_groups": [ENDPOINT],
+                        "fixed_ips": [
+                            {"subnet_id": GENERATION, "ip_address": "192.0.2." + str(index + 10)}
+                        ],
+                        "admin_state_up": False,
+                        "port_security_enabled": True,
+                    },
+                },
+                {
+                    "key": prefix + "_boot",
+                    "kind": "volume",
+                    "spec": {
+                        "name": prefix + "-boot",
+                        "size": 40,
+                        "volume_type": "qualified",
+                        "availability_zone": "nova",
+                        "imageRef": REVISION,
+                    },
+                },
+                {
+                    "key": prefix + "_vm",
+                    "kind": "server",
+                    "spec": {
+                        "name": prefix + "-vm",
+                        "flavorRef": "2",
+                        "availability_zone": "nova",
+                        "config_drive": True,
+                        "ports": [prefix + "_port"],
+                        "volumes": [{"key": prefix + "_boot", "boot_index": 0}],
+                    },
+                },
+            ]
+        )
+    operation_plan = {
+        "schema_version": 1,
+        "project_id": project,
+        "ownership_digest": digest(policy["ownership"]),
+        "custody_id": custody,
+        "custody_generation": 1,
+        "api_versions": {"compute": "2.1", "network": "2.0", "volume": "3.0"},
+        "resources": resources,
+    }
+    policy["native_api"] = {
+        "operation_plan": operation_plan,
+        "operation_plan_sha256": digest(operation_plan),
+        "api_contracts_sha256": artifacts["contracts"],
+        "adapter_sha256": artifacts["adapter"],
+        "custody_ref": "evidence://fixture/custody",
+        "custody_id": custody,
+        "custody_generation": 1,
+        "fence_owner": "lifecycle",
     }
     req = requirements(intent) + [
         {"key": k, "value": True}
@@ -83,7 +139,7 @@ def inputs() -> tuple[
         "endpoint_id": ENDPOINT,
         "generation_id": GENERATION,
         "platform": "openstack",
-        "native_scope": "project:synthetic",
+        "native_scope": "project:" + project,
         "current": True,
         "completion": "complete",
         "expires_at": NOW + 1800,
@@ -125,7 +181,7 @@ def inputs() -> tuple[
     }
     q["scope"].update(
         action="application.provision",
-        method="saved_plan",
+        method="native_api",
         profile_digest=p["digest"],
         artifacts=artifacts,
     )
@@ -143,7 +199,7 @@ def assessment() -> dict[str, Any]:
         "environment": ENV,
         "created_at": NOW,
         "action": "application.provision",
-        "method": "saved_plan",
+        "method": "native_api",
         "intent": {
             "id": REVISION,
             "application_id": APP,
@@ -151,14 +207,14 @@ def assessment() -> dict[str, Any]:
             "digest": digest(intent),
         },
         "inputs": [{"destination": d, "profile": p, "policy": policy, "qualification": q}],
-        "results": [assess(intent, d, p, policy, q, "application.provision", "saved_plan", NOW)],
+        "results": [assess(intent, d, p, policy, q, "application.provision", "native_api", NOW)],
     }
 
 
 def request() -> dict[str, Any]:
     return {
         "action": "application.provision",
-        "method": "saved_plan",
+        "method": "native_api",
         "lane": "operational",
         "executor_ids": [ACTOR],
         "valid_until": NOW + 300,

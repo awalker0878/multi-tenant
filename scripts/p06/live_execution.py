@@ -93,7 +93,7 @@ def _campaign(c,p):
     def command(index,action):
         view=current(index)
         return lifecycle('jobs/'+view['id']+'/commands',view['scope'],{'action':action,'expected_revision':view['revision']},expected=202)
-    for action,method in [('provision','saved_plan'),('migrate','application_rebuild_restore'),('recover','forward_recovery'),('retire','owned_retirement')]:
+    for action,method in [('provision','native_api'),('migrate','native_api_export_import'),('recover','forward_recovery'),('retire','owned_retirement')]:
         dest=copy.deepcopy(p['a']);dest.update(site_id=str(uuid.uuid4()),endpoint_id=str(uuid.uuid4()),generation_id=str(uuid.uuid4()))
         p['peer'].destinations[dest['endpoint_id']]=dest
         p['registry']['assignments'].append({'tenant_id':tenant,'site_id':dest['site_id'],'endpoint_id':dest['endpoint_id'],'profile':'synthetic','policy':'synthetic'})

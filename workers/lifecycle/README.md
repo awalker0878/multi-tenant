@@ -39,21 +39,16 @@ The default image diagnostic remains non-consuming. See the
 
 ## P07 native adapter components
 
-`lifecycle-native-inspect` checks a protected native binding and pinned Terraform
-bundle; `--observe` reads exact native resource IDs using an independent scoped
-OpenStack identity. See the [native adapter runbook](../../docs/operations/runbooks/openstack-native-adapters.md)
-for the runtime export, immutable inputs, HTTP backend boundary and uncertainty
-holds. The worker owns an append-only native attempt journal and typed saved-plan
-effect protocol. It does not implement Lifecycle's native grant authority, enable
-P06 native execution or expose a CLI apply switch. The reusable module is under
-`terraform/openstack-application/`; commissioning packages it as a separately pinned
-module artifact. No sibling source or historical qualification is imported.
+`lifecycle-native-inspect` validates a protected native operation plan and binding.
+Optional `--observe --receipts` uses an independent OpenStack observer and exact
+journaled native IDs. It grants no write or retry authority.
 
-`NativeEffectApp` exposes the separately composed internal saved-plan effect
-contract. `NativeSavedPlanEffect` resolves tenant/worker from verified caller trust,
-checks Lifecycle authority before artifact access, and uses the native claim,
-single-use redemption and independent readback path. `MountedNativeTooling`
-resolves the same protected runtime packet as inspection. The simulation command
-does not register this route. Commissioned owner authority, caller trust and
-provider fencing remain required; see the
-[native control runbook](../../docs/operations/runbooks/native-workflow-control.md).
+`NativeApiEffect` resolves protected runtime connections, redeems current Lifecycle
+authority, and invokes the durable native API adapter. Each request is journaled
+before submission; returned object/request IDs are retained; unknown outcomes
+hold custody without automatic retry. The internal effect API trusts only its
+independently composed caller resolver and never accepts caller identity or commands.
+
+See [native adapter operations](../../docs/operations/runbooks/openstack-native-adapters.md)
+for the exact plan, runtime and journal boundaries. P08 owns the separate
+[VM migration architecture](../../docs/implementation/p08-native-migration.md).

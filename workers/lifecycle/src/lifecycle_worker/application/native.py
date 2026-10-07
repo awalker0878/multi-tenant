@@ -1,4 +1,4 @@
-"""P07 saved-plan effect boundary. Native admission remains owned by Lifecycle.
+"""P07 native API effect boundary. Native admission remains owned by Lifecycle.
 
 An adapter result is infrastructure evidence, never application readiness. A claimed
 attempt cannot run twice, even after an error, crash, lease expiry or missing readback.
@@ -7,9 +7,9 @@ attempt cannot run twice, even after an error, crash, lease expiry or missing re
 import hashlib
 import json
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Literal, Protocol
+from typing import Any, Protocol
 from uuid import UUID
 
 
@@ -80,10 +80,10 @@ class NativeBinding:
     executor_id: str
     epoch: str
     plan_digest: str
-    bundle_sha256: str
-    workspace: str
-    state_lineage: str
-    state_serial: int
+    operation_plan_sha256: str
+    ownership_digest: str
+    custody_id: str
+    custody_generation: int
     expires_at: int
 
     @classmethod
@@ -100,16 +100,17 @@ class NativeBinding:
             "campaign_id",
             "executor_id",
             "epoch",
-            "state_lineage",
+            "custody_id",
         ):
             identity(value[name])
         native_identity(value["project_id"])
         if (
-            not all(sha256(value[key]) for key in ("plan_digest", "bundle_sha256"))
-            or not isinstance(value["workspace"], str)
-            or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}", value["workspace"]) is None
-            or type(value["state_serial"]) is not int
-            or not 0 <= value["state_serial"] < 2**63
+            not all(
+                sha256(value[key])
+                for key in ("plan_digest", "operation_plan_sha256", "ownership_digest")
+            )
+            or type(value["custody_generation"]) is not int
+            or not 0 <= value["custody_generation"] < 2**63
             or type(value["expires_at"]) is not int
             or value["expires_at"] <= 0
         ):
@@ -124,46 +125,36 @@ class NativeBinding:
         return digest(self.document())
 
 
-@dataclass(frozen=True)
-class ProcessResult:
-    exit_code: int | None
-    interrupted: bool
-
-
 class NativeAuthority(Protocol):
-    def require_current(self, binding: NativeBinding, boundary: str) -> None:
-        """Authenticate current owner authority, exact scope, epoch and stop/revocation state."""
-        ...
+    def require_current(self, binding: NativeBinding, boundary: str) -> None: ...
 
 
 class NativeJournal(Protocol):
-    def claim(self, binding: NativeBinding) -> bool:
-        """Durably claim once, excluding overlapping project/workspace writers."""
-        ...
-
+    def claim(self, binding: NativeBinding) -> bool: ...
     def record(self, binding: NativeBinding, event: str, facts: dict[str, Any]) -> None: ...
+    def resources(self, binding: NativeBinding) -> dict[str, dict[str, str]]: ...
+    def transfers(self, binding: NativeBinding) -> dict[str, dict[str, Any]]: ...
 
 
-class SavedPlanTool(Protocol):
+class NativeApiAdapter(Protocol):
     def inspect(self, binding: NativeBinding) -> dict[str, Any]: ...
-    def apply(self, binding: NativeBinding, heartbeat: Callable[[], None]) -> ProcessResult: ...
-    def state(self, binding: NativeBinding) -> dict[str, Any]: ...
+    def execute(self, binding: NativeBinding, boundary: Callable[[], None]) -> None: ...
 
 
 class NativeObserver(Protocol):
-    def observe(self, binding: NativeBinding, state: dict[str, Any]) -> dict[str, Any]: ...
+    def observe(self, binding: NativeBinding, objects: dict[str, Any]) -> dict[str, Any]: ...
 
 
-class SavedPlanExecution:
+class NativeApiExecution:
     def __init__(
         self,
         authority: NativeAuthority,
         journal: NativeJournal,
-        tool: SavedPlanTool,
+        adapter: NativeApiAdapter,
         observer: NativeObserver,
         clock: Callable[[], int],
     ) -> None:
-        self.authority, self.journal, self.tool = authority, journal, tool
+        self.authority, self.journal, self.adapter = authority, journal, adapter
         self.observer, self.clock = observer, clock
 
     def require_current(self, binding: NativeBinding, boundary: str) -> None:
@@ -176,43 +167,31 @@ class SavedPlanExecution:
     def execute(self, binding: NativeBinding) -> dict[str, Any]:
         NativeBinding.parse(binding.document())
         self.require_current(binding, "preflight")
-        inspection = self.tool.inspect(binding)
-        # Inspection is not an authority receipt. The claim is committed before an effect.
+        inspection = self.adapter.inspect(binding)
         if not self.journal.claim(binding):
             raise NativeHeld("native_attempt_requires_reconciliation")
         self.journal.record(binding, "prepared", inspection)
         try:
-            self.require_current(binding, "before_saved_plan_apply")
-            self.journal.record(binding, "apply_started", {})
-            result = self.tool.apply(
-                binding, lambda: self.require_current(binding, "during_saved_plan_apply")
-            )
-            self.journal.record(
-                binding,
-                "process_exited",
-                {"exit_code": result.exit_code, "interrupted": result.interrupted},
+            self.require_current(binding, "before_api_sequence")
+            self.adapter.execute(
+                binding, lambda: self.require_current(binding, "during_api_sequence")
             )
         except Exception:
-            # An exception may follow provider acceptance. Never translate it into absence.
-            self.journal.record(binding, "outcome_unknown", {"reason": "apply_or_authority_held"})
+            self.journal.record(
+                binding, "outcome_unknown", {"reason": "native_request_or_authority_held"}
+            )
             raise NativeHeld("native_attempt_requires_reconciliation") from None
-        observation = self.reconcile(binding)
         return {
             "binding_sha256": binding.fingerprint,
-            "process_exit_code": result.exit_code,
-            "interrupted": result.interrupted,
-            "observation": observation,
+            "observation": self.reconcile(binding),
             "retry_authorized": False,
             "activation_authorized": False,
             "application_ready": False,
         }
 
     def reconcile(self, binding: NativeBinding) -> dict[str, Any]:
-        # Read-only observation is useful after write authority has expired or been revoked.
-        # Its own authenticated observer scope must still be current.
         try:
-            state = self.tool.state(binding)
-            observation = self.observer.observe(binding, state)
+            observation = self.observer.observe(binding, self.journal.resources(binding))
             if (
                 observation.get("binding_sha256") != binding.fingerprint
                 or observation.get("independent") is not True
@@ -231,26 +210,3 @@ class SavedPlanExecution:
             }
         self.journal.record(binding, "readback", observation)
         return observation
-
-
-ResourceKind = Literal["server", "port", "volume"]
-RESOURCE_TYPES: Mapping[str, ResourceKind] = {
-    "openstack_compute_instance_v2": "server",
-    "openstack_networking_port_v2": "port",
-    "openstack_blockstorage_volume_v3": "volume",
-}
-
-EXPECTED_FIELDS: Mapping[str, set[str]] = {
-    "server": {"name", "flavor_id", "metadata", "availability_zone", "config_drive"},
-    "port": {
-        "name",
-        "tenant_id",
-        "network_id",
-        "fixed_ip",
-        "description",
-        "admin_state_up",
-        "security_group_ids",
-        "port_security_enabled",
-    },
-    "volume": {"name", "size", "volume_type", "metadata", "availability_zone", "image_id"},
-}

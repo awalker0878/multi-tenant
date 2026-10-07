@@ -22,12 +22,12 @@ mandatory conditions prevent eligibility. Capacity observations are never receip
 
 ## P05.04 — Compilation choice
 
-The P05 implementation of [ADR-016](../decisions/adr-016-terraform-plans-and-resource-ownership.md)
-uses a reviewed saved-plan digest, toolchain digest, backend/workspace/state
-lineage and serial, lock owner, and one writer per resource/field. Missing native
-state or ownership is an explicit proposal hold. This selects the representation
-for engineering; actual backend/tool/provider choices and accountable review
-remain external P06/P07 inputs and no acceptance is invented.
+The P05 implementation of [ADR-016](../decisions/adr-016-native-api-plans-and-resource-ownership.md)
+uses a canonical native operation plan containing exact resource specifications,
+API versions, custody ID/generation and the ownership-map digest. The envelope
+pins adapter and API-contract artifacts. A missing plan or ownership map holds
+execution. Each native request is separately journaled under current authority;
+API-first Inventory observations and administrator validation supply installed facts.
 
 Canonical semantic JSON uses `p05-json-v1`: recursively sorted ASCII object keys,
 original array order, compact UTF-8 JSON, escaped Unicode, unescaped slashes,

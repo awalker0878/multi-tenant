@@ -1,57 +1,73 @@
-"""Resolve the existing protected tooling packet; it supplies no effect authority."""
+"""Resolve native API connections and operation bytes from protected runtime custody."""
 
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
+from lifecycle_worker.application.api_plan import validate_api_plan
 from lifecycle_worker.application.native import (
+    NativeApiAdapter,
     NativeBinding,
     NativeHeld,
+    NativeJournal,
     NativeObserver,
-    SavedPlanTool,
     decode,
 )
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint, NativeReads
+from lifecycle_worker.infrastructure.openstack_api import NativeWrites, OpenStackApi
 from lifecycle_worker.infrastructure.openstack_readback import OpenStackReadback
-from lifecycle_worker.infrastructure.terraform import TerraformSavedPlan
 
 
-class MountedNativeTooling:
-    def __init__(self, runtime_file: Path, clock: Callable[[], int]) -> None:
-        self.runtime_file, self.clock = runtime_file, clock
-
-    def resolve(self, binding: NativeBinding) -> tuple[SavedPlanTool, NativeObserver]:
-        config = decode(protected_read(self.runtime_file, 65536))
-        if set(config) != {
-            "terraform_executable",
-            "bundle_root",
-            "environment",
-            "credential_files",
-            "observer",
+def endpoints(rows: dict[str, Any]) -> dict[str, NativeEndpoint]:
+    if not isinstance(rows, dict) or set(rows) != {"identity", "compute", "network", "volume"}:
+        raise NativeHeld("invalid_native_connections")
+    result = {}
+    for name, row in rows.items():
+        if not isinstance(row, dict) or set(row) != {
+            "base_url",
+            "address",
+            "ca_file",
+            "token_file",
         }:
-            raise NativeHeld("invalid_native_runtime")
-        tool = TerraformSavedPlan(
-            Path(config["terraform_executable"]),
-            Path(config["bundle_root"]),
-            config["environment"],
-            {k: Path(v) for k, v in config["credential_files"].items()},
+            raise NativeHeld("invalid_native_connection")
+        result[name] = NativeEndpoint(
+            row["base_url"], row["address"], Path(row["ca_file"]), Path(row["token_file"])
         )
-        observer = config["observer"]
-        if set(observer) != {"endpoints", "user_id", "writer_user_id"}:
-            raise NativeHeld("invalid_native_observer")
-        reads = NativeReads(
-            {
-                name: NativeEndpoint(
-                    row["base_url"], row["address"], Path(row["ca_file"]), Path(row["token_file"])
-                )
-                for name, row in observer["endpoints"].items()
-            }
+    return result
+
+
+def runtime(path: Path) -> dict[str, Any]:
+    config = decode(protected_read(path, 65536))
+    if set(config) != {"operation_plan", "writer", "observer"}:
+        raise NativeHeld("invalid_native_runtime")
+    for key in ("writer", "observer"):
+        if set(config[key]) != {"endpoints", "user_id"}:
+            raise NativeHeld("invalid_native_identity_connection")
+    return config
+
+
+class MountedNativeRuntime:
+    def __init__(
+        self, runtime_file: Path, journal: NativeJournal, clock: Callable[[], int]
+    ) -> None:
+        self.runtime_file, self.journal, self.clock = runtime_file, journal, clock
+
+    def resolve(self, binding: NativeBinding) -> tuple[NativeApiAdapter, NativeObserver]:
+        config = runtime(self.runtime_file)
+        plan_file = Path(config["operation_plan"])
+        resources = validate_api_plan(decode(protected_read(plan_file, 1_048_576)), binding)
+        writer, observer = config["writer"], config["observer"]
+        adapter = OpenStackApi(
+            plan_file,
+            NativeWrites(endpoints(writer["endpoints"]), writer["user_id"], self.clock),
+            self.journal,
         )
         independent = OpenStackReadback(
-            reads,
-            tool.verified(binding)["resources"],
+            NativeReads(endpoints(observer["endpoints"])),
+            resources,
             observer["user_id"],
-            observer["writer_user_id"],
+            writer["user_id"],
             self.clock,
         )
-        return tool, independent
+        return adapter, independent

@@ -47,7 +47,7 @@ def setup(database: Postgres) -> tuple[Planning, Actor, dict[str, Any]]:
         {
             "revision_id": REVISION,
             "action": "application.provision",
-            "method": "saved_plan",
+            "method": "native_api",
             "candidates": [{"site_id": SITE, "endpoint_id": ENDPOINT, "generation_id": GENERATION}],
         },
     )
@@ -67,7 +67,7 @@ def test_atomic_retry_race_and_restart(database: Postgres) -> None:
         outbox = tx.one("SELECT count(*) AS n FROM app.planning_outbox")
         assert outbox is not None and outbox["n"] == 1
     with pytest.raises(Rejected, match="command_key_conflict"):
-        p.assessment(a, key, dict(b, method="application_rebuild_restore"), {})
+        p.assessment(a, key, dict(b, method="native_api_export_import"), {})
 
 
 def test_immutable_history_and_tenant_isolation(database: Postgres) -> None:

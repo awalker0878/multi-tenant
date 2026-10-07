@@ -1,75 +1,68 @@
 # ADR-014 — First native provisioning and migration slice
 
-Owner role: Product/infrastructure leads. Related phases: P00. Record date: 2026-10-04.
+Owner role: Product/infrastructure leads. Related phases: P00, P07, P08.
 
-Origin: `DESIGN`. Disposition: `ACCEPTED` as recorded in the [decision register](decision-register.md).
-
-The requesting user accepted this initial route direction in the [2026-10-04 G00 decision](../qualification/gate-reviews/g00-user-decision-2026-10-04.md). Acceptance covers continued implementation; full application feasibility and native qualification remain at the explicit receiving checkpoints.
+Origin: `DESIGN`. Disposition: `ACCEPTED` in the [decision register](decision-register.md).
 
 ## Context
 
-The first usable native delivery needs a narrow route with observable application recovery. The current P00 assessment and the user’s 2026-10-04 clarification favor rebuilding a reproducible Linux application on OpenStack and restoring its complete consistent state from VMware. This replaces the earlier cold-conversion-first proposal.
-
-The historical branch used a `REBUILD_RESTORE` application driver. Its design is reference information; the recommendation here follows the current application assessment and does not import old implementation, selected Ubuntu/tool versions, test results or native support. Exact target artifacts, capture/restore tooling, downtime and consistency behavior remain subject to feasibility.
+The first native provisioning path is OpenStack. Migration is P08 and uses
+native source/target APIs with minimal production-source changes. Exact installed
+platform, guest, data and service tuples require independent qualification.
 
 ## Decision and scope
 
-Prefer OpenStack provisioning followed by VMware→OpenStack `application_rebuild_restore` for the selected rebuildable Linux stateful application, subject to feasibility. Build a clean target from pinned guest/application/configuration artifacts, capture and restore all state consistently, and admit final cutover only after source writer exclusion and target validation.
+Use the [P08 native migration architecture](../implementation/p08-native-migration.md).
+Inventory discovers source workload and destination capability profiles; Planning
+binds one explicit method, source/destination identities, exact disk/resource maps,
+conversion/transformation artifacts, acceptance checks, recovery boundaries and
+authorization epoch to an immutable plan.
 
-Whole-VM `cold_guest_disk_conversion_import` remains a separately scoped and qualified P09 option. Rebuild/restore does not satisfy a requirement to preserve an opaque VM or unsupported appliance.
+`ExportVm`/`HttpNfcLease` is the baseline generic VMware whole-VM export mechanism.
+Capture a consistent disk-only snapshot and an isolated powered-off migration clone
+bound to that snapshot. Export the clone through leased HTTPS URLs and verify the
+native manifest. Native destination APIs import the planned disk format and create
+the quarantined VM. Conversion and guest driver/tool changes operate only on the
+migration/destination copy. Production source changes are limited to the explicitly
+authorized consistency, power, snapshot and fencing operations.
 
-Initial checkpoint: G00 accepted the method and measured state-recovery scope; complete application/configuration and candidate-topology feasibility is carried into P01.02/P01.06 before G01.
+Application rebuild/restore, snapshot baseline plus application delta, snapshot
+baseline plus file delta, and cold export are distinct qualification scopes.
+Planning selects one from demonstrated requirements and capabilities; execution
+never switches to another after a failure. Low downtime requires a qualified delta
+method. Without one, the source stays stopped/fenced for the authoritative cold
+export and cutover. Optional external block replication requires its own approved,
+entitled integration. VDDK is never required by the baseline product.
 
-Refinement and validation: Discovery confirms assumptions at G04; separate native qualification at G07/G08; changed method needs revised scope.
+Terraform is not an execution dependency. Native APIs govern source and target
+resources; immutable request plans, resource ownership, custody generations and
+single-use authority follow [ADR-016](adr-016-native-api-plans-and-resource-ownership.md).
 
-## Options and trade-offs
+## Safety and qualification
 
-| Option | Assessment |
-| --- | --- |
-| Application rebuild and consistent data restore | Preferred for the first reproducible Linux application. Makes deployment artifacts and dataset recovery explicit; requires complete dependency/configuration/secret reconstruction and proven capture/restore compatibility. |
-| Cold whole-VM conversion/import | Separate P09 option when application rebuild is unsuitable or VM preservation is required. Adds firmware/device/driver, disk-chain, encryption and target-boot qualification; it does not bypass application recovery obligations. |
-| Application-native synchronization, warm or live VM movement | May reduce outage for suitable workloads but adds distinct consistency, convergence and cutover requirements. Each method needs its own implementation and qualification. |
+Persist each effect before submission, retain native task/lease/object identities,
+and hold unknown results without blind retry. Verify source and clone identity,
+production-network disconnection, byte/disk completeness, encryption and trust.
+An export lease does not fence production after completion. Independently verify
+source-writer exclusion before target writes and preserve that fence through cutover.
 
-## Consequences
+Boot and validate the target in quarantine. Require all data, application, service,
+backup and allowed/denied policy checks before activation. Before target writes,
+source return requires a fenced target; after possible target writes, require an
+explicit data-preserving recovery decision. Source retirement is separate authority.
 
-- OpenStack provisioning and application migration have separate native gates; a successful empty target deployment does not qualify migration.
-- First-route feasibility prioritizes reproducible deployment, complete consistent capture/restore, configuration/secret treatment, isolation and stateful cutover/recovery. Converter selection does not block this method.
-- Final migration includes an explicit source quiescence/fencing and data boundary; target preparation before the window is not proof of zero outage.
-- The source remains protected until application acceptance and a separate retirement decision. Pre-write source return and post-write recovery preserve different data boundaries.
-- Every later whole-VM route has its own method identifier, exact tuple, campaign and support claim.
+Q05/Q06 qualify P07 provisioning; Q07/G08 qualify the selected migration method and
+installed route. Synthetic tests do not establish native platform support. VMware →
+Nutanix and VMware → VMware require separate destination adapters and qualification.
 
-## Unresolved details and evidence needed
+## Primary API references
 
-- Select the exact platform/guest/application/database/storage/network tuple and reproducible deployment artifacts.
-- Select consistent capture/restore tooling; prove database/attachment completeness, required metadata, configuration and secret reconstruction.
-- Define outage/data bounds, source fencing, first target-write observation, post-write recovery and application-owner participation.
-
-## Acceptance and validation
-
-- Complete the carried [initial route feasibility](../qualification/feasibility/initial-route.md) application/configuration and candidate-topology coverage in P01.02/P01.06 before G01, retaining explicit limits on the existing state-recovery observations.
-- Reconfirm discovery assumptions at G04 and qualify provisioning separately at G07.
-- At G08, verify stateful application behavior, data integrity, security and both recovery boundaries for `application_rebuild_restore` on the selected tuple.
-- Qualify any P09 whole-VM expansion independently; no earlier method result transfers automatically.
-
-The G00 decision above records the actual reviewer, date and accepted scope. Record subsequent fixture and native review decisions with their own evidence. Delivery and gate outcomes remain in the delivery register; updating this ADR does not complete a work package.
+- [VMware VirtualMachine operations](https://developer.broadcom.com/xapis/vsphere-web-services-api/latest/vim.VirtualMachine.html)
+- [VMware HttpNfcLease](https://developer.broadcom.com/xapis/vsphere-web-services-api/latest/vim.HttpNfcLease.html)
+- [OpenStack Image Service v2](https://docs.openstack.org/api-ref/image/v2/)
+- [OpenStack Compute API](https://docs.openstack.org/api-ref/compute/)
 
 ## Revisit conditions
 
-The application cannot be reproduced completely, capture/restore cannot preserve required state, the source/target tuple changes, or downtime/data requirements require a different method.
-
-## Related records
-
-- [Decision register](decision-register.md) — authority for disposition, origin and blocking checkpoint.
-- [P00 route and operating review](../implementation/p00-route-and-operations-review.md) — candidate input records, experiments and unresolved decisions.
-- [Phased implementation plan](../implementation/phased-plan.md) — package and gate sequence.
-- [ADR authoring template](../templates/adr.md) — required decision-record fields.
-
-
-The [engineering selection record](../implementation/p00-engineering-selections.md) now fixes this choice for reversible development at its stated scope. The later G00 user decision supplies accountable baseline acceptance; missing operating facts and native authority remain separate inputs.
-
-
-## Bounded state-recovery observation
-
-The [PostgreSQL/attachment fixture report](../implementation/p00-restore-fixture-results.md) now records actual consistent-state capture, clean restore, exact invalid-bundle rejection and both fixture recovery boundaries. It retains an initial archive-transfer failure and corrected locked execution. This is E2 real-dependency evidence at the declared fixture scope. It does not show the full application deployment/configuration, a particular installed source/target backend, independent native fencing or recovery after loss of uncaptured target state.
-
-Use this result in the G00.04 bounded feasibility review alongside the pinned candidate/application profile and appropriate fixture review. Full E3 native provisioning/migration remains G07/G08; actual native effects require their own scoped authority. The accepted method direction does not complete the required application/profile evidence; its missing coverage is carried into P01/G01 by the reviewer decision.
+Installed APIs, capture/clone isolation, conversion compatibility, guest prerequisites,
+delta semantics, source fencing or accepted outage/data boundaries change.

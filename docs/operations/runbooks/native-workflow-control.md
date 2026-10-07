@@ -42,7 +42,7 @@ subnet, inter-host and edge paths plus applicable IPv6 and return cases.
 
 Reconciliation is read-only and remains available after write expiry or stop.
 It advances only after all independent post-effect observations, including
-provider-request quiescence, exist. A 404, Terraform exit, heartbeat timeout or
+provider-request quiescence, exist. A 404, native API exit, heartbeat timeout or
 empty pending-request list does not supply that evidence. Failed or incomplete
 observations hold the job. Earlier successful observations cannot clear a later
 hold or regress a terminal state. No automatic retry or hold deletion is supplied.
@@ -61,7 +61,7 @@ and [golden request](../../../contracts/fixtures/lifecycle/native-stage-grant-v1
 define a separate internal check route. The ASGI handler resolves tenant and worker
 from its authenticated caller port; neither identity can be supplied in JSON.
 Provisioning envelopes contain every existing worker `NativeBinding` field.
-`GrantedNativeAuthority` checks the envelope before each saved-plan boundary;
+`GrantedNativeAuthority` checks the envelope before each native-plan boundary;
 `LifecycleNativeBoundary` provides fixed-origin pinned TLS, a protected distinct
 workload credential, bounded strict JSON and no retries or redirects. Lost
 redemption replies retain the existing worker journal hold without launching.
@@ -82,7 +82,7 @@ actual owners and receiving decisions. No native operation is enabled by this
 migration or by a test result.
 
 The P07 component campaign now runs the complete Lifecycle suite with real
-PostgreSQL, in addition to the existing worker/TLS/Terraform tests. Local
+PostgreSQL, in addition to the existing worker/TLS/native API tests. Local
 environments without PostgreSQL process/user support cannot qualify persistence;
 the hosted campaign must run without skips.
 
@@ -114,7 +114,7 @@ exercise accepted start/effect response loss, restart, current-authority change,
 missing provider-quiescence evidence, cancellation, retirement ordering and history
 replay. Provision crosses the real worker effect TLS route, returns over the real
 Lifecycle boundary TLS route and writes a separate worker-owned PostgreSQL journal.
-Its current authority, saved-plan process, provider observations and other stage
+Its current authority, native-plan process, provider observations and other stage
 effects are synthetic; this is E2 software evidence, not a native Q05/Q06 result.
 Actual run results are retained separately.
 
@@ -129,7 +129,7 @@ Uncertain transport outcomes enter the same reconciliation hold.
 The [worker effect contract](../../../contracts/openapi/worker-native-effect-v1.json)
 is implemented by `NativeEffectApp` and `NativeSavedPlanEffect`. Caller trust supplies
 tenant and worker independently from JSON. The use case checks current authority
-before resolving tooling, then uses the existing saved-plan journal and one-time
+before resolving tooling, then uses the existing native-plan journal and one-time
 grant redemption. Only the provision stage is supported; other stages require
 their selected service adapters and remain held. `MountedNativeTooling` resolves
 the existing protected tooling/observer packet, validates actual bound artifact

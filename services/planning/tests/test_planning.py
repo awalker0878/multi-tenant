@@ -10,10 +10,10 @@ from planning.domain.model import DIMENSIONS, PLATFORMS, Rejected, canonical, di
 
 def test_two_destinations_explain_constraints() -> None:
     i, d, p, policy, q = inputs()
-    good = assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)
+    good = assess(i, d, p, policy, q, "application.provision", "native_api", NOW)
     assert good["status"] == "eligible" and good["reserved"] is False
     d["capacity"]["vcpus"] = 3
-    bad = assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)
+    bad = assess(i, d, p, policy, q, "application.provision", "native_api", NOW)
     assert bad["status"] == "blocked"
     assert any(
         r["requirement"] == "capacity.vcpus" and r["reason"] == "observed_capacity_insufficient"
@@ -26,7 +26,7 @@ def test_two_destinations_explain_constraints() -> None:
 def test_each_missing_dimension_holds(dimension: str) -> None:
     i, d, p, policy, q = inputs()
     del d["dimensions"][dimension]
-    result = assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)
+    result = assess(i, d, p, policy, q, "application.provision", "native_api", NOW)
     assert not result["operationally_eligible"]
     assert any(
         f["requirement"] == dimension and f["reason"] == "dimension_not_observed"
@@ -82,7 +82,7 @@ def test_fail_closed_inputs(fault: str) -> None:
             d["installed_provenance"] = "declaration"
         case "policy_expired":
             policy["expires_at"] = NOW
-    assert not assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)[
+    assert not assess(i, d, p, policy, q, "application.provision", "native_api", NOW)[
         "operationally_eligible"
     ]
 
@@ -101,7 +101,7 @@ def test_fail_closed_inputs(fault: str) -> None:
 def test_security_service_and_custody_never_default_allow(key: str) -> None:
     i, d, p, policy, q = inputs()
     del d["capabilities"][key]
-    assert not assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)[
+    assert not assess(i, d, p, policy, q, "application.provision", "native_api", NOW)[
         "operationally_eligible"
     ]
 
@@ -109,11 +109,11 @@ def test_security_service_and_custody_never_default_allow(key: str) -> None:
 def test_preference_retained_and_conditional_is_not_eligible() -> None:
     i, d, p, policy, q = inputs()
     i["requirements"] = [{"key": "unknown.preference", "value": True, "strength": "preferred"}]
-    result = assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)
+    result = assess(i, d, p, policy, q, "application.provision", "native_api", NOW)
     assert result["operationally_eligible"]
     d["capabilities"]["guest.image"]["dependencies"] = ["image_owner_confirmation"]
     assert (
-        assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)["status"]
+        assess(i, d, p, policy, q, "application.provision", "native_api", NOW)["status"]
         == "conditional"
     )
 
@@ -157,11 +157,9 @@ def test_ownership_collision_and_missing_state_hold() -> None:
     with pytest.raises(Rejected, match="overlapping"):
         compile_plan(a, 0, request())
     a = assessment()
-    a["inputs"][0]["policy"]["terraform"] = None
+    a["inputs"][0]["policy"]["native_api"] = None
     c = compile_plan(a, 0, request())
-    assert not c["execution_ready"] and c["holds"] == [
-        "reviewed_saved_plan_and_state_lineage_missing"
-    ]
+    assert not c["execution_ready"] and c["holds"] == ["reviewed_native_operation_plan_missing"]
 
 
 @pytest.mark.parametrize("value", [1.5, float("nan"), {"secret": "no"}, 2**53, {"x": "\ud800"}])
@@ -181,7 +179,7 @@ def test_per_requirement_unknown_and_expired_support_cannot_pass(side: str, stat
         capability["expires_at"] = NOW
     else:
         capability["status"] = status
-    assert not assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)[
+    assert not assess(i, d, p, policy, q, "application.provision", "native_api", NOW)[
         "operationally_eligible"
     ]
 
@@ -189,7 +187,7 @@ def test_per_requirement_unknown_and_expired_support_cannot_pass(side: str, stat
 def test_boolean_is_not_numeric_requirement_value() -> None:
     i, d, p, policy, q = inputs()
     d["capabilities"]["placement.tenant_isolation"]["values"] = [1]
-    assert not assess(i, d, p, policy, q, "application.provision", "saved_plan", NOW)[
+    assert not assess(i, d, p, policy, q, "application.provision", "native_api", NOW)[
         "operationally_eligible"
     ]
 
@@ -215,7 +213,7 @@ def test_lab_qualification_waiver_cannot_mask_observation_safety(fault: str, rea
         observation["values"] = [False]
     else:
         observation["dependencies"] = ["independent-isolation-confirmation"]
-    result = assess(i, d, p, policy, {}, "application.provision", "saved_plan", NOW)
+    result = assess(i, d, p, policy, {}, "application.provision", "native_api", NOW)
     assert not result["operationally_eligible"]
     assert any(
         f["requirement"] == "placement.tenant_isolation" and f["reason"] == reason

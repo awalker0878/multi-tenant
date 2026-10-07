@@ -6,7 +6,7 @@ from typing import Any
 
 import psycopg
 
-from lifecycle_worker.application.native import NativeBinding, NativeHeld
+from lifecycle_worker.application.native import NativeBinding, NativeHeld, native_identity
 
 
 class PostgresNativeJournal:
@@ -26,11 +26,11 @@ class PostgresNativeJournal:
                     raise NativeHeld("native_operation_binding_conflict")
                 return False
             held = connection.execute(
-                "SELECT operation_id FROM native.workspace_holds WHERE state_lineage=%s",
-                (binding.state_lineage,),
+                "SELECT operation_id FROM native.custody_holds WHERE custody_id=%s",
+                (binding.custody_id,),
             ).fetchone()
             if held:
-                raise NativeHeld("native_workspace_held")
+                raise NativeHeld("native_custody_held")
             connection.execute(
                 "INSERT INTO native.attempts(operation_id,attempt_id,tenant_id,"
                 "fingerprint,binding) "
@@ -44,8 +44,8 @@ class PostgresNativeJournal:
                 ),
             )
             connection.execute(
-                "INSERT INTO native.workspace_holds(state_lineage,operation_id) VALUES(%s,%s)",
-                (binding.state_lineage, binding.operation_id),
+                "INSERT INTO native.custody_holds(custody_id,operation_id) VALUES(%s,%s)",
+                (binding.custody_id, binding.operation_id),
             )
         return True
 
@@ -61,3 +61,46 @@ class PostgresNativeJournal:
                 "INSERT INTO native.events(operation_id,kind,facts) VALUES(%s,%s,%s::jsonb)",
                 (binding.operation_id, event, json.dumps(facts, allow_nan=False)),
             )
+
+    def resources(self, binding: NativeBinding) -> dict[str, dict[str, str]]:
+        with self.connect() as connection:
+            prior = connection.execute(
+                "SELECT fingerprint FROM native.attempts WHERE operation_id=%s",
+                (binding.operation_id,),
+            ).fetchone()
+            if prior is None or prior["fingerprint"] != binding.fingerprint:
+                raise NativeHeld("native_attempt_not_bound")
+            rows = connection.execute(
+                "SELECT facts FROM native.events WHERE operation_id=%s "
+                "AND kind='request_accepted' ORDER BY sequence",
+                (binding.operation_id,),
+            ).fetchall()
+        result: dict[str, dict[str, str]] = {}
+        for row in rows:
+            facts = row["facts"]
+            key = facts["resource_key"]
+            if key in result or facts["kind"] not in {"server", "port", "volume", "image"}:
+                raise NativeHeld("ambiguous_native_receipt")
+            result[key] = {"kind": facts["kind"], "id": native_identity(facts["native_id"])}
+        return result
+
+    def transfers(self, binding: NativeBinding) -> dict[str, dict[str, Any]]:
+        with self.connect() as connection:
+            prior = connection.execute(
+                "SELECT fingerprint FROM native.attempts WHERE operation_id=%s",
+                (binding.operation_id,),
+            ).fetchone()
+            if prior is None or prior["fingerprint"] != binding.fingerprint:
+                raise NativeHeld("native_attempt_not_bound")
+            rows = connection.execute(
+                "SELECT facts FROM native.events WHERE operation_id=%s "
+                "AND kind='disk_transferred' ORDER BY sequence",
+                (binding.operation_id,),
+            ).fetchall()
+        result: dict[str, dict[str, Any]] = {}
+        for row in rows:
+            key = row["facts"]["resource_key"]
+            if key in result:
+                raise NativeHeld("ambiguous_native_transfer_receipt")
+            result[key] = row["facts"]
+        return result

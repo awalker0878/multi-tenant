@@ -144,14 +144,14 @@ def binding() -> NativeBinding:
                 "campaign_id",
                 "executor_id",
                 "epoch",
-                "state_lineage",
+                "custody_id",
             )
         }
         | {
             "plan_digest": "a" * 64,
-            "bundle_sha256": "b" * 64,
-            "workspace": "default",
-            "state_serial": 1,
+            "operation_plan_sha256": "b" * 64,
+            "ownership_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "custody_generation": 1,
             "expires_at": int(time.time()) + 60,
         }
     )
@@ -166,16 +166,16 @@ def test_concurrent_duplicate_deliveries_claim_once(postgres: dict[str, Any]) ->
     with ThreadPoolExecutor(max_workers=8) as pool:
         results = list(pool.map(lambda _: journal(postgres).claim(request), range(16)))
     assert results.count(True) == 1 and results.count(False) == 15
-    journal(postgres).record(request, "apply_started", {})
+    journal(postgres).record(request, "request_started", {})
     assert not journal(postgres).claim(request)  # a new adapter process cannot repeat it
 
 
-def test_cross_tenant_workspace_and_changed_attempt_denied(postgres: dict[str, Any]) -> None:
+def test_cross_tenant_ownership_digest_and_changed_attempt_denied(postgres: dict[str, Any]) -> None:
     request = binding()
     assert journal(postgres).claim(request)
     with pytest.raises(NativeHeld, match="binding_conflict"):
         journal(postgres).claim(replace(request, attempt_id=str(uuid4())))
-    with pytest.raises(NativeHeld, match="workspace_held"):
+    with pytest.raises(NativeHeld, match="custody_held"):
         journal(postgres).claim(
             replace(
                 request, tenant_id=str(uuid4()), operation_id=str(uuid4()), attempt_id=str(uuid4())
@@ -188,10 +188,10 @@ def test_cross_tenant_workspace_and_changed_attempt_denied(postgres: dict[str, A
 @pytest.mark.parametrize(
     "statement",
     [
-        "DELETE FROM native.workspace_holds",
+        "DELETE FROM native.custody_holds",
         "DELETE FROM native.events",
         "UPDATE native.attempts SET fingerprint=repeat('a',64)",
-        "TRUNCATE native.workspace_holds",
+        "TRUNCATE native.custody_holds",
         "ALTER TABLE native.attempts DROP COLUMN fingerprint",
     ],
 )

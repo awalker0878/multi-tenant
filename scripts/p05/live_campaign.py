@@ -81,7 +81,7 @@ def campaign(c, extension=None):
             OAS31Validator({'$ref':'#/components/schemas/'+schema,'components':api['components']}).validate(value)
             check('planning-wire-'+schema+'-no-store','no-store' in returned.get('Cache-Control',''))
         return value
-    create={'revision_id':revision,'action':'application.provision','method':'saved_plan','candidates':candidates}
+    create={'revision_id':revision,'action':'application.provision','method':'native_api','candidates':candidates}
     actual=planning('assessments',dict(create,candidates=candidates[:1]),sites=[a['site_id']],expected=201)
     actual_view=planning('assessments/'+actual['id'],sites=[a['site_id']])
     check('actual-P04-owner-declarations-never-imply-support',actual_view['results'][0]['operationally_eligible'] is False and any(f['reason']=='installed_tuple_only_declared' for f in actual_view['results'][0]['findings']))
@@ -93,8 +93,8 @@ def campaign(c, extension=None):
     check('live-concurrent-idempotency-one-result',replies[0]==replies[1])
     assessment=planning('assessments/'+replies[0]['id'])
     check('two-authorized-destinations-explain-positive-and-blocked',[r['status'] for r in assessment['results']]==['eligible','blocked'])
-    planning('assessments',dict(create,method='application_rebuild_restore'),key=key,expected=409)
-    req={'action':'application.provision','method':'saved_plan','lane':'operational','executor_ids':[fixture['operator_id']],'valid_until':int(time.time())+900}
+    planning('assessments',dict(create,method='native_api_export_import'),key=key,expected=409)
+    req={'action':'application.provision','method':'native_api','lane':'operational','executor_ids':[fixture['operator_id']],'valid_until':int(time.time())+900}
     first=planning('plans',{'assessment_id':assessment['id'],'candidate':0,'request':req},expected=201)
     saved=planning('plans/'+first['id'],sites=[a['site_id']])
     check('immutable-plan-is-current-without-native-authority',saved['validity']['current'] and saved['content']['native_write_authorized'] is False)

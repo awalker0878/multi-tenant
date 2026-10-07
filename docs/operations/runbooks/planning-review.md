@@ -33,8 +33,8 @@ Mount `PLANNING_REGISTRY_FILE` as a read-only absolute path, at most 512 KiB:
 `tenant_id/site_id/endpoint_id` assignments selecting one of each. Each profile
 has platform, version and all eleven dimension declarations. Each policy pins
 its revision, expiry, mandatory requirements, compiler/adapter/automation/contract
-SHA-256 values, downtime bound, reservation owners, exact saved Terraform plan,
-toolchain, backend/workspace/lineage/serial/lock owner and sole field writers.
+SHA-256 values, downtime bound, reservation owners, exact native operation plan,
+API/adapter artifacts, custody ID/generation, fencing owner and sole field writers.
 A missing assignment fails closed. Treat policy/profile changes as new immutable
 versions; retain prior versions for reproducible review. The synthetic fixture
 illustrates the shape and supplies no deployable production inputs.

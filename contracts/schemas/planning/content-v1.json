@@ -152,10 +152,56 @@
         "contracts"
       ]
     },
-    "terraform": {
-      "type": [
-        "object",
-        "null"
+    "native_api": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation_plan": {
+              "type": "object"
+            },
+            "operation_plan_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "api_contracts_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "adapter_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "custody_ref": {
+              "type": "string"
+            },
+            "custody_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "custody_generation": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "fence_owner": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "operation_plan",
+            "operation_plan_sha256",
+            "api_contracts_sha256",
+            "adapter_sha256",
+            "custody_ref",
+            "custody_id",
+            "custody_generation",
+            "fence_owner"
+          ]
+        }
       ]
     },
     "ownership": {
@@ -301,7 +347,7 @@
     "inventory_generation",
     "installed_tuple",
     "artifacts",
-    "terraform",
+    "native_api",
     "ownership",
     "mappings",
     "effects",

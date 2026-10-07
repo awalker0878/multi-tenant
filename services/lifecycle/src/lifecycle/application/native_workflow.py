@@ -109,9 +109,9 @@ class NativeWorkflow:
             self.require(tx, {"plan": plan, "stopped": False}, admission)
             key = digest({k: plan["scope"][k] for k in ("tenant_id", "resource_id")})
             held = tx.one(
-                "SELECT job,state_lineage FROM app.native_resource_holds "
-                "WHERE resource_key=%s OR state_lineage=%s",
-                (key, plan["state_lineage"]),
+                "SELECT job,custody_id FROM app.native_resource_holds "
+                "WHERE resource_key=%s OR custody_id=%s",
+                (key, plan["custody_id"]),
             )
             if plan["purpose"] == "provision":
                 if held:
@@ -125,7 +125,7 @@ class NativeWorkflow:
                     or source["plan"]["scope"] != plan["scope"]
                     or source["plan"]["purpose"] != "provision"
                     or source["plan"]["epoch"] != plan["epoch"]
-                    or str(held["state_lineage"]) != plan["state_lineage"]
+                    or str(held["custody_id"]) != plan["custody_id"]
                     or source["plan"]["approval_id"] == plan["approval_id"]
                     or source["plan"]["plan_digest"] == plan["plan_digest"]
                 ):
@@ -145,7 +145,7 @@ class NativeWorkflow:
             else:
                 tx.execute(
                     "INSERT INTO app.native_resource_holds VALUES(%s,%s,%s)",
-                    (key, plan["state_lineage"], job),
+                    (key, plan["custody_id"], job),
                 )
             self.event(
                 tx, job, "admitted", {"plan_sha256": fingerprint, "purpose": plan["purpose"]}
@@ -233,10 +233,10 @@ class NativeWorkflow:
                             "executor_id",
                             "epoch",
                             "plan_digest",
-                            "bundle_sha256",
-                            "workspace",
-                            "state_lineage",
-                            "state_serial",
+                            "operation_plan_sha256",
+                            "ownership_digest",
+                            "custody_id",
+                            "custody_generation",
                             "expires_at",
                         )
                     },
@@ -282,8 +282,8 @@ class NativeWorkflow:
     ) -> dict[str, Any]:
         if boundary not in {
             "preflight",
-            "before_saved_plan_apply",
-            "during_saved_plan_apply",
+            "before_api_sequence",
+            "during_api_sequence",
             "before_effect",
             "during_effect",
         }:
@@ -294,7 +294,7 @@ class NativeWorkflow:
             if row["state"] != "running" or binding["expires_at"] <= self.clock():
                 raise Rejected("native_grant_held", 423)
             expected = (
-                {"preflight", "before_saved_plan_apply", "during_saved_plan_apply"}
+                {"preflight", "before_api_sequence", "during_api_sequence"}
                 if binding["stage"] == "provision"
                 else {"preflight", "before_effect", "during_effect"}
             )
@@ -304,7 +304,7 @@ class NativeWorkflow:
             redemption = tx.one(
                 "SELECT worker FROM app.native_redemptions WHERE operation=%s", (operation["id"],)
             )
-            if boundary in {"before_saved_plan_apply", "before_effect"}:
+            if boundary in {"before_api_sequence", "before_effect"}:
                 if self.clock() - operation["created_at"] > 60:
                     raise Rejected("native_dispatch_expired", 423)
                 if redemption:

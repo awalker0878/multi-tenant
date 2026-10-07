@@ -13,7 +13,7 @@ Use the [application walkthrough](../../product/application-walkthrough.md), [su
 1. Confirm the applicable G06 outcomes and Q04 fault procedures for the release under test.
 2. Commission exact endpoints, native quotas/capacity, management/transport, failure domains, trust, restricted credentials and independent observer access.
 3. Establish campaign-specific authority, impact budget, stop/revocation, separate retirement scope and retention rules.
-4. Pin reviewed saved plan, Terraform state/backend identity, provider/worker images, guest hardening and application fixture manifest.
+4. Pin reviewed native operation plan, native resource custody/backend identity, provider/worker images, guest hardening and application fixture manifest.
 5. Verify quarantine paths, approved policy probes, service owner receipts and an isolated restore destination before native writes.
 
 ## Case matrix
@@ -22,7 +22,7 @@ Use the [application walkthrough](../../product/application-walkthrough.md), [su
 | --- | --- | --- | --- |
 | Q05.01 | Admit and prepare the exact plan, then present an uncommissioned site or widened endpoint/resource scope | Valid campaign proceeds within limits; uncommissioned/widened scope is denied before effects | Admission and commissioning comparison |
 | Q05.02 | Reserve capacity/IP/service allocations, including one partial owner failure | Authoritative receipts match journaled scope; partial results are held/reconciled without double allocation | Owner receipts and independent allocation observations |
-| Q05.03 | Apply the saved plan for multi-workload, disk and NIC mappings | Only owned scoped resources appear; ordering, state identity, placement and mappings match the reviewed plan | Saved-plan digest, state identity and native resource readback |
+| Q05.03 | Apply the native operation plan for multi-workload, disk and NIC mappings | Only owned scoped resources appear; ordering, state identity, placement and mappings match the reviewed plan | Saved-plan digest, state identity and native resource readback |
 | Q05.04 | Boot and configure the selected guest profile in quarantine | Boot, device mapping, guest identity/hardening and readiness pass; no application traffic is exposed early | Guest observations, hardening report and quarantine probes |
 | Q05.05 | Enroll DNS/IPAM, identity, time/trust, logging, monitoring and backup | Actual service/reply paths work; owner receipts and expected records match scoped resources | Service checks, receipts and correlated observations |
 | Q05.06 | Restore the synthetic database/attachments into isolated validation scope | Application checks, record relationships, metadata and attachment digests match the accepted recovery objective | Backup/restore identities and data comparison |

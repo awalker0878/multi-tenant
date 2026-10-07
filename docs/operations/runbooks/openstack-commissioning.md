@@ -28,7 +28,7 @@ The repository's [input record](../../../release/p07-native-inputs.json) records
 only supplied observations; unknown values remain null. Actual endpoints, native
 data, credential material and original evidence stay in the protected operating
 record. Populate a protected copy when it contains identifying operating facts.
-Never put passwords, private keys, tokens, Terraform state or saved-plan bytes in
+Never put passwords, private keys, tokens, native resource custody or native-plan bytes in
 the repository or general CI artifacts.
 
 | Input | Required contents of the protected record | Responsible owner | Cases |
@@ -36,7 +36,7 @@ the repository or general CI artifacts.
 | N01 | Installed distribution/release, exact service APIs/microversions, hypervisor/network/storage backends, project/region and failure domains; independent current native observation | OpenStack platform | Q05.01/.03 |
 | N02 | Campaign ID, exact tenant/application/site/endpoints, named resources/datasets, permitted effects, impact/concurrency quotas, time window, cleanup owner and separate retirement boundary | Platform/security | Q05.01 |
 | N03 | Approved endpoint allowlist and TLS trust, restricted writer and separate read identities, credential references, permission visibility and independently observed scope/denials | Security/IAM | Q05.01/.08 |
-| N04 | Exact Terraform executable, providers, dependency lock, modules and worker artifact; saved-plan digest; backend/workspace/lineage/serial; lock/fencing and independent state-recovery custody | Infrastructure/state | Q05.03/.08 |
+| N04 | Exact native API contract and adapter/worker artifacts, operation-plan digest, custody ID/generation, sole field owners, fencing and independent journal recovery | Infrastructure/custody | Q05.03/.08 |
 | N05 | Sole writer for each resource/field, externally owned resources, imports/adoption, independent mapping and drift comparison | Infrastructure/resource | Q05.03/.09 |
 | N06 | Approved image/profile digests, firmware/device/boot/storage/network constraints, hardening and reproducible application configuration | Guest/application | Q05.04 |
 | N07 | Quarantine, traffic activation mechanism and approved Q06 expected outcomes across same-host/subnet, inter-host and edge; applicable IPv6 and return paths | Network/security | Q05.04/.07 |
@@ -52,7 +52,7 @@ the repository or general CI artifacts.
 Bind the packet to one `scope` with P05's exact tenant/site/environment/resource/
 endpoint/native-scope fields, one campaign ID and expiry. The binding contains
 SHA-256 identities for the plan, installed tuple, artifact set, ownership map,
-toolchain, state binding, service contracts, impact budget and data scope. These
+API contracts, custody binding, service contracts, impact budget and data scope. These
 hashes identify protected contents; supplying a hash does not verify those contents.
 Use P05's `p05-json-v1` canonical JSON for structured-material digests.
 
@@ -87,55 +87,35 @@ Even a complete packet returns `native_write_authorized: false` and
 adapter, scope proof or published support claim. There is no native runtime adapter
 in this increment; P06 remains an isolated simulation.
 
-## Compare the reviewed saved plan
-
-The second local command compares the P05 immutable envelope with the protected
-commissioning record, supplied toolchain/state/ownership observations and actual
-saved-plan file bytes:
+## Compare the native operation plan
 
 ```sh
 uv run --project services/lifecycle --frozen python -m lifecycle.bootstrap.native_preflight \
   --plan /protected/plan-envelope.json \
   --commissioning /protected/p07-native-inputs.json \
-  --toolchain /protected/toolchain.json \
+  --api-contracts /protected/api-contracts.json \
   --snapshot /protected/independent-snapshot.json \
-  --saved-plan /protected/reviewed.tfplan
+  --operation-plan /protected/operation-plan.json
 ```
 
-The envelope contains exactly P05 `content` and `binding`. This preparation is
-limited to `application.provision`, `saved_plan`, `isolated_campaign`, and an
-OpenStack tuple. Other operations require their own implementation and qualification.
-It compares the canonical envelope/content hashes, plan/fact expiry and the
-commissioning packet's exact scope, tuple, artifacts, ownership, toolchain and
-state-binding hashes. State-binding material is the five fields `backend_ref`,
-`workspace`, `state_lineage`, `state_serial` and `lock_owner`. Backend references
-are protected `evidence://` identities, not inline connection configuration.
+The exact P05 content/binding envelope must select `application.provision`,
+`native_api`, `isolated_campaign` and an OpenStack tuple. The protected API manifest
+contains schema version 1, exact `api_versions`, `adapter_sha256` and
+`worker_image_digest`. The native plan binds operation contents and digest,
+API/adapter digests, `custody_ref`, `custody_id`, `custody_generation`, and
+`fence_owner`; its operation contents also bind project and ownership-map digest.
 
-The version-1 toolchain manifest contains `terraform: {version, sha256}`,
-`providers: [{source, version, sha256}]`, `modules: [{id, uri, revision, sha256}]`,
-`dependency_lock_sha256` and `worker_image_digest` (`sha256:<digest>`).
-Use exact three-part release versions; floating ranges/tags and duplicate provider
-or module entries are rejected. These are identities of the selected tools, not
-a default Terraform/provider/module version or a claim of their compatibility.
+The independent snapshot contains scope, installed tuple, artifacts, ownership,
+API-contract digest, observer/executor IDs, observation time, outstanding operation
+IDs and native custody. The custody snapshot also records lock ID, positive fence,
+lease expiry and actual held status. Observations older than five seconds, changed
+scope/artifacts/ownership/custody, missing independent observer or unresolved
+operations hold the comparison. Supplied records are not authenticated owner reads.
 
-The independent snapshot contains `scope`, `installed_tuple`, `artifacts`,
-`ownership`, `toolchain_sha256`, `observed_at`, `observer_id`, `executor_id`,
-`outstanding_operation_ids` and `terraform`. Its Terraform object carries the five
-state-binding fields plus `lock_id`, positive integer `fence`, `lease_expires_at`
-and boolean `held`. Observation age is bounded to five seconds. The observer must
-differ from the approved executor. A changed backend/workspace/lineage/serial/owner,
-missing/expired lock, changed mapping/writer, stale observation, or any unresolved
-operation holds the preflight. It never proposes a blind retry or automatic cleanup.
-
-Exit 0 means this offline comparison passed; exit 1 means invalid input; exit 2
-means held. Saved-plan files are bounded to 64 MiB and JSON files to 256 KiB.
-The report grants neither apply nor retry authority. The command does **not**
-authenticate or fetch owner records, inspect Terraform plan semantics, verify
-executable/provider/module bytes, acquire a lock, redeem a grant, execute a native
-effect or confirm its outcome. Actual native adapters must obtain those records
-independently, verify artifact bytes under the real state lock and current grant,
-and retain independent readback. A file can change after this offline check;
-its report is never a reusable execution token.
+Exit 0 means the offline comparison passed, 1 invalid inputs, and 2 held. The result
+grants no native or retry authority. Execution must independently obtain current
+owner facts, verify protected artifact bytes and resource schemas, enforce custody,
+redeem the boundary grant and observe native outcomes.
 
 ## Execute only after concrete prerequisites are supplied
 

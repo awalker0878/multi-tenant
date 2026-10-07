@@ -196,13 +196,13 @@ Define a lab-only campaign authorization lane so new adapters can acquire qualif
 | Work package | Deliverable and owner |
 | --- | --- |
 | P07.01 Native site readiness | SRE/platform owners: write commissioning, scoped credentials, network/storage baselines, backup readiness, quota limits and emergency stop/revocation rehearsal |
-| P07.02 Infrastructure automation | Infrastructure: selected OpenStack compute/storage/network adapters and reviewed Terraform plan/apply/state ownership |
+| P07.02 Infrastructure automation | Infrastructure: selected OpenStack compute/storage/network adapters and reviewed native API plan/apply/state ownership |
 | P07.03 Guest and service integration | Infrastructure/service owners: admitted native capacity/IP reservations, approved image, Ansible hardening, identity, DNS/IPAM, time, monitoring/logging and backup enrollment |
 | P07.04 Activation and verification | Lifecycle/quality: controlled quarantine-to-active transition, native readback, allowed/denied traffic, same-host/same-subnet checks and application health |
 | P07.05 Failure and retirement | Lifecycle: partial-provision recovery, drift holds, safe cleanup, dependencies, retention and deletion confirmation |
 | P07.06 Native support dossier | Assurance: exact tuple, qualification evidence, limitations, operator runbook and measured recovery timings |
 
-The first native write requires P01 baseline operational controls and P06 gate closure. Terraform owns its declared fields and state; direct API and Ansible adapters must not compete for those fields. A human-readable dry run is insufficient: execute only the reviewed saved plan and pinned inputs with verified backend/workspace binding. Prove service integration results with their authoritative systems.
+The first native write requires P01 baseline operational controls and P06 gate closure. Lifecycle owns its declared fields through native API adapters; guest and service adapters must not compete for those fields. A human-readable dry run is insufficient: execute only the reviewed native operation plan and pinned inputs with verified custody and ownership binding. Prove service integration results with their authoritative systems.
 
 Lifecycle owns reservation intent, attempts and receipts; the external capacity/IPAM owner controls the actual allocation. Commit the local journal atomically, perform idempotent owner operations and reconcile or compensate partial outcomes. There is no distributed transaction across these systems. Native reservation acquisition is itself an approved scoped effect, followed by prerequisite validation before dependent mutations.
 
@@ -235,7 +235,7 @@ Before enabling target writes, establish source fencing and the selected rollbac
 | --- | --- |
 | P09.01 Platform tranches | Infrastructure: VMware and Nutanix provisioning/lifecycle adapters, platform-specific capabilities and service insertion/network/storage variants |
 | P09.02 Migration matrix | Infrastructure/quality: additional source/target directions and methods, Windows/Linux profiles, boot modes and application/data classes |
-| P09.03 Brownfield adoption | Inventory/lifecycle: ownership claims, duplicate detection, drift review, explicit imports, Terraform state adoption and detach/relinquish behavior |
+| P09.03 Brownfield adoption | Inventory/lifecycle: ownership claims, duplicate detection, drift review, explicit imports, native resource custody adoption and detach/relinquish behavior |
 | P09.04 Enterprise capabilities | Planning/workers: HA/recovery variants, shared services, capacity, scaling, policy changes, patching, certificate rotation and day-two operations |
 | P09.05 Extension contract | Architecture: adapter packaging, declared constraints, signed artifact/version identity, conformance kit and compatibility documentation |
 
@@ -256,7 +256,7 @@ Sequence tranches by business demand and feasibility. Full profiles must include
 | P10.05 Installation qualification | SRE/quality: clean install, restricted-network artifact promotion if required, trust enrollment, rollback/recovery and decommission rehearsals |
 | P10.06 Release dossier | Quality/product: all selected native tuples rerun on release candidates, remaining risks, acceptance evidence and sign-off record |
 
-HA and backups are delivered incrementally from P01. This phase tests their complete behavior. Restoring old operation state must not repeat external writes: quarantine resumed jobs, inspect native outcomes and re-establish ownership before admission. Backing up PostgreSQL alone does not restore Temporal histories, evidence, cryptographic keys or Terraform state.
+HA and backups are delivered incrementally from P01. This phase tests their complete behavior. Restoring old operation state must not repeat external writes: quarantine resumed jobs, inspect native outcomes and re-establish ownership before admission. Backing up PostgreSQL alone does not restore Temporal histories, evidence, cryptographic keys or native resource custody.
 
 **Exit gate:** agreed SLO/load targets and RPO/RTO are demonstrated; recovery does not create duplicate native writes; supported mixed versions run through upgrades; required security issues are resolved; the service owner accepts support responsibilities; and every support claim matches evidence from the release candidate.
 

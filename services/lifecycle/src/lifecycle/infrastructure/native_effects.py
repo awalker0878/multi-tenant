@@ -97,7 +97,7 @@ class NativeWorkerEffects:
             )
             if connection.sock is None:
                 raise Rejected("native_effect_connection_lost", 423)
-            # Terraform is bounded independently. Timeout leaves the prepared grant held.
+            # Native API execution is bounded independently. Timeout leaves the prepared grant held.
             deadline = time.monotonic() + 620
             stream = connection.sock
             stream.settimeout(620)

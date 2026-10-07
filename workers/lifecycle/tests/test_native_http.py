@@ -57,13 +57,16 @@ def native_tls(tmp_path: Path) -> Iterator[tuple[NativeReads, dict[str, Any]]]:
                     "body": self.rfile.read(int(self.headers.get("Content-Length", "0"))),
                 }
             )
-            self.send_response(fixture["status"])
-            self.send_header("Content-Type", fixture.get("content_type", "application/json"))
-            if fixture.get("location"):
-                self.send_header("Location", fixture["location"])
+            reply = fixture.get("routes", {}).get(self.path, fixture)
+            self.send_response(reply["status"])
+            self.send_header("Content-Type", reply.get("content_type", "application/json"))
+            if reply.get("location"):
+                self.send_header("Location", reply["location"])
+            if reply.get("request_id"):
+                self.send_header("x-openstack-request-id", reply["request_id"])
             self.end_headers()
             try:
-                self.wfile.write(fixture["body"])
+                self.wfile.write(reply["body"])
             except (BrokenPipeError, ConnectionResetError, ssl.SSLEOFError):
                 pass
 
@@ -78,13 +81,16 @@ def native_tls(tmp_path: Path) -> Iterator[tuple[NativeReads, dict[str, Any]]]:
                     "volume_version": self.headers.get("OpenStack-API-Version"),
                 }
             )
-            self.send_response(fixture["status"])
-            self.send_header("Content-Type", fixture.get("content_type", "application/json"))
-            if fixture.get("location"):
-                self.send_header("Location", fixture["location"])
+            reply = fixture.get("routes", {}).get(self.path, fixture)
+            self.send_response(reply["status"])
+            self.send_header("Content-Type", reply.get("content_type", "application/json"))
+            if reply.get("location"):
+                self.send_header("Location", reply["location"])
+            if reply.get("request_id"):
+                self.send_header("x-openstack-request-id", reply["request_id"])
             self.end_headers()
             try:
-                self.wfile.write(fixture["body"])
+                self.wfile.write(reply["body"])
             except (BrokenPipeError, ConnectionResetError, ssl.SSLEOFError):
                 pass
 
@@ -237,7 +243,7 @@ def test_lifecycle_native_boundary_denials_are_never_retried(
     endpoint.token_file.write_text("synthetic-distinct-native-worker-token")
     fixture.update(status=status, location="https://foreign.invalid/authority")
     with pytest.raises(NativeHeld):
-        LifecycleNativeBoundary(endpoint).check({}, "before_saved_plan_apply")
+        LifecycleNativeBoundary(endpoint).check({}, "before_api_sequence")
     assert len(fixture["requests"]) == 1
 
 

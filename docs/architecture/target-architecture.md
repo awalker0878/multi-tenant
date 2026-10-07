@@ -102,7 +102,7 @@ Identifiers are stable and opaque. Every tenant-owned record contains an explici
 - Planning owns immutable plans. Governance owns approval decisions. Lifecycle owns admission and native-operation records.
 - Temporal owns durable workflow history and resumption. Lifecycle job views are controlled projections, not a competing workflow state machine.
 - Assurance owns evidence metadata and qualification decisions; protected object storage holds the artifact bytes.
-- Terraform owns its declared resource fields and locked state. API and Ansible operations must not silently contend for those fields.
+- native API owns its declared resource fields and locked state. API and Ansible operations must not silently contend for those fields.
 - Cross-service workflows use explicit state transitions and compensations rather than distributed database transactions.
 
 The data dictionary must identify retention, classification, encryption, deletion, export and recovery needs per aggregate. RPO/RTO values are proposed and accepted with service owners in P00; this document does not assert existing targets.

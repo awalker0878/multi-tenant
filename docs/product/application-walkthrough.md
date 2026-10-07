@@ -6,7 +6,7 @@ Status: synthetic design example, 2026-10-04. Every record and outcome below is 
 
 Permit Desk is a fictional internal application with a Linux web workload and a Linux relational-database workload. It stores synthetic permit records and attachments. It is small enough to rehearse completely but includes state, tier isolation, shared services and a real recovery boundary.
 
-The example has two separate routes: provisioning a new empty deployment on OpenStack, then migrating a different deployment from VMware to OpenStack by rebuilding the application and restoring its application-consistent data. A successful provision does not qualify the migration. Rebuild/restore is the preferred P00 proposal under ADR-014, which remains proposed pending owner review and feasibility results. P00 must prove that the selected target image, application artifacts and configuration can reproduce the service, and that the selected capture/restore mechanism preserves all required data and behavior across the chosen versions. Exact guest/image/tool versions remain unselected. Whole-VM disk capture/conversion is a separate P09 option for unrebuildable applications, never a fallback selected implicitly by this workflow.
+P07 provisions OpenStack through native APIs. P08 selects one explicitly qualified migration method from source and destination capability profiles. Generic whole-VM movement uses an isolated migration copy, `ExportVm`/NFC, verified transfer, any explicitly planned copy-only conversion and destination native APIs. Guest transformation occurs on the copy. Restarting production after a baseline requires a qualified application or file delta method; opaque workloads without one require cold migration. No method is an automatic fallback. Native provisioning and migration require separate Q05/Q06 and Q07 qualification.
 
 | Record | Synthetic value and purpose |
 | --- | --- |
@@ -83,14 +83,14 @@ Governance records `ap_prov_01` against `plan_prov_01` and its exact digest with
 | --- | --- | --- |
 | 1 | `op_prov_reserve` | Lifecycle journals scoped capacity/IP allocations; authoritative allocation owners return receipts. Partial allocations are reconciled or explicitly compensated. |
 | 2 | `op_prov_domains` | Realize or bind approved isolated domain/network scopes; inventory observes `di_os_oz_01`/`di_os_rz_01`; lifecycle records `mdb_oz_01`/`mdb_rz_01` with ownership/fencing. Required shared infrastructure is already commissioned. |
-| 3 | `op_prov_compute` | Apply the reviewed saved Terraform plan to create exactly the scoped workload resources in quarantine. Persist execution/state identity and result; prohibit another adapter from concurrently owning the same fields. |
+| 3 | `op_prov_compute` | Apply the reviewed native operation plan to create exactly the scoped workload resources in quarantine. Persist execution/state identity and result; prohibit another adapter from concurrently owning the same fields. |
 | 4 | `op_prov_guest` | Scoped guest activities configure only admitted fields, identity, time/trust and hardening. Record exact guest/automation artifacts and readiness results. |
 | 5 | `op_prov_services` | Register DNS, monitoring/logging and backup through owner contracts, retaining authoritative receipts and observable service checks. |
 | 6 | `ev_prov_restore_01` | Restore protected synthetic data into an isolated validation target and verify application/dataset checks; a successful backup job alone is insufficient. |
 | 7 | `op_prov_activate` | Revalidate authority and preconditions, observe mandatory policy outcomes, then enable only declared application access. Capture positive and negative traffic checks. |
 | 8 | `ev_prov_accept_01` | Independent readback verifies native state, application login/read/write, required service paths, protection and actual timings. Lifecycle emits `lifecycle.job.completed` only when completion postconditions and mandatory evidence receipts are satisfied. |
 
-Names here identify logical operation scopes, not a requirement to hide many irreversible effects in one unobservable call. P06 must split any scope that needs different authority, fencing or recovery into separately journaled operations. Terraform's saved plan, backend/workspace, state version and lock ownership must be bound and reconciled; a worker must not substitute an ad hoc API retry for an uncertain apply.
+Names here identify logical operation scopes, not a requirement to hide many irreversible effects in one unobservable call. P06 must split any scope that needs different authority, fencing or recovery into separately journaled operations. Native operation payloads, custody generation, ownership and fencing must be bound and reconciled; an uncertain native request is never blindly repeated.
 
 ```mermaid
 sequenceDiagram
@@ -112,35 +112,37 @@ sequenceDiagram
     Lifecycle->>Lifecycle: Resolve outcome and recheck authority
 ```
 
-The observer shown above does not repair Terraform state or acquire write authority. If native readback alone cannot resolve execution/state identity or stale-writer risk, the hold remains for the declared operator recovery procedure.
+The observer shown above does not repair native resource custody or acquire write authority. If native readback alone cannot resolve execution/state identity or stale-writer risk, the hold remains for the declared operator recovery procedure.
 
 After Q05/Q06 and applicable fault/recovery checks succeed, assurance independently reviews the dossier and may record `qual_prov_01` plus `assurance.qualification.published`. This future decision would cover only its exact provision/activation/retirement scope, tested artifacts and tuple. Subsequent ordinary provisioning still needs its own plan approval, current admission checks and the operating release's accepted scope.
 
 To qualify retirement, create a separate `plan_retire_01`, obtain `ap_retire_01` and run `job_retire_01`. Verify retention obligations, delete only managed scope, release allocations after native absence is confirmed and retain required evidence. Original provisioning approval does not authorize deletion.
 
-## 5. P08: VMware-to-OpenStack application rebuild/restore
+## 5. P08: VMware-to-OpenStack native VM copy
 
-The migration deployment `dep_permit_move` is distinct from the fresh provisioning deployment. Its source resources must have explicit source-operation authority for quiesce, capture and fencing, including shutdown only where required by the selected exclusion procedure. Discovery and name matching do not establish that authority. The first route may use a purposely prepared lab source with an approved bounded resource scope; general brownfield adoption remains the separate P09 capability.
+The migration deployment is distinct from fresh provisioning. Its approved plan
+binds the source VM/configuration, complete disk inventory, firmware/drivers,
+source and destination APIs, destination images, transfer custody and independent
+writer-fencing requirements. Source-operation authority covers guest preparation,
+application quiescence, shutdown and export; discovery alone grants none of it.
 
-The proposed method is represented as `application_rebuild_restore` in design examples. It rebuilds the target from reviewed artifacts and restores selected application data; it does not preserve an opaque guest image, native VM identity or unmodeled operating-system customization. “Offline” means the accepted application outage during final quiesce, consistent capture/restore and cutover. Source disk-format compatibility is not the acceptance test for this method. Historical rebuild/restore implementation supplies safety lessons only; the new runtime, tests and qualification must be delivered independently.
+| Step | Required action and completion condition |
+| --- | --- |
+| Assess and plan | Discover both native endpoints and image capabilities; validate every disk, device, guest prerequisite, service dependency and outage/data objective. Unsupported combinations hold. |
+| Rehearse | Copy an approved representative source into an isolated target with business effects suppressed; verify boot, all data, services and policy before cleanup. |
+| Approve cutover | Bind current source configuration, destination scope, reviewed API artifacts, custody, reservation receipts and accepted rehearsal evidence. |
+| Fence source | Quiesce all application/other writers, record the last accepted transaction, power off the exact VM and independently verify the source fence. |
+| Export VM | Persist intent, invoke `ExportVm` once, record the NFC lease and transfer every approved disk using allowlisted TLS URLs and lease keepalive. |
+| Verify export | Check native manifest inventory, capacities, lengths and secure checksums; complete the lease only after all disks are captured. Retain the independent source fence. |
+| Import disks | Create private Glance images, stage the verified bytes and invoke the admitted native import method. Journal every returned ID and independently verify imported bytes and ownership. |
+| Create isolated target | Execute the native volume/port/compute plan with exact imported-image mappings and disabled traffic ports. Verify boot and guest prerequisites. |
+| Validate | Independently check all data and attachments, application roles, service owners, backup recovery and allowed/denied traffic. Target writes remain blocked. |
+| Activate | Recheck current authority, source fencing and all acceptance results before target writes and traffic changes. Record the first-write boundary. |
+| Accept and retain | Review Q07 evidence for the exact route. Preserve source disks/data/keys until a separate retirement plan and authority. |
 
-| Step | Records and inputs | Required action and completion condition |
-| --- | --- | --- |
-| Define migration | `ir_move_01`, `as_move_01`, source/target observations and reviewed source binding | Pin workload/dataset membership, consistency groups, target image/application/configuration artifacts, secret/key references, supported application/database versions, capture/restore tools, mappings and transfer/staging/retained-source budgets. Unreproducible source customizations or unavailable data/key dependencies block this method. |
-| Build rehearsal plan | `plan_rehearse_01`, `ap_rehearse_01`, `job_rehearse_01` | Rebuild an isolated target from the exact proposed artifacts, restore an approved application-consistent source capture, suppress production business effects and writers, verify application/data/service behavior, then clean up with explicit authority. |
-| Review final plan | `plan_move_01` with recovery policy, accepted rehearsal references and exact final input versions | Show anticipated outage, source fencing, final capture, transfer order, target validation, write enablement boundary and post-write recovery. Rehearsal approval does not authorize cutover. |
-| Approve and admit | `ap_move_01`, `job_move_01` under `campaign_move_01` until qualification exists | Check current authority, campaign scope, installed/artifact tuple, endpoint readiness, window, reservations and recoverability. Emit `lifecycle.job.admitted`. |
-| Rebuild target | `op_move_rebuild` | Provision the reviewed OpenStack resources in quarantine and deploy the selected application/configuration artifacts. Independently verify artifact identity, service dependencies and target readiness; production writers and side effects remain disabled. |
-| Stop writers | `op_move_quiesce`, `op_move_fence` | Stop ingress/background and external writers, establish application/database consistency and independently observed source/other-writer exclusion. Record the last accepted transaction baseline. A stopped process or VM power label alone does not prove every writer is excluded. |
-| Capture and transfer | `op_move_capture`, `op_move_transfer` | Capture all selected data with the reviewed application-consistency procedure and required metadata/key lineage. Move bytes only between approved endpoints and verify complete manifests/digests. Generic file copy or a crash-consistent snapshot cannot replace required database/application consistency. No workload payload traverses the console or event bus. |
-| Restore and validate | `op_move_restore`, `op_move_validate` | Restore every selected dataset into its mapped target and verify version/schema compatibility, complete data/metadata, application behavior and service/policy paths. Confirm source remains fenced; production target writers remain disabled. |
-| Authorize activation boundary | Admission-boundary check and `op_move_enable_writes` | Check current approval, time window, fences, acceptance checks and declared recovery readiness immediately before permitting target writes. Record when target writes become possible and whether any occurred. |
-| Switch traffic | `op_move_traffic` | Perform only approved DNS/routing/service changes, observe authoritative receipts and effective access; detect split-brain or unintended reachability. A timeout creates a hold. |
-| Accept application | `ev_move_data_01`, `ev_move_security_01`, `ev_move_restore_01`, `ev_move_accept_01` | Verify fixture invariants, accepted target read/write, role checks, isolation, service integration, restore and measured outage. Preserve source fencing during observation. |
-| Review support | `qual_move_01` if independently accepted | Assurance reviews Q07 and required Q04/Q06 evidence; the resulting scope is VMware→OpenStack, the selected method and tested conditions only. |
-| Retain/retire source | Separate retention decision and source retirement plan/approval/job | Keep source data/keys for the accepted period, then confirm deletion/disposal and allocation cleanup under new authority. Migration completion alone does not retire the source. |
-
-Both provisioning and migration evidence include failure cases. Passing the happy path is insufficient. The product may report the migration workflow complete while later retention/retirement work remains explicitly pending, provided its completion contract and application acceptance conditions were satisfied.
+A lease or import timeout holds the original attempt. There is no alternate migration
+method or converter. Recovery before target writes and recovery after possible
+accepted target writes remain separate approved procedures.
 
 ## 6. Held outcomes, revocation and recovery decisions
 

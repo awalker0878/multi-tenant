@@ -80,7 +80,7 @@ The [2026-10-04 accountable decision](../qualification/gate-reviews/g00-user-dec
 
 | Criterion | Required pass/fail check | Evidence | Environment | Reviewer role |
 | --- | --- | --- | --- | --- |
-| G07.01 — Qualified provisioning | Commission exact OpenStack tuple; execute reviewed saved plan, hardening and real service integrations; independently observe readiness before activation. | E3: Q05 provisioning and owner receipts | Authorized native qualification lab | Platform, service and qualification owners |
+| G07.01 — Qualified provisioning | Commission exact OpenStack tuple; execute reviewed native operation plan, hardening and real service integrations; independently observe readiness before activation. | E3: Q05 provisioning and owner receipts | Authorized native qualification lab | Platform, service and qualification owners |
 | G07.02 — Policy and scope denials | Q06 proves allowed flows and denied tenant/tier/edge paths, same-host/subnet and relevant IPv6/return behavior; wrong plan/scope/ownership cannot mutate. | E3: Q05/Q06 traffic and authority matrix | Native lab exact topology | Security and independent observer |
 | G07.03 — Failure and restore | Partial provision, lost response, restart, revocation and failed activation remain contained; restore application data and reconcile before further writes. | E3: Q04/Q05 fault/restore dossier | Native lab | SRE, application and qualification owners |
 | G07.04 — Retirement and support bounds | Separate retirement authority preserves retention, confirms deletion/release of only owned resources and publishes exact tested tuple/limits. | E3: retirement receipts and qualification review | Native lab | Governance and assurance owners |

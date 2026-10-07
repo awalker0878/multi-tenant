@@ -93,7 +93,7 @@ no native effect, automatic restore re-enable or production support is implied.
 
 The [native workflow runbook](../operations/runbooks/native-workflow-control.md)
 and [internal boundary contract](../../contracts/openapi/lifecycle-native-boundary-v1.json)
-define durable single-use stage grants, exact saved-plan worker bindings,
+define durable single-use stage grants, exact native-plan worker bindings,
 independent readiness/reconciliation and separately approved retirement. The
 controller is a local authority/journal component for the native Temporal journey;
 it is not a second workflow engine or an enabled native API/dispatcher. Its owner

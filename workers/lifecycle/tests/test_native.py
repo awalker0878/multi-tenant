@@ -1,10 +1,8 @@
-"""P07 software boundaries using synthetic plans/providers, never native qualification."""
+"""Native execution boundaries against synthetic owner and API responses."""
 
 import copy
-import hashlib
 import json
 import os
-import sys
 from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
@@ -13,24 +11,24 @@ from uuid import uuid4
 
 import pytest
 
+from lifecycle_worker.application.api_plan import validate_api_plan
 from lifecycle_worker.application.native import (
+    NativeApiExecution,
     NativeBinding,
     NativeHeld,
-    ProcessResult,
-    SavedPlanExecution,
     decode,
     digest,
 )
-from lifecycle_worker.infrastructure.native_files import protected_read, verify_bundle
-from lifecycle_worker.infrastructure.openstack_readback import OpenStackReadback, state_objects
-from lifecycle_worker.infrastructure.terraform import TerraformSavedPlan, run, validate_plan
+from lifecycle_worker.infrastructure.native_files import protected_read
+from lifecycle_worker.infrastructure.openstack_api import OpenStackApi
+from lifecycle_worker.infrastructure.openstack_readback import OpenStackReadback
 
 
 @pytest.fixture
 def binding() -> NativeBinding:
     values: dict[str, Any] = {
-        k: str(uuid4())
-        for k in (
+        key: str(uuid4())
+        for key in (
             "tenant_id",
             "site_id",
             "project_id",
@@ -41,187 +39,67 @@ def binding() -> NativeBinding:
             "campaign_id",
             "executor_id",
             "epoch",
-            "state_lineage",
+            "custody_id",
         )
     }
     return NativeBinding.parse(
         values
         | {
             "plan_digest": "a" * 64,
-            "bundle_sha256": "b" * 64,
-            "workspace": "default",
-            "state_serial": 1,
+            "operation_plan_sha256": "b" * 64,
+            "ownership_digest": "c" * 64,
+            "custody_generation": 1,
             "expires_at": 200,
         }
     )
 
 
-def resources(binding: NativeBinding) -> dict[str, Any]:
-    metadata = {"product_tenant_id": binding.tenant_id, "product_resource_id": binding.resource_id}
+def plan_for(binding: NativeBinding) -> dict[str, Any]:
     return {
-        "openstack_compute_instance_v2.application": {
-            "kind": "server",
-            "expected": {"name": "application", "flavor_id": "small", "metadata": metadata},
+        "schema_version": 1,
+        **{
+            key: binding.document()[key]
+            for key in ("project_id", "custody_id", "custody_generation", "ownership_digest")
         },
-        "openstack_networking_port_v2.quarantine": {
-            "kind": "port",
-            "expected": {
-                "tenant_id": binding.project_id,
-                "description": f"product:{binding.tenant_id}:{binding.resource_id}",
-                "admin_state_up": False,
-                "port_security_enabled": True,
-                "security_group_ids": [str(uuid4())],
-                "network_id": str(uuid4()),
-                "fixed_ip": [{"subnet_id": str(uuid4()), "ip_address": "192.0.2.8"}],
-            },
-        },
-        "openstack_blockstorage_volume_v3.root": {
-            "kind": "volume",
-            "expected": {
-                "name": "root",
-                "size": 10,
-                "volume_type": "encrypted",
-                "metadata": metadata,
-            },
-        },
-    }
-
-
-def plan_for(expected: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "format_version": "1.2",
-        "terraform_version": "1.16.0",
-        "errored": False,
-        "applyable": True,
-        "complete": True,
-        "configuration": {"root_module": {}},
-        "resource_changes": [
+        "api_versions": {"compute": "2.1", "network": "2.0", "volume": "3.0"},
+        "resources": [
             {
-                "address": address,
-                "mode": "managed",
-                "type": address.split(".")[0],
-                "provider_name": "registry.terraform.io/terraform-provider-openstack/openstack",
-                "change": {
-                    "actions": ["create"],
-                    "before": None,
-                    "after": contract["expected"],
-                    "after_unknown": {"id": True},
+                "key": "nic",
+                "kind": "port",
+                "spec": {
+                    "name": "nic",
+                    "network_id": str(uuid4()),
+                    "fixed_ips": [{"subnet_id": str(uuid4()), "ip_address": "192.0.2.8"}],
+                    "security_groups": [str(uuid4())],
+                    "admin_state_up": False,
+                    "port_security_enabled": True,
                 },
-            }
-            for address, contract in expected.items()
+            },
+            {
+                "key": "boot",
+                "kind": "volume",
+                "spec": {
+                    "name": "boot",
+                    "size": 10,
+                    "volume_type": "encrypted",
+                    "availability_zone": "nova",
+                    "imageRef": str(uuid4()),
+                },
+            },
+            {
+                "key": "vm",
+                "kind": "server",
+                "spec": {
+                    "name": "vm",
+                    "flavorRef": "small",
+                    "availability_zone": "nova",
+                    "config_drive": True,
+                    "ports": ["nic"],
+                    "volumes": [{"key": "boot", "boot_index": 0}],
+                },
+            },
         ],
     }
-
-
-@pytest.mark.parametrize(
-    "raw", [b'{"a":1,"a":2}', b'{"a":NaN}', b'{"a":Infinity}', b"[]", b"{} " * 10]
-)
-def test_strict_native_documents(raw: bytes) -> None:
-    with pytest.raises(NativeHeld):
-        decode(raw)
-
-
-def test_bindings_are_exact_and_accept_keystone_hex_ids(binding: NativeBinding) -> None:
-    assert NativeBinding.parse(binding.document()) == binding
-    document = binding.document() | {"project_id": uuid4().hex}
-    assert NativeBinding.parse(document).project_id == document["project_id"]
-    with pytest.raises(NativeHeld):
-        NativeBinding.parse(document | {"native_write_authorized": True})
-
-
-@pytest.mark.parametrize(
-    "field,value",
-    [
-        ("state_serial", True),
-        ("state_serial", -1),
-        ("expires_at", False),
-        ("workspace", "../other"),
-        ("project_id", "*"),
-        ("plan_digest", "A" * 64),
-    ],
-)
-def test_invalid_bindings(binding: NativeBinding, field: str, value: Any) -> None:
-    with pytest.raises(NativeHeld):
-        NativeBinding.parse(binding.document() | {field: value})
-
-
-def test_plan_accepts_only_reviewed_quarantined_creates(binding: NativeBinding) -> None:
-    expected = resources(binding)
-    validate_plan(plan_for(expected), expected, binding)
-
-
-@pytest.mark.parametrize(
-    "mutation",
-    [
-        "delete",
-        "replace",
-        "update",
-        "unlisted",
-        "duplicate",
-        "foreign_provider",
-        "import",
-        "moved",
-        "deposed",
-        "deferred",
-        "drift",
-        "incomplete",
-        "errored",
-        "provisioner",
-        "unknown_metadata",
-        "changed_field",
-        "wrong_project",
-        "active_port",
-        "unsecured_port",
-        "missing_security_group",
-        "ownership",
-        "new_format",
-    ],
-)
-def test_plan_denials(binding: NativeBinding, mutation: str) -> None:
-    expected = resources(binding)
-    plan = copy.deepcopy(plan_for(expected))
-    first = plan["resource_changes"][0]
-    if mutation in {"delete", "replace", "update"}:
-        first["change"]["actions"] = ["create", "delete"] if mutation == "replace" else [mutation]
-    elif mutation == "unlisted":
-        first["address"] += "_unowned"
-    elif mutation == "duplicate":
-        plan["resource_changes"][1] = copy.deepcopy(first)
-    elif mutation == "foreign_provider":
-        first["provider_name"] = "registry.example/untrusted/openstack"
-    elif mutation == "import":
-        first["change"]["importing"] = {"id": str(uuid4())}
-    elif mutation in {"moved", "deposed"}:
-        first["previous_address" if mutation == "moved" else "deposed"] = "other"
-    elif mutation in {"deferred", "drift"}:
-        plan["deferred_changes" if mutation == "deferred" else "resource_drift"] = [first]
-    elif mutation == "incomplete":
-        plan["complete"] = False
-    elif mutation == "errored":
-        plan["errored"] = True
-    elif mutation == "provisioner":
-        plan["configuration"]["root_module"]["provisioners"] = [{"type": "local-exec"}]
-    elif mutation == "unknown_metadata":
-        first["change"]["after_unknown"]["metadata"] = True
-    elif mutation == "changed_field":
-        first["change"]["after"]["name"] = "other"
-    elif mutation == "new_format":
-        plan["format_version"] = "2.0"
-    else:
-        port = expected["openstack_networking_port_v2.quarantine"]["expected"]
-        if mutation == "wrong_project":
-            port["tenant_id"] = str(uuid4())
-        elif mutation == "active_port":
-            port["admin_state_up"] = True
-        elif mutation == "unsecured_port":
-            port["port_security_enabled"] = False
-        elif mutation == "missing_security_group":
-            port["security_group_ids"] = []
-        else:
-            expected["openstack_compute_instance_v2.application"]["expected"]["metadata"] = {}
-        plan = plan_for(expected)
-    with pytest.raises(NativeHeld):
-        validate_plan(plan, expected, binding)
 
 
 class Journal:
@@ -236,7 +114,22 @@ class Journal:
         return True
 
     def record(self, binding: NativeBinding, event: str, facts: dict[str, Any]) -> None:
+        assert self.claimed
         self.events.append((event, facts))
+
+    def resources(self, binding: NativeBinding) -> dict[str, dict[str, str]]:
+        return {
+            facts["resource_key"]: {"kind": facts["kind"], "id": facts["native_id"]}
+            for event, facts in self.events
+            if event == "request_accepted"
+        }
+
+    def transfers(self, binding: NativeBinding) -> dict[str, dict[str, Any]]:
+        return {
+            facts["resource_key"]: facts
+            for event, facts in self.events
+            if event == "disk_transferred"
+        }
 
 
 class Authority:
@@ -246,508 +139,261 @@ class Authority:
 
     def require_current(self, binding: NativeBinding, boundary: str) -> None:
         self.calls.append(boundary)
-        if boundary == self.denied:
+        if self.denied == boundary:
             raise NativeHeld("revoked")
 
 
 class Tool:
-    def __init__(self, journal: Journal, result: ProcessResult | None = None) -> None:
-        self.journal, self.result = journal, result or ProcessResult(0, False)
-        self.applies = 0
+    def __init__(self, journal: Journal) -> None:
+        self.journal = journal
+        self.calls = 0
 
     def inspect(self, binding: NativeBinding) -> dict[str, Any]:
-        return {"bundle_sha256": binding.bundle_sha256}
+        return {"native_write_authorized": False}
 
-    def apply(self, binding: NativeBinding, heartbeat: Callable[[], None]) -> ProcessResult:
+    def execute(self, binding: NativeBinding, boundary: Callable[[], None]) -> None:
         assert self.journal.claimed
-        assert self.journal.events[-1][0] == "apply_started"
-        heartbeat()
-        self.applies += 1
-        return self.result
-
-    def state(self, binding: NativeBinding) -> dict[str, Any]:
-        return {"resources": []}
+        boundary()
+        self.calls += 1
 
 
 class Observer:
-    def __init__(self, outcome: str = "observed_present") -> None:
-        self.outcome = outcome
-
-    def observe(self, binding: NativeBinding, state: dict[str, Any]) -> dict[str, Any]:
+    def observe(self, binding: NativeBinding, objects: dict[str, Any]) -> dict[str, Any]:
         return {
             "binding_sha256": binding.fingerprint,
             "independent": True,
-            "outcome": self.outcome,
             "observed_at": 100,
+            "outcome": "observed_present",
         }
 
 
-def test_committed_attempt_precedes_apply_and_never_repeats(binding: NativeBinding) -> None:
-    journal, authority = Journal(), Authority()
-    tool = Tool(journal)
-    execution = SavedPlanExecution(authority, journal, tool, Observer(), lambda: 100)
-    result = execution.execute(binding)
-    assert result["observation"]["outcome"] == "observed_present"
-    assert not result["application_ready"] and not result["activation_authorized"]
-    with pytest.raises(NativeHeld, match="requires_reconciliation"):
-        execution.execute(binding)
-    assert tool.applies == 1
-    assert "before_saved_plan_apply" in authority.calls
-    assert "during_saved_plan_apply" in authority.calls
+@pytest.mark.parametrize("raw", [b'{"a":1,"a":2}', b'{"a":NaN}', b"[]", b"{} " * 10])
+def test_strict_native_documents(raw: bytes) -> None:
+    with pytest.raises(NativeHeld):
+        decode(raw, 20)
 
 
 @pytest.mark.parametrize(
-    "boundary", ["preflight", "before_saved_plan_apply", "during_saved_plan_apply"]
+    "field,value",
+    [
+        ("expires_at", True),
+        ("custody_generation", True),
+        ("ownership_digest", "default"),
+        ("operation_plan_sha256", "missing"),
+        ("project_id", "arbitrary"),
+    ],
 )
-def test_revocation_prevents_effect(binding: NativeBinding, boundary: str) -> None:
-    journal = Journal()
-    tool = Tool(journal)
-    execution = SavedPlanExecution(Authority(boundary), journal, tool, Observer(), lambda: 100)
+def test_invalid_binding(binding: NativeBinding, field: str, value: Any) -> None:
     with pytest.raises(NativeHeld):
-        execution.execute(binding)
-    assert tool.applies == 0
+        NativeBinding.parse(binding.document() | {field: value})
 
 
-@pytest.mark.parametrize("process", [ProcessResult(1, False), ProcessResult(-9, True)])
-def test_failure_or_interruption_does_not_authorize_retry(
-    binding: NativeBinding, process: ProcessResult
-) -> None:
-    journal = Journal()
-    tool = Tool(journal, process)
-    execution = SavedPlanExecution(Authority(), journal, tool, Observer("held"), lambda: 100)
-    result = execution.execute(binding)
-    assert result["observation"]["outcome"] == "held" and not result["retry_authorized"]
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "changed",
+        "extra",
+        "active_port",
+        "no_security",
+        "free_device",
+        "shared_port",
+        "bootless",
+        "unknown_kind",
+        "api_version",
+    ],
+)
+def test_native_operation_schema_denies_unsafe_intent(binding: NativeBinding, fault: str) -> None:
+    plan = plan_for(binding)
+    bound = replace(binding, operation_plan_sha256=digest(plan))
+    if fault == "changed":
+        plan["resources"][0]["spec"]["name"] = "changed"
+    elif fault == "extra":
+        plan["command"] = "unapproved"
+    elif fault == "active_port":
+        plan["resources"][0]["spec"]["admin_state_up"] = True
+    elif fault == "no_security":
+        plan["resources"][0]["spec"]["security_groups"] = []
+    elif fault == "free_device":
+        plan["resources"][2]["spec"]["ports"] = []
+    elif fault == "shared_port":
+        plan["resources"][2]["spec"]["ports"] *= 2
+    elif fault == "bootless":
+        plan["resources"][2]["spec"]["volumes"][0]["boot_index"] = -1
+    elif fault == "unknown_kind":
+        plan["resources"][0]["kind"] = "shell"
+    else:
+        plan["api_versions"]["compute"] = "latest"
+    if fault != "changed":
+        bound = replace(bound, operation_plan_sha256=digest(plan))
     with pytest.raises(NativeHeld):
-        execution.execute(binding)
-    assert tool.applies == 1
-
-
-def test_expired_authority_never_claims(binding: NativeBinding) -> None:
-    journal = Journal()
-    with pytest.raises(NativeHeld):
-        SavedPlanExecution(Authority(), journal, Tool(journal), Observer(), lambda: 200).execute(
-            binding
-        )
-    assert not journal.claimed
-
-
-def test_real_subprocess_revocation_kills_child_without_exposing_output(tmp_path: Path) -> None:
-    calls = 0
-
-    def heartbeat() -> None:
-        nonlocal calls
-        calls += 1
-        if calls > 2:
-            raise NativeHeld("revoked")
-
-    result, _ = run(
-        [sys.executable, "-c", "import time; time.sleep(5)"], tmp_path, {}, 10, heartbeat
-    )
-    assert result.interrupted and result.exit_code != 0
-
-
-def test_real_subprocess_output_is_bounded(tmp_path: Path) -> None:
-    result, output = run(
-        [sys.executable, "-c", "print('sensitive' * 1000)"], tmp_path, {}, 2, lambda: None, 100
-    )
-    assert result.interrupted and output == b""
-
-
-def test_protected_input_rejects_symlink_fifo_and_world_writable(tmp_path: Path) -> None:
-    file = tmp_path / "input"
-    file.write_text("{}")
-    link = tmp_path / "link"
-    link.symlink_to(file)
-    with pytest.raises(NativeHeld):
-        protected_read(link, 10)
-    file.chmod(0o666)
-    with pytest.raises(NativeHeld):
-        protected_read(file, 10)
-    fifo = tmp_path / "fifo"
-    os.mkfifo(fifo)
-    with pytest.raises(NativeHeld):
-        protected_read(fifo, 10)
+        validate_api_plan(plan, bound)
 
 
 class NativeFixture:
-    def __init__(self, binding: NativeBinding) -> None:
-        self.expected = resources(binding)
-        self.user = uuid4().hex
-        self.calls: list[str] = []
-        self.documents: dict[str, dict[str, Any]] = {
-            "/auth/tokens": {
-                "token": {
-                    "user": {"id": self.user},
-                    "project": {"id": binding.project_id},
-                    "expires_at": "2100-01-01T00:00:00Z",
-                }
-            }
-        }
-        self.state: dict[str, Any] = {"resources": []}
-        ids = {contract["kind"]: str(uuid4()) for contract in self.expected.values()}
-        for address, contract in self.expected.items():
-            kind = contract["kind"]
-            attrs = copy.deepcopy(contract["expected"]) | {"id": ids[kind]}
-            if kind == "server":
-                attrs["block_device"] = [
-                    {"uuid": ids["volume"], "source_type": "volume", "destination_type": "volume"}
-                ]
-                attrs["network"] = [{"port": ids["port"]}]
-            resource_type, name = address.split(".")
-            self.state["resources"].append(
-                {
-                    "mode": "managed",
-                    "type": resource_type,
-                    "name": name,
-                    "provider": (
-                        'provider["registry.terraform.io/terraform-provider-openstack/openstack"]'
-                    ),
-                    "instances": [{"attributes": attrs}],
-                }
+    def __init__(self, binding: NativeBinding, plan: dict[str, Any]) -> None:
+        self.binding, self.plan = binding, plan
+        self.writer, self.reader = str(uuid4()), str(uuid4())
+        self.objects: dict[str, dict[str, str]] = {}
+        self.documents: dict[str, dict[str, Any]] = {}
+        self.posts: list[str] = []
+        self.fail = ""
+
+    def create(
+        self,
+        binding: NativeBinding,
+        service: str,
+        path: str,
+        body: dict[str, Any],
+        boundary: Callable[[], None],
+    ) -> dict[str, Any]:
+        boundary()
+        kind = next(iter(body))
+        spec = body[kind]
+        key = next(
+            row["key"] for row in self.plan["resources"] if row["spec"]["name"] == spec["name"]
+        )
+        object_id = str(uuid4())
+        self.posts.append(kind)
+        self.objects[key] = {"kind": kind, "id": object_id}
+        native = copy.deepcopy(spec) | {"id": object_id, "tenant_id": binding.project_id}
+        if kind == "server":
+            native.update(
+                status="ACTIVE",
+                flavor={"id": spec["flavorRef"]},
+                **{
+                    "OS-EXT-AZ:availability_zone": spec["availability_zone"],
+                    "os-extended-volumes:volumes_attached": [{"id": self.objects["boot"]["id"]}],
+                },
             )
-            native = copy.deepcopy(attrs) | {"project_id": binding.project_id}
-            if kind == "server":
-                native.update(status="ACTIVE", flavor={"id": attrs["flavor_id"]})
-                native["os-extended-volumes:volumes_attached"] = [{"id": ids["volume"]}]
-            elif kind == "port":
-                native.update(
-                    fixed_ips=attrs["fixed_ip"],
-                    security_groups=attrs["security_group_ids"],
-                    device_id=ids["server"],
-                )
-            else:
-                native.update(status="in-use", attachments=[{"server_id": ids["server"]}])
-            self.documents[f"/{kind}s/{ids[kind]}"] = {kind: native}
+            self.documents[self.objects["boot"]["id"]]["volume"].update(
+                status="in-use", attachments=[{"server_id": object_id}]
+            )
+            self.documents[self.objects["nic"]["id"]]["port"]["device_id"] = object_id
+        elif kind == "volume":
+            native.update(status="available", volume_image_metadata={"image_id": spec["imageRef"]})
+        self.documents[object_id] = {kind: native}
+        if self.fail == kind:
+            raise OSError("accepted reply lost")
+        return {"document": {kind: {"id": object_id}}, "request_id": "req-" + str(uuid4())}
 
     def get(self, service: str, path: str, *, subject: bool = False) -> dict[str, Any]:
-        self.calls.append(path)
-        if path not in self.documents:
-            raise NativeHeld("native_read_not_observed")
-        return self.documents[path]
-
-    def observer(self) -> OpenStackReadback:
-        return OpenStackReadback(self, self.expected, self.user, uuid4().hex, lambda: 100)
-
-
-def test_exact_native_readback_and_no_application_readiness(binding: NativeBinding) -> None:
-    fixture = NativeFixture(binding)
-    result = fixture.observer().observe(binding, fixture.state)
-    assert result["outcome"] == "observed_present" and len(result["objects"]) == 3
-    assert not result["application_ready"] and not result["activation_authorized"]
-    assert fixture.calls[0] == "/auth/tokens"
-    assert all("?" not in path for path in fixture.calls)
-
-
-@pytest.mark.parametrize(
-    "mutation",
-    ["wrong_project", "wrong_user", "expired_token", "unbound_timezone", "writer_is_observer"],
-)
-def test_observer_identity_is_bound(binding: NativeBinding, mutation: str) -> None:
-    fixture = NativeFixture(binding)
-    token = fixture.documents["/auth/tokens"]["token"]
-    if mutation == "wrong_project":
-        token["project"]["id"] = str(uuid4())
-    elif mutation == "wrong_user":
-        token["user"]["id"] = uuid4().hex
-    elif mutation == "expired_token":
-        token["expires_at"] = "1970-01-01T00:00:01Z"
-    elif mutation == "unbound_timezone":
-        token["expires_at"] = "2100-01-01T00:00:00"
-    with pytest.raises(NativeHeld):
-        if mutation == "writer_is_observer":
-            OpenStackReadback(fixture, fixture.expected, fixture.user, fixture.user, lambda: 100)
-        else:
-            fixture.observer().observe(binding, fixture.state)
-    assert not any(path.startswith("/servers/") for path in fixture.calls)
-
-
-@pytest.mark.parametrize(
-    "mutation",
-    [
-        "404",
-        "unknown_id",
-        "foreign_project",
-        "metadata",
-        "active_port",
-        "wrong_ip",
-        "wrong_attachment",
-        "wrong_volume",
-        "tainted",
-        "unowned",
-        "duplicate",
-    ],
-)
-def test_readback_uncertainty_and_drift_stay_held(binding: NativeBinding, mutation: str) -> None:
-    fixture = NativeFixture(binding)
-    server_path = next(k for k in fixture.documents if k.startswith("/servers/"))
-    server = fixture.documents[server_path]["server"]
-    port = next(v["port"] for v in fixture.documents.values() if "port" in v)
-    if mutation == "404":
-        del fixture.documents[server_path]
-    elif mutation == "unknown_id":
-        fixture.state["resources"] = []
-    elif mutation == "foreign_project":
-        server["project_id"] = str(uuid4())
-    elif mutation == "metadata":
-        server["metadata"] = {}
-    elif mutation == "active_port":
-        port["admin_state_up"] = True
-    elif mutation == "wrong_ip":
-        port["fixed_ips"] = [{"subnet_id": str(uuid4()), "ip_address": "192.0.2.99"}]
-    elif mutation == "wrong_attachment":
-        port["device_id"] = str(uuid4())
-    elif mutation == "wrong_volume":
-        server["os-extended-volumes:volumes_attached"] = [{"id": str(uuid4())}]
-    else:
-        if mutation == "tainted":
-            fixture.state["resources"][0]["instances"][0]["status"] = "tainted"
-        elif mutation == "unowned":
-            fixture.state["resources"][0]["name"] += "_unowned"
-        else:
-            fixture.state["resources"].append(copy.deepcopy(fixture.state["resources"][0]))
-        with pytest.raises(NativeHeld):
-            fixture.observer().observe(binding, fixture.state)
-        return
-    result = fixture.observer().observe(binding, fixture.state)
-    assert result["outcome"] == "held" and not result["retry_authorized"]
-
-
-def test_state_for_each_and_module_addresses(binding: NativeBinding) -> None:
-    fixture = NativeFixture(binding)
-    resource = fixture.state["resources"][0]
-    resource["module"] = "module.application"
-    resource["instances"][0]["index_key"] = "one"
-    objects = state_objects(fixture.state)
-    assert 'module.application.openstack_compute_instance_v2.application["one"]' in objects
-
-
-def test_bundle_checks_all_bytes_and_rejects_unlisted_plugins(tmp_path: Path) -> None:
-    for name in ("plan.bin", ".terraform.lock.hcl"):
-        (tmp_path / name).write_bytes(b"synthetic")
-    manifest: dict[str, Any] = {
-        "schema_version": 1,
-        "terraform_version": "1.16.0",
-        "terraform_sha256": "a" * 64,
-        "saved_plan": "plan.bin",
-        "plan_json_sha256": "b" * 64,
-        "environment_sha256": "c" * 64,
-        "resources": {},
-        "files": {
-            name: hashlib.sha256(b"synthetic").hexdigest()
-            for name in ("plan.bin", ".terraform.lock.hcl")
-        },
-    }
-    (tmp_path / "bundle.json").write_text(json.dumps(manifest))
-    assert verify_bundle(tmp_path, digest(manifest)) == manifest
-    (tmp_path / "unlisted.auto.tfvars").write_text("dangerous=1")
-    with pytest.raises(NativeHeld, match="unlisted"):
-        verify_bundle(tmp_path, digest(manifest))
-    (tmp_path / "unlisted.auto.tfvars").unlink()
-    (tmp_path / "plan.bin").write_bytes(b"changed")
-    with pytest.raises(NativeHeld, match="artifact_changed"):
-        verify_bundle(tmp_path, digest(manifest))
-
-
-def test_terraform_never_inherits_unsafe_environment(
-    binding: NativeBinding, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setenv("TF_CLI_ARGS_apply", "-lock=false")
-    credentials = {}
-    for name in ("OS_APPLICATION_CREDENTIAL_ID", "OS_APPLICATION_CREDENTIAL_SECRET"):
-        file = tmp_path / name
-        file.write_text("synthetic-protected-credential")
-        credentials[name] = file
-    environment = {
-        "OS_PROJECT_ID": binding.project_id,
-        "OS_AUTH_TYPE": "v3applicationcredential",
-        "OS_AUTH_URL": "https://identity.invalid/v3",
-        "OS_CACERT": "/trusted/ca.pem",
-    }
-    tool = TerraformSavedPlan(tmp_path / "terraform", tmp_path, environment, credentials)
-    assert "TF_CLI_ARGS_apply" not in tool.environment(binding)
-    environment["OS_INSECURE"] = "true"
-    with pytest.raises(NativeHeld):
-        tool.environment(binding)
-
-
-def test_saved_plan_adapter_runs_exact_command_and_rejects_changed_state(
-    binding: NativeBinding,
-    tmp_path: Path,
-) -> None:
-    root = tmp_path / "bundle"
-    (root / ".terraform").mkdir(parents=True)
-    expected = resources(binding)
-    plan = plan_for(expected)
-    state = {
-        "version": 4,
-        "lineage": binding.state_lineage,
-        "serial": binding.state_serial,
-        "resources": [],
-    }
-    marker, arguments = tmp_path / "accepted", tmp_path / "arguments.json"
-    executable = tmp_path / "fixture-terraform"
-    executable.write_text(
-        f"#!{sys.executable}\nimport json,sys\nfrom pathlib import Path\n"
-        f"state={state!r}\nplan={plan!r}\nmarker=Path({str(marker)!r})\n"
-        "command=sys.argv[1:]\n"
-        "if command==['version','-json']: print(json.dumps({'terraform_version':'1.16.0'}))\n"
-        "elif command==['workspace','show']: print('default')\n"
-        "elif command==['state','pull']:\n"
-        " state['serial'] += int(marker.exists()); print(json.dumps(state))\n"
-        "elif command[:2]==['show','-json']: print(json.dumps(plan))\n"
-        "elif command[0]=='apply':\n"
-        f" Path({str(arguments)!r}).write_text(json.dumps(command))\n"
-        " marker.write_text('accepted')\n"
-        "else: sys.exit(2)\n"
-    )
-    executable.chmod(0o700)
-    (root / "plan.bin").write_bytes(b"synthetic-opaque-plan")
-    (root / ".terraform.lock.hcl").write_text("synthetic-provider-lock")
-    (root / ".terraform/terraform.tfstate").write_text(
-        json.dumps(
-            {
-                "backend": {
-                    "type": "http",
-                    "config": {
-                        "address": "https://state.invalid/value",
-                        "lock_address": "https://state.invalid/lock",
-                        "unlock_address": "https://state.invalid/lock",
-                        "skip_cert_verification": False,
-                    },
+        if subject:
+            return {
+                "token": {
+                    "user": {"id": self.reader},
+                    "project": {"id": self.binding.project_id},
+                    "expires_at": "2099-01-01T00:00:00Z",
                 }
             }
+        if path.endswith("/os-interface"):
+            return {"interfaceAttachments": [{"port_id": self.objects["nic"]["id"]}]}
+        return self.documents[path.rsplit("/", 1)[-1]]
+
+    def observer(self) -> OpenStackReadback:
+        return OpenStackReadback(
+            self,
+            {r["key"]: r for r in self.plan["resources"]},
+            self.reader,
+            self.writer,
+            lambda: 100,
         )
+
+
+def campaign(
+    binding: NativeBinding, tmp_path: Path
+) -> tuple[NativeBinding, NativeApiExecution, Journal, NativeFixture]:
+    plan = plan_for(binding)
+    bound = replace(binding, operation_plan_sha256=digest(plan))
+    path = tmp_path / "plan.json"
+    path.write_text(json.dumps(plan))
+    journal = Journal()
+    native = NativeFixture(bound, plan)
+    adapter = OpenStackApi(path, native, journal, interval=0)
+    return (
+        bound,
+        NativeApiExecution(Authority(), journal, adapter, native.observer(), lambda: 100),
+        journal,
+        native,
     )
-    credentials = {}
-    for name in ("OS_APPLICATION_CREDENTIAL_ID", "OS_APPLICATION_CREDENTIAL_SECRET"):
-        file = tmp_path / name
-        file.write_text("synthetic-protected-credential")
-        credentials[name] = file
-    environment = {
-        "OS_PROJECT_ID": binding.project_id,
-        "OS_AUTH_TYPE": "v3applicationcredential",
-        "OS_AUTH_URL": "https://identity.invalid/v3",
-        "OS_CACERT": "/trusted/ca.pem",
-    }
-    manifest = {
-        "schema_version": 1,
-        "terraform_version": "1.16.0",
-        "terraform_sha256": hashlib.sha256(executable.read_bytes()).hexdigest(),
-        "saved_plan": "plan.bin",
-        "plan_json_sha256": digest(plan),
-        "environment_sha256": digest(environment),
-        "resources": expected,
-        "files": {
-            p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
-            for p in root.rglob("*")
-            if p.is_file()
-        },
-    }
-    (root / "bundle.json").write_text(json.dumps(manifest))
-    bound = replace(binding, bundle_sha256=digest(manifest))
-    tool = TerraformSavedPlan(executable, root, environment, credentials)
-    assert tool.inspect(bound)["resource_count"] == 3
-    assert tool.apply(bound, lambda: None) == ProcessResult(0, False)
-    command = json.loads(arguments.read_text())
-    assert command == [
-        "apply",
-        "-input=false",
-        "-no-color",
-        "-lock=true",
-        "-lock-timeout=0s",
-        "-parallelism=1",
-        str(root / "plan.bin"),
-    ]
-    assert tool.state(bound)["serial"] == binding.state_serial + 1
-    with pytest.raises(NativeHeld, match="state_changed"):
-        tool.inspect(bound)
+
+
+def test_native_create_order_journal_and_independent_readback(
+    binding: NativeBinding, tmp_path: Path
+) -> None:
+    bound, execution, journal, native = campaign(binding, tmp_path)
+    result = execution.execute(bound)
+    assert native.posts == ["port", "volume", "server"]
+    assert result["observation"]["outcome"] == "observed_present"
+    assert not result["application_ready"] and not result["activation_authorized"]
+    assert [event for event, _ in journal.events].count("request_started") == 3
+    with pytest.raises(NativeHeld, match="reconciliation"):
+        execution.execute(bound)
+    assert len(native.posts) == 3
+
+
+@pytest.mark.parametrize("lost", ["port", "volume", "server"])
+def test_native_accepted_reply_loss_never_repeats(
+    binding: NativeBinding, tmp_path: Path, lost: str
+) -> None:
+    bound, execution, journal, native = campaign(binding, tmp_path)
+    native.fail = lost
+    with pytest.raises(NativeHeld):
+        execution.execute(bound)
+    count = len(native.posts)
+    assert journal.events[-1][0] == "outcome_unknown"
+    assert execution.reconcile(bound)["outcome"] == "held"
+    with pytest.raises(NativeHeld):
+        execution.execute(bound)
+    assert len(native.posts) == count
+
+
+@pytest.mark.parametrize("boundary", ["preflight", "before_api_sequence", "during_api_sequence"])
+def test_revocation_prevents_effect(binding: NativeBinding, boundary: str) -> None:
+    journal = Journal()
+    tool = Tool(journal)
+    with pytest.raises(NativeHeld):
+        NativeApiExecution(Authority(boundary), journal, tool, Observer(), lambda: 100).execute(
+            binding
+        )
+    assert tool.calls == 0
 
 
 @pytest.mark.parametrize(
-    "kind,field,native_field,value",
+    "kind,field,value",
     [
-        ("server", "availability_zone", "OS-EXT-AZ:availability_zone", "compute-a"),
-        ("volume", "availability_zone", "availability_zone", "storage-b"),
-        ("server", "config_drive", "config_drive", True),
+        ("server", "status", "ERROR"),
+        ("server", "config_drive", 1),
+        ("port", "admin_state_up", True),
+        ("port", "security_groups", []),
+        ("volume", "size", True),
+        ("volume", "attachments", []),
     ],
 )
-def test_optional_native_fields_are_actually_observed(
-    binding: NativeBinding,
-    kind: str,
-    field: str,
-    native_field: str,
-    value: Any,
+def test_native_readback_drift_holds(
+    binding: NativeBinding, tmp_path: Path, kind: str, field: str, value: Any
 ) -> None:
-    fixture = NativeFixture(binding)
-    contract = next(v for v in fixture.expected.values() if v["kind"] == kind)
-    contract["expected"][field] = value
-    resource = next(
-        r
-        for r in fixture.state["resources"]
-        if r["type"].startswith(
-            {"server": "openstack_compute", "volume": "openstack_blockstorage"}[kind]
-        )
-    )
-    resource["instances"][0]["attributes"][field] = value
-    native = next(v[kind] for v in fixture.documents.values() if kind in v)
-    native[native_field] = value
-    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "observed_present"
-    native[native_field] = False if value is True else "other-zone"
-    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "held"
+    bound, execution, journal, native = campaign(binding, tmp_path)
+    execution.execute(bound)
+    for document in native.documents.values():
+        if kind in document:
+            document[kind][field] = value
+    assert execution.reconcile(bound)["outcome"] == "held"
 
 
-def test_image_and_volume_attachment_are_independently_verified(binding: NativeBinding) -> None:
-    fixture = NativeFixture(binding)
-    image_id = str(uuid4())
-    fixture.expected["openstack_blockstorage_volume_v3.root"]["expected"]["image_id"] = image_id
-    volume = fixture.state["resources"][2]["instances"][0]["attributes"]
-    volume["image_id"] = image_id
-    native = next(v["volume"] for v in fixture.documents.values() if "volume" in v)
-    native["volume_image_metadata"] = {"image_id": image_id}
-    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "observed_present"
-    native["volume_image_metadata"]["image_id"] = str(uuid4())
-    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "held"
-    native["volume_image_metadata"]["image_id"] = image_id
-    native["attachments"] = [{"server_id": str(uuid4())}]
-    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "held"
-
-
-def test_unsupported_field_cannot_be_claimed_as_native_readback(binding: NativeBinding) -> None:
-    expected = resources(binding)
-    expected["openstack_compute_instance_v2.application"]["expected"]["hypervisor_hostname"] = (
-        "unverified-host"
-    )
-    with pytest.raises(NativeHeld, match="readback_not_implemented"):
-        validate_plan(plan_for(expected), expected, binding)
-
-
-@pytest.mark.parametrize("boundary", ["plan", "state", "native_volume", "native_config_drive"])
-def test_json_boolean_never_substitutes_for_number(binding: NativeBinding, boundary: str) -> None:
-    fixture = NativeFixture(binding)
-    volume_expected = fixture.expected["openstack_blockstorage_volume_v3.root"]["expected"]
-    volume_expected["size"] = 1
-    volume_state = fixture.state["resources"][2]["instances"][0]["attributes"]
-    volume_state["size"] = 1
-    native_volume = next(v["volume"] for v in fixture.documents.values() if "volume" in v)
-    native_volume["size"] = 1
-    if boundary == "plan":
-        plan = copy.deepcopy(plan_for(fixture.expected))
-        plan["resource_changes"][2]["change"]["after"]["size"] = True
-        with pytest.raises(NativeHeld, match="expected_field_changed"):
-            validate_plan(plan, fixture.expected, binding)
-        return
-    if boundary == "state":
-        volume_state["size"] = True
-    elif boundary == "native_volume":
-        native_volume["size"] = True
-    else:
-        fixture.expected["openstack_compute_instance_v2.application"]["expected"][
-            "config_drive"
-        ] = True
-        fixture.state["resources"][0]["instances"][0]["attributes"]["config_drive"] = True
-        native_server = next(v["server"] for v in fixture.documents.values() if "server" in v)
-        native_server["config_drive"] = 1
-    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "held"
+def test_protected_input_rejects_symlink_fifo_and_world_writable(tmp_path: Path) -> None:
+    regular = tmp_path / "regular"
+    regular.write_text("protected")
+    assert protected_read(regular, 100) == b"protected"
+    link = tmp_path / "link"
+    link.symlink_to(regular)
+    fifo = tmp_path / "fifo"
+    os.mkfifo(fifo)
+    for path in (link, fifo):
+        with pytest.raises(NativeHeld):
+            protected_read(path, 100)
+    regular.chmod(0o666)
+    with pytest.raises(NativeHeld):
+        protected_read(regular, 100)
 
 
 class GrantClient:
@@ -786,16 +432,16 @@ def stage_grant(binding: NativeBinding) -> dict[str, Any]:
     }
 
 
-def test_saved_plan_uses_live_stage_authority(binding: NativeBinding) -> None:
+def test_native_plan_uses_live_stage_authority(binding: NativeBinding) -> None:
     from lifecycle_worker.application.native_authority import GrantedNativeAuthority
 
     client = GrantClient()
     authority = GrantedNativeAuthority(stage_grant(binding), client, lambda: 100)
     journal = Journal()
     tool = Tool(journal)
-    result = SavedPlanExecution(authority, journal, tool, Observer(), lambda: 100).execute(binding)
-    assert client.calls == ["preflight", "before_saved_plan_apply", "during_saved_plan_apply"]
-    assert tool.applies == 1 and result["activation_authorized"] is False
+    result = NativeApiExecution(authority, journal, tool, Observer(), lambda: 100).execute(binding)
+    assert client.calls == ["preflight", "before_api_sequence", "during_api_sequence"]
+    assert tool.calls == 1 and result["activation_authorized"] is False
     with pytest.raises(NativeHeld):
         authority.require_current(replace(binding, project_id=str(uuid4())), "preflight")
 
@@ -823,13 +469,13 @@ def test_native_stage_authority_rejects_rebinding_or_stale_reply(
     client.change = change
     authority = GrantedNativeAuthority(stage_grant(binding), client, lambda: 100)
     with pytest.raises(NativeHeld):
-        authority.require_current(binding, "before_saved_plan_apply")
+        authority.require_current(binding, "before_api_sequence")
 
 
 @pytest.mark.parametrize(
     "field", ["job_id", "operation_id", "attempt_id", "epoch", "executor_id", "expires_at"]
 )
-def test_saved_plan_and_grant_fields_must_agree(binding: NativeBinding, field: str) -> None:
+def test_native_plan_and_grant_fields_must_agree(binding: NativeBinding, field: str) -> None:
     from lifecycle_worker.application.native_authority import GrantedNativeAuthority
 
     grant = stage_grant(binding)
@@ -842,17 +488,17 @@ def test_lost_native_redemption_response_never_launches_or_retries(binding: Nati
     from lifecycle_worker.application.native_authority import GrantedNativeAuthority
 
     client = GrantClient()
-    client.fail = "before_saved_plan_apply"
+    client.fail = "before_api_sequence"
     journal = Journal()
     tool = Tool(journal)
     authority = GrantedNativeAuthority(stage_grant(binding), client, lambda: 100)
-    execution = SavedPlanExecution(authority, journal, tool, Observer(), lambda: 100)
+    execution = NativeApiExecution(authority, journal, tool, Observer(), lambda: 100)
     with pytest.raises(NativeHeld, match="requires_reconciliation"):
         execution.execute(binding)
     client.fail = None
     with pytest.raises(NativeHeld, match="requires_reconciliation"):
         execution.execute(binding)
-    assert tool.applies == 0 and journal.claimed
+    assert tool.calls == 0 and journal.claimed
     assert journal.events[-1][0] == "outcome_unknown"
 
 

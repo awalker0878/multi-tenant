@@ -1,76 +1,36 @@
-# Next work — P07 native integration and commissioning
+# Next work — P07 native API qualification
 
-P07 is incomplete. Lifecycle now supplies durable native stage control,
-configuration/plan/epoch-bound grants, one-time worker redemption, independent
-readiness checks, unknown-outcome reconciliation and separate retirement controls.
-The saved-plan worker consumes the exact native grant through the internal
-TLS effect and boundary contracts. Native admission now commits a durable Temporal
-outbox, and the separate native queue advances only after independent reconciliation.
-The [control runbook](docs/operations/runbooks/native-workflow-control.md)
-and [implementation record](docs/implementation/p07-native-provisioning.md)
-describe the implemented component boundary. Enabling production dispatch still
-requires commissioned current-owner, caller-trust, provider-fencing and selected
-stage adapters. The actual Q05/Q06 campaign remains absent.
+P07 uses immutable native operation plans, direct Neutron/Cinder/Nova requests,
+per-request authority, durable API receipts and independent exact-ID readback.
+ADR-016 is the native API-only baseline; no Terraform dependency, module or
+compatibility path remains in the execution implementation.
 
-The [dispatch and worker evidence](verification/p07/native-dispatch/qualification-index.json)
-retains original passing and failed campaigns and their exact source bindings.
-At `9b01db784ce4ceac012cc98592dd96997efc6168`, all 288 Lifecycle tests and 157
-worker tests pass without skips, along with 18 contract/quality/build/Terraform
-commands. The isolated worker package passes at `ad32c16` with all 130 inputs
-unchanged at the final revision. The actual Temporal/TLS/PostgreSQL
-campaign passes 43 checks and replays six histories, including both internal TLS
-routes and the separate worker journal. All six retained histories also replay
-offline. Native authority, tooling and observations
-in that orchestration campaign remain synthetic.
-Earlier [workflow evidence](verification/p07/native-workflows/qualification-index.json)
-remains unchanged.
-The [regression receipt](verification/p07/native-dispatch/regression-completion.json)
-records 13 passing workflow types with exact revisions, including Kubernetes and
-P06 execution. Only the two P07 history-retention scripts differ between the
-runtime source and final campaign source. Earlier failed runs remain failures.
-Earlier [worker component](verification/p07/native-components/qualification-index.json)
-and [API configuration](verification/p07/configuration/qualification-index.json)
-evidence remains unchanged. The installed native inspection command remains
-read-only. No P07 package, G07 receiving decision or native support claim is
-closed by these component tests.
+The current source needs the hosted native component, real PostgreSQL/Temporal,
+browser and repository qualification campaigns. Earlier source-bound campaign
+records establish only the exact implementation they measured.
 
-1. **P07.02 — commissioned authority and dispatch:** implement the composite
-   `NativeOwners` adapter against live Governance approval, immutable Planning,
-   Inventory's confirmed Console revision, installed tuple, entitlement/campaign
-   scope and independently administered state/provider custody. Resolve the
-   authenticated worker identity from workload trust and compose the implemented
-   native boundary/effect handlers and Temporal dispatcher with actual registered
-   stage adapters. Durable dispatch, cancellation holds and saved-plan submission
-   are implemented; commissioning their authority is still outstanding.
-   Do not route native work through P06 simulation or use test owners.
-   The existing Governance execution-approval API returns `simulation_boundary`
-   with `native_write_authorized: false`; it cannot supply the native receipt.
-2. **P07.02/P07.05 — actual provider exclusion and recovery:** implement and qualify
-   the selected provider request fence, including accepted asynchronous requests,
-   native state lineage and restored-journal epoch handling. The coordinator now
-   requires independent provider-quiescence evidence before advancing. A process
-   kill, expired credential, Terraform lock or empty local queue cannot supply it.
-   Keep uncertain claims; there is no automatic retry or runtime hold deletion.
-3. **P07.03–P07.05 — selected effect/observer adapters:** bind versioned allocation,
-   guest hardening, IPAM/DNS/identity/time/trust/logging/monitoring/backup and restore
-   interfaces to the commissioned implementation. Supply actual quarantine/active
-   traffic, policy/application/data, retention/deletion and allocation-release
-   observations. The stage controller enforces their order and independent proof;
-   it does not implement these native services or establish that they succeeded.
-4. **P07.01/P07.06 — commissioning and native dossier:** use the existing API-first
-   Console workflow to collect installed/configured facts, review interpretations
-   and supply only non-discoverable values. Bind N01–N15, exact campaign authority,
-   approved resource/data/impact scope, actual observers and applicable operating
-   controls. Execute all required Q05/Q06 native cases and retain original results,
-   recovery timings, support limits and receiving decisions.
+1. Qualify the native API contracts, worker journal, request uncertainty, readback,
+   Temporal control and dependent Planning/Console integration without skipped
+   persistence cases. Retain originals and fix any failures.
+2. Compose actual current-owner and caller-trust integrations from commissioned
+   Governance, Planning, Inventory and independently administered native custody.
+   Do not use simulation authority or synthetic test owners for native writes.
+3. Bind concrete guest/service/reservation/traffic/retirement adapters and native
+   stale-worker exclusion to the discovered installation and validated configuration.
+4. Run Q05/Q06 on the commissioned native topology, including backup/application
+   restoration, denied paths, response loss, revocation and separate retirement.
+   Record original observations and actual G07 receiving decisions.
 
-The [remaining packet](docs/implementation/p07-completion-review.md) maps these
-outputs to concrete input groups. [BL-P07-001](docs/implementation/delivery-register.yaml)
-remains open: no real OpenStack connection, native operating identities, selected
-enterprise interface contracts or independent campaign observations are supplied
-in the repository. The unknown input record is a template, not an alternative to
-Console configuration and not a reason to stop independent versioned development.
-Existing development authorization and the API-first baseline remain effective.
+No native environment, selected service-owner protocols, actual Q05/Q06 evidence
+or G07 acceptance is supplied. Those missing inputs remain explicit in
+[the completion packet](docs/implementation/p07-completion-review.md). Software
+checks cannot establish installed-platform acceptance or complete those outcomes.
+
+P08 follows [the native migration design](docs/implementation/p08-native-migration.md):
+explicit method selection, isolated snapshot-bound clone/export, copy-only conversion
+and guest changes, delta strategies, native import, validation and recovery. The
+export/import component covers only part of M3/M4/M6 and is not a complete P08
+workflow or evidence of P07 native acceptance.
 
 # Retained P06 engineering handoff
 
@@ -366,7 +326,7 @@ The user's reviewer identity, G00 approval, baseline decision scope, migration d
 - Obtain installed VMware/OpenStack facts and permitted discovery scope before G04 work, and exact campaign effects/authority before G07/G08 native tests. Native qualifications remain unrun.
 - Retain application outage/data objectives before P08, operating/retained-state obligations at P10/P11, and staffing/dependency dates when supplied. Approval does not invent these facts.
 
-The original P00 task axes continue to show any carried incomplete work; the accountable G00 advancement decision is recorded separately. No unperformed check becomes a pass. Whole-VM conversion stays a separate P09 option; the approved first migration direction uses `application_rebuild_restore`.
+The original P00 task axes continue to show any carried incomplete work; the accountable G00 advancement decision is recorded separately. No unperformed check becomes a pass. P08 follows the native migration architecture, with explicit qualified methods and copy-only conversion/transformation.
 
 Historical `implementation/all-waves` source is pinned at `a2963d8d43e25f08d70fbd99b0e5e19ab5c9828e` for reference. Current documentation, stack and ADR-024 take precedence; no historical implementation, passing result or authority transfers.
 

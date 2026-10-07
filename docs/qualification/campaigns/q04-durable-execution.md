@@ -6,7 +6,7 @@ Q04 verifies R15–R17 and R29–R31. It supports P06.01–P06.06, P07 failure/r
 
 Lifecycle and worker owners supply workflow/activity contracts; SRE supplies persistence and dependency recovery; assurance supplies evidence custody. Quality coordinates injection timing and an independent observer reads effects. E2 uses real databases, broker and Temporal with controlled platform adapters. E3 reruns relevant faults on the exact authorized native tuple.
 
-Use the [lifecycle specification](../../services/lifecycle.md), [assurance specification](../../services/assurance.md) and [application walkthrough](../../product/application-walkthrough.md). Bind workflow, worker, adapter, saved-plan and state identities in the run manifest.
+Use the [lifecycle specification](../../services/lifecycle.md), [assurance specification](../../services/assurance.md) and [application walkthrough](../../product/application-walkthrough.md). Bind workflow, worker, adapter, native-plan and state identities in the run manifest.
 
 ## Preparation
 
@@ -37,7 +37,7 @@ For each effect class, run the failure on both sides of the native acceptance bo
 
 Repeat the unknown-outcome case with native response identity missing or ambiguous. The correct outcome may be an unresolved hold requiring operator review. The test fails if the implementation guesses success, retries blindly or releases a possibly consumed allocation.
 
-Bind saved Terraform plan and state/backend identity to any tested apply. Independent native readback cannot by itself repair state history or prove a stale Terraform writer has stopped.
+Bind native operation plan and state/backend identity to any tested apply. Independent native readback cannot by itself repair state history or prove a stale native API writer has stopped.
 
 ## Pass criteria and evidence
 

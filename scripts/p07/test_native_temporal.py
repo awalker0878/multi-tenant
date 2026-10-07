@@ -45,7 +45,7 @@ def test_native_durable_orchestration(native, postgres, tmp_path):
                 self.grants.append(deepcopy(grant))
                 return
             tenant = documents[grant['job_id']]['scope']['tenant_id']
-            boundary = 'before_saved_plan_apply' if grant['stage'] == 'provision' else 'before_effect'
+            boundary = 'before_api_sequence' if grant['stage'] == 'provision' else 'before_effect'
             control.boundary(tenant, grant, grant['executor_id'], boundary)
             self.grants.append(deepcopy(grant))
             if self.mode == 'lost_reply':
@@ -198,8 +198,8 @@ def test_native_durable_orchestration(native, postgres, tmp_path):
             check('eight-live-boundary-callbacks-crossed-real-tls', calls['boundary'] == 8)
             with worker_connect() as database:
                 check('worker-journal-retains-two-claims', database.execute('SELECT count(*) AS total FROM native.attempts').fetchone()['total'] == 2)
-                check('worker-journal-retains-two-holds', database.execute('SELECT count(*) AS total FROM native.workspace_holds').fetchone()['total'] == 2)
-                check('worker-journal-retains-eight-events', database.execute('SELECT count(*) AS total FROM native.events').fetchone()['total'] == 8)
+                check('worker-journal-retains-two-holds', database.execute('SELECT count(*) AS total FROM native.custody_holds').fetchone()['total'] == 2)
+                check('worker-journal-retains-four-events', database.execute('SELECT count(*) AS total FROM native.events').fetchone()['total'] == 4)
             try:
                 with psycopg.connect(**(postgres | {'user': 'native_runtime'})) as database:
                     database.execute('SELECT * FROM app.native_jobs')

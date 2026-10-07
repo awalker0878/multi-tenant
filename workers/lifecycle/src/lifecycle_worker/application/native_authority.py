@@ -1,4 +1,4 @@
-"""Lifecycle's single-use stage grant bound to the exact saved-plan invocation."""
+"""Lifecycle's single-use stage grant bound to the exact native API invocation."""
 
 import json
 from collections.abc import Callable
@@ -47,8 +47,8 @@ class GrantedNativeAuthority:
         NativeBinding.parse(binding.document())
         if digest(binding.document()) != digest(self.binding.document()) or boundary not in {
             "preflight",
-            "before_saved_plan_apply",
-            "during_saved_plan_apply",
+            "before_api_sequence",
+            "during_api_sequence",
         }:
             raise NativeHeld("native_stage_binding_mismatch")
         if binding.expires_at <= self.clock():

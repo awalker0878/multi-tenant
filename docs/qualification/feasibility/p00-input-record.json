@@ -38,7 +38,7 @@
         },
         "method": {
           "status": "OBSERVED",
-          "value": "application_rebuild_restore",
+          "value": "native_api_export_import",
           "evidence": [
             {
               "kind": "repository",

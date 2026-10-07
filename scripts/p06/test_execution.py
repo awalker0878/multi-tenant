@@ -198,7 +198,7 @@ def test_stale_ui_cannot_resume_or_retry_unknown(world: dict[str, Any]) -> None:
         service.command(w['tenant'],job['id'],w['actor'],str(uuid4()),'resume',service.read(w['tenant'],job['id'])['revision'])
 
 
-@pytest.mark.parametrize('step', ['reserve','apply_reviewed_saved_plan','configure_and_restore','activate_target','confirm_owner_allocations'])
+@pytest.mark.parametrize('step', ['reserve','execute_native_api_plan','verify_guest_and_imported_disks','activate_target','confirm_owner_allocations'])
 @pytest.mark.parametrize('accepted',[False,True])
 def test_each_effect_boundary_has_sealed_certainty_before_further_work(world: dict[str, Any],step: str,accepted: bool) -> None:
     w=world;job=w['admit']();service=w['service']
@@ -235,7 +235,7 @@ def test_accepted_receipt_can_be_recovered_after_inputs_expire_without_new_autho
     assert w['service'].activity(w['tenant'],first['id'],'reserve','sim-worker')['state']=='held'
 
 
-@pytest.mark.parametrize('step',['reserve','apply_reviewed_saved_plan','activate_target'])
+@pytest.mark.parametrize('step',['reserve','execute_native_api_plan','activate_target'])
 @pytest.mark.parametrize('action',['pause','cancel','stop'])
 @pytest.mark.parametrize('accepted',[False,True])
 def test_operator_controls_at_each_safe_boundary(world: dict[str, Any],step: str,action: str,accepted: bool) -> None:

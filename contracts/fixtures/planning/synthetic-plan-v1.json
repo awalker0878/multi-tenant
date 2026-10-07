@@ -9,10 +9,10 @@
       "environment": "00000000-0000-4000-8000-000000000010",
       "resource_id": "10000000-0000-4000-8000-000000000003",
       "endpoint_id": "10000000-0000-4000-8000-000000000005",
-      "native_scope": "project:synthetic"
+      "native_scope": "project:10000000-0000-4000-8000-000000000020"
     },
     "action": "application.provision",
-    "method": "saved_plan",
+    "method": "native_api",
     "lane": "operational",
     "executor_ids": [
       "10000000-0000-4000-8000-000000000002"
@@ -20,11 +20,11 @@
     "valid_until": 2000000300,
     "input_fresh_until": 2000001800,
     "input_digests": {
-      "inventory": "3a93cd3bb879c5ae0dcad4730175ff663bcdd72eb77972e9f10edea5239ef25c",
+      "inventory": "f2b55e38b67546cfa278dc22fbdbbb1a1ffb33731cb523dd86a74e80bf94b795",
       "profile": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
-      "policy": "b29d3f4c76c2696769294ee0a0d788e32a6bd31fd77203b5ef0270b582fe4dc1",
-      "qualification": "065680386479223ade2ba975aef0b491cc994710efd16dce1520aded8c72978a",
-      "intent": "6751e9f95db1a370aed58b5b246e71aaf90f72a74f5eb631f27e445820b063e6"
+      "policy": "713f367848a9f0479ad4118e54ceae0df657de23275fd14ac2ae8f58be556313",
+      "qualification": "74ffd80d5a95404a8b65a3deacfae3e9fe13ce419bc097aae4dccb37ea3abd12",
+      "intent": "b90c28a4324332aca5571333e8448da0ca562960d23e45a128cb08fe9c7ffff6"
     },
     "intent_revision": "10000000-0000-4000-8000-000000000007",
     "inventory_generation": "10000000-0000-4000-8000-000000000006",
@@ -44,14 +44,126 @@
       "automation": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
       "contracts": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f"
     },
-    "terraform": {
-      "saved_plan_sha256": "a9347c50430fb5947a6d022b1ae4dcfc5f961af3fd9a22899aff3b4437c0136b",
-      "toolchain_sha256": "dd04afac1bebb050783a245ed0d88633759f352c85d4ab3bea3d416bf2019c75",
-      "backend_ref": "fixture://state",
-      "workspace": "fixture",
-      "state_lineage": "lineage",
-      "state_serial": 1,
-      "lock_owner": "lifecycle"
+    "native_api": {
+      "operation_plan": {
+        "schema_version": 1,
+        "project_id": "10000000-0000-4000-8000-000000000020",
+        "ownership_digest": "1913f004ce18d5c4aa0f93a9dc314e53b55b6b93a1a277a6dc6100be552653d1",
+        "custody_id": "10000000-0000-4000-8000-000000000021",
+        "custody_generation": 1,
+        "api_versions": {
+          "compute": "2.1",
+          "network": "2.0",
+          "volume": "3.0"
+        },
+        "resources": [
+          {
+            "key": "workload0_port",
+            "kind": "port",
+            "spec": {
+              "name": "workload0-port",
+              "network_id": "10000000-0000-4000-8000-000000000004",
+              "security_groups": [
+                "10000000-0000-4000-8000-000000000005"
+              ],
+              "fixed_ips": [
+                {
+                  "subnet_id": "10000000-0000-4000-8000-000000000006",
+                  "ip_address": "192.0.2.10"
+                }
+              ],
+              "admin_state_up": false,
+              "port_security_enabled": true
+            }
+          },
+          {
+            "key": "workload0_boot",
+            "kind": "volume",
+            "spec": {
+              "name": "workload0-boot",
+              "size": 40,
+              "volume_type": "qualified",
+              "availability_zone": "nova",
+              "imageRef": "10000000-0000-4000-8000-000000000007"
+            }
+          },
+          {
+            "key": "workload0_vm",
+            "kind": "server",
+            "spec": {
+              "name": "workload0-vm",
+              "flavorRef": "2",
+              "availability_zone": "nova",
+              "config_drive": true,
+              "ports": [
+                "workload0_port"
+              ],
+              "volumes": [
+                {
+                  "key": "workload0_boot",
+                  "boot_index": 0
+                }
+              ]
+            }
+          },
+          {
+            "key": "workload1_port",
+            "kind": "port",
+            "spec": {
+              "name": "workload1-port",
+              "network_id": "10000000-0000-4000-8000-000000000004",
+              "security_groups": [
+                "10000000-0000-4000-8000-000000000005"
+              ],
+              "fixed_ips": [
+                {
+                  "subnet_id": "10000000-0000-4000-8000-000000000006",
+                  "ip_address": "192.0.2.11"
+                }
+              ],
+              "admin_state_up": false,
+              "port_security_enabled": true
+            }
+          },
+          {
+            "key": "workload1_boot",
+            "kind": "volume",
+            "spec": {
+              "name": "workload1-boot",
+              "size": 40,
+              "volume_type": "qualified",
+              "availability_zone": "nova",
+              "imageRef": "10000000-0000-4000-8000-000000000007"
+            }
+          },
+          {
+            "key": "workload1_vm",
+            "kind": "server",
+            "spec": {
+              "name": "workload1-vm",
+              "flavorRef": "2",
+              "availability_zone": "nova",
+              "config_drive": true,
+              "ports": [
+                "workload1_port"
+              ],
+              "volumes": [
+                {
+                  "key": "workload1_boot",
+                  "boot_index": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "operation_plan_sha256": "c5476ea04af38a9ba297f89c764aae61b6a55706ca71764194eb05d7f8f1d228",
+      "api_contracts_sha256": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f",
+      "adapter_sha256": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+      "custody_ref": "evidence://fixture/custody",
+      "custody_id": "10000000-0000-4000-8000-000000000021",
+      "custody_generation": 1,
+      "fence_owner": "lifecycle"
     },
     "ownership": [
       {
@@ -59,8 +171,8 @@
         "fields": [
           "infrastructure"
         ],
-        "writer": "terraform",
-        "state_ref": "fixture://state",
+        "writer": "lifecycle",
+        "custody_ref": "evidence://fixture/custody",
         "native_identity": null
       },
       {
@@ -68,8 +180,8 @@
         "fields": [
           "infrastructure"
         ],
-        "writer": "terraform",
-        "state_ref": "fixture://state",
+        "writer": "lifecycle",
+        "custody_ref": "evidence://fixture/custody",
         "native_identity": null
       }
     ],
@@ -86,7 +198,7 @@
           "version": 1
         },
         "site_id": "10000000-0000-4000-8000-000000000004",
-        "native_scope": "project:synthetic",
+        "native_scope": "project:10000000-0000-4000-8000-000000000020",
         "domain_instance": "synthetic-domain-0",
         "native_identity": null,
         "devices": {
@@ -141,7 +253,7 @@
           "version": 1
         },
         "site_id": "10000000-0000-4000-8000-000000000004",
-        "native_scope": "project:synthetic",
+        "native_scope": "project:10000000-0000-4000-8000-000000000020",
         "domain_instance": "synthetic-domain-1",
         "native_identity": null,
         "devices": {
@@ -196,7 +308,7 @@
           "environment": "00000000-0000-4000-8000-000000000010",
           "resource_id": "10000000-0000-4000-8000-000000000003",
           "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
         },
         "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
         "destructive": false,
@@ -216,7 +328,7 @@
           "environment": "00000000-0000-4000-8000-000000000010",
           "resource_id": "10000000-0000-4000-8000-000000000003",
           "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
         },
         "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
         "destructive": false,
@@ -225,29 +337,9 @@
         "authority_recheck": "immediately_before_effect"
       },
       {
-        "id": "apply_reviewed_saved_plan",
+        "id": "execute_native_api_plan",
         "after": [
           "preflight"
-        ],
-        "owner": "terraform",
-        "scope": {
-          "tenant_id": "10000000-0000-4000-8000-000000000001",
-          "site_id": "10000000-0000-4000-8000-000000000004",
-          "environment": "00000000-0000-4000-8000-000000000010",
-          "resource_id": "10000000-0000-4000-8000-000000000003",
-          "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
-        },
-        "artifact_digest": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
-        "destructive": false,
-        "boundary": "exact_saved_plan_and_state_lock",
-        "on_unknown": "hold_and_observe_before_retry",
-        "authority_recheck": "immediately_before_effect"
-      },
-      {
-        "id": "configure_and_restore",
-        "after": [
-          "apply_reviewed_saved_plan"
         ],
         "owner": "lifecycle",
         "scope": {
@@ -256,7 +348,27 @@
           "environment": "00000000-0000-4000-8000-000000000010",
           "resource_id": "10000000-0000-4000-8000-000000000003",
           "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
+        },
+        "artifact_digest": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+        "destructive": false,
+        "boundary": "exact_native_requests_and_current_custody",
+        "on_unknown": "hold_and_observe_before_retry",
+        "authority_recheck": "immediately_before_effect"
+      },
+      {
+        "id": "verify_guest_and_imported_disks",
+        "after": [
+          "execute_native_api_plan"
+        ],
+        "owner": "lifecycle",
+        "scope": {
+          "tenant_id": "10000000-0000-4000-8000-000000000001",
+          "site_id": "10000000-0000-4000-8000-000000000004",
+          "environment": "00000000-0000-4000-8000-000000000010",
+          "resource_id": "10000000-0000-4000-8000-000000000003",
+          "endpoint_id": "10000000-0000-4000-8000-000000000005",
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
         },
         "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
         "destructive": true,
@@ -267,7 +379,7 @@
       {
         "id": "verify_application",
         "after": [
-          "configure_and_restore"
+          "verify_guest_and_imported_disks"
         ],
         "owner": "lifecycle",
         "scope": {
@@ -276,7 +388,7 @@
           "environment": "00000000-0000-4000-8000-000000000010",
           "resource_id": "10000000-0000-4000-8000-000000000003",
           "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
         },
         "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
         "destructive": false,
@@ -296,7 +408,7 @@
           "environment": "00000000-0000-4000-8000-000000000010",
           "resource_id": "10000000-0000-4000-8000-000000000003",
           "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
         },
         "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
         "destructive": true,
@@ -316,7 +428,7 @@
           "environment": "00000000-0000-4000-8000-000000000010",
           "resource_id": "10000000-0000-4000-8000-000000000003",
           "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
         },
         "artifact_digest": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
         "destructive": false,
@@ -336,7 +448,7 @@
           "environment": "00000000-0000-4000-8000-000000000010",
           "resource_id": "10000000-0000-4000-8000-000000000003",
           "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
         },
         "ttl_seconds": 300,
         "authority": "intent_only",
@@ -352,7 +464,7 @@
           "environment": "00000000-0000-4000-8000-000000000010",
           "resource_id": "10000000-0000-4000-8000-000000000003",
           "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
         },
         "ttl_seconds": 300,
         "authority": "intent_only",
@@ -368,7 +480,7 @@
           "environment": "00000000-0000-4000-8000-000000000010",
           "resource_id": "10000000-0000-4000-8000-000000000003",
           "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
         },
         "ttl_seconds": 300,
         "authority": "intent_only",
@@ -384,7 +496,7 @@
           "environment": "00000000-0000-4000-8000-000000000010",
           "resource_id": "10000000-0000-4000-8000-000000000003",
           "endpoint_id": "10000000-0000-4000-8000-000000000005",
-          "native_scope": "project:synthetic"
+          "native_scope": "project:10000000-0000-4000-8000-000000000020"
         },
         "ttl_seconds": 300,
         "authority": "intent_only",
@@ -425,9 +537,9 @@
       "10000000-0000-4000-8000-000000000002"
     ],
     "valid_until": 2000000300,
-    "content_digest": "099dd6e54cffcfcffda34309a6f1657de8d06aa1cb22ac1e37ab1a3dfd8c5d07",
+    "content_digest": "14a1785ab630c38d74185172a66f2da6780ae1f3376e40f346c0bcad3da593af",
     "canonicalization": "p05-json-v1",
     "lane": "operational",
-    "digest": "62315798325bd5d51721ccd856d38712a5f724b913a320120779a50fdabea588"
+    "digest": "546b396c38d3b595f174be512f1958cd5be307a520c8d06bfb7b91b85247612a"
   }
 }

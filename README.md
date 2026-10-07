@@ -32,7 +32,7 @@ Portability means expressing application requirements independently of one platf
 | Platform / service operator | Commission sites and integrations, maintain availability and handle recovery |
 | Auditor / assurance reviewer | Examine provenance, qualification, access decisions and operating acceptance |
 
-The console should make each task understandable through clear requirements, differences, blockers and recovery choices. Credentials, provider APIs, Terraform state and data-transfer mechanics remain behind the relevant service and worker boundaries.
+The console should make each task understandable through clear requirements, differences, blockers and recovery choices. Credentials, provider APIs, native resource custody and data-transfer mechanics remain behind the relevant service and worker boundaries.
 
 ## How it is organized
 
@@ -64,9 +64,7 @@ Each independently built Laravel service owns its own `App\` namespace. Capabili
 
 ## First release and delivery milestones
 
-The approved initial direction first provisions a selected Linux application on OpenStack, then migrates a VMware deployment by **rebuilding the application on OpenStack and restoring its application-consistent data**. The target uses reviewed images, application artifacts and configuration; cutover requires source-writer fencing, verified data and controlled target write admission. The approved direction retains the remaining application/configuration feasibility work at P01/G01. Exact installed tuples, application outage/recovery objectives and native outcomes remain required at their discovery, provisioning and migration checkpoints.
-
-Whole-VM disk capture/conversion is a separate P09 option for applications that cannot be rebuilt, with its own feasibility and qualification. It is never a silent fallback. Historical rebuild/restore code and tests supply design information only; they establish no implementation or support on this branch.
+P07 provisions OpenStack through native APIs. P08 selects one explicitly qualified migration method from source and destination capability profiles. Generic whole-VM movement uses an isolated migration copy, `ExportVm`/NFC, verified transfer, any explicitly planned copy-only conversion and destination native APIs. Guest transformation occurs on the copy. Restarting production after a baseline requires a qualified application or file delta method; opaque workloads without one require cold migration. No method is an automatic fallback. Native provisioning and migration require separate Q05/Q06 and Q07 qualification.
 
 | Milestone | What a user can demonstrate | Phases |
 | --- | --- | --- |

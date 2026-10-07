@@ -18,7 +18,7 @@ The product owns its catalogue, governance, plans, operation authority and evide
 | Assessment | Capability/policy matching, explainable eligibility and destination comparison | Required unknown or unsupported outcomes block execution |
 | Planning | Immutable effects, resource mappings, service prerequisites, risks and recovery boundaries | Each plan binds exact revisions, environment, method and scope |
 | Provisioning | Selected OpenStack/Linux application with networking, guest and shared-service readiness | Exact image, backend, security and service profile qualified by Q05/Q06 |
-| Migration | Preferred first method: VMware-to-OpenStack application rebuild/restore | Reproduce the target application and restore application-consistent data; P00 feasibility and owner review remain required under proposed ADR-014 |
+| Migration | P08 VMware-to-OpenStack native migration | Explicitly selected method, isolated clone/export, copy-only conversion/transformation and qualified delta or cold cutover under ADR-014 |
 | Operations | Controlled cancellation, reconciliation, recovery and retirement | Only the operations and failure cases included in the support record |
 | Assurance | Traceable evidence and exact-scope qualification/acceptance | Claims apply to the recorded tuple and product revision |
 
@@ -30,7 +30,7 @@ For rebuild/restore, the selection also pins target image and application artifa
 
 P09 selects additional platform operations, migration directions, guest profiles, data methods and brownfield adoption. The [support matrix](../implementation/support-matrix.md) contains all six directed cross-platform routes and relevant profile dimensions. Selecting a tranche creates concrete packages, campaigns and capacity needs; it does not confer inherited qualification.
 
-Whole-VM cold capture/conversion/import is a separate P09 option for applications that cannot be rebuilt. Its boot, device, encryption, image/import and recovery constraints need their own assessment and campaigns. An unsuccessful rebuild/restore assessment does not switch methods automatically; it blocks that route until a separately selected method is planned, approved and qualified.
+P07 provisions OpenStack through native APIs. P08 selects one explicitly qualified migration method from source and destination capability profiles. Generic whole-VM movement uses an isolated migration copy, `ExportVm`/NFC, verified transfer, any explicitly planned copy-only conversion and destination native APIs. Guest transformation occurs on the copy. Restarting production after a baseline requires a qualified application or file delta method; opaque workloads without one require cold migration. No method is an automatic fallback. Native provisioning and migration require separate Q05/Q06 and Q07 qualification.
 
 The initial release does not promise live migration, zero downtime, universal guest conversion, all API/backend combinations, every same-family relocation topology or autonomous operation across disconnected trust boundaries. Required capabilities remain represented even when their implementation is deferred. A later release may include them only after scope selection and relevant evidence.
 

@@ -59,44 +59,62 @@ def compile_plan(
     artifacts = policy["artifacts"]
     for kind in ("compiler", "adapter", "automation", "contracts"):
         sha(artifacts[kind])
-    terraform = policy["terraform"]
+    native_api = policy["native_api"]
     ownership = policy["ownership"]
-    if terraform is None:
-        holds.append("reviewed_saved_plan_and_state_lineage_missing")
+    if native_api is None:
+        holds.append("reviewed_native_operation_plan_missing")
     else:
         shape(
-            terraform,
+            native_api,
             {
-                "saved_plan_sha256",
-                "toolchain_sha256",
-                "backend_ref",
-                "workspace",
-                "state_lineage",
-                "state_serial",
-                "lock_owner",
+                "operation_plan",
+                "operation_plan_sha256",
+                "api_contracts_sha256",
+                "adapter_sha256",
+                "custody_ref",
+                "custody_id",
+                "custody_generation",
+                "fence_owner",
             },
         )
-        sha(terraform["saved_plan_sha256"])
-        sha(terraform["toolchain_sha256"])
-        integer(terraform["state_serial"])
+        for key in ("operation_plan_sha256", "api_contracts_sha256", "adapter_sha256"):
+            sha(native_api[key])
+        integer(native_api["custody_generation"])
+        identifier(native_api["custody_id"])
         if any(
-            not isinstance(terraform[k], str) or not terraform[k]
-            for k in ("backend_ref", "workspace", "state_lineage", "lock_owner")
+            not isinstance(native_api[key], str) or not native_api[key]
+            for key in ("custody_ref", "fence_owner")
         ):
-            raise Rejected("invalid_state_binding")
+            raise Rejected("invalid_native_custody_binding")
+        if (
+            not isinstance(native_api["operation_plan"], dict)
+            or digest(native_api["operation_plan"]) != native_api["operation_plan_sha256"]
+            or native_api["adapter_sha256"] != artifacts["adapter"]
+            or native_api["api_contracts_sha256"] != artifacts["contracts"]
+        ):
+            raise Rejected("native_operation_artifacts_changed")
     if ownership is None:
         holds.append("managed_field_ownership_missing")
         ownership = []
     owned: set[tuple[str, str]] = set()
     for row in ownership:
-        shape(row, {"resource", "fields", "writer", "state_ref", "native_identity"})
-        if row["writer"] not in {"terraform", "lifecycle", "external"} or not row["fields"]:
+        shape(row, {"resource", "fields", "writer", "custody_ref", "native_identity"})
+        if row["writer"] not in {"lifecycle", "external"} or not row["fields"]:
             raise Rejected("invalid_ownership")
         for field in row["fields"]:
-            key = (row["resource"], field)
-            if key in owned:
+            owned_field = (row["resource"], field)
+            if owned_field in owned:
                 raise Rejected("overlapping_field_ownership")
-            owned.add(key)
+            owned.add(owned_field)
+    if native_api is not None:
+        operation = native_api["operation_plan"]
+        if (
+            operation.get("ownership_digest") != digest(ownership)
+            or operation.get("custody_id") != native_api["custody_id"]
+            or operation.get("custody_generation") != native_api["custody_generation"]
+            or destination["native_scope"] != "project:" + str(operation.get("project_id"))
+        ):
+            raise Rejected("native_operation_scope_changed")
     mappings = []
     for w in sorted(intent["workloads"], key=lambda item: item["id"]):
         mapping = {
@@ -133,7 +151,9 @@ def compile_plan(
                 "after": after,
                 "owner": owner,
                 "scope": scope,
-                "artifact_digest": artifacts["adapter" if owner == "terraform" else "automation"],
+                "artifact_digest": artifacts[
+                    "adapter" if key == "execute_native_api_plan" else "automation"
+                ],
                 "destructive": destructive,
                 "boundary": boundary,
                 "on_unknown": "hold_and_observe_before_retry",
@@ -158,17 +178,29 @@ def compile_plan(
             "dataset_consistency_and_objectives",
         )
         previous = "final_data_checkpoint"
+    if assessment["action"] == "application.migrate":
+        effect(
+            "export_source_vm", [previous], "lifecycle", True, "powered_off_vm_native_export_lease"
+        )
+        effect(
+            "import_native_disks",
+            ["export_source_vm"],
+            "lifecycle",
+            True,
+            "manifest_verified_native_image_import",
+        )
+        previous = "import_native_disks"
     effect(
-        "apply_reviewed_saved_plan",
+        "execute_native_api_plan",
         [previous],
-        "terraform",
+        "lifecycle",
         assessment["action"] == "application.retire",
-        "exact_saved_plan_and_state_lock",
+        "exact_native_requests_and_current_custody",
     )
     if assessment["action"] == "application.retire":
         effect(
             "verify_retention_and_deletion",
-            ["apply_reviewed_saved_plan"],
+            ["execute_native_api_plan"],
             "lifecycle",
             True,
             "separate_retention_and_release_authority",
@@ -176,15 +208,15 @@ def compile_plan(
         previous = "verify_retention_and_deletion"
     else:
         effect(
-            "configure_and_restore",
-            ["apply_reviewed_saved_plan"],
+            "verify_guest_and_imported_disks",
+            ["execute_native_api_plan"],
             "lifecycle",
             True,
             "isolated_target_no_business_effects",
         )
         effect(
             "verify_application",
-            ["configure_and_restore"],
+            ["verify_guest_and_imported_disks"],
             "lifecycle",
             False,
             "independent_application_and_security_postconditions",
@@ -224,7 +256,7 @@ def compile_plan(
         "inventory_generation": destination["generation_id"],
         "installed_tuple": destination["installed_tuple"],
         "artifacts": artifacts,
-        "terraform": terraform,
+        "native_api": native_api,
         "ownership": ownership,
         "mappings": mappings,
         "effects": effects,

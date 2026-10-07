@@ -15,8 +15,8 @@ import uvicorn
 from lifecycle.domain.execution import Rejected
 from lifecycle.infrastructure.native_effects import NativeWorkerEndpoint, NativeWorkerEffects
 from lifecycle.interfaces.native import NativeBoundaryApp
-from lifecycle_worker.application.native import NativeHeld, ProcessResult
-from lifecycle_worker.application.native_effect import NativeSavedPlanEffect
+from lifecycle_worker.application.native import NativeHeld
+from lifecycle_worker.application.native_effect import NativeApiEffect
 from lifecycle_worker.infrastructure.native_authority import LifecycleNativeBoundary
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint
 from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
@@ -90,19 +90,15 @@ def native_wire(control, owners, initial, postgres, private):
 
     class Tool:
         def inspect(self, binding):
-            return {'bundle_sha256': binding.bundle_sha256, 'fixture': 'synthetic_tool'}
+            return {'operation_plan_sha256': binding.operation_plan_sha256, 'fixture': 'synthetic_tool'}
 
-        def apply(self, binding, heartbeat):
+        def execute(self, binding, heartbeat):
             with connect() as database:
                 rows = database.execute('SELECT kind FROM native.events WHERE operation_id=%s ORDER BY sequence',
                                         (binding.operation_id,)).fetchall()
-                assert [row['kind'] for row in rows] == ['prepared', 'apply_started']
+                assert [row['kind'] for row in rows] == ['prepared']
             calls['applies'].append(binding.operation_id)
             heartbeat()
-            return ProcessResult(0, False)
-
-        def state(self, binding):
-            return {'fixture': 'synthetic_native_state'}
 
     class Observer:
         def observe(self, binding, state):
@@ -117,7 +113,7 @@ def native_wire(control, owners, initial, postgres, private):
     with ExitStack() as stack:
         boundary_origin = stack.enter_context(server(NativeBoundaryApp(control, caller('boundary')), certificate, key))
         authority = LifecycleNativeBoundary(NativeEndpoint(boundary_origin, '127.0.0.1', certificate, private / 'boundary'))
-        effect = NativeSavedPlanEffect(authority, PostgresNativeJournal(connect), Tooling(), lambda: owners.now)
+        effect = NativeApiEffect(authority, PostgresNativeJournal(connect), Tooling(), lambda: owners.now)
         effect_origin = stack.enter_context(server(NativeEffectApp(effect, caller('effect')), certificate, key))
         transport = NativeWorkerEffects({initial['executor_id']: NativeWorkerEndpoint(
             effect_origin, '127.0.0.1', certificate, private / 'effect')})

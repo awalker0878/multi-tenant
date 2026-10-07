@@ -20,14 +20,14 @@
       "campaign_id": "00000000-0000-4000-8000-000000000007",
       "executor_id": "00000000-0000-4000-8000-000000000008",
       "epoch": "00000000-0000-4000-8000-000000000009",
-      "state_lineage": "00000000-0000-4000-8000-00000000000a",
+      "custody_id": "00000000-0000-4000-8000-00000000000a",
       "project_id": "00000000-0000-4000-8000-00000000000b",
       "plan_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "bundle_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      "workspace": "default",
-      "state_serial": 1,
+      "operation_plan_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "ownership_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "custody_generation": 1,
       "expires_at": 2000
     }
   },
-  "boundary": "before_saved_plan_apply"
+  "boundary": "before_api_sequence"
 }

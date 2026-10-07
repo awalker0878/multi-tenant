@@ -1,4 +1,4 @@
-"""Saved-plan effect entrypoint cannot accept caller identity, commands or readiness claims."""
+"""Native API effect entrypoint cannot accept caller identity, commands or readiness claims."""
 
 import asyncio
 import json
@@ -11,12 +11,12 @@ from test_native import GrantClient, Journal, Observer, Tool, stage_grant
 from test_native import binding as binding
 
 from lifecycle_worker.application.native import NativeBinding, NativeHeld, digest
-from lifecycle_worker.application.native_effect import NativeSavedPlanEffect
+from lifecycle_worker.application.native_effect import NativeApiEffect
 from lifecycle_worker.interfaces.native import NativeEffectApp
 
 
 @pytest.fixture
-def effect(binding: NativeBinding) -> tuple[NativeSavedPlanEffect, Any, Journal, Tool, list[str]]:
+def effect(binding: NativeBinding) -> tuple[NativeApiEffect, Any, Journal, Tool, list[str]]:
     client, journal = GrantClient(), Journal()
     tool = Tool(journal)
     resolutions: list[str] = []
@@ -27,7 +27,7 @@ def effect(binding: NativeBinding) -> tuple[NativeSavedPlanEffect, Any, Journal,
             return tool, Observer()
 
     return (
-        NativeSavedPlanEffect(client, journal, Tooling(), lambda: 100),
+        NativeApiEffect(client, journal, Tooling(), lambda: 100),
         client,
         journal,
         tool,
@@ -79,16 +79,16 @@ def test_effect_uses_live_authority_and_never_repeats_claim(
         "readiness_established": False,
         "retry_authorized": False,
     }
-    assert tool.applies == 1 and journal.claimed
+    assert tool.calls == 1 and journal.claimed
     assert client.calls == [
         "preflight",
         "preflight",
-        "before_saved_plan_apply",
-        "during_saved_plan_apply",
+        "before_api_sequence",
+        "during_api_sequence",
     ]
     with pytest.raises(NativeHeld):
         service.execute(binding.tenant_id, binding.executor_id, grant)
-    assert tool.applies == 1
+    assert tool.calls == 1
 
 
 @pytest.mark.parametrize("foreign", ["tenant", "worker"])
@@ -102,7 +102,7 @@ def test_foreign_caller_cannot_resolve_artifacts(
             str(uuid4()) if foreign == "worker" else binding.executor_id,
             stage_grant(binding),
         )
-    assert not resolutions and not client.calls and tool.applies == 0
+    assert not resolutions and not client.calls and tool.calls == 0
 
 
 def test_revoked_authority_stops_before_artifact_resolution(
@@ -112,7 +112,7 @@ def test_revoked_authority_stops_before_artifact_resolution(
     client.fail = "preflight"
     with pytest.raises(NativeHeld):
         service.execute(binding.tenant_id, binding.executor_id, stage_grant(binding))
-    assert not resolutions and tool.applies == 0
+    assert not resolutions and tool.calls == 0
 
 
 def test_effect_http_uses_trusted_caller_and_fixed_receipt(
@@ -129,12 +129,12 @@ def test_effect_http_uses_trusted_caller_and_fixed_receipt(
     body = {"grant": stage_grant(binding)}
     for field in ("tenant_id", "worker_id", "command", "native_write_authorized"):
         status, result = invoke(app, body | {field: "caller_controlled"})
-        assert status == 422 and tool.applies == 0
+        assert status == 422 and tool.calls == 0
     status, result = invoke(app, body)
     assert status == 200 and result["readiness_established"] is False
-    assert result["grant_sha256"] == digest(body["grant"]) and tool.applies == 1
+    assert result["grant_sha256"] == digest(body["grant"]) and tool.calls == 1
     status, result = invoke(app, body)
-    assert status == 423 and tool.applies == 1
+    assert status == 423 and tool.calls == 1
 
 
 @pytest.mark.parametrize(
@@ -146,7 +146,7 @@ def test_effect_http_malformed_body_never_executes(
     service, client, journal, tool, resolutions = effect
     app = NativeEffectApp(service, lambda token: (binding.tenant_id, binding.executor_id))
     assert invoke(app, body)[0] in {413, 422}
-    assert not client.calls and not resolutions and tool.applies == 0
+    assert not client.calls and not resolutions and tool.calls == 0
 
 
 @pytest.mark.parametrize(
@@ -162,7 +162,7 @@ def test_effect_http_header_controls(binding: NativeBinding, effect: Any, header
     service, client, journal, tool, resolutions = effect
     app = NativeEffectApp(service, lambda token: (binding.tenant_id, binding.executor_id))
     assert invoke(app, {"grant": stage_grant(binding)}, headers)[0] in {401, 413, 415}
-    assert not resolutions and tool.applies == 0
+    assert not resolutions and tool.calls == 0
 
 
 def test_non_provision_grant_is_held_before_tooling(binding: NativeBinding, effect: Any) -> None:
@@ -171,4 +171,4 @@ def test_non_provision_grant_is_held_before_tooling(binding: NativeBinding, effe
     grant["stage"] = "retire"
     with pytest.raises(NativeHeld):
         service.execute(binding.tenant_id, binding.executor_id, grant)
-    assert not resolutions and not client.calls and tool.applies == 0
+    assert not resolutions and not client.calls and tool.calls == 0

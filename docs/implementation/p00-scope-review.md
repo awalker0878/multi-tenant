@@ -8,7 +8,7 @@ Inputs: [product scope](../product/scope.md), [product overview](../product/READ
 
 Use **Permit Desk**, the existing synthetic Linux web-and-database application, as the first repeatable product journey. It exercises application state, attachments, two workload/security placements, tenant isolation, shared services and recovery without using live business data. Freeze its logical contents for design and fixture work; exact platform/guest selections and numerical acceptance targets remain P00.04/P00.05 decisions.
 
-The preferred first migration proposal is **application rebuild/restore**, following the current discussion of that approach. Its feasibility depends on reproducible target image/application/configuration artifacts and an application-consistent restore across the selected versions. ADR-014 remains proposed pending the required review; the previous branch supplies information rather than implementation or qualification.
+P07 provisions OpenStack through native APIs. P08 selects one explicitly qualified migration method from source and destination capability profiles. Generic whole-VM movement uses an isolated migration copy, `ExportVm`/NFC, verified transfer, any explicitly planned copy-only conversion and destination native APIs. Guest transformation occurs on the copy. Restarting production after a baseline requires a qualified application or file delta method; opaque workloads without one require cold migration. No method is an automatic fallback. Native provisioning and migration require separate Q05/Q06 and Q07 qualification.
 
 | Scope element | Recommended baseline | Required before acceptance |
 | --- | --- | --- |
@@ -66,7 +66,7 @@ For this method, “offline” means the final application quiesce and consisten
 | Excluded from the first qualified slice | Treatment |
 | --- | --- |
 | AHV execution, other directed routes and same-family relocation topologies | Keep represented in the support matrix and P09; qualify each selected combination independently |
-| Whole-VM cold disk capture/conversion/import | Separate P09 option for applications that cannot be rebuilt; never silently fall back from failed rebuild/restore |
+| Whole-VM capture/export, conversion and import | P08 native migration copy, explicit method and transformation plan; never an automatic fallback |
 | Windows, appliances, GPUs/passthrough, shared disks, unselected encryption/vTPM and other special device profiles | Return explicit unsupported/unknown findings until a selected implementation and qualification campaign exists |
 | Warm/live migration, RAM transfer, zero-downtime guarantee and automatic reverse migration | No inferred support from a successful application restore or forward route |
 | General brownfield ownership adoption | Read-only discovery and ownership-collision safeguards are early scope; mutation requires separately reviewed transfer and P09 adoption work |
@@ -78,7 +78,7 @@ For this method, “offline” means the final application quiesce and consisten
 
 The previous branch contains archive/rehearsal designs and implementation statements. It does not establish that any organization has deployed that runtime, that operational records exist, or that every previous writer has stopped. Repository examples, synthetic tests and source history are not an operational-state inventory.
 
-The review must inventory old product identities/revisions, approvals/audit history, evidence, workflow/operation journals, allocation/service receipts, Terraform state and native bindings where any exist. Identify custody, tenant/scope, counts, format/version, retention/access duties and active or queued writers. Keep originals and operational secrets in their approved systems; Git stores only the sanitized decision and immutable references.
+The review must inventory old product identities/revisions, approvals/audit history, evidence, workflow/operation journals, allocation/service receipts, native resource custody and native bindings where any exist. Identify custody, tenant/scope, counts, format/version, retention/access duties and active or queued writers. Keep originals and operational secrets in their approved systems; Git stores only the sanitized decision and immutable references.
 
 | Inventory outcome | Required disposition |
 | --- | --- |

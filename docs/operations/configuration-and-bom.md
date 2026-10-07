@@ -6,7 +6,7 @@ Owners: SRE and delivery for environment/release records; each context owner for
 
 Keep three records linked by immutable references: a release manifest identifies deployable artifacts; an environment BOM identifies what is installed; domain records describe tenant intent and authority through owner APIs. Deployment values must not become a second database of grants, approvals, workloads, OIDC connections or qualification decisions. External OIDC provider/client settings and claim mappings are entered through the console and persisted by Governance. No OIDC provider values are required in environment variables, Helm values, deployment manifests or static configuration files.
 
-Repository configuration contains schemas, non-sensitive defaults and synthetic examples. Restricted environment records contain real endpoints, identities, network approvals, recovery locations and permitted secret references. Secrets and live Terraform state are not repository configuration. Separate a non-secret configuration digest from secret version/reference attestations so secret material is never hashed into published evidence accidentally.
+Repository configuration contains schemas, non-sensitive defaults and synthetic examples. Restricted environment records contain real endpoints, identities, network approvals, recovery locations and permitted secret references. Secrets and live native resource custody are not repository configuration. Separate a non-secret configuration digest from secret version/reference attestations so secret material is never hashed into published evidence accidentally.
 
 ## Minimum release and environment records
 

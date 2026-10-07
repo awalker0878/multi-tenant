@@ -16,7 +16,7 @@ CREATE TABLE app.native_projection (
  stopped boolean NOT NULL DEFAULT false, reason text, updated_at bigint NOT NULL
 );
 CREATE TABLE app.native_resource_holds (
- resource_key text PRIMARY KEY, state_lineage uuid NOT NULL UNIQUE,
+ resource_key text PRIMARY KEY, custody_id uuid NOT NULL UNIQUE,
  job uuid NOT NULL REFERENCES app.native_jobs(id)
 );
 CREATE TABLE app.native_operations (

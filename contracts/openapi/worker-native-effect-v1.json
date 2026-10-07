@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Lifecycle worker native saved-plan effect",
+    "title": "Lifecycle worker native API effect",
     "version": "1.0.0",
     "description": "Separate internal P07 worker component. Requires authenticated caller, current native grant authority, protected tooling and independent observer. The simulation API and inspection CLI do not expose this route."
   },
@@ -222,12 +222,12 @@
                   "campaign_id",
                   "executor_id",
                   "epoch",
-                  "state_lineage",
+                  "custody_id",
                   "project_id",
                   "plan_digest",
-                  "bundle_sha256",
-                  "workspace",
-                  "state_serial",
+                  "operation_plan_sha256",
+                  "ownership_digest",
+                  "custody_generation",
                   "expires_at"
                 ],
                 "properties": {
@@ -276,7 +276,7 @@
                     "format": "uuid",
                     "pattern": "^[a-f0-9-]{36}$"
                   },
-                  "state_lineage": {
+                  "custody_id": {
                     "type": "string",
                     "format": "uuid",
                     "pattern": "^[a-f0-9-]{36}$"
@@ -289,15 +289,15 @@
                     "type": "string",
                     "pattern": "^[a-f0-9]{64}$"
                   },
-                  "bundle_sha256": {
+                  "operation_plan_sha256": {
                     "type": "string",
                     "pattern": "^[a-f0-9]{64}$"
                   },
-                  "workspace": {
+                  "ownership_digest": {
                     "type": "string",
-                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                    "pattern": "^[a-f0-9]{64}$"
                   },
-                  "state_serial": {
+                  "custody_generation": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 9223372036854775807

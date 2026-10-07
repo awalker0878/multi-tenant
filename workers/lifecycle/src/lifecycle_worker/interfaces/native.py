@@ -9,13 +9,11 @@ from typing import Any
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from lifecycle_worker.application.native import NativeHeld, decode, identity
-from lifecycle_worker.application.native_effect import NativeSavedPlanEffect
+from lifecycle_worker.application.native_effect import NativeApiEffect
 
 
 class NativeEffectApp:
-    def __init__(
-        self, effects: NativeSavedPlanEffect, caller: Callable[[str], tuple[str, str]]
-    ) -> None:
+    def __init__(self, effects: NativeApiEffect, caller: Callable[[str], tuple[str, str]]) -> None:
         self.effects, self.caller = effects, caller
 
     async def __call__(

@@ -130,7 +130,7 @@
         "recovery": {
           "rpo_seconds": 0,
           "rto_seconds": 3600,
-          "method": "application_rebuild_restore",
+          "method": "native_api_export_import",
           "strength": "required"
         }
       }
@@ -182,7 +182,7 @@
     "endpoint_id": "10000000-0000-4000-8000-000000000005",
     "generation_id": "10000000-0000-4000-8000-000000000006",
     "platform": "openstack",
-    "native_scope": "project:synthetic",
+    "native_scope": "project:10000000-0000-4000-8000-000000000020",
     "current": true,
     "completion": "complete",
     "expires_at": 2000001800,
@@ -343,7 +343,7 @@
       "recovery.method": {
         "status": "observed",
         "values": [
-          "application_rebuild_restore"
+          "native_api_export_import"
         ],
         "expires_at": 2000001800,
         "dependencies": []
@@ -587,23 +587,14 @@
       "storage_gib": "synthetic-storage_gib",
       "addresses": "synthetic-addresses"
     },
-    "terraform": {
-      "saved_plan_sha256": "a9347c50430fb5947a6d022b1ae4dcfc5f961af3fd9a22899aff3b4437c0136b",
-      "toolchain_sha256": "dd04afac1bebb050783a245ed0d88633759f352c85d4ab3bea3d416bf2019c75",
-      "backend_ref": "fixture://state",
-      "workspace": "fixture",
-      "state_lineage": "lineage",
-      "state_serial": 1,
-      "lock_owner": "lifecycle"
-    },
     "ownership": [
       {
         "resource": "00000000-0000-4000-8000-000000000100",
         "fields": [
           "infrastructure"
         ],
-        "writer": "terraform",
-        "state_ref": "fixture://state",
+        "writer": "lifecycle",
+        "custody_ref": "evidence://fixture/custody",
         "native_identity": null
       },
       {
@@ -611,11 +602,132 @@
         "fields": [
           "infrastructure"
         ],
-        "writer": "terraform",
-        "state_ref": "fixture://state",
+        "writer": "lifecycle",
+        "custody_ref": "evidence://fixture/custody",
         "native_identity": null
       }
-    ]
+    ],
+    "native_api": {
+      "operation_plan": {
+        "schema_version": 1,
+        "project_id": "10000000-0000-4000-8000-000000000020",
+        "ownership_digest": "1913f004ce18d5c4aa0f93a9dc314e53b55b6b93a1a277a6dc6100be552653d1",
+        "custody_id": "10000000-0000-4000-8000-000000000021",
+        "custody_generation": 1,
+        "api_versions": {
+          "compute": "2.1",
+          "network": "2.0",
+          "volume": "3.0"
+        },
+        "resources": [
+          {
+            "key": "workload0_port",
+            "kind": "port",
+            "spec": {
+              "name": "workload0-port",
+              "network_id": "10000000-0000-4000-8000-000000000004",
+              "security_groups": [
+                "10000000-0000-4000-8000-000000000005"
+              ],
+              "fixed_ips": [
+                {
+                  "subnet_id": "10000000-0000-4000-8000-000000000006",
+                  "ip_address": "192.0.2.10"
+                }
+              ],
+              "admin_state_up": false,
+              "port_security_enabled": true
+            }
+          },
+          {
+            "key": "workload0_boot",
+            "kind": "volume",
+            "spec": {
+              "name": "workload0-boot",
+              "size": 40,
+              "volume_type": "qualified",
+              "availability_zone": "nova",
+              "imageRef": "10000000-0000-4000-8000-000000000007"
+            }
+          },
+          {
+            "key": "workload0_vm",
+            "kind": "server",
+            "spec": {
+              "name": "workload0-vm",
+              "flavorRef": "2",
+              "availability_zone": "nova",
+              "config_drive": true,
+              "ports": [
+                "workload0_port"
+              ],
+              "volumes": [
+                {
+                  "key": "workload0_boot",
+                  "boot_index": 0
+                }
+              ]
+            }
+          },
+          {
+            "key": "workload1_port",
+            "kind": "port",
+            "spec": {
+              "name": "workload1-port",
+              "network_id": "10000000-0000-4000-8000-000000000004",
+              "security_groups": [
+                "10000000-0000-4000-8000-000000000005"
+              ],
+              "fixed_ips": [
+                {
+                  "subnet_id": "10000000-0000-4000-8000-000000000006",
+                  "ip_address": "192.0.2.11"
+                }
+              ],
+              "admin_state_up": false,
+              "port_security_enabled": true
+            }
+          },
+          {
+            "key": "workload1_boot",
+            "kind": "volume",
+            "spec": {
+              "name": "workload1-boot",
+              "size": 40,
+              "volume_type": "qualified",
+              "availability_zone": "nova",
+              "imageRef": "10000000-0000-4000-8000-000000000007"
+            }
+          },
+          {
+            "key": "workload1_vm",
+            "kind": "server",
+            "spec": {
+              "name": "workload1-vm",
+              "flavorRef": "2",
+              "availability_zone": "nova",
+              "config_drive": true,
+              "ports": [
+                "workload1_port"
+              ],
+              "volumes": [
+                {
+                  "key": "workload1_boot",
+                  "boot_index": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "operation_plan_sha256": "c5476ea04af38a9ba297f89c764aae61b6a55706ca71764194eb05d7f8f1d228",
+      "api_contracts_sha256": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f",
+      "adapter_sha256": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+      "custody_ref": "evidence://fixture/custody",
+      "custody_id": "10000000-0000-4000-8000-000000000021",
+      "custody_generation": 1,
+      "fence_owner": "lifecycle"
+    }
   },
   "qualification": {
     "id": "synthetic-evidence",
@@ -628,7 +740,7 @@
       "tenant_id": "10000000-0000-4000-8000-000000000001",
       "site_id": "10000000-0000-4000-8000-000000000004",
       "endpoint_id": "10000000-0000-4000-8000-000000000005",
-      "native_scope": "project:synthetic",
+      "native_scope": "project:10000000-0000-4000-8000-000000000020",
       "installed_tuple": {
         "platform": "openstack",
         "release": "synthetic",
@@ -640,7 +752,7 @@
         "guest": "synthetic"
       },
       "action": "application.provision",
-      "method": "saved_plan",
+      "method": "native_api",
       "profile_digest": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
       "artifacts": {
         "compiler": "8d9aa3ce74652dc4e69fac8954afd3f92db75062429b870d650291969189b46e",
@@ -797,7 +909,7 @@
       "recovery.method": {
         "status": "supported",
         "values": [
-          "application_rebuild_restore"
+          "native_api_export_import"
         ],
         "expires_at": 2000001800,
         "dependencies": []

@@ -1,4 +1,4 @@
-"""Offline P07 saved-plan comparison; no apply, retry or native authority is issued."""
+"""Offline P07 native plan comparison; no native or retry authority is issued."""
 
 import re
 from typing import Any
@@ -9,100 +9,57 @@ from lifecycle.domain.commissioning import (
     exact_id,
     sha256,
     timestamp,
-    validate_evidence,
 )
 from lifecycle.domain.execution import Rejected, shape
 
-STATE_KEYS = {"backend_ref", "workspace", "state_lineage", "state_serial", "lock_owner"}
-TERRAFORM_KEYS = STATE_KEYS | {"saved_plan_sha256", "toolchain_sha256"}
+CUSTODY_KEYS = {"custody_ref", "custody_id", "custody_generation", "fence_owner"}
+NATIVE_KEYS = CUSTODY_KEYS | {
+    "operation_plan",
+    "operation_plan_sha256",
+    "api_contracts_sha256",
+    "adapter_sha256",
+}
 
 
-def _version(value: Any) -> bool:
-    return isinstance(value, str) and re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", value) is not None
-
-
-def validate_toolchain(manifest: dict[str, Any]) -> None:
-    shape(
-        manifest,
-        {
-            "schema_version",
-            "terraform",
-            "providers",
-            "modules",
-            "dependency_lock_sha256",
-            "worker_image_digest",
-        },
-    )
-    shape(manifest["terraform"], {"version", "sha256"})
+def validate_contracts(manifest: dict[str, Any]) -> None:
+    shape(manifest, {"schema_version", "api_versions", "adapter_sha256", "worker_image_digest"})
     if (
         type(manifest["schema_version"]) is not int
         or manifest["schema_version"] != 1
-        or not _version(manifest["terraform"]["version"])
-        or not sha256(manifest["terraform"]["sha256"])
-        or not sha256(manifest["dependency_lock_sha256"])
+        or manifest["api_versions"] != {"compute": "2.1", "network": "2.0", "volume": "3.0"}
+        or not sha256(manifest["adapter_sha256"])
         or not isinstance(manifest["worker_image_digest"], str)
         or re.fullmatch(r"sha256:[a-f0-9]{64}", manifest["worker_image_digest"]) is None
     ):
-        raise Rejected("unpinned_native_toolchain", 422)
-    providers = manifest["providers"]
-    if not isinstance(providers, list) or not 1 <= len(providers) <= 32:
-        raise Rejected("invalid_provider_inventory", 422)
-    seen: set[str] = set()
-    for provider in providers:
-        shape(provider, {"source", "version", "sha256"})
-        source = provider["source"]
-        if (
-            not isinstance(source, str)
-            or re.fullmatch(r"[a-z0-9.-]+/[a-z0-9_-]+/[a-z0-9_-]+", source) is None
-            or source in seen
-            or not _version(provider["version"])
-            or not sha256(provider["sha256"])
-        ):
-            raise Rejected("unpinned_or_duplicate_provider", 422)
-        seen.add(source)
-    modules = manifest["modules"]
-    if not isinstance(modules, list) or not 1 <= len(modules) <= 64:
-        raise Rejected("invalid_module_inventory", 422)
-    seen = set()
-    for module in modules:
-        shape(module, {"id", "uri", "revision", "sha256"})
-        if not exact_id(module["id"]) or module["id"] in seen:
-            raise Rejected("invalid_or_duplicate_module", 422)
-        # Immutable protected module identities use the same reference rules as commissioning.
-        validate_evidence(
-            {k: v for k, v in module.items() if k != "id"}
-            | {"level": "E1", "binding_sha256": digest(manifest["terraform"])},
-            digest(manifest["terraform"]),
-        )
-        seen.add(module["id"])
+        raise Rejected("unpinned_native_api_contracts", 422)
 
 
-def validate_state(state: dict[str, Any]) -> None:
+def validate_custody(state: dict[str, Any]) -> None:
     if (
-        not all(exact_id(state[k]) for k in ("workspace", "state_lineage", "lock_owner"))
-        or not isinstance(state["backend_ref"], str)
-        or re.fullmatch(r"evidence://[A-Za-z0-9_-]+/[A-Za-z0-9._/-]+", state["backend_ref"]) is None
-        or ".." in state["backend_ref"].split("/")
-        or state["backend_ref"].endswith("/")
-        or type(state["state_serial"]) is not int
-        or not 0 <= state["state_serial"] <= 2**63 - 1
+        not all(exact_id(state[k]) for k in ("custody_id", "fence_owner"))
+        or not isinstance(state["custody_ref"], str)
+        or re.fullmatch(r"evidence://[A-Za-z0-9_-]+/[A-Za-z0-9._/-]+", state["custody_ref"]) is None
+        or ".." in state["custody_ref"].split("/")
+        or state["custody_ref"].endswith("/")
+        or type(state["custody_generation"]) is not int
+        or not 0 <= state["custody_generation"] <= 2**63 - 1
     ):
-        raise Rejected("invalid_native_state_binding", 422)
+        raise Rejected("invalid_native_custody_binding", 422)
 
 
-def validate_ownership(owners: Any, backend_ref: str) -> None:
+def validate_ownership(owners: Any, custody_ref: str) -> None:
     if not isinstance(owners, list) or not 1 <= len(owners) <= 512:
         raise Rejected("invalid_native_ownership", 422)
     seen: set[tuple[str, str]] = set()
     for owner in owners:
-        shape(owner, {"resource", "fields", "writer", "state_ref", "native_identity"})
+        shape(owner, {"resource", "fields", "writer", "custody_ref", "native_identity"})
         if (
             not exact_id(owner["resource"])
             or not exact_id(owner["writer"])
             or not isinstance(owner["fields"], list)
             or not 1 <= len(owner["fields"]) <= 128
             or not all(exact_id(f) for f in owner["fields"])
-            or owner["state_ref"] != backend_ref
+            or owner["custody_ref"] != custody_ref
             or (owner["native_identity"] is not None and not exact_id(owner["native_identity"]))
         ):
             raise Rejected("invalid_native_ownership", 422)
@@ -113,12 +70,12 @@ def validate_ownership(owners: Any, backend_ref: str) -> None:
             seen.add(key)
 
 
-def assess_saved_plan(
+def assess_native_plan(
     plan: dict[str, Any],
     commissioning: dict[str, Any],
-    toolchain: dict[str, Any],
+    api_contracts: dict[str, Any],
     snapshot: dict[str, Any],
-    saved_plan_sha256: str,
+    operation_plan_sha256: str,
     now: int,
 ) -> dict[str, Any]:
     """All inputs are supplied records; callers must not interpret comparison as a grant."""
@@ -136,36 +93,47 @@ def assess_saved_plan(
         or content["schema_version"] != 1
     ):
         raise Rejected("plan_integrity", 422)
-    terraform = content["terraform"]
-    shape(terraform, TERRAFORM_KEYS)
-    validate_state(terraform)
-    if not all(sha256(terraform[k]) for k in ("saved_plan_sha256", "toolchain_sha256")):
-        raise Rejected("unpinned_saved_plan", 422)
-    validate_toolchain(toolchain)
-    validate_ownership(content["ownership"], terraform["backend_ref"])
+    native_api = content["native_api"]
+    shape(native_api, NATIVE_KEYS)
+    validate_custody(native_api)
+    if not all(sha256(native_api[k]) for k in ("operation_plan_sha256", "api_contracts_sha256")):
+        raise Rejected("unpinned_native_plan", 422)
+    operation = native_api["operation_plan"]
+    if (
+        not isinstance(operation, dict)
+        or digest(operation) != native_api["operation_plan_sha256"]
+        or operation.get("ownership_digest") != digest(content["ownership"])
+        or operation.get("custody_id") != native_api["custody_id"]
+        or operation.get("custody_generation") != native_api["custody_generation"]
+        or content["scope"]["native_scope"] != "project:" + str(operation.get("project_id"))
+        or native_api["adapter_sha256"] != content["artifacts"]["adapter"]
+    ):
+        raise Rejected("native_operation_scope_changed", 422)
+    validate_contracts(api_contracts)
+    validate_ownership(content["ownership"], native_api["custody_ref"])
     shape(
         snapshot,
         {
             "scope",
             "installed_tuple",
             "artifacts",
-            "terraform",
+            "native_api",
             "ownership",
-            "toolchain_sha256",
+            "api_contracts_sha256",
             "observed_at",
             "observer_id",
             "executor_id",
             "outstanding_operation_ids",
         },
     )
-    shape(snapshot["terraform"], STATE_KEYS | {"lock_id", "fence", "lease_expires_at", "held"})
-    validate_state(snapshot["terraform"])
+    shape(snapshot["native_api"], CUSTODY_KEYS | {"lock_id", "fence", "lease_expires_at", "held"})
+    validate_custody(snapshot["native_api"])
     if (
         not timestamp(snapshot["observed_at"])
         or not exact_id(snapshot["observer_id"])
         or not exact_id(snapshot["executor_id"])
-        or not sha256(saved_plan_sha256)
-        or not sha256(snapshot["toolchain_sha256"])
+        or not sha256(operation_plan_sha256)
+        or not sha256(snapshot["api_contracts_sha256"])
         or not isinstance(snapshot["outstanding_operation_ids"], list)
         or len(snapshot["outstanding_operation_ids"]) > 128
         or not all(exact_id(o) for o in snapshot["outstanding_operation_ids"])
@@ -183,14 +151,14 @@ def assess_saved_plan(
             "installed_tuple_sha256": digest(content["installed_tuple"]),
             "artifact_set_sha256": digest(content["artifacts"]),
             "ownership_sha256": digest(content["ownership"]),
-            "toolchain_sha256": terraform["toolchain_sha256"],
-            "state_binding_sha256": digest({k: terraform[k] for k in STATE_KEYS}),
+            "api_contracts_sha256": native_api["api_contracts_sha256"],
+            "custody_binding_sha256": digest({k: native_api[k] for k in CUSTODY_KEYS}),
         }.items()
     ):
         holds.append("commissioning_plan_mismatch")
     if (
         content.get("action") != "application.provision"
-        or content.get("method") != "saved_plan"
+        or content.get("method") != "native_api"
         or content.get("lane") != "isolated_campaign"
         or content["installed_tuple"].get("platform") != "openstack"
     ):
@@ -208,16 +176,22 @@ def assess_saved_plan(
         or min(content["valid_until"], content["input_fresh_until"]) <= now
     ):
         holds.append("plan_or_facts_expired")
-    if terraform["saved_plan_sha256"] != saved_plan_sha256:
-        holds.append("saved_plan_bytes_changed")
-    if not terraform["toolchain_sha256"] == digest(toolchain) == snapshot["toolchain_sha256"]:
-        holds.append("toolchain_changed")
+    if native_api["operation_plan_sha256"] != operation_plan_sha256:
+        holds.append("native_operation_plan_changed")
+    if (
+        not native_api["api_contracts_sha256"]
+        == digest(api_contracts)
+        == snapshot["api_contracts_sha256"]
+        or api_contracts["adapter_sha256"] != native_api["adapter_sha256"]
+        or api_contracts["api_versions"] != operation.get("api_versions")
+    ):
+        holds.append("api_contracts_changed")
     for key in ("scope", "installed_tuple", "artifacts", "ownership"):
         if snapshot[key] != content[key]:
             holds.append(key + "_changed")
-    if any(snapshot["terraform"][k] != terraform[k] for k in STATE_KEYS):
-        holds.append("terraform_state_changed")
-    lock = snapshot["terraform"]
+    if any(snapshot["native_api"][k] != native_api[k] for k in CUSTODY_KEYS):
+        holds.append("native_custody_changed")
+    lock = snapshot["native_api"]
     if (
         lock["held"] is not True
         or not exact_id(lock["lock_id"])
@@ -226,7 +200,7 @@ def assess_saved_plan(
         or not timestamp(lock["lease_expires_at"])
         or lock["lease_expires_at"] <= now
     ):
-        holds.append("current_state_lock_missing")
+        holds.append("current_custody_lock_missing")
     if snapshot["observer_id"] == snapshot["executor_id"]:
         holds.append("independent_native_observer_missing")
     if snapshot["executor_id"] not in content["executor_ids"]:
@@ -246,8 +220,7 @@ def assess_saved_plan(
         "retry_authorized": False,
         "limitations": [
             "Record and byte comparison only; no authenticated owner read or evidence fetch.",
-            "Saved-plan bytes are not parsed or applied; semantic changes need independent review.",
-            "Actual executable/provider/module bytes and lock possession are not verified here.",
-            "Native grant redemption, fencing and post-effect readback remain unimplemented.",
+            "Execution checks adapter bytes, authentic owners and current lock possession.",
+            "Native operation schemas are validated again by the worker before any request.",
         ],
     }

@@ -83,7 +83,7 @@ qualification. See the [commissioning runbook](../../docs/operations/runbooks/op
 and [implementation record](../../docs/implementation/p07-native-provisioning.md).
 
 `python -m lifecycle.bootstrap.native_preflight` compares protected plan, packet,
-toolchain and observation files with saved-plan bytes. See the runbook for its five
+API-contract and observation files with the canonical native operation plan. See the runbook for its five
 required file arguments. It has no native effect path and cannot issue apply/retry
 authority; current owner authentication, actual tool bytes and native fencing
 remain responsibilities of the selected native integration.

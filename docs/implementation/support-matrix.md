@@ -32,7 +32,7 @@ Each direction below needs its own method, guest, data and recovery qualificatio
 
 | Source → target | Planning scope | Method selection | Required qualification before a support claim |
 | --- | --- | --- | --- |
-| VMware → OpenStack | Initial candidate, P08 | Preferred `application_rebuild_restore`, conditional on reproducible application deployment and P00 restore feasibility | Q07 for exact source/target/guest/data/security/service tuple; deployment/configuration reconstruction, consistent capture, all datasets and required metadata, writer fencing, application checks and post-target-write recovery |
+| VMware → OpenStack | Initial candidate, P08 | `native_api_export_import` through ExportVm/NFC and destination native APIs | Q07 for exact source/target/guest/data/security/service tuple; all disks, native import, firmware/drivers, writer fencing, application checks and post-target-write recovery |
 | OpenStack → VMware | Expansion candidate, P09 or later | Selection needed; no reverse-method assumption | Q08 independently covering export/import or selected restore method, target policy/service realization and recovery |
 | VMware → Nutanix AHV | Expansion candidate, P09 or later | Selection needed | Q08 independently covering source/target mapping, selected method, guest/data and recovery |
 | Nutanix AHV → VMware | Expansion candidate, P09 or later | Selection needed | Q08 independently; VMware→AHV results are not evidence for this direction |

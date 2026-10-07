@@ -55,7 +55,7 @@ Add full decisions as `docs/decisions/adr-NNN-short-title.md` using the [ADR tem
 
 Detailed designs identify status, owner role, related IDs and last reviewed date/revision. Label proposed examples. When implementation differs, update the design in the same change or record a time-bounded tracked divergence. Preserve superseded decisions with replacement links. Put task procedures under `docs/operations/runbooks/`; keep cross-cutting deployment, observability, threat and support design documents directly under `docs/operations/`.
 
-Operational credentials, live inventory, endpoint addresses, Terraform state and native evidence belong in approved operational systems. Repository records use synthetic examples and authorized evidence references. Historical completion flags never become new evidence.
+Operational credentials, live inventory, endpoint addresses, native resource custody and native evidence belong in approved operational systems. Repository records use synthetic examples and authorized evidence references. Historical completion flags never become new evidence.
 
 ## 4. Documentation required with each change
 

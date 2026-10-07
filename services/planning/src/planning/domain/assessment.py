@@ -82,8 +82,8 @@ def assess(
     now: int,
 ) -> dict[str, Any]:
     if action not in ACTIONS or method not in {
-        "application_rebuild_restore",
-        "saved_plan",
+        "native_api_export_import",
+        "native_api",
         "forward_recovery",
         "owned_retirement",
     }:

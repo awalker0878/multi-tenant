@@ -1,15 +1,15 @@
-"""Internal saved-plan worker use case with independently resolved caller and tooling."""
+"""Internal native API worker use case with independently resolved caller and tooling."""
 
 from collections.abc import Callable
 from typing import Any, Protocol
 
 from lifecycle_worker.application.native import (
+    NativeApiAdapter,
+    NativeApiExecution,
     NativeBinding,
     NativeHeld,
     NativeJournal,
     NativeObserver,
-    SavedPlanExecution,
-    SavedPlanTool,
     digest,
     identity,
 )
@@ -19,18 +19,18 @@ from lifecycle_worker.application.native_authority import (
 )
 
 
-class NativeTooling(Protocol):
-    def resolve(self, binding: NativeBinding) -> tuple[SavedPlanTool, NativeObserver]:
+class NativeRuntime(Protocol):
+    def resolve(self, binding: NativeBinding) -> tuple[NativeApiAdapter, NativeObserver]:
         """Resolve protected plan artifacts and observer from independently commissioned custody."""
         ...
 
 
-class NativeSavedPlanEffect:
+class NativeApiEffect:
     def __init__(
         self,
         authority: NativeBoundaryClient,
         journal: NativeJournal,
-        tooling: NativeTooling,
+        tooling: NativeRuntime,
         clock: Callable[[], int],
     ) -> None:
         self.authority, self.journal, self.tooling, self.clock = authority, journal, tooling, clock
@@ -43,7 +43,7 @@ class NativeSavedPlanEffect:
         # Authorize before resolving protected artifacts as well as immediately before applying.
         authority.require_current(binding, "preflight")
         tool, observer = self.tooling.resolve(binding)
-        SavedPlanExecution(authority, self.journal, tool, observer, self.clock).execute(binding)
+        NativeApiExecution(authority, self.journal, tool, observer, self.clock).execute(binding)
         # Native process output and provider details do not cross the control/history boundary.
         return {
             "grant_sha256": digest(authority.grant),

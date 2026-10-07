@@ -40,7 +40,7 @@ def plan() -> dict[str, Any]:
                 "executor_id",
                 "campaign_id",
                 "epoch",
-                "state_lineage",
+                "custody_id",
             )
         },
         "plan_revision": 1,
@@ -50,9 +50,9 @@ def plan() -> dict[str, Any]:
         "source_revision": "e" * 40,
         "purpose": "provision",
         "source_job_id": None,
-        "workspace": "default",
-        "state_serial": 1,
-        "bundle_sha256": "f" * 64,
+        "ownership_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "custody_generation": 1,
+        "operation_plan_sha256": "f" * 64,
         "expires_at": 2000,
         "intents": {s: digest(s) for s in PROVISION},
         "policy_cases": [
@@ -166,7 +166,7 @@ def complete(
 ) -> dict[str, Any]:
     bound = service.prepare(tenant, job, stage)
     service.boundary(tenant, bound, p["executor_id"], "preflight")
-    boundary = "before_saved_plan_apply" if stage == "provision" else "before_effect"
+    boundary = "before_api_sequence" if stage == "provision" else "before_effect"
     service.boundary(tenant, bound, p["executor_id"], boundary)
     service.boundary(tenant, bound, p["executor_id"], boundary.replace("before", "during"))
     service.reconcile(tenant, bound)
@@ -177,10 +177,10 @@ def complete(
     "field,value",
     [
         ("schema_version", True),
-        ("state_serial", True),
+        ("custody_generation", True),
         ("expires_at", 1000),
         ("source_revision", "unbound"),
-        ("workspace", "../other"),
+        ("ownership_digest", "../other"),
         ("intents", {}),
         ("policy_cases", []),
         ("purpose", "destroy"),
@@ -341,7 +341,7 @@ def test_stale_command_cross_tenant_and_cross_worker_denied(native: Any) -> None
     with pytest.raises(Rejected, match="binding_denied"):
         service.boundary(tenant, binding, str(uuid4()), "before_effect")
     with pytest.raises(Rejected, match="boundary_mismatch"):
-        service.boundary(tenant, binding, p["executor_id"], "before_saved_plan_apply")
+        service.boundary(tenant, binding, p["executor_id"], "before_api_sequence")
     altered = binding | {"intent_digest": "0" * 64}
     with pytest.raises(Rejected, match="binding_denied"):
         service.reconcile(tenant, altered)
@@ -505,7 +505,7 @@ def test_native_http_identity_is_independent_of_body(native: Any) -> None:
     bound = binding["native_binding"]
     assert bound["project_id"] == p["scope"]["project_id"]
     assert bound["job_id"] == job and bound["operation_id"] == binding["operation_id"]
-    body = {"grant": binding, "boundary": "before_saved_plan_apply"}
+    body = {"grant": binding, "boundary": "before_api_sequence"}
     status, reply = native_http(service, tenant, p["executor_id"], body, token="b" * 64)
     assert status == 401
     status, reply = native_http(service, tenant, str(uuid4()), body)
@@ -537,7 +537,7 @@ def test_previous_stage_observation_cannot_clear_later_unknown_hold(native: Any)
     service, owners, p, tenant, job = admitted(native)
     prior = complete(service, p, tenant, job, "reserve")
     b = service.prepare(tenant, job, "provision")
-    service.boundary(tenant, b, p["executor_id"], "before_saved_plan_apply")
+    service.boundary(tenant, b, p["executor_id"], "before_api_sequence")
     owners.failure = True
     with pytest.raises(Rejected):
         service.reconcile(tenant, b)

@@ -11,8 +11,8 @@ CREATE TABLE native.attempts (
     claimed_at timestamptz NOT NULL DEFAULT clock_timestamp()
 );
 
-CREATE TABLE native.workspace_holds (
-    state_lineage uuid PRIMARY KEY,
+CREATE TABLE native.custody_holds (
+    custody_id uuid PRIMARY KEY,
     operation_id uuid NOT NULL UNIQUE REFERENCES native.attempts(operation_id),
     held_at timestamptz NOT NULL DEFAULT clock_timestamp()
 );
@@ -21,7 +21,8 @@ CREATE TABLE native.events (
     sequence bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     operation_id uuid NOT NULL REFERENCES native.attempts(operation_id),
     kind text NOT NULL CHECK (kind IN (
-        'prepared', 'apply_started', 'process_exited', 'outcome_unknown', 'readback'
+        'prepared', 'request_started', 'request_accepted', 'poll_observed',
+        'outcome_unknown', 'readback', 'export_lease', 'disk_transferred', 'export_complete'
     )),
     facts jsonb NOT NULL CHECK (octet_length(facts::text) <= 262144),
     occurred_at timestamptz NOT NULL DEFAULT clock_timestamp()

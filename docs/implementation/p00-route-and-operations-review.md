@@ -1,42 +1,16 @@
-# P00 route feasibility and operating review
+# Native route and operating-input review
 
-Review date: 2026-10-04. Scope: P00.04 and P00.05; G00.04 and G00.05. This is a completed desk review and experiment design. Native inventory, application deployment, dataset capture/restore, data recovery, load measurement and owner acceptance have not occurred. The packages remain open in the [delivery register](delivery-register.yaml).
+P07 provisions OpenStack through native APIs. P08 selects one explicitly qualified migration method from source and destination capability profiles. Generic whole-VM movement uses an isolated migration copy, `ExportVm`/NFC, verified transfer, any explicitly planned copy-only conversion and destination native APIs. Guest transformation occurs on the copy. Restarting production after a baseline requires a qualified application or file delta method; opaque workloads without one require cold migration. No method is an automatic fallback. Native provisioning and migration require separate Q05/Q06 and Q07 qualification.
 
-## Findings and current direction
+## Native API boundaries
 
-The preferred first migration is VMware → OpenStack using `application_rebuild_restore` for the rebuildable two-workload Linux [Permit Desk application](../product/application-walkthrough.md). This recommendation follows the current P00 method assessment and the user’s clarification on 2026-10-04. It replaces the earlier cold-conversion-first proposal; it is not an automatic inheritance of the old branch’s implementation or status. ADR-014 remains `DESIGN` / `PROPOSED` pending feasibility and accountable review. Whole-VM `cold_guest_disk_conversion_import` remains a separately qualified P09 expansion for workloads that need it. OpenStack provisioning is qualified separately. Laravel service structure, context ownership, current package numbering and the greenfield implementation sequence remain authoritative.
-
-The historical [execution plan](https://github.com/awalker0878/multi-tenant/blob/a2963d8d43e25f08d70fbd99b0e5e19ab5c9828e/docs/product/enterprise-workload-mobility-execution-plan.md) and [migration runtime](https://github.com/awalker0878/multi-tenant/blob/a2963d8d43e25f08d70fbd99b0e5e19ab5c9828e/docs/engineering/application-migration-runtime.md) were read at the pinned `implementation/all-waves` commit `a2963d8d43e25f08d70fbd99b0e5e19ab5c9828e`. The [historical source review](../reference/p00-historical-source-review.md) retains the source-to-current-requirement mapping. Their selected application driver was `REBUILD_RESTORE` for Ubuntu 24.04. The execution plan describes separate cold capture/conversion work while leaving cold target boot and guest remediation open. Neither that implementation nor its test results establish the current route's feasibility. In particular, Ubuntu 24.04, restic transfer and the old runtime owners are not inherited selections for this branch.
-
-Four concrete gaps need resolution before G00.04/G00.05 can pass:
-
-1. No installed source/target tuple or approved fixture is available. A source manifest must identify every application component, dataset, configuration, secret reference and external writer, not merely VM names.
-2. Reproducible application deployment, compatible database capture/restore and complete configuration/secret reconstruction are not yet demonstrated. A booted guest and a successful restore command are separate from accepted application behavior.
-3. The application outage/data objective and post-target-write recovery method need accountable decisions and a stateful experiment.
-4. Existing control-plane target numbers lack an accepted load distribution, measurement denominator and dependency/custody assumptions. The proposed measurement matrix below makes these decisions reviewable.
-
-## Preferred rebuild/restore decisions
-
-These are recommendations for the bounded spike, not selected tool versions, installed facts or native support claims. Rebuild/restore is preferred when the application can be reproduced from known artifacts and its complete state can be captured consistently. An opaque appliance, unavailable dependency or unidentified state can make it unsuitable; do not relabel a whole-VM requirement as satisfied by a rebuild.
-
-| Decision | Recommended next action | Acceptance boundary |
-| --- | --- | --- |
-| Application reproducibility | Deploy pinned web/database artifacts, guest configuration and required dependencies onto a clean isolated target | Reproduce a usable application without copying undocumented source-machine state; explicitly map required configuration and secret references |
-| Data capture and restore | Select a database-aware consistent capture and file/attachment capture covering one declared consistency boundary | A copied live database directory or file checksum alone does not prove application consistency; verify all records, relationships and required metadata |
-| Target resource ownership | Create clean OpenStack compute/storage/network resources using the reviewed resource owner; restore datasets through separately journaled operations | Terraform/native infrastructure and data restore must own distinct declared fields/effects; uncertainty holds prevent duplicate creation or restore |
-| Guest and application identity | Pin a supported target guest and approved treatment of host, application, certificates, service accounts and licensing identities | Do not inherit Ubuntu 24.04 or old tools by association; test the actual chosen versions and identity-dependent integrations |
-| Rehearsal and final cutover | Rehearse with copied synthetic data in quarantine; then quiesce/fence source writers and capture/restore the final consistent state | No production business effects during rehearsal; final cutover binds fresh source state and current authority |
-| Recovery | Evaluate target-forward recovery after the first accepted target write; keep source-return as a separate method requiring proven reconciliation | Known accepted target changes must survive; a reachable old source is not sufficient recovery evidence |
-
-## Separate whole-VM expansion
-
-`cold_guest_disk_conversion_import` remains available for P09 design and qualification after its own scope decision. It is not a prerequisite for the preferred first rebuild/restore slice. Preserve these primary-source findings from the 2026-10-04 review for that later work:
-
-- [virt-v2v VMware input](https://libguestfs.org/virt-v2v-input-vmware.1.html) documents different transport constraints. Its VMX-over-SSH path does not support snapshot-bearing guests; direct VMX conversion requires shutdown. A later conversion spike must select a compatible capture/transport rather than issue snapshot consolidation or enable host SSH without separate authority.
-- [virt-v2v OpenStack output](https://libguestfs.org/virt-v2v-output-openstack.1.html) describes direct Cinder output from a conversion appliance inside OpenStack and calls its Glance output mode legacy. Cinder output generally needs block-device access. Compare that topology with local conversion and separately journaled import, including exact image/volume ownership, privilege and cleanup.
-- [OpenStack image conversion](https://docs.openstack.org/image-guide/convert-images.html) documents disk-format conversion. Our project inference is narrower: format conversion alone supplies no evidence of application correctness, boot compatibility, policy equivalence or recovery.
-
-That expansion must qualify complete disk/backing chains, firmware/controllers/drivers, encryption/vTPM handling, conversion and boot, data correctness, isolation and both recovery boundaries on its own tuple. No conversion dependency was installed or selected by this review, and no converter experiment is required to claim progress on the current rebuild/restore desk work.
+Use [ExportVm](https://developer.broadcom.com/xapis/vsphere-web-services-api/latest/vim.VirtualMachine.html#exportVm)
+and its [NFC lease](https://developer.broadcom.com/xapis/vsphere-web-services-api/latest/vim.HttpNfcLease.html)
+for a powered-off copy, then [Glance native import](https://docs.openstack.org/api-ref/image/v2/).
+Source leases require keepalive and manifest verification. Destination acceptance,
+firmware, drivers and independent source fencing are separate admission requirements.
+The lease does not fence source writers after completion. Payloads remain on approved
+native data paths; Console and events carry references and hashes only.
 
 ## Feasibility input record
 
@@ -46,7 +20,7 @@ Every supplied field group needs `fact_status`, value, source reference/digest, 
 
 | Input ID / field group | Required fields and constraints | Current finding | Responsible role / next action |
 | --- | --- | --- | --- |
-| RT01 `route` | Direction; method; logical application/workload IDs; target environment; fixture revision | `PROPOSED`: VMware → OpenStack; `application_rebuild_restore`; Permit Desk web/database workloads | Product/application owners review method and representative fixture |
+| RT01 `route` | Direction; method; logical application/workload IDs; target environment; fixture revision | `PROPOSED`: VMware → OpenStack; `native_api_export_import`; Permit Desk web/database workloads | Product/application owners review method and representative fixture |
 | RT02 `source` | vCenter/ESXi builds, API version, endpoint/tenant scope, immutable native VM IDs, observation generation/completeness and permitted reads/effects | `UNKNOWN`: no installed facts or source-operation grant supplied | VMware owner provides read-only inventory and separately scoped lab authority |
 | RT03 `target` | Distribution/release and enabled Nova, Glance, Cinder, Neutron APIs; hypervisor/storage/network backends; project, region, failure domains, quotas and feature configuration | `UNKNOWN`: a generic OpenStack label cannot establish boot, security or storage behavior | OpenStack owner supplies supported installed tuple and scoped project facts |
 | RT04 `application_and_guest` | Source/target OS, architecture and runtime versions; application/dependency artifacts; database compatibility; service units; required guest/device features; volume/mount mappings; reproducible configuration and secret references | `UNKNOWN`: Linux and web/database roles are directed; distribution, runtime and deployment artifacts remain unselected | Application/platform owners demonstrate clean deployment and identify state or dependencies that cannot be rebuilt |
@@ -131,4 +105,4 @@ No actual owner identities, lab addresses, credential grants, fixture bytes or t
 | RI05 Recovery and custody decision | Selected post-write method; source retention/key rules; current trust, support/custody and restore model | RF08–RF10, OM05–OM07, G00.05 acceptance |
 | RI06 Operating target review | Accept or replace tier numbers and objective measurement/denominator rules; assign accountable people and independent reviewers | Ratifying ADR-017 and reporting any accepted capacity/SLO claim |
 
-Independent work completed: historical/current method comparison; current rebuild/restore recommendation and feasibility design; retained primary-source constraints for separate P09 whole-VM work; input inventory; bounded positive/negative/recovery experiment design; proposed load tiers and measurement definitions. Continue schema/fixture-generator design and compatibility work under the current phases while requesting RI01–RI06. No native command is authorized or claimed by this review, and no P00 gate passes from documentation alone.
+The input inventory and bounded positive, negative and recovery cases support implementation. Actual native outcomes and operating targets require observations on the commissioned topology.

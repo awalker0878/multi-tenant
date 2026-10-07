@@ -10,7 +10,7 @@ The manifest identifies a reproducible product release and its evaluated scope. 
 | Services | Console and six domain-service image digests, configuration schema versions and required runtime dependencies |
 | Context and code controls | Context-map revision/digest, service source paths and context IDs, language-analysis/configuration identities and coverage, required-check/review evidence and scoped unexpired exception references |
 | Workers | Workflow, discovery, infrastructure, guest, shared-service and data-mover artifact identities; permitted routing/version combinations |
-| Automation | Terraform/provider/module and Ansible/role identities, schema/input versions and approved ownership model |
+| Automation | native API contract/adapter and guest automation identities, schema/input versions and approved ownership model |
 | Contracts | HTTP/event/schema versions, client compatibility and canonicalization/digest version |
 | Persistence | Service migration versions, compatible previous state, expand/contract stages and downgrade limits |
 | Deployment | Dependency/BOM identities, environment profile, configuration digests, network/trust assumptions and artifact-mirror requirements |

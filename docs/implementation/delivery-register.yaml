@@ -286,11 +286,11 @@ phases:
   - EV-P07-003
   blocker_ids:
   - BL-P07-001
-  delivery_note: 'API-first configuration and prior saved-plan/readback evidence remain retained. Durable native
-    Temporal dispatch, single-attempt stages, cancellation holds and authenticated saved-plan worker submission
-    pass E2 qualification at 9b01db784ce4ceac012cc98592dd96997efc6168: 445 component tests, 43 live checks and six
-    offline-replayed histories. Commissioned current-owner/caller trust, provider fencing, selected native service/effect/observer
-    adapters and Q05/Q06 remain unfinished. P07 and G07 are not complete.'
+  delivery_note: 'Native API-only operation plans, Neutron/Cinder/Nova requests, durable request/object receipts,
+    custody generations and independent readback implement ADR-016. Current-source hosted qualification is pending.
+    Native Temporal dispatch and single-use grants remain implemented. Commissioned current-owner/caller trust,
+    provider fencing, selected guest/service/traffic/retirement adapters and actual Q05/Q06 remain outstanding.
+    P08 owns the migration design and copy-only conversion/transformation. P07 and G07 are not complete.'
 - id: P08
   title: VMware-to-OpenStack migration
   owner_role: Infrastructure and application owner
@@ -7117,7 +7117,7 @@ blockers:
     interpretation overrides and supply non-discoverable implementation inputs in Console under the existing ADR-015/016
     baseline. Before native effects, supply exact campaign authority and complete applicable G06 receiving and OP01-OP07
     controls. Qualify the implemented adapters on that exact native scope.
-  next_action: Compose the implemented native stage/grant, Temporal outbox/queue and saved-plan effect/boundary TLS
+  next_action: Compose the implemented native stage/grant, Temporal outbox/queue and native API effect/boundary TLS
     components with actual Governance/Planning/Inventory owner reads, independently administered state/provider
     custody and verified caller trust. Implement the selected provider request fence and guest/service/traffic/retirement
     effect and observer adapters. Collect actual installed/interface/operating inputs through API-first Console,

@@ -85,10 +85,10 @@ def validate_plan(plan: dict[str, Any], now: int) -> None:
             "source_revision",
             "purpose",
             "source_job_id",
-            "workspace",
-            "state_lineage",
-            "state_serial",
-            "bundle_sha256",
+            "ownership_digest",
+            "custody_id",
+            "custody_generation",
+            "operation_plan_sha256",
             "expires_at",
             "intents",
             "policy_cases",
@@ -119,28 +119,25 @@ def validate_plan(plan: dict[str, Any], now: int) -> None:
         "executor_id",
         "campaign_id",
         "epoch",
-        "state_lineage",
+        "custody_id",
     ):
         identity(plan[key])
     if plan["approver_id"] in {plan["actor_id"], plan["requester_id"]}:
         raise Rejected("independent_native_approval_required", 403)
-    for key in ("plan_digest", "bundle_sha256", "tuple_digest"):
+    for key in ("plan_digest", "operation_plan_sha256", "tuple_digest"):
         checksum(plan[key])
     config = exact(plan["configuration"], {"revision", "digest"})
     integer(config["revision"], 1)
     checksum(config["digest"])
     integer(plan["plan_revision"], 1)
-    integer(plan["state_serial"])
+    integer(plan["custody_generation"])
     if integer(plan["expires_at"], 1) <= now:
         raise Rejected("native_plan_expired", 423)
     if not isinstance(plan["source_revision"], str) or not re.fullmatch(
         r"[a-f0-9]{40}", plan["source_revision"]
     ):
         raise Rejected("invalid_native_source", 422)
-    if not isinstance(plan["workspace"], str) or not re.fullmatch(
-        r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}", plan["workspace"]
-    ):
-        raise Rejected("invalid_native_workspace", 422)
+    checksum(plan["ownership_digest"])
     if plan["purpose"] not in {"provision", "retire"}:
         raise Rejected("unsupported_native_purpose", 422)
     if plan["purpose"] == "retire":

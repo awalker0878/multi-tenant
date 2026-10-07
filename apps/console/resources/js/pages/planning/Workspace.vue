@@ -11,7 +11,7 @@ const kind=props.record?.binding?'plans':'assessments';
 const {validity,now,unavailable}=usePlanningAccess(props.record?`${base}/${kind}/${props.record.id}/status${query}`:null,props.record?.validity);
 const rows=ref([{site:'',endpoint:'',endpoints:[] as Endpoint[]},{site:'',endpoint:'',endpoints:[] as Endpoint[]}]);
 const selectionError=ref('');
-const action=ref('application.provision');const method=ref('saved_plan');const executor=ref('');const lane=ref('operational');const compare=ref('');
+const action=ref('application.provision');const method=ref('native_api');const executor=ref('');const lane=ref('operational');const compare=ref('');
 type CommandBody = {revision_id?:string;action?:string;method?:string;candidates?:{site_id:string;endpoint_id:string;generation_id:string}[];assessment_id?:string;candidate?:number;request?:{action:string;method:string;lane:string;executor_ids:string[];valid_until:number};plan_id?:string;plan_digest?:string;other_plan_id?:string};
 const command=useForm({operation:'assessments',command_key:crypto.randomUUID() as string,sites:[] as string[],body:{} as CommandBody});
 const errorMessage=ref('');
@@ -56,7 +56,7 @@ function compile(index:number){if(!props.record)return;send('plans',{assessment_
         <button type="button" class="secondary" @click="load(index)">Load collected endpoints</button>
         <label :for="`endpoint-${index}`">Endpoint<select :id="`endpoint-${index}`" v-model="row.endpoint" :required="index===0"><option value="">Choose a collected endpoint</option><option v-for="e in row.endpoints" :key="e.endpoint_id" :value="e.endpoint_id" :disabled="!e.generation_id">{{e.label}} · {{e.platform}} · {{e.reason??'current collection'}}</option></select></label>
       </section></div>
-      <div class="grid max-w-3xl gap-4 sm:grid-cols-2"><label for="planning-action">Action<select id="planning-action" v-model="action"><option value="application.provision">Provision</option><option value="application.migrate">Migrate</option><option value="application.recover">Recover</option><option value="application.retire">Retire</option></select></label><label for="planning-method">Method<select id="planning-method" v-model="method"><option value="saved_plan">Reviewed saved plan</option><option value="application_rebuild_restore">Application rebuild and restore</option><option value="forward_recovery">Forward recovery</option><option value="owned_retirement">Owned resource retirement</option></select></label></div>
+      <div class="grid max-w-3xl gap-4 sm:grid-cols-2"><label for="planning-action">Action<select id="planning-action" v-model="action"><option value="application.provision">Provision</option><option value="application.migrate">Migrate</option><option value="application.recover">Recover</option><option value="application.retire">Retire</option></select></label><label for="planning-method">Method<select id="planning-method" v-model="method"><option value="native_api">Native API provisioning</option><option value="native_api_export_import">Native VM export and import</option><option value="forward_recovery">Forward recovery</option><option value="owned_retirement">Owned resource retirement</option></select></label></div>
       <p v-if="selectionError" role="alert">{{selectionError}}</p><button type="submit">Assess destinations</button>
     </fieldset>
   </form>
