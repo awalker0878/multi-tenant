@@ -190,6 +190,8 @@ def test_native_durable_orchestration(native, postgres, tmp_path):
                 scheduled = [event.activity_task_scheduled_event_attributes for event in history.events if event.HasField('activity_task_scheduled_event_attributes')]
                 check('every-activity-disables-retry', all(a.retry_policy.maximum_attempts == 1 for a in scheduled))
                 check('history-redacts-private-provider-message', 'private_synthetic_provider_reply' not in history.to_json())
+                history_path = Path(os.environ['P07_DISPATCH_OBSERVATIONS']).parent / ('history-' + handle.id + '.json')
+                history_path.write_text(history.to_json() + '\n')
                 histories.append({'workflow_id': handle.id, 'events': len(history.events), 'replay': 'PASSED'})
             check('six-real-native-histories-replayed', len(histories) == 6)
             check('two-provision-effects-crossed-real-tls', calls['effect'] == 2 and len(calls['applies']) == 2)

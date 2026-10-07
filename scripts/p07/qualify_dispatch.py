@@ -78,6 +78,8 @@ def main():
         measured = json.loads((out / 'observations.json').read_text())
         if not measured['checks'] or len(measured['histories']) != 6:
             raise RuntimeError('native_temporal_observations_incomplete')
+        if any(not (out / ('history-' + row['workflow_id'] + '.json')).is_file() for row in measured['histories']):
+            raise RuntimeError('native_temporal_histories_not_retained')
         report['check_count'] = len(measured['checks'])
         report['replayed_histories'] = len(measured['histories'])
     except Exception as error:
