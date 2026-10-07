@@ -56,6 +56,9 @@ def main():
         if not env.get('P05_POSTGRES_BIN'):
             raise RuntimeError('P05_POSTGRES_BIN required; skipped database tests cannot pass qualification')
         env['P07_POSTGRES_BIN'] = env['P05_POSTGRES_BIN']
+        # Check authored source before wheel builds create disposable build/lib copies.
+        # The architecture gate intentionally does not ignore arbitrary build folders.
+        command('.', ['python', 'scripts/validate_architecture.py'])
         for directory, suite in (('services/planning', 'planning'), ('services/lifecycle', 'lifecycle'), ('workers/lifecycle', 'worker')):
             for argv in (['uv', 'sync', '--locked', '--group', 'build'],
                          ['uv', 'run', '--frozen', 'ruff', 'check', 'src', 'tests'],
@@ -70,7 +73,6 @@ def main():
             if totals['tests'] == 0 or any(totals[k] for k in ('failures', 'errors', 'skipped')):
                 raise RuntimeError(suite + ' not fully passing')
         command('services/planning', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p09/check_contract.py')])
-        command('.', ['python', 'scripts/validate_architecture.py'])
     except Exception as error:
         report['error'] = str(error)
     report['result'] = 'PASSED' if report['commands'] and not report.get('error') and all(c['exit_code'] == 0 for c in report['commands']) else 'FAILED'
