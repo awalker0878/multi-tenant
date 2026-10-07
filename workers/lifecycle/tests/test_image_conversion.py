@@ -140,3 +140,46 @@ def test_sandbox_has_no_network_credentials_or_writable_source() -> None:
     assert command[command.index("/custody/source.vmdk") - 1] == "--ro-bind"
     assert command.count("--bind") == 1
     assert "--share-net" not in command and "--share-user" not in command
+
+
+@pytest.mark.parametrize("fault", ["file_bound", "output_bound", "deadline"])
+def test_real_subprocess_limits_and_threaded_cancellation(tmp_path: Path, fault: str) -> None:
+    import sys
+    import time
+    from concurrent.futures import ThreadPoolExecutor
+
+    class ProcessEngine(PinnedQemuSandbox):
+        def __init__(self) -> None:
+            # This fixture exercises the real launcher, not a QEMU/bubblewrap runtime.
+            self.sandbox = tmp_path / "synthetic-sandbox"
+            self.sandbox.write_bytes(b"synthetic launcher artifact")
+            self.runtime = {"sandbox_sha256": hashlib.sha256(self.sandbox.read_bytes()).hexdigest()}
+
+        def command(self, arguments: list[str], source: Path, output: Path) -> list[str]:
+            return [sys.executable, "-I", "-S", "-c", arguments[0]]
+
+    output = tmp_path / "partial"
+    code = {
+        "file_bound": f"f=open({str(output)!r},'wb'); f.write(b'x'*4096); f.flush()",
+        "output_bound": "import sys; sys.stdout.write('x'*131072)",
+        "deadline": "import time; time.sleep(5)",
+    }[fault]
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(
+            ProcessEngine().run,
+            [code],
+            tmp_path,
+            tmp_path,
+            1024,
+            time.monotonic() + 0.5,
+            lambda: None,
+        )
+        reason = {
+            "file_bound": "conversion_engine_held",
+            "output_bound": "conversion_output_bound",
+            "deadline": "conversion_deadline",
+        }[fault]
+        with pytest.raises(NativeHeld, match=reason):
+            future.result(timeout=3)
+    if fault == "file_bound":
+        assert output.stat().st_size <= 1024

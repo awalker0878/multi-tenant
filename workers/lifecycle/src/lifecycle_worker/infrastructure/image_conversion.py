@@ -7,11 +7,11 @@ than invoking salvage, in-place repair or a second conversion method.
 
 import hashlib
 import os
-import resource
 import selectors
 import signal
 import stat
 import subprocess
+import sys
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -142,22 +142,35 @@ class PinnedQemuSandbox:
         if file_digest(self.sandbox, 2**24, current)["sha256"] != self.runtime["sandbox_sha256"]:
             raise NativeHeld("conversion_runtime_changed")
 
-        def limits() -> None:
-            resource.setrlimit(resource.RLIMIT_FSIZE, (max_bytes, max_bytes))
-            resource.setrlimit(resource.RLIMIT_AS, (2**31, 2**31))
-            resource.setrlimit(resource.RLIMIT_CPU, (600, 600))
-            resource.setrlimit(resource.RLIMIT_NOFILE, (64, 64))
-            resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
-
+        # ASGI invokes this worker in a thread. preexec_fn is unsafe after a
+        # multithreaded fork; set limits in a fresh isolated interpreter before
+        # replacing it with the pinned sandbox. No shell or guest code is used.
+        limiter = (
+            "import os,resource,sys; "
+            "n=int(sys.argv[1]); "
+            "resource.setrlimit(resource.RLIMIT_FSIZE,(n,n)); "
+            "resource.setrlimit(resource.RLIMIT_AS,(2**31,2**31)); "
+            "resource.setrlimit(resource.RLIMIT_CPU,(600,600)); "
+            "resource.setrlimit(resource.RLIMIT_NOFILE,(64,64)); "
+            "resource.setrlimit(resource.RLIMIT_CORE,(0,0)); "
+            "os.execv(sys.argv[2],sys.argv[2:])"
+        )
         process = subprocess.Popen(
-            self.command(arguments, source, output),
+            [
+                sys.executable,
+                "-I",
+                "-S",
+                "-c",
+                limiter,
+                str(max_bytes),
+                *self.command(arguments, source, output),
+            ],
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env={"PATH": "/usr/bin:/bin", "LANG": "C"},
             close_fds=True,
             start_new_session=True,
-            preexec_fn=limits,
         )
         data = bytearray()
         try:
