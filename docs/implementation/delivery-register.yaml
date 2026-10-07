@@ -280,11 +280,13 @@ phases:
   evidence_ids:
   - EV-P07-001
   - EV-P07-002
+  - EV-P07-003
   blocker_ids:
   - BL-P07-001
-  delivery_note: Commissioning-input and saved-plan comparison preparation passes E1 qualification; existing execution
-    passes E2 regression. All fifteen actual input groups remain missing. Native adapters and Q05/Q06 E3 are unimplemented,
-    so no P07 package or G07 criterion is complete.
+  delivery_note: API-first OpenStack configuration pulls and Console administrator review pass E2 software qualification;
+    commissioning-input and saved-plan preparation retain their original E1 evidence. Actual native configuration
+    is supplied at runtime through API discovery and Console validation. Native provisioning/service/recovery/retirement
+    adapters and Q05/Q06 E3 remain unfinished, so P07 and G07 are not complete.
 - id: P08
   title: VMware-to-OpenStack migration
   owner_role: Infrastructure and application owner
@@ -1695,6 +1697,7 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P07-001
+  - EV-P07-003
   blocker_ids:
   - BL-P07-001
   doc_refs:
@@ -1702,11 +1705,15 @@ work_packages:
   - docs/implementation/p07-native-provisioning.md
   - docs/operations/runbooks/openstack-commissioning.md
   - docs/implementation/p07-completion-review.md
+  - docs/implementation/openstack-version-qualification.md
   criterion_ids:
   - G07.01
   - G07.02
-  delivery_note: Bounded commissioning-input evaluator and protected-file parser pass E1 checks; all N01-N15 actual
-    inputs remain missing. Metadata comparison supplies neither native site readiness nor write authority.
+  delivery_note: Inventory pulls installed API ranges, advertised features and configured options through trusted
+    read connections. Console stores immutable administrator reviews, reasoned overrides and non-discoverable inputs.
+    135 Inventory/worker tests and three compiled browser campaigns pass at the indexed source; actual native readiness
+    and commissioning remain unqualified. The unknown N01-N15 repository record is a template, not a development
+    prerequisite.
 - id: P07.02
   phase_id: P07
   title: Infrastructure automation
@@ -2606,6 +2613,7 @@ requirements:
   - EV-P05-001
   - EV-P05-002
   - EV-P05-003
+  - EV-P07-003
   blocker_ids:
   - BL-P05-001
   - BL-P07-001
@@ -2952,6 +2960,7 @@ requirements:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P07-001
+  - EV-P07-003
   blocker_ids:
   - BL-P07-001
 - id: R19
@@ -3568,6 +3577,7 @@ requirements:
   - EV-P06-001
   - EV-P06-002
   - EV-P06-003
+  - EV-P07-003
   blocker_ids:
   - BL-P03-001
   - BL-P03-002
@@ -6591,6 +6601,33 @@ evidence:
     All 1,021 source bindings and 81 artifact hashes match per browser. Original failures and superseded one-file
     source discrepancies are retained. Associated foundation regression has its own explicitly recorded source and
     outcome.
+- id: EV-P07-003
+  level: E2
+  source_revision: 9f353a4de5d44dc7da84ee2298325ddd728819f1
+  artifact_revisions:
+    retained_artifact_commit: f2925e7c7f79653955ff027c2d3c0e07e3232a58
+    run_id: '37554391902'
+  campaign_ids:
+  - Q02
+  criterion_ids: []
+  observed_at: '2026-10-07T00:58:29.355156+00:00'
+  observer: GitHub Actions hosted PostgreSQL and compiled-browser campaigns; Codex compared every retained archive,
+    source, command and artifact digest.
+  reviewer: Codex engineering consistency review only; designated native and receiving reviews remain open.
+  limitations: Synthetic native-provider responses only; no actual OpenStack environment, backend operation, release
+    or native support tuple qualified. No native write authority. Core collection is bounded below 100 items per
+    query; optional services require separately trusted streams. Native provisioning, service integration, activation,
+    recovery, retirement and Q05/Q06 remain unfinished.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/f2925e7c7f79653955ff027c2d3c0e07e3232a58/verification/p07/configuration/qualification-index.json
+  sha256: c9075b0a37d291f946a4012b2c95482536df887c60dcc2f0532d8a6c852acdd7
+  environment: GitHub Actions Ubuntu 24.04; real PostgreSQL runtime role, separately authenticated TLS APIs, AMQPS
+    and compiled Chromium/Firefox/WebKit; synthetic scoped OpenStack HTTP peer.
+  scope: 86 Inventory and 49 worker tests pass without skips; three complete API-to-Console campaigns each pass
+    78 checks. Collection, immutable facts, scoped revisions, explained overrides, empty manual object preservation,
+    reload persistence, choice ordering, fresh confirmation, access revocation and original-contract compatibility
+    are verified. All archive/source/log/artifact hashes match; original failed observations remain retained.
 blockers:
 - id: BL-P00-001
   scope_ids:

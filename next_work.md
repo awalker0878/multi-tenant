@@ -8,6 +8,14 @@ unimplemented. The [implementation record](docs/implementation/p07-native-provis
 delivered increment and its limits. The [input record](release/p07-native-inputs.json)
 still correctly reports all fifteen input groups missing.
 
+API-first OpenStack configuration collection and Console administrator review are
+implemented. The [configuration evidence](verification/p07/configuration/qualification-index.json)
+binds tested API pulls, immutable findings, reasoned overrides, saved manual values
+and exact-revision confirmation. The [newest-first version register](docs/implementation/openstack-version-qualification.md)
+starts with 2026.2 Hibiscus and distinguishes documentation review from native
+qualification. The repository's unknown input record remains a template; deployed
+configuration belongs in Inventory and the Console.
+
 1. Continue native adapter development against the [released OpenStack API baseline](docs/implementation/openstack-version-qualification.md). API pulls and Console administrator review own implementation-specific inputs; they are runtime configuration, not a prerequisite for independent engineering.
 2. Exercise the Console source/destination pulls, validate configured options and installed/advertised features, explain interpretation overrides, and supply inputs unavailable through APIs. Bind confirmed revisions to the actual campaign when commissioning.
 3. **BL-P07-001** remains a native execution/qualification hold: actual current scope, protected identity/trust, campaign authority, independent observers and applicable receiving controls are necessary for Q05/Q06 E3. Complete the native infrastructure, allocation, guest/service, activation, recovery, retirement and support dossier outputs in the [remaining packet](docs/implementation/p07-completion-review.md).

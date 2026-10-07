@@ -3,6 +3,11 @@
 This is an E1 preparation increment. The fifteen commissioning inputs remain
 missing; no Q05/Q06 native case has run and no G07 criterion has passed.
 
+The subsequent [API configuration and Console review increment](configuration/README.md)
+has its own E1/E2 [qualification index](configuration/qualification-index.json).
+Its results supplement this original preparation record; they do not turn the
+unknown commissioning template into a native readiness observation.
+
 | Boundary | Measured checks | Scope |
 | --- | --- | --- |
 | Commissioning packet | 55 passing cases: every missing obligation, exact binding, contradictory observations, stale/rejected/unreviewed evidence, reviewer/observer independence, E2 rejection for native observations and bounded/redacted parsing | Synthetic metadata and local files only |

@@ -62,3 +62,10 @@ Deployment inputs are runtime commissioning data. BL-P07-001 blocks native effec
 and qualification that need an actual environment, not independent product or
 adapter development. Existing N01–N15 preparation evidence remains original;
 the checked-in unknown record is a template, not the Console configuration store.
+
+The [configuration qualification](../../verification/p07/configuration/qualification-index.json)
+and [check record](../../verification/p07/configuration/README.md) retain the
+API-to-Console campaign, scoped PostgreSQL/collector tests, original failures and
+source/hash comparisons. These exercise synthetic provider responses over real
+TLS and database boundaries; they establish software behavior without qualifying
+an installed OpenStack environment or completing native P07 operations.

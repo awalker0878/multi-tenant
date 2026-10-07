@@ -17,7 +17,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | P04 | Site commissioning and inventory | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 3 / 2 |
 | P05 | Capabilities and immutable plans | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | G05: NOT_REVIEWED | 3 / 1 |
 | P06 | Durable execution in simulation | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | G06: NOT_REVIEWED | 3 / 1 |
-| P07 | Native OpenStack provisioning | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G07: NOT_REVIEWED | 2 / 1 |
+| P07 | Native OpenStack provisioning | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G07: NOT_REVIEWED | 3 / 1 |
 | P08 | VMware-to-OpenStack migration | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G08: NOT_REVIEWED | 0 / 0 |
 | P09 | Platform and capability expansion | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G09: NOT_REVIEWED | 0 / 0 |
 | P10 | Enterprise operating qualification | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G10: NOT_REVIEWED | 0 / 0 |
@@ -68,7 +68,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P06.04 | Evidence custody | Assurance | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P06.05 | Simulation and fault injection | Quality | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P06.06 | Jobs experience | Console | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | 3 / 1 |
-| P07.01 | Native site readiness | SRE/platform owners | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 1 |
+| P07.01 | Native site readiness | SRE/platform owners | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 1 |
 | P07.02 | Infrastructure automation | Infrastructure | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 1 |
 | P07.03 | Guest and service integration | Infrastructure/service owners | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
 | P07.04 | Activation and verification | Lifecycle/quality | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **82**. Blocker records: **15**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **83**. Blocker records: **15**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -185,6 +185,7 @@ Evidence records: **82**. Blocker records: **15**. Planning inputs awaiting sele
 | EV-P06-003 | E2 | GitHub Actions Ubuntu 24.04; separately owned TLS APIs/stores; pinned PostgreSQL 18.6, AMQPS and real Temporal; compiled Chromium/Firefox/WebKit. | 3a9c136639426087d060845184048f52850fcfc7 | E1/E2 simulation only. Controlled source/qualification records and synthetic OIDC bootstrap confer no native E3 or operating acceptance. Loopback TLS, keyboard/reflow and browser automation do not establish operated ingress, representative comprehension or assistive support. Restore denies re-enable; no automatic epoch rebind or native recovery adapter exists. No time-based expiry is asserted; material source, scope or assumptions require affected requalification. |
 | EV-P07-001 | E1 | GitHub Actions Ubuntu 24.04/Python 3.12.14/uv 0.12.19; separate local isolated installed-wheel smoke. | 249a77e9fda5c0a3e25918ce3efdb52f4ab415de | Offline comparison only; input identities and evidence records are not authenticated and lock possession is not established. No native adapter is implemented and no P07 package or G07 criterion is complete. No native OpenStack/Terraform/service/backup/policy/revocation/retirement execution or support claim. No operating or receiving acceptance. Fixed-source observations have no asserted time expiry; changed relevant source, scope or assumptions require affected qualification. |
 | EV-P07-002 | E2 | GitHub Actions Ubuntu 24.04; real PostgreSQL journal/effect simulation and independently owned TLS APIs, Temporal, AMQPS and compiled Chromium/Firefox/WebKit. | c2c29067f0ecdb7d0df0c92687507b66415219e5 | P06 E2 regression only; not a Q05/Q06 native campaign. Restored simulation remains held until independent reconciliation and newly bound authority. No native OpenStack/Terraform/service/backup/policy/revocation/retirement execution or support claim. No operating or receiving acceptance. Fixed-source observations have no asserted time expiry; changed relevant source, scope or assumptions require affected qualification. |
+| EV-P07-003 | E2 | GitHub Actions Ubuntu 24.04; real PostgreSQL runtime role, separately authenticated TLS APIs, AMQPS and compiled Chromium/Firefox/WebKit; synthetic scoped OpenStack HTTP peer. | 9f353a4de5d44dc7da84ee2298325ddd728819f1 | Synthetic native-provider responses only; no actual OpenStack environment, backend operation, release or native support tuple qualified. No native write authority. Core collection is bounded below 100 items per query; optional services require separately trusted streams. Native provisioning, service integration, activation, recovery, retirement and Q05/Q06 remain unfinished. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
 | BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, P01, P01.02, P01.04, P01.05, P01.06, G01, R29, R30 | Requesting user for baseline decisions; actual integration, operating and records owners at their affected checkpoints | OPEN | Supply the concrete runtime, registry/signer, trust, operating or records input before the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward checkpoints; do not request baseline approval again. | Complete the exact OP01–OP07 receiving inputs in release/operating-inputs.json with actual identities and immutable evidence. Run operating_inputs.py --require-complete, then integrate and qualify the affected trust/runtime/operations path. Preserve the accepted G00 decision and later P08/P10/P11 receiving checkpoints. |
