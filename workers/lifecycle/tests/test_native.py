@@ -439,7 +439,8 @@ def test_exact_native_readback_and_no_application_readiness(binding: NativeBindi
 
 
 @pytest.mark.parametrize(
-    "mutation", ["wrong_project", "wrong_user", "expired_token", "writer_is_observer"]
+    "mutation",
+    ["wrong_project", "wrong_user", "expired_token", "unbound_timezone", "writer_is_observer"],
 )
 def test_observer_identity_is_bound(binding: NativeBinding, mutation: str) -> None:
     fixture = NativeFixture(binding)
@@ -450,6 +451,8 @@ def test_observer_identity_is_bound(binding: NativeBinding, mutation: str) -> No
         token["user"]["id"] = uuid4().hex
     elif mutation == "expired_token":
         token["expires_at"] = "1970-01-01T00:00:01Z"
+    elif mutation == "unbound_timezone":
+        token["expires_at"] = "2100-01-01T00:00:00"
     with pytest.raises(NativeHeld):
         if mutation == "writer_is_observer":
             OpenStackReadback(fixture, fixture.expected, fixture.user, fixture.user, lambda: 100)
@@ -716,3 +719,32 @@ def test_unsupported_field_cannot_be_claimed_as_native_readback(binding: NativeB
     )
     with pytest.raises(NativeHeld, match="readback_not_implemented"):
         validate_plan(plan_for(expected), expected, binding)
+
+
+@pytest.mark.parametrize("boundary", ["plan", "state", "native_volume", "native_config_drive"])
+def test_json_boolean_never_substitutes_for_number(binding: NativeBinding, boundary: str) -> None:
+    fixture = NativeFixture(binding)
+    volume_expected = fixture.expected["openstack_blockstorage_volume_v3.root"]["expected"]
+    volume_expected["size"] = 1
+    volume_state = fixture.state["resources"][2]["instances"][0]["attributes"]
+    volume_state["size"] = 1
+    native_volume = next(v["volume"] for v in fixture.documents.values() if "volume" in v)
+    native_volume["size"] = 1
+    if boundary == "plan":
+        plan = copy.deepcopy(plan_for(fixture.expected))
+        plan["resource_changes"][2]["change"]["after"]["size"] = True
+        with pytest.raises(NativeHeld, match="expected_field_changed"):
+            validate_plan(plan, fixture.expected, binding)
+        return
+    if boundary == "state":
+        volume_state["size"] = True
+    elif boundary == "native_volume":
+        native_volume["size"] = True
+    else:
+        fixture.expected["openstack_compute_instance_v2.application"]["expected"][
+            "config_drive"
+        ] = True
+        fixture.state["resources"][0]["instances"][0]["attributes"]["config_drive"] = True
+        native_server = next(v["server"] for v in fixture.documents.values() if "server" in v)
+        native_server["config_drive"] = 1
+    assert fixture.observer().observe(binding, fixture.state)["outcome"] == "held"

@@ -77,11 +77,12 @@ class OpenStackReadback:
     def observe(self, binding: NativeBinding, state: dict[str, Any]) -> dict[str, Any]:
         token = self.transport.get("identity", "/auth/tokens", subject=True).get("token", {})
         try:
-            expiry = datetime.fromisoformat(token["expires_at"].replace("Z", "+00:00")).timestamp()
+            expiry = datetime.fromisoformat(token["expires_at"].replace("Z", "+00:00"))
             if (
-                token.get("project", {}).get("id") != binding.project_id
+                expiry.tzinfo is None
+                or token.get("project", {}).get("id") != binding.project_id
                 or token.get("user", {}).get("id") != self.observer_user_id
-                or expiry <= self.clock()
+                or expiry.timestamp() <= self.clock()
             ):
                 raise ValueError
         except (KeyError, ValueError, TypeError):
@@ -148,7 +149,7 @@ class OpenStackReadback:
     ) -> None:
         if set(expected) - EXPECTED_FIELDS[kind]:
             raise NativeHeld("native_field_readback_not_implemented")
-        if any(attributes.get(k) != v for k, v in expected.items()):
+        if any(digest(attributes.get(k)) != digest(v) for k, v in expected.items()):
             raise NativeHeld("terraform_expected_fields_changed")
         project = native.get("project_id", native.get("tenant_id"))
         if kind == "volume":
@@ -183,7 +184,8 @@ class OpenStackReadback:
             if "config_drive" in expected:
                 drive = native.get("config_drive")
                 if (
-                    drive not in {True, False, "True", ""}
+                    type(drive) not in {bool, str}
+                    or drive not in {True, False, "True", ""}
                     or (drive in {True, "True"}) != expected["config_drive"]
                 ):
                     raise NativeHeld("native_config_drive_changed")
@@ -252,6 +254,7 @@ class OpenStackReadback:
                 raise NativeHeld("native_volume_attachment_changed")
             if (
                 native.get("status") != "in-use"
+                or type(native.get("size")) is not int
                 or native.get("size") != expected.get("size")
                 or native.get("volume_type") != expected.get("volume_type")
                 or native.get("name") != expected.get("name")

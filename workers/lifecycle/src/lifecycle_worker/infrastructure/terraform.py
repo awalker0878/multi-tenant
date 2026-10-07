@@ -297,7 +297,7 @@ def validate_plan(plan: dict[str, Any], resources: Any, binding: NativeBinding) 
         unknown = change.get("after_unknown", {})
         # A review may never claim a known field when Terraform still considers it unknown.
         for field, value in expected.items():
-            if after.get(field) != value or unknown.get(field):
+            if digest(after.get(field)) != digest(value) or unknown.get(field):
                 raise NativeHeld("native_expected_field_changed")
         if contract["kind"] in {"server", "volume"}:
             metadata = expected.get("metadata", {})
