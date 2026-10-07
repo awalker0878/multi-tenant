@@ -103,16 +103,19 @@ class CatalogueBroker:
             path = self.private/filename
             path.chmod(0o444)
             mounts += ['-v', str(path) + ':' + ('/etc/rabbitmq/rabbitmq.conf' if filename.endswith('.conf') else '/config/'+filename) + ':ro']
-        self.run(['docker', 'run', '-d', '--name', self.name, '--hostname', 'p03-broker', '-p', '127.0.0.1:5679:5671', '-e', 'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=+S 2:2', '-e', 'RABBITMQ_CTL_ERL_ARGS=+S 2:2', '--health-cmd', 'rabbitmq-diagnostics -q check_running', '--health-interval', '2s', '--health-retries', '45', *mounts, self.image], label='broker-start')
+        # A root health probe can create an unreadable cookie before server startup.
+        self.run(['docker', 'run', '-d', '--name', self.name, '--hostname', 'p03-broker', '-p', '127.0.0.1:5679:5671', '-e', 'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=+S 2:2', '-e', 'RABBITMQ_CTL_ERL_ARGS=+S 2:2', '--health-cmd', 'gosu rabbitmq rabbitmq-diagnostics -q check_running', '--health-interval', '2s', '--health-retries', '45', *mounts, self.image], label='broker-start')
         deadline = time.monotonic()+90
         while True:
             state = json.loads(subprocess.check_output(['docker', 'inspect', '--format', '{{json .State}}', self.name]))
             if state.get('Health', {}).get('Status') == 'healthy':
                 break
             if not state.get('Running') or time.monotonic() >= deadline:
+                self.run(['docker', 'logs', self.name], label='broker-failure')
+                self.run(['docker', 'inspect', '--format', '{{json .State}}', self.name], label='broker-failure-state')
                 raise RuntimeError('broker_not_ready')
             time.sleep(1)
-        self.run(['docker', 'exec', self.name, 'rabbitmq-diagnostics', '-q', 'check_port_connectivity', '--address', '127.0.0.1'], label='broker-ready')
+        self.run(['docker', 'exec', '--user', 'rabbitmq', self.name, 'rabbitmq-diagnostics', '-q', 'check_port_connectivity', '--address', '127.0.0.1'], label='broker-ready')
 
     def close(self):
         subprocess.run(['docker', 'rm', '-f', self.name], capture_output=True, timeout=30)

@@ -43,7 +43,7 @@ def main():
         shutil.copytree(artifacts, output/'browser', dirs_exist_ok=True)
     stats = report.get('stats', {})
     report['result'] = 'PASSED' if all(c['exit_code'] == 0 for c in report['commands']) and stats.get('expected') == 1 and not any(stats.get(k, 1) for k in ('unexpected', 'flaky', 'skipped')) else 'FAILED'
-    report['artifact_sha256'] = {str(p.relative_to(output)): sha(p) for p in output.rglob('*') if p.is_file() and p.name != 'report.json'}
+    report['artifact_sha256'] = {str(p.relative_to(output)): sha(p) for p in output.rglob('*') if p.is_file() and p.name != 'report.json' and not any(part.startswith('.') for part in p.relative_to(output).parts)}
     (output/'report.json').write_text(json.dumps(report, indent=2)+'\n')
     return 0 if report['result'] == 'PASSED' else 1
 
