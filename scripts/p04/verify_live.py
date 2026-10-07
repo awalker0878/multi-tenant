@@ -323,7 +323,8 @@ def main():
             finish(current, 'configuration-page', page_limit=40)
             workspace = inventory('getPortingConfiguration')
             review = {'source_endpoint': endpoint, 'target_endpoint': endpoint, 'manual': {},
-                      'choices': [{'id': 'compute', 'required': True, 'interpretation': 'observed', 'reason': ''}]}
+                      'choices': [{'id': c['id'], 'required': c['id'] == 'compute', 'interpretation': 'observed', 'reason': ''} for c in reversed(workspace['capabilities'])]}
+            inventory('savePortingConfiguration', {**review, 'choices': review['choices'][:1]}, expected=422)
             saved = inventory('savePortingConfiguration', review)
             workspace = inventory('getPortingConfiguration')
             check('configuration-core-api-queries-pulled', len(workspace['source']['queries']) == 12 and workspace['source']['current'])
