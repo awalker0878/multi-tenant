@@ -31,6 +31,7 @@ class PlanningRouter:
             self.planning.planning, prepare_migration, recipe_for, visible_recipes
         )
         self.planning.planning.migration_current = migrations.current
+        self.planning.planning.migration_execution_current = migrations.execution_current
         self.migration = MigrationPreparationApp(
             self.planning.authority, prepare_migration, migrations
         )

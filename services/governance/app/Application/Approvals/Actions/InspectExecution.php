@@ -22,7 +22,22 @@ final class InspectExecution
      * @return array<string, mixed> */
     public function handle(string $tenant, array $input): array
     {
-        return DB::transaction(function () use ($tenant, $input): array {
+        return $this->inspect($tenant, $input, false);
+    }
+
+    /** An approval is one input to native admission, never a platform write grant.
+     * @param array<string, mixed> $input
+     * @return array<string, mixed> */
+    public function native(string $tenant, array $input): array
+    {
+        return $this->inspect($tenant, $input, true);
+    }
+
+    /** @param array<string, mixed> $input
+     * @return array<string, mixed> */
+    private function inspect(string $tenant, array $input, bool $native): array
+    {
+        return DB::transaction(function () use ($tenant, $input, $native): array {
             BootstrapAdministrator::query()->lockForUpdate()->findOrFail(1);
             $actor = DB::table('app.federated_actors as a')->join('app.oidc_connections as c', 'c.issuer', '=', 'a.issuer')
                 ->join('app.oidc_installation as i', 'i.active_revision', '=', 'c.revision')
@@ -36,7 +51,7 @@ final class InspectExecution
             }
             $plan = BoundPlan::fromArray(json_decode($approval->binding_json, true, 32, JSON_THROW_ON_ERROR));
             ApprovalExpiry::apply($approval);
-            if ($approval->state !== 'approved' || ($plan->binding['lane'] ?? null) !== 'isolated_campaign'
+            if ($approval->state !== 'approved' || ($plan->binding['lane'] ?? null) !== ($native ? 'operational' : 'isolated_campaign')
                 || $plan->binding['valid_until'] <= now()->getTimestamp()
                 || $approval->plan_id !== $input['plan_id'] || $approval->plan_revision !== $input['plan_revision']
                 || ! hash_equals($plan->digest, $input['plan_digest'])
@@ -53,14 +68,19 @@ final class InspectExecution
                 throw new IdentityDenied('approval_authority_changed', 403);
             }
 
-            return ['allowed' => true, 'tenant_id' => $tenant, 'actor_id' => $actor->id, 'approval_id' => $approval->id,
+            $result = ['allowed' => true, 'tenant_id' => $tenant, 'actor_id' => $actor->id, 'approval_id' => $approval->id,
                 'plan_digest' => $plan->digest, 'executor_fingerprint' => AuthorizeTenant::fingerprint($executor),
-                'authority_use' => 'simulation_boundary', 'evaluated_at' => now()->getTimestamp(),
+                'authority_use' => $native ? 'native_approval' : 'simulation_boundary', 'evaluated_at' => now()->getTimestamp(),
                 'approval' => ['state' => 'approved', 'revoked' => false, 'plan_digest' => $plan->digest,
                     'plan_id' => $approval->plan_id, 'plan_revision' => $approval->plan_revision,
                     'approver_id' => $approval->decided_by, 'approver_grant_current' => true,
                     'expires_at' => Carbon::parse($approval->expires_at)->getTimestamp(), 'scope' => $plan->scope()],
                 'native_write_authorized' => false];
+            if ($native) {
+                $result['requester_id'] = $approval->requester_id;
+            }
+
+            return $result;
         });
     }
 }

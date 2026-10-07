@@ -89,6 +89,24 @@ class MigrationPlans:
             )
         return {"items": options, "native_write_authorized": False}
 
+    def execution_current(self, plan: dict[str, Any]) -> None:
+        """Service-only read checks recipe revocation without borrowing a user delegation."""
+        scope = plan["content"]["scope"]
+        actor = Actor(
+            scope["tenant_id"],
+            plan["binding"]["requested_by"],
+            "plan.read",
+            scope["resource_id"],
+            scope["environment"],
+        )
+        composition = plan["content"]["native_migration"]
+        recipe = self.recipes(actor, scope["site_id"], composition["recipe_id"])
+        if (
+            digest(recipe) != composition["recipe_sha256"]
+            or recipe["expires_at"] <= self.planning.clock()
+        ):
+            raise Rejected("migration_recipe_changed", 423)
+
     def current(self, actor: Actor, plan: dict[str, Any], delegations: dict[str, str]) -> None:
         content = plan["content"]
         site = content["scope"]["site_id"]

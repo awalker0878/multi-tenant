@@ -100,7 +100,10 @@
         "uvicorn==0.53.0",
         "temporalio==1.34.0"
       ],
-      "runtime_entrypoint": "/opt/venv/bin/lifecycle-serve"
+      "runtime_entrypoint": "/opt/venv/bin/lifecycle-serve",
+      "additional_scripts": {
+        "lifecycle-native": "lifecycle.bootstrap.native_server:main"
+      }
     },
     {
       "id": "inventory-workers",

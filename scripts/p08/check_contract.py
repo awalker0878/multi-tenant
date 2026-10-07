@@ -46,3 +46,7 @@ validator.validate({'action': 'pause', 'expected_revision': 1})
 for negative in ({'action': 'force', 'expected_revision': 1}, {'action': 'schedule', 'expected_revision': True}, {'action': 'cancel', 'expected_revision': 1, 'release_allocations': True}):
     assert list(validator.iter_errors(negative))
 print('Migration campaign contract is valid; bypass commands are denied.')
+
+for name in ('governance-native-approval-v1.json', 'inventory-native-input-v1.json'):
+    validate_spec(json.loads((ROOT / 'contracts/openapi' / name).read_text()))
+print('Native consent and exact Inventory read contracts validate; consent never grants writes.')

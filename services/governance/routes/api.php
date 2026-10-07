@@ -94,3 +94,4 @@ Route::post('/v1/tenants/{tenant}/inventory-collection-checks', InventoryCollect
 Route::post('/v1/tenants/{tenant}/planning-input-checks', PlanningInputController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);
 
 Route::post('/v1/tenants/{tenant}/execution-approval-checks', ExecutionApprovalController::class)->whereUuid('tenant')->middleware(AuthenticateService::class);
+Route::post('/v1/tenants/{tenant}/native-approval-checks', [ExecutionApprovalController::class, 'native'])->whereUuid('tenant')->middleware(AuthenticateService::class);

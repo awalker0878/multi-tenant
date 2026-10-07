@@ -10,6 +10,7 @@ from inventory.application.discovery import Discovery
 from inventory.infrastructure.authority import GovernanceAuthority, planning_actor
 from inventory.infrastructure.foundation import database_ready
 from inventory.infrastructure.generated_configuration_streams import configuration_streams
+from inventory.infrastructure.native_readers import native_reader
 from inventory.infrastructure.policies import MountedPolicies
 from inventory.infrastructure.store import Postgres
 from inventory.infrastructure.telemetry import BoundedSignalBuffer
@@ -32,7 +33,7 @@ class InventoryRouter:
             ),
             authority,
         )
-        self.planning = PlanningInputApp(self.inventory.discovery, planning_actor)
+        self.planning = PlanningInputApp(self.inventory.discovery, planning_actor, native_reader)
         self.foundation = FoundationApp(database_ready)
 
     async def __call__(

@@ -1,0 +1,229 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Native approval consent (no write grant)",
+    "version": "1.0.0"
+  },
+  "security": [
+    {
+      "WorkloadBearer": []
+    }
+  ],
+  "paths": {
+    "/v1/tenants/{tenant}/native-approval-checks": {
+      "post": {
+        "operationId": "inspectNativeApproval",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current independently approved operational plan consent; custody admission is still required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Consent"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unapproved, wrong lane, revoked or changed authority"
+          },
+          "503": {
+            "description": "An authoritative owner is unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "WorkloadBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Request": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "actor_id",
+          "approval_id",
+          "plan_id",
+          "plan_revision",
+          "plan_digest"
+        ],
+        "properties": {
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "approval_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "Consent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "allowed",
+          "tenant_id",
+          "actor_id",
+          "approval_id",
+          "plan_digest",
+          "executor_fingerprint",
+          "requester_id",
+          "authority_use",
+          "evaluated_at",
+          "native_write_authorized",
+          "approval"
+        ],
+        "properties": {
+          "allowed": {
+            "const": true
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "approval_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "executor_fingerprint": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "requester_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "authority_use": {
+            "const": "native_approval"
+          },
+          "evaluated_at": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "native_write_authorized": {
+            "const": false
+          },
+          "approval": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "state",
+              "revoked",
+              "plan_digest",
+              "plan_id",
+              "plan_revision",
+              "approver_id",
+              "approver_grant_current",
+              "expires_at",
+              "scope"
+            ],
+            "properties": {
+              "state": {
+                "const": "approved"
+              },
+              "revoked": {
+                "const": false
+              },
+              "plan_digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "plan_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "plan_revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "approver_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "approver_grant_current": {
+                "const": true
+              },
+              "expires_at": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "scope": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "site_id",
+                  "environment",
+                  "resource_id"
+                ],
+                "properties": {
+                  "site_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "environment": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "resource_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

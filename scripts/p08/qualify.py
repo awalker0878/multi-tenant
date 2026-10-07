@@ -71,6 +71,7 @@ def main():
             report['suites'].append({'name': suite, **totals})
             if totals['tests'] == 0 or any(totals[k] for k in ('failures', 'errors', 'skipped')):
                 raise RuntimeError(suite + ' not fully passing')
+        command('services/planning', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_composition.py')])
         command('.', ['python', 'scripts/p04/generate_clients.py', '--check'])
         command('scripts/p01/contracts', ['uv', 'sync', '--locked'])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_contract.py')])

@@ -15,6 +15,7 @@ from planning.domain.model import Actor, Rejected, canonical, digest, identifier
 class Planning:
     def __init__(self, database: Database, sources: Sources, clock: Callable[[], int]) -> None:
         self.database, self.sources, self.clock = database, sources, clock
+        self.migration_execution_current: Callable[[dict[str, Any]], None] | None = None
         self.migration_current: Callable[[Actor, dict[str, Any], dict[str, str]], None] | None = (
             None
         )
@@ -273,6 +274,17 @@ class Planning:
             "native_write_authorized": False,
         }
 
+    def check_native_recipe(self, record: dict[str, Any]) -> None:
+        if "native_migration" in record["content"]:
+            if self.migration_execution_current is None:
+                raise Rejected("migration_recipe_authority_unavailable", 423)
+            self.migration_execution_current(record)
+            if (
+                min(record["content"]["valid_until"], record["content"]["input_fresh_until"])
+                <= self.clock()
+            ):
+                raise Rejected("migration_plan_expired", 423)
+
     def bound_plan(self, identity: str, revision: int) -> dict[str, Any]:
         if revision != 1:
             raise Rejected("not_found", 404)
@@ -283,6 +295,7 @@ class Planning:
             )
             if row is None:
                 raise Rejected("not_found", 404)
+            self.check_native_recipe(row["payload"])
             return dict(row["payload"]["binding"])
 
     def execution_plan(self, tenant: str, identity_value: str, revision: int) -> dict[str, Any]:
@@ -296,6 +309,7 @@ class Planning:
             )
             if row is None:
                 raise Rejected("not_found", 404)
+            self.check_native_recipe(row["payload"])
             invalidated = tx.one(
                 "SELECT event_id FROM app.planning_invalidations WHERE plan=%s LIMIT 1",
                 (identity_value,),

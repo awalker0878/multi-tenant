@@ -344,3 +344,36 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     with database.transaction() as tx:
         assert tx.one("SELECT count(*) AS n FROM app.planning_records WHERE kind='plan'")["n"] == 2
         assert tx.one("SELECT count(*) AS n FROM app.planning_outbox")["n"] == 3
+
+
+def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -> None:
+    from unittest.mock import MagicMock
+
+    from planning.application.planning import Planning
+
+    base, bound, recipe = values()
+    content = compose_migration(base, bound, recipe, 1000)
+    content["native_migration"].update(recipe_id=str(uuid4()), base_plan_id=str(uuid4()))
+    payload = {"content": content, "binding": {"requested_by": str(uuid4())}}
+    database = MagicMock()
+    tx = database.transaction.return_value.__enter__.return_value
+    planning = Planning(database, Mock(), lambda: 1000)
+    recipes = Mock(return_value=recipe)
+    migrations = MigrationPlans(planning, Mock(), recipes)
+    key, tenant = str(uuid4()), recipe["scope"]["tenant_id"]
+    tx.one.side_effect = [{"payload": payload}]
+    with pytest.raises(Rejected, match="recipe_authority"):
+        planning.execution_plan(tenant, key, 1)
+    planning.migration_execution_current = migrations.execution_current
+    tx.one.side_effect = [{"payload": payload}, None, {"payload": payload}]
+    assert planning.execution_plan(tenant, key, 1)["invalidated"] is False
+    assert planning.bound_plan(key, 1) == payload["binding"]
+    assert recipes.call_count == 2
+    recipes.return_value = recipe | {"expires_at": 999}
+    for native in (True, False):
+        tx.one.side_effect = [{"payload": payload}]
+        with pytest.raises(Rejected, match="recipe_changed"):
+            if native:
+                planning.execution_plan(tenant, key, 1)
+            else:
+                planning.bound_plan(key, 1)
