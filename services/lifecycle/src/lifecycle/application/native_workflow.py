@@ -187,6 +187,35 @@ class NativeWorkflow:
                 "executor_id": plan["executor_id"],
                 "expires_at": plan["expires_at"],
             }
+            if stage == "provision":
+                binding["native_binding"] = {
+                    **{
+                        k: plan["scope"][k]
+                        for k in (
+                            "tenant_id",
+                            "site_id",
+                            "project_id",
+                            "resource_id",
+                        )
+                    },
+                    **{
+                        k: plan[k]
+                        for k in (
+                            "campaign_id",
+                            "executor_id",
+                            "epoch",
+                            "plan_digest",
+                            "bundle_sha256",
+                            "workspace",
+                            "state_lineage",
+                            "state_serial",
+                            "expires_at",
+                        )
+                    },
+                    "job_id": job,
+                    "operation_id": operation,
+                    "attempt_id": attempt,
+                }
             self.require(tx, row, binding)
             proof = self.owners.observe(plan, binding, "before")
             evidence_digest = observations(plan, binding, "before", proof, self.clock())

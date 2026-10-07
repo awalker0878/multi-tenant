@@ -104,6 +104,11 @@ class Owners:
             "approval_current": True,
             "ownership_current": True,
             "provider_fence_current": True,
+            "plan_current": True,
+            "state_current": True,
+            "artifacts_current": True,
+            "entitlement_current": True,
+            "campaign_current": True,
             "evaluated_at": self.now,
             "expires_at": p["expires_at"],
             **self.authority_changes,
@@ -197,6 +202,11 @@ def test_malformed_or_incomplete_plan(field: str, value: Any) -> None:
         ("configuration_current", False),
         ("approval_current", False),
         ("ownership_current", False),
+        ("plan_current", False),
+        ("state_current", False),
+        ("artifacts_current", False),
+        ("entitlement_current", False),
+        ("campaign_current", False),
         ("provider_fence_current", False),
         ("authority_use", "simulation_boundary"),
         ("epoch", str(uuid4())),
@@ -438,3 +448,98 @@ def test_runtime_cannot_rewrite_authority_or_certainty(
     with psycopg.connect(**(postgres | {"user": "lifecycle_runtime"})) as c:
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
             c.execute(sql)
+
+
+def native_http(
+    service: NativeWorkflow, tenant: str, worker: str, body: dict[str, Any], token: str = "a" * 64
+) -> tuple[int, dict[str, Any]]:
+    import asyncio
+    import json
+
+    from uvicorn._types import ASGIReceiveEvent, ASGISendEvent, HTTPScope
+
+    from lifecycle.interfaces.native import NativeBoundaryApp
+
+    def caller(value: str) -> tuple[str, str]:
+        if value != "a" * 64:
+            raise Rejected("invalid_workload", 401)
+        return tenant, worker
+
+    scope: HTTPScope = {
+        "type": "http",
+        "asgi": {"version": "3.0", "spec_version": "2.0"},
+        "http_version": "1.1",
+        "method": "POST",
+        "scheme": "https",
+        "path": "/internal/native-grants/checks",
+        "raw_path": b"/internal/native-grants/checks",
+        "query_string": b"",
+        "root_path": "",
+        "headers": [
+            (b"authorization", ("Bearer " + token).encode()),
+            (b"content-type", b"application/json"),
+        ],
+        "client": ("127.0.0.1", 8000),
+        "server": ("127.0.0.1", 8080),
+        "state": {},
+    }
+    events: list[ASGISendEvent] = []
+
+    async def send(event: ASGISendEvent) -> None:
+        events.append(event)
+
+    async def receive() -> ASGIReceiveEvent:
+        return {"type": "http.request", "body": json.dumps(body).encode(), "more_body": False}
+
+    asyncio.run(NativeBoundaryApp(service, caller)(scope, receive, send))
+    start, response = events
+    assert start["type"] == "http.response.start" and response["type"] == "http.response.body"
+    assert (b"cache-control", b"no-store, private") in start["headers"]
+    return start["status"], json.loads(response["body"])
+
+
+def test_native_http_identity_is_independent_of_body(native: Any) -> None:
+    service, owners, p, tenant, job = admitted(native)
+    complete(service, p, tenant, job, "reserve")
+    binding = service.prepare(tenant, job, "provision")
+    bound = binding["native_binding"]
+    assert bound["project_id"] == p["scope"]["project_id"]
+    assert bound["job_id"] == job and bound["operation_id"] == binding["operation_id"]
+    body = {"grant": binding, "boundary": "before_saved_plan_apply"}
+    status, reply = native_http(service, tenant, p["executor_id"], body, token="b" * 64)
+    assert status == 401
+    status, reply = native_http(service, tenant, str(uuid4()), body)
+    assert status == 403
+    status, reply = native_http(service, str(uuid4()), p["executor_id"], body)
+    assert status == 404
+    status, reply = native_http(
+        service, tenant, p["executor_id"], body | {"worker_id": p["executor_id"]}
+    )
+    assert status == 409
+    status, reply = native_http(service, tenant, p["executor_id"], body)
+    assert status == 200 and reply["binding_sha256"] == digest(binding)
+    status, reply = native_http(service, tenant, p["executor_id"], body)
+    assert status == 423 and reply["error"] == "native_grant_already_redeemed"
+
+
+def test_long_running_grant_remains_bound_and_rechecks_current_authority(native: Any) -> None:
+    service, owners, p, tenant, job = admitted(native)
+    b = service.prepare(tenant, job, "reserve")
+    service.boundary(tenant, b, p["executor_id"], "before_effect")
+    owners.now += 120
+    assert service.boundary(tenant, b, p["executor_id"], "during_effect")["allowed"] is True
+    owners.authority_changes = {"approval_current": False}
+    with pytest.raises(Rejected, match="authority"):
+        service.boundary(tenant, b, p["executor_id"], "during_effect")
+
+
+def test_previous_stage_observation_cannot_clear_later_unknown_hold(native: Any) -> None:
+    service, owners, p, tenant, job = admitted(native)
+    prior = complete(service, p, tenant, job, "reserve")
+    b = service.prepare(tenant, job, "provision")
+    service.boundary(tenant, b, p["executor_id"], "before_saved_plan_apply")
+    owners.failure = True
+    with pytest.raises(Rejected):
+        service.reconcile(tenant, b)
+    assert service.reconcile(tenant, prior) == "held"
+    assert service.read(tenant, job)["state"] == "held"

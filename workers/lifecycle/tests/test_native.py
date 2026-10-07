@@ -748,3 +748,120 @@ def test_json_boolean_never_substitutes_for_number(binding: NativeBinding, bound
         native_server = next(v["server"] for v in fixture.documents.values() if "server" in v)
         native_server["config_drive"] = 1
     assert fixture.observer().observe(binding, fixture.state)["outcome"] == "held"
+
+
+class GrantClient:
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+        self.change: dict[str, Any] = {}
+        self.fail: str | None = None
+
+    def check(self, grant: dict[str, Any], boundary: str) -> dict[str, Any]:
+        if boundary == self.fail:
+            raise OSError("private dependency details")
+        self.calls.append(boundary)
+        return {
+            "binding_sha256": digest(grant),
+            "epoch": grant["epoch"],
+            "boundary": boundary,
+            "allowed": True,
+            "authority_use": "native_boundary",
+            "evaluated_at": 100,
+            "expires_at": grant["expires_at"],
+            **self.change,
+        }
+
+
+def stage_grant(binding: NativeBinding) -> dict[str, Any]:
+    return {
+        **{
+            k: binding.document()[k]
+            for k in ("job_id", "operation_id", "attempt_id", "epoch", "executor_id", "expires_at")
+        },
+        "grant_id": str(uuid4()),
+        "stage": "provision",
+        "plan_sha256": "c" * 64,
+        "intent_digest": "d" * 64,
+        "native_binding": binding.document(),
+    }
+
+
+def test_saved_plan_uses_live_stage_authority(binding: NativeBinding) -> None:
+    from lifecycle_worker.application.native_authority import GrantedNativeAuthority
+
+    client = GrantClient()
+    authority = GrantedNativeAuthority(stage_grant(binding), client, lambda: 100)
+    journal = Journal()
+    tool = Tool(journal)
+    result = SavedPlanExecution(authority, journal, tool, Observer(), lambda: 100).execute(binding)
+    assert client.calls == ["preflight", "before_saved_plan_apply", "during_saved_plan_apply"]
+    assert tool.applies == 1 and result["activation_authorized"] is False
+    with pytest.raises(NativeHeld):
+        authority.require_current(replace(binding, project_id=str(uuid4())), "preflight")
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"allowed": 1},
+        {"authority_use": "simulation_boundary"},
+        {"boundary": "preflight"},
+        {"evaluated_at": True},
+        {"evaluated_at": 94},
+        {"evaluated_at": 101},
+        {"expires_at": 201},
+        {"epoch": str(uuid4())},
+        {"binding_sha256": "0" * 64},
+    ],
+)
+def test_native_stage_authority_rejects_rebinding_or_stale_reply(
+    binding: NativeBinding, change: dict[str, Any]
+) -> None:
+    from lifecycle_worker.application.native_authority import GrantedNativeAuthority
+
+    client = GrantClient()
+    client.change = change
+    authority = GrantedNativeAuthority(stage_grant(binding), client, lambda: 100)
+    with pytest.raises(NativeHeld):
+        authority.require_current(binding, "before_saved_plan_apply")
+
+
+@pytest.mark.parametrize(
+    "field", ["job_id", "operation_id", "attempt_id", "epoch", "executor_id", "expires_at"]
+)
+def test_saved_plan_and_grant_fields_must_agree(binding: NativeBinding, field: str) -> None:
+    from lifecycle_worker.application.native_authority import GrantedNativeAuthority
+
+    grant = stage_grant(binding)
+    grant[field] = 201 if field == "expires_at" else str(uuid4())
+    with pytest.raises(NativeHeld):
+        GrantedNativeAuthority(grant, GrantClient(), lambda: 100)
+
+
+def test_lost_native_redemption_response_never_launches_or_retries(binding: NativeBinding) -> None:
+    from lifecycle_worker.application.native_authority import GrantedNativeAuthority
+
+    client = GrantClient()
+    client.fail = "before_saved_plan_apply"
+    journal = Journal()
+    tool = Tool(journal)
+    authority = GrantedNativeAuthority(stage_grant(binding), client, lambda: 100)
+    execution = SavedPlanExecution(authority, journal, tool, Observer(), lambda: 100)
+    with pytest.raises(NativeHeld, match="requires_reconciliation"):
+        execution.execute(binding)
+    client.fail = None
+    with pytest.raises(NativeHeld, match="requires_reconciliation"):
+        execution.execute(binding)
+    assert tool.applies == 0 and journal.claimed
+    assert journal.events[-1][0] == "outcome_unknown"
+
+
+def test_published_native_grant_fixture_is_consumed_without_field_translation() -> None:
+    from lifecycle_worker.application.native_authority import GrantedNativeAuthority
+
+    root = Path(__file__).resolve().parents[3]
+    fixture = json.loads(
+        (root / "contracts/fixtures/lifecycle/native-stage-grant-v1.json").read_text()
+    )
+    authority = GrantedNativeAuthority(fixture["grant"], GrantClient(), lambda: 100)
+    authority.require_current(authority.binding, fixture["boundary"])

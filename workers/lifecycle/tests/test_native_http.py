@@ -48,6 +48,25 @@ def native_tls(tmp_path: Path) -> Iterator[tuple[NativeReads, dict[str, Any]]]:
     }
 
     class Handler(BaseHTTPRequestHandler):
+        def do_POST(self) -> None:
+            fixture["requests"].append(
+                {
+                    "path": self.path,
+                    "method": "POST",
+                    "authorization": self.headers.get("Authorization"),
+                    "body": self.rfile.read(int(self.headers.get("Content-Length", "0"))),
+                }
+            )
+            self.send_response(fixture["status"])
+            self.send_header("Content-Type", fixture.get("content_type", "application/json"))
+            if fixture.get("location"):
+                self.send_header("Location", fixture["location"])
+            self.end_headers()
+            try:
+                self.wfile.write(fixture["body"])
+            except (BrokenPipeError, ConnectionResetError, ssl.SSLEOFError):
+                pass
+
         def do_GET(self) -> None:
             fixture["requests"].append(
                 {
@@ -183,3 +202,54 @@ def test_token_rotation_requires_new_scope_read(
     with pytest.raises(NativeHeld, match="scope_recheck"):
         reads.get("compute", "/servers/known")
     assert len(fixture["requests"]) == 1
+
+
+def test_lifecycle_native_boundary_uses_pinned_authenticated_post(
+    native_tls: tuple[NativeReads, dict[str, Any]],
+) -> None:
+    import json
+
+    from lifecycle_worker.infrastructure.native_authority import LifecycleNativeBoundary
+
+    reads, fixture = native_tls
+    endpoint = reads.endpoints["compute"]
+    endpoint.token_file.write_text("synthetic-distinct-native-worker-token")
+    fixture["body"] = b'{"allowed":true}'
+    client = LifecycleNativeBoundary(endpoint)
+    assert client.check({"binding": "synthetic"}, "preflight") == {"allowed": True}
+    request = fixture["requests"][0]
+    assert request["path"] == "/compute/v2.1/internal/native-grants/checks"
+    assert request["authorization"] == "Bearer synthetic-distinct-native-worker-token"
+    assert json.loads(request["body"]) == {
+        "grant": {"binding": "synthetic"},
+        "boundary": "preflight",
+    }
+
+
+@pytest.mark.parametrize("status", [301, 307, 401, 403, 409, 423, 429, 500])
+def test_lifecycle_native_boundary_denials_are_never_retried(
+    native_tls: tuple[NativeReads, dict[str, Any]], status: int
+) -> None:
+    from lifecycle_worker.infrastructure.native_authority import LifecycleNativeBoundary
+
+    reads, fixture = native_tls
+    endpoint = reads.endpoints["compute"]
+    endpoint.token_file.write_text("synthetic-distinct-native-worker-token")
+    fixture.update(status=status, location="https://foreign.invalid/authority")
+    with pytest.raises(NativeHeld):
+        LifecycleNativeBoundary(endpoint).check({}, "before_saved_plan_apply")
+    assert len(fixture["requests"]) == 1
+
+
+@pytest.mark.parametrize("body", [b'{"a":1,"a":2}', b'{"a":NaN}', b"x" * 16385])
+def test_lifecycle_native_boundary_enforces_small_strict_responses(
+    native_tls: tuple[NativeReads, dict[str, Any]], body: bytes
+) -> None:
+    from lifecycle_worker.infrastructure.native_authority import LifecycleNativeBoundary
+
+    reads, fixture = native_tls
+    endpoint = reads.endpoints["compute"]
+    endpoint.token_file.write_text("synthetic-distinct-native-worker-token")
+    fixture["body"] = body
+    with pytest.raises(NativeHeld):
+        LifecycleNativeBoundary(endpoint).check({}, "preflight")

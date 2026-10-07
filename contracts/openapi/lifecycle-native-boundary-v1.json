@@ -1,0 +1,434 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Lifecycle native boundary control",
+    "version": "1.0.0",
+    "description": "P07 internal component contract. Production routing requires commissioned authenticated owner adapters and provider fencing. The simulation API does not implement this endpoint."
+  },
+  "security": [
+    {
+      "NativeWorker": []
+    }
+  ],
+  "paths": {
+    "/internal/native-grants/checks": {
+      "post": {
+        "operationId": "checkNativeBoundary",
+        "description": "Caller trust resolves tenant and worker independently from this body. Native provision grants bind the complete NativeBinding; all grants are single-use for launch. No automatic transport retries. Maximum request/response 16384 bytes.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BoundaryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "One current exact-boundary receipt. No cache; a lost redemption response must be reconciled, never retried.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoundaryReceipt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Denied or unavailable. No retry authority; no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied or unavailable. No retry authority; no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied or unavailable. No retry authority; no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Denied or unavailable. No retry authority; no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied or unavailable. No retry authority; no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Denied or unavailable. No retry authority; no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Denied or unavailable. No retry authority; no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied or unavailable. No retry authority; no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Denied or unavailable. No retry authority; no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied or unavailable. No retry authority; no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "NativeWorker": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "BoundaryRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "grant",
+          "boundary"
+        ],
+        "properties": {
+          "grant": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "job_id",
+              "operation_id",
+              "attempt_id",
+              "grant_id",
+              "epoch",
+              "executor_id",
+              "stage",
+              "plan_sha256",
+              "intent_digest",
+              "expires_at"
+            ],
+            "properties": {
+              "job_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "operation_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "attempt_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "grant_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "epoch": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "executor_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "stage": {
+                "type": "string",
+                "enum": [
+                  "reserve",
+                  "provision",
+                  "configure_guest",
+                  "enroll_services",
+                  "activate",
+                  "retire",
+                  "release"
+                ]
+              },
+              "plan_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "intent_digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "expires_at": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9223372036854775807
+              },
+              "native_binding": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "tenant_id",
+                  "site_id",
+                  "resource_id",
+                  "job_id",
+                  "operation_id",
+                  "attempt_id",
+                  "campaign_id",
+                  "executor_id",
+                  "epoch",
+                  "state_lineage",
+                  "project_id",
+                  "plan_digest",
+                  "bundle_sha256",
+                  "workspace",
+                  "state_serial",
+                  "expires_at"
+                ],
+                "properties": {
+                  "tenant_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "site_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "resource_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "job_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "operation_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "attempt_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "campaign_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "executor_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "epoch": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "state_lineage": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "project_id": {
+                    "type": "string",
+                    "pattern": "^([a-f0-9]{32}|[a-f0-9-]{36})$"
+                  },
+                  "plan_digest": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "bundle_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "workspace": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "state_serial": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9223372036854775807
+                  },
+                  "expires_at": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9223372036854775807
+                  }
+                }
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "stage": {
+                      "const": "provision"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "native_binding"
+                  ]
+                },
+                "else": {
+                  "not": {
+                    "required": [
+                      "native_binding"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "boundary": {
+            "type": "string",
+            "enum": [
+              "preflight",
+              "before_saved_plan_apply",
+              "during_saved_plan_apply",
+              "before_effect",
+              "during_effect"
+            ]
+          }
+        }
+      },
+      "BoundaryReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "binding_sha256",
+          "epoch",
+          "boundary",
+          "allowed",
+          "authority_use",
+          "evaluated_at",
+          "expires_at"
+        ],
+        "properties": {
+          "binding_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "epoch": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[a-f0-9-]{36}$"
+          },
+          "boundary": {
+            "type": "string",
+            "enum": [
+              "preflight",
+              "before_saved_plan_apply",
+              "during_saved_plan_apply",
+              "before_effect",
+              "during_effect"
+            ]
+          },
+          "allowed": {
+            "const": true,
+            "type": "boolean"
+          },
+          "authority_use": {
+            "const": "native_boundary",
+            "type": "string"
+          },
+          "evaluated_at": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,100}$"
+          }
+        }
+      }
+    }
+  }
+}

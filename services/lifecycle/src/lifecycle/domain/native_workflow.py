@@ -199,6 +199,11 @@ def current_authority(
         "approval_current": True,
         "ownership_current": True,
         "provider_fence_current": True,
+        "plan_current": True,
+        "state_current": True,
+        "artifacts_current": True,
+        "entitlement_current": True,
+        "campaign_current": True,
     }
     if any(digest(receipt.get(k)) != digest(v) for k, v in expected.items()):
         raise Rejected("native_authority_not_current", 423)

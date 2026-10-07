@@ -54,6 +54,22 @@ authority and readable retained data/keys. Independent native absence precedes
 allocation release, and retained data/keys are checked again afterward. Successful
 retirement does not grant authority to reprovision or destroy retained storage.
 
+## Worker boundary contract
+
+The [native boundary OpenAPI](../../../contracts/openapi/lifecycle-native-boundary-v1.json)
+and [golden request](../../../contracts/fixtures/lifecycle/native-stage-grant-v1.json)
+define a separate internal check route. The ASGI handler resolves tenant and worker
+from its authenticated caller port; neither identity can be supplied in JSON.
+Provisioning envelopes contain every existing worker `NativeBinding` field.
+`GrantedNativeAuthority` checks the envelope before each saved-plan boundary;
+`LifecycleNativeBoundary` provides fixed-origin pinned TLS, a protected distinct
+workload credential, bounded strict JSON and no retries or redirects. Lost
+redemption replies retain the existing worker journal hold without launching.
+
+The handler is not installed into the simulation router. It must be composed with
+the commissioned native owner and workload-trust implementations; an implemented
+transport is not proof that those independent controls exist.
+
 ## Integration and qualification still required
 
 The application interface is executable and persistence-tested independently.
