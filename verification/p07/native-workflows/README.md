@@ -21,6 +21,13 @@ their FAILED/FAIL dispositions. The [corrections](../corrections.md) explain the
 causes and exact corrections. No contract, assertion or package isolation was
 weakened to obtain a pass.
 
+The [regression receipt](regression-completion.json) records 13 successful
+workflow types at their actual source revisions, including the final-source P06
+core and Chromium/Firefox/WebKit jobs. Kubernetes, messaging, Catalogue and
+Inventory passed at the earlier revision with identical runtime/deployment bytes;
+the receipt enumerates the four later test/fixture/checker changes. This metadata
+receipt does not imply independent revalidation of every regression archive.
+
 The [control runbook](../../../docs/operations/runbooks/native-workflow-control.md)
 describes delivered single-use grants, readiness/retirement and recovery controls.
 Production current-owner/workload-trust/Temporal composition, actual provider

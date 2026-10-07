@@ -1,55 +1,64 @@
-# Next work — P07 native commissioning
+# Next work — P07 native integration and commissioning
 
-P07 is incomplete. The worker now implements guarded saved-plan execution,
-scoped OpenStack readback, an append-only PostgreSQL attempt journal and a
-multi-workload Terraform module. All 112 worker tests and ten component quality,
-build and Terraform commands pass at `dd31bed12de3133b30f0a06072ada37abd9f4961`.
-The [component evidence](verification/p07/native-components/qualification-index.json)
-is E2 software evidence; product native dispatch and Q05/Q06 remain unfinished.
-The [implementation record](docs/implementation/p07-native-provisioning.md),
-[check matrix](verification/p07/check-matrix.md) and
-[qualification index](verification/p07/final/qualification-index.json) record the
-delivered increment and its limits. The [input record](release/p07-native-inputs.json)
-still correctly reports all fifteen input groups missing.
+P07 is incomplete. Lifecycle now supplies durable native stage control,
+configuration/plan/epoch-bound grants, one-time worker redemption, independent
+readiness checks, unknown-outcome reconciliation and separate retirement controls.
+The saved-plan worker consumes the exact native grant through the internal
+TLS boundary contract. The [control runbook](docs/operations/runbooks/native-workflow-control.md)
+and [implementation record](docs/implementation/p07-native-provisioning.md)
+describe the implemented component boundary. Production native dispatch and the
+actual Q05/Q06 campaign are still absent; a synthetic owner is not a native owner.
 
-API-first OpenStack configuration collection and Console administrator review are
-implemented. The [configuration evidence](verification/p07/configuration/qualification-index.json)
-binds tested API pulls, immutable findings, reasoned overrides, saved manual values
-and exact-revision confirmation. The [newest-first version register](docs/implementation/openstack-version-qualification.md)
-starts with 2026.2 Hibiscus and distinguishes documentation review from native
-qualification. The repository's unknown input record remains a template; deployed
-configuration belongs in Inventory and the Console.
+The [workflow evidence](verification/p07/native-workflows/qualification-index.json)
+retains original passing and failed campaigns and their exact source bindings.
+At `880db145e2d90e0be6b23f7a744f592cf6af233f`, all 253 Lifecycle tests and 142
+worker tests pass without skips, along with 18 contract/quality/build/Terraform
+commands and the isolated worker package.
+The [regression receipt](verification/p07/native-workflows/regression-completion.json)
+records 13 passing workflow types with exact revisions and the limited source
+comparison for the earlier-source Kubernetes, messaging, Catalogue and Inventory
+results. Earlier failed runs remain recorded as failures.
+Earlier [worker component](verification/p07/native-components/qualification-index.json)
+and [API configuration](verification/p07/configuration/qualification-index.json)
+evidence remains unchanged. The installed native inspection command remains
+read-only. No P07 package, G07 receiving decision or native support claim is
+closed by these component tests.
 
-1. **P07.02 — current native authority and fencing:** connect the worker protocol
-   to Lifecycle/Governance native grant redemption, the confirmed Inventory/Console
-   revisions and actual state-custody epoch. Implement and independently qualify
-   exclusion of stale provider requests before enabling dispatch. P06's simulation
-   receipts cannot be reused as native grants; heartbeat/process cancellation alone
-   does not fence already accepted provider operations. The
-   [adapter runbook](docs/operations/runbooks/openstack-native-adapters.md) specifies
-   the delivered interfaces and current supported boundary.
-2. **P07.03–P07.05 — remaining native workflows:** implement the selected allocation,
-   guest and enterprise service contracts, quarantine-to-active observations,
-   partial/unknown recovery and separately authorized retirement. Obtain actual
-   interface versions and ownership/retention requirements through API discovery
-   and Console administration. Do not substitute generic fixture receipts for
-   DNS/IPAM/identity/time/trust/logging/monitoring/backup enrollment or data restore.
-3. **P07.01/P07.06 — native commissioning and dossier:** exercise the Console
-   source/destination pulls, validate configured options and installed features,
-   explain interpretation overrides, and supply inputs unavailable through APIs.
-   Bind confirmed revisions, protected identities/trust, exact campaign scope and
-   independent observers to Q05/Q06. Retain original native results and receiving
-   decisions. **BL-P07-001** holds the native effects and qualification that need
-   those actual inputs; it does not block independent versioned implementation.
+1. **P07.02 — commissioned authority and dispatch:** implement the composite
+   `NativeOwners` adapter against live Governance approval, immutable Planning,
+   Inventory's confirmed Console revision, installed tuple, entitlement/campaign
+   scope and independently administered state/provider custody. Resolve the
+   authenticated worker identity from workload trust, compose the native boundary
+   handler and connect the durable coordinator to the registered Temporal worker
+   pool. Do not route native work through P06 simulation or use test owners.
+   The existing Governance execution-approval API returns `simulation_boundary`
+   with `native_write_authorized: false`; it cannot supply the native receipt.
+2. **P07.02/P07.05 — actual provider exclusion and recovery:** implement and qualify
+   the selected provider request fence, including accepted asynchronous requests,
+   native state lineage and restored-journal epoch handling. The coordinator now
+   requires independent provider-quiescence evidence before advancing. A process
+   kill, expired credential, Terraform lock or empty local queue cannot supply it.
+   Keep uncertain claims; there is no automatic retry or runtime hold deletion.
+3. **P07.03–P07.05 — selected effect/observer adapters:** bind versioned allocation,
+   guest hardening, IPAM/DNS/identity/time/trust/logging/monitoring/backup and restore
+   interfaces to the commissioned implementation. Supply actual quarantine/active
+   traffic, policy/application/data, retention/deletion and allocation-release
+   observations. The stage controller enforces their order and independent proof;
+   it does not implement these native services or establish that they succeeded.
+4. **P07.01/P07.06 — commissioning and native dossier:** use the existing API-first
+   Console workflow to collect installed/configured facts, review interpretations
+   and supply only non-discoverable values. Bind N01–N15, exact campaign authority,
+   approved resource/data/impact scope, actual observers and applicable operating
+   controls. Execute all required Q05/Q06 native cases and retain original results,
+   recovery timings, support limits and receiving decisions.
 
-The [remaining packet](docs/implementation/p07-completion-review.md) maps each
-unfinished output to its required inputs. The new journal permanently holds a
-claimed state lineage until a separate recovery workflow exists. No retry, release,
-activation or retirement is authorized by a successful readback.
-
-Development authorization persists. P06 simulation and complete input metadata
-do not authorize native effects. P07 remains incomplete until its scoped outputs
-and native observations exist.
+The [remaining packet](docs/implementation/p07-completion-review.md) maps these
+outputs to concrete input groups. [BL-P07-001](docs/implementation/delivery-register.yaml)
+remains open: no real OpenStack connection, native operating identities, selected
+enterprise interface contracts or independent campaign observations are supplied
+in the repository. The unknown input record is a template, not an alternative to
+Console configuration and not a reason to stop independent versioned development.
+Existing development authorization and the API-first baseline remain effective.
 
 # Retained P06 engineering handoff
 

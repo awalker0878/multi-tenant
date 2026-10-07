@@ -11,8 +11,11 @@ The Lifecycle worker now supplies a saved-plan process adapter, worker-owned
 PostgreSQL attempt journal, exact-ID Nova/Neutron/Cinder readback and a reusable
 Terraform module. The read-only `lifecycle-native-inspect` command composes the
 actual tooling and readback adapters. `SavedPlanExecution` supplies the tested
-effect protocol through its typed current-authority port; product native dispatch
-and that authority implementation are not enabled by this component increment.
+effect protocol through its typed current-authority port. The subsequent
+[native workflow control](native-workflow-control.md) supplies durable Lifecycle
+grants, an internal boundary handler and the worker TLS client. Commissioned
+current-owner composition, provider fencing and product native dispatch are still
+required before that path can be enabled.
 P06 remains simulation-only. There is no CLI apply, auto-replan, force-unlock,
 automatic retry, activation or retirement option.
 

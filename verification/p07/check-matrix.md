@@ -15,6 +15,12 @@ PostgreSQL and TLS behavior with synthetic platform responses. It supplies no
 Q05/Q06 native or G07 receiving result; the original preparation table below is
 unchanged.
 
+The [workflow-control index](native-workflows/qualification-index.json) additionally
+retains durable admission/redemption competition, least privilege, stop/epoch and
+configuration changes, complete activation evidence, safe reconciliation, distinct
+retirement and worker TLS grant binding. Its synthetic owner responses do not
+supply provider fencing, enterprise service integration or any native qualification.
+
 | Boundary | Measured checks | Scope |
 | --- | --- | --- |
 | Commissioning packet | 55 passing cases: every missing obligation, exact binding, contradictory observations, stale/rejected/unreviewed evidence, reviewer/observer independence, E2 rejection for native observations and bounded/redacted parsing | Synthetic metadata and local files only |

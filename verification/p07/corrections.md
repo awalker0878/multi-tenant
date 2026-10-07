@@ -46,3 +46,36 @@ starts its temporary initialization server without a TCP listener; PostgreSQL's
 [readiness tool](https://www.postgresql.org/docs/16/app-pg-isready.html) can target
 TCP with an explicit host. These mechanisms support the diagnosed race; the actual
 failure and subsequent campaign outcomes remain the evidence for this repository.
+
+
+## Native workflow-control continuation
+
+The expanded native campaign at `62a10992ea09677092c289ec3972f1646b7883f7`
+failed one test assertion: an extra caller-controlled worker identity is correctly
+rejected as malformed input with HTTP 422, while the new test expected 409.
+The product rejection was unchanged. `e4ce3f4b1416845aa35735315d0f758ef845bf7a`
+corrects that assertion; the complete campaign is repeated. The original failed
+archive, report, test XML and command logs remain under
+[native-workflows](native-workflows/qualification-index.json), with their original
+FAILED result. The initial passing control-core campaign is retained separately.
+
+Local persistence setup again encountered the known UID/chown EINVAL limitation.
+No database assertion from that local attempt is claimed as passing; hosted
+qualification requires both service and worker PostgreSQL tests without skips.
+
+The isolated worker package campaign at `62a1099` also found a test packaging
+error: its golden request was read from the repository-level contract directory,
+which is deliberately unavailable in the isolated component copy. Preserve the
+original `p07-isolated-worker-initial-62a1099.zip` archive. `880db145e2d90e0be6b23f7a744f592cf6af233f`
+keeps a private fixture inside the worker's test inputs, and the authoritative
+contract campaign verifies that it exactly equals the published fixture. The
+worker's 93 saved-plan/authority tests pass from an isolated local copy. No
+package boundary or required test is relaxed; hosted package verification repeats.
+
+Final source `880db145e2d90e0be6b23f7a744f592cf6af233f` passes the complete
+P07 campaign (253 Lifecycle and 142 worker tests, zero skips, all 18 commands),
+the isolated worker package and P06 core plus all three live browser journeys.
+All six original component/package archives remain retained with verified source,
+command and artifact hashes. The [regression receipt](native-workflows/regression-completion.json)
+records the remaining workflow passes and each run's actual source. No failed
+record is relabelled and no P07 native result follows from these regression passes.

@@ -96,3 +96,38 @@ API-to-Console campaign, scoped PostgreSQL/collector tests, original failures an
 source/hash comparisons. These exercise synthetic provider responses over real
 TLS and database boundaries; they establish software behavior without qualifying
 an installed OpenStack environment or completing native P07 operations.
+
+
+## Durable native control and worker grant boundary
+
+The [native workflow control](../operations/runbooks/native-workflow-control.md)
+adds Lifecycle-owned immutable plans, resource/state-lineage holds, ordered
+operations, one-time redemptions, append-only observations and a controlled job
+projection. Actual owner authority is required at admission, preparation,
+redemption and ongoing boundaries; the confirmed Console revision/digest,
+plan/artifact/tuple, actor/workload, campaign, custody epoch and provider fence
+must remain current. The database control starts empty and runtime cannot change it.
+
+Mandatory readiness includes all eight enterprise services, backup restore,
+application/data observations and exact positive/negative policy paths. Independent
+provider quiescence is required after every effect. Partial or unknown observations
+retain holds; old successful observations cannot clear a later hold. Stops prevent
+further writes even after successful readback. Retirement requires a different
+plan/approval, retention and readable retained data/keys, and independently
+observed deletion before allocation release. None of these checks creates a real
+service adapter, native observation or right to erase the worker's held claims.
+
+The worker now implements `GrantedNativeAuthority` and a protected, pinned-TLS
+Lifecycle client. The matching internal ASGI handler derives tenant and worker
+from its trusted caller interface and rejects caller-supplied identities. Every
+existing `NativeBinding` field is included in provision grants. Lost redemption
+responses, stale authority, redirects and mismatched bindings cannot relaunch
+Terraform. The [wire contract](../../contracts/openapi/lifecycle-native-boundary-v1.json)
+and golden fixture are checked with the locked contract tools.
+
+The [retained workflow qualification](../../verification/p07/native-workflows/qualification-index.json)
+is E2 software evidence. The production composite owner adapter, workload-trust
+composition, native Temporal dispatch, actual provider fencing and selected
+service/effect/observer adapters remain unfinished. The simulation router does
+not expose the native handler. Native commissioning and Q05/Q06 must still occur
+on the selected environment. P07 remains IN_PROGRESS and G07 NOT_REVIEWED.
