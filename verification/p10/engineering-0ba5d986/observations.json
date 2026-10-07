@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "source_revision": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+  "candidate_sha256": "898258e049b83c8e7534139e0b153ae046b7c0a7c250fad7ff027f86f04e7f98",
+  "candidate_schema_version": 2,
+  "run_id": 37704372041,
+  "job_id": 113075123992,
+  "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372041",
+  "result": "PASSED_ENGINEERING_CHECKS",
+  "evidence_level": "E2",
+  "g10_status": "HELD",
+  "native_write_authorized": false,
+  "release_authorized": false,
+  "artifacts": [
+    {
+      "id": 11517979734,
+      "name": "p10-qualification-37704372041-1",
+      "size_in_bytes": 126056,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11517979734",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11517979734/zip",
+      "expired": false,
+      "created_at": "2026-10-07T23:51:37Z",
+      "expires_at": "2027-01-05T23:48:57Z",
+      "updated_at": "2026-10-07T23:51:37Z",
+      "digest": "sha256:b91d0e9a6342b01ce5a8baab394152275cfccabb1207dde4670e2e3cbe34c450",
+      "workflow_run": {
+        "id": 37704372041,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352"
+      }
+    }
+  ],
+  "component_suites": [
+    {
+      "errors": 0,
+      "failures": 0,
+      "name": "planning",
+      "skipped": 0,
+      "tests": 325
+    },
+    {
+      "errors": 0,
+      "failures": 0,
+      "name": "lifecycle",
+      "skipped": 0,
+      "tests": 371
+    },
+    {
+      "errors": 0,
+      "failures": 0,
+      "name": "worker",
+      "skipped": 0,
+      "tests": 303
+    }
+  ],
+  "campaign_commands_passed": 9,
+  "measurements": {
+    "capacity_claim": false,
+    "error_fraction": 0.0,
+    "jain_fairness": 1.0,
+    "latency_ms": {
+      "max": 16.748844,
+      "p50": 16.234726,
+      "p95": 16.661776,
+      "p99": 16.748844
+    },
+    "measurement_seconds": 3.248631104,
+    "non_success": 0,
+    "percentile_method": "nearest_rank_all_attempts_no_warmup_exclusion",
+    "samples": 48,
+    "slo_result": "NOT_EVALUATED",
+    "succeeded": 48,
+    "tenant_attempts": {
+      "05979232-f5ad-4bf0-918e-b50ad89d0464": 4,
+      "474a025c-b0b3-4e6c-9ec8-1f47594cc2f9": 4,
+      "47defd59-c1bb-4a12-bcda-0562df497bfa": 4,
+      "527b94bf-3094-4572-9fc3-8a4e65c360e3": 4,
+      "675ef009-4507-4a27-b7b0-bfded75b69f1": 4,
+      "6b25ed1f-c23f-4c15-adf6-f3fd52a1ef5a": 4,
+      "6c7bf854-97c1-4b6f-8c7c-c0a0b2aa9b39": 4,
+      "89cb703d-c41c-45bd-9308-1c9b470cbe3c": 4,
+      "b82488fc-179e-47e7-9625-38d906522195": 4,
+      "d35d2567-09c9-45a3-9e8d-79d340844293": 4,
+      "efe65a30-6c09-46fe-89fa-913c3f36fd6a": 4,
+      "f005ebc4-6666-4bd5-9fad-1f6e8ce39108": 4
+    },
+    "tenant_successes": {
+      "05979232-f5ad-4bf0-918e-b50ad89d0464": 4,
+      "474a025c-b0b3-4e6c-9ec8-1f47594cc2f9": 4,
+      "47defd59-c1bb-4a12-bcda-0562df497bfa": 4,
+      "527b94bf-3094-4572-9fc3-8a4e65c360e3": 4,
+      "675ef009-4507-4a27-b7b0-bfded75b69f1": 4,
+      "6b25ed1f-c23f-4c15-adf6-f3fd52a1ef5a": 4,
+      "6c7bf854-97c1-4b6f-8c7c-c0a0b2aa9b39": 4,
+      "89cb703d-c41c-45bd-9308-1c9b470cbe3c": 4,
+      "b82488fc-179e-47e7-9625-38d906522195": 4,
+      "d35d2567-09c9-45a3-9e8d-79d340844293": 4,
+      "efe65a30-6c09-46fe-89fa-913c3f36fd6a": 4,
+      "f005ebc4-6666-4bd5-9fad-1f6e8ce39108": 4
+    },
+    "throughput_per_second": 14.775454172342984,
+    "unserved_tenants": []
+  },
+  "restore": {
+    "scope": "single_lifecycle_database_real_pg_dump_restore_synthetic_custody",
+    "restore_and_denial_ms": 258.914411,
+    "old_grant_denied": true,
+    "accepted_synthetic_effects": 1,
+    "native_write_authorized": false,
+    "full_control_plane_rto_claim": false
+  },
+  "local_qualification_tests": {
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "source_revision": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+    "log_sha256": "e43284d90620a42b2ebaee1ad18eda1ccefb66f1ea06fb8e8026885b3f8d802b"
+  },
+  "input_readiness": {
+    "native_inputs_unknown": [
+      "N01",
+      "N02",
+      "N03",
+      "N04",
+      "N05",
+      "N06",
+      "N07",
+      "N08",
+      "N09",
+      "N10",
+      "N11",
+      "N12",
+      "N13",
+      "N14",
+      "N15"
+    ],
+    "operating_inputs_held": [
+      "OP01",
+      "OP02",
+      "OP03",
+      "OP04",
+      "OP05",
+      "OP06",
+      "OP07"
+    ],
+    "all_p10_packages": "HELD"
+  },
+  "retrieval": {
+    "job_log": "Connected GitHub API; decoded job log retained verbatim",
+    "job_log_sha256": "1b7681ed60d2162a7b2d56f762446f7fdad8998754e94a26fd7053ec71d47fec",
+    "artifact_bytes_downloaded": false,
+    "artifact_note": "Signed archive download returned HTTP 403; GitHub-reported digest is retained and is not an independent local rehash."
+  },
+  "limitations": [
+    "Synthetic native owners with real PostgreSQL/TLS/Cosign; no installed platform qualification or throughput claim.",
+    "Single Lifecycle database restore with synthetic custody; no coordinated control-plane RPO/RTO claim.",
+    "Local TLS alert receiver; no real recipient, restricted installation, receiving decision or G10 acceptance."
+  ]
+}

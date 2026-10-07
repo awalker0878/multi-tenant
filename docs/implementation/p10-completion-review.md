@@ -37,6 +37,21 @@ request remains subject to reconciliation; the transport does not replay it.
 
 ## Observed engineering result
 
+The latest [run 37704372041](https://github.com/awalker0878/multi-tenant/actions/runs/37704372041)
+passes at `0ba5d986d6ba20ec9303f016baf468cedaa3c352`: **999 component tests**
+(325 Planning, 371 Lifecycle, 303 worker), zero failures/errors/skips, and all nine
+campaign commands. The 19 P10 qualification-tool checks also pass. The
+[retained correction evidence](../../verification/p10/engineering-0ba5d986/observations.json)
+includes the decoded original job log, exact source, candidate identity, local
+qualification log, artifact metadata and held dossier. The archive download returned
+HTTP 403; its GitHub-reported digest is not represented as an independent local rehash.
+
+All 48 synthetic workload operations complete with equal tenant service; the actual
+Lifecycle database restore denies the old grant and preserves one accepted synthetic
+effect. Native throughput, coordinated recovery and G10 acceptance remain unqualified.
+
+### Prior retained engineering result
+
 [Run 37701090761](https://github.com/awalker0878/multi-tenant/actions/runs/37701090761)
 passes at `b7411590868138ce2e240658ddbd2c167607a300`: 325 Planning, 371 Lifecycle and
 294 worker tests, with zero failures, errors or skips. All nine campaign commands

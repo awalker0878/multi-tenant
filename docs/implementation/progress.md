@@ -20,7 +20,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | P07 | Native OpenStack provisioning | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G07: NOT_REVIEWED | 7 / 1 |
 | P08 | VMware-to-OpenStack migration | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G08: NOT_REVIEWED | 8 / 2 |
 | P09 | Platform and capability expansion | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G09: NOT_REVIEWED | 2 / 2 |
-| P10 | Enterprise operating qualification | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G10: NOT_REVIEWED | 2 / 2 |
+| P10 | Enterprise operating qualification | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G10: NOT_REVIEWED | 3 / 2 |
 | P11 | Pilot and supported release | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G11: NOT_REVIEWED | 0 / 0 |
 
 ## Packages
@@ -85,12 +85,12 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P09.03 | Brownfield adoption | Inventory/lifecycle | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
 | P09.04 | Enterprise capabilities | Planning/workers | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
 | P09.05 | Extension contract | Architecture | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
-| P10.01 | Resilience and performance | SRE/quality | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
-| P10.02 | Recovery and upgrades | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
-| P10.03 | Security assurance | Security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
-| P10.04 | Operations | SRE/service owner | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
-| P10.05 | Installation qualification | SRE/quality | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
-| P10.06 | Release dossier | Quality/product | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 2 |
+| P10.01 | Resilience and performance | SRE/quality | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
+| P10.02 | Recovery and upgrades | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
+| P10.03 | Security assurance | Security | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
+| P10.04 | Operations | SRE/service owner | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
+| P10.05 | Installation qualification | SRE/quality | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
+| P10.06 | Release dossier | Quality/product | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 2 |
 | P11.01 | Production commissioning | SRE/service owners | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P11.02 | Controlled pilot | Product/operators | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P11.03 | Acceptance | Application/security/service owners | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **99**. Blocker records: **22**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **100**. Blocker records: **22**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -202,6 +202,7 @@ Evidence records: **99**. Blocker records: **22**. Planning inputs awaiting sele
 | EV-P10-001 | E2 | GitHub Actions Ubuntu 24.04/Python 3.12.14, actual PostgreSQL 16/TLS/Cosign; synthetic native owners and local alert receiver. | eb8805ff74fa780b6ab0ba021322253c62a7d37f | Synthetic native owner/custody/load/alert scope only. No native throughput, coordinated control-plane RTO, actual restricted install, real recipient or operational acceptance. Artifact ZIP is retained on GitHub; its signed download returned HTTP 403 here, so local archive integrity is not claimed. |
 | EV-P09-002 | E2 | GitHub Actions Ubuntu 24.04, Python 3.12.14, real PostgreSQL/TLS and synthetic native owner responses. | f7001d3e75cffa13b28701f184c076a1bd1854af | No native qualification or G09 acceptance. Original local skips are preserved as historical observations; hosted conformance subsequently passes. Artifact ZIP not independently rehashed here. |
 | EV-P10-002 | E2 | GitHub Actions Ubuntu 24.04/Python 3.12.14, actual PostgreSQL 16/TLS/Cosign; synthetic native owners and local alert receiver. | b7411590868138ce2e240658ddbd2c167607a300 | Synthetic native/owner/load/alert scope only. No native throughput, full control-plane RTO, restricted install, real recipient or G10 acceptance. Original decoded job log and GitHub-reported artifact metadata retained; ZIP not independently downloaded or rehashed here. |
+| EV-P10-003 | E2 | GitHub Actions Ubuntu 24.04/Python 3.12.14, actual PostgreSQL 16/TLS/Cosign; synthetic native owners and local alert receiver. Local P10 tool checks use Python 3.12.14 against the same source. | 0ba5d986d6ba20ec9303f016baf468cedaa3c352 | E2 with synthetic native owners only; no installed platform, native throughput, coordinated RPO/RTO, restricted installation, actual alert recipient or operating acceptance. Artifact download returned HTTP 403; its recorded GitHub digest is not a local archive rehash. N01-N15 and OP01-OP07 remain unbound or unreviewed. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
 | BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, P01, P01.02, P01.04, P01.05, P01.06, G01, R29, R30 | Requesting user for baseline decisions; actual integration, operating and records owners at their affected checkpoints | OPEN | Supply the concrete runtime, registry/signer, trust, operating or records input before the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward checkpoints; do not request baseline approval again. | Complete the exact OP01–OP07 receiving inputs in release/operating-inputs.json with actual identities and immutable evidence. Run operating_inputs.py --require-complete, then integrate and qualify the affected trust/runtime/operations path. Preserve the accepted G00 decision and later P08/P10/P11 receiving checkpoints. |

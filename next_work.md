@@ -6,8 +6,12 @@ increment adds immutable provision/retire composition, authenticated native jobs
 and strict writer/observer credential separation. P10 now has an executable
 candidate-bound engineering campaign, real database load/restore exercises,
 artifact/alert checks and a release dossier that explicitly holds missing evidence.
-Final hosted source `b741159` passes all 990 component tests with no skips and all
-nine engineering campaign commands. See [P10's receiving packet](docs/implementation/p10-completion-review.md) and
+Current hosted source `0ba5d986` passes all 999 component tests with no skips and all
+nine engineering campaign commands. The 19 P10 tooling checks pass. Candidate
+identity now survives evidence-only commits, original observations and artifact
+identities are required, and receiving reviews bind the exact reviewed packet.
+Independent observation origins and credential rotation at effect boundaries are
+covered by the worker corrections. See [P10's receiving packet](docs/implementation/p10-completion-review.md) and
 [tool instructions](scripts/p10/README.md).
 
 **P07/P08/P09/P10 remain IN_PROGRESS; G07–G10 remain NOT_REVIEWED.** A passing

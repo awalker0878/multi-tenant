@@ -389,6 +389,7 @@ phases:
   evidence_ids:
   - EV-P10-001
   - EV-P10-002
+  - EV-P10-003
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2234,6 +2235,7 @@ work_packages:
   evidence_ids:
   - EV-P10-001
   - EV-P10-002
+  - EV-P10-003
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2264,6 +2266,7 @@ work_packages:
   evidence_ids:
   - EV-P10-001
   - EV-P10-002
+  - EV-P10-003
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2296,6 +2299,7 @@ work_packages:
   evidence_ids:
   - EV-P10-001
   - EV-P10-002
+  - EV-P10-003
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2325,6 +2329,7 @@ work_packages:
   evidence_ids:
   - EV-P10-001
   - EV-P10-002
+  - EV-P10-003
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2354,6 +2359,7 @@ work_packages:
   evidence_ids:
   - EV-P10-001
   - EV-P10-002
+  - EV-P10-003
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2384,6 +2390,7 @@ work_packages:
   evidence_ids:
   - EV-P10-001
   - EV-P10-002
+  - EV-P10-003
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -4253,6 +4260,7 @@ gates:
   evidence_ids:
   - EV-P10-001
   - EV-P10-002
+  - EV-P10-003
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -7451,6 +7459,40 @@ evidence:
   limitations: Synthetic native/owner/load/alert scope only. No native throughput, full control-plane RTO, restricted
     install, real recipient or G10 acceptance. Original decoded job log and GitHub-reported artifact metadata retained;
     ZIP not independently downloaded or rehashed here.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P10-003
+  level: E2
+  artifact_uri: verification/p10/engineering-0ba5d986/observations.json
+  sha256: 8a42425fda0c253adcb39e1ffae20a2bf0d19c6b684cd478c07388a10e9122c0
+  source_revision: 0ba5d986d6ba20ec9303f016baf468cedaa3c352
+  artifact_revisions:
+    workflow_run: '37704372041'
+    artifact_id: '11517979734'
+    artifact_sha256: b91d0e9a6342b01ce5a8baab394152275cfccabb1207dde4670e2e3cbe34c450
+    candidate_sha256: 898258e049b83c8e7534139e0b153ae046b7c0a7c250fad7ff027f86f04e7f98
+  environment: GitHub Actions Ubuntu 24.04/Python 3.12.14, actual PostgreSQL 16/TLS/Cosign; synthetic native owners
+    and local alert receiver. Local P10 tool checks use Python 3.12.14 against the same source.
+  scope: 'Nine campaign commands and 999 component tests pass without failures, errors or skips: Planning 325,
+    Lifecycle 371 and worker 303. Nineteen P10 tool checks pass. Corrections cover effect-boundary credential
+    separation and rotation, separate observation origins, stable candidate identity, original evidence/counter
+    validation, exact artifact identities, packet-bound receiving review and timezone-aware acknowledgements.
+    All 48 synthetic scheduler operations and the stale Lifecycle database restore pass; G10 remains held.'
+  campaign_ids:
+  - Q09
+  - Q10
+  criterion_ids:
+  - G10.01
+  - G10.02
+  - G10.03
+  - G10.04
+  observed_at: '2026-10-07T23:51:37Z'
+  observer: GitHub Actions campaign and local P10 checks; decoded original job log and artifact metadata retrieved
+    through authenticated GitHub API.
+  reviewer: Engineering consistency only; no designated independent native or G10 receiving review.
+  limitations: E2 with synthetic native owners only; no installed platform, native throughput, coordinated RPO/RTO,
+    restricted installation, actual alert recipient or operating acceptance. Artifact download returned HTTP 403;
+    its recorded GitHub digest is not a local archive rehash. N01-N15 and OP01-OP07 remain unbound or unreviewed.
   valid_until: null
   invalidated_at: null
 blockers:
