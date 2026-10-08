@@ -95,6 +95,28 @@ def test_signed_observation_is_not_an_adapter_assertion(
         )
     )
     trust.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "keys": {
+                    "observer-key": {
+                        "role": "observer",
+                        "subject_id": "observer",
+                        "public_key_pem": key.public_key()
+                        .public_bytes(
+                            serialization.Encoding.PEM,
+                            serialization.PublicFormat.SubjectPublicKeyInfo,
+                        )
+                        .decode(),
+                        "expires_at": now + 600,
+                        "scope": {
+                            k: base[k] for k in ("tenant_id", "site_id", "endpoint_id")
+                        },
+                    }
+                },
+            }
+        )
+    )
     monkeypatch.setenv("INVENTORY_CAPABILITY_EVIDENCE_FILE", str(evidence))
     monkeypatch.setenv("INVENTORY_CAPABILITY_TRUST_FILE", str(trust))
     owner = MountedCapabilityObservations()
