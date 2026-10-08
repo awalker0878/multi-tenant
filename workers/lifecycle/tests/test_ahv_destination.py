@@ -318,3 +318,22 @@ def test_actual_tls_import_transport_no_retry(
             "POST", COLLECTIONS["image"], {}, headers, lambda: None
         )
     assert len(peer["requests"]) == 1
+
+
+@pytest.mark.parametrize("fault", ["", "platform", "firmware"])
+def test_prepared_guest_copy_must_match_destination_platform_and_firmware(
+    campaign: dict[str, Any],
+    fault: str,
+) -> None:
+    c = campaign
+    c["receipt"].update(
+        guest_transformation="prepared_offline",
+        guest_target_platform="openstack" if fault == "platform" else "ahv",
+        guest_firmware="efi" if fault == "firmware" else "bios",
+    )
+    if fault:
+        with pytest.raises(NativeHeld):
+            c["execution"].execute(c["binding"])
+        assert not c["peer"].posts
+    else:
+        assert c["execution"].execute(c["binding"])["observation"]["outcome"] == "observed_present"

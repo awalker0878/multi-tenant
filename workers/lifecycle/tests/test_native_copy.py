@@ -276,7 +276,7 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
                     },
                 )
             elif self.path.endswith(("/HttpNfcLeaseProgress", "/HttpNfcLeaseComplete")):
-                self.answer(200)
+                self.answer(204)
             elif self.path == "/v2/images":
                 image = json.loads(raw)
                 image.update(owner=binding.project_id, status="queued")
@@ -575,3 +575,24 @@ def test_vmware_session_rotation_holds_export_without_retry(copy_campaign: Any, 
     with pytest.raises(NativeHeld, match="credential_changed"):
         api.request("POST", "/sdk/vim25/9.1.1.0/VirtualMachine/vm-1/ExportVm", current)
     assert len(fixture["calls"]) == (when != "before_request")
+
+
+def test_export_wildcard_host_uses_only_the_commissioned_api_origin(copy_campaign: Any) -> None:
+    from urllib.parse import urlsplit
+
+    _, execution, fixture, _ = copy_campaign
+    source = execution.adapter.source
+    origin = urlsplit(next(iter(source.nfc_endpoints)))
+    url = (
+        "https://*"
+        + (":" + str(origin.port) if origin.port is not None else "")
+        + "/nfc/disk?ticket=private"
+    )
+    sink = io.BytesIO()
+    result = source.download(url, 1048576, sink, lambda: None)
+    assert result["size"] == len(sink.getvalue()) > 0
+    assert all(row["session"] is None and row["token"] is None for row in fixture["calls"])
+    with pytest.raises(NativeHeld, match="uncommissioned"):
+        source.download(
+            url.replace("https://*", "https://untrusted@*"), 1048576, io.BytesIO(), lambda: None
+        )

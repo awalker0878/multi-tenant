@@ -17,7 +17,10 @@ from lifecycle_worker.infrastructure.vmware_glance_copy import NativeVmCopy
 
 
 @pytest.mark.parametrize("version", [1, 2])
-@pytest.mark.parametrize("fault", ["", "digest", "lost_image", "stage", "mapping", "format"])
+@pytest.mark.parametrize(
+    "fault",
+    ["", "digest", "lost_image", "stage", "mapping", "format", "guest_platform", "guest_firmware"],
+)
 def test_retained_image_import_exact_method_and_custody(
     copy_campaign: Any, tmp_path: Path, fault: str, version: int
 ) -> None:
@@ -33,6 +36,9 @@ def test_retained_image_import_exact_method_and_custody(
         "format": "raw",
         "virtual_bytes": len(data),
         "sector_comparison": "passed",
+        "guest_transformation": "prepared_offline",
+        "guest_target_platform": "vmware" if fault == "guest_platform" else "openstack",
+        "guest_firmware": "efi" if fault == "guest_firmware" else "bios",
     }
     source_op = str(uuid4())
     folder = old.spool / source_op / "disk-2000"

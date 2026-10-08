@@ -43,7 +43,7 @@ class AhvHttp:
         create = method == "POST" and path in COLLECTIONS.values()
         objects = any(re.fullmatch(re.escape(p) + "/" + UUID, path) for p in COLLECTIONS.values())
         reads = objects or re.fullmatch(
-            r"/api/(?:prism/v4\.3/config/(?:tasks/[A-Za-z0-9:_-]{1,160}|domain-managers/"
+            r"/api/(?:prism/v4\.3/config/(?:tasks/(?:[A-Za-z0-9:_=-]|%2[BbFf]){1,160}|domain-managers/"
             + UUID
             + r"|categories/"
             + UUID

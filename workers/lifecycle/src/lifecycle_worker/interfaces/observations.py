@@ -1,4 +1,4 @@
-"""Bounded internal effect route, separate from simulation and read-only inspection."""
+"""Authenticated, bounded native observation route with no effect endpoint."""
 
 import asyncio
 import json
@@ -9,11 +9,11 @@ from typing import Any
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from lifecycle_worker.application.native import NativeHeld, decode, identity
-from lifecycle_worker.application.native_effect import NativeApiEffect
+from lifecycle_worker.application.observation_probe import ObservationProbe
 
 
-class NativeEffectApp:
-    def __init__(self, effects: NativeApiEffect, caller: Callable[[str], tuple[str, str]]) -> None:
+class NativeObservationApp:
+    def __init__(self, effects: ObservationProbe, caller: Callable[[str], tuple[str, str]]) -> None:
         self.effects, self.caller = effects, caller
 
     async def __call__(
@@ -22,16 +22,11 @@ class NativeEffectApp:
         if scope["type"] != "http":
             return
         payload: dict[str, Any]
-        status, payload = 503, {"error": "native_effect_unavailable"}
+        status, payload = 503, {"error": "native_observation_unavailable"}
         try:
             if (
                 scope["method"] != "POST"
-                or scope["path"]
-                not in {
-                    "/internal/native-effects",
-                    "/internal/native-transfer-continuations",
-                    "/internal/native-progress",
-                }
+                or scope["path"] != "/v1/native-observations"
                 or scope["query_string"]
             ):
                 status = 404
@@ -60,30 +55,23 @@ class NativeEffectApp:
                     if message["type"] != "http.request":
                         raise NativeHeld("native_request_interrupted")
                     raw.extend(message["body"])
-                    if len(raw) > 16384:
+                    if len(raw) > 1048576:
                         status = 413
                         raise NativeHeld("native_request_bound")
                     if not message.get("more_body", False):
                         break
-            body = decode(bytes(raw), 16384)
-            if set(body) != {"grant"} or not isinstance(body["grant"], dict):
+            body = decode(bytes(raw), 1048576)
+            if set(body) != {"plan", "binding", "phase"}:
                 raise NativeHeld("invalid_native_request")
             status = 423
-            operation = (
-                self.effects.continue_transfer
-                if scope["path"] == "/internal/native-transfer-continuations"
-                else self.effects.progress
-                if scope["path"] == "/internal/native-progress"
-                else self.effects.execute
-            )
-            payload = await asyncio.to_thread(operation, tenant, worker, body["grant"])
+            payload = await asyncio.to_thread(self.effects.observe, tenant, worker, body)
             status = 200
         except NativeHeld:
-            payload = {"error": "native_effect_held"}
+            payload = {"error": "native_observation_held"}
         except (KeyError, TypeError, ValueError, UnicodeError, TimeoutError):
             status, payload = 422, {"error": "invalid_native_request"}
         except Exception:
-            status, payload = 503, {"error": "native_effect_unavailable"}
+            status, payload = 503, {"error": "native_observation_unavailable"}
         encoded = json.dumps(payload, allow_nan=False, separators=(",", ":")).encode()
         await send(
             {

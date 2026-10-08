@@ -15,6 +15,7 @@ from lifecycle_worker.application.native import (
     NativeBinding,
     NativeHeld,
     NativeObserver,
+    NativeTransferContinuation,
     decode,
     digest,
     identity,
@@ -25,6 +26,7 @@ from lifecycle_worker.infrastructure.migration_conversion import MigrationConver
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint
 from lifecycle_worker.infrastructure.native_image_archive import NativeImageArchive
+from lifecycle_worker.infrastructure.native_image_observer import CapturedImageObserver
 from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
 from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.native_runtime import (
@@ -37,7 +39,6 @@ from lifecycle_worker.infrastructure.openstack_capture import OpenStackCapture
 from lifecycle_worker.infrastructure.openstack_image_import import OpenStackImageImport
 from lifecycle_worker.infrastructure.openstack_image_transport import GlanceImport, GlanceReadback
 from lifecycle_worker.infrastructure.openstack_source_images import (
-    CapturedImageObserver,
     OpenStackCapturedImages,
 )
 from lifecycle_worker.infrastructure.owner_protocol import (
@@ -197,6 +198,25 @@ class MountedMigrationRuntime:
                 current()
                 adapter.execute(supplied, current)
 
+        if isinstance(adapter, NativeTransferContinuation):
+            continuation = adapter
+
+            class GuardedTransfer(GuardedAdapter):
+                def resume_transfer(
+                    self, supplied: NativeBinding, boundary: Callable[[], None]
+                ) -> None:
+                    if supplied.fingerprint != binding.fingerprint:
+                        raise NativeHeld("migration_runtime_binding_changed")
+
+                    def current() -> None:
+                        self.current()
+                        boundary()
+                        self.current()
+
+                    current()
+                    continuation.resume_transfer(supplied, current)
+
+            return GuardedTransfer()
         return GuardedAdapter()
 
     def resolve(self, binding: NativeBinding) -> tuple[NativeApiAdapter, NativeObserver]:
@@ -210,6 +230,93 @@ class MountedMigrationRuntime:
             adapter = VmwareCapture(
                 path, NativeJson(endpoint(config["source"]), "vmware-api-session-id"), self.journal
             )
+        elif kind == "ahv_capture" or (
+            kind == "native_image_archive" and plan.get("source_platform") == "ahv"
+        ):
+            from lifecycle_worker.infrastructure.ahv_accounts import probe, validate_account
+            from lifecycle_worker.infrastructure.ahv_capture import AhvCapture
+            from lifecycle_worker.infrastructure.ahv_http import AhvHttp
+            from lifecycle_worker.infrastructure.ahv_source_images import AhvCapturedImages
+
+            if set(config) != {"writer", "reader"} | (
+                {"spool"} if kind == "native_image_archive" else set()
+            ):
+                raise NativeHeld("invalid_ahv_source_configuration")
+            source_writer, source_reader = config["writer"], config["reader"]
+            source_write_endpoint, source_read_endpoint = (
+                endpoint(source_writer["endpoint"]),
+                endpoint(source_reader["endpoint"]),
+            )
+            if (
+                source_write_endpoint.base_url,
+                source_write_endpoint.address,
+                source_write_endpoint.ca_file,
+            ) != (
+                source_read_endpoint.base_url,
+                source_read_endpoint.address,
+                source_read_endpoint.ca_file,
+            ):
+                raise NativeHeld("ahv_observer_origin_changed")
+            source_write_api, source_read_api = (
+                AhvHttp(source_write_endpoint),
+                AhvHttp(source_read_endpoint, read_only=True),
+            )
+
+            def ahv_source_current() -> None:
+                if digest(self.entry(binding)) != digest(entry):
+                    raise NativeHeld("migration_commissioning_changed")
+                distinct_credentials(source_write_endpoint, source_read_endpoint)
+                if source_writer["user_id"] == source_reader["user_id"]:
+                    raise NativeHeld("independent_ahv_observer_required")
+                validate_account(source_writer, source_write_endpoint)
+                validate_account(source_reader, source_read_endpoint)
+
+            ahv_source_current()
+            probe(
+                source_write_api,
+                source_writer,
+                source_write_endpoint,
+                self.clock,
+                ahv_source_current,
+            )
+            probe(
+                source_read_api, source_reader, source_read_endpoint, self.clock, ahv_source_current
+            )
+            ahv_source = AhvCapturedImages(source_write_api, source_write_endpoint)
+            ahv_read_source = AhvCapturedImages(source_read_api, source_read_endpoint)
+            adapter = (
+                AhvCapture(path, source_write_api, self.journal)
+                if kind == "ahv_capture"
+                else NativeImageArchive(
+                    path,
+                    ahv_source,
+                    self.journal,
+                    self.journal,
+                    Path(config["spool"]),
+                    self.journal,
+                )
+            )
+            source_observer = CapturedImageObserver(
+                ahv_read_source,
+                plan,
+                self.journal,
+                self.journal,
+                source_writer["user_id"],
+                source_reader["user_id"],
+                self.clock,
+                ahv_source_current,
+                (
+                    lambda supplied: ahv_read_source.reconcile_capture(
+                        supplied, plan, self.journal, ahv_source_current
+                    )
+                )
+                if kind == "ahv_capture"
+                else None,
+            )
+            if entry["observer"] is not None:
+                raise NativeHeld("unexpected_source_observer")
+            adapter.inspect(binding)
+            return self.bound(adapter, binding, entry, ahv_source_current), source_observer
         elif kind in {"openstack_capture", "native_image_archive"} and set(config) == (
             {"writer", "reader", "spool"}
             if kind == "native_image_archive"
@@ -269,10 +376,21 @@ class MountedMigrationRuntime:
                 )
             else:
                 adapter = NativeImageArchive(
-                    path, writer_source, self.journal, self.journal, Path(config["spool"])
+                    path,
+                    writer_source,
+                    self.journal,
+                    self.journal,
+                    Path(config["spool"]),
+                    self.journal,
                 )
             capture_observer = CapturedImageObserver(
-                reader_source, plan, self.journal, self.journal, writer["user_id"], self.clock
+                reader_source,
+                plan,
+                self.journal,
+                self.journal,
+                writer["user_id"],
+                reader["user_id"],
+                self.clock,
             )
             if entry["observer"] is not None:
                 raise NativeHeld("unexpected_source_observer")
@@ -288,11 +406,93 @@ class MountedMigrationRuntime:
             adapter = VmwareExportArchive(
                 path, source, self.journal, self.journal, Path(config["spool"])
             )
-        elif kind == "migration_copy_conversion" and set(config) == {"converter", "spool"}:
+        elif kind == "vmware_destination" and set(config) == {"writer", "reader", "nfc", "spool"}:
+            from lifecycle_worker.infrastructure.vmware_import import (
+                NfcUpload,
+                VmwareDestination,
+                VmwareDestinationObserver,
+            )
+            from lifecycle_worker.infrastructure.vmware_import import (
+                path as vmware_path,
+            )
+
+            vm_writer, vm_reader = config["writer"], config["reader"]
+            for account in (vm_writer, vm_reader):
+                if not isinstance(account, dict) or set(account) != {"endpoint", "principal"}:
+                    raise NativeHeld("invalid_vmware_import_account")
+            vm_write_endpoint, vm_read_endpoint = (
+                endpoint(vm_writer["endpoint"]),
+                endpoint(vm_reader["endpoint"]),
+            )
+            if (
+                vm_write_endpoint.base_url,
+                vm_write_endpoint.address,
+                vm_write_endpoint.ca_file,
+            ) != (vm_read_endpoint.base_url, vm_read_endpoint.address, vm_read_endpoint.ca_file):
+                raise NativeHeld("vmware_observer_origin_changed")
+            vm_write_api, vm_read_api = (
+                NativeJson(vm_write_endpoint, "vmware-api-session-id"),
+                NativeJson(vm_read_endpoint, "vmware-api-session-id"),
+            )
+
+            def vmware_import_current() -> None:
+                if digest(self.entry(binding)) != digest(entry):
+                    raise NativeHeld("migration_commissioning_changed")
+                distinct_credentials(vm_write_endpoint, vm_read_endpoint)
+                if not vm_writer["principal"] or vm_writer["principal"] == vm_reader["principal"]:
+                    raise NativeHeld("independent_vmware_observer_required")
+
+            vmware_import_current()
+            for api, account in ((vm_write_api, vm_writer), (vm_read_api, vm_reader)):
+                session = api.request(
+                    "GET",
+                    vmware_path(plan, "SessionManager", "SessionManager", "currentSession"),
+                    vmware_import_current,
+                )
+                if not isinstance(session, dict) or session.get("userName") != account["principal"]:
+                    raise NativeHeld("vmware_import_principal_changed")
+            if not isinstance(config["nfc"], dict) or not 1 <= len(config["nfc"]) <= 64:
+                raise NativeHeld("invalid_nfc_registry")
+            adapter = VmwareDestination(
+                path,
+                vm_write_api,
+                NfcUpload(
+                    {k: endpoint(v) for k, v in config["nfc"].items()},
+                    api_origin=vm_write_endpoint.base_url,
+                ),
+                self.journal,
+                self.journal,
+                Path(config["spool"]),
+            )
+            vmware_observer = VmwareDestinationObserver(
+                path, vm_read_api, self.journal, self.clock, vmware_import_current
+            )
+            if entry["observer"] is not None:
+                raise NativeHeld("unexpected_vmware_observer")
+            adapter.inspect(binding)
+            return self.bound(adapter, binding, entry, vmware_import_current), vmware_observer
+        elif kind == "migration_copy_conversion" and set(config) == {"converter", "spool"} | (
+            {"guest_runtime"} if plan.get("schema_version") == 4 else set()
+        ):
             # The read-only rootfs and executable digests are verified before claim.
             sandbox = PinnedQemuSandbox(Path(config["converter"]), lambda: None)
+            from lifecycle_worker.infrastructure.guest_preparation import (
+                GuestPreparation,
+                PinnedGuestSandbox,
+            )
+
+            guest = (
+                GuestPreparation(PinnedGuestSandbox(Path(config["guest_runtime"]), lambda: None))
+                if "guest_runtime" in config
+                else None
+            )
             adapter = MigrationConversion(
-                path, CopyConverter(sandbox), self.journal, self.journal, Path(config["spool"])
+                path,
+                CopyConverter(sandbox),
+                self.journal,
+                self.journal,
+                Path(config["spool"]),
+                guest,
             )
         elif kind == "migration_image_import" and set(config) == {"writer", "reader", "spool"}:
             writer, reader = config["writer"], config["reader"]
@@ -480,6 +680,11 @@ class MountedMigrationRuntime:
             self.clock,
             family="native" if kind == "native_owner_protocol" else "migration",
             identity_check=independent_credentials,
+            method_plan=(
+                plan
+                if kind == "migration_owner_protocol" and plan.get("schema_version") == 2
+                else None
+            ),
         )
         adapter.inspect(binding)
         return self.bound(adapter, binding, entry, independent_credentials), independent_observer

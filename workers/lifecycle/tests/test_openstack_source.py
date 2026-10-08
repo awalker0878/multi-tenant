@@ -325,3 +325,47 @@ def test_native_archive_keeps_all_disks_and_interrupted_custody(
         assert journal.events[-1][0] == "export_complete"
         with pytest.raises(FileExistsError):
             tool.execute(b, lambda: None)
+
+
+@pytest.mark.parametrize(
+    "fault", ["", "ignored_range", "wrong_range", "corrupt_prefix", "corrupt_suffix"]
+)
+def test_continued_native_range_must_prove_the_complete_original_image(
+    native_tls: Any, fault: str
+) -> None:
+    reads, peer = native_tls
+    original = b"immutable original image data"
+    prefix = original[:10] if fault != "corrupt_prefix" else b"corruption"
+    suffix = original[10:] if fault != "corrupt_suffix" else b"x" * (len(original) - 10)
+    content_range = f"bytes 10-{len(original) - 1}/{len(original)}"
+    peer.update(
+        status=200 if fault == "ignored_range" else 206,
+        body=suffix,
+        content_type="application/octet-stream",
+        headers={
+            "Content-Range": ["bytes 0-9/10" if fault == "wrong_range" else content_range],
+            "Content-Length": [str(len(suffix))],
+        },
+    )
+    tool = NativeBlobDownload(reads.endpoints["compute"], "X-Auth-Token")
+    output = io.BytesIO()
+
+    def download() -> dict[str, Any]:
+        return tool.download(
+            "/images/immutable/file",
+            output,
+            len(original),
+            "sha256",
+            hashlib.sha256(original).hexdigest(),
+            lambda: None,
+            io.BytesIO(prefix),
+        )
+
+    if fault:
+        with pytest.raises(NativeHeld):
+            download()
+    else:
+        result = download()
+        assert prefix + output.getvalue() == original
+        assert result["sha256"] == hashlib.sha256(original).hexdigest()
+    assert peer["requests"][0]["range"] == "bytes=10-"

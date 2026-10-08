@@ -1,0 +1,5 @@
+# Approved signed installer and its prerequisites are sealed in the appliance.
+# Tools finish on first boot in quarantine; this does not prove guest readiness.
+mkdir /ProgramData/Migration
+upload /usr/share/migration/drivers/vmware-tools/setup64.exe:/ProgramData/Migration/setup64.exe
+firstboot /usr/share/migration/profiles/windows-vmware.cmd

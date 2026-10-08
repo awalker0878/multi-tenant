@@ -5,7 +5,7 @@ import re
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, BinaryIO, Protocol, runtime_checkable
 
 from lifecycle_worker.application.api_plan import shape
 from lifecycle_worker.application.native import (
@@ -17,9 +17,9 @@ from lifecycle_worker.application.native import (
     sha256,
 )
 from lifecycle_worker.infrastructure.migration_budget import seconds
-from lifecycle_worker.infrastructure.migration_custody import CaptureCustody
+from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody, CaptureCustody
 from lifecycle_worker.infrastructure.migration_transfer import BlobSink, RateBound
-from lifecycle_worker.infrastructure.native_files import protected_read
+from lifecycle_worker.infrastructure.native_files import protected_read, sync_directory
 
 
 class NativeImageSource(Protocol):
@@ -38,6 +38,13 @@ class NativeImageSource(Protocol):
     ) -> dict[str, Any]: ...
 
 
+@runtime_checkable
+class ResumableImageSource(NativeImageSource, Protocol):
+    def download_remaining(
+        self, image: dict[str, Any], sink: BlobSink, prefix: BinaryIO, boundary: Callable[[], None]
+    ) -> dict[str, Any]: ...
+
+
 class NativeImageArchive:
     def __init__(
         self,
@@ -46,7 +53,9 @@ class NativeImageArchive:
         journal: NativeJournal,
         custody: CaptureCustody,
         spool: Path,
+        continuation_custody: ArtifactCustody | None = None,
     ) -> None:
+        self.continuation_custody = continuation_custody
         self.plan_file, self.source, self.journal, self.custody, self.spool = (
             plan_file,
             source,
@@ -68,11 +77,12 @@ class NativeImageArchive:
                 "max_seconds",
                 "bytes_per_second",
                 "spool_bytes",
-            },
+            }
+            | ({"max_continuations"} if p.get("schema_version") == 3 else set()),
         )
         if (
             type(p["schema_version"]) is not int
-            or p["schema_version"] != 2
+            or p["schema_version"] not in {2, 3}
             or p["kind"] != "native_image_archive"
             or p["source_platform"] not in {"openstack", "ahv"}
             or not sha256(p["capture_plan_sha256"])
@@ -80,6 +90,13 @@ class NativeImageArchive:
         ):
             raise NativeHeld("native_image_archive_plan_changed")
         seconds(p)
+        if p["schema_version"] == 3 and (
+            type(p["max_continuations"]) is not int
+            or not 1 <= p["max_continuations"] <= 32
+            or self.continuation_custody is None
+            or not isinstance(self.source, ResumableImageSource)
+        ):
+            raise NativeHeld("native_transfer_continuation_unqualified")
         if (
             type(p["bytes_per_second"]) is not int
             or not 65536 <= p["bytes_per_second"] <= 2**34
@@ -120,6 +137,11 @@ class NativeImageArchive:
 
     def execute(self, binding: NativeBinding, boundary: Callable[[], None]) -> None:
         p = self.plan(binding)
+        if p["schema_version"] == 3:
+            from lifecycle_worker.infrastructure.native_archive_continuation import archive
+
+            archive(self, binding, boundary, resume=False)
+            return
         deadline = time.monotonic() + seconds(p)
 
         def current() -> None:
@@ -138,6 +160,7 @@ class NativeImageArchive:
         self.source.current(binding, capture, current)
         directory = self.spool / binding.operation_id
         directory.mkdir(mode=0o700)
+        sync_directory(self.spool)
         receipts = {}
         for disk in p["disks"]:
             current()
@@ -160,6 +183,7 @@ class NativeImageArchive:
                 raise NativeHeld("source_image_changed_during_transfer")
             receipt = result | {"format": image["format"], "image_sha256": digest(image)}
             receipts[key] = receipt
+            sync_directory(directory)
             self.journal.record(binding, "disk_transferred", {"resource_key": key, **receipt})
         self.source.current(binding, capture, current)
         fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY)
@@ -176,3 +200,10 @@ class NativeImageArchive:
                 "capture_sha256": digest(capture),
             },
         )
+
+    def resume_transfer(self, binding: NativeBinding, boundary: Callable[[], None]) -> None:
+        if self.plan(binding)["schema_version"] != 3:
+            raise NativeHeld("native_transfer_continuation_not_selected")
+        from lifecycle_worker.infrastructure.native_archive_continuation import archive
+
+        archive(self, binding, boundary, resume=True)

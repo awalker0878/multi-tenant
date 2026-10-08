@@ -60,3 +60,76 @@ independently composed caller resolver and never accepts caller identity or comm
 See [native adapter operations](../../docs/operations/runbooks/openstack-native-adapters.md)
 for the exact plan, runtime and journal boundaries. P08 owns the separate
 [VM migration architecture](../../docs/implementation/p08-native-migration.md).
+
+## P09-A composed migrations
+
+The protected registry composes source capture, retained archive, copy conversion
+and destination import separately. `openstack_capture` reads a stopped Nova source
+and captures every local/attached disk through Nova, isolated Cinder copies and
+private Glance images. `ahv_capture` binds each stopped source disk to a Prism
+image and durable accepted task. `vmware_capture` and `vmware_export_archive`
+retain the isolated clone, NFC manifest and OVF descriptor. No Terraform provider
+or VDDK is in this data path.
+
+`native_image_archive` version 3 permits an explicit same-grant continuation for
+OpenStack/AHV immutable image GETs. A private file lock excludes concurrent byte
+writers; persisted capture identity, checksums, continuation count and the original
+deadline survive a restart. Changed captures, expired grants, missing receipts and
+uncertain native POST responses remain held. VMware supports bounded in-process
+range continuation against a live NFC lease; a process restart cannot create a new
+lease under an old operation. Independent AHV readback can reconstruct a missing
+completed capture receipt from all retained accepted tasks; partial task inventory
+and ambiguous custody cannot be repaired by replaying creates.
+
+`migration_copy_conversion` version 4 accepts an exact sealed `guest_profile`:
+`id`, `family`, `distribution`, `major_version`, `architecture`, `target_platform`,
+`firmware`, `commands_sha256` and `artifact_sha256`. Conversion first creates
+sector-verified private RAW copies, runs the pinned offline libguestfs profile,
+re-inspects guest identity, retains before/after hashes and converts the prepared
+disks to their explicit target format. Writable hard links and shared directories
+are rejected. Destination import checks any prepared receipt's platform and
+firmware against its own plan. Profiles in `guest-profiles/` are appliance build
+inputs; seal the exact scripts, signed offline drivers/packages and toolchain in
+the commissioned read-only rootfs. They require qualification for each advertised
+guest tuple. An offline preparation receipt never establishes boot or application
+health.
+
+`vmware_destination` uses OVF `CreateImportSpec` and `ImportVApp`/NFC with native
+`datacenter-*` and `vm-*` identities. Its independently read target ancestry,
+datastore/network memberships, hardware profile, disconnected NICs and powered-off
+state must match the selected scope. AHV and OpenStack imports use their native
+image/storage/workload APIs. Source and destination platform roles can be composed
+in all nine directions; that composition does not establish native qualification.
+
+Account commissioning manifest version 3 requires explicit `platform` on both
+`source` and `target`. Each side has separate `collector`, `writer` and `observer`
+accounts and the following native scope:
+
+| Platform | Side scope | Account fields |
+| --- | --- | --- |
+| VMware | `api_version`, `instance_uuid`, `session_manager`, `authorization_manager` | `user_name`, pinned `endpoint`, explicit required/forbidden `privileges` per native entity |
+| OpenStack | `project_id` | `user_id`, `roles`, four pinned `endpoints` (`identity`, `compute`, `volume`, `network`) and `image` endpoint |
+| AHV | `project_id`, `prism_central_id`, `cluster_id` | `user_id`, `key_id`, `credential_sha256`, `authorization_policies`, pinned `endpoint` |
+
+All service endpoints for one OpenStack account must use one scoped credential;
+all three roles must observe the same native origins. Principals and credentials
+must be distinct and remain unchanged during probing. Version 1/2 manifests remain
+supported. A successful commissioning probe verifies identity, connectivity and
+scope; it does not establish mutation permissions or workload readiness.
+
+`lifecycle-worker-observer --config <protected-file>` starts the separate TLS
+observation process. Its configuration binds `callers_file`, `registry_file`,
+`observer_id`, `tls_cert_file`, `tls_key_file` and `schema_version=1`. Exact plan,
+stage, caller and phase assignments select fixed native service endpoints, subject
+IDs and assertions. Guest, service, dataset, security and health outcomes need a
+native measurement timestamp no older than the commissioned bound (at most five
+minutes). Each allow/deny policy result needs its own measurement timestamp. A
+fresh HTTP read cannot restamp a stale restore or traffic result as passed.
+
+The authenticated `/internal/native-progress` route exposes only a current
+redeemed `export_copy` grant's journaled verified disk count, bytes and archive
+completion. These counters survive worker restarts and never invent percentage,
+remaining time or in-flight bytes. Missing/stopped/expired authority returns a hold.
+Apply native migration `005_any_to_any.sql` as the separate journal owner before
+running these adapters; runtime remains append-only. Synthetic API/TLS peers are
+E2 mechanism evidence, not E3 platform or E4 receiving-owner acceptance.

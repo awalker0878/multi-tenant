@@ -1,6 +1,7 @@
 """Worker-owned PostgreSQL certainty ledger. No Lifecycle database access."""
 
 import json
+import re
 from collections.abc import Callable
 from typing import Any
 
@@ -71,12 +72,33 @@ class PostgresNativeJournal:
 
     def record(self, binding: NativeBinding, event: str, facts: dict[str, Any]) -> None:
         with self.connect() as connection:
+            recovered_capture = event == "source_capture_bound" or (
+                event == "request_accepted" and "task_id" in facts
+            )
+            if recovered_capture:
+                # Advisory locking retains append-only database privileges. Two
+                # independent readers may confirm the same completed AHV task;
+                # they must not create duplicate authoritative custody records.
+                connection.execute(
+                    "SELECT pg_advisory_xact_lock(hashtextextended(%s,7707002))",
+                    (binding.operation_id,),
+                )
             prior = connection.execute(
                 "SELECT fingerprint FROM native.attempts WHERE operation_id=%s",
                 (binding.operation_id,),
             ).fetchone()
             if prior is None or prior["fingerprint"] != binding.fingerprint:
                 raise NativeHeld("native_attempt_not_bound")
+            if recovered_capture:
+                matches = connection.execute(
+                    "SELECT facts FROM native.events WHERE operation_id=%s AND kind=%s "
+                    "AND (%s='source_capture_bound' OR facts->>'resource_key'=%s)",
+                    (binding.operation_id, event, event, facts.get("resource_key")),
+                ).fetchall()
+                if matches:
+                    if len(matches) != 1 or digest(matches[0]["facts"]) != digest(facts):
+                        raise NativeHeld("native_recovered_receipt_conflict")
+                    return
             connection.execute(
                 "INSERT INTO native.events(operation_id,kind,facts) VALUES(%s,%s,%s::jsonb)",
                 (binding.operation_id, event, json.dumps(facts, allow_nan=False)),
@@ -101,7 +123,17 @@ class PostgresNativeJournal:
             key = facts["resource_key"]
             if key in result or facts["kind"] not in {"server", "port", "volume", "image"}:
                 raise NativeHeld("ambiguous_native_receipt")
-            result[key] = {"kind": facts["kind"], "id": native_identity(facts["native_id"])}
+            value = facts["native_id"]
+            if (
+                facts["kind"] == "server"
+                and re.fullmatch(r"datacenter-[1-9][0-9]{0,18}", binding.project_id)
+                and isinstance(value, str)
+                and re.fullmatch(r"vm-[1-9][0-9]{0,18}", value)
+            ):
+                object_id = value
+            else:
+                object_id = native_identity(value)
+            result[key] = {"kind": facts["kind"], "id": object_id}
         return result
 
     def ahv_tasks(self, binding: NativeBinding) -> dict[str, dict[str, Any]]:
@@ -146,6 +178,60 @@ class PostgresNativeJournal:
             result[key] = row["facts"]
         return result
 
+    def import_lease(self, binding: NativeBinding) -> str:
+        with self.connect() as connection:
+            rows = connection.execute(
+                "SELECT e.facts FROM native.attempts a JOIN native.events e "
+                "ON e.operation_id=a.operation_id WHERE a.operation_id=%s "
+                "AND a.fingerprint=%s AND e.kind='import_lease'",
+                (binding.operation_id, binding.fingerprint),
+            ).fetchall()
+        if len(rows) != 1 or not isinstance(rows[0]["facts"].get("lease_id"), str):
+            raise NativeHeld("vmware_import_lease_ambiguous")
+        return str(rows[0]["facts"]["lease_id"])
+
+    def archive_progress(self, binding: NativeBinding) -> dict[str, Any]:
+        """Count durable verified disks, never inferred percentages or in-flight bytes."""
+        with self.connect() as connection:
+            prior = connection.execute(
+                "SELECT fingerprint FROM native.attempts WHERE operation_id=%s",
+                (binding.operation_id,),
+            ).fetchone()
+            if prior is None or prior["fingerprint"] != binding.fingerprint:
+                raise NativeHeld("native_attempt_not_bound")
+            rows = connection.execute(
+                "SELECT kind,facts FROM native.events WHERE operation_id=%s "
+                "AND kind IN ('disk_transferred','export_complete') ORDER BY sequence LIMIT 35",
+                (binding.operation_id,),
+            ).fetchall()
+        if len(rows) > 33:
+            raise NativeHeld("native_progress_receipts_ambiguous")
+        disks: dict[str, dict[str, Any]] = {}
+        complete = False
+        for row in rows:
+            facts = row["facts"]
+            if row["kind"] == "export_complete":
+                if complete or not disks or facts.get("disks_sha256") != digest(disks):
+                    raise NativeHeld("native_progress_completion_changed")
+                complete = True
+                continue
+            key, size = facts.get("resource_key"), facts.get("size")
+            if (
+                complete
+                or not isinstance(key, str)
+                or key in disks
+                or type(size) is not int
+                or not 0 < size <= 2**46
+                or len(disks) >= 32
+            ):
+                raise NativeHeld("native_progress_receipts_ambiguous")
+            disks[key] = {k: v for k, v in facts.items() if k != "resource_key"}
+        return {
+            "bytes_completed": sum(d["size"] for d in disks.values()),
+            "disks_completed": len(disks),
+            "artifact_complete": complete,
+        }
+
     def capture(self, binding: NativeBinding, plan_sha256: str) -> dict[str, Any]:
         """Resolve a prior immutable capture intent only inside the same tenant/job/plan."""
         with self.connect() as connection:
@@ -156,6 +242,8 @@ class PostgresNativeJournal:
                 "AND e.kind IN ('clone_bound','source_capture_bound')",
                 (binding.tenant_id, binding.job_id, plan_sha256),
             ).fetchall()
+        if not rows:
+            raise NativeHeld("migration_capture_receipt_missing")
         if len(rows) != 1:
             raise NativeHeld("migration_capture_receipt_ambiguous")
         prior = rows[0]["binding"]

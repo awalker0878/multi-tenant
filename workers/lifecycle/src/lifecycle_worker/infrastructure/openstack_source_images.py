@@ -3,16 +3,14 @@
 import hashlib
 from collections.abc import Callable
 from dataclasses import replace
-from typing import Any
+from typing import Any, BinaryIO
 
 from lifecycle_worker.application.native import (
     NativeBinding,
     NativeHeld,
-    NativeJournal,
     digest,
     identity,
 )
-from lifecycle_worker.infrastructure.migration_custody import CaptureCustody
 from lifecycle_worker.infrastructure.migration_transfer import BlobSink, NativeBlobDownload
 from lifecycle_worker.infrastructure.native_http import credential
 from lifecycle_worker.infrastructure.native_json import NativeJson
@@ -64,7 +62,11 @@ class OpenStackCapturedImages:
         return observed
 
     def download(
-        self, image: dict[str, Any], sink: BlobSink, boundary: Callable[[], None]
+        self,
+        image: dict[str, Any],
+        sink: BlobSink,
+        boundary: Callable[[], None],
+        prefix: BinaryIO | None = None,
     ) -> dict[str, Any]:
         def current() -> None:
             boundary()
@@ -84,66 +86,10 @@ class OpenStackCapturedImages:
             image["checksum_algorithm"],
             image["checksum"],
             current,
+            prefix,
         )
 
-
-class CapturedImageObserver:
-    """Separate native identity checks image metadata and durable transfer hashes.
-
-    This proves copy custody only. It never claims guest or application health.
-    """
-
-    def __init__(
-        self,
-        source: OpenStackCapturedImages,
-        plan: dict[str, Any],
-        custody: CaptureCustody,
-        journal: NativeJournal,
-        writer_id: str,
-        clock: Callable[[], int],
-    ) -> None:
-        if source.authorization.user_id == writer_id:
-            raise NativeHeld("independent_native_identity_required")
-        self.source, self.plan, self.custody, self.journal, self.clock = (
-            source,
-            plan,
-            custody,
-            journal,
-            clock,
-        )
-
-    def observe(self, binding: NativeBinding, objects: dict[str, Any]) -> dict[str, Any]:
-        is_archive = self.plan["kind"] == "native_image_archive"
-        capture = self.custody.capture(
-            binding,
-            self.plan["capture_plan_sha256"] if is_archive else binding.operation_plan_sha256,
-        )
-        self.source.current(binding, capture, lambda: None)
-        expected = {d["key"] for d in self.plan["disks"]}
-        if set(capture["disks"]) != expected or objects:
-            raise NativeHeld("source_capture_inventory_changed")
-        receipts = self.journal.transfers(binding) if is_archive else {}
-        if is_archive and set(receipts) != expected:
-            raise NativeHeld("source_transfer_receipts_incomplete")
-        for key in sorted(expected):
-            image = self.source.image(binding, capture, key, lambda: None)
-            if is_archive:
-                receipt = receipts[key]
-                if (
-                    receipt.get("size") != image["size"]
-                    or receipt.get(image["checksum_algorithm"]) != image["checksum"]
-                    or receipt.get("image_sha256") != digest(image)
-                    or receipt.get("format") != image["format"]
-                ):
-                    raise NativeHeld("source_transfer_integrity_changed")
-        return {
-            "binding_sha256": binding.fingerprint,
-            "independent": True,
-            "observed_at": self.clock(),
-            "outcome": "observed_present",
-            "capture_sha256": digest(capture),
-            "transfers_sha256": digest(receipts),
-            "objects_sha256": digest(objects),
-            "application_ready": False,
-            "activation_authorized": False,
-        }
+    def download_remaining(
+        self, image: dict[str, Any], sink: BlobSink, prefix: BinaryIO, boundary: Callable[[], None]
+    ) -> dict[str, Any]:
+        return self.download(image, sink, boundary, prefix)

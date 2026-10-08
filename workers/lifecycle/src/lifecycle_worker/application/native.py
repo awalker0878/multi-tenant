@@ -1,7 +1,8 @@
 """P07 native API effect boundary. Native admission remains owned by Lifecycle.
 
 An adapter result is infrastructure evidence, never application readiness. A claimed
-attempt cannot run twice, even after an error, crash, lease expiry or missing readback.
+native mutation cannot run twice. Explicit immutable-transfer continuation retains
+the original claim, authority, file lock and deadline.
 """
 
 import hashlib
@@ -9,7 +10,7 @@ import json
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 from uuid import UUID
 
 
@@ -63,6 +64,12 @@ def native_identity(value: Any) -> str:
     return identity(value)
 
 
+def native_project_identity(value: Any) -> str:
+    if isinstance(value, str) and re.fullmatch(r"datacenter-[1-9][0-9]{0,18}", value):
+        return value
+    return native_identity(value)
+
+
 def sha256(value: Any) -> bool:
     return isinstance(value, str) and re.fullmatch(r"[a-f0-9]{64}", value) is not None
 
@@ -103,7 +110,7 @@ class NativeBinding:
             "custody_id",
         ):
             identity(value[name])
-        native_identity(value["project_id"])
+        native_project_identity(value["project_id"])
         if (
             not all(
                 sha256(value[key])
@@ -145,6 +152,13 @@ class NativeObserver(Protocol):
     def observe(self, binding: NativeBinding, objects: dict[str, Any]) -> dict[str, Any]: ...
 
 
+@runtime_checkable
+class NativeTransferContinuation(Protocol):
+    def resume_transfer(self, binding: NativeBinding, boundary: Callable[[], None]) -> None:
+        """Resume immutable reads only, excluding concurrent spool writers."""
+        ...
+
+
 class NativeApiExecution:
     def __init__(
         self,
@@ -177,10 +191,37 @@ class NativeApiExecution:
                 binding, lambda: self.require_current(binding, "during_api_sequence")
             )
         except Exception:
+            # Reads can recover accepted IDs after lost polling responses. They
+            # cannot replay writes, renew authority or clear the unknown outcome.
+            self.reconcile(binding)
             self.journal.record(
                 binding, "outcome_unknown", {"reason": "native_request_or_authority_held"}
             )
             raise NativeHeld("native_attempt_requires_reconciliation") from None
+        return {
+            "binding_sha256": binding.fingerprint,
+            "observation": self.reconcile(binding),
+            "retry_authorized": False,
+            "activation_authorized": False,
+            "application_ready": False,
+        }
+
+    def continue_transfer(self, binding: NativeBinding) -> dict[str, Any]:
+        NativeBinding.parse(binding.document())
+        self.require_current(binding, "during_api_sequence")
+        self.journal.resources(binding)
+        if not isinstance(self.adapter, NativeTransferContinuation):
+            raise NativeHeld("native_transfer_continuation_not_supported")
+        self.adapter.inspect(binding)
+        try:
+            self.adapter.resume_transfer(
+                binding, lambda: self.require_current(binding, "during_api_sequence")
+            )
+        except Exception:
+            self.journal.record(
+                binding, "continuation_held", {"reason": "immutable_transfer_not_confirmed"}
+            )
+            raise NativeHeld("native_transfer_continuation_held") from None
         return {
             "binding_sha256": binding.fingerprint,
             "observation": self.reconcile(binding),

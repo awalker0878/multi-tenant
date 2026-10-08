@@ -136,6 +136,12 @@ class OpenStackImageImport:
                 or not 0 < receipt["size"] <= 2**46
             ):
                 raise NativeHeld("migration_import_artifact_changed")
+            if receipt.get("guest_transformation") == "prepared_offline" and (
+                receipt.get("guest_target_platform") != "openstack"
+                or receipt.get("guest_firmware")
+                != {"bios": "bios", "uefi": "efi"}[disk["hw_firmware_type"]]
+            ):
+                raise NativeHeld("migration_import_guest_profile_changed")
             path = self.spool / operation / disk["key"] / ("disk." + disk["disk_format"])
             observed = file_digest(path, receipt["size"], current)
             if any(observed[k] != receipt[k] for k in ("size", "sha256", "sha512")):

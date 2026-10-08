@@ -1,0 +1,4 @@
+# The appliance must contain the approved signed VirtIO driver bundle at this
+# path. The appliance digest and exact Windows profile require qualification.
+inject-virtio-win /usr/share/migration/drivers/virtio-win
+firstboot-command sc.exe config VMTools start= disabled

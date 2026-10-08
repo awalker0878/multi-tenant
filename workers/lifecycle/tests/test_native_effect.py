@@ -172,3 +172,64 @@ def test_non_provision_grant_is_held_before_tooling(binding: NativeBinding, effe
     with pytest.raises(NativeHeld):
         service.execute(binding.tenant_id, binding.executor_id, grant)
     assert not resolutions and not client.calls and tool.calls == 0
+
+
+def test_continuation_reuses_live_redeemed_authority_without_new_claim_or_mutation(
+    binding: NativeBinding,
+) -> None:
+    client, journal = GrantClient(), Journal()
+    journal.claim(binding)
+
+    class Resumable(Tool):
+        def resume_transfer(self, b: NativeBinding, boundary: Any) -> None:
+            boundary()
+            self.calls += 1
+
+    tool = Resumable(journal)
+
+    class Runtime:
+        def resolve(self, b: NativeBinding) -> tuple[Resumable, Observer]:
+            return tool, Observer()
+
+    service = NativeApiEffect(client, journal, Runtime(), lambda: 100)
+    result = service.continue_transfer(binding.tenant_id, binding.executor_id, stage_grant(binding))
+    assert result["submitted"] is True and tool.calls == 1
+    assert client.calls and set(client.calls) == {"during_api_sequence"}
+    client.fail = "during_api_sequence"
+    with pytest.raises(NativeHeld):
+        service.continue_transfer(binding.tenant_id, binding.executor_id, stage_grant(binding))
+    assert tool.calls == 1
+
+
+def test_progress_reads_durable_counters_without_claiming_or_running_effect(
+    binding: NativeBinding,
+) -> None:
+    class MeasuredJournal(Journal):
+        def archive_progress(self, supplied: NativeBinding) -> dict[str, Any]:
+            assert supplied == binding
+            return {"bytes_completed": 1048576, "disks_completed": 1, "artifact_complete": False}
+
+    client, journal = GrantClient(), MeasuredJournal()
+    tool = Tool(journal)
+
+    class Runtime:
+        def resolve(self, supplied: NativeBinding) -> tuple[Tool, Observer]:
+            raise AssertionError("progress cannot resolve or run native effects")
+
+    service = NativeApiEffect(client, journal, Runtime(), lambda: 100)
+    grant = stage_grant(binding) | {
+        "schema_version": 2,
+        "stage": "export_copy",
+        "intent_digest": binding.operation_plan_sha256,
+    }
+    result = service.progress(binding.tenant_id, binding.executor_id, grant)
+    assert result["bytes_completed"] == 1048576 and result["disks_completed"] == 1
+    assert result["measured_at"] == 100 and result["artifact_complete"] is False
+    assert result["evidence_source"] == "worker_custody_journal"
+    assert (
+        result["grant_sha256"] == digest(grant) and result["binding_sha256"] == binding.fingerprint
+    )
+    assert not journal.claimed and not tool.calls
+    client.fail = "during_api_sequence"
+    with pytest.raises(NativeHeld):
+        service.progress(binding.tenant_id, binding.executor_id, grant)

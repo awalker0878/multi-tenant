@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from lifecycle_worker.application.native import NativeHeld, decode, digest, sha256
-from lifecycle_worker.infrastructure.native_files import protected_read
+from lifecycle_worker.infrastructure.native_files import protected_read, sync_directory
 
 
 def file_digest(path: Path, maximum: int, current: Callable[[], None]) -> dict[str, Any]:
@@ -326,6 +326,15 @@ class CopyConverter:
         receipt = file_digest(
             output / ("disk." + target_format), intent["max_output_bytes"], current
         )
+        descriptor = os.open(
+            output / ("disk." + target_format), os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK
+        )
+        try:
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+        sync_directory(output)
+        sync_directory(output.parent)
         return {
             **receipt,
             "source_sha256": before["sha256"],

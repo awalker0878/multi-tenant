@@ -53,7 +53,7 @@ def native_tls(tmp_path: Path) -> Iterator[tuple[NativeReads, dict[str, Any]]]:
                 callback()
             self.send_response(reply["status"])
             self.send_header("Content-Type", reply.get("content_type", "application/json"))
-            for key in ("Content-Length", "Transfer-Encoding"):
+            for key in ("Content-Length", "Transfer-Encoding", "Content-Range"):
                 for value in reply.get("headers", {}).get(key, []):
                     self.send_header(key, value)
             if reply.get("location"):
@@ -84,6 +84,7 @@ def native_tls(tmp_path: Path) -> Iterator[tuple[NativeReads, dict[str, Any]]]:
                     "method": "GET",
                     "token": self.headers.get("X-Auth-Token"),
                     "subject": self.headers.get("X-Subject-Token"),
+                    "range": self.headers.get("Range"),
                     "nova_version": self.headers.get("X-OpenStack-Nova-API-Version"),
                     "volume_version": self.headers.get("OpenStack-API-Version"),
                 }

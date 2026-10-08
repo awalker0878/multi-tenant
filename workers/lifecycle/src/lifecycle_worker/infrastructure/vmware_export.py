@@ -67,7 +67,11 @@ class VmwareExport:
     ) -> Any:
         method = "GET" if operation in {"state", "info"} else "POST"
         return self.api.request(
-            method, self.path(plan, "HttpNfcLease", lease, operation), boundary, body
+            method,
+            self.path(plan, "HttpNfcLease", lease, operation),
+            boundary,
+            body,
+            expected=204 if operation in {"HttpNfcLeaseProgress", "HttpNfcLeaseComplete"} else 200,
         )
 
     def ready(
@@ -100,7 +104,23 @@ class VmwareExport:
         allow_range_continuation: bool = False,
         on_continuation: Callable[[dict[str, Any]], None] | None = None,
     ) -> dict[str, Any]:
-        parsed = urlsplit(url)
+        if not isinstance(url, str) or any(ord(c) < 33 or ord(c) > 126 for c in url):
+            raise NativeHeld("uncommissioned_native_export_destination")
+        try:
+            parsed = urlsplit(url)
+            if parsed.username or parsed.password:
+                raise NativeHeld("uncommissioned_native_export_destination")
+            if parsed.hostname == "*":
+                api_origin = urlsplit(self.api.endpoint.base_url)
+                if api_origin.scheme != "https" or not api_origin.hostname:
+                    raise NativeHeld("uncommissioned_native_export_destination")
+                host = api_origin.hostname
+                if ":" in host:
+                    host = "[" + host + "]"
+                host += ":" + str(parsed.port) if parsed.port is not None else ""
+                parsed = parsed._replace(netloc=host)
+        except ValueError:
+            raise NativeHeld("uncommissioned_native_export_destination") from None
         origin = f"https://{parsed.netloc}"
         endpoint = self.nfc_endpoints.get(origin)
         if (

@@ -31,11 +31,12 @@ def validate(p: dict[str, Any], binding: NativeBinding) -> dict[str, Any]:
             "policy_ids",
             "shared_resource_ids",
             "max_seconds",
-        },
+        }
+        | ({"firmware"} if p.get("schema_version") == 2 else set()),
     )
     if (
         type(p["schema_version"]) is not int
-        or p["schema_version"] != 1
+        or p["schema_version"] not in {1, 2}
         or p["kind"] != "ahv_destination"
         or p["project_id"] != binding.project_id
         or digest(p) != binding.operation_plan_sha256
@@ -50,6 +51,8 @@ def validate(p: dict[str, Any], binding: NativeBinding) -> dict[str, Any]:
         for k in ("custody_id", "custody_generation", "ownership_digest")
     ):
         raise NativeHeld("ahv_custody_or_api_contract_changed")
+    if p.get("firmware", "bios") not in {"bios", "efi"}:
+        raise NativeHeld("ahv_firmware_not_qualified")
     for field in ("project_id", "prism_central_id", "cluster_id"):
         identity(p[field])
     name(p["name"])
@@ -161,7 +164,13 @@ def vm_body(p: dict[str, Any], images: dict[str, str], binding: NativeBinding) -
         "numThreadsPerCore": 1,
         "memorySizeBytes": p["memory_bytes"],
         "powerState": "OFF",
-        "bootConfig": {"$objectType": "vmm.v4.ahv.config.LegacyBoot", "bootOrder": ["DISK"]},
+        "bootConfig": {
+            "$objectType": "vmm.v4.ahv.config.UefiBoot",
+            "bootOrder": ["DISK"],
+            "isSecureBootEnabled": False,
+        }
+        if p.get("firmware") == "efi"
+        else {"$objectType": "vmm.v4.ahv.config.LegacyBoot", "bootOrder": ["DISK"]},
         "categories": [{"extId": key} for key in p["category_ids"]],
         "disks": [
             {

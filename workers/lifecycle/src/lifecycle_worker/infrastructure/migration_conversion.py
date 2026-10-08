@@ -15,10 +15,11 @@ from lifecycle_worker.application.native import (
     digest,
     sha256,
 )
+from lifecycle_worker.infrastructure.guest_preparation import GuestPreparation
 from lifecycle_worker.infrastructure.image_conversion import CopyConverter
 from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
-from lifecycle_worker.infrastructure.native_files import protected_read
+from lifecycle_worker.infrastructure.native_files import protected_read, sync_directory
 
 
 class MigrationConversion:
@@ -29,7 +30,9 @@ class MigrationConversion:
         journal: NativeJournal,
         custody: ArtifactCustody,
         spool: Path,
+        guest: GuestPreparation | None = None,
     ) -> None:
+        self.guest = guest
         self.plan_file, self.converter, self.journal, self.custody, self.spool = (
             plan_file,
             converter,
@@ -50,11 +53,12 @@ class MigrationConversion:
                 "disks",
                 "max_seconds",
                 "bytes_per_second",
-            },
+            }
+            | ({"guest_profile"} if p.get("schema_version") == 4 else set()),
         )
         if (
             type(p["schema_version"]) is not int
-            or p["schema_version"] not in {1, 2, 3}
+            or p["schema_version"] not in {1, 2, 3, 4}
             or p["kind"] != "migration_copy_conversion"
             or digest(p) != binding.operation_plan_sha256
             or not sha256(p["export_plan_sha256"])
@@ -78,7 +82,7 @@ class MigrationConversion:
                 or not re.fullmatch(r"[A-Za-z0-9_-]{1,80}", d["key"])
                 or d["key"] in keys
                 or d["target_format"]
-                not in ({"raw", "qcow2", "vmdk"} if p["schema_version"] == 3 else {"raw", "qcow2"})
+                not in ({"raw", "qcow2", "vmdk"} if p["schema_version"] >= 3 else {"raw", "qcow2"})
             ):
                 raise NativeHeld("conversion_mapping_invalid")
             keys.add(d["key"])
@@ -92,6 +96,10 @@ class MigrationConversion:
             or self.spool.stat().st_mode & 0o077
         ):
             raise NativeHeld("private_native_spool_required")
+        if p["schema_version"] == 4:
+            if self.guest is None:
+                raise NativeHeld("guest_preparation_runtime_required")
+            self.guest.validate(p["guest_profile"])
         return p
 
     def inspect(self, binding: NativeBinding) -> dict[str, Any]:
@@ -120,18 +128,50 @@ class MigrationConversion:
             raise NativeHeld("conversion_source_mapping_changed")
         output = self.spool / binding.operation_id
         output.mkdir(mode=0o700)
+        sync_directory(self.spool)
+        prepared: dict[str, dict[str, Any]] = {}
+        preparation: dict[str, Any] = {}
+        if p["schema_version"] == 4:
+            assert self.guest is not None
+            directory = output / "preparation"
+            directory.mkdir(mode=0o700)
+            for d in p["disks"]:
+                prior = archive["disks"][d["key"]]
+                fmt = prior.get("format", "vmdk")
+                prepared[d["key"]] = self.converter.convert(
+                    self.spool / operation_id / (d["key"] + "." + fmt),
+                    directory / d["key"],
+                    {
+                        "source_sha256": prior["sha256"],
+                        "source_bytes": prior["size"],
+                        "source_format": fmt,
+                        "virtual_bytes": d["virtual_bytes"],
+                        "target_format": "raw",
+                        "max_output_bytes": d["virtual_bytes"],
+                        **{k: p[k] for k in ("max_seconds", "bytes_per_second", "artifact_sha256")},
+                    },
+                    current,
+                )
+            preparation = self.guest.prepare(
+                directory, prepared, p["guest_profile"], deadline, current
+            )
+            self.journal.record(binding, "guest_copy_prepared", preparation)
         receipts = {}
         for d in p["disks"]:
             prior = archive["disks"][d["key"]]
+            source = self.spool / operation_id / (d["key"] + "." + prior.get("format", "vmdk"))
+            if preparation:
+                prior = preparation["disks"][d["key"]] | {"format": "raw"}
+                source = output / "preparation" / d["key"] / "disk.raw"
             source_format = prior.get("format", "vmdk")
             if source_format not in {"vmdk", "qcow2", "raw"} or (
-                source_format != "vmdk" and p["schema_version"] != 3
+                source_format != "vmdk" and p["schema_version"] < 3
             ):
                 raise NativeHeld("conversion_source_format_unqualified")
             intent = {
                 "source_sha256": prior["sha256"],
                 "source_bytes": prior["size"],
-                **({"source_format": source_format} if p["schema_version"] == 3 else {}),
+                **({"source_format": source_format} if p["schema_version"] >= 3 else {}),
                 **{k: d[k] for k in ("virtual_bytes", "target_format", "max_output_bytes")},
                 **{k: p[k] for k in ("max_seconds", "bytes_per_second", "artifact_sha256")},
             }
@@ -145,11 +185,20 @@ class MigrationConversion:
                 },
             )
             result = self.converter.convert(
-                self.spool / operation_id / (d["key"] + "." + source_format),
+                source,
                 output / d["key"],
                 intent,
                 current,
             )
+            if preparation:
+                result.update(
+                    guest_transformation="prepared_offline",
+                    guest_profile_sha256=digest(p["guest_profile"]),
+                    guest_target_platform=p["guest_profile"]["target_platform"],
+                    guest_firmware=p["guest_profile"]["firmware"],
+                    preparation_sha256=digest(preparation),
+                    original_source_sha256=archive["disks"][d["key"]]["sha256"],
+                )
             receipts[d["key"]] = result
             self.journal.record(
                 binding, "conversion_observed", {"resource_key": d["key"], **result}

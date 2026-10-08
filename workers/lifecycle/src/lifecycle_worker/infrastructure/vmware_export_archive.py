@@ -25,7 +25,7 @@ from lifecycle_worker.application.native import (
 from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.migration_custody import CaptureCustody
 from lifecycle_worker.infrastructure.migration_transfer import RateBound
-from lifecycle_worker.infrastructure.native_files import protected_read
+from lifecycle_worker.infrastructure.native_files import protected_read, sync_directory
 from lifecycle_worker.infrastructure.vmware_capture import NICS, devices, moref
 from lifecycle_worker.infrastructure.vmware_export import VmwareExport
 
@@ -297,6 +297,7 @@ class VmwareExportArchive:
                 },
             )
         manifest = self.source.call(resolved, lease, "HttpNfcLeaseGetManifest", current)
+        sync_directory(directory)
         if not isinstance(manifest, list) or len(manifest) != len(receipts):
             raise NativeHeld("export_manifest_inventory_changed")
         entries = {d["key"]: d for d in manifest if d.get("disk") is True}
@@ -330,6 +331,7 @@ class VmwareExportArchive:
             stream.write(raw)
             stream.flush()
             os.fsync(stream.fileno())
+        sync_directory(directory)
         self.journal.record(
             binding,
             "ovf_retained",

@@ -8,6 +8,14 @@ from typing import Any
 from lifecycle_worker.application.native import NativeHeld
 
 
+def sync_directory(path: Path) -> None:
+    descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
 def protected_read(path: Path, limit: int) -> bytes:
     if not path.is_absolute() or limit < 1:
         raise NativeHeld("protected_absolute_file_required")

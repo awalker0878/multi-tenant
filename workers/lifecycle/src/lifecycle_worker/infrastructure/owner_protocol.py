@@ -56,9 +56,11 @@ class OwnerProtocolClient:
             "/v1/migration/observations",
             "/v1/native/effects",
             "/v1/native/observations",
+            "/v2/migration/method-effects",
+            "/v2/migration/method-observations",
         }:
             raise NativeHeld("migration_protocol_route_denied")
-        if self.read_only and not path.endswith("/observations"):
+        if self.read_only and not path.endswith(("/observations", "/method-observations")):
             raise NativeHeld("observer_effect_denied")
         token = self.credential()
         fingerprint = hashlib.sha256(token.encode()).hexdigest()
@@ -108,6 +110,7 @@ class OwnerProtocolEffect:
 
     def inspect(self, binding: NativeBinding) -> dict[str, Any]:
         from lifecycle_worker.application.migration_runtime import MIGRATION_STAGES
+        from lifecycle_worker.infrastructure.migration_method import contract
 
         native_stages = {
             "reserve",
@@ -117,15 +120,21 @@ class OwnerProtocolEffect:
             "retire",
             "release",
         }
+        version = self.plan.get("schema_version")
+        method = version == 2 and self.plan.get("kind") == "migration_owner_protocol"
         stages = (
-            native_stages
+            set(MIGRATION_STAGES)
+            if method
+            else native_stages
             if self.plan.get("kind") == "native_owner_protocol"
             else MIGRATION_STAGES - {"capture", "export_copy", "convert_copy", "import_target"}
         )
         if (
-            set(self.plan) != {"schema_version", "kind", "stage", "protocol_sha256", "parameters"}
+            set(self.plan)
+            != {"schema_version", "kind", "stage", "protocol_sha256", "parameters"}
+            | ({"method_contract"} if method else set())
             or type(self.plan["schema_version"]) is not int
-            or self.plan["schema_version"] != 1
+            or self.plan["schema_version"] != (2 if method else 1)
             or self.plan["kind"] not in {"migration_owner_protocol", "native_owner_protocol"}
             or self.plan["stage"] not in stages
             or not sha256(self.plan["protocol_sha256"])
@@ -133,6 +142,10 @@ class OwnerProtocolEffect:
             or digest(self.plan) != binding.operation_plan_sha256
         ):
             raise NativeHeld("migration_protocol_plan_changed")
+        if method:
+            contract(self.plan["method_contract"], self.plan["stage"])
+            if self.plan["parameters"] != {}:
+                raise NativeHeld("migration_method_untyped_parameters_denied")
         return {"operation_plan_sha256": digest(self.plan), "native_write_authorized": False}
 
     def execute(self, binding: NativeBinding, boundary: Callable[[], None]) -> None:
@@ -142,11 +155,18 @@ class OwnerProtocolEffect:
             "request_started",
             {"kind": "owner_protocol", "protocol_sha256": self.plan["protocol_sha256"]},
         )
+        method = self.plan["schema_version"] == 2
         result = self.client.call(
-            "/v1/native/effects"
+            "/v2/migration/method-effects"
+            if method
+            else "/v1/native/effects"
             if self.plan["kind"] == "native_owner_protocol"
             else "/v1/migration/effects",
-            {"schema_version": 1, "binding": binding.document(), "intent": self.plan},
+            {
+                "schema_version": 2 if method else 1,
+                "binding": binding.document(),
+                "intent": self.plan,
+            },
             boundary,
         )
         if (
@@ -158,6 +178,7 @@ class OwnerProtocolEffect:
                 "submitted",
                 "retry_authorized",
             }
+            | ({"method_contract_sha256", "task_id"} if method else set())
             or result["binding_sha256"] != binding.fingerprint
             or result["intent_sha256"] != binding.operation_plan_sha256
             or not sha256(result["receipt_sha256"])
@@ -165,6 +186,12 @@ class OwnerProtocolEffect:
             or result["retry_authorized"] is not False
         ):
             raise NativeHeld("migration_protocol_receipt_changed")
+        if method and (
+            result["method_contract_sha256"] != digest(self.plan["method_contract"])
+            or not isinstance(result["task_id"], str)
+            or not re.fullmatch(r"[A-Za-z0-9_.:/-]{1,200}", result["task_id"])
+        ):
+            raise NativeHeld("migration_method_submission_unbound")
         self.journal.record(binding, "poll_observed", {"kind": "owner_protocol", **result})
 
 
@@ -178,6 +205,7 @@ class OwnerProtocolObserver:
         *,
         family: str = "migration",
         identity_check: Callable[[], None] = lambda: None,
+        method_plan: dict[str, Any] | None = None,
     ) -> None:
         self.observer_id, self.writer_id = identity(observer_id), identity(writer_id)
         if observer_id == writer_id:
@@ -186,12 +214,30 @@ class OwnerProtocolObserver:
             raise NativeHeld("invalid_owner_protocol_family")
         self.family, self.identity_check = family, identity_check
         self.client, self.clock = client, clock
+        self.method_plan = method_plan
+        if method_plan is not None and family != "migration":
+            raise NativeHeld("migration_method_observer_family_changed")
 
     def observe(self, binding: NativeBinding, objects: dict[str, Any]) -> dict[str, Any]:
         # Reads remain available after a pause or expiry; they cannot authorize effects.
+        method = self.method_plan is not None
+        selected = None
+        if self.method_plan is not None:
+            from lifecycle_worker.infrastructure.migration_method import contract
+
+            if digest(self.method_plan) != binding.operation_plan_sha256:
+                raise NativeHeld("migration_method_observation_plan_changed")
+            selected = contract(self.method_plan["method_contract"], self.method_plan["stage"])
         result = self.client.call(
-            "/v1/" + self.family + "/observations",
-            {"schema_version": 1, "binding": binding.document(), "objects": objects},
+            "/v2/migration/method-observations"
+            if method
+            else "/v1/" + self.family + "/observations",
+            {
+                "schema_version": 2 if method else 1,
+                "binding": binding.document(),
+                "objects": objects,
+            }
+            | ({"intent": self.method_plan} if method else {}),
             self.identity_check,
         )
         if (
@@ -205,6 +251,7 @@ class OwnerProtocolObserver:
                 "observed_at",
                 "evidence_sha256",
             }
+            | ({"measurement"} if method else set())
             or result.get("binding_sha256") != binding.fingerprint
             or result.get("observer_id") != self.observer_id
             or result.get("intent_sha256") != binding.operation_plan_sha256
@@ -215,4 +262,11 @@ class OwnerProtocolObserver:
             or not sha256(result.get("evidence_sha256"))
         ):
             raise NativeHeld("migration_protocol_observation_changed")
+        if selected is not None:
+            from lifecycle_worker.infrastructure.migration_method import measured
+
+            if result["outcome"] == "observed_present":
+                measured(result["measurement"], selected, self.clock())
+            elif result["measurement"] is not None:
+                raise NativeHeld("migration_method_held_measurement_invalid")
         return result

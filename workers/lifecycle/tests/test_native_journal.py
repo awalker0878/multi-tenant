@@ -411,3 +411,108 @@ def test_ahv_tasks_survive_reconnect_and_remain_bound_to_the_attempt(
     j.record(b, "ahv_task_accepted", task)
     with pytest.raises(NativeHeld, match="ambiguous"):
         j.ahv_tasks(b)
+
+
+def test_archive_progress_retains_only_verified_disk_counts_and_bound_completion(
+    postgres: dict[str, Any],
+) -> None:
+    request = binding()
+    original = journal(postgres)
+    assert original.claim(request)
+    original.record(request, "transfer_started", {"resource_key": "root"})
+    assert original.archive_progress(request) == {
+        "bytes_completed": 0,
+        "disks_completed": 0,
+        "artifact_complete": False,
+    }
+    disk = {"size": 1024, "sha256": "a" * 64, "sha512": "b" * 128}
+    original.record(request, "disk_transferred", {"resource_key": "root", **disk})
+    assert journal(postgres).archive_progress(request) == {
+        "bytes_completed": 1024,
+        "disks_completed": 1,
+        "artifact_complete": False,
+    }
+    original.record(request, "export_complete", {"disks_sha256": digest({"root": disk})})
+    assert journal(postgres).archive_progress(request)["artifact_complete"] is True
+    with pytest.raises(NativeHeld, match="not_bound"):
+        original.archive_progress(replace(request, tenant_id=str(uuid4())))
+    original.record(request, "disk_transferred", {"resource_key": "other", **disk})
+    with pytest.raises(NativeHeld, match="ambiguous"):
+        original.archive_progress(request)
+
+
+@pytest.mark.parametrize(
+    "event",
+    [
+        "source_request_started",
+        "source_object_created",
+        "source_capture_bound",
+        "transfer_started",
+        "transfer_continued",
+        "continuation_held",
+        "guest_copy_prepared",
+        "import_lease",
+    ],
+)
+def test_any_to_any_receipts_survive_postgres_constraint_and_reconnect(
+    postgres: dict[str, Any],
+    event: str,
+) -> None:
+    request = binding()
+    j = journal(postgres)
+    assert j.claim(request)
+    j.record(request, event, {"evidence_sha256": "a" * 64})
+    with psycopg.connect(**postgres, row_factory=dict_row) as connection:
+        row = connection.execute(
+            "SELECT kind,facts FROM native.events WHERE operation_id=%s",
+            (request.operation_id,),
+        ).fetchone()
+    assert row == {"kind": event, "facts": {"evidence_sha256": "a" * 64}}
+
+
+def test_vmware_datacenter_and_vm_ids_remain_native_and_tenant_scoped(
+    postgres: dict[str, Any],
+) -> None:
+    request = replace(binding(), project_id="datacenter-42")
+    assert NativeBinding.parse(request.document()) == request
+    j = journal(postgres)
+    assert j.claim(request)
+    j.record(
+        request, "request_accepted", {"kind": "server", "resource_key": "vm", "native_id": "vm-51"}
+    )
+    assert j.resources(request) == {"vm": {"kind": "server", "id": "vm-51"}}
+    with pytest.raises(NativeHeld):
+        j.resources(replace(request, project_id="datacenter-43"))
+
+
+def test_concurrent_recovered_capture_receipts_are_idempotent_but_conflicts_hold(
+    postgres: dict[str, Any],
+) -> None:
+    request = binding()
+    ledger = journal(postgres)
+    assert ledger.claim(request)
+    facts: dict[str, Any] = {
+        "source_platform": "ahv",
+        "disks": {"root": {"image_id": str(uuid4())}},
+    }
+    accepted = {
+        "resource_key": "root",
+        "kind": "image",
+        "native_id": facts["disks"]["root"]["image_id"],
+        "task_id": "ZXJnb24=:" + str(uuid4()),
+        "request_id": str(uuid4()),
+    }
+
+    def reconcile(_: int) -> None:
+        fresh = journal(postgres)
+        fresh.record(request, "request_accepted", accepted)
+        fresh.record(request, "source_capture_bound", facts)
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(reconcile, range(8)))
+    assert ledger.capture(request, request.operation_plan_sha256) == facts
+    assert ledger.resources(request) == {"root": {"kind": "image", "id": accepted["native_id"]}}
+    with pytest.raises(NativeHeld, match="conflict"):
+        ledger.record(request, "request_accepted", accepted | {"native_id": str(uuid4())})
+    with pytest.raises(NativeHeld, match="conflict"):
+        ledger.record(request, "source_capture_bound", facts | {"unexpected": True})

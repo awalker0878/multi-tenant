@@ -34,6 +34,7 @@ class NativeBlobDownload:
         algorithm: str,
         checksum: str,
         current: Callable[[], None],
+        prefix: BinaryIO | None = None,
     ) -> dict[str, Any]:
         if (
             re.fullmatch(r"/(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+", path) is None
@@ -51,6 +52,16 @@ class NativeBlobDownload:
         token = credential(self.endpoint)
         hashes = {name: hashlib.new(name) for name in ("sha256", "sha512")}
         count = 0
+        if prefix is not None:
+            prefix.seek(0)
+            while chunk := prefix.read(1048576):
+                current()
+                count += len(chunk)
+                if count >= size:
+                    raise NativeHeld("native_blob_partial_range_invalid")
+                for value in hashes.values():
+                    value.update(chunk)
+        offset = count
         connection = PinnedConnection(self.endpoint)
         try:
             current()
@@ -61,17 +72,22 @@ class NativeBlobDownload:
                     self.header: token,
                     "Accept": "application/octet-stream",
                     "Accept-Encoding": "identity",
+                    **({"Range": f"bytes={offset}-"} if offset else {}),
                 },
             )
             response = connection.getresponse()
             if (
-                response.status != 200
+                response.status != (206 if offset else 200)
+                or (
+                    offset > 0
+                    and response.getheader("Content-Range") != f"bytes {offset}-{size - 1}/{size}"
+                )
                 or response.getheader("Content-Encoding", "identity") != "identity"
                 or response.getheader("Content-Type", "").split(";")[0].lower()
                 not in {"application/octet-stream", "application/binary"}
                 or (
                     response.getheader("Content-Length") is not None
-                    and response.getheader("Content-Length") != str(size)
+                    and response.getheader("Content-Length") != str(size - offset)
                 )
             ):
                 raise NativeHeld("native_blob_response_unconfirmed")

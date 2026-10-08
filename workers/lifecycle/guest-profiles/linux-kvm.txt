@@ -1,0 +1,1 @@
+run /usr/share/migration/profiles/linux-kvm.sh

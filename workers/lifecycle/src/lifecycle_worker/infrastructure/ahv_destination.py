@@ -1,44 +1,24 @@
 """Native image URL import and powered-off AHV VM creation with durable task receipts."""
 
-import re
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Protocol
-from uuid import UUID, uuid5
+from typing import Any
 
 from lifecycle_worker.application.ahv_plan import image_body, marker, validate, vm_body
 from lifecycle_worker.application.native import (
     NativeBinding,
     NativeHeld,
-    NativeJournal,
     decode,
     digest,
     identity,
 )
 from lifecycle_worker.infrastructure.ahv_http import COLLECTIONS, AhvTransport, read
 from lifecycle_worker.infrastructure.ahv_staging import AhvStaging
+from lifecycle_worker.infrastructure.ahv_tasks import AhvJournal, completed, submit
 from lifecycle_worker.infrastructure.image_conversion import file_digest
 from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
 from lifecycle_worker.infrastructure.native_files import protected_read
-
-
-class AhvJournal(NativeJournal, Protocol):
-    def ahv_tasks(self, binding: NativeBinding) -> dict[str, dict[str, Any]]: ...
-
-
-def completed(api: AhvTransport, task: dict[str, Any], boundary: Callable[[], None]) -> str | None:
-    data = read(api, "/api/prism/v4.3/config/tasks/" + task["task_id"], boundary)
-    if data.get("extId") != task["task_id"]:
-        raise NativeHeld("ahv_task_identity_changed")
-    if data.get("status") in {"QUEUED", "RUNNING"}:
-        return None
-    if data.get("status") != "SUCCEEDED" or data.get("errorMessages"):
-        raise NativeHeld("ahv_task_failed_or_unknown")
-    entities = data.get("entitiesAffected")
-    if not isinstance(entities, list) or len(entities) != 1:
-        raise NativeHeld("ahv_task_object_ambiguous")
-    return identity(entities[0].get("extId"))
 
 
 def owned(document: dict[str, Any], key: str, p: dict[str, Any], b: NativeBinding) -> None:
@@ -113,53 +93,6 @@ class AhvDestination:
             "native_write_authorized": False,
         }
 
-    def submit(
-        self,
-        b: NativeBinding,
-        key: str,
-        kind: str,
-        body: dict[str, Any],
-        current: Callable[[], None],
-    ) -> str:
-        request_id = str(uuid5(UUID(b.operation_id), key))
-        current()
-        self.journal.record(
-            b,
-            "request_started",
-            {
-                "resource_key": key,
-                "kind": kind,
-                "request_id": request_id,
-                "payload_sha256": digest(body),
-            },
-        )
-        reply = self.api.call(
-            "POST", COLLECTIONS[kind], body, {"Ntnx-Request-Id": request_id}, current
-        )
-        task_id = reply["document"].get("data", {}).get("extId")
-        if not isinstance(task_id, str) or not re.fullmatch(r"[A-Za-z0-9:_-]{1,160}", task_id):
-            raise NativeHeld("ahv_task_identity_missing")
-        task = {"resource_key": key, "kind": kind, "task_id": task_id, "request_id": request_id}
-        # Persist acceptance before the first poll. Interrupted POSTs are never retried.
-        self.journal.record(b, "ahv_task_accepted", task)
-        while True:
-            current()
-            native_id = completed(self.api, task, current)
-            if native_id is not None:
-                self.journal.record(
-                    b,
-                    "request_accepted",
-                    {
-                        "resource_key": key,
-                        "kind": kind,
-                        "native_id": native_id,
-                        "task_id": task_id,
-                        "request_id": request_id,
-                    },
-                )
-                return native_id
-            time.sleep(self.interval)
-
     def execute(self, b: NativeBinding, boundary: Callable[[], None]) -> None:
         p = self.plan(b)
         deadline = time.monotonic() + p["max_seconds"]
@@ -185,6 +118,11 @@ class AhvDestination:
                 or receipt.get("sector_comparison") != "passed"
                 or receipt.get("virtual_bytes") != disk["virtual_bytes"]
                 or receipt.get("size") != disk["virtual_bytes"]
+                or receipt.get("guest_transformation") == "prepared_offline"
+                and (
+                    receipt.get("guest_target_platform") != "ahv"
+                    or receipt.get("guest_firmware") != p.get("firmware", "bios")
+                )
             ):
                 raise NativeHeld("ahv_converted_disk_changed")
             path = self.staging.spool / operation / disk["key"] / "disk.raw"
@@ -204,14 +142,23 @@ class AhvDestination:
                     **{k: receipt[k] for k in ("size", "sha256", "sha512")},
                 },
             )
-            image_id = self.submit(
-                b, disk["key"], "image", image_body(p, disk, receipt, url, b), current
+            image_id = submit(
+                self.api,
+                self.journal,
+                b,
+                disk["key"],
+                "image",
+                image_body(p, disk, receipt, url, b),
+                current,
+                self.interval,
             )
             image = read(self.api, COLLECTIONS["image"] + "/" + image_id, current)
             verify_image(image, disk, receipt, p, b)
             images[disk["key"]] = image_id
             self.staging.revoke(token)
-        self.submit(b, "vm", "server", vm_body(p, images, b), current)
+        submit(
+            self.api, self.journal, b, "vm", "server", vm_body(p, images, b), current, self.interval
+        )
 
 
 def verify_image(
@@ -293,7 +240,7 @@ class AhvDestinationObserver:
                     "powerState",
                 )
             )
-            or vm.get("bootConfig", {}).get("$objectType") != "vmm.v4.ahv.config.LegacyBoot"
+            or any(vm.get("bootConfig", {}).get(k) != v for k, v in expected["bootConfig"].items())
             or {c.get("extId") for c in vm.get("categories", [])} != set(p["category_ids"])
             or len(vm.get("disks", [])) != len(p["disks"])
             or len(vm.get("nics", [])) != len(p["nics"])
