@@ -6,6 +6,7 @@ from inventory.application.discovery import Discovery
 from inventory.application.ports import Transaction
 from inventory.domain.discovery import Actor, Rejected, canonical, digest, identifier, shape
 from inventory.domain.migration import destination_input
+from inventory.domain.destination_security import source_security_ids
 from inventory.domain.source_profile import source_identity
 from inventory.domain.workload import METHODS, OWNER_FIELDS, review_input
 
@@ -131,6 +132,16 @@ class WorkloadProfiles:
             holds.append("current_source_and_target_profiles_required")
         holds.extend("source_" + h for h in source["facts"]["holds"])
         holds.extend("target_" + h for h in target["facts"]["holds"])
+        required_security = source_security_ids(source["facts"])
+        if required_security is None:
+            holds.append("source_security_policy_observation_required")
+        elif required_security and target["facts"]["platform"] == "vmware":
+            holds.append("destination_security_policy_catalog_required")
+        elif required_security and target["facts"]["platform"] == "ahv":
+            # Observed enforced Prism policy membership does not prove the
+            # required traffic allows/denies. A separate native E3/E4 check
+            # is needed before confirmation and execution.
+            holds.append("destination_security_flow_equivalence_unproven")
         confirmed = tx.one(
             "SELECT actor,confirmed_at FROM inventory.migration_confirmations "
             "WHERE tenant=%s AND site=%s AND revision=%s",
