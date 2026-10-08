@@ -50,7 +50,9 @@ def exchange(
 
 
 @pytest.fixture
-def receiver(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[QualificationInvalidationApp, Mock]:
+def receiver(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> tuple[QualificationInvalidationApp, Mock]:
     token = tmp_path / "credential"
     token.write_text(CREDENTIAL)
     monkeypatch.setenv("PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE", str(token))
