@@ -44,6 +44,10 @@ def inputs() -> tuple[
         "artifacts": artifacts,
         "downtime_seconds": 3600,
         "allowed_zones": ["zone-1"],
+        "forbidden_flows": [{
+            "from": "foreign-tenant", "to": intent["workloads"][0]["id"],
+            "protocol": "tcp", "port": 22,
+        }],
         "reservation_owners": {
             k: "synthetic-" + k for k in ("vcpus", "memory_mib", "storage_gib", "addresses")
         },
@@ -266,6 +270,52 @@ def snapshot_fixture(
             "used": {k: 0 for k in vector},
             "pending": {k: 0 for k in vector},
         })
+    communication = [d for d in intent["dependencies"] if d["kind"] == "communication"]
+    negative = [policy["forbidden_flows"][0] | {"kind": "tenant"}]
+    negative += [{
+        "from": "foreign-domain-" + str(index), "to": workload["id"],
+        "protocol": "tcp", "port": 22, "kind": "domain",
+        "security_domain_id": workload["security_domain"]["id"],
+    } for index, workload in enumerate(intent["workloads"])]
+    topology = {
+        "nodes": {w["id"]: "fixture://native-port-" + w["id"] for w in intent["workloads"]},
+        "routes": [{"from": d["from"], "to": d["to"], "native_ref": "fixture://route"}
+                   for d in communication],
+    }
+    for flow in negative:
+        topology["nodes"][flow["from"]] = "fixture://foreign-port-" + flow["from"]
+    policy_sha = digest(policy)
+    network = {
+        "policy_sha256": policy_sha,
+        "topology_sha256": digest(topology),
+        "topology": topology,
+        "default_action": "deny",
+        "firewall_rules": [
+            {k: d[k] for k in ("from", "to", "protocol", "port")}
+            | {"action": "allow", "native_ref": "fixture://native-firewall-rule"}
+            for d in communication
+        ],
+        "measurements": [
+            {k: d[k] for k in ("from", "to", "protocol", "port")}
+            | {
+                "outcome": "allow" if d in communication else "deny",
+                "sequence": 1, "observed_at": NOW, "expires_at": NOW + 120,
+                "native_subjects": ["fixture://native-probe-client"],
+                "policy_sha256": policy_sha, "topology_sha256": digest(topology),
+            } for d in communication + negative
+        ],
+    }
+    isolation = {
+        "tenant_id": destination["tenant_id"],
+        "native_scope": destination["native_scope"],
+        "native_project_id": destination["native_scope"].split(":")[1],
+        "policy_sha256": policy_sha,
+        "domains": destination["domain_bindings"],
+        "observer_principal": "fixture-observer",
+        "writer_principal": "fixture-writer",
+        "observed_at": NOW, "expires_at": NOW + 120,
+        "negative_flows": negative,
+    }
     return {
         "definition_sha256": DEFINITION_SHA256,
         "source_sha256": q["verification"]["runtime_sha256"],
@@ -273,5 +323,5 @@ def snapshot_fixture(
         "scope_sha256": digest(q["scope"]),
         "observed_at": NOW,
         "expires_at": NOW + 120,
-        "data": {"pools": pools},
+        "data": {"pools": pools, "network": network, "isolation": isolation},
     }

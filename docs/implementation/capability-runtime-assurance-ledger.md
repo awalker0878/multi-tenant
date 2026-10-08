@@ -112,3 +112,15 @@ The immutable inventory digest excludes runtime fetch timestamps but retains the
 complete measured snapshot and authority bindings. Assessment remains unreserved.
 Focused E2 tests cover fragmentation, pending debits, fault-domain collision and
 missing/foreign/stale native snapshots. Authoritative admission follows separately.
+
+## CT-04 observations
+
+Eligibility now evaluates native directed routes, firewall rules and default-deny
+policy against fresh measured required and forbidden flows. Measurements bind the
+exact topology and policy digests; a required flow without a route or firewall rule
+cannot pass from its own declaration. Isolation requires native project/tenant
+identity, distinct observer/writer principals, distinct domain instances and measured
+negative controls covering each security domain and the tenant boundary. Concrete
+placement verifies failure-domain separation. Missing measurements remain unknown;
+failed controls block. E2 tests cover route removal, forbidden traffic leakage,
+domain aliasing and observer/writer reuse.

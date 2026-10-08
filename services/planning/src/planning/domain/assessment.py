@@ -5,6 +5,7 @@ from typing import Any
 from planning.domain.capability_definitions import STRATEGIES
 from planning.domain.matching import matches
 from planning.domain.model import ACTIONS, DIMENSIONS, Rejected, digest, integer
+from planning.domain.network_evidence import isolation_checks, network_checks
 from planning.domain.operational_evidence import inventory_digest, snapshot
 from planning.domain.placement import PlacementUnknown, fit
 from planning.domain.qualification import binding_digest, verified
@@ -285,6 +286,34 @@ def assess(
         placement_reason,
         "Observe physical pools, pending reservations, policy and placement constraints.",
     )
+    if native_snapshot is None:
+        finding(
+            "network.native_policy", "unknown", "network_native_snapshot_missing",
+            "Measure required and forbidden paths on the exact native topology.",
+        )
+        finding(
+            "placement.native_isolation", "unknown", "isolation_native_snapshot_missing",
+            "Verify native project, domain bindings and negative traffic controls.",
+        )
+    else:
+        for evaluator in (network_checks,):
+            try:
+                checks = evaluator(intent, native_snapshot, policy, now)
+                for key, status, reason, mandatory in checks:
+                    finding(key, status, reason, "Refresh native route and firewall evidence.",
+                            mandatory=mandatory)
+            except (KeyError, TypeError, ValueError):
+                finding("network.native_policy", "unknown", "network_evidence_incomplete",
+                        "Commission native route, policy and measurement evidence.")
+        try:
+            for key, status, reason, mandatory in isolation_checks(
+                intent, destination, native_snapshot, policy, now
+            ):
+                finding(key, status, reason, "Refresh native isolation and negative controls.",
+                        mandatory=mandatory)
+        except (KeyError, TypeError, ValueError):
+            finding("placement.native_isolation", "unknown", "isolation_evidence_incomplete",
+                    "Commission native identity, policy and isolation measurements.")
     mandatory_states = {f["status"] for f in findings if f["mandatory"]}
     state = next(
         (s for s in ("blocked", "unknown", "conditional") if s in mandatory_states), "eligible"
