@@ -32,7 +32,8 @@ class PythonLockTest(unittest.TestCase):
                                      "jsonschema-specifications": "2025.9.1", "pika": "1.4.4",
                                      "referencing": "0.37.0", "rpds-py": "2026.9.1"})
                 if service == "inventory":
-                    expected["pika"] = "1.4.4"
+                    expected.update({"pika": "1.4.4", "cryptography": "50.0.2",
+                                     "cffi": "2.1.1", "pycparser": "3.0"})
                 if service == "lifecycle":
                     expected.update({"temporalio": "1.34.0", "nexus-rpc": "1.4.0", "protobuf": "7.36.2", "types-protobuf": "7.35.1.20260906"})
                 self.assertEqual(inventory, expected)

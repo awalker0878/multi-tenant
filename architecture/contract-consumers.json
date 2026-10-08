@@ -1,17 +1,90 @@
 {
   "schema_version": 1,
   "dependencies": {
-    "catalogue": [], "planning": ["catalogue"], "inventory": [], "lifecycle": [],
-    "governance": [], "assurance": [], "console": ["governance"],
-    "inventory-workers": ["inventory"], "lifecycle-workers": ["lifecycle"]
+    "catalogue": [],
+    "planning": [
+      "catalogue"
+    ],
+    "inventory": [],
+    "lifecycle": [],
+    "governance": [],
+    "assurance": [],
+    "console": [
+      "governance"
+    ],
+    "inventory-workers": [
+      "inventory"
+    ],
+    "lifecycle-workers": [
+      "lifecycle"
+    ]
   },
   "contracts": {
-    "contracts/schemas/events/catalogue-foundation-recorded-v1.json": ["catalogue", "planning"],
-    "contracts/asyncapi/catalogue.yaml": ["catalogue", "planning"],
-    "contracts/openapi/foundation-health-v1.json": ["console", "governance", "catalogue", "inventory", "planning", "lifecycle", "assurance"],
-    "contracts/openapi/governance-local-identity-v1.json": ["governance", "console"],
-    "contracts/schemas/events/governance-change-v1.json": ["governance", "console"],
-    "contracts/asyncapi/governance.yaml": ["governance", "console"]
+    "contracts/schemas/events/catalogue-foundation-recorded-v1.json": [
+      "catalogue",
+      "planning"
+    ],
+    "contracts/asyncapi/catalogue.yaml": [
+      "catalogue",
+      "planning"
+    ],
+    "contracts/openapi/foundation-health-v1.json": [
+      "console",
+      "governance",
+      "catalogue",
+      "inventory",
+      "planning",
+      "lifecycle",
+      "assurance"
+    ],
+    "contracts/openapi/governance-local-identity-v1.json": [
+      "governance",
+      "console"
+    ],
+    "contracts/schemas/events/governance-change-v1.json": [
+      "governance",
+      "console"
+    ],
+    "contracts/asyncapi/governance.yaml": [
+      "governance",
+      "console"
+    ],
+    "contracts/openapi/inventory-v1.8.json": [
+      "inventory",
+      "console"
+    ],
+    "contracts/openapi/planning-migration-v1.4.json": [
+      "planning",
+      "console"
+    ],
+    "contracts/schemas/planning/migration-input-v3.json": [
+      "inventory",
+      "planning"
+    ],
+    "contracts/schemas/planning/migration-outcomes-v1.json": [
+      "planning",
+      "lifecycle",
+      "lifecycle-workers"
+    ],
+    "contracts/openapi/lifecycle-native-jobs-v1.1.json": [
+      "lifecycle",
+      "console"
+    ],
+    "contracts/openapi/worker-migration-effect-v2.1.json": [
+      "lifecycle",
+      "lifecycle-workers"
+    ],
+    "contracts/openapi/worker-migration-method-v2.json": [
+      "lifecycle-workers"
+    ],
+    "contracts/platforms/ahv/source-profile-v1.json": [
+      "inventory-workers",
+      "lifecycle-workers"
+    ],
+    "contracts/platforms/openstack/source-profile-v1.json": [
+      "inventory-workers",
+      "lifecycle-workers"
+    ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied."
 }

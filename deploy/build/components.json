@@ -65,7 +65,8 @@
       "runtime_requirements": [
         "psycopg[binary]==3.3.6",
         "uvicorn==0.53.0",
-        "pika==1.4.4"
+        "pika==1.4.4",
+        "cryptography==50.0.2"
       ],
       "runtime_entrypoint": "/opt/venv/bin/inventory-serve"
     },
