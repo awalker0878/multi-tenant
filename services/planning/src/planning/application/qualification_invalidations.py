@@ -95,13 +95,18 @@ class QualificationInvalidations:
                     "< EXCLUDED.authority_epoch",
                     (scope_hash, tenant, epoch, event_hash, event["state"]),
                 )
-                # An invalidation is only a hint, including publish/restore:
-                # never clear an old hold, grant support or modify plan bytes.
+                # Only the exact pinned qualification scope is held. Plans
+                # without a trusted scope index are conservatively held;
+                # unrelated indexed scopes stay available. Even publish/restore
+                # never clears prior holds or authorizes an effect.
                 tx.execute(
                     "INSERT INTO app.planning_invalidations(tenant,plan,event_id) "
-                    "SELECT tenant,id,%s FROM app.planning_records "
-                    "WHERE tenant=%s AND kind='plan'",
-                    (event_id, tenant),
+                    "SELECT p.tenant,p.id,%s FROM app.planning_records p "
+                    "LEFT JOIN app.planning_plan_qualification_scopes s "
+                    "ON s.plan=p.id AND s.tenant=p.tenant "
+                    "WHERE p.tenant=%s AND p.kind='plan' "
+                    "AND (s.plan IS NULL OR s.scope_sha256 IS NULL OR s.scope_sha256=%s)",
+                    (event_id, tenant, scope_hash),
                 )
 
         return {
