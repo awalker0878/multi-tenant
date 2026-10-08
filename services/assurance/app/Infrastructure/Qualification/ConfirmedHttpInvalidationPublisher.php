@@ -38,6 +38,7 @@ final readonly class ConfirmedHttpInvalidationPublisher implements ConfirmedInva
             || preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/D', $event['tenant_id']) !== 1
             || ! is_int($event['authority_epoch'])
             || $event['authority_epoch'] < 1
+            || $event['authority_epoch'] > 9007199254740991
             || ! is_string($event['operation'])
             || ! isset($states[$event['operation']])
             || $event['state'] !== $states[$event['operation']]
@@ -61,6 +62,8 @@ final readonly class ConfirmedHttpInvalidationPublisher implements ConfirmedInva
             || isset($parts['user'])
             || isset($parts['pass'])
             || isset($parts['fragment'])
+            || isset($parts['query'])
+            || ($parts['path'] ?? null) !== '/internal/qualification-events'
             || ! is_string($ca)
             || ! str_starts_with($ca, '/')
             || is_link($ca)
@@ -86,7 +89,14 @@ final readonly class ConfirmedHttpInvalidationPublisher implements ConfirmedInva
             ->post($url, $event);
         $ack = $response->json();
         if ($response->status() !== 200
+            || strlen($response->body()) > 8192
             || ! is_array($ack)
+            || array_keys($ack) === []
+            || count($ack) !== 5
+            || array_diff(
+                ['persisted', 'event_id', 'scope_sha256', 'authority_epoch', 'event_sha256'],
+                array_keys($ack)
+            ) !== []
             || ($ack['persisted'] ?? null) !== true
             || ($ack['event_id'] ?? null) !== $event['event_id']
             || ($ack['scope_sha256'] ?? null) !== $event['scope_sha256']
