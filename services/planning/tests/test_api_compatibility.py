@@ -115,6 +115,29 @@ def test_different_api_releases_do_not_block_qualified_operations() -> None:
     ]
 
 
+def test_multiple_negotiated_versions_select_only_a_qualified_compatible_release() -> None:
+    row = selected()
+    evidence = owner_input(row)
+    older = deepcopy(evidence["observations"][1])
+    older.update(
+        api_version="2.1",
+        result="unsupported",
+        evidence_sha256="7" * 64,
+        qualification_sha256=None,
+        qualification_level="none",
+        qualification_decision="not_reviewed",
+    )
+    evidence["observations"].append(older)
+    assessment = evaluate(row, evidence, 100)
+    assert assessment["cases"][1]["status"] == "eligible"
+    assert assessment["cases"][1]["selected_api_family"] == "openstack.nova"
+    assert assessment["cases"][1]["selected_api_version"] == "2.104"
+    # If the qualifying release disappears, the remaining older release
+    # cannot inherit its proof, even though it is on the same installation.
+    evidence["environments"]["target"]["apis"]["openstack.nova"] = ["2.1"]
+    assert evaluate(row, evidence, 100)["status"] == "blocked"
+
+
 def test_missing_or_unqualified_disk_prevents_approval() -> None:
     row = selected()
     evidence = owner_input(row)
