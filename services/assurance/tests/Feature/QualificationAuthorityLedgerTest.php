@@ -150,3 +150,49 @@ it('prevents runtime alteration or deletion of committed authority history', fun
     }
     expect($this->ledger->current($this->scope)['authority_epoch'])->toBe(1);
 });
+
+
+it('delivers immutable invalidations in order and does not clear uncertain acknowledgments', function (): void {
+    $this->ledger->mutate(
+        $this->scope, 'publish', (string) Str::uuid(), 0, 'reviewed fixture',
+        ['source' => 'e2'], str_repeat('a', 64), 1, 'reviewer-one'
+    );
+    $this->ledger->mutate(
+        $this->scope, 'suspend', (string) Str::uuid(), 1, 'native contradiction',
+        null, '', 0, 'native-observer'
+    );
+    $scopeHash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
+    $publisher = new class implements \App\Application\Qualification\Contracts\ConfirmedInvalidationPublisher
+    {
+        /** @var list<array<string, mixed>> */
+        public array $accepted = [];
+
+        public bool $unavailable = true;
+
+        public function publish(array $event): void
+        {
+            if ($this->unavailable) {
+                throw new \RuntimeException('receiving_inbox_unavailable');
+            }
+            $this->accepted[] = $event;
+        }
+    };
+    $delivery = new \App\Application\Qualification\Actions\DeliverQualificationInvalidation($publisher);
+
+    try {
+        $delivery->handle();
+        $this->fail('Unconfirmed event cleared the durable outbox.');
+    } catch (\RuntimeException $error) {
+        expect($error->getMessage())->toBe('receiving_inbox_unavailable');
+    }
+    expect(DB::table('app.qualification_authority_outbox')
+        ->where('scope_sha256', $scopeHash)->whereNotNull('delivered_at')->count())->toBe(0);
+
+    $publisher->unavailable = false;
+    expect($delivery->handle())->toBe('delivered')
+        ->and($delivery->handle())->toBe('delivered')
+        ->and($delivery->handle())->toBe('idle');
+    expect(array_column($publisher->accepted, 'authority_epoch'))->toBe([1, 2])
+        ->and(DB::table('app.qualification_authority_outbox')
+            ->where('scope_sha256', $scopeHash)->whereNotNull('delivered_at')->count())->toBe(2);
+});
