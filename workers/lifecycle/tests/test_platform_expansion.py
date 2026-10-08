@@ -245,6 +245,39 @@ class Authority:
         pass
 
 
+@pytest.mark.parametrize("invalid", [False, True])
+def test_ahv_lifecycle_retains_native_namespaced_task_identity(
+    tmp_path: Path, invalid: bool
+) -> None:
+    b = binding()
+    p, current = plan_for(b, "ahv")
+    trust, envelope, artifact, manifest, _ = signed(tmp_path, p)
+    p["adapter_sha256"] = digest(manifest)
+    b = replace(b, operation_plan_sha256=digest(p))
+    path = write(tmp_path / "plan.json", p)
+    task = "ZXJnb24=:" + str(uuid4()) if not invalid else "unbound-task"
+
+    class AhvTransport(Transport):
+        def send(
+            self, platform: str, document: dict[str, Any], boundary: Callable[[], None]
+        ) -> dict[str, Any]:
+            boundary()
+            self.sent += 1
+            return {"document": {"data": {"extId": task}}, "status": 202, "etag": ""}
+
+    journal, transport = Journal(), AhvTransport(current)
+    adapter = PlatformApi(path, envelope, artifact, trust, transport, journal)
+    if invalid:
+        with pytest.raises(NativeHeld, match="ahv_task_identity_missing"):
+            adapter.execute(b, lambda: None)
+        assert not any(event == "request_accepted" for event, _ in journal.events)
+    else:
+        adapter.execute(b, lambda: None)
+        assert journal.events[-1][0] == "request_accepted"
+        assert journal.events[-1][1]["request_id"] == task
+    assert transport.sent == 1
+
+
 def test_response_loss_never_resubmits_and_independent_readback_recovers(tmp_path: Path) -> None:
     b = binding()
     p, current = plan_for(b)
