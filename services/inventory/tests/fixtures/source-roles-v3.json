@@ -1,0 +1,261 @@
+{
+  "synthetic_only": true,
+  "native_qualification": false,
+  "profiles": [
+    {
+      "schema_version": 3,
+      "profile_type": "SourceWorkloadProfile",
+      "platform": "openstack",
+      "vm_id": "a749bfad-4ef2-4323-90c1-649015414e0f",
+      "installation_id": "cloud-a",
+      "native_scope": "project-a",
+      "api_version": "2.1",
+      "versions": {
+        "compute": "2.1",
+        "volume": "3.0",
+        "network": "2.0",
+        "product": "synthetic"
+      },
+      "config_sha256": "9b1d14b57e354be131f8641e416e9e49de4822b6aaaed746cd3cbfbd6139fba8",
+      "observations_sha256": "7095ce1d0b3e1cb71e4c36509f728fb5f77efa0b555aa0ddf44ba3cceb8c7c4e",
+      "observed_at": 1791439737,
+      "power_state": "SHUTOFF",
+      "guest_id": "debian",
+      "firmware": "bios",
+      "cpu": 2,
+      "memory_mb": 4096,
+      "disks": [
+        {
+          "key": 0,
+          "capacity_bytes": 21474836480,
+          "controller_key": null,
+          "unit_number": 0,
+          "backing_chain": [],
+          "native_sha256": "22950f6bd85e156e488c231cb924ff87fee6b338f08fc267838d8e9b683d97b8"
+        },
+        {
+          "key": 1,
+          "capacity_bytes": 10737418240,
+          "controller_key": null,
+          "unit_number": 1,
+          "backing_chain": [],
+          "native_sha256": "b6bf3107c87567234a2df04cda98a8d4af22abab5e708e1c9c296846991cfe47"
+        }
+      ],
+      "nics": [
+        {
+          "key": 0,
+          "model": "unknown",
+          "mac": null,
+          "backing_sha256": "06372e4d47940ea1e567da3912c377a01b91ca310122ddfcbf25bb1f27b8395c",
+          "connectable": {
+            "connected": true,
+            "startConnected": true,
+            "allowGuestControl": null
+          }
+        }
+      ],
+      "controllers": [],
+      "native": {
+        "identity": {
+          "vm_id": "a749bfad-4ef2-4323-90c1-649015414e0f",
+          "scope": "project-a",
+          "created": "2026-01-01T00:00:00Z"
+        },
+        "disk_records": [
+          {
+            "key": 0,
+            "native_id": "local-root:a749bfad-4ef2-4323-90c1-649015414e0f",
+            "role": "root",
+            "metadata": {
+              "image_id": "30693a59-6bcc-4f32-97f5-cdbe2fd41a1d",
+              "flavor_id": "small"
+            }
+          },
+          {
+            "key": 1,
+            "native_id": "1935dc51-2c67-468e-a27e-cd0d4fdf85ba",
+            "role": "data_volume",
+            "metadata": {
+              "id": "1935dc51-2c67-468e-a27e-cd0d4fdf85ba",
+              "size": 10,
+              "encrypted": false,
+              "bootable": "false",
+              "attachments": [
+                {
+                  "server_id": "a749bfad-4ef2-4323-90c1-649015414e0f"
+                }
+              ]
+            }
+          }
+        ],
+        "metadata": {
+          "server": {
+            "id": "a749bfad-4ef2-4323-90c1-649015414e0f",
+            "tenant_id": "project-a",
+            "created": "2026-01-01T00:00:00Z",
+            "status": "SHUTOFF",
+            "flavor": {
+              "id": "small"
+            },
+            "image": {
+              "id": "30693a59-6bcc-4f32-97f5-cdbe2fd41a1d"
+            },
+            "metadata": {
+              "os_distro": "debian",
+              "hw_firmware_type": "bios"
+            }
+          },
+          "ports": [
+            {
+              "id": "dfe7066c-2976-4bdc-89d2-85b5374bd097",
+              "project_id": "project-a",
+              "device_id": "a749bfad-4ef2-4323-90c1-649015414e0f",
+              "status": "ACTIVE",
+              "admin_state_up": true
+            }
+          ],
+          "flavor": {
+            "vcpus": 2,
+            "ram": 4096,
+            "disk": 20
+          },
+          "guest_provenance": "native_metadata_declaration",
+          "firmware_provenance": "native_metadata_declaration"
+        }
+      },
+      "required_owner_inputs": [
+        "guest_boot_drivers",
+        "application_consistency",
+        "writer_fencing",
+        "complete_disk_capture",
+        "service_validation"
+      ],
+      "holds": [],
+      "native_qualification": "not_established"
+    },
+    {
+      "schema_version": 3,
+      "profile_type": "SourceWorkloadProfile",
+      "platform": "ahv",
+      "vm_id": "d2a960dd-7481-4b0f-bc6b-3f1f56cbc371",
+      "installation_id": "cd2028fd-d4fa-4ff1-aab7-39e347fabba8",
+      "native_scope": "e5e5c53e-6545-452d-9e4b-0202272c4e50",
+      "api_version": "v4.3",
+      "versions": {
+        "vmm": "v4.3",
+        "prism": "v4.3",
+        "clustermgmt": "v4.3",
+        "product": "synthetic"
+      },
+      "config_sha256": "a643ef11bb0c0eac4ba5b2658be4209b0db174ca55a870b74c8f9d43c0deea10",
+      "observations_sha256": "853bbfd012a1522657a2e2366debabdb7570b4fff1ca4684a9e78a031973e464",
+      "observed_at": 1791439737,
+      "power_state": "OFF",
+      "guest_id": null,
+      "firmware": "bios",
+      "cpu": 4,
+      "memory_mb": 4096,
+      "disks": [
+        {
+          "key": 0,
+          "capacity_bytes": 1073741824,
+          "controller_key": null,
+          "unit_number": 0,
+          "backing_chain": [],
+          "native_sha256": "e7b07f5fab68ef41387789476987e64f62a29517e2cc8187242c1dfb868d8378"
+        }
+      ],
+      "nics": [],
+      "controllers": [
+        {
+          "key": 0,
+          "model": "SCSI",
+          "bus": 0,
+          "sharing": null
+        }
+      ],
+      "native": {
+        "identity": {
+          "vm_id": "d2a960dd-7481-4b0f-bc6b-3f1f56cbc371",
+          "scope": "e5e5c53e-6545-452d-9e4b-0202272c4e50",
+          "cluster_id": "7ac91104-a215-46c2-9caa-0df8807ed4c8",
+          "generation_uuid": "7833e209-6a2b-4320-96e5-10c1fe3f35a8",
+          "bios_uuid": "277b8317-0cb7-442e-8e48-ddd5c5869251"
+        },
+        "disk_records": [
+          {
+            "key": 0,
+            "native_id": "cda40228-48c6-40a8-ba51-966778001e60",
+            "role": "vm_disk",
+            "metadata": {
+              "extId": "cda40228-48c6-40a8-ba51-966778001e60",
+              "diskAddress": {
+                "busType": "SCSI",
+                "index": 0
+              },
+              "backingInfo": {
+                "$objectType": "vmm.v4.ahv.config.VmDisk",
+                "diskSizeBytes": 1073741824
+              }
+            }
+          }
+        ],
+        "metadata": {
+          "vm": {
+            "extId": "d2a960dd-7481-4b0f-bc6b-3f1f56cbc371",
+            "name": "vm",
+            "generationUuid": "7833e209-6a2b-4320-96e5-10c1fe3f35a8",
+            "biosUuid": "277b8317-0cb7-442e-8e48-ddd5c5869251",
+            "projectExtId": "e5e5c53e-6545-452d-9e4b-0202272c4e50",
+            "cluster": {
+              "extId": "7ac91104-a215-46c2-9caa-0df8807ed4c8"
+            },
+            "numSockets": 2,
+            "numCoresPerSocket": 2,
+            "numThreadsPerCore": 1,
+            "memorySizeBytes": 4294967296,
+            "powerState": "OFF",
+            "bootConfig": {
+              "$objectType": "vmm.v4.ahv.config.LegacyBoot"
+            },
+            "disks": [
+              {
+                "extId": "cda40228-48c6-40a8-ba51-966778001e60",
+                "diskAddress": {
+                  "busType": "SCSI",
+                  "index": 0
+                },
+                "backingInfo": {
+                  "$objectType": "vmm.v4.ahv.config.VmDisk",
+                  "diskSizeBytes": 1073741824
+                }
+              }
+            ],
+            "nics": []
+          },
+          "installed": {
+            "cluster": {
+              "buildInfo": {
+                "version": "synthetic"
+              }
+            },
+            "prism_central": {
+              "buildInfo": {
+                "version": "synthetic"
+              }
+            }
+          }
+        }
+      },
+      "required_owner_inputs": [
+        "guest_identity_and_drivers",
+        "application_consistency",
+        "writer_fencing",
+        "service_validation"
+      ],
+      "holds": [],
+      "native_qualification": "not_established"
+    }
+  ]
+}

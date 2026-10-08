@@ -47,6 +47,10 @@ def outputs():
         source_contract = '\"\"\"Generated native configuration projection; runtime status is separate.\"\"\"\n\nfrom typing import Any\n\nFIELDS = ' + ('{\n' + ''.join('    ' + json.dumps(k) + ': (\n' + ''.join('        ' + json.dumps(field) + ',\n' for field in fields) + '    ),\n' for k, fields in native.items() if k != 'schema_version') + '}') + '\n\n\ndef configuration(kind: str, document: dict[str, Any]) -> dict[str, Any]:\n    return {key: document.get(key) for key in FIELDS[kind]}\n'
         for component in ('inventory', 'lifecycle'):
             outputs[f'workers/{component}/src/{component}_worker/infrastructure/{platform}_source_contract.py'] = source_contract
+    # Independently copied packages cannot reach repository-level fixtures.
+    # Keep their owned test inputs byte-identical to the published contracts.
+    for name in ('source-roles-v3.json', 'vmware-destination-v1.json', 'ahv-destination-v1.json'):
+        outputs['services/inventory/tests/fixtures/' + name] = (ROOT / 'contracts/fixtures/inventory' / name).read_text()
     return outputs
 
 def main():

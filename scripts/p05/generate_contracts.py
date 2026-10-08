@@ -103,6 +103,7 @@ event=obj({'specversion':{'const':'1.0'},'event_id':U,'tenant_id':U,'event_type'
 emit('contracts/schemas/planning/fact-v1.json',{'$schema':'https://json-schema.org/draft/2020-12/schema',**event})
 # Isolated builds must own their fixtures; exact copies are checked at repository qualification.
 copies=[('contracts/fixtures/planning/synthetic-plan-v1.1.json','services/lifecycle/tests/fixtures/synthetic-plan-v1.json'),('contracts/fixtures/planning/synthetic-plan-v1.1.json','services/governance/tests/Fixtures/synthetic-plan-v1.json'),('contracts/schemas/inventory/fact-v1.1.json','services/planning/src/planning/infrastructure/facts/inventory.json'),('contracts/schemas/events/catalogue-intent-v1.json','services/planning/src/planning/infrastructure/facts/catalogue.json')]
+copies.append(('contracts/openapi/planning-v1.1.json', 'services/planning/tests/fixtures/planning-v1.1.json'))
 for source,target in copies:
     if (ROOT/source).read_bytes()!=(ROOT/target).read_bytes():changed.append(target+' differs from '+source)
 if changed:raise SystemExit('Contract or fixture drift: '+', '.join(changed))

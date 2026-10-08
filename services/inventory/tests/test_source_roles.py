@@ -18,12 +18,9 @@ from inventory.infrastructure.policies import parse_policy
 
 def profiles() -> list[dict[str, Any]]:
     return list(
-        json.loads(
-            (
-                Path(__file__).resolve().parents[3]
-                / "contracts/fixtures/inventory/source-roles-v3.json"
-            ).read_text()
-        )["profiles"]
+        json.loads((Path(__file__).with_name("fixtures") / "source-roles-v3.json").read_text())[
+            "profiles"
+        ]
     )
 
 
