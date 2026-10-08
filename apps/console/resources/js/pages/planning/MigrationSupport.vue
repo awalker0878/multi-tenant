@@ -5,7 +5,9 @@ import { capabilityDefinitions } from '../../features/planning/capabilityDefinit
 import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 
 type Platform = { platform: string; installation_id: string; versions: Record<string, string> };
-type Route = { route_id: string; guest: string; guest_profile_sha256: string; method: string; source: Platform; target: Platform; constraints: Record<string, string | number>; exclusions: string[]; blockers: string[]; native_qualified: boolean; operationally_accepted: boolean };
+type ApiAlert = { capability_id: string; side: 'source' | 'target'; severity: 'blocker' | 'warning'; reason: string; impact: string; action: string; omission_accepted: boolean };
+type ApiAssessment = { status: 'eligible' | 'conditional' | 'blocked' | 'unknown'; operationally_eligible: boolean; administrator_alerts: ApiAlert[] };
+type Route = { route_id: string; guest: string; guest_profile_sha256: string; method: string; source: Platform; target: Platform; constraints: Record<string, string | number>; exclusions: string[]; blockers: string[]; native_qualified: boolean; operationally_accepted: boolean; api_compatibility?: ApiAssessment };
 type Support = { tranche_sha256: string; release_sha256: string; directions: { direction: string; state: string; routes: Route[] }[] };
 const props = defineProps<{ tenantId: string; siteId: string; applicationId: string; environment: string; support: Support }>();
 const current = ref(props.support);
@@ -63,6 +65,24 @@ const versions = (platform: Platform) => Object.entries(platform.versions).map((
           <div v-for="route in direction.routes" :key="route.route_id" class="mb-4">
             <p>Native qualification: {{ !unavailable && route.native_qualified ? 'Accepted' : 'Held' }}</p>
             <p>Operating acceptance: {{ !unavailable && route.operationally_accepted ? 'Accepted' : 'Pending' }}</p>
+            <section v-if="route.api_compatibility" class="mt-2 border-l-4 border-amber-600 pl-3" aria-label="API feature migration compatibility">
+              <p class="font-semibold">Migration API compatibility: {{ unavailable ? 'Unknown — refresh required' : route.api_compatibility.status }}</p>
+              <p v-if="route.api_compatibility.administrator_alerts.length && !unavailable" role="alert" class="font-semibold">
+                {{ route.api_compatibility.administrator_alerts.length }} feature{{ route.api_compatibility.administrator_alerts.length === 1 ? '' : 's' }} cannot be transferred unchanged.
+              </p>
+              <ul v-if="!unavailable" class="list-disc pl-5">
+                <li v-for="alert in route.api_compatibility.administrator_alerts" :key="alert.side + ':' + alert.capability_id" class="mb-2">
+                  <strong>{{ alert.severity === 'blocker' ? 'Critical — blocks migration' : 'Optional — administrator action required' }}</strong>:
+                  {{ alert.capability_id }} ({{ alert.side }}); {{ alert.reason.replaceAll('_', ' ') }}.
+                  <span>{{ alert.impact }}</span>
+                  <span v-if="alert.omission_accepted">Omission independently accepted, subject to plan revalidation.</span>
+                  <span v-else>{{ alert.action.replaceAll('_', ' ') }}.</span>
+                </li>
+              </ul>
+              <p v-if="route.api_compatibility.status !== 'eligible' || unavailable" class="text-red-800">
+                No migration approval or native write is permitted until every critical requirement is qualified and optional omissions are explicitly accepted.
+              </p>
+            </section>
             <p v-for="blocker in route.blockers" :key="blocker">{{ blocker.replaceAll('_', ' ') }}</p>
             <p v-if="route.blockers.length">Qualification owner: supply current independent evidence for this exact release and route in Assurance. Rejected, expired or revoked evidence must be resolved before admission.</p>
           </div>
