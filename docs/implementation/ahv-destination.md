@@ -48,11 +48,12 @@ UUID. Address pins, CA and credential paths, current authority and endpoint budg
 remain mandatory. Shared infrastructure IDs require explicit commissioning; no
 resource is selected merely because its display name matches another resource.
 
-The collector performs **seven separately authorized reads** under the existing
-profile lease. List responses require an exact `totalAvailableResults`, unique
-IDs, fewer than 100 records and no continuation. Larger or ambiguous inventories
-fail collection instead of publishing a truncated profile. Enroll a suitably scoped
-collector; multi-page AHV profiles are outside this initial bounded implementation.
+The collector performs two identity reads and one or more separately authorized
+reads per resource list. Explicit numbered pages contain at most 100 rows, up to
+`min(max_pages, 10)` pages per list and 52 total reads under the existing lease.
+Exact consistent totals, unique IDs and complete pages are required. Response
+links are never followed. See the [bounded discovery increment](contextual-commissioning.md)
+for service receipt checks, budget limits and failure behavior.
 Unknown capacity reservations, boot drivers, network policy behavior, reachability,
 application consistency and service behavior remain explicit evidence obligations.
 Raw format is an adapter candidate, not a claimed API-advertised capability.

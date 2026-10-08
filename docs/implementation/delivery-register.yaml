@@ -1911,6 +1911,7 @@ work_packages:
   - EV-P08-006
   - EV-P08-007
   - EV-P08-008
+  - EV-P08-009
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
@@ -1919,6 +1920,7 @@ work_packages:
   - docs/implementation/p08-execution.md
   - docs/implementation/p08-runtime-commissioning.md
   - docs/implementation/p08-native-control.md
+  - docs/implementation/contextual-commissioning.md
   - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
@@ -1949,6 +1951,7 @@ work_packages:
   - EV-P08-006
   - EV-P08-007
   - EV-P08-008
+  - EV-P08-009
   blocker_ids:
   - BL-P08-001
   - BL-P08-002
@@ -1957,6 +1960,7 @@ work_packages:
   - docs/implementation/p08-execution.md
   - docs/implementation/p08-runtime-commissioning.md
   - docs/implementation/p08-native-control.md
+  - docs/implementation/contextual-commissioning.md
   - docs/implementation/p08-operations.md
   - docs/implementation/p08-completion-review.md
   - docs/operations/runbooks/native-migration.md
@@ -7363,6 +7367,35 @@ evidence:
     producers, selected guest/data/service/traffic/recovery/cleanup implementations, converter qualification and
     interrupted-transfer reconciliation remain required. Extended budgets do not renew authority or supply resumption.
     No native Q05/Q06/Q07, G07/G08 receiving, P08 completion or operating acceptance is claimed.
+- id: EV-P08-009
+  level: E2
+  source_revision: 98e528d4b3ed6d1e6a28c81dcfe7dd2df11a7c9f
+  artifact_revisions:
+    p08_run_id: '37729362825'
+    tested_merge_commit: ff97995ebdd41f026a166e9ea4873e5130ca8d19
+    source_tree: 77c983d234ef518c0bde0f68d0b218308cdc3d7c
+    original_run_id: '37729078373'
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-08T04:50:14.350250+00:00'
+  observer: GitHub Actions PostgreSQL/TLS and Chromium campaigns; Codex verified original archive, source and
+    command-log hashes and visually inspected desktop/mobile captures.
+  reviewer: Codex engineering consistency review only; designated native and receiving reviewers remain open.
+  valid_until: null
+  invalidated_at: null
+  artifact_uri: verification/p08/commissioning/qualification-index.json
+  sha256: 44bccb8ede7c0093d64c90426106f9bb0d865bf043c83d2720f10ddfa85a8773
+  environment: GitHub Actions Ubuntu 24.04, PostgreSQL 16, Python 3.12.14, uv 0.12.19, Node 24.19.0 and pinned
+    Chromium; synthetic native and owner peers.
+  scope: Contextual commissioning, scoped signed owner evidence and immutable inputs; bounded AHV pagination
+    with per-read authority and variable receipts; explicit same-lease export continuation. All 39 component
+    commands and 1336 tests pass without skips; all five browser commands/journeys pass. Original failed browser
+    observation and its section-selection correction are retained. Each run has 1023 component or 251 browser
+    source bindings verified against an identical permanent source tree.
+  limitations: E2 only. Actual lab/account/provider commissioning, guest/service/data integrations, Windows/UEFI
+    and additional routes, process-restart and post-write application recovery, workload targets and independent
+    receiving decisions remain required. No native Q05-Q10 qualification, phase completion or operating acceptance
+    is claimed.
 - id: EV-P09-001
   level: E2
   artifact_uri: git:eca275f98c7aca9774d4a20b2174a7c017c878ce:verification/p09/local/qualification-index.json

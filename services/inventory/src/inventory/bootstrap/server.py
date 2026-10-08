@@ -12,6 +12,7 @@ from inventory.infrastructure.foundation import database_ready
 from inventory.infrastructure.generated_configuration_streams import configuration_streams
 from inventory.infrastructure.native_readers import native_reader
 from inventory.infrastructure.policies import MountedPolicies
+from inventory.infrastructure.readiness_evidence import read_evidence
 from inventory.infrastructure.store import Postgres
 from inventory.infrastructure.telemetry import BoundedSignalBuffer
 from inventory.interfaces.discovery import InventoryApp
@@ -32,6 +33,7 @@ class InventoryRouter:
                 configuration_streams=configuration_streams,
             ),
             authority,
+            read_evidence,
         )
         self.planning = PlanningInputApp(self.inventory.discovery, planning_actor, native_reader)
         self.foundation = FoundationApp(database_ready)

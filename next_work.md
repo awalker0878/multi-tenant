@@ -1,12 +1,21 @@
-# Console operator-input handoff
+# Contextual commissioning and recovery increment
 
-Site administrators can now collect the required owner inputs through
-**Site inventory → Operator readiness**. The immutable, revision-bound packet
-collects 32 references/targets across access, execution, recovery, operating
-objectives and service handover. The [implementation record](docs/implementation/console-operator-readiness.md)
-explains deployment and the remaining commissioning steps. The user's latest
-instruction authorizes merging this branch to main after validation. Native
-effects and receiving acceptance still require their existing exact-scope authority.
+Operator readiness now follows the selected task, migration method and observed
+platforms, with accountable actions and independently signed evidence checks.
+AHV discovery supports bounded numbered pages; export archives can explicitly
+opt into same-lease byte-range continuation. The
+[implementation and operating instructions](docs/implementation/contextual-commissioning.md)
+record the exact behavior, verification commands and remaining native boundaries.
+The user authorizes publishing these tested changes to main.
+[Retained verification](verification/p08/commissioning/README.md) records 1,336
+component tests without skips and five passing browser journeys.
+
+The next concrete work is to enroll the actual source/destination and owner
+producers, populate the existing native/operating input records, and execute the
+VMware-to-OpenStack campaign before widening native qualification to AHV. Guest,
+service, Windows/UEFI and post-write recovery support still need their selected
+owner protocols and original campaigns. Software verification does not create
+those operating inputs or close the receiving gates.
 
 # Next work — P10 operating qualification
 

@@ -625,10 +625,23 @@ class Discovery:
             kind = stream_spec["kind"]
             if kind in {"source_profile", "target_profile"}:
                 profile = profile_payload(body.get("profile"), stream_spec, p.native_scope)
+                minimum_reads = maximum_reads = 8 if kind == "source_profile" else 7
+                if kind == "target_profile" and p.platform == "ahv":
+                    minimum_reads = 2 + sum(
+                        max(1, (len(profile[field]) + 99) // 100)
+                        for field in (
+                            "storage_containers",
+                            "subnets",
+                            "vpcs",
+                            "categories",
+                            "policies",
+                        )
+                    )
+                    maximum_reads = 2 + 5 * min(p.max_pages, 10)
                 if (
                     body["observations"]
                     or "configuration" in body
-                    or j["profile_reads"] != (8 if kind == "source_profile" else 7)
+                    or not minimum_reads <= j["profile_reads"] <= maximum_reads
                 ):
                     raise Rejected("incomplete_profile_collection")
                 if not int(collected) <= profile["observed_at"] <= int(now):

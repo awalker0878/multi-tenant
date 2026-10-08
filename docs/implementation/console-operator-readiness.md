@@ -5,6 +5,9 @@ console theme and merge to main. This implementation supplies the missing
 collection surface for selected P07/P08/P10 commissioning inputs. It does not
 record a new architecture decision or an accountable operating acceptance.
 
+The [contextual commissioning increment](contextual-commissioning.md) extends this
+collection workflow with task-specific requirements and authenticated owner evidence.
+
 ## Operator workflow
 
 1. Open a site in **Observed inventory**. Use **Environment configuration** to

@@ -101,6 +101,8 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
                     "path": self.path,
                     "session": self.headers.get("vmware-api-session-id"),
                     "token": self.headers.get("X-Auth-Token"),
+                    "range": self.headers.get("Range"),
+                    "if_match": self.headers.get("If-Match"),
                 }
             )
             length = int(self.headers.get("Content-Length", "0"))
@@ -162,6 +164,39 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
                     },
                 )
             elif self.path.startswith("/nfc/"):
+                mode = fixture.get("range_fault")
+                if mode:
+                    offset = int(self.headers.get("Range", "bytes=0-")[6:-1])
+                    self.send_response(200 if not offset or mode == "ignored" else 206)
+                    self.send_header("Content-Length", str(len(data) - offset))
+                    self.send_header("Accept-Ranges", "bytes")
+                    if mode != "no_validator":
+                        self.send_header(
+                            "ETag",
+                            'W/"v1"'
+                            if mode == "weak"
+                            else '"v2"'
+                            if offset and mode == "changed"
+                            else '"v1"',
+                        )
+                    if offset:
+                        self.send_header(
+                            "Content-Range",
+                            f"bytes {offset + (1 if mode == 'wrong_range' else 0)}-"
+                            f"{len(data) - 1}/{len(data)}",
+                        )
+                    self.end_headers()
+                    part = (
+                        data[offset : offset + 32768]
+                        if mode == "repeated"
+                        else data[:65536]
+                        if not offset
+                        else data[offset:]
+                    )
+                    self.wfile.write(part)
+                    self.wfile.flush()
+                    self.close_connection = True
+                    return
                 self.send_response(302 if fault == "redirect" else 200)
                 self.send_header("Content-Length", str(len(data)))
                 self.end_headers()
@@ -365,6 +400,95 @@ def test_export_import_integrity_and_independent_readback(copy_campaign: Any) ->
     with pytest.raises(NativeHeld):
         execution.execute(bound)
     assert len(fixture["calls"]) == count
+
+
+def test_tls_export_continues_exact_bytes_with_current_authority(copy_campaign: Any) -> None:
+    _, execution, fixture, _ = copy_campaign
+    source = execution.adapter.source
+    fixture["range_fault"] = "continue"
+    sink = io.BytesIO()
+    observations: list[dict[str, Any]] = []
+    url = next(iter(source.nfc_endpoints)) + "/nfc/disk?ticket=private"
+    heartbeats = 0
+
+    def current() -> None:
+        nonlocal heartbeats
+        heartbeats += 1
+
+    result = source.download(
+        url,
+        1048576,
+        sink,
+        current,
+        allow_range_continuation=True,
+        on_continuation=observations.append,
+    )
+    payload = b"synthetic-vmdk-stream" * 8000
+    assert sink.read() == payload
+    assert result["sha256"] == hashlib.sha256(payload).hexdigest()
+    assert len(fixture["calls"]) == 2 and heartbeats > 2
+    assert fixture["calls"][1]["range"] == "bytes=65536-"
+    assert fixture["calls"][1]["if_match"] == '"v1"'
+    assert all(call["session"] is call["token"] is None for call in fixture["calls"])
+    assert observations == [
+        {
+            "bytes": 65536,
+            "total": len(payload),
+            "prefix_sha256": hashlib.sha256(payload[:65536]).hexdigest(),
+            "validator_sha256": hashlib.sha256(b'"v1"').hexdigest(),
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "disabled",
+        "no_validator",
+        "weak",
+        "ignored",
+        "changed",
+        "wrong_range",
+        "repeated",
+        "revoked",
+        "local_io",
+        "journal",
+    ],
+)
+def test_export_continuation_holds_on_uncertainty(copy_campaign: Any, fault: str) -> None:
+    _, execution, fixture, _ = copy_campaign
+    source = execution.adapter.source
+    fixture["range_fault"] = fault
+
+    class Sink(io.BytesIO):
+        def write(self, value: Any) -> int:
+            if fault == "local_io" and self.tell():
+                raise OSError("disk unavailable")
+            return super().write(value)
+
+    sink = Sink()
+
+    def current() -> None:
+        if fault == "revoked" and sink.tell():
+            raise NativeHeld("authority_revoked")
+
+    def journal(value: dict[str, Any]) -> None:
+        if fault == "journal":
+            raise OSError("journal unavailable")
+
+    with pytest.raises(NativeHeld):
+        source.download(
+            next(iter(source.nfc_endpoints)) + "/nfc/disk",
+            1048576,
+            sink,
+            current,
+            allow_range_continuation=fault != "disabled",
+            on_continuation=journal,
+        )
+    assert len(fixture["calls"]) == (
+        3 if fault == "repeated" else 2 if fault in {"ignored", "changed", "wrong_range"} else 1
+    )
+    assert all(call["method"] == "GET" for call in fixture["calls"])
 
 
 @pytest.mark.parametrize(

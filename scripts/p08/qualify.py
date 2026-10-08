@@ -23,7 +23,7 @@ def main():
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
     prefixes = ('services/lifecycle/', 'services/inventory/', 'services/planning/', 'services/governance/', 'workers/lifecycle/', 'workers/inventory/', 'apps/console/',
                 'scripts/p08/', 'scripts/p04/generate_clients.py', 'contracts/schemas/inventory/', 'contracts/schemas/planning/migration-', 'contracts/openapi/inventory-v1.', 'contracts/openapi/inventory-native-', 'contracts/openapi/governance-native-', 'contracts/openapi/lifecycle-migration-',
-                'contracts/openapi/worker-migration-', 'contracts/openapi/planning-migration-', 'contracts/openapi/planning-v1.', 'contracts/fixtures/lifecycle/migration-', 'contracts/fixtures/inventory/migration-', 'contracts/fixtures/inventory/ahv-',
+                'contracts/openapi/worker-migration-', 'contracts/openapi/planning-migration-', 'contracts/openapi/planning-v1.', 'contracts/fixtures/lifecycle/migration-', 'contracts/fixtures/inventory/migration-', 'contracts/fixtures/inventory/ahv-', 'contracts/fixtures/inventory/operator-',
                 '.github/workflows/p08-', '.github/workflows/ahv-destination.yml')
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -79,6 +79,7 @@ def main():
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_ahv.py')])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_fleet.py')])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_operator_inputs.py')])
+        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_readiness.py')])
     except Exception as error:
         report['error'] = str(error)
     report['result'] = 'PASSED' if report['commands'] and not report.get('error') and all(c['exit_code'] == 0 for c in report['commands']) else 'FAILED'

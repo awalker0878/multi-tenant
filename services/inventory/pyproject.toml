@@ -8,12 +8,13 @@ version = "0.1.0.dev0"
 description = "Scoped Inventory discovery, observation history and fact delivery"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
-dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0", "pika==1.4.4"]
+dependencies = ["psycopg[binary]==3.3.6", "uvicorn==0.53.0", "pika==1.4.4", "cryptography==50.0.2"]
 
 [project.scripts]
 inventory-health = "inventory.bootstrap.health:main"
 inventory-publish = "inventory.bootstrap.publish:main"
 inventory-serve = "inventory.bootstrap.server:main"
+inventory-readiness-receipt = "inventory.bootstrap.readiness_receipt:main"
 
 [dependency-groups]
 dev = ["mypy==2.4.0", "pytest==9.1.1", "ruff==0.16.10"]

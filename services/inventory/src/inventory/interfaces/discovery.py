@@ -3,6 +3,7 @@
 import asyncio
 import json
 import re
+from collections.abc import Callable
 from typing import Any
 from urllib.parse import parse_qs
 
@@ -20,6 +21,18 @@ from inventory.domain.discovery import Rejected
 
 UUID = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
 ROUTES = (
+    (
+        "GET",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/operator-readiness",
+        "operator_readiness",
+        "inventory.admin",
+    ),
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/operator-readiness",
+        "operator_readiness_save",
+        "inventory.admin",
+    ),
     (
         "GET",
         rf"/v1/tenants/({UUID})/sites/({UUID})/operator-inputs",
@@ -195,12 +208,17 @@ def decode(raw: bytes) -> dict[str, Any]:
 
 
 class InventoryApp:
-    def __init__(self, discovery: Discovery, authority: Authority) -> None:
+    def __init__(
+        self,
+        discovery: Discovery,
+        authority: Authority,
+        evidence: Callable[..., dict[str, Any]] | None = None,
+    ) -> None:
         self.discovery = discovery
         self.authority = authority
         self.views = InventoryViews(discovery)
         self.configuration = PortingConfiguration(discovery)
-        self.operator_inputs = OperatorInputs(discovery)
+        self.operator_inputs = OperatorInputs(discovery, evidence)
         self.workloads = WorkloadProfiles(discovery)
         self.fleet = MigrationFleet(discovery)
 
@@ -262,7 +280,10 @@ class InventoryApp:
                         if event["type"] != "http.request":
                             raise Rejected("request_interrupted", 400)
                         chunks.extend(event["body"])
-                        if len(chunks) > 262144:
+                        maximum = (
+                            2097152 if scope["path"] == "/internal/collections/pages" else 262144
+                        )
+                        if len(chunks) > maximum:
                             raise Rejected("request_bound", 413)
                         if not event.get("more_body", False):
                             break
@@ -285,10 +306,15 @@ class InventoryApp:
                     raise Rejected("invalid_query")
                 target = values[2] if len(values) > 2 else None
                 if scope["method"] == "GET":
-                    if operation == "operator_inputs":
+                    if operation in {"operator_inputs", "operator_readiness"}:
                         if params:
                             raise Rejected("invalid_query")
-                        payload = await asyncio.to_thread(self.operator_inputs.read, actor)
+                        payload = await asyncio.to_thread(
+                            self.operator_inputs.readiness
+                            if operation == "operator_readiness"
+                            else self.operator_inputs.read,
+                            actor,
+                        )
                     elif operation == "migration_fleet":
                         payload = await asyncio.to_thread(
                             self.fleet.read, actor, params.get("cursor", [None])[0]
@@ -321,7 +347,7 @@ class InventoryApp:
                         raise Rejected("invalid_revision")
                     payload = await asyncio.to_thread(
                         self.operator_inputs.command
-                        if operation == "operator_inputs_save"
+                        if operation in {"operator_inputs_save", "operator_readiness_save"}
                         else self.fleet.command
                         if operation == "migration_group_save"
                         else self.workloads.command

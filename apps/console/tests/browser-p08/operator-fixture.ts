@@ -1,7 +1,7 @@
 // Isolated HTTP presentation checks; persistence/authorization are tested in their owners.
 import { readFileSync } from 'node:fs';
 import type { Plugin } from 'vite';
-const fixture = JSON.parse(readFileSync('../../contracts/fixtures/inventory/operator-inputs-v1.json', 'utf8'));
+const fixture = JSON.parse(readFileSync('../../contracts/fixtures/inventory/operator-readiness-v1.json', 'utf8'));
 const route = `/tenants/${fixture.tenant_id}/inventory/sites/${fixture.site_id}/operator-inputs`;
 let state: any;
 function reset() { state = { workspace: structuredClone(fixture), errors: {}, notice: null, posts: [], uncertain: false, stale: false, access: 200 }; }
@@ -14,14 +14,16 @@ export function operatorFixture(): Plugin { return { name: 'operator-inputs-fixt
     const send = (value: unknown, status = 200) => { res.statusCode = status; res.setHeader('Content-Type', 'application/json'); res.setHeader('Cache-Control', 'no-store'); res.end(JSON.stringify(value)); };
     if (path === '/__operators') {
       if (req.method === 'POST') { const control = JSON.parse(body); if (control.reset) reset(); for (const key of ['uncertain', 'stale', 'access']) if (key in control) state[key] = control[key]; }
-      return send(state);
+      if (req.method === 'POST') { const control = JSON.parse(body); if (control.evidence) { state.workspace.checks = state.workspace.checks.map((check: any) => check.field_id === control.evidence.field_id ? { ...check, ...control.evidence } : check); } } return send(state);
     }
     if (path.endsWith('/status')) return send({ available: true }, state.access);
     if (path.endsWith('/download')) { res.setHeader('Content-Disposition', 'attachment; filename="operator-inputs.json"'); return send({ qualification_status: 'not_established', ...state.workspace }); }
     if (req.method === 'POST') {
       const command = JSON.parse(body); state.posts.push(command);
       state.errors = state.stale ? { inventory_status: '412', command: 'A saved revision or environment review changed.' } : state.uncertain ? { inventory_status: '503', command: 'The result is uncertain. Recover the unchanged save before editing further.' } : {};
-      if (!state.stale) { state.workspace.record = { revision: 1, digest: 'a'.repeat(64), values: command.input.values, configuration_digest: command.input.configuration_digest, saved_at: Date.now()/1000 }; state.workspace.missing_fields = state.workspace.fields.filter((f: any) => !(f.id in command.input.values)).map((f: any) => f.id); }
+      if (!state.stale) { state.workspace.record = { revision: 1, digest: 'a'.repeat(64), values: command.input.values, configuration_digest: command.input.configuration_digest, saved_at: Date.now()/1000 }; state.workspace.context = command.input.context; const required = state.workspace.contexts.find((context: any) => context.operation === command.input.context.operation && context.method === command.input.context.method).required_fields;
+        state.workspace.missing_fields = required.filter((id: string) => !(id in command.input.values));
+        state.workspace.checks = state.workspace.checks.map((check: any) => ({ ...check, state: !required.includes(check.field_id) ? 'not_applicable' : check.field_id in command.input.values ? 'unverified' : 'missing' })); }
       state.notice = Object.keys(state.errors).length ? null : 'Operator inputs saved. Remaining requirements are listed below.';
       state.uncertain = false; state.stale = false;
       res.statusCode = 303; res.setHeader('Location', route); res.end(); return;

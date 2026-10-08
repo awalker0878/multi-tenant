@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "evidence_level": "E2",
+  "native_write_authorized": false,
+  "source_revision": "98e528d4b3ed6d1e6a28c81dcfe7dd2df11a7c9f",
+  "campaigns": [
+    {
+      "name": "initial-components",
+      "archive": "archives/commissioning-initial-components.zip",
+      "archive_sha256": "546038af99fe574a6343210e7f42637d2acc35a1cb91f37afa705b07955739ba",
+      "run_id": "37729078373",
+      "artifact_id": "11529291933",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37729078373",
+      "published_head": "43591b9f93adb25057790cc3f8f73a6ef186fc36",
+      "tested_merge_commit": "7a7cb374149a128eafb667d1569197c0edeb53b0",
+      "source_tree": "37dc5f1b9396fb1b97ff8cba5583a35f01544f97",
+      "result": "PASSED",
+      "source_bindings_verified": 1023,
+      "commands": 39,
+      "suites": [
+        {
+          "name": "inventory",
+          "tests": 164,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "planning",
+          "tests": 327,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "lifecycle",
+          "tests": 372,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "worker",
+          "tests": 395,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "inventory-worker",
+          "tests": 77,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "stats": null,
+      "observed_at": "2026-10-08T04:46:38.286553+00:00"
+    },
+    {
+      "name": "initial-console",
+      "archive": "archives/commissioning-initial-console.zip",
+      "archive_sha256": "438865890477df132f64b9ed06d284451e5220a714c07d99456e1776061e5c88",
+      "run_id": "37729078373",
+      "artifact_id": "11529072552",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37729078373",
+      "published_head": "43591b9f93adb25057790cc3f8f73a6ef186fc36",
+      "tested_merge_commit": "7a7cb374149a128eafb667d1569197c0edeb53b0",
+      "source_tree": "37dc5f1b9396fb1b97ff8cba5583a35f01544f97",
+      "result": "FAILED",
+      "source_bindings_verified": 251,
+      "commands": 5,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-08T04:46:56.516Z",
+        "duration": 48937.857,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "observed_at": "2026-10-08T04:46:47.812879+00:00"
+    },
+    {
+      "name": "components",
+      "archive": "archives/commissioning-components.zip",
+      "archive_sha256": "09d1d8166c169debc7629798fd57804ea2068207a78c8152c5af9c033ca52342",
+      "run_id": "37729362825",
+      "artifact_id": "11529436878",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37729362825",
+      "published_head": "98e528d4b3ed6d1e6a28c81dcfe7dd2df11a7c9f",
+      "tested_merge_commit": "ff97995ebdd41f026a166e9ea4873e5130ca8d19",
+      "source_tree": "77c983d234ef518c0bde0f68d0b218308cdc3d7c",
+      "result": "PASSED",
+      "source_bindings_verified": 1023,
+      "commands": 39,
+      "suites": [
+        {
+          "name": "inventory",
+          "tests": 165,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "planning",
+          "tests": 327,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "lifecycle",
+          "tests": 372,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "worker",
+          "tests": 395,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "inventory-worker",
+          "tests": 77,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "stats": null,
+      "observed_at": "2026-10-08T04:50:14.350250+00:00"
+    },
+    {
+      "name": "console",
+      "archive": "archives/commissioning-console.zip",
+      "archive_sha256": "fb2ccbc200d24662680521077a9c69f4083c9aa239131d71b838032f91ff5c88",
+      "run_id": "37729362825",
+      "artifact_id": "11529590987",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37729362825",
+      "published_head": "98e528d4b3ed6d1e6a28c81dcfe7dd2df11a7c9f",
+      "tested_merge_commit": "ff97995ebdd41f026a166e9ea4873e5130ca8d19",
+      "source_tree": "77c983d234ef518c0bde0f68d0b218308cdc3d7c",
+      "result": "PASSED",
+      "source_bindings_verified": 251,
+      "commands": 5,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-08T04:50:39.330Z",
+        "duration": 58452.159,
+        "expected": 5,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "observed_at": "2026-10-08T04:50:32.957472+00:00"
+    }
+  ],
+  "correction": "Initial browser failure checked an evidence badge in a closed section after form remount. The test now selects Operating targets before checking evidence and expiry. Producer trust was additionally restricted to explicit tenant/site scopes and distinct public keys. No test assertion or admission rule was weakened. Local architecture checking also rejected a verifier placed under the evidence directory; it was moved to the existing scripts/p08 tooling root without changing policy.",
+  "limitations": [
+    "Real PostgreSQL, HTTPS and pinned Chromium; native platforms, owner observations and browser HTTP peers are synthetic.",
+    "No installed platform or guest/service/data integration is qualified; no Q05-Q10 receiving decision is recorded.",
+    "Continuation is bounded to the same live export lease; process restart and post-write application recovery remain separate.",
+    "Local Console run passed 208 tests and 980 assertions, with seven existing broker-campaign skips; local PHP source was unchanged in this engineering increment after that run."
+  ]
+}

@@ -131,7 +131,8 @@ class MigrationArchive:
                 "max_seconds",
                 "bytes_per_second",
                 "spool_bytes",
-            },
+            }
+            | ({"range_continuation"} if "range_continuation" in p else set()),
         )
         if (
             type(p["schema_version"]) is not int
@@ -141,6 +142,10 @@ class MigrationArchive:
             or not sha256(p["capture_plan_sha256"])
         ):
             raise NativeHeld("migration_archive_plan_changed")
+        if "range_continuation" in p and (
+            p["schema_version"] != 2 or type(p["range_continuation"]) is not bool
+        ):
+            raise NativeHeld("migration_continuation_policy_invalid")
         # Validate the exact route before any lease can be opened.
         import re
 
@@ -278,9 +283,29 @@ class MigrationArchive:
                 )
                 # VmwareExport's download accepts a seekable write sink; the wrapper
                 # checks rate/custody before every write and fsyncs on completion.
-                receipt = self.source.download(
-                    devices_by_key[disk["key"]]["url"], disk["max_bytes"], stream_bound, heartbeat
-                )
+                if p.get("range_continuation") is True:
+
+                    def continuation(facts: dict[str, Any], key: str = disk["key"]) -> None:
+                        current()
+                        self.journal.record(
+                            binding, "transfer_continued", {"resource_key": key, **facts}
+                        )
+
+                    receipt = self.source.download(
+                        devices_by_key[disk["key"]]["url"],
+                        disk["max_bytes"],
+                        stream_bound,
+                        heartbeat,
+                        allow_range_continuation=True,
+                        on_continuation=continuation,
+                    )
+                else:
+                    receipt = self.source.download(
+                        devices_by_key[disk["key"]]["url"],
+                        disk["max_bytes"],
+                        stream_bound,
+                        heartbeat,
+                    )
             transferred += receipt["size"]
             receipts[disk["key"]] = receipt
             files.append(

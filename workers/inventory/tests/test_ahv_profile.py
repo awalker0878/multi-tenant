@@ -6,7 +6,7 @@ from uuid import uuid4
 
 import pytest
 
-from inventory_worker.infrastructure.ahv_profile import collect_ahv, complete_list
+from inventory_worker.infrastructure.ahv_profile import collect_ahv, collect_list
 from inventory_worker.infrastructure.native import CollectionFailure
 from inventory_worker.infrastructure.profile_collection import collect_profile
 
@@ -87,26 +87,88 @@ def test_seven_budgeted_reads_use_pinned_origin_and_scope() -> None:
     assert profile["observations_sha256"] and result["terminal"] is True
 
 
+@pytest.mark.parametrize("count", [0, 1, 100, 101, 200, 1000])
+def test_numbered_pages_charge_each_request_and_never_follow_native_links(count: int) -> None:
+    rows = [{"extId": uid()} for _ in range(count)]
+    stream = {"credential_file": "/secret"}
+    calls: list[str] = []
+    budget: list[bool] = []
+
+    def page(connection: dict[str, Any], route: str, headers: dict[str, str]) -> dict[str, Any]:
+        assert connection is stream
+        assert len(budget) == len(calls) + 1
+        assert headers == {"X-Ntnx-Api-Key": "current"}
+        index = len(calls)
+        assert route == f"/api/prism/v4.3/config/categories?$limit=100&$page={index}"
+        calls.append(route)
+        return {
+            "data": rows[index * 100 : (index + 1) * 100],
+            "metadata": {
+                "totalAvailableResults": count,
+                "links": [{"rel": "next", "href": "https://untrusted.invalid/"}],
+            },
+        }
+
+    with (
+        patch("inventory_worker.infrastructure.ahv_profile.exchange", side_effect=page),
+        patch(
+            "inventory_worker.infrastructure.ahv_profile.secret", return_value="current"
+        ) as secret,
+    ):
+        collected, observations = collect_list(
+            stream, "/api/prism/v4.3/config/categories", 10, lambda: budget.append(True)
+        )
+    assert collected == rows
+    assert len(calls) == len(observations) == max(1, (count + 99) // 100)
+    assert secret.call_count == len(calls)
+
+
 @pytest.mark.parametrize(
-    "fault", ["page", "total", "missing_total", "duplicate", "next", "wrong_type"]
+    "fault", ["short", "total", "missing_total", "duplicate", "wrong_type", "limit", "revoked"]
 )
-def test_partial_or_ambiguous_discovery_is_never_a_complete_profile(fault: str) -> None:
-    key = uid()
-    document: dict[str, Any] = {"data": [{"extId": key}], "metadata": {"totalAvailableResults": 1}}
-    if fault == "page":
-        document["data"] = [{"extId": uid()} for _ in range(100)]
-    if fault == "total":
-        document["metadata"]["totalAvailableResults"] = 2
-    if fault == "missing_total":
-        document["metadata"] = {}
-    if fault == "duplicate":
-        document["data"].append({"extId": key})
-    if fault == "next":
-        document["metadata"]["links"] = [{"rel": "next", "href": "https://foreign.invalid"}]
-    if fault == "wrong_type":
-        document["data"] = ["invalid"]
-    with pytest.raises(CollectionFailure):
-        complete_list(document)
+def test_partial_or_ambiguous_pages_never_become_complete(fault: str) -> None:
+    rows = [{"extId": uid()} for _ in range(101)]
+    count = 0
+    budget = 0
+
+    def before() -> None:
+        nonlocal budget
+        budget += 1
+        if fault == "revoked" and budget == 2:
+            raise CollectionFailure("permission_denied")
+
+    def page(*args: Any) -> dict[str, Any]:
+        nonlocal count
+        count += 1
+        document: dict[str, Any] = {
+            "data": rows[:100] if count == 1 else rows[100:],
+            "metadata": {"totalAvailableResults": 101},
+        }
+        if fault == "short":
+            document["data"] = document["data"][:-1]
+        if fault == "total" and count == 2:
+            document["metadata"]["totalAvailableResults"] = 102
+        if fault == "missing_total":
+            document["metadata"] = {}
+        if fault == "duplicate" and count == 2:
+            document["data"] = [rows[0]]
+        if fault == "wrong_type":
+            document["data"] = ["invalid"]
+        if fault == "limit":
+            document["metadata"]["totalAvailableResults"] = 1001
+        return document
+
+    with (
+        patch("inventory_worker.infrastructure.ahv_profile.exchange", side_effect=page),
+        patch("inventory_worker.infrastructure.ahv_profile.secret", return_value="secret"),
+        pytest.raises(CollectionFailure),
+    ):
+        collect_list(
+            {"credential_file": "/secret"}, "/api/prism/v4.3/config/categories", 10, before
+        )
+    assert count <= 2
+    if fault == "revoked":
+        assert count == 1
 
 
 def test_foreign_prism_central_response_cannot_change_authority() -> None:
