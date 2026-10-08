@@ -67,6 +67,27 @@ def inputs() -> tuple[
             for w in intent["workloads"]
         ],
     }
+    contextual_flows = [
+        dep for dep in intent["dependencies"] if dep["kind"] == "communication"
+    ] + policy["forbidden_flows"]
+    contextual_flows += [
+        {
+            "from": "foreign-domain-" + str(i),
+            "to": workload["id"],
+            "protocol": "tcp",
+            "port": 22,
+        }
+        for i, workload in enumerate(intent["workloads"])
+    ]
+    policy["network_flow_contexts"] = {
+        digest({k: item[k] for k in ("from", "to", "protocol", "port")}): {
+            "address_family": "ipv4",
+            "vrf_id": "fixture-vrf-" + SITE,
+            "direction": "source_to_destination",
+            "return_path_policy": "stateful_allow",
+        }
+        for item in contextual_flows
+    }
     recovery_limits = policy["recovery_profile"]
     recovery_limits["review"] = {
         "decision": "approved",
@@ -310,7 +331,14 @@ def snapshot_fixture(
     topology: dict[str, Any] = {
         "nodes": {w["id"]: "fixture://native-port-" + w["id"] for w in intent["workloads"]},
         "routes": [
-            {"from": d["from"], "to": d["to"], "native_ref": "fixture://route"}
+            {
+                "from": d["from"],
+                "to": d["to"],
+                "native_ref": "fixture://route",
+                "context": policy["network_flow_contexts"][
+                    digest({k: d[k] for k in ("from", "to", "protocol", "port")})
+                ],
+            }
             for d in communication
         ],
     }
@@ -324,7 +352,34 @@ def snapshot_fixture(
         "default_action": "deny",
         "firewall_rules": [
             {k: d[k] for k in ("from", "to", "protocol", "port")}
-            | {"action": "allow", "native_ref": "fixture://native-firewall-rule"}
+            | {
+                "action": "allow",
+                "egress_action": "allow",
+                "ingress_action": "allow",
+                "native_ref": "fixture://native-firewall-rule",
+                "context": policy["network_flow_contexts"][
+                    digest({k: d[k] for k in ("from", "to", "protocol", "port")})
+                ],
+            }
+            for d in communication
+        ],
+        "return_paths": [
+            {
+                "from": d["to"],
+                "to": d["from"],
+                "protocol": d["protocol"],
+                "port": d["port"],
+                "context": policy["network_flow_contexts"][
+                    digest({k: d[k] for k in ("from", "to", "protocol", "port")})
+                ],
+                "sequence": 1,
+                "outcome": "allow",
+                "observed_at": NOW,
+                "expires_at": NOW + 120,
+                "native_ref": "fixture://return-path-probe",
+                "policy_sha256": policy_sha,
+                "topology_sha256": digest(topology),
+            }
             for d in communication
         ],
         "measurements": [
@@ -335,6 +390,9 @@ def snapshot_fixture(
                 "observed_at": NOW,
                 "expires_at": NOW + 120,
                 "native_subjects": ["fixture://native-probe-client"],
+                "context": policy["network_flow_contexts"][
+                    digest({k: d[k] for k in ("from", "to", "protocol", "port")})
+                ],
                 "policy_sha256": policy_sha,
                 "topology_sha256": digest(topology),
             }
