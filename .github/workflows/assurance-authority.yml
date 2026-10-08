@@ -74,5 +74,14 @@ jobs:
       - name: Verify migration and service file formatting
         working-directory: services/assurance
         run: |
-          ./vendor/bin/pint --test app/Application/Qualification/Actions/QualificationAuthorityLedger.php tests/Feature/QualificationAuthorityLedgerTest.php
-          ./vendor/bin/pint --test app/Application/Qualification/Actions/DeliverQualificationInvalidation.php app/Infrastructure/Qualification/ConfirmedHttpInvalidationPublisher.php tests/Feature/QualificationInvalidationPublisherTest.php
+          ./vendor/bin/pint --test \
+            app/Application/Qualification/Actions/QualificationAuthorityLedger.php \
+            app/Application/Qualification/Actions/DeliverQualificationInvalidation.php \
+            app/Application/Qualification/Contracts/ConfirmedInvalidationPublisher.php \
+            app/Http/Controllers/QualificationPublicationController.php \
+            app/Infrastructure/Qualification/ConfirmedHttpInvalidationPublisher.php \
+            app/Console/Commands/DeliverQualificationInvalidations.php \
+            app/Providers/AppServiceProvider.php bootstrap/app.php config/planning.php \
+            tests/Feature/QualificationAuthorityLedgerTest.php \
+            tests/Feature/QualificationPublicationTest.php \
+            tests/Feature/QualificationInvalidationPublisherTest.php
