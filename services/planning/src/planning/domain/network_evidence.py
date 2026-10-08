@@ -7,7 +7,7 @@ from planning.domain.placement import PlacementUnknown, fit
 
 
 FLOW_KEYS = ("from", "to", "protocol", "port")
-CONTEXT_KEYS = ("address_family", "vrf_id", "direction", "return_path_policy")
+CONTEXT_KEYS = ("address_family", "vrf_id", "vpc_id", "direction", "return_path_policy")
 
 
 def flow_context(flow: dict[str, Any], policy: dict[str, Any]) -> dict[str, str] | None:
