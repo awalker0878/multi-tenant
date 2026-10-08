@@ -71,6 +71,12 @@ def main():
             flush=True,
         )
         if code:
+            from uuid import uuid4
+
+            marker = str(uuid4())
+            print(f"::stop-commands::{marker}", flush=True)
+            print(data[-32000:], flush=True)
+            print(f"::{marker}::", flush=True)
             raise RuntimeError("command_failed:" + filename)
 
     try:

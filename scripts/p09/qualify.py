@@ -51,6 +51,15 @@ def main():
         report['commands'].append({'directory': directory, 'argv': argv, 'exit_code': code,
                                    'log': log.name, 'sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
         print(f'{index:02d}: {"PASS" if code == 0 else "FAIL"} {directory}', flush=True)
+        if code:
+            # Retain the complete log above and expose a bounded failure excerpt
+            # when an artifact service is unavailable during incident diagnosis.
+            from uuid import uuid4
+
+            marker = str(uuid4())
+            print(f'::stop-commands::{marker}', flush=True)
+            print(data[-24000:], flush=True)
+            print(f'::{marker}::', flush=True)
 
     try:
         if not env.get('P05_POSTGRES_BIN'):
