@@ -272,3 +272,24 @@ def test_concurrent_qualification_revoke_and_new_plan_cannot_leave_an_eligible_p
     assert hold in {"qualification_authority_withdrawn", "owner_change_requires_new_assessment"}
     saved = p.get(TENANT, APP, ENV, plan["id"], "plan")
     assert not p.validity(actor, saved, {})["current"]
+
+
+def test_bound_plan_refuses_payload_scope_of_a_different_tenant(
+    database: Postgres,
+) -> None:
+    identity = str(uuid4())
+    wrong_tenant = str(uuid4())
+    with database.transaction() as tx:
+        tx.execute(
+            "INSERT INTO app.planning_records"
+            "(id,tenant,actor,application,environment,kind,payload,digest,created_at) "
+            "VALUES(%s,%s,%s,%s,%s,'plan',%s::jsonb,%s,%s)",
+            (
+                identity, TENANT, ACTOR, APP, ENV,
+                '{"content":{"scope":{"tenant_id":"' + wrong_tenant + '"}}}',
+                "a" * 64, NOW,
+            ),
+        )
+    p, _, _ = setup(database)
+    with pytest.raises(Rejected, match="plan_tenant_mismatch"):
+        p.bound_plan(identity, 1)
