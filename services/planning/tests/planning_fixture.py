@@ -45,7 +45,9 @@ def inputs() -> tuple[
         "downtime_seconds": 3600,
         "allowed_zones": ["zone-1"],
         "recovery_profile": {
-            "minimum_load": 1, "parallel_restores": 1, "load_unit": "requests_per_second",
+            "minimum_load": 1, "parallel_restores": 1,
+            "load_unit": "requests_per_second",
+            "maximum_rpo_seconds": 3600, "maximum_rto_seconds": 3600,
         },
         "forbidden_flows": [{
             "from": "foreign-tenant", "to": intent["workloads"][0]["id"],
@@ -64,6 +66,16 @@ def inputs() -> tuple[
             }
             for w in intent["workloads"]
         ],
+    }
+    recovery_limits = policy["recovery_profile"]
+    recovery_limits["review"] = {
+        "decision": "approved",
+        "profile_sha256": digest(recovery_limits),
+        "reviewed_by": "fixture-independent-reviewer",
+        "observer_id": "fixture-recovery-observer",
+        "revision": 1,
+        "approved_at": NOW - 60,
+        "expires_at": NOW + 1200,
     }
     project = "10000000-0000-4000-8000-000000000020"
     custody = "10000000-0000-4000-8000-000000000021"
@@ -341,6 +353,24 @@ def snapshot_fixture(
         "restore_chain_sha256": digest(dataset), "outcome": "passed", "consistency_passed": True,
         "last_consistent_checkpoint_at": NOW - 30, "failure_at": NOW - 30,
         "restore_started_at": NOW - 30, "application_ready_at": NOW,
+        "observer_id": "fixture-recovery-observer",
+        "key_readiness": {
+            "available": True, "verified_at": NOW - 20,
+            "native_ref": "fixture://native-key-readback",
+        },
+        "application_readiness": {
+            "verified": True, "verified_at": NOW,
+            "native_ref": "fixture://application-health-probe",
+        },
+        "dependency_readiness": {
+            f"{dep['from']}->{dep['to']}": {
+                "verified": True, "verified_at": NOW,
+                "native_ref": "fixture://dependent-service-health-probe",
+            }
+            for dep in intent["dependencies"]
+            if dep["strength"] == "required"
+            and dep.get("dataset_id") in (None, dataset["id"])
+        },
     } for dataset in intent["datasets"]]
     return {
         "definition_sha256": DEFINITION_SHA256,
