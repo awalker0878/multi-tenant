@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import time
 import uuid
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from jsonschema import Draft202012Validator
 from openapi_schema_validator import OAS31Validator
@@ -62,10 +63,26 @@ def campaign(c, extension=None):
     native['operation_plan_sha256']=canonical_digest(native['operation_plan'])
     registry={'schema_version':1,'profiles':{'synthetic':{'platform':p['platform'],'version':p['version'],'declarations':{r['dimension']:r['declaration'] for r in p['dimensions']}}},'policies':{'synthetic':policy},'assignments':[{'tenant_id':tenant,'site_id':d['site_id'],'endpoint_id':d['endpoint_id'],'profile':'synthetic','policy':'synthetic'} for d in [a,b]]}
     registry_file=private/'planning-registry.json';registry_file.write_text(json.dumps(registry))
-    quals={'schema_version':1,'records':[]}
+    sys.path.insert(0, str(root/'tests/contracts'))
+    from native_qualification_fixture import FixtureRuntimePublisher, signed_fixture
+    quals={'schema_version':2,'records':[]}
+    trust={'schema_version':1,'keys':{}}
     for d in [a,b]:
-        q=copy.deepcopy(model['qualification']);q['scope'].update({k:d[k] for k in ['tenant_id','site_id','endpoint_id','native_scope','installed_tuple']});quals['records'].append(q)
+        q=copy.deepcopy(model['qualification']);q['scope'].update({k:d[k] for k in ['tenant_id','site_id','endpoint_id','native_scope','installed_tuple']})
+        bundle,keys=signed_fixture(q,private/('fixture-keys-'+d['site_id']))
+        # Scope-specific enrolled keys; these are isolated E2 peer fixtures.
+        prefix=d['site_id']+':'
+        for envelope in [bundle['decision'],bundle['runtime'],*bundle['evidence']]:
+            envelope['key_id']=prefix+envelope['key_id']
+        trust['keys'].update({prefix+k:v for k,v in keys.items()})
+        quals['records'].append(bundle)
     qualification_file=private/'qualification-registry.json';qualification_file.write_text(json.dumps(quals))
+    qualification_file.chmod(0o600)
+    trust_file=private/'qualification-trust.json';trust_file.write_text(json.dumps(trust));trust_file.chmod(0o600)
+    envs['assurance']['ASSURANCE_QUALIFICATION_TRUST_FILE']=str(trust_file)
+    runtime_file=private/'qualification-runtime.json'
+    c['proxies'].append(FixtureRuntimePublisher(runtime_file,quals,private))
+    envs['assurance']['ASSURANCE_QUALIFICATION_RUNTIME_FILE']=str(runtime_file)
     envs['planning']['PLANNING_REGISTRY_FILE']=str(registry_file)
     envs['assurance']['ASSURANCE_QUALIFICATION_REGISTRY_FILE']=str(qualification_file)
     for service in ['planning','assurance']:c['stop'](service);c['start'](service)
@@ -117,7 +134,7 @@ def campaign(c, extension=None):
     check('real-governance-approval-content-binding-and-changed-digest-denial',True)
     c['stop']('planning');c['start']('planning')
     check('service-restart-preserves-immutable-plan',planning('plans/'+first['id'],sites=[a['site_id']])['content']==saved['content'])
-    original_qual=copy.deepcopy(quals);quals['records'][0]['revoked']=True;qualification_file.write_text(json.dumps(quals))
+    original_qual=copy.deepcopy(quals);quals['records'][0]['record']['revoked']=True;qualification_file.write_text(json.dumps(quals))
     held=planning('plans/'+first['id'],sites=[a['site_id']])
     check('current-qualification-revocation-holds-without-changing-plan',not held['validity']['current'] and held['content']==saved['content'])
     qualification_file.write_text(json.dumps(original_qual))

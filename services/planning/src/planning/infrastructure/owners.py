@@ -18,6 +18,7 @@ from urllib.parse import urlsplit
 from jsonschema import Draft202012Validator, FormatChecker
 
 from planning.domain.model import Actor, Rejected, decode, identifier, profile
+from planning.domain.qualification import verified
 from planning.infrastructure.foundation import mounted_secret
 
 
@@ -77,12 +78,13 @@ def request(
                 name = {
                     "CATALOGUE": "catalogue-input-v1",
                     "INVENTORY": "inventory-input-v1",
-                    "ASSURANCE": "qualification-v1",
+                    "ASSURANCE": "qualification-v2",
                 }[owner]
                 if schema_name is not None:
                     if (owner, schema_name) not in {
                         ("INVENTORY", "migration-input-v3"),
                         ("ASSURANCE", "migration-support-v1"),
+                        ("ASSURANCE", "qualification-v2"),
                     }:
                         raise ValueError
                     name = schema_name
@@ -245,7 +247,7 @@ class OwnerSources:
                 qualification = request(
                     "ASSURANCE",
                     "POST",
-                    f"/v1/tenants/{actor.tenant}/planning-qualification",
+                    f"/v1/tenants/{actor.tenant}/planning-qualification-v2",
                     {
                         "scope": {
                             "site_id": site,
@@ -286,3 +288,23 @@ class OwnerSources:
             raise
         except (KeyError, ValueError, TypeError, OSError, IndexError):
             raise Rejected("invalid_owner_input", 503) from None
+
+
+def qualification_current(plan: dict[str, Any]) -> None:
+    scope = plan["content"]["scope"]
+    pinned = plan["inputs"][0]["qualification"]
+    current = request(
+        "ASSURANCE",
+        "POST",
+        f"/internal/tenants/{scope['tenant_id']}/qualification-checks",
+        {"qualification_scope": pinned["scope"]},
+        schema_name="qualification-v2",
+    )
+    if (
+        not verified(current, int(time.time()))
+        or current.get("status") != "qualified"
+        or current.get("revoked") is not False
+        or current["verification"]["record_sha256"]
+        != (pinned.get("verification") or {}).get("record_sha256")
+    ):
+        raise Rejected("current_qualification_required", 423)

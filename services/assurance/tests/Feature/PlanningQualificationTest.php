@@ -33,7 +33,7 @@ it('keeps exact tuple values typed and fails closed on ambiguous custody records
         $body = $this->body;
         $body['qualification_scope']['installed_tuple']['api'] = true;
         $this->postJson($this->path, $body)->assertOk()->assertJsonPath('status', 'unknown');
-        $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('status', 'qualified');
+        $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('status', 'unknown');
         file_put_contents($file, json_encode(['schema_version' => 1, 'records' => [$record, $record]], JSON_THROW_ON_ERROR));
         $this->postJson($this->path, $this->body)->assertStatus(503);
         file_put_contents($file, '{broken');

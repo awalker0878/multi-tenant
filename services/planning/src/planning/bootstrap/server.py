@@ -16,7 +16,7 @@ from planning.infrastructure.foundation import database_ready
 from planning.infrastructure.migration import prepare_migration
 from planning.infrastructure.migration_recipes import recipe_for, visible_recipes
 from planning.infrastructure.migration_support import qualification_records, selected_tranche
-from planning.infrastructure.owners import GovernanceAuthority, OwnerSources
+from planning.infrastructure.owners import GovernanceAuthority, OwnerSources, qualification_current
 from planning.infrastructure.store import Postgres
 from planning.infrastructure.telemetry import BoundedSignalBuffer
 from planning.interfaces.http import FoundationApp
@@ -40,6 +40,7 @@ class PlanningRouter:
                 clock,
             ),
             MigrationValidation(prepare_migration, recipe_for, self.support.require, clock),
+            qualification_current,
         )
         self.planning = PlanningApp(
             Planning(Postgres(), OwnerSources(), clock, validation), GovernanceAuthority()

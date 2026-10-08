@@ -5,6 +5,7 @@ from typing import Any
 from planning.domain.capability_definitions import STRATEGIES
 from planning.domain.matching import matches
 from planning.domain.model import ACTIONS, DIMENSIONS, Rejected, digest, integer
+from planning.domain.qualification import verified
 
 
 def requirements(intent: dict[str, Any]) -> list[dict[str, Any]]:
@@ -150,8 +151,10 @@ def assess(
         "profile_digest": profile["digest"],
         "artifacts": policy["artifacts"],
     }
+    verification = qualification.get("verification") or {}
     qualified = (
-        digest(qualification.get("scope")) == digest(expected)
+        verified(qualification, now)
+        and digest(qualification.get("scope")) == digest(expected)
         and qualification.get("status") == "qualified"
         and qualification.get("evidence_level") in {"E3", "E4"}
         and qualification.get("expires_at", 0) > now
@@ -196,7 +199,9 @@ def assess(
     expiries = [
         destination["expires_at"],
         policy["expires_at"],
-        qualification["expires_at"] if qualified else destination["expires_at"],
+        min(qualification["expires_at"], verification["expires_at"])
+        if qualified
+        else destination["expires_at"],
     ]
     for row in requested:
         key, value = row["key"], row["value"]

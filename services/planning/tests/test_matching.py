@@ -3,7 +3,7 @@
 from typing import Any
 
 import pytest
-from planning_fixture import NOW, inputs
+from planning_fixture import NOW, inputs, verify_fixture
 
 from planning.domain.assessment import assess
 from planning.domain.matching import matches
@@ -36,6 +36,7 @@ def test_registered_matcher_is_used_by_both_observation_and_qualification() -> N
         dataset["recovery"]["rpo_seconds"] = 120
     for record in (destination, qualification):
         record["capabilities"]["recovery.rpo_seconds"]["values"] = [60]
+    verify_fixture(qualification)
     assert assess(
         intent,
         destination,

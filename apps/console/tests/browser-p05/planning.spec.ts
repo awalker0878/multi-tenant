@@ -29,7 +29,7 @@ test('compare exact destinations, retain uncertain command, review bound approva
   await page.keyboard.press('Enter');
   await expect(page.getByRole('status').first()).toContainText('Approval requested');
   const qualified=JSON.parse(readFileSync(fixture.qualification_file,'utf8'));
-  qualified.records[0].revoked=true;writeFileSync(fixture.qualification_file,JSON.stringify(qualified));
+  qualified.records[0].record.revoked=true;writeFileSync(fixture.qualification_file,JSON.stringify(qualified));
   await expect(page.getByRole('button',{name:'Request independent approval for this digest'})).toBeDisabled({timeout:35_000});
   await expect(page.getByText('exact tuple qualification missing or stale',{exact:true})).toBeVisible();
   const originalURL=page.url();
@@ -43,3 +43,4 @@ test('compare exact destinations, retain uncertain command, review bound approva
   await page.goto(originalURL);
   await expect(page).toHaveURL(/\/account$/);
 });
+

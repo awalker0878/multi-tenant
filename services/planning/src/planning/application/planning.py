@@ -290,6 +290,10 @@ class Planning:
         }
 
     def check_native_recipe(self, record: dict[str, Any]) -> None:
+        if record["content"]["lane"] == "operational" and (
+            "native_provisioning" in record["content"] or "native_migration" in record["content"]
+        ):
+            self.validation.support_current(record)
         if "native_provisioning" in record["content"]:
             self.validation.native.current(record)
         if "native_migration" in record["content"]:

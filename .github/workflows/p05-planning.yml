@@ -91,6 +91,8 @@ jobs:
           npm run build --prefix apps/console
           cd apps/console
           npx playwright install --with-deps "${P05_BROWSER_ENGINE}"
+      - name: Verify signed qualification custody without asserting native support
+        run: python -m unittest discover -s tests/contracts -p test_native_qualification.py -v
       - name: Exercise PostgreSQL, native fixture pagination, live TLS authority, broker replay and compiled browser journeys
         env:
           P05_TEST_POSTGRES: '1'

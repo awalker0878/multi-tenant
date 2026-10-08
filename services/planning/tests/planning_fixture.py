@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from planning.domain.assessment import assess, requirements
+from planning.domain.capability_definitions import DEFINITION_SHA256
 from planning.domain.model import ACTIONS, DIMENSIONS, digest, profile
 
 NOW = 2_000_000_000
@@ -166,7 +167,7 @@ def inputs() -> tuple[
     }
     q: dict[str, Any] = {
         "id": "synthetic-evidence",
-        "version": 1,
+        "version": 2,
         "status": "qualified",
         "evidence_level": "E3",
         "expires_at": NOW + 1800,
@@ -187,7 +188,23 @@ def inputs() -> tuple[
     )
     for capability in q["capabilities"].values():
         capability["status"] = "supported"
+    verify_fixture(q)
     return intent, d, p, policy, q
+
+
+def verify_fixture(record: dict[str, Any], now: int = NOW) -> None:
+    """Synthetic authenticated owner boundary; never used by a production resolver."""
+    record.pop("verification", None)
+    checksum = digest(record)
+    record["verification"] = {
+        "valid": True,
+        "definition_sha256": DEFINITION_SHA256,
+        "decision_sha256": "a" * 64,
+        "runtime_sha256": "b" * 64,
+        "record_sha256": checksum,
+        "resolved_at": now,
+        "expires_at": record["expires_at"],
+    }
 
 
 def assessment() -> dict[str, Any]:

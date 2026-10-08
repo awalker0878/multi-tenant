@@ -10,9 +10,9 @@ do not establish E3 native qualification or E4 receiving acceptance.
 | Increment | Scope | State | Verification |
 | --- | --- | --- | --- |
 | CT-00a | Required immutable validation composition | Implemented | Planning Ruff, format and strict mypy pass; 383 tests pass locally, 6 PostgreSQL tests await GitHub runner |
-| CT-00b | Verified provenance and precise assessment status | Planned | Pending |
+| CT-00b / CT-02a | Verified qualification provenance and current execution revalidation | Implemented | Real RSA positive and eight negative controls pass; Planning 403 tests pass locally, 6 PostgreSQL tests delegated to GitHub |
 | CT-01 | Canonical definition registry, generated consumers and typed matching | Implemented | Generated projections agree; 30 stage combinations preserved; typed maximum/unit and handler tests pass; strict mypy passes in four products |
-| CT-02 | Verified qualification records, native observation projection and runtime invalidation | Planned | Pending |
+| CT-02b | Native observation projection and sticky runtime suspension | In progress | Pending |
 | CT-03 | Concrete placement and authoritative reservation owner integration | Planned | Pending |
 | CT-04 | Evidence-bound network, isolation and failure-domain evaluation | Planned | Pending |
 | CT-05 | Measured recovery profiles and reassessment feedback | Planned | Pending |
@@ -66,3 +66,19 @@ Maximum RPO/RTO fields accept a 60-second bound for a 120-second target and reje
 objective in every profile; no fastest-sample selection is allowed. Unknown
 requirement definitions remain unknown. The registry is metadata, never a native
 qualification decision.
+
+## CT-02a observations
+
+Assurance v2 resolves signed observer evidence and independently signed reviewer
+decisions against separately enrolled, scope-bound RSA keys. It verifies content
+hashes, exact record/scope/artifact/definition binding, referenced evidence, required
+case coverage and a separately refreshed runtime record. Observer and reviewer
+identities and key material must differ. Legacy unsigned records remain unknown.
+A stale, failed, changed or missing runtime record cannot publish positive support.
+
+Planning verifies the resolver's record digest and definition version. Runtime
+validity bounds plan freshness. A required service-only qualification read also
+runs on unattended native plan reads, which Lifecycle repeats at effect boundaries.
+No cached user delegation is borrowed. Isolated E2 live-test peers now sign fixture
+records with scope-bound fixture keys; this exercises the protocol without granting
+E3 support to any actual platform. The original E2 simulation custody API is unchanged.

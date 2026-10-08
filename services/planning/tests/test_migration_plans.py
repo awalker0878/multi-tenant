@@ -317,7 +317,7 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
         planner.database,
         planner.sources,
         planner.clock,
-        PlanValidation(planner.validation.native, validation),
+        PlanValidation(planner.validation.native, validation, Mock()),
     )
     service = MigrationPlans(
         planner, validation, lambda a, s: [{"id": recipe_id, "recipe": recipe}]
@@ -375,7 +375,7 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     denied = Planning(database, Mock(), clock, PlanValidation.unavailable(clock))
     validation = PlanValidation.unavailable(clock)
     validation = PlanValidation(
-        validation.native, MigrationValidation(Mock(), recipes, Mock(), clock)
+        validation.native, MigrationValidation(Mock(), recipes, Mock(), clock), Mock()
     )
     planning = Planning(database, Mock(), clock, validation)
     key, tenant = str(uuid4()), recipe["scope"]["tenant_id"]

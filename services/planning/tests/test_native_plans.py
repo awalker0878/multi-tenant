@@ -170,7 +170,7 @@ def test_complete_native_proposal_persistence_retry_and_revocation(database: Any
         planner.database,
         planner.sources,
         planner.clock,
-        PlanValidation(validation, planner.validation.migration),
+        PlanValidation(validation, planner.validation.migration, Mock()),
     )
     service = NativePlans(planner, validation)
     body = {"site_id": SITE, "base_plan_id": base_id, "recipe_id": str(uuid4())}

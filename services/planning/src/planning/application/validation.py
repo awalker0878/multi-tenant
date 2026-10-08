@@ -99,12 +99,15 @@ def unavailable(*args: Any, **kwargs: Any) -> Never:
 class PlanValidation:
     native: NativeValidation
     migration: MigrationValidation
+    support_current: Callable[[dict[str, Any]], None]
 
     def __post_init__(self) -> None:
         if not isinstance(self.native, NativeValidation) or not isinstance(
             self.migration, MigrationValidation
         ):
             raise ValueError("required_plan_validation")
+        if not callable(self.support_current):
+            raise ValueError("required_support_validation")
 
     @classmethod
     def unavailable(cls, clock: Callable[[], int]) -> "PlanValidation":
@@ -112,4 +115,5 @@ class PlanValidation:
         return cls(
             NativeValidation(unavailable, clock),
             MigrationValidation(unavailable, unavailable, unavailable, clock),
+            unavailable,
         )
