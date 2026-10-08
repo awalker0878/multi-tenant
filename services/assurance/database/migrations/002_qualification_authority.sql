@@ -59,8 +59,13 @@ CREATE TRIGGER qualification_head_monotonic
     FOR EACH ROW EXECUTE FUNCTION app.guard_qualification_head_epoch();
 
 CREATE FUNCTION app.verify_qualification_head_event()
-RETURNS trigger LANGUAGE plpgsql AS $$
+RETURNS trigger LANGUAGE plpgsql AS $
+DECLARE
+    prior_event text;
 BEGIN
+    IF TG_OP = 'UPDATE' THEN
+        prior_event := OLD.last_event_sha256;
+    END IF;
     IF NOT EXISTS (
         SELECT 1
           FROM app.qualification_authority_events e
@@ -80,11 +85,7 @@ BEGIN
            AND o.authority_epoch = NEW.authority_epoch
            AND o.payload->>'event_sha256' = e.event_sha256
            AND o.payload->>'tenant_id' = NEW.tenant::text
-           AND (
-               (TG_OP = 'INSERT' AND e.previous_event_sha256 IS NULL)
-               OR (TG_OP = 'UPDATE' AND
-                   e.previous_event_sha256 = OLD.last_event_sha256)
-           )
+           AND e.previous_event_sha256 IS NOT DISTINCT FROM prior_event
     ) THEN
         RAISE EXCEPTION 'qualification head, history, and outbox disagree'
             USING ERRCODE = '23514';
