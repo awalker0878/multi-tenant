@@ -114,8 +114,13 @@ def native_reader(
 
 
 def capability_reader(
-    token: str, tenant: str, application: str, environment: str,
-    site: str, endpoint: str, generation: str,
+    token: str,
+    tenant: str,
+    application: str,
+    environment: str,
+    site: str,
+    endpoint: str,
+    generation: str,
 ) -> None:
     """A separate revocable service grant for one pinned capability generation."""
     try:
@@ -123,8 +128,12 @@ def capability_reader(
         shape(registry, {"schema_version", "grants"})
         number(registry["schema_version"], 1, 1)
         expected = {
-            "tenant_id": tenant, "application_id": application, "environment": environment,
-            "site_id": site, "endpoint_id": endpoint, "generation_id": generation,
+            "tenant_id": tenant,
+            "application_id": application,
+            "environment": environment,
+            "site_id": site,
+            "endpoint_id": endpoint,
+            "generation_id": generation,
         }
         for value in expected.values():
             identifier(value)
