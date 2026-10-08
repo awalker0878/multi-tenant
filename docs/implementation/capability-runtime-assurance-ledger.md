@@ -396,3 +396,23 @@ actual no-op/skip receipts for optional capabilities, required API
 version pinning into effect grants, adapter equivalence and native
 recovery tests. See CT-N14 / CT-API-01–09 in `next_work.md`. None of
 these external gates can be closed by synthetic fixtures.
+
+## CT-N15 — Version-controlled VM collection attribute catalogue
+
+Committed `contracts/capabilities/migration-collection-manifest-v1.json`
+with 278 source/destination/owner attribute entries across VMware (86),
+AHV (89) and OpenStack (103). Every entry defines stable ID, native API
+field or explicit owner attestation, collector module, collection method,
+maximum age, conditional applicability and mandatory/optional criticality.
+A strict JSON Schema and stdlib static/source-field assurance test are
+version controlled; E2 CI was extended to run it. The manifest has
+non-affirmative `native_field_candidate`/`external_evidence_required`
+statuses, so documentation cannot be mistaken for E3 support.
+Published policy and freshness semantics:
+`docs/implementation/migration-collection-manifest.md`.
+
+**Code-level manifest checks and GitHub commit do not constitute native
+data collection, freshness enforcement, an operator alert or E3/E4
+acceptance.** Real per-environment collection, append-only evidence, owner
+review, conditional applicability, native-effect admission and independent
+tests are outstanding as CT-N15 / CT-API-10.

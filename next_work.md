@@ -35,6 +35,54 @@ at every checkpoint.
 | CT-N13 | P1 | Verification / A01–A16 | **PARTIAL: E2 tests mapped, source CI/native OPEN** | Build and run the complete source-bound acceptance matrix with positive, negative, timeout/retry, cross-tenant, authority-revocation and native-effect cases. Map each A01–A16 to code, test and evidence in the implementation ledger; do not close an A-ID with a mere fixture. |
 | CT-N14 | P0 | Planning + Assurance + Inventory + Console / vendor API compatibility | **PARTIAL: version-aware E2 path and on-screen alerts committed** | Extend exact route `api_usage` coverage to every actual migration method/callsite; live-discover and pin per-site API versions/entitlements; qualify negative+positive probes, E4-approved optional omissions with effect suppression, and end-to-end version/failover readback. Detailed CT-API tasks below. |
 
+## CT-N15 — Per-VM API collection manifest and freshness obligations
+
+**Requirements/data committed**, not a completed installed discovery,
+qualified API operation or runtime integration. The source of truth is
+[the collection manifest](contracts/capabilities/migration-collection-manifest-v1.json)
+and its [closed JSON Schema](contracts/schemas/capabilities/migration-collection-manifest-v1.json).
+It identifies every currently documented source/destination attribute,
+API field or owner-evidence input, collection method, maximum acceptable
+age, criticality, applicable conditions and source collector module.
+[Policy and source coverage](docs/implementation/migration-collection-manifest.md).
+
+| Platform | Source VM | Destination | Owner/independent | Total |
+| --- | ---: | ---: | ---: | ---: |
+| VMware | 44 | 15 | 27 | 86 |
+| AHV | 41 | 21 | 27 | 89 |
+| OpenStack | 48 | 28 | 27 | 103 |
+| **Total** | **133** | **64** | **81** | **278** |
+
+Test `scripts/assurance/test_migration_collection_manifest.py` checks
+native AHV/OpenStack source contract field names, mandatory disks, network
+and recovery evidence, scope/custody, uniqueness, file references, stale
+power/physical-capacity limits, operator attribution and safe optional
+classifications. The existing `capability-assurance.yml` E2 lane now
+runs an explicit manifest step. These tests are **committed, not yet
+confirmed green at the exact PR head**.
+
+**Remaining to close CT-N15:**
+
+1. Implement the platform-specific Inventory collectors for **every**
+   manifest row and method, including complete pagination, version and
+   scope binding, operator inputs and independent probe results. The
+   `native_field_candidate` label must never be interpreted as already
+   collected or supported.
+2. Persist append-only evidence with identity, exact API version, observed
+   timestamp, expiry, signature/source, interpretation and revocation.
+   Enforce max age and conditional-critical applicability at Inventory,
+   Planning and immediately-before-effect Lifecycle admission. A changed
+   API/identity/backing/topology/policy invalidates a record before TTL.
+3. Display per-VM uncollected critical/optional fields and correct
+   remediation to administrators, with evidence provenance and actual
+   suppressed-effect receipts. Preserve required firewall and negative
+   isolation as critical. Add contract, DB, version-drift, loss/retry,
+   native E3 and receiving E4 tests.
+4. Check native storage, host capacity and project entitlement separately
+   from advertised maximums. Current physical capacity/reservation has
+   a distinct critical 15-second field; it cannot be inferred from
+   datastore size or a Cinder/Placement resource type declaration.
+
 ## CT-N14 — Migration API-version compatibility and administrator warnings
 
 [Design, source paths and trust model](docs/implementation/migration-api-capability-compatibility.md).
@@ -64,6 +112,7 @@ per-feature verification.
 | CT-API-07 | P0 | **OPEN** | Persist each qualified selected API family/version and required capability set with immutable migration/native effect grants; re-check current owner API versions, entitlements and capability qualification immediately before every write and retry; hold if version or adapter bytes changed. |
 | CT-API-08 | P1 | **OPEN** | Model independently qualified adapter substitutions when destination lacks the source capability. Require equivalent outcomes, target API probe, approved adapter identity/expiry and native negative cases; an unqualified mapping must be blocked. |
 | CT-API-09 | P1 | **OPEN** | Execute A01–A16 + multi-version E2 campaigns and native E3 migration tests across all three platforms. Validate admin accessibility, security effects, actual optional suppression, alert delivery and independent E4 receiving sign-off before rollout. |
+| CT-API-10 | P0 | **REQUIREMENTS COMMITTED, COLLECTOR INTEGRATION OPEN** | Enforce [VM migration collection manifest](docs/implementation/migration-collection-manifest.md) per source VM and candidate destination: 278 version-controlled attribute rows, separate native/vendor fields and owner evidence, max-age and conditional-critical requirements, append-only observations, API-version scope, signed provenance, missing-fact holds and administrator omission warnings. The data/schema/static coverage checks are added to CI; live collector enforcement, end-to-end tests and E3/E4 remain open. |
 
 A version string, API spec, operator statement or synthetic E2 fixture
 must never be interpreted as installed support. Missing `api_usage`,
