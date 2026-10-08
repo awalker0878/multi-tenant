@@ -20,6 +20,36 @@ final readonly class ConfirmedHttpInvalidationPublisher implements ConfirmedInva
     /** @param array<string, mixed> $event */
     public function publish(array $event): void
     {
+        // Malformed or expanded wire contracts cannot leave the authority
+        // boundary, including when the publisher is invoked outside the relay.
+        $required = [
+            'event_id', 'tenant_id', 'scope_sha256', 'authority_epoch',
+            'operation', 'state', 'decision_sha256', 'event_sha256',
+        ];
+        $states = [
+            'publish' => 'qualified', 'restore' => 'qualified',
+            'suspend' => 'suspended', 'revoke' => 'revoked',
+        ];
+        if (count($event) !== count($required)
+            || array_diff($required, array_keys($event)) !== []
+            || ! is_string($event['event_id'])
+            || ! is_string($event['tenant_id'])
+            || preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/D', $event['event_id']) !== 1
+            || preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/D', $event['tenant_id']) !== 1
+            || ! is_int($event['authority_epoch'])
+            || $event['authority_epoch'] < 1
+            || ! is_string($event['operation'])
+            || ! isset($states[$event['operation']])
+            || $event['state'] !== $states[$event['operation']]
+            || ! is_string($event['scope_sha256'])
+            || ! is_string($event['event_sha256'])
+            || ! is_string($event['decision_sha256'])
+            || preg_match('/^[a-f0-9]{64}$/D', $event['scope_sha256']) !== 1
+            || preg_match('/^[a-f0-9]{64}$/D', $event['event_sha256']) !== 1
+            || preg_match('/^[a-f0-9]{64}$/D', $event['decision_sha256']) !== 1) {
+            throw new RuntimeException('qualification_invalidation_invalid_wire');
+        }
+
         $url = config('planning.qualification_invalidation_url');
         $ca = config('planning.qualification_invalidation_ca_file');
         $token = $this->secrets->read(config('planning.qualification_invalidation_credential_file'));
