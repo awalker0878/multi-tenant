@@ -34,6 +34,34 @@ at every checkpoint.
 | CT-N12 | P1 | Platform governance / shadow adoption | **OPEN** | Read-only shadow comparison of qualification decisions, profile/adapter behaviour and native outcome changes; reconcile false confidence, stale qualification and method catalogue differences. Record rollout/rollback gates, versioned replay and promotion authority before any cutover. |
 | CT-N13 | P1 | Verification / A01–A16 | **PARTIAL** | Build and run the complete source-bound acceptance matrix with positive, negative, timeout/retry, cross-tenant, authority-revocation and native-effect cases. Map each A01–A16 to code, test and evidence in the implementation ledger; do not close an A-ID with a mere fixture. |
 
+## A01–A16 acceptance coverage (CT-N13)
+
+The precise scenarios are defined in
+[the implementation plan](docs/implementation/capability-runtime-assurance.md).
+A checked engineering implementation is **not** a passed scenario. Retain
+source SHA, original positive/negative results, environment, signed reviewer
+and receiving decision before closing a row. All scenarios are presently
+**acceptance OPEN**.
+
+| Case | Required failure/positive control | Outstanding acceptance evidence |
+| --- | --- | --- |
+| A01 | Missing, tampered or foreign evidence cannot qualify | Run signed-source evidence tamper/tenant denial against enrolled observers; E3 pending |
+| A02 | Failed independent adapter case overrides declaration | Native negative conformance observation, suspension and plan/effect denial; E3 pending |
+| A03 | Drift in adapter bytes, installed tuple or backend/topology forces requalification | Original observation and changed native tuple retest, compare shadow decisions; E3 pending |
+| A04 | Concurrent physical vector reservations do not oversubscribe | Real CPU/memory/storage/address owner conflicts across tenants, durable exclusivity; E3 pending |
+| A05 | Aggregate headroom with no feasible placement must hold | Prove current allocation topology readback and specific reject reason; E3 pending |
+| A06 | Required flow blocked or forbidden flow reachable must fail | Native ingress/egress/return path, address-family and VRF/VPC negatives; E3 pending |
+| A07 | Anti-affinity must span real required fault boundary | Read physical placement/fault domain instead of labels; E3 pending |
+| A08 | Typed 60/120 versus 180 RPO and unit checks | Exact-source type/unit contract CI plus native observed measurements; E3 pending |
+| A09 | RTO/consistency/key/application dependency failure revokes recovery claim | Representative native timed restore, original fault-trigger measurement and review; E3 pending |
+| A10 | Approval-to-effect expiry or revocation must halt effect | Cross-service signed revocation during live Lifecycle preflight/effect, prove no write; E2 composed + E3 pending |
+| A11 | Delayed/duplicate/reordered hint, stale cache or unavailable owner must fail closed | Complete TLS producer/receiver replay, restart and stale-cache campaign; E2 composed + E3 pending |
+| A12 | Omitted mandatory validator/handler cannot skip qualification | Run contract/composition denial checks on exact source and receiving sign-off; E2 + E4 pending |
+| A13 | Owner succeeded but reply lost must reconcile, never double-effect | Real owner retry/readback, exactly fenced request identity, no speculative compensation; E3 pending |
+| A14 | Old plan replay after definition/workflow upgrade must pin or hold | Source-versioned replay matrix, compatibility denial and no silent reinterpretation; E2 + E3 pending |
+| A15 | Registered method without adapter/qualification is visible but not executable | Generator/registry checks, unsupported native-path refusal and reviewed new method; E2 + E3 pending |
+| A16 | Passing E2 must not self-upgrade to E3/E4 | Independent native reviewer and operating receiver recorded; no implicit promotion; E3 + E4 pending |
+
 ## Execution sequence and handoff rules
 
 1. **Repair and verify P0 correctness first:** CT-N01–N03, including real
