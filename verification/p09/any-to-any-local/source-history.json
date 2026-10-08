@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "archive": "source-history.bundle",
+  "archive_sha256": "e09789f67c2d6819b0a133fd45c71ae8295aa5848a1da71f51b31958a2da6fb9",
+  "prerequisite_commit": "eda64354816b4884530118f6595c037a5a556807",
+  "archived_head": "066cc4b62049e69d80d1685d5f432298a52c479f",
+  "archived_head_tree": "6f9eee7d436eade329a72ced7ac40fcc2b57c4b8",
+  "commits": {
+    "b0bc25c7bf6ed2400a26c72485ed4823a9fe3620": "4d5d0a3446243b66e3d683ae14903814ffb4b30e",
+    "d676cdfe9a224c6d8c290bad9a477035713f71ad": "2c5d4588e6955f1b511ef44a0bfe38c08a1a4a8b"
+  }
+}

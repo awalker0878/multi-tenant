@@ -9,11 +9,14 @@ The [P09-A record](docs/implementation/p09-any-to-any.md) maps G1â€“G6 and A01â€
 the [runbook](docs/operations/runbooks/any-to-any-migration.md) names concrete
 commissioning and operating requirements.
 
-Current changes are local commits. Automatic approval review rejected the push to
-`https://github.com/awalker0878/multi-tenant.git` because it did not recognize
-publication authorization. Do not try a different transport to bypass that rejection.
-After explicit publication approval, push this enhancement branch and open a PR to
-main, run the restored main-targeted CI and resolve all actual failures before merge.
+The user explicitly approved publication to `awalker0878/multi-tenant` and opening
+an enhancement PR on 2026-10-08. Direct Git transport has no runtime credential;
+the connected GitHub API is used to publish the same source tree. The original
+local commit history and source identities are preserved in
+`verification/p09/any-to-any-local/source-history.bundle`, with a checksum and
+commit/tree manifest. Hosted checks must bind the newly published commit; local
+evidence keeps its original revision identities. Continue through all actual
+hosted failures before treating software qualification as complete.
 
 Local PostgreSQL fixtures cannot create the required unprivileged process identity;
 PHP 8.5 is unavailable. These checks remain unverified. Installed native platforms,
