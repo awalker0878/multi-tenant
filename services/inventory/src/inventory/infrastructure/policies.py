@@ -101,20 +101,18 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
     if p["coverage_reference"] is not None:
         text(p["coverage_reference"])
     streams = p["streams"]
+    if not isinstance(streams, list):
+        raise Rejected("invalid_stream_coverage")
     required = {
         "openstack": {"server", "network", "volume"},
         "vmware": {"server", "network", "datastore"},
-        "ahv": {"target_profile"},
+        "ahv": {"server"}
+        if any(s.get("kind") == "source_profile" for s in p["streams"] if isinstance(s, dict))
+        else {"target_profile"},
     }[p["platform"]]
     allowed = (
         required
-        | (
-            {"source_profile"}
-            if p["platform"] == "vmware"
-            else {"target_profile"}
-            if p["platform"] in {"openstack", "ahv"}
-            else set()
-        )
+        | ({"source_profile", "target_profile"})
         | (
             {"config_" + q for q in CONFIGURATION_QUERIES}
             if p["platform"] == "openstack"
@@ -148,21 +146,34 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
             if (
                 not isinstance(vms, list)
                 or not 1 <= len(vms) <= 32
-                or not all(isinstance(v, str) and re.fullmatch(r"vm-[0-9]+", v) for v in vms)
+                or not all(
+                    isinstance(v, str)
+                    and re.fullmatch(
+                        r"vm-[0-9]+"
+                        if p["platform"] == "vmware"
+                        else r"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}",
+                        v,
+                    )
+                    for v in vms
+                )
                 or len(set(vms)) != len(vms)
             ):
                 raise Rejected("invalid_vm_allowlist")
-            if not isinstance(s["api_version"], str) or not re.fullmatch(
-                r"[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+", s["api_version"]
+            if p["platform"] == "vmware" and (
+                not isinstance(s["api_version"], str)
+                or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+", s["api_version"])
             ):
                 raise Rejected("explicit_vi_release_required")
-            if streams.index(s) < kinds.index("server") or urlsplit(s["base_url"]).path not in {
-                "",
-                "/",
-            }:
+            if "server" not in kinds or streams.index(s) < kinds.index("server"):
+                raise Rejected("profile_scope_not_ready")
+            if p["platform"] == "vmware" and urlsplit(s["base_url"]).path not in {"", "/"}:
                 raise Rejected("profile_scope_not_ready")
             server = streams[kinds.index("server")]
             source_url, server_url = urlsplit(s["base_url"]), urlsplit(server["base_url"])
+            if p["platform"] == "openstack" and (
+                s["api_version"] != "2.1" or s["base_url"] != server["base_url"]
+            ):
+                raise Rejected("explicit_nova_source_scope_required")
             if (source_url.hostname, source_url.port or 443, s["addresses"], s["ca_file"]) != (
                 server_url.hostname,
                 server_url.port or 443,

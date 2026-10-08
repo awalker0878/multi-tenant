@@ -26,6 +26,7 @@ final class MigrationSupportController
         return response()->json(['available' => true, 'support' => $this->read($request, $tenant, $application, $environment, $site, $planning)])->header('Cache-Control', 'no-store, private');
     }
 
+    /** @return array<string, mixed> */
     private function read(Request $request, string $tenant, string $application, string $environment, string $site, PlanningGateway $planning): array
     {
         $session = $request->session()->get('identity.token');

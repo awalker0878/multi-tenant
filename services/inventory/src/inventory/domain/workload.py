@@ -5,6 +5,7 @@ from typing import Any
 
 from inventory.domain.ahv import AHV_FIELDS, validate_profile
 from inventory.domain.discovery import Rejected, canonical, identifier, number, shape, text
+from inventory.domain.source_profile import validate_source
 
 METHODS = (
     "APPLICATION_REBUILD_RESTORE",
@@ -79,8 +80,12 @@ def checksum(value: Any) -> str:
     return value
 
 
-def profile_payload(value: Any, stream: dict[str, Any], scope: str) -> dict[str, Any]:
+def profile_payload(
+    value: Any, stream: dict[str, Any], scope: str, platform: str | None = None
+) -> dict[str, Any]:
     source = stream["kind"] == "source_profile"
+    if source and isinstance(value, dict) and value.get("schema_version") == 3:
+        return validate_source(value, stream, scope, platform or value.get("platform", ""))
     ahv = not source and isinstance(value, dict) and value.get("platform") == "ahv"
     p = shape(value, SOURCE_FIELDS if source else AHV_FIELDS if ahv else TARGET_FIELDS)
     if (

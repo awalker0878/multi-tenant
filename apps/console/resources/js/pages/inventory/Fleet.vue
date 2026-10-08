@@ -165,7 +165,7 @@ async function completeGroup(operation: 'options' | 'compose') {
     <p v-if="unavailable" role="status">Access cannot currently be verified. Selection and preparation are paused.</p>
     <p v-if="message" role="status" class="my-4 rounded bg-amber-50 p-4">{{ message }}</p>
     <section class="my-6 flex flex-wrap items-end gap-3 rounded-xl border border-slate-300 bg-slate-50 p-5" aria-label="API source collection">
-      <label class="min-w-64">Source connection<select aria-label="Source connection" v-model="refreshForm.endpoint_id" :disabled="blocked"><option value="">Choose an enrolled source</option><option v-for="endpoint in endpoints.items.filter(e => e.platform === 'vmware')" :key="endpoint.endpoint_id" :value="endpoint.endpoint_id">{{ endpoint.label }} · {{ endpoint.native_scope }}</option></select></label>
+      <label class="min-w-64">Source connection<select aria-label="Source connection" v-model="refreshForm.endpoint_id" :disabled="blocked"><option value="">Choose an enrolled source</option><option v-for="endpoint in endpoints.items.filter(e => ['vmware', 'openstack', 'ahv'].includes(e.platform))" :key="endpoint.endpoint_id" :value="endpoint.endpoint_id">{{ endpoint.label }} · {{ endpoint.native_scope }}</option></select></label>
       <button :disabled="blocked || !refreshForm.endpoint_id" @click="refreshApi">Refresh from API</button>
       <button class="secondary" :disabled="blocked" @click="router.get(group ? `${base}/groups/${group.id}` : base)">Refresh findings</button>
       <p class="w-full text-sm text-slate-600">Collection uses existing read permissions and scope. Only complete generations appear below. Additional connections are available through Site inventory.</p>

@@ -6,6 +6,7 @@ from inventory.application.discovery import Discovery
 from inventory.application.ports import Transaction
 from inventory.domain.ahv import destination_input
 from inventory.domain.discovery import Actor, Rejected, canonical, digest, identifier, shape
+from inventory.domain.source_profile import source_identity
 from inventory.domain.workload import METHODS, OWNER_FIELDS, review_input
 
 
@@ -82,7 +83,9 @@ class WorkloadProfiles:
                 else ("compute_version", "volume_version")
             )
         ]
-        if p["platform"] == "ahv":
+        if source:
+            identity, installed = source_identity(p)
+        elif p["platform"] == "ahv":
             identity = [p[k] for k in ("project_id", "prism_central_id", "cluster_id")]
             installed = [p["api_versions"], p["installed"]]
         return {

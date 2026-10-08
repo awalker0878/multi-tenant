@@ -23,7 +23,7 @@ const blocked = computed(() => form.processing || unavailable.value || uncertain
 const source = computed(() => props.workspace.profiles.find(p => p.id === form.review.source_profile_id) ?? (saved?.source.id === form.review.source_profile_id ? saved.source : null));
 const target = computed(() => props.workspace.profiles.find(p => p.id === form.review.target_profile_id) ?? (saved?.target.id === form.review.target_profile_id ? saved.target : null));
 const disks = computed(() => source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.disks : []);
-const ahv = computed(() => target.value?.facts.platform === 'ahv' ? target.value.facts : null);
+const ahv = computed(() => target.value?.facts.profile_type === 'TargetCapabilityProfile' && target.value.facts.platform === 'ahv' ? target.value.facts : null);
 watch(() => [form.review.source_profile_id, form.review.target_profile_id], (_, previous) => {
   if (!ahv.value) { delete form.review.destination; return; }
   if (!previous && form.review.destination) return;

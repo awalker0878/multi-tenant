@@ -26,7 +26,7 @@ class MigrationFleet:
             "r.*,e.label,e.native_scope,e.current_generation,o.payload,o.collected_at,o.expires_at "
             "FROM inventory.resources r JOIN inventory.endpoints e ON e.id=r.endpoint "
             "JOIN inventory.observations o ON o.resource=r.id AND o.generation=r.last_generation "
-            "WHERE r.id=%s AND r.tenant=%s AND e.site=%s AND e.platform='vmware' AND "
+            "WHERE r.id=%s AND r.tenant=%s AND e.site=%s AND "
             "r.kind='server'",
             (uuid_value(resource), actor.tenant, actor.site),
         )
@@ -66,7 +66,11 @@ class MigrationFleet:
             holds.append("source_profile_stale")
         holds.extend("source_" + h for h in facts.get("holds", []))
         identity = self.profiles.binding(profile)["native_identity_sha256"] if profile else None
-        if profile and (not facts.get("instance_uuid") or not facts.get("vcenter_uuid")):
+        if (
+            profile
+            and facts["schema_version"] == 1
+            and (not facts.get("instance_uuid") or not facts.get("vcenter_uuid"))
+        ):
             holds.append("source_identity_required")
         observation = r["payload"]
         return {
@@ -103,7 +107,7 @@ class MigrationFleet:
             rows = tx.all(
                 "SELECT r.id FROM inventory.resources r JOIN inventory.endpoints e ON "
                 "e.id=r.endpoint "
-                "WHERE r.tenant=%s AND e.site=%s AND e.platform='vmware' AND r.kind='server' "
+                "WHERE r.tenant=%s AND e.site=%s AND r.kind='server' "
                 "AND r.id>%s ORDER BY r.id LIMIT 51",
                 (actor.tenant, actor.site, after),
             )

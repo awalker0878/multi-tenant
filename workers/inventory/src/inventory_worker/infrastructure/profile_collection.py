@@ -26,9 +26,18 @@ def collect_profile(
         if index >= len(vms):
             raise CollectionFailure("invalid_response")
         vm = vms[index]
-        profile = VmwareWorkloadDiscovery(
-            stream, set(vms), stream["api_version"], lambda: int(started), before_request
-        ).collect(vm)
+        if policy["platform"] == "openstack":
+            from inventory_worker.infrastructure.openstack_workload import collect_openstack_source
+
+            profile = collect_openstack_source(policy, stream, vm, int(started), before_request)
+        elif policy["platform"] == "ahv":
+            from inventory_worker.infrastructure.ahv_workload import collect_ahv_source
+
+            profile = collect_ahv_source(policy, stream, vm, int(started), before_request)
+        else:
+            profile = VmwareWorkloadDiscovery(
+                stream, set(vms), stream["api_version"], lambda: int(started), before_request
+            ).collect(vm)
         if index + 1 < len(vms):
             next_cursor = vm
     elif policy["platform"] == "ahv":

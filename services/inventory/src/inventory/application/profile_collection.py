@@ -41,7 +41,7 @@ def authorize_read(d: Discovery, worker: Worker, body: dict[str, Any]) -> dict[s
         )
         stream = streams[j["stream"]]
         limit = (
-            8
+            {"vmware": 8, "openstack": 38, "ahv": 4}[p.platform]
             if stream["kind"] == "source_profile"
             else 2 + 5 * min(p.max_pages, 10)
             if p.platform == "ahv"

@@ -42,7 +42,9 @@ def test_revocation_between_vi_reads_stops_the_native_sequence(
         "credential_file": "/fixture",
     }
     with pytest.raises(CollectionFailure, match="permission_denied"):
-        collect_profile({"coverage_reference": "observer"}, stream, None, authority)
+        collect_profile(
+            {"platform": "vmware", "coverage_reference": "observer"}, stream, None, authority
+        )
     assert [p.rsplit("/", 1)[1] for p in requests] == ["config", "runtime"]
 
 

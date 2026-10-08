@@ -624,8 +624,17 @@ class Discovery:
             stream_spec = streams[j["stream"]]
             kind = stream_spec["kind"]
             if kind in {"source_profile", "target_profile"}:
-                profile = profile_payload(body.get("profile"), stream_spec, p.native_scope)
+                profile = profile_payload(
+                    body.get("profile"), stream_spec, p.native_scope, p.platform
+                )
                 minimum_reads = maximum_reads = 8 if kind == "source_profile" else 7
+                if kind == "source_profile" and p.platform == "openstack":
+                    minimum_reads = maximum_reads = 5 + sum(
+                        r["role"] in {"bootable_volume", "data_volume"}
+                        for r in profile["native"]["disk_records"]
+                    )
+                if kind == "source_profile" and p.platform == "ahv":
+                    minimum_reads = maximum_reads = 4
                 if kind == "target_profile" and p.platform == "ahv":
                     minimum_reads = 2 + sum(
                         max(1, (len(profile[field]) + 99) // 100)

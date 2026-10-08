@@ -172,6 +172,37 @@ def collect(
     ):
         raise CollectionFailure("unsafe_destination")
     token = secret(stream["credential_file"])
+    if platform == "ahv" and kind == "server":
+        if stream["api_version"] != "v4.3":
+            raise CollectionFailure("unsupported_api")
+        from inventory_worker.infrastructure.ahv_workload import read_vm
+
+        source = next((s for s in policy["streams"] if s["kind"] == "source_profile"), None)
+        if source is None or (cursor is not None and cursor not in source["vm_ids"]):
+            raise CollectionFailure("unsafe_destination")
+        index = source["vm_ids"].index(cursor) + 1 if cursor else 0
+        if index >= len(source["vm_ids"]):
+            raise CollectionFailure("invalid_response")
+        vm = source["vm_ids"][index]
+        row = read_vm(stream, vm, scope)
+        last = index + 1 == len(source["vm_ids"])
+        return {
+            "observations": [
+                {
+                    "kind": "server",
+                    "native_id": vm,
+                    "incarnation": row.get("generationUuid"),
+                    "name": row.get("name") or vm,
+                    "scope": scope,
+                    "facts": {"power": row.get("powerState", "UNKNOWN")},
+                }
+            ],
+            "next_cursor": None if last else vm,
+            "terminal": last,
+            "coverage": policy["coverage_reference"] is not None,
+            "collected_at": time.time(),
+            "error": None,
+        }
     if platform == "openstack":
         route, collection = {
             "server": ("/servers/detail", "servers"),
