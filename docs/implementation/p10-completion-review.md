@@ -37,7 +37,22 @@ request remains subject to reconciliation; the transport does not replay it.
 
 ## Observed engineering result
 
-The latest [run 37704372041](https://github.com/awalker0878/multi-tenant/actions/runs/37704372041)
+The [transport-correction run 37708345920](https://github.com/awalker0878/multi-tenant/actions/runs/37708345920)
+passes at `b1ee0355580f06620fc723f7120f11725fade743`: **1,050 component tests**
+(325 Planning, 371 Lifecycle, 354 worker), zero failures/errors/skips, and all nine
+campaign commands. All ten exact-source workflows and the 19 P10 tooling checks
+also pass. The [retained evidence](../../verification/p10/engineering-b1ee0355/README.md)
+includes the original failed runs, the upload receipt synchronization correction,
+passing log, candidate manifest, measurements and actual held dossier.
+
+Credential changes and expiry are now checked through native request/response and
+upload completion; incomplete HTTP framing cannot establish a successful reply.
+These E2 corrections do not supply the missing commissioned interfaces, native
+campaigns, installed artifact/trust scope or receiving decisions. G10 remains held.
+
+### Prior candidate and evidence correction
+
+The prior [run 37704372041](https://github.com/awalker0878/multi-tenant/actions/runs/37704372041)
 passes at `0ba5d986d6ba20ec9303f016baf468cedaa3c352`: **999 component tests**
 (325 Planning, 371 Lifecycle, 303 worker), zero failures/errors/skips, and all nine
 campaign commands. The 19 P10 qualification-tool checks also pass. The

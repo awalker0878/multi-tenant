@@ -1,12 +1,25 @@
 # Next work — P10 operating qualification
 
+Latest engineering source `b1ee0355` passes P07/P08/P09 and all nine P10 campaign
+commands: 1,050 component tests (325 Planning, 371 Lifecycle, 354 worker), with no
+failures, errors or skips. All ten exact-source workflows and the 19 P10 tooling
+checks pass. This increment closes
+credential-rotation/expiry and incomplete-response defects across OpenStack,
+VMware, Glance, owner protocols and platform transport, with pre-effect mounted
+observer checks. Original hosted test failures and the receipt-synchronized test
+correction are retained in [the current evidence](verification/p10/engineering-b1ee0355/README.md).
+Candidate `4d48a81d3a44a807a80cd2cebc97055ec419d2cd6aa0c355d73af067e3241e03`
+still holds all six P10 operating packages. Complete the actual native and owner
+inputs below; these engineering results do not close BL-P07-001, BL-P08-001/002
+or BL-P10-001/002. Development authorization remains effective.
+
 The user approved public publication to `greenfield/enterprise-microservices-plan`.
 P09 is published and its full PostgreSQL conformance passed. The P07/P08 product
 increment adds immutable provision/retire composition, authenticated native jobs
 and strict writer/observer credential separation. P10 now has an executable
 candidate-bound engineering campaign, real database load/restore exercises,
 artifact/alert checks and a release dossier that explicitly holds missing evidence.
-Current hosted source `0ba5d986` passes all 999 component tests with no skips and all
+Prior hosted source `0ba5d986` passes all 999 component tests with no skips and all
 nine engineering campaign commands. The 19 P10 tooling checks pass. Candidate
 identity now survives evidence-only commits, original observations and artifact
 identities are required, and receiving reviews bind the exact reviewed packet.

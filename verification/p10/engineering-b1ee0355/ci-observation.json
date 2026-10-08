@@ -1,0 +1,87 @@
+{
+  "observed_at": "2026-10-08T00:39:46.729955+00:00",
+  "source_revision": "b1ee0355580f06620fc723f7120f11725fade743",
+  "all_workflows_passed": true,
+  "runs": [
+    {
+      "id": 37708346086,
+      "name": "Context policy",
+      "head_sha": "b1ee0355580f06620fc723f7120f11725fade743",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37708346086"
+    },
+    {
+      "id": 37708346071,
+      "name": "P01 policy controls",
+      "head_sha": "b1ee0355580f06620fc723f7120f11725fade743",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37708346071"
+    },
+    {
+      "id": 37708345912,
+      "name": "P01 foundation contracts",
+      "head_sha": "b1ee0355580f06620fc723f7120f11725fade743",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37708345912"
+    },
+    {
+      "id": 37708346046,
+      "name": "P01 bootstrap images",
+      "head_sha": "b1ee0355580f06620fc723f7120f11725fade743",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37708346046"
+    },
+    {
+      "id": 37708345920,
+      "name": "P10 operating qualification engineering",
+      "head_sha": "b1ee0355580f06620fc723f7120f11725fade743",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37708345920"
+    },
+    {
+      "id": 37708345994,
+      "name": "P08 native migration components",
+      "head_sha": "b1ee0355580f06620fc723f7120f11725fade743",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37708345994"
+    },
+    {
+      "id": 37708345982,
+      "name": "P09 platform expansion conformance",
+      "head_sha": "b1ee0355580f06620fc723f7120f11725fade743",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37708345982"
+    },
+    {
+      "id": 37708346029,
+      "name": "P01 foundation packages",
+      "head_sha": "b1ee0355580f06620fc723f7120f11725fade743",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37708346029"
+    },
+    {
+      "id": 37708346016,
+      "name": "P07 native readiness preparation",
+      "head_sha": "b1ee0355580f06620fc723f7120f11725fade743",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37708346016"
+    },
+    {
+      "id": 37708345977,
+      "name": "P06 execution",
+      "head_sha": "b1ee0355580f06620fc723f7120f11725fade743",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37708345977"
+    }
+  ]
+}

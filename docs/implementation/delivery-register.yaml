@@ -390,6 +390,7 @@ phases:
   - EV-P10-001
   - EV-P10-002
   - EV-P10-003
+  - EV-P10-004
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2236,6 +2237,7 @@ work_packages:
   - EV-P10-001
   - EV-P10-002
   - EV-P10-003
+  - EV-P10-004
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2267,6 +2269,7 @@ work_packages:
   - EV-P10-001
   - EV-P10-002
   - EV-P10-003
+  - EV-P10-004
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2300,6 +2303,7 @@ work_packages:
   - EV-P10-001
   - EV-P10-002
   - EV-P10-003
+  - EV-P10-004
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2330,6 +2334,7 @@ work_packages:
   - EV-P10-001
   - EV-P10-002
   - EV-P10-003
+  - EV-P10-004
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2360,6 +2365,7 @@ work_packages:
   - EV-P10-001
   - EV-P10-002
   - EV-P10-003
+  - EV-P10-004
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -2391,6 +2397,7 @@ work_packages:
   - EV-P10-001
   - EV-P10-002
   - EV-P10-003
+  - EV-P10-004
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -4261,6 +4268,7 @@ gates:
   - EV-P10-001
   - EV-P10-002
   - EV-P10-003
+  - EV-P10-004
   blocker_ids:
   - BL-P10-001
   - BL-P10-002
@@ -7493,6 +7501,42 @@ evidence:
   limitations: E2 with synthetic native owners only; no installed platform, native throughput, coordinated RPO/RTO,
     restricted installation, actual alert recipient or operating acceptance. Artifact download returned HTTP 403;
     its recorded GitHub digest is not a local archive rehash. N01-N15 and OP01-OP07 remain unbound or unreviewed.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P10-004
+  level: E2
+  artifact_uri: verification/p10/engineering-b1ee0355/observations.json
+  sha256: c6a7fd4c69a4d6f4169685485ff6c1599b2002c660803d98cc1e55818bf765a6
+  source_revision: b1ee0355580f06620fc723f7120f11725fade743
+  artifact_revisions:
+    workflow_run: '37708345920'
+    artifact_id: '11520831923'
+    artifact_sha256: f32a0677c50db397e1a10d4efdc6bd940bcddb6d3bdc0178763c35de2b8bdbb0
+    candidate_sha256: 4d48a81d3a44a807a80cd2cebc97055ec419d2cd6aa0c355d73af067e3241e03
+  environment: GitHub Actions Ubuntu 24.04/Python 3.12.14, actual PostgreSQL 16/TLS/Cosign with synthetic native
+    peers and local alert receiver. Local P10 tools use Python 3.12.14 against the same source.
+  scope: 'All ten exact-source workflows pass. P10 passes nine commands and 1050 component tests with zero
+    failures/errors/skips: Planning 325, Lifecycle 371, worker 354; 19 P10 tooling checks pass. Corrections
+    cover credential rotation and expiry through submission, upload chunks and response completion, mounted
+    OpenStack writer/observer independence, and complete HTTP response framing. Original failures and the TLS
+    receipt synchronization test correction are retained. All 48 synthetic scheduler operations and the stale
+    Lifecycle database restore pass; G10 remains held.'
+  campaign_ids:
+  - Q09
+  - Q10
+  criterion_ids:
+  - G10.01
+  - G10.02
+  - G10.03
+  - G10.04
+  observed_at: '2026-10-08T00:35:45Z'
+  observer: GitHub Actions campaigns and local tooling; decoded original job logs and artifact metadata retrieved
+    through the authenticated GitHub API.
+  reviewer: Engineering consistency only; no designated independent native or G10 receiving review.
+  limitations: E2 synthetic native owners only. No installed platform, native throughput, coordinated RPO/RTO,
+    restricted installation, actual alert recipient or operating acceptance. Archive digest is GitHub-reported
+    and has not been independently rehashed here. N01-N15 and OP01-OP07 remain unbound or unreviewed; selected
+    owner-specific implementations and receiving evidence remain required.
   valid_until: null
   invalidated_at: null
 blockers:
