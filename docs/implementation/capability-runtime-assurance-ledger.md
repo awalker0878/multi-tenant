@@ -136,3 +136,21 @@ A later failed or slower restore overrides earlier successful samples and holds
 the next assessment. The observer's failed-case suspension additionally requires
 new independent review before positive publication. E2 tests cover latest failure,
 RPO/RTO violations, byte/second confusion, undersized restores and insufficient load.
+
+## CT-03b observations
+
+Lifecycle now owns a production SQL vector ledger and service-only reservation,
+readback, confirmation, renewal and release routes. Transactions serialize globally
+by physical pool authority across tenants; identities bind provider and native host.
+The independently observed provider lease, current usage and exact protected request
+approval must be available. Confirmed provider usage is counted once only after
+readback identifies the reservation token. Unknown and expired allocations retain
+their debits. Release requires fresh absence and unused-resource evidence.
+
+Unattended Planning validation resolves the retained assessment reference, re-reads
+Assurance and a separately granted Inventory capability generation, evaluates current
+network/isolation/recovery findings and requires a matching live vector receipt from
+the commissioned capacity owner. The receipt binds plan digest, allocation witness,
+generation and policy. No browser delegation or simulation receipt can satisfy it.
+Real PostgreSQL tests cover competing tenants, exact retry after restart, conflicting
+requests, expiry with live allocation and confirmed consumption without double debit.

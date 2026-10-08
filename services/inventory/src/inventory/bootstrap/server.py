@@ -11,7 +11,7 @@ from inventory.infrastructure.capability_observations import MountedCapabilityOb
 from inventory.infrastructure.authority import GovernanceAuthority, planning_actor
 from inventory.infrastructure.foundation import database_ready
 from inventory.infrastructure.generated_configuration_streams import configuration_streams
-from inventory.infrastructure.native_readers import native_reader
+from inventory.infrastructure.native_readers import capability_reader, native_reader
 from inventory.infrastructure.policies import MountedPolicies
 from inventory.infrastructure.readiness_evidence import read_evidence
 from inventory.infrastructure.store import Postgres
@@ -41,6 +41,7 @@ class InventoryRouter:
             planning_actor,
             native_reader,
             MountedCapabilityObservations(),
+            capability_reader,
         )
         self.foundation = FoundationApp(database_ready)
 

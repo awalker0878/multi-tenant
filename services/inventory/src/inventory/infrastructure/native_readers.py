@@ -111,3 +111,46 @@ def native_reader(
         raise
     except Exception:
         raise Rejected("native_reader_unavailable", 503) from None
+
+
+def capability_reader(
+    token: str, tenant: str, application: str, environment: str,
+    site: str, endpoint: str, generation: str,
+) -> None:
+    """A separate revocable service grant for one pinned capability generation."""
+    try:
+        registry = decode(protected(os.environ["INVENTORY_CAPABILITY_READERS_FILE"], 1048576))
+        shape(registry, {"schema_version", "grants"})
+        number(registry["schema_version"], 1, 1)
+        expected = {
+            "tenant_id": tenant, "application_id": application, "environment": environment,
+            "site_id": site, "endpoint_id": endpoint, "generation_id": generation,
+        }
+        for value in expected.values():
+            identifier(value)
+        grants = registry["grants"]
+        if not isinstance(grants, list) or not 1 <= len(grants) <= 256:
+            raise ValueError
+        selected = []
+        tokens = []
+        for grant in grants:
+            shape(grant, {"token_file", "expires_at", "scopes"})
+            secret = protected(grant["token_file"], 4098).decode("ascii").rstrip("\r\n")
+            if not re.fullmatch(r"[A-Za-z0-9_-]{32,4096}", secret):
+                raise ValueError
+            tokens.append(secret)
+            if hmac.compare_digest(token, secret):
+                selected.append(grant)
+        if len(set(tokens)) != len(tokens) or len(selected) != 1:
+            raise Rejected("capability_reader_denied", 403)
+        grant = selected[0]
+        if (
+            type(grant["expires_at"]) is not int
+            or grant["expires_at"] <= time.time()
+            or expected not in grant["scopes"]
+        ):
+            raise Rejected("capability_reader_scope_denied", 403)
+    except Rejected:
+        raise
+    except Exception:
+        raise Rejected("capability_reader_unavailable", 503) from None

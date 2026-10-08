@@ -17,9 +17,12 @@ from urllib.parse import urlsplit
 
 from jsonschema import Draft202012Validator, FormatChecker
 
-from planning.domain.model import Actor, Rejected, decode, identifier, profile
+from planning.domain.assessment import assess
+from planning.domain.model import Actor, Rejected, decode, digest, identifier, profile
+from planning.domain.placement import fit
 from planning.domain.qualification import verified
 from planning.infrastructure.foundation import mounted_secret
+from planning.infrastructure.store import Postgres
 
 
 def request(
@@ -292,6 +295,21 @@ class OwnerSources:
 
 
 def qualification_current(plan: dict[str, Any]) -> None:
+    # The v1 plan retains an assessment reference, rather than copying transport inputs.
+    if "inputs" not in plan:
+        with Postgres().transaction() as tx:
+            row = tx.one(
+                "SELECT payload FROM app.planning_records WHERE id=%s AND tenant=%s "
+                "AND kind='assessment'",
+                (plan["assessment_id"], plan["content"]["scope"]["tenant_id"]),
+            )
+        if row is None:
+            raise Rejected("pinned_assessment_unavailable", 423)
+        assessment = row["payload"]
+        plan = plan | {
+            "inputs": [assessment["inputs"][plan["candidate"]]],
+            "source_intent": assessment["intent"]["intent"],
+        }
     scope = plan["content"]["scope"]
     pinned = plan["inputs"][0]["qualification"]
     current = request(
@@ -309,3 +327,63 @@ def qualification_current(plan: dict[str, Any]) -> None:
         != (pinned.get("verification") or {}).get("record_sha256")
     ):
         raise Rejected("current_qualification_required", 423)
+    placement_current(plan, current)
+
+
+def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
+    """Admission uses the current resource owner; support and measurements are re-read."""
+    content, pinned = plan["content"], plan["inputs"][0]
+    scope = content["scope"]
+    destination = request(
+        "INVENTORY", "GET",
+        f"/internal/tenants/{scope['tenant_id']}/planning-capability-inputs/"
+        f"{scope['resource_id']}/{scope['environment']}/{scope['site_id']}/"
+        f"{scope['endpoint_id']}/{content['inventory_generation']}",
+    )
+    intent = plan["intent"]["intent"] if "intent" in plan else plan["inputs"][0].get("intent")
+    if intent is None:
+        # Existing plans retain their immutable catalogue intent reference; read it from the record.
+        intent = plan.get("source_intent")
+    if not isinstance(intent, dict):
+        raise Rejected("placement_intent_unavailable", 423)
+    result = assess(
+        intent, destination, pinned["profile"], pinned["policy"], current,
+        content["action"], content["method"], int(time.time()),
+    )
+    if any(
+        f["mandatory"] and f["status"] != "eligible"
+        for f in result["findings"] if not f["requirement"].startswith("capacity.")
+    ):
+        raise Rejected("current_native_measurement_required", 423)
+    placed = fit(
+        intent, pinned["destination"]["capability_snapshot"]["data"]["pools"],
+        pinned["policy"], int(time.time()),
+    )
+    if placed["status"] != "eligible":
+        raise Rejected("placement_binding_invalid", 423)
+    receipt = request(
+        "CAPACITY", "POST",
+        f"/internal/tenants/{scope['tenant_id']}/placement-reservations/checks",
+        {"plan_digest": plan["binding"]["digest"]},
+    )
+    now = int(time.time())
+    if (
+        receipt.get("state") not in {"reserved", "confirmed"}
+        or receipt.get("tenant_id") != scope["tenant_id"]
+        or receipt.get("plan_digest") != plan["binding"]["digest"]
+        or receipt.get("placement_sha256") != digest(placed["allocations"])
+        or receipt.get("allocations") != placed["allocations"]
+        or receipt.get("generation_id") != content["inventory_generation"]
+        or receipt.get("policy_sha256") != digest(pinned["policy"])
+        or type(receipt.get("observed_at")) is not int
+        or not 0 <= now - receipt["observed_at"] <= 5
+        or receipt.get("expires_at", 0) <= now
+    ):
+        raise Rejected("authoritative_placement_reservation_required", 423)
+    pools = destination["capability_snapshot"]["data"]["pools"]
+    for allocation in placed["allocations"]:
+        pool = next((p for p in pools if p["id"] == allocation["pool_id"]), None)
+        if pool is None or any(
+            pool[k] != allocation[k] for k in ("native_ref", "failure_domain")
+        ):
+            raise Rejected("reserved_placement_topology_changed", 423)
