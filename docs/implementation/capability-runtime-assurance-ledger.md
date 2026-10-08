@@ -124,3 +124,15 @@ negative controls covering each security domain and the tenant boundary. Concret
 placement verifies failure-domain separation. Missing measurements remain unknown;
 failed controls block. E2 tests cover route removal, forbidden traffic leakage,
 domain aliasing and observer/writer reuse.
+
+## CT-05 observations
+
+Recovery eligibility now uses the latest observed attempt for each dataset, bound
+to method, consistency, generation, native scope, backend, profile, policy and
+artifacts. Representative byte volume, accepted load and restore concurrency are
+required. RPO is failure time minus the last consistent checkpoint; RTO is application
+readiness minus restore start. Units and timestamp order are checked explicitly.
+A later failed or slower restore overrides earlier successful samples and holds
+the next assessment. The observer's failed-case suspension additionally requires
+new independent review before positive publication. E2 tests cover latest failure,
+RPO/RTO violations, byte/second confusion, undersized restores and insufficient load.

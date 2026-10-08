@@ -44,6 +44,9 @@ def inputs() -> tuple[
         "artifacts": artifacts,
         "downtime_seconds": 3600,
         "allowed_zones": ["zone-1"],
+        "recovery_profile": {
+            "minimum_load": 1, "parallel_restores": 1, "load_unit": "requests_per_second",
+        },
         "forbidden_flows": [{
             "from": "foreign-tenant", "to": intent["workloads"][0]["id"],
             "protocol": "tcp", "port": 22,
@@ -316,6 +319,22 @@ def snapshot_fixture(
         "observed_at": NOW, "expires_at": NOW + 120,
         "negative_flows": negative,
     }
+    recoveries = [{
+        "dataset_id": dataset["id"], "sequence": 1,
+        "observed_at": NOW, "expires_at": NOW + 120,
+        "profile_digest": q["scope"]["profile_digest"],
+        "generation_id": destination["generation_id"],
+        "native_scope": destination["native_scope"],
+        "artifacts": policy["artifacts"], "policy_sha256": policy_sha,
+        "storage_backend": destination["installed_tuple"]["storage_backend"],
+        "method": dataset["recovery"]["method"], "consistency": dataset["consistency"],
+        "representative_bytes": 40 * 1024**3, "load": 1, "parallel_restores": 1,
+        "load_unit": "requests_per_second",
+        "unit": "seconds", "native_restore_id": "fixture://restore-" + dataset["id"],
+        "restore_chain_sha256": digest(dataset), "outcome": "passed", "consistency_passed": True,
+        "last_consistent_checkpoint_at": NOW - 30, "failure_at": NOW - 30,
+        "restore_started_at": NOW - 30, "application_ready_at": NOW,
+    } for dataset in intent["datasets"]]
     return {
         "definition_sha256": DEFINITION_SHA256,
         "source_sha256": q["verification"]["runtime_sha256"],
@@ -323,5 +342,8 @@ def snapshot_fixture(
         "scope_sha256": digest(q["scope"]),
         "observed_at": NOW,
         "expires_at": NOW + 120,
-        "data": {"pools": pools, "network": network, "isolation": isolation},
+        "data": {
+            "pools": pools, "network": network, "isolation": isolation,
+            "recovery_measurements": recoveries,
+        },
     }

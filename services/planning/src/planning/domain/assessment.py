@@ -9,6 +9,7 @@ from planning.domain.network_evidence import isolation_checks, network_checks
 from planning.domain.operational_evidence import inventory_digest, snapshot
 from planning.domain.placement import PlacementUnknown, fit
 from planning.domain.qualification import binding_digest, verified
+from planning.domain.recovery_evidence import recovery_checks
 
 
 def requirements(intent: dict[str, Any]) -> list[dict[str, Any]]:
@@ -314,6 +315,19 @@ def assess(
         except (KeyError, TypeError, ValueError):
             finding("placement.native_isolation", "unknown", "isolation_evidence_incomplete",
                     "Commission native identity, policy and isolation measurements.")
+    if native_snapshot is None and intent["datasets"]:
+        finding("recovery.native_measurement", "unknown", "restore_native_snapshot_missing",
+                "Measure a representative restore and application readiness.")
+    elif native_snapshot is not None:
+        try:
+            for key, status, reason, mandatory in recovery_checks(
+                intent, destination, profile, policy, native_snapshot, now
+            ):
+                finding(key, status, reason, "Run and review a representative native restore.",
+                        mandatory=mandatory)
+        except (KeyError, TypeError, ValueError):
+            finding("recovery.native_measurement", "unknown", "restore_evidence_incomplete",
+                    "Commission dataset profiles, load and restore timing evidence.")
     mandatory_states = {f["status"] for f in findings if f["mandatory"]}
     state = next(
         (s for s in ("blocked", "unknown", "conditional") if s in mandatory_states), "eligible"
