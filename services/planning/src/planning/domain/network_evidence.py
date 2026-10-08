@@ -5,9 +5,7 @@ from typing import Any
 from planning.domain.model import digest
 
 
-def traffic(
-    flow: dict[str, Any], network: dict[str, Any], policy: dict[str, Any], now: int
-) -> str:
+def traffic(flow: dict[str, Any], network: dict[str, Any], policy: dict[str, Any], now: int) -> str:
     topology = network["topology"]
     if (
         network["policy_sha256"] != digest(policy)
@@ -26,8 +24,7 @@ def traffic(
     reached = {flow["from"]}
     for _ in range(len(nodes)):
         added = {
-            e["to"] for e in edges
-            if e["from"] in reached and e["to"] in nodes and e["native_ref"]
+            e["to"] for e in edges if e["from"] in reached and e["to"] in nodes and e["native_ref"]
         }
         if added <= reached:
             break
@@ -39,7 +36,8 @@ def traffic(
         for rule in network["firewall_rules"]
     )
     rows = [
-        m for m in network["measurements"]
+        m
+        for m in network["measurements"]
         if all(m.get(k) == flow[k] for k in ("from", "to", "protocol", "port"))
     ]
     if not rows:
@@ -73,23 +71,34 @@ def network_checks(
     for dependency in intent["dependencies"]:
         if dependency["kind"] == "communication":
             status = traffic(dependency, network, policy, now)
-            checks.append((
-                "network.reachability", status, "required_native_flow_" + status,
-                dependency["strength"] == "required",
-            ))
+            checks.append(
+                (
+                    "network.reachability",
+                    status,
+                    "required_native_flow_" + status,
+                    dependency["strength"] == "required",
+                )
+            )
     forbidden = policy.get("forbidden_flows")
     if not isinstance(forbidden, list) or not forbidden:
-        checks.append(("network.default_deny", "unknown", "negative_traffic_controls_missing", True))
+        checks.append(
+            ("network.default_deny", "unknown", "negative_traffic_controls_missing", True)
+        )
     else:
         for flow in forbidden:
             status = traffic(flow | {"expectation": "deny"}, network, policy, now)
-            checks.append(("network.forbidden_flow", status, "forbidden_native_flow_" + status, True))
+            checks.append(
+                ("network.forbidden_flow", status, "forbidden_native_flow_" + status, True)
+            )
     return checks
 
 
 def isolation_checks(
-    intent: dict[str, Any], destination: dict[str, Any], data: dict[str, Any],
-    policy: dict[str, Any], now: int,
+    intent: dict[str, Any],
+    destination: dict[str, Any],
+    data: dict[str, Any],
+    policy: dict[str, Any],
+    now: int,
 ) -> list[tuple[str, str, str, bool]]:
     isolation = data["isolation"]
     scope = destination["native_scope"]
@@ -118,15 +127,29 @@ def isolation_checks(
     expected_domains = {w["security_domain"]["id"] for w in intent["workloads"]}
     covered = {f.get("security_domain_id") for f in negative if f.get("kind") == "domain"}
     tenant_controls = any(f.get("kind") == "tenant" for f in negative)
-    controls_ok = tenant_controls and expected_domains <= covered and all(
-        traffic(flow | {"expectation": "deny"}, data["network"], policy, now) == "eligible"
-        for flow in negative
+    controls_ok = (
+        tenant_controls
+        and expected_domains <= covered
+        and all(
+            traffic(flow | {"expectation": "deny"}, data["network"], policy, now) == "eligible"
+            for flow in negative
+        )
     )
     return [
-        ("placement.tenant_boundary", "eligible" if tenant_ok and controls_ok else "blocked",
-         "measured_tenant_isolation" if tenant_ok and controls_ok else "tenant_isolation_unverified",
-         True),
-        ("placement.security_domains", "eligible" if domain_ok and controls_ok else "blocked",
-         "measured_domain_isolation" if domain_ok and controls_ok else "domain_isolation_unverified",
-         True),
+        (
+            "placement.tenant_boundary",
+            "eligible" if tenant_ok and controls_ok else "blocked",
+            "measured_tenant_isolation"
+            if tenant_ok and controls_ok
+            else "tenant_isolation_unverified",
+            True,
+        ),
+        (
+            "placement.security_domains",
+            "eligible" if domain_ok and controls_ok else "blocked",
+            "measured_domain_isolation"
+            if domain_ok and controls_ok
+            else "domain_isolation_unverified",
+            True,
+        ),
     ]
