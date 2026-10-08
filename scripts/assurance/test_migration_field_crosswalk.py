@@ -19,7 +19,7 @@ class MigrationFieldCrosswalkTests(unittest.TestCase):
 
     def test_exact_source_attribute_coverage(self) -> None:
         report = validate(self.source, self.crosswalk)
-        self.assertEqual(report, {"fields": 278, "groups": 115})
+        self.assertEqual(report, {"fields": 278, "groups": 116})
         self.assertEqual(
             set(self.crosswalk["summary"]["manifest_fields"]), set(PLATFORMS)
         )
@@ -45,7 +45,7 @@ class MigrationFieldCrosswalkTests(unittest.TestCase):
             "source.vm.incarnation", "source.vm.disk.backing",
             "source.disk.capture_method", "source.disk.encryption",
             "source.nic.attachment", "target.network.security_policy",
-            "target.network.isolation", "target.storage.free_bytes",
+            "target.network.isolation", "target.storage.capacity_indicators",
             "target.vm.create",
         )
         for name in names:
@@ -78,6 +78,20 @@ class MigrationFieldCrosswalkTests(unittest.TestCase):
         )
         self.assertEqual(
             self.by_id["source.nic.security"]["criticality"], "critical"
+        )
+
+    def test_placement_traits_do_not_masquerade_as_free_capacity(self) -> None:
+        self.assertIsNone(
+            self.by_id["target.compute.capacity"]["platforms"]["openstack"]
+        )
+        self.assertIsNone(
+            self.by_id["target.openstack.placement_traits"]["platforms"]["vmware"]
+        )
+        storage = self.by_id["target.storage.capacity_indicators"]
+        self.assertEqual(storage["relationship"], "conditional")
+        self.assertIn("not a reservation", storage["semantic_constraints"])
+        self.assertEqual(
+            storage["qualification"], "not_qualified"
         )
 
     def test_policy_flow_and_capacity_owner_review_is_not_optional(self) -> None:
