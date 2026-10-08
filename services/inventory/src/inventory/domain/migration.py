@@ -24,7 +24,17 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
         source_ids = source_security_ids(source)
         selected = body.get("destination")
         if source_ids is None:
-            raise Rejected("source_security_policy_observation_required")
+            # Preserve an incomplete review as a draft, without accepting
+            # any invented destination policy. Review holds confirmation.
+            if selected is not None:
+                draft = shape(selected, {"platform", "project_id", "security_mappings"})
+                if (
+                    draft["platform"] != "openstack"
+                    or draft["project_id"] != target["project_id"]
+                    or draft["security_mappings"] != []
+                ):
+                    raise Rejected("source_security_policy_observation_required")
+            return
         if not source_ids and selected is None:
             return
         d = shape(selected, {"platform", "project_id", "security_mappings"})
