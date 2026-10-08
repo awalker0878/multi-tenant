@@ -4,12 +4,14 @@ import asyncio
 import json
 import os
 from pathlib import Path
+from uuid import uuid4
 from typing import Any, cast
 from unittest.mock import Mock
 
 import pytest
 
 from planning.application.qualification_invalidations import QualificationInvalidations
+from planning.infrastructure.store import Postgres
 from planning.interfaces.qualification_invalidations import QualificationInvalidationApp
 
 CREDENTIAL = "q" * 64
@@ -121,3 +123,76 @@ def test_existing_read_caller_cannot_impersonate_invalidation_receiver(
     )
     assert exchange(app, b"{}")[0] == 503
     inbox.accept.assert_not_called()
+
+
+def test_authenticated_http_ack_is_committed_before_response_and_safe_to_replay(
+    database: Postgres, receiver: tuple[QualificationInvalidationApp, Mock]
+) -> None:
+    app, _ = receiver
+    app.inbox = QualificationInvalidations(database)
+    tenant, foreign = str(uuid4()), str(uuid4())
+    plan, other = str(uuid4()), str(uuid4())
+    with database.transaction() as tx:
+        for plan_id, tenant_id in ((plan, tenant), (other, foreign)):
+            tx.execute(
+                "INSERT INTO app.planning_records"
+                "(id,tenant,actor,application,environment,kind,payload,digest,created_at) "
+                "VALUES(%s,%s,%s,%s,%s,'plan',%s::jsonb,%s,%s)",
+                (
+                    plan_id,
+                    tenant_id,
+                    str(uuid4()),
+                    str(uuid4()),
+                    str(uuid4()),
+                    json.dumps({"id": plan_id}),
+                    "a" * 64,
+                    1,
+                ),
+            )
+    event = {
+        "event_id": str(uuid4()),
+        "tenant_id": tenant,
+        "scope_sha256": "b" * 64,
+        "authority_epoch": 1,
+        "operation": "revoke",
+        "state": "revoked",
+        "decision_sha256": "c" * 64,
+        "event_sha256": "d" * 64,
+    }
+    raw = json.dumps(event).encode()
+    first_status, first_ack = exchange(app, raw)
+    assert first_status == 200
+    assert first_ack == {
+        "persisted": True,
+        "event_id": event["event_id"],
+        "scope_sha256": event["scope_sha256"],
+        "authority_epoch": 1,
+        "event_sha256": event["event_sha256"],
+    }
+
+    # The caller loses the first HTTP response. Replaying the exact request
+    # must return an identical persisted acknowledgment without duplicate holds.
+    assert exchange(app, raw) == (first_status, first_ack)
+    with database.transaction() as tx:
+        stored = tx.one(
+            "SELECT count(*) AS n FROM app.planning_qualification_inbox WHERE event_id=%s",
+            (event["event_id"],),
+        )
+        affected = tx.one(
+            "SELECT count(*) AS n FROM app.planning_invalidations WHERE plan=%s",
+            (plan,),
+        )
+        isolated = tx.one(
+            "SELECT count(*) AS n FROM app.planning_invalidations WHERE plan=%s",
+            (other,),
+        )
+        assert stored is not None and stored["n"] == 1
+        assert affected is not None and affected["n"] == 1
+        assert isolated is not None and isolated["n"] == 0
+
+    modified = dict(event, decision_sha256="f" * 64)
+    assert exchange(app, json.dumps(modified).encode())[0] == 409
+    with database.transaction() as tx:
+        assert tx.one(
+            "SELECT count(*) AS n FROM app.planning_qualification_inbox"
+        ) == {"n": 1}
