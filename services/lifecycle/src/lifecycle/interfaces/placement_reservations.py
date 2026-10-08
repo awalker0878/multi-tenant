@@ -13,9 +13,7 @@ from lifecycle.application.reservations import Held
 
 
 class PlacementReservationApp:
-    def __init__(
-        self, service: PlacementReservations, authorize: Callable[[str], None]
-    ) -> None:
+    def __init__(self, service: PlacementReservations, authorize: Callable[[str], None]) -> None:
         self.service, self.authorize = service, authorize
 
     async def __call__(
@@ -60,12 +58,15 @@ class PlacementReservationApp:
         except Exception:
             status, payload = 503, {"error": "placement_owner_unavailable"}
         raw_response = json.dumps(payload, separators=(",", ":")).encode()
-        await send({
-            "type": "http.response.start", "status": status,
-            "headers": [
-                (b"content-type", b"application/json"),
-                (b"cache-control", b"no-store, private"),
-                (b"content-length", str(len(raw_response)).encode()),
-            ],
-        })
+        await send(
+            {
+                "type": "http.response.start",
+                "status": status,
+                "headers": [
+                    (b"content-type", b"application/json"),
+                    (b"cache-control", b"no-store, private"),
+                    (b"content-length", str(len(raw_response)).encode()),
+                ],
+            }
+        )
         await send({"type": "http.response.body", "body": raw_response})
