@@ -53,6 +53,14 @@ caller-trust implementations and provider fencing before dispatch. An absent
 registry entry holds the effect; never substitute a generic command runner or
 synthetic observer. The simulation deployment does not activate this runtime.
 
+Image import requires separate writer/observer project credentials on identical
+enrolled OpenStack service URLs and address pins. The worker checks credential
+separation before effects. Rotation or expiry during a Glance upload stops before
+the next chunk and holds the attempt, including when the provider's final response
+arrives after rotation. Preserve the staged object and receipts for independent
+reconciliation. A truncated or ambiguously framed native response is unconfirmed;
+it cannot justify continuing, completing an import or replaying a request.
+
 ## Data custody
 
 1. `VmwareCapture` requires a stopped source and exact current native profile.

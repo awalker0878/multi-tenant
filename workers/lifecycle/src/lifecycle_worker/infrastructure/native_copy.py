@@ -22,7 +22,8 @@ from lifecycle_worker.application.native import (
     sha256,
 )
 from lifecycle_worker.infrastructure.native_files import protected_read
-from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection
+from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection, credential
+from lifecycle_worker.infrastructure.native_response import response_bytes
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites
 
 
@@ -108,10 +109,7 @@ class NativeJson:
         self.expected_token_sha256: str | None = None
 
     def credential(self) -> str:
-        value = protected_read(self.endpoint.token_file, 4096).rstrip(b"\r\n")
-        if not value or any(c < 33 or c > 126 for c in value):
-            raise NativeHeld("invalid_native_credential")
-        return value.decode("ascii")
+        return credential(self.endpoint)
 
     def request(
         self,
@@ -127,8 +125,19 @@ class NativeJson:
             or any(part in {".", ".."} for part in path.split("/"))
         ):
             raise NativeHeld("invalid_native_api_route")
+        token = self.credential()
+        token_sha256 = hashlib.sha256(token.encode()).hexdigest()
+
+        def current() -> None:
+            boundary()
+            if self.credential() != token or (
+                self.expected_token_sha256 is not None
+                and token_sha256 != self.expected_token_sha256
+            ):
+                raise NativeHeld("native_credential_changed")
+
         headers = {
-            self.header: self.credential(),
+            self.header: token,
             "Accept": "application/json",
             "Accept-Encoding": "identity",
         }
@@ -139,13 +148,7 @@ class NativeJson:
                 raise NativeHeld("native_request_bound")
         connection = PinnedConnection(self.endpoint)
         try:
-            boundary()
-            if (
-                self.expected_token_sha256 is not None
-                and hashlib.sha256(headers[self.header].encode()).hexdigest()
-                != self.expected_token_sha256
-            ):
-                raise NativeHeld("native_credential_changed")
+            current()
             connection.request(
                 method, urlsplit(self.endpoint.base_url).path.rstrip("/") + path, data, headers
             )
@@ -155,27 +158,13 @@ class NativeJson:
                 or response.getheader("Content-Encoding", "identity") != "identity"
             ):
                 raise NativeHeld("native_api_response_unconfirmed")
-            if expected == 204:
+            raw = response_bytes(response, 0 if expected == 204 else 2097152, 10, current)
+            if not raw:
                 return None
-            result = bytearray()
-            deadline = time.monotonic() + 10
-            while True:
-                if time.monotonic() >= deadline:
-                    raise NativeHeld("native_api_response_deadline")
-                chunk = response.read1(min(65536, 2097153 - len(result)))
-                result.extend(chunk)
-                if len(result) > 2097152:
-                    raise NativeHeld("native_api_response_bound")
-                if not chunk:
-                    if not result:
-                        return None
-                    if (
-                        response.getheader("Content-Type", "").split(";")[0].lower()
-                        != "application/json"
-                    ):
-                        raise NativeHeld("native_api_response_type")
-                    # Strict duplicate/nonfinite checking also covers arrays and scalar replies.
-                    return decode(b'{"value":' + bytes(result) + b"}", 2097164)["value"]
+            if response.getheader("Content-Type", "").split(";")[0].lower() != "application/json":
+                raise NativeHeld("native_api_response_type")
+            # Strict duplicate/nonfinite checking also covers arrays and scalar replies.
+            return decode(b'{"value":' + raw + b"}", 2097164)["value"]
         except (OSError, http.client.HTTPException):
             raise NativeHeld("native_api_outcome_unknown") from None
         finally:
@@ -382,14 +371,29 @@ class GlanceImport:
         boundary: Callable[[], None],
     ) -> None:
         self.current(binding, boundary)
+        token = self.api.credential()
+        token_sha256 = hashlib.sha256(token.encode()).hexdigest()
+
+        def current() -> None:
+            boundary()
+            self.scope.identity_check()
+            if (
+                self.api.credential() != token
+                or token_sha256 != self.scope.subject_token_sha256
+                or token_sha256 != self.api.expected_token_sha256
+            ):
+                raise NativeHeld("image_credential_changed")
+            if self.scope.clock() >= self.scope.credential_expires_at:
+                raise NativeHeld("image_credential_expired")
+
         headers = {
-            "X-Auth-Token": self.api.credential(),
+            "X-Auth-Token": token,
             "Content-Type": "application/octet-stream",
             "Content-Length": str(receipt["size"]),
         }
         connection = PinnedConnection(self.api.endpoint)
         try:
-            boundary()
+            current()
             path = (
                 urlsplit(self.api.endpoint.base_url).path.rstrip("/")
                 + "/v2/images/"
@@ -403,7 +407,7 @@ class GlanceImport:
             size, checksum = 0, hashlib.sha256()
             stream.seek(0)
             while chunk := stream.read(65536):
-                boundary()
+                current()
                 size += len(chunk)
                 if size > receipt["size"]:
                     raise NativeHeld("native_export_artifact_changed")
@@ -411,9 +415,11 @@ class GlanceImport:
                 connection.send(chunk)
             if size != receipt["size"] or checksum.hexdigest() != receipt["sha256"]:
                 raise NativeHeld("native_export_artifact_changed")
-            boundary()
-            if connection.getresponse().status != 204:
+            current()
+            response = connection.getresponse()
+            if response.status != 204:
                 raise NativeHeld("native_image_stage_unconfirmed")
+            response_bytes(response, 0, 10, current)
         except (OSError, http.client.HTTPException):
             raise NativeHeld("native_image_stage_outcome_unknown") from None
         finally:

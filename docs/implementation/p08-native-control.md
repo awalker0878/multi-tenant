@@ -95,6 +95,15 @@ maximum. The immutable intent still pins the chosen budget, and every effect/chu
 continues to check current authority. The shorter plan, credential, profile or
 campaign expiry always wins. A larger budget does not refresh stale observations.
 
+VMware session and Glance credentials are rechecked after authority callbacks and
+through the final response byte. Glance staging checks the authorized token and its
+expiry before headers, each upload chunk and completion. Rotation during staging
+closes the connection and leaves the operation held; it does not finish an import
+or repeat the upload. Mounted image import also requires distinct writer/observer
+credentials on the same enrolled OpenStack service destinations before effects.
+Native replies must satisfy their declared byte/chunk framing as well as JSON
+validation. These controls are covered with actual TLS and synthetic native peers.
+
 The native worker HTTP wait and Temporal effect timeout follow the grant's remaining
 lifetime with a maximum one-day effect budget. Temporal records a patch marker so
 retained histories preserve their prior timeout commands. Automatic effect retries

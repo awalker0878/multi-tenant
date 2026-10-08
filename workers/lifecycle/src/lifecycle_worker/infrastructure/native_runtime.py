@@ -12,9 +12,10 @@ from lifecycle_worker.application.native import (
     NativeJournal,
     NativeObserver,
     decode,
+    digest,
 )
 from lifecycle_worker.infrastructure.native_files import protected_read
-from lifecycle_worker.infrastructure.native_http import NativeEndpoint, NativeReads
+from lifecycle_worker.infrastructure.native_http import NativeEndpoint, NativeReads, credential
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites, OpenStackApi
 from lifecycle_worker.infrastructure.openstack_readback import OpenStackReadback
 
@@ -47,6 +48,25 @@ def runtime(path: Path) -> dict[str, Any]:
     return config
 
 
+def independent_openstack(
+    writer: dict[str, NativeEndpoint], observer: dict[str, NativeEndpoint]
+) -> None:
+    if (
+        not writer
+        or set(writer) != set(observer)
+        or any(
+            (endpoint.base_url, endpoint.address)
+            != (observer[service].base_url, observer[service].address)
+            for service, endpoint in writer.items()
+        )
+    ):
+        raise NativeHeld("independent_openstack_destination_mismatch")
+    writer_tokens = {credential(endpoint) for endpoint in writer.values()}
+    observer_tokens = {credential(endpoint) for endpoint in observer.values()}
+    if len(writer_tokens) != 1 or len(observer_tokens) != 1 or writer_tokens & observer_tokens:
+        raise NativeHeld("independent_openstack_credentials_required")
+
+
 class MountedNativeRuntime:
     def __init__(
         self, runtime_file: Path, journal: NativeJournal, clock: Callable[[], int]
@@ -58,13 +78,25 @@ class MountedNativeRuntime:
         plan_file = Path(config["operation_plan"])
         resources = validate_api_plan(decode(protected_read(plan_file, 1_048_576)), binding)
         writer, observer = config["writer"], config["observer"]
+        writer_endpoints, observer_endpoints = (
+            endpoints(writer["endpoints"]),
+            endpoints(observer["endpoints"]),
+        )
+
+        def current() -> None:
+            if digest(runtime(self.runtime_file)) != digest(config):
+                raise NativeHeld("native_runtime_changed")
+            independent_openstack(writer_endpoints, observer_endpoints)
+
+        current()
         adapter = OpenStackApi(
             plan_file,
-            NativeWrites(endpoints(writer["endpoints"]), writer["user_id"], self.clock),
+            NativeWrites(writer_endpoints, writer["user_id"], self.clock, current),
             self.journal,
+            identity_check=current,
         )
         independent = OpenStackReadback(
-            NativeReads(endpoints(observer["endpoints"])),
+            NativeReads(observer_endpoints, current),
             resources,
             observer["user_id"],
             writer["user_id"],

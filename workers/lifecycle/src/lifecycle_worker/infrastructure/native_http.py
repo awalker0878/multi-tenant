@@ -6,7 +6,7 @@ import ipaddress
 import re
 import socket
 import ssl
-import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -14,6 +14,7 @@ from urllib.parse import urlsplit
 
 from lifecycle_worker.application.native import NativeHeld, decode
 from lifecycle_worker.infrastructure.native_files import protected_read
+from lifecycle_worker.infrastructure.native_response import response_bytes
 
 
 @dataclass(frozen=True)
@@ -22,6 +23,13 @@ class NativeEndpoint:
     address: str
     ca_file: Path
     token_file: Path
+
+
+def credential(endpoint: NativeEndpoint) -> str:
+    raw = protected_read(endpoint.token_file, 4096).rstrip(b"\r\n")
+    if not raw or any(c < 33 or c > 126 for c in raw):
+        raise NativeHeld("invalid_native_credential")
+    return raw.decode("ascii")
 
 
 class PinnedConnection(http.client.HTTPSConnection):
@@ -57,13 +65,18 @@ class PinnedConnection(http.client.HTTPSConnection):
 
 
 class NativeReads:
-    def __init__(self, endpoints: dict[str, NativeEndpoint]) -> None:
+    def __init__(
+        self,
+        endpoints: dict[str, NativeEndpoint],
+        identity_check: Callable[[], None] = lambda: None,
+    ) -> None:
         if (
             set(endpoints) != {"identity", "compute", "network", "volume"}
             or len({e.token_file for e in endpoints.values()}) != 1
         ):
             raise NativeHeld("one_project_scoped_observer_token_required")
         self.endpoints = endpoints
+        self.identity_check = identity_check
         self.subject_token_sha256: str | None = None
 
     def get(self, service: str, path: str, *, subject: bool = False) -> dict[str, Any]:
@@ -74,17 +87,19 @@ class NativeReads:
         ):
             raise NativeHeld("unsafe_native_read")
         endpoint = self.endpoints[service]
-        raw = protected_read(endpoint.token_file, 4096).rstrip(b"\r\n")
-        if not raw or any(c < 33 or c > 126 for c in raw):
-            raise NativeHeld("invalid_observer_credential")
-        token = raw.decode("ascii")
-        token_sha256 = hashlib.sha256(raw).hexdigest()
+        token = credential(endpoint)
+        token_sha256 = hashlib.sha256(token.encode()).hexdigest()
         if subject:
             if service != "identity" or path != "/auth/tokens":
                 raise NativeHeld("invalid_native_subject_read")
-            self.subject_token_sha256 = token_sha256
         elif self.subject_token_sha256 is not None and token_sha256 != self.subject_token_sha256:
             raise NativeHeld("observer_token_changed_requires_scope_recheck")
+
+        def current() -> None:
+            self.identity_check()
+            if credential(endpoint) != token:
+                raise NativeHeld("native_read_credential_changed")
+
         headers = {
             "X-Auth-Token": token,
             "Accept": "application/json",
@@ -98,6 +113,7 @@ class NativeReads:
             headers["OpenStack-API-Version"] = "volume 3.0"
         connection = PinnedConnection(endpoint)
         try:
+            current()
             connection.request(
                 "GET", urlsplit(endpoint.base_url).path.rstrip("/") + path, headers=headers
             )
@@ -109,17 +125,10 @@ class NativeReads:
             ):
                 # A 404 or empty listing never establishes sealed absence after an uncertain create.
                 raise NativeHeld("native_read_not_observed")
-            deadline = time.monotonic() + 10
-            result = bytearray()
-            while True:
-                if time.monotonic() >= deadline:
-                    raise NativeHeld("native_read_deadline")
-                data = response.read1(min(65536, 2_097_153 - len(result)))
-                result.extend(data)
-                if len(result) > 2_097_152:
-                    raise NativeHeld("native_read_bound")
-                if not data:
-                    return decode(bytes(result))
+            result = decode(response_bytes(response, 2_097_152, 10, current))
+            if subject:
+                self.subject_token_sha256 = token_sha256
+            return result
         except (OSError, http.client.HTTPException):
             raise NativeHeld("native_read_unavailable") from None
         finally:

@@ -4,7 +4,6 @@ import hashlib
 import http.client
 import json
 import re
-import time
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Protocol
@@ -22,6 +21,7 @@ from lifecycle_worker.application.platform_plan import achieved, request, valida
 from lifecycle_worker.infrastructure.extension_trust import ExtensionTrust
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection
+from lifecycle_worker.infrastructure.native_response import response_bytes
 
 
 class PlatformTransport(Protocol):
@@ -102,21 +102,9 @@ class PlatformHttp:
                 != "application/json"
             ):
                 raise NativeHeld("invalid_platform_response")
-            raw = bytearray()
-            deadline = time.monotonic() + 10
-            while True:
-                current()
-                if time.monotonic() >= deadline:
-                    raise NativeHeld("platform_response_deadline")
-                data = response.read1(min(65536, 2097153 - len(raw)))
-                raw.extend(data)
-                if len(raw) > 2097152:
-                    raise NativeHeld("platform_response_bound")
-                if not data:
-                    current()
-                    break
+            raw = response_bytes(response, 0 if expected == 204 else 2097152, 10, current)
             return {
-                "document": decode(bytes(raw)) if raw else {},
+                "document": decode(raw) if raw else {},
                 "etag": response.getheader("ETag", ""),
                 "status": response.status,
             }

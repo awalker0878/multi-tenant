@@ -37,6 +37,14 @@ observers can use a different origin from vCenter or the service writer; their
 own pinned address and TLS policy still apply. Direct VMware/AHV lifecycle
 readback continues to require the same enrolled provider origin.
 
+The direct OpenStack worker now checks mounted runtime identity and distinct
+writer/observer tokens before inspection and at native request boundaries. Both
+identities use the same enrolled service URLs and address pins. A runtime edit,
+missing observer token, credential collision, in-flight rotation or token expiry
+holds the attempt. Scope is retained only after a complete Keystone response.
+Native JSON transports also reject truncated bodies, conflicting length/chunk
+framing and incomplete chunks; a valid JSON prefix cannot establish acceptance.
+
 Published additive interfaces are in `contracts/openapi/planning-native-v1.json`
 and `contracts/openapi/lifecycle-native-jobs-v1.json`. The compiler/resolver
 composition check is `scripts/p07/check_composition.py`; PostgreSQL persistence,

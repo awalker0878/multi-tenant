@@ -9,7 +9,6 @@ import hashlib
 import http.client
 import json
 import re
-import time
 from collections.abc import Callable
 from typing import Any
 from urllib.parse import urlsplit
@@ -25,6 +24,7 @@ from lifecycle_worker.application.native import (
 )
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection
+from lifecycle_worker.infrastructure.native_response import response_bytes
 
 
 def distinct_owner_credentials(writer: NativeEndpoint, reader: NativeEndpoint) -> None:
@@ -93,19 +93,7 @@ class OwnerProtocolClient:
                 or response.getheader("Content-Type", "").split(";")[0] != "application/json"
             ):
                 raise NativeHeld("migration_protocol_unconfirmed")
-            data = bytearray()
-            deadline = time.monotonic() + 10
-            while True:
-                recheck()
-                if time.monotonic() >= deadline:
-                    raise NativeHeld("migration_protocol_deadline")
-                chunk = response.read1(min(16384, 131073 - len(data)))
-                data.extend(chunk)
-                if len(data) > 131072:
-                    raise NativeHeld("migration_protocol_response_bound")
-                if not chunk:
-                    recheck()
-                    return decode(bytes(data), 131072)
+            return decode(response_bytes(response, 131072, 10, recheck), 131072)
         except (OSError, http.client.HTTPException):
             raise NativeHeld("migration_protocol_outcome_unknown") from None
         finally:

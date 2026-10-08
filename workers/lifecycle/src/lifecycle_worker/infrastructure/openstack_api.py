@@ -25,7 +25,9 @@ from lifecycle_worker.infrastructure.native_http import (
     NativeEndpoint,
     NativeReads,
     PinnedConnection,
+    credential,
 )
+from lifecycle_worker.infrastructure.native_response import response_bytes
 
 
 class NativeCreates(Protocol):
@@ -42,10 +44,15 @@ class NativeCreates(Protocol):
 
 class NativeWrites(NativeReads):
     def __init__(
-        self, endpoints: dict[str, NativeEndpoint], user_id: str, clock: Callable[[], int]
+        self,
+        endpoints: dict[str, NativeEndpoint],
+        user_id: str,
+        clock: Callable[[], int],
+        identity_check: Callable[[], None] = lambda: None,
     ) -> None:
-        super().__init__(endpoints)
+        super().__init__(endpoints, identity_check)
         self.user_id, self.clock = native_identity(user_id), clock
+        self.credential_expires_at = 0.0
 
     def authorize(self, binding: NativeBinding) -> None:
         token = self.get("identity", "/auth/tokens", subject=True).get("token", {})
@@ -60,6 +67,7 @@ class NativeWrites(NativeReads):
                 raise ValueError
         except (KeyError, TypeError, ValueError):
             raise NativeHeld("native_writer_scope_denied") from None
+        self.credential_expires_at = expiry.timestamp()
 
     def create(
         self,
@@ -78,14 +86,23 @@ class NativeWrites(NativeReads):
             raise NativeHeld("unapproved_native_write_route")
         self.authorize(binding)
         endpoint = self.endpoints[service]
-        token = protected_read(endpoint.token_file, 4096).rstrip(b"\r\n")
-        if hashlib.sha256(token).hexdigest() != self.subject_token_sha256:
+        token = credential(endpoint)
+        if hashlib.sha256(token.encode()).hexdigest() != self.subject_token_sha256:
             raise NativeHeld("native_writer_credential_changed")
+
+        def current() -> None:
+            boundary()
+            self.identity_check()
+            if credential(endpoint) != token:
+                raise NativeHeld("native_writer_credential_changed")
+            if self.clock() >= self.credential_expires_at:
+                raise NativeHeld("native_writer_scope_expired")
+
         payload = json.dumps(body, allow_nan=False, separators=(",", ":")).encode()
         if len(payload) > 262144:
             raise NativeHeld("native_request_bound")
         headers = {
-            "X-Auth-Token": token.decode("ascii"),
+            "X-Auth-Token": token,
             "Content-Type": "application/json",
             "Accept": "application/json",
             "Accept-Encoding": "identity",
@@ -96,7 +113,7 @@ class NativeWrites(NativeReads):
             headers["OpenStack-API-Version"] = "volume 3.0"
         connection = PinnedConnection(endpoint)
         try:
-            boundary()
+            current()
             connection.request(
                 "POST",
                 urlsplit(endpoint.base_url).path.rstrip("/") + path,
@@ -113,17 +130,8 @@ class NativeWrites(NativeReads):
             ):
                 raise NativeHeld("native_create_unconfirmed")
             native_identity(request_id[4:])
-            deadline = time.monotonic() + 5
-            raw = bytearray()
-            while True:
-                if time.monotonic() >= deadline:
-                    raise NativeHeld("native_create_response_deadline")
-                data = response.read1(min(16384, 262145 - len(raw)))
-                raw.extend(data)
-                if len(raw) > 262144:
-                    raise NativeHeld("native_create_response_bound")
-                if not data:
-                    return {"document": decode(bytes(raw), 262144), "request_id": request_id}
+            raw = response_bytes(response, 262144, 5, current)
+            return {"document": decode(raw, 262144), "request_id": request_id}
         except (OSError, http.client.HTTPException):
             raise NativeHeld("native_create_requires_reconciliation") from None
         finally:
@@ -138,13 +146,16 @@ class OpenStackApi:
         journal: NativeJournal,
         timeout: float = 600,
         interval: float = 1,
+        identity_check: Callable[[], None] = lambda: None,
     ) -> None:
         if not 0 < timeout <= 600 or not 0 <= interval <= 5:
             raise NativeHeld("invalid_native_poll_bound")
         self.plan_file, self.transport, self.journal = plan_file, transport, journal
         self.timeout, self.interval = timeout, interval
+        self.identity_check = identity_check
 
     def resources(self, binding: NativeBinding) -> dict[str, dict[str, Any]]:
+        self.identity_check()
         return validate_api_plan(decode(protected_read(self.plan_file, 1_048_576)), binding)
 
     def inspect(self, binding: NativeBinding) -> dict[str, Any]:

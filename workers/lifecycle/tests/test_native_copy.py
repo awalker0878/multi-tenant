@@ -1,6 +1,7 @@
 """Real HTTPS export/import with synthetic VM/image data, never native qualification."""
 
 import hashlib
+import io
 import json
 import ssl
 import subprocess
@@ -67,20 +68,30 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
         },
     }
     data = b"synthetic-vmdk-stream" * 8000
-    fixture: dict[str, Any] = {"fault": "", "calls": [], "images": {}}
+    fixture: dict[str, Any] = {
+        "fault": "",
+        "calls": [],
+        "images": {},
+        "upload_finished": threading.Event(),
+    }
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, format: str, *args: Any) -> None:
             pass
 
         def answer(self, status: int, value: Any = None) -> None:
+            if self.path.endswith("/stage") and fixture["fault"] == "stage_rotation":
+                (tmp_path / "writer.token").write_text("rotated-after-upload")
             raw = b"" if value is None else json.dumps(value).encode()
             self.send_response(status)
             if value is not None:
                 self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(raw)))
             self.end_headers()
-            self.wfile.write(raw)
+            try:
+                self.wfile.write(raw)
+            except (BrokenPipeError, ConnectionResetError, ssl.SSLEOFError):
+                pass
 
         def record(self) -> bytes:
             fixture["calls"].append(
@@ -245,9 +256,17 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
                 self.answer(404)
 
         def do_PUT(self) -> None:
-            assert self.record() == data
+            received = self.record()
+            fixture["upload_bytes"] = len(received)
+            fixture["upload_finished"].set()
+            assert received == data or (
+                fixture.get("allow_partial_upload") and data.startswith(received)
+            )
             assert self.path.endswith("/stage")
-            self.answer(500 if fixture["fault"] == "stage" else 204)
+            try:
+                self.answer(500 if fixture["fault"] == "stage" else 204)
+            except (BrokenPipeError, ConnectionResetError, ssl.SSLEOFError):
+                pass
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
@@ -351,6 +370,7 @@ def test_export_import_integrity_and_independent_readback(copy_campaign: Any) ->
         "checksum",
         "lost_image",
         "stage",
+        "stage_rotation",
         "converted",
     ],
 )
@@ -365,3 +385,56 @@ def test_copy_holds_without_fallback_or_repeat(copy_campaign: Any, fault: str) -
         execution.execute(bound)
     assert len(fixture["calls"]) == count
     assert not any(row["path"].endswith("/PowerOnVM_Task") for row in fixture["calls"])
+
+
+@pytest.mark.parametrize("when", ["before_upload", "during_upload", "expiry"])
+def test_glance_upload_stops_before_next_chunk_after_credential_change(
+    copy_campaign: Any, when: str
+) -> None:
+    bound, execution, fixture, _ = copy_campaign
+    destination = execution.adapter.destination
+    payload = b"synthetic-vmdk-stream" * 8000
+    stream = io.BytesIO(payload)
+    fixture["allow_partial_upload"] = True
+    boundaries = 0
+
+    def current() -> None:
+        nonlocal boundaries
+        boundaries += 1
+        if (when == "before_upload" and boundaries == 3) or (
+            when == "during_upload" and stream.tell() > 65536
+        ):
+            destination.api.endpoint.token_file.write_text("rotated-during-upload")
+        elif when == "expiry" and stream.tell() > 65536:
+            destination.scope.clock = lambda: 4070908800  # Token expiry, 2099-01-01.
+
+    with pytest.raises(NativeHeld, match="credential_(changed|expired)"):
+        destination.stage(
+            bound,
+            {"image_id": str(uuid4())},
+            stream,
+            {"size": len(payload), "sha256": hashlib.sha256(payload).hexdigest()},
+            current,
+        )
+    if when != "before_upload":
+        assert fixture["upload_finished"].wait(3)
+        assert fixture["upload_bytes"] == 65536
+    uploads = [row for row in fixture["calls"] if row["method"] == "PUT"]
+    assert len(uploads) == (when != "before_upload")
+    # The stream can be read ahead by one chunk, but the changed credential never
+    # authorizes that chunk or a follow-up import request.
+    assert not any(row["path"].endswith("/import") for row in fixture["calls"])
+
+
+@pytest.mark.parametrize("when", ["before_request", "during_response"])
+def test_vmware_session_rotation_holds_export_without_retry(copy_campaign: Any, when: str) -> None:
+    _, execution, fixture, _ = copy_campaign
+    api = execution.adapter.source.api
+
+    def current() -> None:
+        if when == "before_request" or fixture["calls"]:
+            api.endpoint.token_file.write_text("rotated-vmware-session")
+
+    with pytest.raises(NativeHeld, match="credential_changed"):
+        api.request("POST", "/sdk/vim25/9.1.1.0/VirtualMachine/vm-1/ExportVm", current)
+    assert len(fixture["calls"]) == (when != "before_request")

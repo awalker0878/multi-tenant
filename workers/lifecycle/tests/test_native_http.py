@@ -48,18 +48,14 @@ def native_tls(tmp_path: Path) -> Iterator[tuple[NativeReads, dict[str, Any]]]:
     }
 
     class Handler(BaseHTTPRequestHandler):
-        def do_POST(self) -> None:
-            fixture["requests"].append(
-                {
-                    "path": self.path,
-                    "method": "POST",
-                    "authorization": self.headers.get("Authorization"),
-                    "body": self.rfile.read(int(self.headers.get("Content-Length", "0"))),
-                }
-            )
-            reply = fixture.get("routes", {}).get(self.path, fixture)
+        def answer(self, reply: dict[str, Any]) -> None:
+            if callback := reply.get("before_response"):
+                callback()
             self.send_response(reply["status"])
             self.send_header("Content-Type", reply.get("content_type", "application/json"))
+            for key in ("Content-Length", "Transfer-Encoding"):
+                for value in reply.get("headers", {}).get(key, []):
+                    self.send_header(key, value)
             if reply.get("location"):
                 self.send_header("Location", reply["location"])
             if reply.get("request_id"):
@@ -69,6 +65,17 @@ def native_tls(tmp_path: Path) -> Iterator[tuple[NativeReads, dict[str, Any]]]:
                 self.wfile.write(reply["body"])
             except (BrokenPipeError, ConnectionResetError, ssl.SSLEOFError):
                 pass
+
+        def do_POST(self) -> None:
+            fixture["requests"].append(
+                {
+                    "path": self.path,
+                    "method": "POST",
+                    "authorization": self.headers.get("Authorization"),
+                    "body": self.rfile.read(int(self.headers.get("Content-Length", "0"))),
+                }
+            )
+            self.answer(fixture.get("routes", {}).get(self.path, fixture))
 
         def do_GET(self) -> None:
             fixture["requests"].append(
@@ -81,18 +88,7 @@ def native_tls(tmp_path: Path) -> Iterator[tuple[NativeReads, dict[str, Any]]]:
                     "volume_version": self.headers.get("OpenStack-API-Version"),
                 }
             )
-            reply = fixture.get("routes", {}).get(self.path, fixture)
-            self.send_response(reply["status"])
-            self.send_header("Content-Type", reply.get("content_type", "application/json"))
-            if reply.get("location"):
-                self.send_header("Location", reply["location"])
-            if reply.get("request_id"):
-                self.send_header("x-openstack-request-id", reply["request_id"])
-            self.end_headers()
-            try:
-                self.wfile.write(reply["body"])
-            except (BrokenPipeError, ConnectionResetError, ssl.SSLEOFError):
-                pass
+            self.answer(fixture.get("routes", {}).get(self.path, fixture))
 
         def log_message(self, format: str, *args: Any) -> None:
             pass
@@ -259,3 +255,80 @@ def test_lifecycle_native_boundary_enforces_small_strict_responses(
     fixture["body"] = body
     with pytest.raises(NativeHeld):
         LifecycleNativeBoundary(endpoint).check({}, "preflight")
+
+
+@pytest.mark.parametrize("client", ["read", "authority", "migration", "owner", "platform"])
+@pytest.mark.parametrize(
+    "headers,body",
+    [
+        ({"Content-Length": ["100"]}, b'{"allowed":true}'),
+        ({"Content-Length": ["-1"]}, b"{}"),
+        ({"Content-Length": ["2", "3"]}, b"{}"),
+        ({"Content-Length": ["2"], "Transfer-Encoding": ["chunked"]}, b"0\r\n\r\n"),
+        ({"Transfer-Encoding": ["gzip"]}, b"{}"),
+        ({"Transfer-Encoding": ["chunked"]}, b"2\r\n{}\r\n"),
+    ],
+    ids=[
+        "truncated_json",
+        "negative_length",
+        "duplicate_length",
+        "ambiguous",
+        "encoding",
+        "chunk_eof",
+    ],
+)
+def test_native_json_clients_reject_incomplete_or_ambiguous_replies(
+    native_tls: tuple[NativeReads, dict[str, Any]],
+    client: str,
+    headers: dict[str, list[str]],
+    body: bytes,
+) -> None:
+    from dataclasses import replace
+
+    from lifecycle_worker.infrastructure.migration_protocol import OwnerProtocolClient
+    from lifecycle_worker.infrastructure.native_authority import LifecycleNativeBoundary
+    from lifecycle_worker.infrastructure.native_copy import NativeJson
+    from lifecycle_worker.infrastructure.platform_api import PlatformHttp
+
+    reads, fixture = native_tls
+    fixture.update(headers=headers, body=body)
+    endpoint = reads.endpoints["compute"]
+    with pytest.raises(NativeHeld):
+        if client == "read":
+            reads.get("compute", "/servers/known")
+        elif client == "authority":
+            LifecycleNativeBoundary(endpoint).check({}, "preflight")
+        elif client == "owner":
+            OwnerProtocolClient(endpoint).call("/v1/native/effects", {}, lambda: None)
+        elif client == "platform":
+            PlatformHttp(
+                replace(endpoint, base_url=endpoint.base_url.removesuffix("/compute/v2.1")),
+                "vmware",
+            ).read("vmware", "vm-1")
+        else:
+            NativeJson(endpoint, "vmware-api-session-id").request("POST", "/export", lambda: None)
+    assert len(fixture["requests"]) == 1
+
+
+@pytest.mark.parametrize("subject", [False, True])
+def test_read_rotation_during_response_does_not_establish_scope(
+    native_tls: tuple[NativeReads, dict[str, Any]], subject: bool
+) -> None:
+    reads, fixture = native_tls
+    fixture["before_response"] = lambda: reads.endpoints["identity"].token_file.write_text(
+        "changed-while-request-in-flight"
+    )
+    with pytest.raises(NativeHeld, match="credential_changed"):
+        reads.get("identity", "/auth/tokens", subject=subject)
+    assert reads.subject_token_sha256 is None
+    assert len(fixture["requests"]) == 1
+
+
+def test_complete_chunked_and_length_delimited_json_are_accepted(
+    native_tls: tuple[NativeReads, dict[str, Any]],
+) -> None:
+    reads, fixture = native_tls
+    fixture.update(headers={"Transfer-Encoding": ["chunked"]}, body=b"2\r\n{}\r\n0\r\n\r\n")
+    assert reads.get("compute", "/servers/known") == {}
+    fixture.update(headers={"Content-Length": ["2"]}, body=b"{}")
+    assert reads.get("compute", "/servers/known") == {}

@@ -39,7 +39,11 @@ from lifecycle_worker.infrastructure.native_copy import (
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint
 from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
-from lifecycle_worker.infrastructure.native_runtime import MountedNativeRuntime, endpoints
+from lifecycle_worker.infrastructure.native_runtime import (
+    MountedNativeRuntime,
+    endpoints,
+    independent_openstack,
+)
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites
 from lifecycle_worker.infrastructure.platform_api import (
     PlatformApi,
@@ -228,13 +232,30 @@ class MountedMigrationRuntime:
                     "image",
                 }:
                     raise NativeHeld("invalid_image_connection")
+            image_writer_endpoints, image_reader_endpoints = (
+                endpoints(writer["endpoints"]),
+                endpoints(reader["endpoints"]),
+            )
+            image_writer, image_reader = endpoint(writer["image"]), endpoint(reader["image"])
+
+            def image_identity_check() -> None:
+                independent_openstack(
+                    image_writer_endpoints | {"image": image_writer},
+                    image_reader_endpoints | {"image": image_reader},
+                )
+
+            image_identity_check()
             destination = GlanceImport(
-                NativeJson(endpoint(writer["image"]), "X-Auth-Token"),
-                NativeWrites(endpoints(writer["endpoints"]), writer["user_id"], self.clock),
+                NativeJson(image_writer, "X-Auth-Token"),
+                NativeWrites(
+                    image_writer_endpoints, writer["user_id"], self.clock, image_identity_check
+                ),
             )
             independent = GlanceImport(
-                NativeJson(endpoint(reader["image"]), "X-Auth-Token"),
-                NativeWrites(endpoints(reader["endpoints"]), reader["user_id"], self.clock),
+                NativeJson(image_reader, "X-Auth-Token"),
+                NativeWrites(
+                    image_reader_endpoints, reader["user_id"], self.clock, image_identity_check
+                ),
             )
             observer = GlanceReadback(
                 independent, plan, self.journal, writer["user_id"], self.clock
@@ -245,7 +266,7 @@ class MountedMigrationRuntime:
             if entry["observer"] is not None:
                 raise NativeHeld("unexpected_image_observer")
             adapter.inspect(binding)
-            return self.bound(adapter, binding, entry), observer
+            return self.bound(adapter, binding, entry, image_identity_check), observer
         elif kind == "platform_lifecycle" and set(config) == {
             "writer",
             "reader",

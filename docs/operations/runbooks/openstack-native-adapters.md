@@ -17,6 +17,10 @@ A protected runtime record contains exactly `operation_plan`, `writer` and
 `ca_file` and `token_file`. Paths are absolute protected files. All services in
 one identity's set use the same project-scoped token. Writer and observer are
 separate native identities; Keystone scope/user/expiry are independently checked.
+For effect execution, both identity sets must use the same enrolled service URLs
+and address pins, with distinct nonempty tokens. The worker rereads the runtime
+record and credential separation before inspection and native requests; changing
+the mounted runtime during an attempt requires reconciliation.
 TLS verifies the commissioned hostname and CA while connecting to the pinned
 address. Redirects, ambient credentials and caller-selected destinations are absent.
 
@@ -50,6 +54,12 @@ in quarantine, volumes are polled to available, and servers to ACTIVE within a
 bounded deadline. A lost reply, cancellation, journal failure, expiration or
 partial result holds the attempt. It never resubmits a create. Custody claims
 survive restart and have no automatic expiry/delete path.
+
+Credential rotation and expiry are checked after each current-authority callback
+and through response completion. Declared response lengths must be satisfied;
+conflicting length/chunk headers or an incomplete chunk stream remain unknown,
+even when the received prefix parses as valid JSON. Retain the request-start
+marker and reconcile with independent native evidence before any new authority.
 
 `OpenStackReadback` uses the separate observer credential and accepted IDs. It
 checks project/name/ownership, placement, exact server NIC and volume attachments,

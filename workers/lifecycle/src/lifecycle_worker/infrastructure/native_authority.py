@@ -2,13 +2,13 @@
 
 import http.client
 import json
-import time
 from typing import Any
 from urllib.parse import urlsplit
 
 from lifecycle_worker.application.native import NativeHeld, decode
 from lifecycle_worker.infrastructure.native_files import protected_read
-from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection
+from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection, credential
+from lifecycle_worker.infrastructure.native_response import response_bytes
 
 
 class LifecycleNativeBoundary:
@@ -23,8 +23,14 @@ class LifecycleNativeBoundary:
         payload = json.dumps({"grant": stage_grant, "boundary": boundary}, allow_nan=False).encode()
         if len(payload) > 16384:
             raise NativeHeld("native_boundary_request_bound")
+
+        def current() -> None:
+            if credential(endpoint).encode() != raw:
+                raise NativeHeld("native_boundary_credential_changed")
+
         connection = PinnedConnection(endpoint)
         try:
+            current()
             connection.request(
                 "POST",
                 urlsplit(endpoint.base_url).path.rstrip("/") + "/internal/native-grants/checks",
@@ -43,17 +49,7 @@ class LifecycleNativeBoundary:
                 or response.getheader("Content-Type", "").split(";")[0] != "application/json"
             ):
                 raise NativeHeld("native_boundary_not_authorized")
-            deadline = time.monotonic() + 5
-            result = bytearray()
-            while True:
-                if time.monotonic() >= deadline:
-                    raise NativeHeld("native_boundary_deadline")
-                part = response.read1(min(4096, 16385 - len(result)))
-                result.extend(part)
-                if len(result) > 16384:
-                    raise NativeHeld("native_boundary_response_bound")
-                if not part:
-                    return decode(bytes(result), limit=16384)
+            return decode(response_bytes(response, 16384, 5, current), limit=16384)
         except (OSError, http.client.HTTPException):
             raise NativeHeld("native_boundary_unavailable") from None
         finally:

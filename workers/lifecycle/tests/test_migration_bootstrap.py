@@ -376,3 +376,65 @@ def test_capture_accepts_separately_enrolled_observer_origin_but_not_shared_cred
     Path(row["observer"]["endpoint"]["token_file"]).write_text("w" * 64)
     with pytest.raises(NativeHeld, match="independent_owner_read_identity_required"):
         adapter.execute(original, lambda: None)
+
+
+@pytest.mark.parametrize("when", ["resolve", "boundary"])
+def test_image_import_requires_independent_credentials_before_native_effects(
+    tmp_path: Path, binding: NativeBinding, when: str
+) -> None:
+    path, binding, row = registry(tmp_path, binding)
+    plan = {
+        "schema_version": 1,
+        "kind": "migration_image_import",
+        "conversion_plan_sha256": "a" * 64,
+        "route": "glance-direct",
+        "max_seconds": 600,
+        "disks": [
+            {
+                "key": "boot",
+                "image_id": str(uuid4()),
+                "name": "copied-boot",
+                "disk_format": "raw",
+                "hw_firmware_type": "bios",
+                "hw_disk_bus": "virtio",
+                "virtual_bytes": 1048576,
+            }
+        ],
+    }
+    binding = replace(binding, operation_plan_sha256=digest(plan))
+    spool = tmp_path / "spool"
+    spool.mkdir(mode=0o700)
+    connections = {}
+    for role, endpoint_row in (
+        ("writer", row["configuration"]["endpoint"]),
+        ("reader", row["observer"]["endpoint"]),
+    ):
+        connections[role] = {
+            "user_id": str(uuid4()),
+            "image": endpoint_row,
+            "endpoints": {
+                service: endpoint_row for service in ("identity", "compute", "network", "volume")
+            },
+        }
+    reader_token = Path(connections["reader"]["image"]["token_file"])
+    row.update(
+        binding={k: binding.document()[k] for k in row["binding"]},
+        adapter="migration_image_import",
+        observer=None,
+        configuration={**connections, "spool": str(spool)},
+    )
+    mounted(Path(row["plan_file"]), plan)
+    mounted(path, {"schema_version": 1, "entries": [row]})
+    runtime = MountedMigrationRuntime(path, PostgresNativeJournal(no_database), lambda: 100)
+    if when == "resolve":
+        reader_token.write_text("w" * 64)
+        with pytest.raises(NativeHeld, match="independent_openstack_credentials_required"):
+            runtime.resolve(binding)
+    else:
+        adapter, _ = runtime.resolve(binding)
+
+        def collide() -> None:
+            reader_token.write_text("w" * 64)
+
+        with pytest.raises(NativeHeld, match="independent_openstack_credentials_required"):
+            adapter.execute(binding, collide)
