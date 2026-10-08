@@ -14,7 +14,11 @@ from planning.infrastructure.owners import qualification_current
 
 
 @pytest.mark.parametrize(
-    "fault", ["none", "missing_receipt", "released", "vector", "restore", "network", "legacy"]
+    "fault",
+    [
+        "none", "missing_receipt", "released", "vector", "restore", "network",
+        "legacy", "shrink", "class_limit", "revision", "owner_stale", "capacity_summary",
+    ],
 )
 def test_every_unattended_read_rechecks_evidence_and_reserved_vectors(
     monkeypatch: pytest.MonkeyPatch, fault: str
@@ -59,6 +63,24 @@ def test_every_unattended_read_rechecks_evidence_and_reserved_vectors(
         ] = "deny"
     elif fault == "legacy":
         qualification["version"] = 1
+    elif fault == "shrink":
+        # No pool ID, native ref, failure domain or policy changes: only headroom.
+        current_destination["capability_snapshot"]["data"]["pools"][0]["total"][
+            "memory_mib"
+        ] -= 1
+    elif fault == "class_limit":
+        # The aggregate can still fit while a required storage class cannot.
+        current_destination["capability_snapshot"]["data"]["pools"][0]["total"][
+            "storage_gib:standard"
+        ] -= 1
+    elif fault == "revision":
+        current_destination["capability_snapshot"]["data"]["pools"][0][
+            "ledger_revision"
+        ] += 1
+    elif fault == "owner_stale":
+        receipt["observed_at"] = NOW - 6
+    elif fault == "capacity_summary":
+        current_destination["capacity"]["vcpus"] = 0
     reads = Mock(side_effect=[qualification, current_destination, receipt])
     monkeypatch.setattr("planning.infrastructure.owners.request", reads)
     monkeypatch.setattr("planning.infrastructure.owners.time.time", lambda: NOW)
