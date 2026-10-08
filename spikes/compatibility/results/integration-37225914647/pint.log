@@ -1,8 +1,0 @@
-
-  ⨯..........................⨯...
-
-  ──────────────────────────────────────────────────────────────────── Laravel  
-    FAIL   .......................................... 31 files, 2 style issues  
-  ⨯ bootstrap/providers.php                       fully_qualified_strict_types  
-  ⨯ tests/Pest.php                                fully_qualified_strict_types  
-

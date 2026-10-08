@@ -1,6 +1,0 @@
-
-Running 1 test using 1 worker
-
-  ✓  1 [webkit] › tests/browser-p04/inventory.spec.ts:4:1 › browses scoped observations, preserves uncertain enrollment and clears revoked access (25.8s)
-
-  1 passed (27.3s)

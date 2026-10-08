@@ -1,1 +1,0 @@
-{"stage": "evidence-ready", "result": "PASS", "checks": [{"name": "evidence-server-authenticated-ready", "passed": true, "observation": null}], "state": {}}

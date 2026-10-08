@@ -1,1 +1,0 @@
-{"status": "PASS", "round_trip": "null and decimal-string precision preserved", "negative_model_cases": 3, "known_gap": "generated request model ignores extra input keys"}

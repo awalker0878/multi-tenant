@@ -1,5 +1,0 @@
-Will connect to 127.0.0.1:15672
-Will connect to 127.0.0.1:15692
-Will connect to 127.0.0.1:25672
-Will connect to 127.0.0.1:5671
-Successfully connected to ports 5671, 15672, 15692, 25672 on node rabbit@p02-notification-broker (using 127.0.0.1 for target IP address)

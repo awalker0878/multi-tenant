@@ -1,5 +1,0 @@
-Using Python 3.12.14 environment at: /home/runner/work/_temp/p01-quality/runtime
-Resolved 1 package in 1ms
-Prepared 1 package in 3ms
-Installed 1 package in 1ms
- + product-lifecycle-worker==0.1.0.dev0 (from file:///home/runner/work/_temp/p01-quality/component/dist/product_lifecycle_worker-0.1.0.dev0-py3-none-any.whl)

@@ -1,1 +1,0 @@
-{"status":"PASS","mock_transport_calls":1,"known_gap":"generated decoder accepts an unknown enum; boundary schema validation is mandatory"}

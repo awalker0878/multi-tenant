@@ -1,1 +1,0 @@
-psql: error: connection to server at "postgres" (172.18.0.2), port 5432 failed: FATAL:  pg_hba.conf rejects connection for host "172.18.0.2", user "lifecycle_runtime", database "lifecycle", no encryption

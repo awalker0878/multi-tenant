@@ -1,3 +1,0 @@
-ERROR:  permission denied for schema app
-LINE 1: CREATE TABLE app.forbidden(id integer);
-                     ^

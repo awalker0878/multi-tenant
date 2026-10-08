@@ -1,1 +1,0 @@
-"sha256:ce99832f4ed67046d3a41193426fc92ba2e251e5d98412984a3ac999f28939bf" "linux" "amd64" {"io.product.component":"lifecycle","org.opencontainers.image.revision":"e9eac175f2fb845847aa5954522a8470260180dc","org.opencontainers.image.source":"https://github.com/awalker0878/multi-tenant","org.opencontainers.image.title":"product-lifecycle bootstrap"}

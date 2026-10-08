@@ -1,1 +1,0 @@
-{"result": "PASS", "checks": 5, "pydantic": "2.13.5", "httpx": "0.28.1", "network": "MockTransport only"}

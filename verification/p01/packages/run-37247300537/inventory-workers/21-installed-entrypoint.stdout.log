@@ -1,1 +1,0 @@
-{"component":"inventory-workers","component_kind":"worker_bootstrap","native_operations_enabled":false,"probe":"liveness","scope":"process_bootstrap","service":"inventory","status":"ok","task_consumption_enabled":false}

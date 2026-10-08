@@ -1,6 +1,0 @@
-
-Running 1 test using 1 worker
-
-  ✓  1 [chromium] › tests/browser-p05/planning.spec.ts:5:1 › compare exact destinations, retain uncertain command, review bound approval and hold revoked evidence (34.9s)
-
-  1 passed (37.0s)

@@ -1,6 +1,0 @@
-
-Running 1 test using 1 worker
-
-  ✓  1 [firefox] › tests/browser-p03/catalogue.spec.ts:5:1 › authors complete intent, preserves conflicts and uncertain retries, compares history and clears revoked access (14.8s)
-
-  1 passed (16.2s)

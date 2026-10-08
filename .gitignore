@@ -4,3 +4,9 @@ __pycache__/
 
 # Python build metadata is regenerated from pyproject.toml and source.
 *.egg-info/
+
+# Generated execution output is retained by CI artifacts, not Git history.
+*.log
+*.zip
+verification/**/run-*/
+spikes/compatibility/results/**/run-*/

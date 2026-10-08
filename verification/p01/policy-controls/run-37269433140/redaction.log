@@ -1,7 +1,0 @@
-test_dependency_identity_and_remediation_survive_redaction (__main__.RedactionTests.test_dependency_identity_and_remediation_survive_redaction) ... ok
-test_secret_bytes_and_snippets_are_not_retained (__main__.RedactionTests.test_secret_bytes_and_snippets_are_not_retained) ... ok
-
-----------------------------------------------------------------------
-Ran 2 tests in 0.000s
-
-OK

@@ -1,7 +1,0 @@
-
-Running 2 tests using 1 worker
-
-  ✓  1 [firefox] › tests/browser-p02/identity.spec.ts:28:1 › deployment credential requires a change, survives reload and cannot be reused (5.6s)
-  ✓  2 [firefox] › tests/browser-p02/identity.spec.ts:60:1 › console configuration verifies HTTPS federation and enforces tenant revocation across browsers (25.7s)
-
-  2 passed (32.9s)

@@ -1,7 +1,0 @@
-
-   PASS  Tests\Feature\ApprovalTest
-  ✓ it retains nonempty terminal decision history for recovery qualific… 0.58s  
-
-  Tests:    1 passed (31 assertions)
-  Duration: 0.63s
-

@@ -1,5 +1,0 @@
-npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
-Listing tests:
-  [webkit] › identity.spec.ts:11:1 › deployment credential requires a change, survives reload and cannot be reused
-  [webkit] › identity.spec.ts:43:1 › console configuration verifies HTTPS federation and enforces tenant revocation across browsers
-Total: 2 tests in 1 file

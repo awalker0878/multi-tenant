@@ -1,1 +1,0 @@
-{"result":"PASS","checks":[{"name":"initial-lock-acquired","passed":true},{"name":"other-tenant-lock-independent","passed":true},{"name":"stored-session-is-encrypted","passed":true},{"name":"shared-drivers-selected","passed":true}]}

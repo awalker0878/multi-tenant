@@ -1,9 +1,0 @@
-test_added_and_broadened_suppressions_are_denied (__main__.ExclusionTests.test_added_and_broadened_suppressions_are_denied) ... ok
-test_configuration_changes_require_security_and_platform (__main__.ExclusionTests.test_configuration_changes_require_security_and_platform) ... ok
-test_exception_must_match_exact_source_and_file (__main__.ExclusionTests.test_exception_must_match_exact_source_and_file) ... ok
-test_removal_is_allowed (__main__.ExclusionTests.test_removal_is_allowed) ... ok
-
-----------------------------------------------------------------------
-Ran 4 tests in 0.001s
-
-OK

@@ -1,6 +1,0 @@
-tests/quarantine.tftest.hcl... in progress
-  run "quarantined_multi_workload_plan"... pass
-tests/quarantine.tftest.hcl... tearing down
-tests/quarantine.tftest.hcl... pass
-
-Success! 1 passed, 0 failed.

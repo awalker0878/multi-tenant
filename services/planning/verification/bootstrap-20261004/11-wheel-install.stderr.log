@@ -1,5 +1,0 @@
-Using Python 3.12.14 environment at: /tmp/p01-planning-yinjn8rn/runtime
-Resolved 1 package in 2ms
-Prepared 1 package in 6ms
-Installed 1 package in 3ms
- + product-planning==0.1.0.dev0 (from file:///tmp/p01-planning-yinjn8rn/artifacts/product_planning-0.1.0.dev0-py3-none-any.whl)

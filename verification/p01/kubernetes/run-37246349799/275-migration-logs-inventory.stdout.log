@@ -1,5 +1,0 @@
- database  | migration_identity | schema_version 
------------+--------------------+----------------
- inventory | inventory_migrator |              1
-(1 row)
-

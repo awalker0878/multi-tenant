@@ -1,8 +1,0 @@
-negative: exit 2 (expected 2)
-failure: exit 2 (expected 0)
-bytes: exit 0 (expected 0)
-timeout: exit 124 (expected 124)
-----------------------------------------------------------------------
-Ran 91 tests in 3.733s
-
-OK

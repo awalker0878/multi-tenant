@@ -1,5 +1,0 @@
- database  | migration_identity | schema_version 
------------+--------------------+----------------
- assurance | assurance_migrator |              1
-(1 row)
-

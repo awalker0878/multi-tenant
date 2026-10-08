@@ -1,2 +1,0 @@
-ERROR:  insert or update on table "attachments" violates foreign key constraint "attachments_tenant_id_permit_id_fkey"
-DETAIL:  Key (tenant_id, permit_id)=(tenant_b, tenant_a_permit_1) is not present in table "permits".

@@ -1,4 +1,0 @@
-Using Python 3.12.14 environment at: venv
-Resolved 1 package in 2ms
-Installed 1 package in 2ms
- + product-lifecycle==0.1.0.dev0 (from file:///workspace/scratch/dcf309239113/multi-tenant/services/lifecycle/dist/product_lifecycle-0.1.0.dev0-py3-none-any.whl)

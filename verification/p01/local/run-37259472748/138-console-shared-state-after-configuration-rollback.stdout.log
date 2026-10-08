@@ -1,1 +1,0 @@
-{"result":"PASS","checks":[{"name":"session-survives-process-or-database-restart","passed":true},{"name":"tenant-a-cache-restored","passed":true},{"name":"tenant-b-cache-isolated","passed":true},{"name":"foreign-tenant-cache-miss","passed":true},{"name":"stored-session-is-encrypted","passed":true},{"name":"shared-drivers-selected","passed":true}]}

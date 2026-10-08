@@ -1,5 +1,0 @@
- database  | migration_identity | schema_version 
------------+--------------------+----------------
- catalogue | catalogue_migrator |              1
-(1 row)
-

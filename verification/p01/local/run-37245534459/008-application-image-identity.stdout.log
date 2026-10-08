@@ -1,1 +1,0 @@
-"sha256:e661f3610c5b7a9ee550dbbcb5b44a59a98a3283d859f7e40885aedbc4028b05" "linux" "amd64" {"io.product.component":"inventory","org.opencontainers.image.revision":"e9eac175f2fb845847aa5954522a8470260180dc","org.opencontainers.image.source":"https://github.com/awalker0878/multi-tenant","org.opencontainers.image.title":"product-inventory bootstrap"}

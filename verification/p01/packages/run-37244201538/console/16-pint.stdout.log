@@ -1,7 +1,0 @@
-
-  ..............................⨯...
-
-  ──────────────────────────────────────────────────────────────────── Laravel  
-    FAIL   ........................................... 34 files, 1 style issue  
-  ⨯ tests/Feature/DependencyHealthTest.php                no_extra_blank_lines  
-

@@ -1,6 +1,0 @@
-
-Running 1 test using 1 worker
-
-  ✓  1 [chromium] › tests/browser-p06/evidence.spec.ts:3:1 › completed evidence has exact custody, simulation label and independent review (1.8s)
-
-  1 passed (2.5s)
