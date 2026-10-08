@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 import pytest
-from planning_fixture import ACTOR, NOW, REVISION, assessment, inputs, request
+from planning_fixture import ACTOR, NOW, REVISION, assessment, inputs, request, verify_fixture
 
 from planning.domain.assessment import assess
 from planning.domain.compilation import bind, compile_plan, diff, graph_order
@@ -197,6 +197,7 @@ def test_plan_freshness_cannot_outlive_required_capability(side: str) -> None:
     assessed = assessment()
     row = assessed["inputs"][0]
     row[side]["capabilities"]["placement.tenant_isolation"]["expires_at"] = NOW + 10
+    verify_fixture(row["qualification"])
     assessed["results"] = [
         assess(
             assessed["intent"]["intent"],
@@ -226,9 +227,10 @@ def test_optional_capability_does_not_shorten_required_freshness() -> None:
         **d["capabilities"]["optional.capability"],
         "status": "supported",
     }
+    verify_fixture(q)
     result = assess(i, d, p, policy, q, "application.provision", "native_api", NOW)
     assert result["operationally_eligible"]
-    assert result["expires_at"] == NOW + 1800
+    assert result["expires_at"] == NOW + 120
 
 
 @pytest.mark.parametrize(

@@ -7,6 +7,7 @@ from collections.abc import Callable
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
+from inventory.application.capability_observations import CapabilityObservations, capability_input
 from inventory.application.discovery import Discovery
 from inventory.application.planning import planning_input
 from inventory.application.workload import WorkloadProfiles
@@ -20,7 +21,11 @@ class PlanningInputApp:
         discovery: Discovery,
         authority: Callable[[str, str, str, str, str, str, str], None],
         native_authority: Callable[[str, str, str, str, str, int, str], None] | None = None,
+        observations: CapabilityObservations | None = None,
+        capability_authority: Callable[[str, str, str, str, str, str, str], None] | None = None,
     ) -> None:
+        self.capability_authority = capability_authority
+        self.observations = observations
         self.discovery, self.authority = discovery, authority
         self.native_authority = native_authority
 
@@ -31,7 +36,7 @@ class PlanningInputApp:
             return
         try:
             route = re.fullmatch(
-                rf"/v1/tenants/({UUID})/planning-inputs/({UUID})/({UUID})/({UUID})/({UUID})/({UUID})",
+                rf"/(?:v1|internal)/tenants/({UUID})/(?:planning-inputs|planning-capability-inputs)/({UUID})/({UUID})/({UUID})/({UUID})/({UUID})",
                 scope["path"],
             )
             migration = re.fullmatch(
@@ -49,7 +54,17 @@ class PlanningInputApp:
             auth = single(headers, b"authorization")
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", auth):
                 raise Rejected("invalid_workload", 401)
-            if scope["path"].startswith("/internal/"):
+            capability_internal = (
+                scope["path"].startswith("/internal/") and "/planning-capability-inputs/" in scope["path"]
+            )
+            if capability_internal:
+                if self.capability_authority is None:
+                    raise Rejected("capability_reader_not_commissioned", 423)
+                await asyncio.to_thread(
+                    self.capability_authority, auth[7:], tenant, application, environment,
+                    site, endpoint, generation,
+                )
+            elif scope["path"].startswith("/internal/"):
                 if self.native_authority is None:
                     raise Rejected("native_reader_not_commissioned", 423)
                 await asyncio.to_thread(
@@ -80,6 +95,16 @@ class PlanningInputApp:
                     site,
                     int(endpoint),
                     generation,
+                )
+            elif "/planning-capability-inputs/" in scope["path"]:
+                payload = await asyncio.to_thread(
+                    capability_input,
+                    self.discovery,
+                    tenant,
+                    site,
+                    endpoint,
+                    generation,
+                    self.observations,
                 )
             else:
                 payload = await asyncio.to_thread(

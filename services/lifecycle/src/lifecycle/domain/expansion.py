@@ -5,6 +5,7 @@ from typing import Any
 
 from lifecycle.domain.admission import digest
 from lifecycle.domain.campaign import dependency_order, intervals
+from lifecycle.domain.capability_definitions import PLATFORMS
 from lifecycle.domain.execution import Rejected, identity
 from lifecycle.domain.native_workflow import checksum, exact, integer
 
@@ -43,7 +44,7 @@ def scope(value: Any) -> dict[str, Any]:
     for key in ("site_id", "endpoint_id", "environment", "resource_id"):
         identity(value[key])
     checksum(value["tuple_sha256"])
-    if value["platform"] not in {"vmware", "ahv", "openstack"}:
+    if value["platform"] not in PLATFORMS:
         raise Rejected("unsupported_expansion_platform", 422)
     for key in ("native_scope", "object_id"):
         if (

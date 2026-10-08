@@ -7,19 +7,31 @@ from typing import Any
 from uuid import uuid4
 
 from planning.application.ports import Database, Sources, Transaction
+from planning.application.validation import PlanValidation
 from planning.domain.assessment import assess
+from planning.domain.placement import fit
 from planning.domain.compilation import bind, compile_plan
 from planning.domain.model import Actor, Rejected, canonical, digest, identifier, integer, shape
 
 
 class Planning:
-    def __init__(self, database: Database, sources: Sources, clock: Callable[[], int]) -> None:
+    __slots__ = ("database", "sources", "clock", "_validation")
+
+    def __init__(
+        self,
+        database: Database,
+        sources: Sources,
+        clock: Callable[[], int],
+        validation: PlanValidation,
+    ) -> None:
+        if not isinstance(validation, PlanValidation):
+            raise ValueError("required_plan_validation")
         self.database, self.sources, self.clock = database, sources, clock
-        self.migration_execution_current: Callable[[dict[str, Any]], None] | None = None
-        self.native_execution_current: Callable[[dict[str, Any]], None] | None = None
-        self.migration_current: Callable[[Actor, dict[str, Any], dict[str, str]], None] | None = (
-            None
-        )
+        self._validation = validation
+
+    @property
+    def validation(self) -> PlanValidation:
+        return self._validation
 
     def get(
         self, tenant: str, application: str, environment: str, identity: str, kind: str
@@ -220,9 +232,7 @@ class Planning:
                 holds.append(error.reason)
         if "native_migration" in content:
             try:
-                if self.migration_current is None:
-                    raise Rejected("migration_owners_unavailable", 503)
-                self.migration_current(actor, plan, delegations)
+                self.validation.migration.current(actor, plan, delegations)
             except Rejected as error:
                 holds.append(error.reason)
         try:
@@ -281,19 +291,68 @@ class Planning:
         }
 
     def check_native_recipe(self, record: dict[str, Any]) -> None:
+        if record["content"]["lane"] == "operational" and (
+            "native_provisioning" in record["content"] or "native_migration" in record["content"]
+        ):
+            self.validation.support_current(record)
         if "native_provisioning" in record["content"]:
-            if self.native_execution_current is None:
-                raise Rejected("native_recipe_authority_unavailable", 423)
-            self.native_execution_current(record)
+            self.validation.native.current(record)
         if "native_migration" in record["content"]:
-            if self.migration_execution_current is None:
-                raise Rejected("migration_recipe_authority_unavailable", 423)
-            self.migration_execution_current(record)
+            self.validation.migration.execution_current(record)
             if (
                 min(record["content"]["valid_until"], record["content"]["input_fresh_until"])
                 <= self.clock()
             ):
                 raise Rejected("migration_plan_expired", 423)
+
+    def placement_proposal(
+        self, tenant: str, identity: str, revision: int
+    ) -> dict[str, Any]:
+        """Expose a deterministic witness; a proposal is never an owner receipt."""
+        if revision != 1:
+            raise Rejected("not_found", 404)
+        with self.database.transaction() as tx:
+            row = tx.one(
+                "SELECT payload FROM app.planning_records WHERE id=%s AND tenant=%s "
+                "AND kind='plan'", (identifier(identity), identifier(tenant)),
+            )
+            if row is None:
+                raise Rejected("not_found", 404)
+            plan = row["payload"]
+            retained = tx.one(
+                "SELECT payload FROM app.planning_records WHERE id=%s AND tenant=%s "
+                "AND kind='assessment'", (plan["assessment_id"], tenant),
+            )
+        content = plan["content"]
+        if (
+            retained is None or content["execution_ready"] is not True
+            or content["lane"] != "operational"
+            or min(content["valid_until"], content["input_fresh_until"]) <= self.clock()
+        ):
+            raise Rejected("placement_proposal_held", 423)
+        assessment = retained["payload"]
+        inputs = assessment["inputs"][plan["candidate"]]
+        try:
+            placed = fit(
+                assessment["intent"]["intent"],
+                inputs["destination"]["capability_snapshot"]["data"]["pools"],
+                inputs["policy"], self.clock(),
+            )
+        except (KeyError, TypeError, ValueError):
+            raise Rejected("placement_proposal_unverified", 423) from None
+        if placed["status"] != "eligible":
+            raise Rejected("placement_proposal_unfit", 423)
+        return {
+            "scope": content["scope"],
+            "plan_id": plan["id"],
+            "plan_revision": 1,
+            "plan_digest": plan["binding"]["digest"],
+            "generation_id": content["inventory_generation"],
+            "policy_sha256": digest(inputs["policy"]),
+            "placement_sha256": digest(placed["allocations"]),
+            "allocations": placed["allocations"],
+            "native_write_authorized": False,
+        }
 
     def bound_plan(self, identity: str, revision: int) -> dict[str, Any]:
         if revision != 1:

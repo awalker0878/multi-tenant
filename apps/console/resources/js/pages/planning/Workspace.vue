@@ -3,6 +3,7 @@ import { computed, onUnmounted, ref } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 import type { Candidate, Endpoint, PlanningRecord } from '../../features/planning/contracts';
+import { capabilityDefinitions } from '../../features/planning/capabilityDefinitions';
 import { usePlanningAccess } from '../../features/planning/useAccess';
 const props=defineProps<{tenantId:string;applicationId:string;environment:string;revisionId:string;record:PlanningRecord|null;sites:string[];notice:string|null;comparison?:{changes:{path:string;change:string}[];approval_reusable:boolean}|null}>();
 const base=`/tenants/${props.tenantId}/applications/${props.applicationId}/environments/${props.environment}/planning`;
@@ -68,7 +69,7 @@ function compile(index:number){if(!props.record)return;send('plans',{assessment_
         <button type="button" class="secondary" @click="load(index)">Load collected endpoints</button>
         <label :for="`endpoint-${index}`">Endpoint<select :id="`endpoint-${index}`" v-model="row.endpoint" :required="index===0"><option value="">Choose a collected endpoint</option><option v-for="e in row.endpoints" :key="e.endpoint_id" :value="e.endpoint_id" :disabled="!e.generation_id">{{e.label}} · {{e.platform}} · {{e.reason??'current collection'}}</option></select></label>
       </section></div>
-      <div class="grid max-w-3xl gap-4 sm:grid-cols-2"><label for="planning-action">Action<select id="planning-action" v-model="action"><option value="application.provision">Provision</option><option value="application.migrate">Migrate</option><option value="application.recover">Recover</option><option value="application.retire">Retire</option></select></label><label for="planning-method">Method<select id="planning-method" v-model="method"><option value="native_api">Native API provisioning</option><option value="native_api_export_import">Native VM export and import</option><option value="forward_recovery">Forward recovery</option><option value="owned_retirement">Owned resource retirement</option></select></label></div>
+      <div class="grid max-w-3xl gap-4 sm:grid-cols-2"><label for="planning-action">Action<select id="planning-action" v-model="action"><option v-for="value in capabilityDefinitions.actions" :key="value" :value="value">{{ value.split('.')[1] }}</option></select></label><label for="planning-method">Method<select id="planning-method" v-model="method"><option v-for="value in capabilityDefinitions.strategies" :key="value" :value="value">{{ value.replaceAll('_', ' ') }}</option></select></label></div>
       <p v-if="selectionError" role="alert">{{selectionError}}</p><button type="submit">Assess destinations</button>
     </fieldset>
   </form>

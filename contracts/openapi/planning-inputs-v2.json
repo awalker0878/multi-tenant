@@ -1,0 +1,2561 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "P05 independent source-owner reads",
+    "version": "2.0.0",
+    "description": "Authenticated source-owner reads; signed native observations and independent decisions are required for positive qualification."
+  },
+  "security": [
+    {
+      "OwnerWorkload": []
+    }
+  ],
+  "paths": {
+    "/v1/tenants/{tenant}/planning-input-checks": {
+      "post": {
+        "operationId": "authorizePlanningSource",
+        "tags": [
+          "governance"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current owner response; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceDecision"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope denied"
+          },
+          "503": {
+            "description": "Owner or authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "plan.read",
+                      "plan.create"
+                    ]
+                  },
+                  "scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "environment": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "resource_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "required": [
+                      "site_id",
+                      "environment",
+                      "resource_id"
+                    ]
+                  }
+                },
+                "required": [
+                  "action",
+                  "scope"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/planning-qualification-v2": {
+      "post": {
+        "operationId": "readPlanningQualification",
+        "tags": [
+          "assurance"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Action",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan.read",
+                "plan.create"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current owner response; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Qualification"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope denied"
+          },
+          "503": {
+            "description": "Owner or authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "environment": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "resource_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "required": [
+                      "site_id",
+                      "environment",
+                      "resource_id"
+                    ]
+                  },
+                  "action": {
+                    "enum": [
+                      "plan.read",
+                      "plan.create"
+                    ]
+                  },
+                  "qualification_scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "tenant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "endpoint_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "native_scope": {
+                        "type": "string"
+                      },
+                      "installed_tuple": {
+                        "type": "object"
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "application.provision",
+                          "application.migrate",
+                          "application.recover",
+                          "application.retire"
+                        ]
+                      },
+                      "method": {
+                        "type": "string"
+                      },
+                      "profile_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "artifacts": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "compiler": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "adapter": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "automation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "contracts": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "compiler",
+                          "adapter",
+                          "automation",
+                          "contracts"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "endpoint_id",
+                      "native_scope",
+                      "installed_tuple",
+                      "action",
+                      "method",
+                      "profile_digest",
+                      "artifacts"
+                    ]
+                  }
+                },
+                "required": [
+                  "scope",
+                  "action",
+                  "qualification_scope"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/tenants/{tenant}/qualification-checks": {
+      "post": {
+        "operationId": "checkCurrentNativeQualification",
+        "tags": [
+          "assurance"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current owner response; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Qualification"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope denied"
+          },
+          "503": {
+            "description": "Owner or authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "qualification_scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "tenant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "endpoint_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "native_scope": {
+                        "type": "string"
+                      },
+                      "installed_tuple": {
+                        "type": "object"
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "application.provision",
+                          "application.migrate",
+                          "application.recover",
+                          "application.retire"
+                        ]
+                      },
+                      "method": {
+                        "type": "string"
+                      },
+                      "profile_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "artifacts": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "compiler": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "adapter": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "automation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "contracts": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "compiler",
+                          "adapter",
+                          "automation",
+                          "contracts"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "endpoint_id",
+                      "native_scope",
+                      "installed_tuple",
+                      "action",
+                      "method",
+                      "profile_digest",
+                      "artifacts"
+                    ]
+                  }
+                },
+                "required": [
+                  "qualification_scope"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{revision}": {
+      "get": {
+        "operationId": "readPlanningIntent",
+        "tags": [
+          "catalogue"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "site",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Action",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan.read",
+                "plan.create"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current owner response; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogueInput"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope denied"
+          },
+          "503": {
+            "description": "Owner or authority unavailable"
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/planning-capability-inputs/{application}/{environment}/{site}/{endpoint}/{generation}": {
+      "get": {
+        "operationId": "readPlanningInventory",
+        "tags": [
+          "inventory"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "site",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "endpoint",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "generation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Action",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan.read",
+                "plan.create"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current owner response; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryInput"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope denied"
+          },
+          "503": {
+            "description": "Owner or authority unavailable"
+          }
+        }
+      }
+    },
+    "/internal/tenants/{tenant}/planning-capability-inputs/{application}/{environment}/{site}/{endpoint}/{generation}": {
+      "get": {
+        "operationId": "readNativeCapabilityGeneration",
+        "tags": [
+          "inventory"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "site",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "endpoint",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "generation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current owner response; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryInput"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope denied"
+          },
+          "503": {
+            "description": "Owner or authority unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "OwnerWorkload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Intent": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": 1
+          },
+          "deployment_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "environment": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "version"
+            ]
+          },
+          "service_owner_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "minItems": 1,
+            "maxItems": 50
+          },
+          "workloads": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "role": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "wsd": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "version"
+                  ]
+                },
+                "security_domain": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "version"
+                  ]
+                },
+                "compute": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "vcpus": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 4096
+                    },
+                    "memory_mib": {
+                      "type": "integer",
+                      "minimum": 128,
+                      "maximum": 16777216
+                    },
+                    "architecture": {
+                      "enum": [
+                        "x86_64",
+                        "aarch64"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "vcpus",
+                    "memory_mib",
+                    "architecture"
+                  ]
+                },
+                "guest": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "os": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    "image": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "firmware": {
+                      "enum": [
+                        "bios",
+                        "uefi"
+                      ]
+                    },
+                    "secure_boot": {
+                      "type": "boolean"
+                    },
+                    "hardening_profile": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    }
+                  },
+                  "required": [
+                    "os",
+                    "image",
+                    "firmware",
+                    "secure_boot",
+                    "hardening_profile"
+                  ]
+                },
+                "disks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                      },
+                      "order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 63
+                      },
+                      "size_gib": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 1048576
+                      },
+                      "storage_class": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "boot": {
+                        "type": "boolean"
+                      },
+                      "dataset_id": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "encryption": {
+                        "enum": [
+                          "required",
+                          "preferred",
+                          "optional"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "order",
+                      "size_gib",
+                      "storage_class",
+                      "boot",
+                      "dataset_id",
+                      "encryption"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 64
+                },
+                "nics": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                      },
+                      "order": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 15
+                      },
+                      "security_domain_id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                      },
+                      "address_families": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "ipv4",
+                            "ipv6"
+                          ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 2,
+                        "uniqueItems": true
+                      },
+                      "address_intent": {
+                        "enum": [
+                          "dynamic",
+                          "reserved",
+                          "static"
+                        ]
+                      },
+                      "network_class": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "order",
+                      "security_domain_id",
+                      "address_families",
+                      "address_intent",
+                      "network_class"
+                    ]
+                  },
+                  "minItems": 0,
+                  "maxItems": 16
+                },
+                "requirements": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9_.-]{0,127}$"
+                      },
+                      "strength": {
+                        "enum": [
+                          "required",
+                          "preferred",
+                          "optional"
+                        ]
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "integer",
+                          "boolean"
+                        ],
+                        "maxLength": 2048
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 500
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "strength",
+                      "value",
+                      "reason"
+                    ]
+                  },
+                  "minItems": 0,
+                  "maxItems": 100
+                },
+                "failure_domain": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "group": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    "mode": {
+                      "enum": [
+                        "affinity",
+                        "anti_affinity",
+                        "independent"
+                      ]
+                    },
+                    "strength": {
+                      "enum": [
+                        "required",
+                        "preferred",
+                        "optional"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "group",
+                    "mode",
+                    "strength"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "role",
+                "wsd",
+                "security_domain",
+                "compute",
+                "guest",
+                "disks",
+                "nics",
+                "requirements",
+                "failure_domain"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 100
+          },
+          "datasets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "owner_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "consistency_group": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "consistency": {
+                  "enum": [
+                    "application",
+                    "crash",
+                    "quiesced"
+                  ]
+                },
+                "recovery": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "rpo_seconds": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 31536000
+                    },
+                    "rto_seconds": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 31536000
+                    },
+                    "method": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    "strength": {
+                      "enum": [
+                        "required",
+                        "preferred",
+                        "optional"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "rpo_seconds",
+                    "rto_seconds",
+                    "method",
+                    "strength"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "owner_id",
+                "consistency_group",
+                "consistency",
+                "recovery"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 200
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "to": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "kind": {
+                  "enum": [
+                    "startup",
+                    "shutdown",
+                    "communication"
+                  ]
+                },
+                "readiness": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "protocol": {
+                  "enum": [
+                    "tcp",
+                    "udp",
+                    "icmp",
+                    "none"
+                  ]
+                },
+                "port": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 1,
+                  "maximum": 65535
+                },
+                "controlled_interface": {
+                  "type": "boolean"
+                },
+                "dataset_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "strength": {
+                  "enum": [
+                    "required",
+                    "preferred",
+                    "optional"
+                  ]
+                }
+              },
+              "required": [
+                "from",
+                "to",
+                "kind",
+                "readiness",
+                "protocol",
+                "port",
+                "controlled_interface",
+                "dataset_id",
+                "strength"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 500
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "owner_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "workload_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "requirements": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9_.-]{0,127}$"
+                      },
+                      "strength": {
+                        "enum": [
+                          "required",
+                          "preferred",
+                          "optional"
+                        ]
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "integer",
+                          "boolean"
+                        ],
+                        "maxLength": 2048
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 500
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "strength",
+                      "value",
+                      "reason"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 100
+                }
+              },
+              "required": [
+                "name",
+                "owner_id",
+                "workload_id",
+                "requirements"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 100
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_.-]{0,127}$"
+                },
+                "strength": {
+                  "enum": [
+                    "required",
+                    "preferred",
+                    "optional"
+                  ]
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "integer",
+                    "boolean"
+                  ],
+                  "maxLength": 2048
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                }
+              },
+              "required": [
+                "key",
+                "strength",
+                "value",
+                "reason"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "schema_version",
+          "deployment_id",
+          "environment",
+          "service_owner_id",
+          "acceptance_criteria",
+          "workloads",
+          "datasets",
+          "dependencies",
+          "services",
+          "requirements"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "Receipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "application_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "revision_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "deployment_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "etag": {
+            "type": "string"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "application_id",
+          "revision_id",
+          "deployment_id",
+          "digest",
+          "etag",
+          "sequence"
+        ]
+      },
+      "ApplicationSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "etag": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "etag"
+        ]
+      },
+      "Application": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "etag": {
+            "type": "string"
+          },
+          "deployments": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^[0-9a-f-]{36}$"
+                },
+                "environment_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^[0-9a-f-]{36}$"
+                },
+                "current_revision_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^[0-9a-f-]{36}$"
+                }
+              },
+              "required": [
+                "id",
+                "environment_id",
+                "current_revision_id"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "etag",
+          "deployments"
+        ]
+      },
+      "RevisionSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "deployment_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "sequence": {
+            "type": "integer"
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "digest": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "deployment_id",
+          "sequence",
+          "parent_id",
+          "actor_id",
+          "digest",
+          "created_at"
+        ]
+      },
+      "Revision": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "application_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "deployment_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "sequence": {
+            "type": "integer"
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "digest": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "intent": {
+            "$ref": "#/components/schemas/Intent"
+          }
+        },
+        "required": [
+          "id",
+          "application_id",
+          "deployment_id",
+          "sequence",
+          "parent_id",
+          "actor_id",
+          "digest",
+          "created_at",
+          "intent"
+        ]
+      },
+      "Reference": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f-]{36}$"
+          },
+          "kind": {
+            "enum": [
+              "environment",
+              "wsd",
+              "security-domain"
+            ]
+          },
+          "version": {
+            "type": "integer"
+          },
+          "retired": {
+            "type": "boolean"
+          },
+          "etag": {
+            "type": "string"
+          },
+          "definition": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "owner_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f-]{36}$"
+              },
+              "shareable": {
+                "type": "boolean"
+              },
+              "zone": {
+                "enum": [
+                  "PAZ",
+                  "OZ",
+                  "RZ",
+                  "HRZ"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "owner_id"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "version",
+          "retired",
+          "etag",
+          "definition"
+        ]
+      },
+      "ApplicationPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplicationSummary"
+            },
+            "maxItems": 50
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1024
+          }
+        },
+        "required": [
+          "applications",
+          "next_cursor"
+        ]
+      },
+      "RevisionPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RevisionSummary"
+            },
+            "maxItems": 50
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1024
+          }
+        },
+        "required": [
+          "revisions",
+          "next_cursor"
+        ]
+      },
+      "ReferencePage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "references": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reference"
+            },
+            "maxItems": 50
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1024
+          }
+        },
+        "required": [
+          "references",
+          "next_cursor"
+        ]
+      },
+      "Scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "site_id",
+          "environment",
+          "resource_id"
+        ],
+        "properties": {
+          "site_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 64
+          },
+          "environment": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 64
+          },
+          "resource_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          }
+        }
+      },
+      "IssueRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "scope",
+          "audience"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "audience": {
+            "enum": [
+              "catalogue",
+              "inventory",
+              "planning",
+              "assurance"
+            ]
+          }
+        }
+      },
+      "InspectRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "scope"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          }
+        }
+      },
+      "IssuedDelegation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "delegation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "delegation_token": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "writeOnly": false
+          },
+          "audience": {
+            "enum": [
+              "catalogue",
+              "inventory",
+              "planning",
+              "assurance"
+            ]
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "authority_use": {
+            "const": "request_bound"
+          }
+        },
+        "required": [
+          "delegation_id",
+          "delegation_token",
+          "audience",
+          "expires_at",
+          "authority_use"
+        ]
+      },
+      "CurrentDelegation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "allowed": {
+            "const": true
+          },
+          "delegation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "delegating_service": {
+            "const": "console"
+          },
+          "audience": {
+            "enum": [
+              "catalogue",
+              "inventory",
+              "planning",
+              "assurance"
+            ]
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action": {
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "expires_at": {
+            "type": "string"
+          },
+          "evaluated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "authority_use": {
+            "const": "request_bound"
+          }
+        },
+        "required": [
+          "allowed",
+          "delegation_id",
+          "actor_id",
+          "delegating_service",
+          "audience",
+          "tenant_id",
+          "action",
+          "scope",
+          "expires_at",
+          "evaluated_at",
+          "authority_use"
+        ]
+      },
+      "Revoked": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revoked"
+        ],
+        "properties": {
+          "revoked": {
+            "const": true
+          }
+        }
+      },
+      "CatalogueInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "application_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "intent": {
+            "$ref": "#/components/schemas/Intent"
+          }
+        },
+        "required": [
+          "id",
+          "application_id",
+          "digest",
+          "intent"
+        ]
+      },
+      "InventoryInput": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "generation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "platform": {
+            "enum": [
+              "vmware",
+              "ahv",
+              "openstack"
+            ]
+          },
+          "native_scope": {
+            "type": "string"
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "completion": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 1000
+          },
+          "installed_provenance": {
+            "enum": [
+              "declaration",
+              "observed",
+              "unknown"
+            ]
+          },
+          "installed_tuple": {
+            "type": "object"
+          },
+          "dimensions": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "installed_identity": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              },
+              "compute_placement": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              },
+              "storage_datasets": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              },
+              "network_vpc": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              },
+              "security_edge": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              },
+              "guest_image": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              },
+              "lifecycle_adoption": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              },
+              "mobility": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              },
+              "shared_services": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              },
+              "resilience_operations": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              },
+              "assurance_sovereignty": {
+                "enum": [
+                  "observed",
+                  "unassessed",
+                  "unsupported"
+                ]
+              }
+            },
+            "required": [
+              "installed_identity",
+              "compute_placement",
+              "storage_datasets",
+              "network_vpc",
+              "security_edge",
+              "guest_image",
+              "lifecycle_adoption",
+              "mobility",
+              "shared_services",
+              "resilience_operations",
+              "assurance_sovereignty"
+            ]
+          },
+          "capabilities": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "enum": [
+                    "observed",
+                    "supported",
+                    "unsupported",
+                    "unknown"
+                  ]
+                },
+                "expires_at": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "values": {
+                  "type": "array",
+                  "items": {},
+                  "maxItems": 1000
+                },
+                "dependencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 1000
+                }
+              },
+              "required": [
+                "status",
+                "expires_at",
+                "values",
+                "dependencies"
+              ]
+            },
+            "maxProperties": 1000
+          },
+          "capacity": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "vcpus": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "memory_mib": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "storage_gib": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "addresses": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "domain_bindings": {
+            "type": "object"
+          },
+          "workload_bindings": {
+            "type": "object"
+          },
+          "capability_snapshot": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "definition_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "source_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "decision_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "scope_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "observed_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "expires_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "data": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "definition_sha256",
+                  "source_sha256",
+                  "decision_sha256",
+                  "scope_sha256",
+                  "observed_at",
+                  "expires_at",
+                  "data"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "tenant_id",
+          "site_id",
+          "endpoint_id",
+          "generation_id",
+          "platform",
+          "native_scope",
+          "current",
+          "completion",
+          "expires_at",
+          "holds",
+          "installed_provenance",
+          "installed_tuple",
+          "dimensions",
+          "capabilities",
+          "capacity",
+          "domain_bindings",
+          "workload_bindings",
+          "capability_snapshot"
+        ]
+      },
+      "Qualification": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "const": 2,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "qualified",
+              "unknown",
+              "unsupported"
+            ]
+          },
+          "evidence_level": {
+            "enum": [
+              null,
+              "E0",
+              "E1",
+              "E2",
+              "E3",
+              "E4"
+            ]
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "revoked": {
+            "type": "boolean"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "endpoint_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "native_scope": {
+                "type": "string"
+              },
+              "installed_tuple": {
+                "type": "object"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              },
+              "method": {
+                "type": "string"
+              },
+              "profile_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "artifacts": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "compiler": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "adapter": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "automation": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "contracts": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "compiler",
+                  "adapter",
+                  "automation",
+                  "contracts"
+                ]
+              }
+            },
+            "required": [
+              "tenant_id",
+              "site_id",
+              "endpoint_id",
+              "native_scope",
+              "installed_tuple",
+              "action",
+              "method",
+              "profile_digest",
+              "artifacts"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 1000
+          },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "installed_identity",
+                "compute_placement",
+                "storage_datasets",
+                "network_vpc",
+                "security_edge",
+                "guest_image",
+                "lifecycle_adoption",
+                "mobility",
+                "shared_services",
+                "resilience_operations",
+                "assurance_sovereignty"
+              ]
+            },
+            "maxItems": 1000
+          },
+          "capabilities": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "enum": [
+                    "observed",
+                    "supported",
+                    "unsupported",
+                    "unknown"
+                  ]
+                },
+                "expires_at": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "values": {
+                  "type": "array",
+                  "items": {},
+                  "maxItems": 1000
+                },
+                "dependencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 1000
+                }
+              },
+              "required": [
+                "status",
+                "expires_at",
+                "values",
+                "dependencies"
+              ]
+            },
+            "maxProperties": 1000
+          },
+          "verification": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "valid": {
+                    "const": true
+                  },
+                  "definition_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "decision_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "runtime_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "record_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "resolved_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "expires_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "acceptance_sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                },
+                "required": [
+                  "valid",
+                  "definition_sha256",
+                  "decision_sha256",
+                  "runtime_sha256",
+                  "record_sha256",
+                  "resolved_at",
+                  "expires_at"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "status",
+          "evidence_level",
+          "expires_at",
+          "revoked",
+          "scope",
+          "evidence_refs",
+          "dimensions",
+          "capabilities",
+          "verification"
+        ],
+        "$id": "urn:multi-tenant:qualification:v2",
+        "title": "Verified native qualification v2"
+      },
+      "SourceDecision": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "allowed": {
+            "const": true
+          },
+          "delegation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "delegating_service": {
+            "const": "console"
+          },
+          "audience": {
+            "enum": [
+              "catalogue",
+              "inventory",
+              "planning",
+              "assurance"
+            ]
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action": {
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "expires_at": {
+            "type": "string"
+          },
+          "evaluated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "authority_use": {
+            "const": "request_bound"
+          },
+          "source_owner": {
+            "enum": [
+              "catalogue",
+              "inventory",
+              "assurance"
+            ]
+          },
+          "source_use": {
+            "const": "planning_read_only"
+          }
+        },
+        "required": [
+          "allowed",
+          "delegation_id",
+          "actor_id",
+          "delegating_service",
+          "audience",
+          "tenant_id",
+          "action",
+          "scope",
+          "expires_at",
+          "evaluated_at",
+          "authority_use",
+          "source_owner",
+          "source_use"
+        ]
+      }
+    }
+  }
+}

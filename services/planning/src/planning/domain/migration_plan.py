@@ -7,68 +7,19 @@ never a browser payload, and supplies explicit stage artifacts and resource budg
 from copy import deepcopy
 from typing import Any
 
+from planning.domain.capability_definitions import METHOD_DELTA, STAGES
+from planning.domain.capability_definitions import RECOVERY_MODES as RECOVERY
 from planning.domain.model import Rejected, digest, identifier, integer, sha, shape
 
-CAPTURE = (
-    "source_prepare",
-    "capture",
-    "export_copy",
-    "convert_copy",
-    "import_target",
-    "transform_copy",
-)
-RECOVERY = {
-    "rollback": ("fence_target", "verify_no_divergence", "restore_source", "verify_source"),
-    "forward_recovery": ("fence_target", "preserve_target", "recover_target", "verify_recovery"),
-    "reverse_recovery": (
-        "fence_target",
-        "preserve_target",
-        "reverse_sync",
-        "verify_source_data",
-        "restore_source",
-        "verify_source",
-    ),
-    "cleanup": (
-        "remove_copy",
-        "remove_snapshot",
-        "verify_consolidation",
-        "revoke_migration_access",
-    ),
-}
-DELTA = {
-    "VM_SNAPSHOT_BASELINE_APP_DELTA": "application",
-    "VM_SNAPSHOT_BASELINE_FILE_DELTA": "file",
-    "VM_COLD_EXPORT": "none",
-    "APPLICATION_REBUILD_RESTORE": "restore",
-    "EXTERNAL_BLOCK_REPLICATION": "block",
-}
+DELTA = METHOD_DELTA
 PHASES = {"capture", "transfer", "conversion", "import", "validation", "cutover"}
 
 
 def stage_order(mode: str, method: str) -> tuple[str, ...]:
-    if method not in DELTA or mode not in {"rehearsal", "cutover", *RECOVERY}:
-        raise Rejected("unsupported_migration_recipe", 422)
-    if mode in RECOVERY:
-        return RECOVERY[mode]
-    capture: tuple[str, ...] = CAPTURE
-    if DELTA[method] in {"application", "file"}:
-        capture = CAPTURE[:2] + ("restart_baseline_source",) + CAPTURE[2:]
-    elif method == "APPLICATION_REBUILD_RESTORE":
-        capture = ("source_prepare", "export_copy", "import_target", "transform_copy")
-    elif method == "EXTERNAL_BLOCK_REPLICATION":
-        capture = ("source_prepare", "capture", "import_target", "transform_copy")
-    return capture + (
-        ("rehearsal_validate", "retain_rehearsal")
-        if mode == "rehearsal"
-        else (
-            "fence_source",
-            "final_sync",
-            "shutdown_source",
-            "validate_target",
-            "admit_writes",
-            "verify_activation",
-        )
-    )
+    try:
+        return STAGES[(mode, method)]
+    except KeyError:
+        raise Rejected("unsupported_migration_recipe", 422) from None
 
 
 def compose_migration(

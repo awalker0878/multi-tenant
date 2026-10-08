@@ -2,7 +2,14 @@
 
 from typing import Any
 
+from planning.domain.capability_definitions import STRATEGIES
+from planning.domain.matching import matches
 from planning.domain.model import ACTIONS, DIMENSIONS, Rejected, digest, integer
+from planning.domain.network_evidence import isolation_checks, network_checks
+from planning.domain.operational_evidence import inventory_digest, snapshot
+from planning.domain.placement import PlacementUnknown, fit
+from planning.domain.qualification import binding_digest, verified
+from planning.domain.recovery_evidence import recovery_checks
 
 
 def requirements(intent: dict[str, Any]) -> list[dict[str, Any]]:
@@ -81,12 +88,7 @@ def assess(
     method: str,
     now: int,
 ) -> dict[str, Any]:
-    if action not in ACTIONS or method not in {
-        "native_api_export_import",
-        "native_api",
-        "forward_recovery",
-        "owned_retirement",
-    }:
+    if action not in ACTIONS or method not in STRATEGIES:
         raise Rejected("unsupported_method")
     findings: list[dict[str, Any]] = []
 
@@ -110,10 +112,10 @@ def assess(
         )
 
     bindings = {
-        "inventory": digest(destination),
+        "inventory": inventory_digest(destination),
         "profile": profile["digest"],
         "policy": digest(policy),
-        "qualification": digest(qualification),
+        "qualification": binding_digest(qualification),
         "intent": digest(intent),
     }
     for key, ok, reason in (
@@ -153,8 +155,10 @@ def assess(
         "profile_digest": profile["digest"],
         "artifacts": policy["artifacts"],
     }
+    verification = qualification.get("verification") or {}
     qualified = (
-        digest(qualification.get("scope")) == digest(expected)
+        verified(qualification, now)
+        and digest(qualification.get("scope")) == digest(expected)
         and qualification.get("status") == "qualified"
         and qualification.get("evidence_level") in {"E3", "E4"}
         and qualification.get("expires_at", 0) > now
@@ -199,13 +203,17 @@ def assess(
     expiries = [
         destination["expires_at"],
         policy["expires_at"],
-        qualification["expires_at"] if qualified else destination["expires_at"],
+        min(qualification["expires_at"], verification["expires_at"])
+        if qualified
+        else destination["expires_at"],
     ]
     for row in requested:
         key, value = row["key"], row["value"]
         mandatory = row["strength"] == "required"
         observation, support = observed.get(key), supported.get(key)
-        if observation is None:
+        if matches(key, value, []) is None:
+            status, reason = "unknown", "requirement_definition_unregistered"
+        elif observation is None:
             status, reason = "unknown", "mandatory_evidence_missing"
         # Observation safety is evaluated independently of qualification. A lab
         # waiver must never mask stale/unsupported facts or unresolved dependencies.
@@ -215,7 +223,7 @@ def assess(
             status, reason = "unknown", "requirement_evidence_unassessed"
         elif observation.get("expires_at", 0) <= now:
             status, reason = "unknown", "requirement_observation_expired"
-        elif digest(value) not in [digest(v) for v in observation.get("values", [])]:
+        elif not matches(key, value, observation.get("values", [])):
             status, reason = "blocked", "constraint_not_satisfied"
         elif observation.get("dependencies"):
             status, reason = "conditional", "dependency_requires_confirmation"
@@ -227,7 +235,7 @@ def assess(
             status, reason = "unknown", "requirement_evidence_unassessed"
         elif support.get("expires_at", 0) <= now:
             status, reason = "unknown", "requirement_qualification_expired"
-        elif digest(value) not in [digest(v) for v in support.get("values", [])]:
+        elif not matches(key, value, support.get("values", [])):
             status, reason = "blocked", "constraint_not_satisfied"
         elif support.get("dependencies"):
             status, reason = "conditional", "dependency_requires_confirmation"
@@ -264,6 +272,62 @@ def assess(
             else "observed_capacity_insufficient",
             "Lifecycle must acquire authoritative owner receipts.",
         )
+    native_snapshot = snapshot(destination, qualification, now) if qualified else None
+    placement_status, placement_reason = "unknown", "placement_native_snapshot_missing"
+    if native_snapshot is not None:
+        expiries.append(destination["capability_snapshot"]["expires_at"])
+        try:
+            placement = fit(intent, native_snapshot["pools"], policy, now)
+            placement_status, placement_reason = placement["status"], placement["reason"]
+        except (PlacementUnknown, KeyError, TypeError, ValueError) as error:
+            placement_reason = str(error)
+    finding(
+        "capacity.placement",
+        placement_status,
+        placement_reason,
+        "Observe physical pools, pending reservations, policy and placement constraints.",
+    )
+    if native_snapshot is None:
+        finding(
+            "network.native_policy", "unknown", "network_native_snapshot_missing",
+            "Measure required and forbidden paths on the exact native topology.",
+        )
+        finding(
+            "placement.native_isolation", "unknown", "isolation_native_snapshot_missing",
+            "Verify native project, domain bindings and negative traffic controls.",
+        )
+    else:
+        for evaluator in (network_checks,):
+            try:
+                checks = evaluator(intent, native_snapshot, policy, now)
+                for key, status, reason, mandatory in checks:
+                    finding(key, status, reason, "Refresh native route and firewall evidence.",
+                            mandatory=mandatory)
+            except (KeyError, TypeError, ValueError):
+                finding("network.native_policy", "unknown", "network_evidence_incomplete",
+                        "Commission native route, policy and measurement evidence.")
+        try:
+            for key, status, reason, mandatory in isolation_checks(
+                intent, destination, native_snapshot, policy, now
+            ):
+                finding(key, status, reason, "Refresh native isolation and negative controls.",
+                        mandatory=mandatory)
+        except (KeyError, TypeError, ValueError):
+            finding("placement.native_isolation", "unknown", "isolation_evidence_incomplete",
+                    "Commission native identity, policy and isolation measurements.")
+    if native_snapshot is None and intent["datasets"]:
+        finding("recovery.native_measurement", "unknown", "restore_native_snapshot_missing",
+                "Measure a representative restore and application readiness.")
+    elif native_snapshot is not None:
+        try:
+            for key, status, reason, mandatory in recovery_checks(
+                intent, destination, profile, policy, native_snapshot, now
+            ):
+                finding(key, status, reason, "Run and review a representative native restore.",
+                        mandatory=mandatory)
+        except (KeyError, TypeError, ValueError):
+            finding("recovery.native_measurement", "unknown", "restore_evidence_incomplete",
+                    "Commission dataset profiles, load and restore timing evidence.")
     mandatory_states = {f["status"] for f in findings if f["mandatory"]}
     state = next(
         (s for s in ("blocked", "unknown", "conditional") if s in mandatory_states), "eligible"

@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:multi-tenant:capability-definitions:v1",
+  "type": "object",
+  "properties": {
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "dimensions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "strategies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "guests": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "retest_triggers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "modes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "schema_version": {
+      "const": 1,
+      "type": "integer"
+    },
+    "definition_version": {
+      "const": "1.0.0"
+    },
+    "methods": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "v1_alias": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "delta": {
+            "enum": [
+              "none",
+              "restore",
+              "application",
+              "file",
+              "block"
+            ]
+          },
+          "implementation_required": {
+            "const": true
+          },
+          "stages": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "minItems": 1,
+              "maxItems": 256,
+              "uniqueItems": true
+            },
+            "minProperties": 1,
+            "maxProperties": 512
+          },
+          "implementation": {
+            "type": "object",
+            "properties": {
+              "handler": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "conformance": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              }
+            },
+            "required": [
+              "handler",
+              "conformance"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "v1_alias",
+          "delta",
+          "implementation_required",
+          "stages",
+          "implementation"
+        ],
+        "additionalProperties": false
+      },
+      "minProperties": 1,
+      "maxProperties": 512
+    },
+    "stage_before": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "minItems": 1,
+        "maxItems": 256,
+        "uniqueItems": true
+      },
+      "minProperties": 1,
+      "maxProperties": 512
+    },
+    "stage_after": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "minItems": 1,
+        "maxItems": 256,
+        "uniqueItems": true
+      },
+      "minProperties": 1,
+      "maxProperties": 512
+    },
+    "terminals": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minProperties": 1,
+      "maxProperties": 512
+    },
+    "requirements": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "comparison": {
+            "enum": [
+              "exact",
+              "maximum"
+            ]
+          },
+          "unit": {
+            "enum": [
+              null,
+              "seconds"
+            ]
+          }
+        },
+        "required": [
+          "comparison",
+          "unit"
+        ],
+        "additionalProperties": false
+      },
+      "minProperties": 1,
+      "maxProperties": 512
+    }
+  },
+  "required": [
+    "platforms",
+    "dimensions",
+    "actions",
+    "strategies",
+    "guests",
+    "operations",
+    "retest_triggers",
+    "modes",
+    "schema_version",
+    "definition_version",
+    "methods",
+    "stage_before",
+    "stage_after",
+    "terminals",
+    "requirements"
+  ],
+  "additionalProperties": false
+}

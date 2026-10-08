@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import time
 import uuid
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from jsonschema import Draft202012Validator
 from openapi_schema_validator import OAS31Validator
@@ -62,10 +63,47 @@ def campaign(c, extension=None):
     native['operation_plan_sha256']=canonical_digest(native['operation_plan'])
     registry={'schema_version':1,'profiles':{'synthetic':{'platform':p['platform'],'version':p['version'],'declarations':{r['dimension']:r['declaration'] for r in p['dimensions']}}},'policies':{'synthetic':policy},'assignments':[{'tenant_id':tenant,'site_id':d['site_id'],'endpoint_id':d['endpoint_id'],'profile':'synthetic','policy':'synthetic'} for d in [a,b]]}
     registry_file=private/'planning-registry.json';registry_file.write_text(json.dumps(registry))
-    quals={'schema_version':1,'records':[]}
+    sys.path.insert(0, str(root/'tests/contracts'))
+    from native_qualification_fixture import FixtureRuntimePublisher, signed_fixture
+    # A synthetic native wire peer exercises the signed protocol without E3 promotion.
+    sys.path.insert(0, str(root/'services/planning/src'))
+    sys.path.insert(0, str(root/'services/planning/tests'))
+    import planning_fixture as capability_fixture
+    capability_fixture.NOW = now
+    policy['allowed_zones'] = ['zone-1']
+    policy['recovery_profile'] = {
+        'minimum_load': 1, 'parallel_restores': 1, 'load_unit': 'requests_per_second',
+    }
+    policy['forbidden_flows'] = [{
+        'from': 'foreign-tenant', 'to': model['intent']['workloads'][0]['id'],
+        'protocol': 'tcp', 'port': 22,
+    }]
+    # Rewrite the independently mounted policy after adding the explicit assessment controls.
+    registry_file.write_text(json.dumps(registry))
+    quals={'schema_version':2,'records':[]}
+    trust={'schema_version':1,'keys':{}}
     for d in [a,b]:
-        q=copy.deepcopy(model['qualification']);q['scope'].update({k:d[k] for k in ['tenant_id','site_id','endpoint_id','native_scope','installed_tuple']});quals['records'].append(q)
+        q=copy.deepcopy(model['qualification']);q['scope'].update({k:d[k] for k in ['tenant_id','site_id','endpoint_id','native_scope','installed_tuple']})
+        q['version']=2
+        capability_fixture.verify_fixture(q, now)
+        d['capability_snapshot']=capability_fixture.snapshot_fixture(model['intent'],d,policy,q)
+        bundle,keys=signed_fixture(
+            q,private/('fixture-keys-'+d['site_id']),inventory=d,
+            snapshot=d['capability_snapshot']['data'],
+        )
+        # Scope-specific enrolled keys; these are isolated E2 peer fixtures.
+        prefix=d['site_id']+':'
+        for envelope in [bundle['decision'],bundle['runtime'],*bundle['evidence']]:
+            envelope['key_id']=prefix+envelope['key_id']
+        trust['keys'].update({prefix+k:v for k,v in keys.items()})
+        quals['records'].append(bundle)
     qualification_file=private/'qualification-registry.json';qualification_file.write_text(json.dumps(quals))
+    qualification_file.chmod(0o600)
+    trust_file=private/'qualification-trust.json';trust_file.write_text(json.dumps(trust));trust_file.chmod(0o600)
+    envs['assurance']['ASSURANCE_QUALIFICATION_TRUST_FILE']=str(trust_file)
+    runtime_file=private/'qualification-runtime.json'
+    c['proxies'].append(FixtureRuntimePublisher(runtime_file,quals,private))
+    envs['assurance']['ASSURANCE_QUALIFICATION_RUNTIME_FILE']=str(runtime_file)
     envs['planning']['PLANNING_REGISTRY_FILE']=str(registry_file)
     envs['assurance']['ASSURANCE_QUALIFICATION_REGISTRY_FILE']=str(qualification_file)
     for service in ['planning','assurance']:c['stop'](service);c['start'](service)
@@ -93,7 +131,7 @@ def campaign(c, extension=None):
     actual=planning('assessments',dict(create,candidates=candidates[:1]),sites=[a['site_id']],expected=201)
     actual_view=planning('assessments/'+actual['id'],sites=[a['site_id']])
     check('actual-P04-owner-declarations-never-imply-support',actual_view['results'][0]['operationally_eligible'] is False and any(f['reason']=='installed_tuple_only_declared' for f in actual_view['results'][0]['findings']))
-    peer=InventoryContractPeer(c['certificate'],c['key'],credentials['planning-inventory'][0],credentials['inventory-governance'][0],{a['endpoint_id']:a,b['endpoint_id']:b})
+    peer=InventoryContractPeer(c['certificate'],c['key'],credentials['planning-inventory'][0],credentials['inventory-governance'][0],{a['endpoint_id']:a,b['endpoint_id']:b},runtime_file=runtime_file)
     c['proxies'].append(peer)
     c['stop']('planning');envs['planning']['INVENTORY_URL']='https://127.0.0.1:8448';c['start']('planning')
     key=str(uuid.uuid4())
@@ -117,7 +155,7 @@ def campaign(c, extension=None):
     check('real-governance-approval-content-binding-and-changed-digest-denial',True)
     c['stop']('planning');c['start']('planning')
     check('service-restart-preserves-immutable-plan',planning('plans/'+first['id'],sites=[a['site_id']])['content']==saved['content'])
-    original_qual=copy.deepcopy(quals);quals['records'][0]['revoked']=True;qualification_file.write_text(json.dumps(quals))
+    original_qual=copy.deepcopy(quals);quals['records'][0]['record']['revoked']=True;qualification_file.write_text(json.dumps(quals))
     held=planning('plans/'+first['id'],sites=[a['site_id']])
     check('current-qualification-revocation-holds-without-changing-plan',not held['validity']['current'] and held['content']==saved['content'])
     qualification_file.write_text(json.dumps(original_qual))

@@ -4,6 +4,7 @@ import re
 from typing import Any
 
 from lifecycle.domain.admission import digest
+from lifecycle.domain.capability_definitions import PLATFORMS
 from lifecycle.domain.execution import Rejected
 from lifecycle.domain.execution import identity as identifier
 from lifecycle.domain.native_workflow import checksum as sha
@@ -29,8 +30,8 @@ def validate_outcomes(o: dict[str, Any], bound: dict[str, Any], artifacts: dict[
         },
     )
     if (
-        o["source_platform"] not in {"vmware", "openstack", "ahv"}
-        or o["target_platform"] not in {"vmware", "openstack", "ahv"}
+        o["source_platform"] not in PLATFORMS
+        or o["target_platform"] not in PLATFORMS
         or o["owner_inputs_sha256"] != bound["owner_inputs_sha256"]
         or o["guest_profile_sha256"] != artifacts["guest"]
     ):

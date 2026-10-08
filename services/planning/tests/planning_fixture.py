@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from planning.domain.assessment import assess, requirements
+from planning.domain.capability_definitions import DEFINITION_SHA256
 from planning.domain.model import ACTIONS, DIMENSIONS, digest, profile
 
 NOW = 2_000_000_000
@@ -42,6 +43,14 @@ def inputs() -> tuple[
         "requirements": [],
         "artifacts": artifacts,
         "downtime_seconds": 3600,
+        "allowed_zones": ["zone-1"],
+        "recovery_profile": {
+            "minimum_load": 1, "parallel_restores": 1, "load_unit": "requests_per_second",
+        },
+        "forbidden_flows": [{
+            "from": "foreign-tenant", "to": intent["workloads"][0]["id"],
+            "protocol": "tcp", "port": 22,
+        }],
         "reservation_owners": {
             k: "synthetic-" + k for k in ("vcpus", "memory_mib", "storage_gib", "addresses")
         },
@@ -166,7 +175,7 @@ def inputs() -> tuple[
     }
     q: dict[str, Any] = {
         "id": "synthetic-evidence",
-        "version": 1,
+        "version": 2,
         "status": "qualified",
         "evidence_level": "E3",
         "expires_at": NOW + 1800,
@@ -187,7 +196,24 @@ def inputs() -> tuple[
     )
     for capability in q["capabilities"].values():
         capability["status"] = "supported"
+    verify_fixture(q)
+    d["capability_snapshot"] = snapshot_fixture(intent, d, policy, q)
     return intent, d, p, policy, q
+
+
+def verify_fixture(record: dict[str, Any], now: int = NOW) -> None:
+    """Synthetic authenticated owner boundary; never used by a production resolver."""
+    record.pop("verification", None)
+    checksum = digest(record)
+    record["verification"] = {
+        "valid": True,
+        "definition_sha256": DEFINITION_SHA256,
+        "decision_sha256": "a" * 64,
+        "runtime_sha256": "b" * 64,
+        "record_sha256": checksum,
+        "resolved_at": now,
+        "expires_at": record["expires_at"],
+    }
 
 
 def assessment() -> dict[str, Any]:
@@ -218,4 +244,113 @@ def request() -> dict[str, Any]:
         "lane": "operational",
         "executor_ids": [ACTOR],
         "valid_until": NOW + 300,
+    }
+
+
+def snapshot_fixture(
+    intent: dict[str, Any], destination: dict[str, Any], policy: dict[str, Any], q: dict[str, Any]
+) -> dict[str, Any]:
+    pools = []
+    for index, workload in enumerate(intent["workloads"]):
+        vector = {
+            "vcpus": workload["compute"]["vcpus"],
+            "memory_mib": workload["compute"]["memory_mib"],
+            "storage_gib": sum(d["size_gib"] for d in workload["disks"]),
+            "addresses": sum(len(n["address_families"]) for n in workload["nics"]),
+        }
+        for disk in workload["disks"]:
+            key = "storage_gib:" + disk["storage_class"]
+            vector[key] = vector.get(key, 0) + disk["size_gib"]
+        for nic in workload["nics"]:
+            for family in nic["address_families"]:
+                key = "addresses:" + nic["network_class"] + ":" + family
+                vector[key] = vector.get(key, 0) + 1
+        pools.append({
+            "id": "pool-" + str(index),
+            "native_ref": "fixture://physical-host-" + str(index),
+            "failure_domain": "rack-" + str(index),
+            "zone": "zone-1",
+            "zone_allowed": True,
+            "architecture": "x86_64",
+            "storage_classes": ["standard"],
+            "network_classes": ["private"],
+            "policy_sha256": digest(policy),
+            "ledger_revision": 1,
+            "total": vector,
+            "used": {k: 0 for k in vector},
+            "pending": {k: 0 for k in vector},
+        })
+    communication = [d for d in intent["dependencies"] if d["kind"] == "communication"]
+    negative = [policy["forbidden_flows"][0] | {"kind": "tenant"}]
+    negative += [{
+        "from": "foreign-domain-" + str(index), "to": workload["id"],
+        "protocol": "tcp", "port": 22, "kind": "domain",
+        "security_domain_id": workload["security_domain"]["id"],
+    } for index, workload in enumerate(intent["workloads"])]
+    topology: dict[str, Any] = {
+        "nodes": {w["id"]: "fixture://native-port-" + w["id"] for w in intent["workloads"]},
+        "routes": [{"from": d["from"], "to": d["to"], "native_ref": "fixture://route"}
+                   for d in communication],
+    }
+    for flow in negative:
+        topology["nodes"][flow["from"]] = "fixture://foreign-port-" + flow["from"]
+    policy_sha = digest(policy)
+    network = {
+        "policy_sha256": policy_sha,
+        "topology_sha256": digest(topology),
+        "topology": topology,
+        "default_action": "deny",
+        "firewall_rules": [
+            {k: d[k] for k in ("from", "to", "protocol", "port")}
+            | {"action": "allow", "native_ref": "fixture://native-firewall-rule"}
+            for d in communication
+        ],
+        "measurements": [
+            {k: d[k] for k in ("from", "to", "protocol", "port")}
+            | {
+                "outcome": "allow" if d in communication else "deny",
+                "sequence": 1, "observed_at": NOW, "expires_at": NOW + 120,
+                "native_subjects": ["fixture://native-probe-client"],
+                "policy_sha256": policy_sha, "topology_sha256": digest(topology),
+            } for d in communication + negative
+        ],
+    }
+    isolation = {
+        "tenant_id": destination["tenant_id"],
+        "native_scope": destination["native_scope"],
+        "native_project_id": destination["native_scope"].split(":")[1],
+        "policy_sha256": policy_sha,
+        "domains": destination["domain_bindings"],
+        "observer_principal": "fixture-observer",
+        "writer_principal": "fixture-writer",
+        "observed_at": NOW, "expires_at": NOW + 120,
+        "negative_flows": negative,
+    }
+    recoveries = [{
+        "dataset_id": dataset["id"], "sequence": 1,
+        "observed_at": NOW, "expires_at": NOW + 120,
+        "profile_digest": q["scope"]["profile_digest"],
+        "generation_id": destination["generation_id"],
+        "native_scope": destination["native_scope"],
+        "artifacts": policy["artifacts"], "policy_sha256": policy_sha,
+        "storage_backend": destination["installed_tuple"]["storage_backend"],
+        "method": dataset["recovery"]["method"], "consistency": dataset["consistency"],
+        "representative_bytes": 40 * 1024**3, "load": 1, "parallel_restores": 1,
+        "load_unit": "requests_per_second",
+        "unit": "seconds", "native_restore_id": "fixture://restore-" + dataset["id"],
+        "restore_chain_sha256": digest(dataset), "outcome": "passed", "consistency_passed": True,
+        "last_consistent_checkpoint_at": NOW - 30, "failure_at": NOW - 30,
+        "restore_started_at": NOW - 30, "application_ready_at": NOW,
+    } for dataset in intent["datasets"]]
+    return {
+        "definition_sha256": DEFINITION_SHA256,
+        "source_sha256": q["verification"]["runtime_sha256"],
+        "decision_sha256": q["verification"]["decision_sha256"],
+        "scope_sha256": digest(q["scope"]),
+        "observed_at": NOW,
+        "expires_at": NOW + 120,
+        "data": {
+            "pools": pools, "network": network, "isolation": isolation,
+            "recovery_measurements": recoveries,
+        },
     }

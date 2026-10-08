@@ -22,7 +22,8 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     files = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
     prefixes = ('services/planning/', 'services/lifecycle/', 'workers/lifecycle/',
-                'scripts/p09/', 'contracts/schemas/expansion/', 'contracts/fixtures/expansion/',
+                'scripts/p09/', 'scripts/generate_capabilities.py', 'tests/contracts/test_capabilities.py',
+                'contracts/capabilities/', 'contracts/schemas/capabilities/', 'contracts/schemas/expansion/', 'contracts/fixtures/expansion/',
                 'contracts/openapi/expansion-', '.github/workflows/p09-')
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),

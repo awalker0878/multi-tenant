@@ -12,6 +12,7 @@ from test_planning_http import exchange
 
 from planning.application.native_plans import NativePlans
 from planning.application.planning import Planning
+from planning.application.validation import NativeValidation, PlanValidation
 from planning.domain.model import Rejected, digest
 from planning.domain.native_plan import STAGES, compose_native
 from planning.interfaces.native_plans import NativePlansApp
@@ -104,7 +105,9 @@ def test_unattended_recipe_revocation_is_checked_without_user_delegation() -> No
     content["native_provisioning"]["recipe_id"] = str(uuid4())
     planning, source = Mock(spec=Planning), Mock(return_value=recipe)
     planning.clock = lambda: 1000
-    service = NativePlans(planning, source)
+    validation = NativeValidation(source, planning.clock)
+    planning.validation.native = validation
+    service = NativePlans(planning, validation)
     plan = {"content": content, "binding": {"requested_by": str(uuid4())}}
     service.current(plan)
     recipe["expires_at"] = 999
@@ -160,8 +163,16 @@ def test_complete_native_proposal_persistence_retry_and_revocation(database: Any
         custody_generation=base["native_api"]["custody_generation"],
     )
     source = Mock(return_value=recipe)
-    service = NativePlans(planner, source)
-    planner.native_execution_current = service.current
+    from planning.application.planning import Planning
+
+    validation = NativeValidation(source, planner.clock)
+    planner = Planning(
+        planner.database,
+        planner.sources,
+        planner.clock,
+        PlanValidation(validation, planner.validation.migration, Mock()),
+    )
+    service = NativePlans(planner, validation)
     body = {"site_id": SITE, "base_plan_id": base_id, "recipe_id": str(uuid4())}
     key = str(uuid4())
     receipt = service.create(actor, body, key, "delegation")

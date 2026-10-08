@@ -4,18 +4,13 @@ import re
 from typing import Any
 
 from inventory.domain.ahv import AHV_FIELDS, validate_profile
+from inventory.domain.capability_definitions import LEGACY_METHODS
 from inventory.domain.discovery import Rejected, canonical, identifier, number, shape, text
 from inventory.domain.source_profile import validate_devices, validate_source
 from inventory.domain.vmware import FIELDS as VMWARE_FIELDS
 from inventory.domain.vmware import validate_profile as validate_vmware_profile
 
-METHODS = (
-    "APPLICATION_REBUILD_RESTORE",
-    "VM_SNAPSHOT_BASELINE_APP_DELTA",
-    "VM_SNAPSHOT_BASELINE_FILE_DELTA",
-    "VM_COLD_EXPORT",
-    "EXTERNAL_BLOCK_REPLICATION",
-)
+METHODS = LEGACY_METHODS
 OWNER_FIELDS = (
     "application_consistency",
     "dependencies",

@@ -8,222 +8,31 @@ and independently observe every effect through NativeWorkflow.
 from typing import Any
 
 from lifecycle.domain.admission import digest
+from lifecycle.domain.capability_definitions import AFTER as AFTER
+from lifecycle.domain.capability_definitions import BEFORE as BEFORE
+from lifecycle.domain.capability_definitions import (
+    LEGACY_METHODS,
+    METHOD_DELTA,
+    RECOVERY_MODES,
+    STAGES,
+)
+from lifecycle.domain.capability_definitions import MODES as MODES
+from lifecycle.domain.capability_definitions import TERMINALS as TERMINALS
 from lifecycle.domain.execution import Rejected, identity
 from lifecycle.domain.native_workflow import checksum, exact, integer
 
-METHODS = {
-    "APPLICATION_REBUILD_RESTORE",
-    "VM_SNAPSHOT_BASELINE_APP_DELTA",
-    "VM_SNAPSHOT_BASELINE_FILE_DELTA",
-    "VM_COLD_EXPORT",
-    "EXTERNAL_BLOCK_REPLICATION",
-}
-DELTA = {"VM_SNAPSHOT_BASELINE_APP_DELTA", "VM_SNAPSHOT_BASELINE_FILE_DELTA"}
-MODES = {"rehearsal", "cutover", "rollback", "forward_recovery", "reverse_recovery", "cleanup"}
-CAPTURE = (
-    "source_prepare",
-    "capture",
-    "export_copy",
-    "convert_copy",
-    "import_target",
-    "transform_copy",
+METHODS = LEGACY_METHODS
+RECOVERY = RECOVERY_MODES
+DELTA = frozenset(
+    method for method, kind in METHOD_DELTA.items() if kind in {"application", "file"}
 )
-RECOVERY = {
-    "rollback": ("fence_target", "verify_no_divergence", "restore_source", "verify_source"),
-    "forward_recovery": ("fence_target", "preserve_target", "recover_target", "verify_recovery"),
-    "reverse_recovery": (
-        "fence_target",
-        "preserve_target",
-        "reverse_sync",
-        "verify_source_data",
-        "restore_source",
-        "verify_source",
-    ),
-    "cleanup": (
-        "remove_copy",
-        "remove_snapshot",
-        "verify_consolidation",
-        "revoke_migration_access",
-    ),
-}
-TERMINALS = {
-    "rehearsal": "rehearsed",
-    "cutover": "migrated",
-    "rollback": "recovered",
-    "forward_recovery": "recovered",
-    "reverse_recovery": "recovered",
-    "cleanup": "cleaned",
-}
-BEFORE = {
-    "source_prepare": (
-        "source_profile_current",
-        "target_profile_current",
-        "datasets_complete",
-        "application_capture_authorized",
-        "capacity_reserved",
-        "recoverability",
-    ),
-    "capture": ("application_stopped", "source_powered_off", "all_source_writers_fenced"),
-    "restart_baseline_source": ("snapshot_bound", "delta_qualified", "source_restart_authorized"),
-    "export_copy": ("copy_isolated", "copy_powered_off", "snapshot_bound"),
-    "convert_copy": ("export_integrity", "copy_custody", "conversion_artifact_current"),
-    "import_target": ("converted_integrity", "target_quarantine", "capacity_reserved"),
-    "transform_copy": ("target_quarantine", "copy_custody", "guest_profile_qualified"),
-    "rehearsal_validate": ("target_quarantine", "business_effects_suppressed", "guest_ready"),
-    "retain_rehearsal": ("rehearsal_integrity", "business_effects_suppressed"),
-    "fence_source": ("rehearsal_accepted", "change_window_current", "source_profile_current"),
-    "final_sync": ("all_source_writers_fenced", "application_stopped", "delta_access_ready"),
-    "shutdown_source": ("final_integrity", "all_source_writers_fenced"),
-    "validate_target": ("source_powered_off", "all_source_writers_fenced", "target_quarantine"),
-    "admit_writes": (
-        "source_powered_off",
-        "all_source_writers_fenced",
-        "final_integrity",
-        "guest_ready",
-        "application_health",
-        "policy_paths",
-        "required_services",
-        "backup_restore",
-        "change_window_current",
-    ),
-    "verify_activation": (
-        "source_powered_off",
-        "all_source_writers_fenced",
-        "target_writer_admitted",
-    ),
-    "fence_target": ("recovery_decision_current", "source_writer_fenced"),
-    "verify_no_divergence": ("target_writer_fenced", "target_requests_quiescent"),
-    "preserve_target": (
-        "target_writer_fenced",
-        "target_requests_quiescent",
-        "target_keys_readable",
-    ),
-    "recover_target": ("accepted_target_changes_retained", "source_writer_fenced"),
-    "reverse_sync": (
-        "accepted_target_changes_retained",
-        "source_writer_fenced",
-        "reverse_adapter_qualified",
-    ),
-    "verify_source_data": (
-        "reverse_sync_integrity",
-        "source_writer_fenced",
-        "target_writer_fenced",
-    ),
-    "restore_source": (
-        "source_return_integrity",
-        "target_writer_fenced",
-        "target_requests_quiescent",
-    ),
-    "verify_source": ("source_writer_admitted", "target_writer_fenced"),
-    "verify_recovery": (
-        "recovered_integrity",
-        "accepted_target_changes_retained",
-        "source_writer_fenced",
-    ),
-    "remove_copy": (
-        "separate_cleanup_authority",
-        "copy_owned",
-        "copy_powered_off",
-        "retained_evidence",
-    ),
-    "remove_snapshot": (
-        "separate_cleanup_authority",
-        "copy_absent",
-        "snapshot_owned",
-        "retained_evidence",
-    ),
-    "verify_consolidation": ("snapshot_absent", "source_retained"),
-    "revoke_migration_access": ("snapshot_consolidated", "retained_evidence", "source_retained"),
-}
-AFTER = {
-    "source_prepare": ("application_stopped", "source_powered_off", "all_source_writers_fenced"),
-    "capture": ("snapshot_bound", "copy_isolated", "copy_powered_off"),
-    "restart_baseline_source": ("source_application_healthy", "delta_tracking_active"),
-    "export_copy": ("export_integrity", "copy_custody", "ovf_bound"),
-    "convert_copy": ("converted_integrity", "copy_custody"),
-    "import_target": ("target_quarantine", "target_disk_mapping", "import_integrity"),
-    "transform_copy": ("guest_ready", "target_quarantine", "business_effects_suppressed"),
-    "rehearsal_validate": (
-        "rehearsal_integrity",
-        "application_health",
-        "policy_paths",
-        "required_services",
-    ),
-    "retain_rehearsal": ("rehearsal_dossier", "target_writer_fenced", "retained_evidence"),
-    "fence_source": ("all_source_writers_fenced", "application_stopped"),
-    "final_sync": ("final_integrity", "last_source_write_bound", "all_source_writers_fenced"),
-    "shutdown_source": ("source_powered_off", "all_source_writers_fenced"),
-    "validate_target": (
-        "final_integrity",
-        "guest_ready",
-        "application_health",
-        "policy_paths",
-        "required_services",
-        "backup_restore",
-        "target_quarantine",
-    ),
-    "admit_writes": ("target_writer_admitted", "source_writer_fenced", "traffic_active"),
-    "verify_activation": (
-        "application_health",
-        "policy_paths",
-        "required_services",
-        "outage_objective_met",
-        "data_objective_met",
-        "one_writer",
-        "source_retained",
-    ),
-    "fence_target": ("target_writer_fenced", "target_requests_quiescent"),
-    "verify_no_divergence": ("source_return_integrity", "no_target_divergence"),
-    "preserve_target": ("accepted_target_changes_retained", "target_keys_readable"),
-    "recover_target": ("recovered_integrity", "accepted_target_changes_retained"),
-    "reverse_sync": ("reverse_sync_integrity", "accepted_target_changes_retained"),
-    "verify_source_data": ("source_return_integrity", "accepted_target_changes_retained"),
-    "restore_source": ("source_writer_admitted", "target_writer_fenced"),
-    "verify_source": (
-        "application_health",
-        "one_writer",
-        "data_objective_met",
-        "outage_objective_met",
-    ),
-    "verify_recovery": (
-        "application_health",
-        "one_writer",
-        "data_objective_met",
-        "outage_objective_met",
-    ),
-    "remove_copy": ("copy_absent", "source_retained"),
-    "remove_snapshot": ("snapshot_absent", "source_retained"),
-    "verify_consolidation": ("snapshot_consolidated", "source_retained"),
-    "revoke_migration_access": (
-        "migration_access_revoked",
-        "buffers_removed",
-        "retained_evidence",
-        "source_retained",
-    ),
-}
 
 
 def stages(migration: dict[str, Any]) -> tuple[str, ...]:
-    mode, method = migration["mode"], migration["method"]
-    if mode in RECOVERY:
-        return RECOVERY[mode]
-    capture: tuple[str, ...] = CAPTURE
-    if method in DELTA:
-        capture = CAPTURE[:2] + ("restart_baseline_source",) + CAPTURE[2:]
-    elif method == "APPLICATION_REBUILD_RESTORE":
-        capture = ("source_prepare", "export_copy", "import_target", "transform_copy")
-    elif method == "EXTERNAL_BLOCK_REPLICATION":
-        capture = ("source_prepare", "capture", "import_target", "transform_copy")
-    if mode == "rehearsal":
-        return capture + ("rehearsal_validate", "retain_rehearsal")
-    return capture + (
-        "fence_source",
-        "final_sync",
-        "shutdown_source",
-        "validate_target",
-        "admit_writes",
-        "verify_activation",
-    )
+    try:
+        return STAGES[(migration["mode"], migration["method"])]
+    except KeyError:
+        raise Rejected("unsupported_migration_recipe", 422) from None
 
 
 def cases(plan: dict[str, Any], stage: str, phase: str) -> tuple[str, ...]:
@@ -379,13 +188,7 @@ def validate(m: dict[str, Any], now: int) -> None:
 
         validate_outcomes(m["outcomes"], m, artifacts)
     delta = exact(m["delta"], {"kind", "requires_running_guest", "qualification_sha256"})
-    expected = {
-        "VM_SNAPSHOT_BASELINE_APP_DELTA": "application",
-        "VM_SNAPSHOT_BASELINE_FILE_DELTA": "file",
-        "APPLICATION_REBUILD_RESTORE": "restore",
-        "VM_COLD_EXPORT": "none",
-        "EXTERNAL_BLOCK_REPLICATION": "block",
-    }[m["method"]]
+    expected = METHOD_DELTA[m["method"]]
     if delta["kind"] != expected or type(delta["requires_running_guest"]) is not bool:
         raise Rejected("migration_delta_method_mismatch", 422)
     checksum(delta["qualification_sha256"])

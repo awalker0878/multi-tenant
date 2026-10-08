@@ -15,6 +15,7 @@ from typing import Any
 
 from lifecycle_worker.application.api_plan import shape
 from lifecycle_worker.application.native import NativeHeld, digest, sha256
+from lifecycle_worker.domain.capability_definitions import PLATFORMS
 from lifecycle_worker.infrastructure.image_conversion import PinnedQemuSandbox, file_digest
 from lifecycle_worker.infrastructure.native_files import protected_read
 
@@ -39,7 +40,7 @@ def profile(value: Any) -> dict[str, Any]:
         not isinstance(p["id"], str)
         or not re.fullmatch(r"[a-z0-9_-]{1,80}", p["id"])
         or p["family"] not in {"linux", "windows"}
-        or p["target_platform"] not in {"vmware", "openstack", "ahv"}
+        or p["target_platform"] not in PLATFORMS
         or p["firmware"] not in {"bios", "efi"}
         or p["architecture"] != "x86_64"
         or type(p["major_version"]) is not int

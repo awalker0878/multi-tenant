@@ -1,14 +1,17 @@
 """Compose the persistent synthetic diagnostic service without product operations."""
 
 import argparse
+import os
 import time
 from collections.abc import Sequence
+from pathlib import Path
 
 import uvicorn
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from lifecycle.application.campaigns import Campaigns
 from lifecycle.application.execution import Execution
+from lifecycle.application.placement_reservations import PlacementReservations
 from lifecycle.domain.campaign_plan import plan_requirements
 from lifecycle.infrastructure.campaign_observers import CampaignObservers
 from lifecycle.infrastructure.execution_owners import (
@@ -17,12 +20,14 @@ from lifecycle.infrastructure.execution_owners import (
     SimulatedEffects,
 )
 from lifecycle.infrastructure.foundation import database_ready
+from lifecycle.infrastructure.pool_snapshots import NativePoolSnapshots, capacity_caller
 from lifecycle.infrastructure.store import Postgres
 from lifecycle.infrastructure.telemetry import BoundedSignalBuffer
 from lifecycle.interfaces.campaign_observations import CampaignObservationApp
 from lifecycle.interfaces.campaigns import CampaignApp
 from lifecycle.interfaces.execution import ExecutionApp
 from lifecycle.interfaces.http import FoundationApp
+from lifecycle.interfaces.placement_reservations import PlacementReservationApp
 from lifecycle.interfaces.telemetry import RequestTelemetry
 
 
@@ -50,12 +55,22 @@ class Router:
         self.campaign_observations = CampaignObservationApp(
             Campaigns(Postgres(), lambda: int(time.time())), CampaignObservers().authorize
         )
+        self.placement = PlacementReservationApp(
+            PlacementReservations(
+                Postgres(),
+                NativePoolSnapshots(Path(os.environ.get("LIFECYCLE_POOL_OWNERS_FILE", "/uncommissioned"))),
+                lambda: int(time.time()),
+            ),
+            capacity_caller,
+        )
         self.foundation = FoundationApp(database_ready)
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        if scope["type"] == "http" and "/migration-observations/" in scope["path"]:
+        if scope["type"] == "http" and "/placement-reservations/" in scope["path"]:
+            await self.placement(scope, receive, send)
+        elif scope["type"] == "http" and "/migration-observations/" in scope["path"]:
             await self.campaign_observations(scope, receive, send)
         elif scope["type"] == "http" and "/migration-campaigns" in scope["path"]:
             await self.campaigns(scope, receive, send)

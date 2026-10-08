@@ -12,6 +12,7 @@ from test_migration_profiles import inputs, mapping
 from test_planning_http import exchange
 
 from planning.application.migration_plans import MigrationPlans
+from planning.application.validation import MigrationValidation, PlanValidation
 from planning.domain.migration import bind_migration
 from planning.domain.migration_plan import DELTA, compose_migration, stage_order
 from planning.domain.model import Actor, Rejected, digest
@@ -242,7 +243,9 @@ def test_plan_revalidation_observes_recipe_revocation_and_inventory_changes() ->
     planner = Mock()
     planner.clock.return_value = 1000
     prepare, recipes = Mock(return_value=bound), Mock(return_value=recipe)
-    service = MigrationPlans(planner, prepare, recipes)
+    validation = MigrationValidation(prepare, recipes, Mock(), planner.clock)
+    planner.validation.migration = validation
+    service = MigrationPlans(planner, validation)
     content = compose_migration(base, bound, recipe, 1000)
     actor = Actor(
         recipe["scope"]["tenant_id"],
@@ -272,6 +275,11 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     assert isinstance(planner.sources, Sources)
     qualification = planner.sources.value["inputs"][0]["qualification"]
     qualification["scope"].update(action="application.migrate", method="native_api_export_import")
+    from planning_fixture import verify_fixture
+
+    verify_fixture(qualification)
+    destination = planner.sources.value["inputs"][0]["destination"]
+    destination["capability_snapshot"]["scope_sha256"] = digest(qualification["scope"])
     assessment_body.update(action="application.migrate", method="native_api_export_import")
     assessment_receipt = planner.assessment(actor, str(uuid4()), assessment_body, {})
     assessed = planner.get(TENANT, APP, ENV, assessment_receipt["id"], "assessment")
@@ -307,10 +315,18 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     recipe_id, key = str(uuid4()), str(uuid4())
     prepare = Mock(return_value=bound)
     recipes = Mock(return_value=recipe)
-    service = MigrationPlans(
-        planner, prepare, recipes, lambda a, s: [{"id": recipe_id, "recipe": recipe}]
+    from planning.application.planning import Planning
+
+    validation = MigrationValidation(prepare, recipes, Mock(), planner.clock)
+    planner = Planning(
+        planner.database,
+        planner.sources,
+        planner.clock,
+        PlanValidation(planner.validation.native, validation, Mock()),
     )
-    planner.migration_current = service.current
+    service = MigrationPlans(
+        planner, validation, lambda a, s: [{"id": recipe_id, "recipe": recipe}]
+    )
     body = {
         "site_id": SITE,
         "review": bound["review"],
@@ -356,14 +372,21 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     payload = {"content": content, "binding": {"requested_by": str(uuid4())}}
     database = MagicMock()
     tx = database.transaction.return_value.__enter__.return_value
-    planning = Planning(database, Mock(), lambda: 1000)
     recipes = Mock(return_value=recipe)
-    migrations = MigrationPlans(planning, Mock(), recipes)
+
+    def clock() -> int:
+        return 1000
+
+    denied = Planning(database, Mock(), clock, PlanValidation.unavailable(clock))
+    validation = PlanValidation.unavailable(clock)
+    validation = PlanValidation(
+        validation.native, MigrationValidation(Mock(), recipes, Mock(), clock), Mock()
+    )
+    planning = Planning(database, Mock(), clock, validation)
     key, tenant = str(uuid4()), recipe["scope"]["tenant_id"]
     tx.one.side_effect = [{"payload": payload}]
-    with pytest.raises(Rejected, match="recipe_authority"):
-        planning.execution_plan(tenant, key, 1)
-    planning.migration_execution_current = migrations.execution_current
+    with pytest.raises(Rejected, match="validation_authority"):
+        denied.execution_plan(tenant, key, 1)
     tx.one.side_effect = [{"payload": payload}, None, {"payload": payload}]
     assert planning.execution_plan(tenant, key, 1)["invalidated"] is False
     assert planning.bound_plan(key, 1) == payload["binding"]

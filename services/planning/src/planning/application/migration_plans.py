@@ -5,6 +5,7 @@ from typing import Any
 from uuid import uuid4
 
 from planning.application.planning import Planning
+from planning.application.validation import MigrationValidation
 from planning.domain.compilation import bind
 from planning.domain.migration_plan import compose_migration
 from planning.domain.model import Actor, Rejected, digest, identifier, integer, sha, shape
@@ -14,20 +15,20 @@ class MigrationPlans:
     def __init__(
         self,
         planning: Planning,
-        prepare: Callable[..., dict[str, Any]],
-        recipes: Callable[[Actor, str, str], dict[str, Any]],
+        validation: MigrationValidation,
         available: Callable[[Actor, str], list[dict[str, Any]]] | None = None,
-        support: Callable[[Actor, str, dict[str, Any]], None] | None = None,
     ) -> None:
-        self.planning, self.prepare, self.recipes = planning, prepare, recipes
-        self.available, self.support = available, support
+        if validation is not planning.validation.migration:
+            raise ValueError("migration_validation_composition_mismatch")
+        self.planning, self.validation = planning, validation
+        self.available = available
 
     def options(self, actor: Actor, body: dict[str, Any], delegation: str) -> dict[str, Any]:
         """Return only currently composable choices; never expose registry paths or intents."""
         shape(body, {"site_id", "review", "disks"})
         site = identifier(body["site_id"])
         review = shape(body["review"], {"revision", "digest"})
-        bound = self.prepare(
+        bound = self.validation.prepare(
             actor.tenant,
             actor.application,
             actor.environment,
@@ -37,8 +38,7 @@ class MigrationPlans:
             delegation,
             body["disks"],
         )
-        if self.support is not None:
-            self.support(actor, site, bound)
+        self.validation.support(actor, site, bound)
         if self.available is None:
             raise Rejected("migration_recipes_unavailable", 503)
         candidates = [
@@ -76,8 +76,7 @@ class MigrationPlans:
                 if self.planning.validity(actor, plan, {site: delegation})["current"] is not True:
                     continue
                 content = compose_migration(plan["content"], bound, recipe, self.planning.clock())
-                if self.support is not None:
-                    self.support(actor, site, content["native_migration"]["migration"])
+                self.validation.support(actor, site, content["native_migration"]["migration"])
             except Rejected as error:
                 if error.status in {401, 403, 404}:
                     raise
@@ -95,54 +94,10 @@ class MigrationPlans:
         return {"items": options, "native_write_authorized": False}
 
     def execution_current(self, plan: dict[str, Any]) -> None:
-        """Service-only read checks recipe revocation without borrowing a user delegation."""
-        scope = plan["content"]["scope"]
-        actor = Actor(
-            scope["tenant_id"],
-            plan["binding"]["requested_by"],
-            "plan.read",
-            scope["resource_id"],
-            scope["environment"],
-        )
-        composition = plan["content"]["native_migration"]
-        if self.support is not None:
-            self.support(actor, scope["site_id"], composition["migration"])
-        recipe = self.recipes(actor, scope["site_id"], composition["recipe_id"])
-        if (
-            digest(recipe) != composition["recipe_sha256"]
-            or recipe["expires_at"] <= self.planning.clock()
-        ):
-            raise Rejected("migration_recipe_changed", 423)
+        self.validation.execution_current(plan)
 
     def current(self, actor: Actor, plan: dict[str, Any], delegations: dict[str, str]) -> None:
-        content = plan["content"]
-        site = content["scope"]["site_id"]
-        composition = content["native_migration"]
-        recipe = self.recipes(actor, site, composition["recipe_id"])
-        if (
-            digest(recipe) != composition["recipe_sha256"]
-            or recipe["expires_at"] <= self.planning.clock()
-        ):
-            raise Rejected("migration_recipe_changed", 423)
-        migration = composition["migration"]
-        if self.support is not None:
-            self.support(actor, site, migration)
-        bound = self.prepare(
-            actor.tenant,
-            actor.application,
-            actor.environment,
-            site,
-            migration["review"]["revision"],
-            migration["review"]["digest"],
-            delegations.get(site, ""),
-            [
-                {k: disk[k] for k in ("source_disk_sha256", "target_key", "format")}
-                for disk in migration["disks"]
-            ],
-            action="plan.read",
-        )
-        if any(digest(migration.get(k)) != digest(v) for k, v in bound.items()):
-            raise Rejected("migration_profiles_changed", 423)
+        self.validation.current(actor, plan, delegations)
 
     def create(
         self, actor: Actor, body: dict[str, Any], key: str, delegation: str
@@ -177,7 +132,7 @@ class MigrationPlans:
             raise Rejected("migration_base_plan_scope_denied", 403)
         if self.planning.validity(actor, base, {site: delegation})["current"] is not True:
             raise Rejected("current_qualified_base_plan_required", 423)
-        bound = self.prepare(
+        bound = self.validation.prepare(
             actor.tenant,
             actor.application,
             actor.environment,
@@ -187,12 +142,10 @@ class MigrationPlans:
             delegation,
             body["disks"],
         )
-        if self.support is not None:
-            self.support(actor, site, bound)
-        recipe = self.recipes(actor, site, body["recipe_id"])
+        self.validation.support(actor, site, bound)
+        recipe = self.validation.recipes(actor, site, body["recipe_id"])
         content = compose_migration(base["content"], bound, recipe, self.planning.clock())
-        if self.support is not None:
-            self.support(actor, site, content["native_migration"]["migration"])
+        self.validation.support(actor, site, content["native_migration"]["migration"])
         content["native_migration"].update(base_plan_id=base["id"], recipe_id=body["recipe_id"])
         plan_id = str(uuid4())
         payload = {

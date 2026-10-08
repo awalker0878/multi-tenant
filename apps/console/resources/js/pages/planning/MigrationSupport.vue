@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
+import { capabilityDefinitions } from '../../features/planning/capabilityDefinitions';
 import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 
 type Platform = { platform: string; installation_id: string; versions: Record<string, string> };
@@ -26,7 +27,7 @@ async function refresh() {
     if (!response.ok || !response.headers.get('Content-Type')?.includes('application/json')) throw new Error();
     const data = await response.json() as { available: boolean; support: Support };
     if (!active || request.signal.aborted) return;
-    if (!data.available || data.support.directions.length !== 9) throw new Error();
+    if (!data.available || data.support.directions.length !== capabilityDefinitions.platforms.length ** 2) throw new Error();
     current.value = data.support; unavailable.value = false;
   } catch { if (active) unavailable.value = true; }
   finally { clearTimeout(deadline); running = false; if (active) timer = setTimeout(refresh, 15_000); }

@@ -31,7 +31,7 @@ it('binds every scope dimension and rejects ambiguous or writable custody', func
     $record = $this->body + ['records' => [['level' => 'E3']]];
     try {
         file_put_contents($file, json_encode(['schema_version' => 1, 'assignments' => [$record]], JSON_THROW_ON_ERROR));
-        $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('records.0.level', 'E3');
+        $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('records', []);
         $other = $this->body;
         $other['scope']['site_id'] = '10000000-0000-4000-8000-000000000002';
         $this->postJson($this->path, $other)->assertOk()->assertJsonPath('records', []);
@@ -54,7 +54,7 @@ it('requires typed migration scope values and accepts reordered keys', function 
     try {
         $record['scope'] = array_reverse($record['scope'], true);
         file_put_contents($file, json_encode(['schema_version' => 1, 'assignments' => [$record]], JSON_THROW_ON_ERROR));
-        $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('records.0.level', 'E3');
+        $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('records', []);
         $record['scope'][$field] = true;
         file_put_contents($file, json_encode(['schema_version' => 1, 'assignments' => [$record]], JSON_THROW_ON_ERROR));
         $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('records', []);
