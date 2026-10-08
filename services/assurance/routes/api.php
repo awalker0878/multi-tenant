@@ -19,6 +19,7 @@ Route::get('/health/dependencies', DependencyHealthController::class)->name('hea
 Route::post('/v1/tenants/{tenant}/migration-qualifications', MigrationQualificationController::class)->whereUuid('tenant');
 
 Route::post('/internal/tenants/{tenant}/qualification-checks', QualificationCurrentController::class)->whereUuid('tenant');
+Route::post('/internal/tenants/{tenant}/qualification-publications', QualificationPublicationController::class)->whereUuid('tenant');
 
 Route::post('/v1/tenants/{tenant}/planning-qualification-v2', PlanningQualificationController::class)->whereUuid('tenant');
 
