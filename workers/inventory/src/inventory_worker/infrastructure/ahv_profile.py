@@ -140,6 +140,12 @@ def collect_ahv(
         or pc.get("extId") != stream["prism_central_id"]
     ):
         raise CollectionFailure("invalid_response")
+    config, pc_config = cluster.get("config", {}), pc.get("config", {})
+    if not isinstance(config, dict) or not isinstance(pc_config, dict):
+        raise CollectionFailure("invalid_response")
+    hypervisors = config.get("hypervisorTypes", [])
+    if not isinstance(hypervisors, list) or any(not isinstance(v, str) for v in hypervisors):
+        raise CollectionFailure("invalid_response")
     inventory["storage_containers"] = [
         r
         for r in inventory["storage_containers"]
@@ -159,12 +165,11 @@ def collect_ahv(
         k: [{f: r.get(f) for f in fields} | {"native_sha256": fingerprint(r)} for r in inventory[k]]
         for k, fields in FIELDS.items()
     }
-    config = cluster.get("config", {})
     installed = {
-        "prism_central": pc.get("config", {}).get("buildInfo", {}),
+        "prism_central": pc_config.get("buildInfo", {}),
         "aos": config.get("buildInfo", {}),
         "cluster_software": config.get("clusterSoftwareMap", []),
-        "hypervisors": config.get("hypervisorTypes", []),
+        "hypervisors": hypervisors,
     }
     holds = []
     if config.get("isAvailable") is not True:

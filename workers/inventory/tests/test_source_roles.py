@@ -98,6 +98,7 @@ def test_openstack_source_includes_attached_bytes_and_native_keys(
         "changed",
         "revoked",
         "truncated",
+        "malformed_flavor",
     ],
 )
 def test_openstack_source_rejects_scope_loss_or_incomplete_collection(
@@ -108,6 +109,8 @@ def test_openstack_source_rejects_scope_loss_or_incomplete_collection(
     paths = list(responses)
     if fault == "foreign_vm":
         responses[paths[0]]["server"]["tenant_id"] = "foreign"
+    if fault == "malformed_flavor":
+        responses[paths[0]]["server"]["flavor"] = None
     if fault == "foreign_port":
         responses[paths[3]]["ports"][0]["project_id"] = "foreign"
     if fault == "duplicate_volume":

@@ -89,13 +89,16 @@ def collect_ahv_source(
     controllers: list[dict[str, Any]] = []
     holds: list[str] = []
     cluster_config = installed["cluster"]
+    hypervisors = cluster_config.get("hypervisorTypes", [])
+    if not isinstance(hypervisors, list) or any(not isinstance(v, str) for v in hypervisors):
+        raise CollectionFailure("invalid_response")
     if (
         not cluster_config.get("buildInfo")
         or not cluster_config.get("clusterSoftwareMap")
         or not installed["prism_central"].get("buildInfo")
     ):
         holds.append("ahv_installed_versions_incomplete")
-    if "AHV" not in (cluster_config.get("hypervisorTypes") or []):
+    if "AHV" not in hypervisors:
         holds.append("ahv_hypervisor_unobserved")
     if (
         not isinstance(row.get("disks"), list)
@@ -182,7 +185,7 @@ def collect_ahv_source(
     )
     if firmware is None:
         holds.append("firmware_unknown")
-    if row.get("powerState") not in {"ON", "OFF"}:
+    if row.get("powerState") not in ("ON", "OFF"):
         holds.append("source_power_state_unsupported")
     cores = [row.get(k) for k in ("numSockets", "numCoresPerSocket", "numThreadsPerCore")]
     cpu = 1
