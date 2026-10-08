@@ -59,6 +59,8 @@ def test_missing_source_policy_observation_is_unknown_not_empty():
         ]}}},
     ):
         assert source_security_ids(bad) is None
+        # Owner can save the rest of the review, but confirmation is held.
+        destination_input({"destination": None}, bad, destination())
         with pytest.raises(Rejected, match="source_security_policy_observation_required"):
             destination_input(review(), bad, destination())
 
