@@ -40,6 +40,10 @@ at every checkpoint.
 **E2 code and tests committed; independent/native E3/E4 OPEN.**
 [Design, source observation and security requirements](docs/implementation/source-gated-destination-selection.md).
 
+- The Console's **feature-level destination view** now filters to
+  source-observed relevant attributes, while separately reporting missing
+  mandatory source facts as blockers. Absent source data never creates
+  a selectable destination candidate.
 - Destination selectors appear only when the source has the relevant
   property: source observed NICs -> network mapping, source AHV
   categories -> optional category options, source guest identity ->
