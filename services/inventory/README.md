@@ -57,6 +57,10 @@ Service-local tests cover authentication ordering, malformed/rotated secrets, re
 
 See [P04 implementation](../../docs/implementation/p04-inventory.md) and [the operation runbook](../../docs/operations/runbooks/inventory-discovery.md) for explicit supported bounds, independent enrollment inputs, controlled migrations and live evidence. `inventory-publish --limit 100` drains at most 100 confirmed immutable facts.
 
+Enrollment policies are returned in stable policy-ID order, at most 50 per page.
+Follow `next_cursor` to retrieve subsequent policies within the same tenant, site
+and owner scope.
+
 ## Migration profile roles
 
 VMware, OpenStack and AHV can each supply source workload observations or destination
