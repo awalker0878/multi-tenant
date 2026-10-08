@@ -192,6 +192,45 @@ def test_boolean_is_not_numeric_requirement_value() -> None:
     ]
 
 
+@pytest.mark.parametrize("side", ["destination", "qualification"])
+def test_plan_freshness_cannot_outlive_required_capability(side: str) -> None:
+    assessed = assessment()
+    row = assessed["inputs"][0]
+    row[side]["capabilities"]["placement.tenant_isolation"]["expires_at"] = NOW + 10
+    assessed["results"] = [
+        assess(
+            assessed["intent"]["intent"],
+            row["destination"],
+            row["profile"],
+            row["policy"],
+            row["qualification"],
+            "application.provision",
+            "native_api",
+            NOW,
+        )
+    ]
+    assert assessed["results"][0]["operationally_eligible"]
+    assert compile_plan(assessed, 0, request())["input_fresh_until"] == NOW + 10
+
+
+def test_optional_capability_does_not_shorten_required_freshness() -> None:
+    i, d, p, policy, q = inputs()
+    i["requirements"].append({"key": "optional.capability", "value": True, "strength": "preferred"})
+    d["capabilities"]["optional.capability"] = {
+        "status": "observed",
+        "values": [True],
+        "expires_at": NOW + 10,
+        "dependencies": [],
+    }
+    q["capabilities"]["optional.capability"] = {
+        **d["capabilities"]["optional.capability"],
+        "status": "supported",
+    }
+    result = assess(i, d, p, policy, q, "application.provision", "native_api", NOW)
+    assert result["operationally_eligible"]
+    assert result["expires_at"] == NOW + 1800
+
+
 @pytest.mark.parametrize(
     "fault,reason",
     [

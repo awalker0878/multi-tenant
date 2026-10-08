@@ -196,6 +196,11 @@ def assess(
     ]
     observed = destination["capabilities"]
     supported = qualification.get("capabilities", {}) if qualified else {}
+    expiries = [
+        destination["expires_at"],
+        policy["expires_at"],
+        qualification["expires_at"] if qualified else destination["expires_at"],
+    ]
     for row in requested:
         key, value = row["key"], row["value"]
         mandatory = row["strength"] == "required"
@@ -228,6 +233,8 @@ def assess(
             status, reason = "conditional", "dependency_requires_confirmation"
         else:
             status, reason = "eligible", "requirement_observed_and_qualified"
+            if mandatory:
+                expiries.extend((observation["expires_at"], support["expires_at"]))
         finding(
             key,
             status,
@@ -272,9 +279,5 @@ def assess(
         "input_digests": bindings,
         "demand": demand,
         "reserved": False,
-        "expires_at": min(
-            destination["expires_at"],
-            policy["expires_at"],
-            qualification["expires_at"] if qualified else destination["expires_at"],
-        ),
+        "expires_at": min(expiries),
     }
