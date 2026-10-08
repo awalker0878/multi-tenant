@@ -10,3 +10,5 @@ __pycache__/
 *.zip
 verification/**/run-*/
 spikes/compatibility/results/**/run-*/
+spikes/compatibility/results/integration-*/
+spikes/compatibility/results/contracts/local-*/
