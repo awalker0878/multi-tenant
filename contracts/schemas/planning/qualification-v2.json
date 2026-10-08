@@ -224,6 +224,10 @@
                 "null"
               ],
               "pattern": "^[a-f0-9]{64}$"
+            },
+            "authority_epoch": {
+              "type": "integer",
+              "minimum": 1
             }
           },
           "required": [
