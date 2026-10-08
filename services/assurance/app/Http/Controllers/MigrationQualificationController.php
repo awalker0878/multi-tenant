@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Application\Foundation\Contracts\SecretReader;
+use App\Application\Qualification\Actions\ResolveQualification;
+use App\Domain\Qualification\NativeQualification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -62,6 +64,22 @@ final class MigrationQualificationController
                 abort_if(count($matches) > 1, 503, 'migration_support_conflict');
                 $records = $matches[0]['records'] ?? [];
                 abort_unless(is_array($records) && array_is_list($records) && count($records) <= 512, 503);
+                $assignment = $matches[0] ?? [];
+                $qualificationScope = $assignment['qualification_scope'] ?? null;
+                if (! is_array($qualificationScope)) {
+                    $records = [];
+                } else {
+                    $resolved = (new ResolveQualification)->handle($qualificationScope);
+                    $binding = NativeQualification::digest([...$input, 'records' => $records]);
+                    $capability = $resolved['capabilities']['migration.support_records'] ?? [];
+                    if (($resolved['verification']['valid'] ?? false) !== true
+                        || ($qualificationScope['tenant_id'] ?? null) !== $tenant
+                        || ($qualificationScope['site_id'] ?? null) !== $input['scope']['site_id']
+                        || ($capability['status'] ?? null) !== 'supported'
+                        || ! in_array($binding, $capability['values'] ?? [], true)) {
+                        $records = [];
+                    }
+                }
             } catch (Throwable) {
                 abort(503, 'migration_support_unavailable');
             } finally {

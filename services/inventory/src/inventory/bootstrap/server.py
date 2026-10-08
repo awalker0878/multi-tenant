@@ -7,6 +7,7 @@ import uvicorn
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from inventory.application.discovery import Discovery
+from inventory.infrastructure.capability_observations import MountedCapabilityObservations
 from inventory.infrastructure.authority import GovernanceAuthority, planning_actor
 from inventory.infrastructure.foundation import database_ready
 from inventory.infrastructure.generated_configuration_streams import configuration_streams
@@ -35,14 +36,19 @@ class InventoryRouter:
             authority,
             read_evidence,
         )
-        self.planning = PlanningInputApp(self.inventory.discovery, planning_actor, native_reader)
+        self.planning = PlanningInputApp(
+            self.inventory.discovery,
+            planning_actor,
+            native_reader,
+            MountedCapabilityObservations(),
+        )
         self.foundation = FoundationApp(database_ready)
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
         if scope["type"] == "http" and any(
-            p in scope["path"] for p in ("/planning-inputs/", "/migration-inputs/")
+            p in scope["path"] for p in ("/planning-inputs/", "/planning-capability-inputs/", "/migration-inputs/")
         ):
             await self.planning(scope, receive, send)
         elif scope["type"] == "http" and (

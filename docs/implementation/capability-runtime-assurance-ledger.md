@@ -82,3 +82,20 @@ runs on unattended native plan reads, which Lifecycle repeats at effect boundari
 No cached user delegation is borrowed. Isolated E2 live-test peers now sign fixture
 records with scope-bound fixture keys; this exercises the protocol without granting
 E3 support to any actual platform. The original E2 simulation custody API is unchanged.
+
+## CT-02b observations
+
+The worker now has a bounded read-only observer poll with protected manifests,
+independent native principals, mounted artifact hashing, measured case bindings,
+RSA signatures and atomic publication. A failed poll suspends its reviewed decision
+persistently; later successful polls cannot clear that suspension. Only a separately
+reviewed decision creates a new publication key. Inventory verifies signatures,
+enrolled scope, tuple, generation and original measurement freshness before its v2
+projection, while retaining discovery and ownership holds. Legacy migration records
+are no longer positive support: signed reviewed evidence must bind the complete
+route support response digest. E4 still requires separate receiving acceptance.
+
+Focused E2 tests exercise signature rejection, expiry, tuple drift, sticky failure,
+artifact drift and preservation of Inventory holds. A dedicated GitHub matrix runs
+format, lint, strict types and product tests; local execution became unavailable
+before this increment, so its verification results are recorded from CI.

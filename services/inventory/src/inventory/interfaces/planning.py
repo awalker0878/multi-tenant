@@ -7,6 +7,7 @@ from collections.abc import Callable
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
+from inventory.application.capability_observations import CapabilityObservations, capability_input
 from inventory.application.discovery import Discovery
 from inventory.application.planning import planning_input
 from inventory.application.workload import WorkloadProfiles
@@ -20,7 +21,9 @@ class PlanningInputApp:
         discovery: Discovery,
         authority: Callable[[str, str, str, str, str, str, str], None],
         native_authority: Callable[[str, str, str, str, str, int, str], None] | None = None,
+        observations: CapabilityObservations | None = None,
     ) -> None:
+        self.observations = observations
         self.discovery, self.authority = discovery, authority
         self.native_authority = native_authority
 
@@ -31,7 +34,7 @@ class PlanningInputApp:
             return
         try:
             route = re.fullmatch(
-                rf"/v1/tenants/({UUID})/planning-inputs/({UUID})/({UUID})/({UUID})/({UUID})/({UUID})",
+                rf"/v1/tenants/({UUID})/(?:planning-inputs|planning-capability-inputs)/({UUID})/({UUID})/({UUID})/({UUID})/({UUID})",
                 scope["path"],
             )
             migration = re.fullmatch(
@@ -80,6 +83,16 @@ class PlanningInputApp:
                     site,
                     int(endpoint),
                     generation,
+                )
+            elif "/planning-capability-inputs/" in scope["path"]:
+                payload = await asyncio.to_thread(
+                    capability_input,
+                    self.discovery,
+                    tenant,
+                    site,
+                    endpoint,
+                    generation,
+                    self.observations,
                 )
             else:
                 payload = await asyncio.to_thread(
