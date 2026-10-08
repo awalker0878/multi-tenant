@@ -207,8 +207,11 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
     for i, route in enumerate(selected_tranche["routes"]):
         route["source"]["profile_sha256"] = digest([i, "source"])
         route["target"]["profile_sha256"] = digest([i, "target"])
-    selected_tranche["routes"][0]["api_usage"] = selected()["api_usage"]
-    route = selected_tranche["routes"][0]
+    route = next(
+        row for row in selected_tranche["routes"]
+        if row["source"]["platform"] == "vmware" and row["target"]["platform"] == "openstack"
+    )
+    route["api_usage"] = selected()["api_usage"]
     owner = owner_input(route)
     actor = Actor(str(uuid4()), str(uuid4()), "plan.read", str(uuid4()), str(uuid4()))
     site = str(uuid4())
@@ -228,7 +231,10 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
         lambda: 100,
         lambda *_: owner,
     )
-    preview = support.read(actor, site)["directions"][0]["routes"][0]
+    preview = next(
+        direction for direction in support.read(actor, site)["directions"]
+        if direction["direction"] == "vmware->openstack"
+    )["routes"][0]
     assert preview["api_compatibility"]["status"] == "conditional"
     assert "api_capabilities_unresolved" in preview["blockers"]
     binding = {
@@ -250,7 +256,9 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
         "expires_at": 150,
         "approval_sha256": "e" * 64,
     }]
-    assert support.read(actor, site)["directions"][0]["routes"][0]["api_compatibility"][
-        "status"
-    ] == "eligible"
+    upgraded = next(
+        direction for direction in support.read(actor, site)["directions"]
+        if direction["direction"] == "vmware->openstack"
+    )["routes"][0]
+    assert upgraded["api_compatibility"]["status"] == "eligible"
     support.require(actor, site, binding)
