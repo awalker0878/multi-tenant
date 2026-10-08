@@ -28,7 +28,8 @@ final readonly class ConfirmedHttpInvalidationPublisher implements ConfirmedInva
             || ($parts['scheme'] ?? null) !== 'https'
             || ! is_string($parts['host'] ?? null)
             || ! preg_match('/^[a-zA-Z0-9][a-zA-Z0-9.-]{0,252}$/D', $parts['host'])
-            || isset($parts['user'], $parts['pass'])
+            || isset($parts['user'])
+            || isset($parts['pass'])
             || isset($parts['fragment'])
             || ! is_string($ca)
             || ! str_starts_with($ca, '/')
