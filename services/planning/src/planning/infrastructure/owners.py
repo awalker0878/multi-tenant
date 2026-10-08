@@ -7,6 +7,7 @@ import json
 import os
 import re
 import ssl
+import stat
 import time
 from datetime import datetime
 from importlib.resources import files
@@ -174,10 +175,18 @@ class OwnerSources:
     ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
         try:
             path = Path(os.environ["PLANNING_REGISTRY_FILE"])
-            if not path.is_absolute() or path.stat().st_size > 524288:
+            if not path.is_absolute() or any(p.is_symlink() for p in (path, *path.parents)):
                 raise ValueError
-            registry = decode(path.read_bytes())
-            if registry["schema_version"] != 1:
+            fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+            with os.fdopen(fd, "rb") as stream:
+                info = os.fstat(stream.fileno())
+                if not stat.S_ISREG(info.st_mode) or info.st_mode & 0o022:
+                    raise ValueError
+                raw = stream.read(524289)
+                if len(raw) > 524288:
+                    raise ValueError
+                registry = decode(raw)
+            if type(registry["schema_version"]) is not int or registry["schema_version"] != 1:
                 raise ValueError
             first = candidates[0]
             base = (
