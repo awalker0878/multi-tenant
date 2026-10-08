@@ -36,6 +36,16 @@ class NativeJson:
         body: dict[str, Any] | None = None,
         expected: int = 200,
     ) -> Any:
+        return self.request_with_headers(method, path, boundary, body, expected)[0]
+
+    def request_with_headers(
+        self,
+        method: str,
+        path: str,
+        boundary: Callable[[], None],
+        body: dict[str, Any] | None = None,
+        expected: int = 200,
+    ) -> tuple[Any, dict[str, str]]:
         if (
             method not in {"GET", "POST"}
             or re.fullmatch(r"/(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+", path) is None
@@ -76,12 +86,21 @@ class NativeJson:
             ):
                 raise NativeHeld("native_api_response_unconfirmed")
             raw = response_bytes(response, 0 if expected == 204 else 2097152, 10, current)
+            retained = {}
+            for name in ("Location", "ETag", "X-Openstack-Request-Id"):
+                values = response.headers.get_all(name, [])
+                if len(values) > 1 or any(
+                    len(value) > 2048 or any(ord(c) < 32 for c in value) for value in values
+                ):
+                    raise NativeHeld("native_api_response_headers")
+                if values:
+                    retained[name.lower()] = values[0]
             if not raw:
-                return None
+                return None, retained
             if response.getheader("Content-Type", "").split(";")[0].lower() != "application/json":
                 raise NativeHeld("native_api_response_type")
             # Strict duplicate/nonfinite checking also covers arrays and scalar replies.
-            return decode(b'{"value":' + raw + b"}", 2097164)["value"]
+            return decode(b'{"value":' + raw + b"}", 2097164)["value"], retained
         except (OSError, http.client.HTTPException):
             raise NativeHeld("native_api_outcome_unknown") from None
         finally:

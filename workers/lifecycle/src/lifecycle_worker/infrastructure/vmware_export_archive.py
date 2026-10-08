@@ -10,7 +10,7 @@ import os
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, BinaryIO, Protocol
+from typing import Any
 from xml.etree import ElementTree
 
 from lifecycle_worker.application.api_plan import shape
@@ -23,15 +23,13 @@ from lifecycle_worker.application.native import (
     sha256,
 )
 from lifecycle_worker.infrastructure.migration_budget import seconds
+from lifecycle_worker.infrastructure.migration_custody import CaptureCustody
+from lifecycle_worker.infrastructure.migration_transfer import RateBound
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.vmware_capture import NICS, devices, moref
 from lifecycle_worker.infrastructure.vmware_export import VmwareExport
 
 OVF = "{http://schemas.dmtf.org/ovf/envelope/1}"
-
-
-class CaptureCustody(Protocol):
-    def capture(self, binding: NativeBinding, plan_sha256: str) -> dict[str, Any]: ...
 
 
 def validate_descriptor(descriptor: Any, files: list[dict[str, Any]]) -> bytes:
@@ -70,33 +68,6 @@ def validate_descriptor(descriptor: Any, files: list[dict[str, Any]]) -> bytes:
     if len(disk_refs) != len(ids) or set(disk_refs) != ids:
         raise NativeHeld("ovf_disk_mapping_incomplete")
     return raw
-
-
-class RateBound:
-    """A cumulative byte limit and rate cap with authority checks during throttling."""
-
-    def __init__(
-        self, stream: BinaryIO, rate: int, limit: int, current: Callable[[], None]
-    ) -> None:
-        self.stream, self.rate, self.limit, self.current = stream, rate, limit, current
-        self.size, self.started = 0, time.monotonic()
-
-    def write(self, data: bytes) -> int:
-        self.current()
-        self.size += len(data)
-        if self.size > self.limit:
-            raise NativeHeld("migration_spool_bound")
-        while (delay := self.size / self.rate - (time.monotonic() - self.started)) > 0:
-            self.current()
-            time.sleep(min(delay, 0.1))
-        return self.stream.write(data)
-
-    def flush(self) -> None:
-        self.stream.flush()
-        os.fsync(self.stream.fileno())
-
-    def seek(self, offset: int, whence: int = 0) -> int:
-        return self.stream.seek(offset, whence)
 
 
 class VmwareExportArchive:

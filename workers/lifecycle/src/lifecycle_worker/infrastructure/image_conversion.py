@@ -119,7 +119,7 @@ class PinnedQemuSandbox:
             "/tmp",
             "--ro-bind",
             str(source),
-            "/input.vmdk",
+            "/input.img",
             "--bind",
             str(output),
             "/out",
@@ -226,12 +226,13 @@ class CopyConverter:
             "max_seconds",
             "bytes_per_second",
             "artifact_sha256",
-        }:
+        } | ({"source_format"} if "source_format" in intent else set()):
             raise NativeHeld("conversion_intent_invalid")
         if (
             not sha256(intent["source_sha256"])
             or intent["artifact_sha256"] != self.sandbox.artifact_sha256
-            or intent["target_format"] not in {"raw", "qcow2"}
+            or intent["target_format"] not in {"raw", "qcow2", "vmdk"}
+            or intent.get("source_format", "vmdk") not in {"raw", "qcow2", "vmdk"}
         ):
             raise NativeHeld("conversion_method_not_qualified")
         for k, low, high in (
@@ -261,30 +262,40 @@ class CopyConverter:
                 arguments, source, output, intent["max_output_bytes"], deadline, current
             )
 
-        info = decode(run(["info", "--output=json", "-f", "vmdk", "/input.vmdk"]))
+        source_format = intent.get("source_format", "vmdk")
+        info = decode(run(["info", "--output=json", "-f", source_format, "/input.img"]))
         if (
-            info.get("format") != "vmdk"
+            info.get("format") != source_format
             or type(info.get("virtual-size")) is not int
             or info["virtual-size"] != intent["virtual_bytes"]
             or info.get("backing-filename")
             or info.get("encrypted")
             or info.get("snapshots")
-            or info.get("format-specific", {}).get("data", {}).get("create-type")
-            not in {"streamOptimized", "monolithicSparse"}
+            or info.get("format-specific", {}).get("data", {}).get("data-file")
+            or (
+                source_format == "vmdk"
+                and info.get("format-specific", {}).get("data", {}).get("create-type")
+                not in {"streamOptimized", "monolithicSparse"}
+            )
         ):
-            raise NativeHeld("conversion_vmdk_profile_unqualified")
+            raise NativeHeld(
+                "conversion_vmdk_profile_unqualified"
+                if source_format == "vmdk"
+                else "conversion_source_profile_unqualified"
+            )
         target_format = intent["target_format"]
         target = "/out/disk." + target_format
         run(
             [
                 "convert",
                 "-f",
-                "vmdk",
+                source_format,
                 "-O",
                 target_format,
+                *(["-o", "subformat=streamOptimized"] if target_format == "vmdk" else []),
                 "-r",
                 str(intent["bytes_per_second"]),
-                "/input.vmdk",
+                "/input.img",
                 target,
             ]
         )
@@ -294,6 +305,14 @@ class CopyConverter:
             or type(converted.get("virtual-size")) is not int
             or converted["virtual-size"] != intent["virtual_bytes"]
             or converted.get("backing-filename")
+            or converted.get("encrypted")
+            or converted.get("snapshots")
+            or converted.get("format-specific", {}).get("data", {}).get("data-file")
+            or (
+                target_format == "vmdk"
+                and converted.get("format-specific", {}).get("data", {}).get("create-type")
+                != "streamOptimized"
+            )
         ):
             raise NativeHeld("conversion_target_metadata_changed")
         if target_format == "qcow2":
@@ -301,7 +320,7 @@ class CopyConverter:
             if any(checked.get(k, 0) != 0 for k in ("check-errors", "corruptions", "leaks")):
                 raise NativeHeld("conversion_target_corrupt")
         # Compare guest-visible sectors, not storage allocation (which changes by format).
-        run(["compare", "-f", "vmdk", "-F", target_format, "/input.vmdk", target])
+        run(["compare", "-f", source_format, "-F", target_format, "/input.img", target])
         if file_digest(source, intent["source_bytes"], current) != before:
             raise NativeHeld("conversion_input_changed")
         receipt = file_digest(

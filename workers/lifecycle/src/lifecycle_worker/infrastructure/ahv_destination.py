@@ -19,7 +19,7 @@ from lifecycle_worker.application.native import (
 from lifecycle_worker.infrastructure.ahv_http import COLLECTIONS, AhvTransport, read
 from lifecycle_worker.infrastructure.ahv_staging import AhvStaging
 from lifecycle_worker.infrastructure.image_conversion import file_digest
-from lifecycle_worker.infrastructure.migration_conversion import ArtifactCustody
+from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
 from lifecycle_worker.infrastructure.native_files import protected_read
 
 

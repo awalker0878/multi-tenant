@@ -4,7 +4,7 @@ import re
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 from lifecycle_worker.application.api_plan import shape
 from lifecycle_worker.application.native import (
@@ -17,11 +17,8 @@ from lifecycle_worker.application.native import (
 )
 from lifecycle_worker.infrastructure.image_conversion import CopyConverter
 from lifecycle_worker.infrastructure.migration_budget import seconds
+from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
 from lifecycle_worker.infrastructure.native_files import protected_read
-
-
-class ArtifactCustody(Protocol):
-    def artifact(self, binding: NativeBinding, plan_sha256: str, kind: str) -> dict[str, Any]: ...
 
 
 class MigrationConversion:
@@ -57,7 +54,7 @@ class MigrationConversion:
         )
         if (
             type(p["schema_version"]) is not int
-            or p["schema_version"] not in {1, 2}
+            or p["schema_version"] not in {1, 2, 3}
             or p["kind"] != "migration_copy_conversion"
             or digest(p) != binding.operation_plan_sha256
             or not sha256(p["export_plan_sha256"])
@@ -80,7 +77,8 @@ class MigrationConversion:
                 not isinstance(d["key"], str)
                 or not re.fullmatch(r"[A-Za-z0-9_-]{1,80}", d["key"])
                 or d["key"] in keys
-                or d["target_format"] not in {"raw", "qcow2"}
+                or d["target_format"]
+                not in ({"raw", "qcow2", "vmdk"} if p["schema_version"] == 3 else {"raw", "qcow2"})
             ):
                 raise NativeHeld("conversion_mapping_invalid")
             keys.add(d["key"])
@@ -125,9 +123,15 @@ class MigrationConversion:
         receipts = {}
         for d in p["disks"]:
             prior = archive["disks"][d["key"]]
+            source_format = prior.get("format", "vmdk")
+            if source_format not in {"vmdk", "qcow2", "raw"} or (
+                source_format != "vmdk" and p["schema_version"] != 3
+            ):
+                raise NativeHeld("conversion_source_format_unqualified")
             intent = {
                 "source_sha256": prior["sha256"],
                 "source_bytes": prior["size"],
+                **({"source_format": source_format} if p["schema_version"] == 3 else {}),
                 **{k: d[k] for k in ("virtual_bytes", "target_format", "max_output_bytes")},
                 **{k: p[k] for k in ("max_seconds", "bytes_per_second", "artifact_sha256")},
             }
@@ -141,7 +145,10 @@ class MigrationConversion:
                 },
             )
             result = self.converter.convert(
-                self.spool / operation_id / (d["key"] + ".vmdk"), output / d["key"], intent, current
+                self.spool / operation_id / (d["key"] + "." + source_format),
+                output / d["key"],
+                intent,
+                current,
             )
             receipts[d["key"]] = result
             self.journal.record(

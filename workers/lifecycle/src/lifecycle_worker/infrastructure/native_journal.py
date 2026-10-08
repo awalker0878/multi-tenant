@@ -153,7 +153,7 @@ class PostgresNativeJournal:
                 "SELECT a.binding,e.facts FROM native.attempts a JOIN native.events e "
                 "ON e.operation_id=a.operation_id WHERE a.tenant_id=%s "
                 "AND a.binding->>'job_id'=%s AND a.binding->>'operation_plan_sha256'=%s "
-                "AND e.kind='clone_bound'",
+                "AND e.kind IN ('clone_bound','source_capture_bound')",
                 (binding.tenant_id, binding.job_id, plan_sha256),
             ).fetchall()
         if len(rows) != 1:

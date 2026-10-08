@@ -94,6 +94,30 @@ def test_conversion_is_new_copy_checked_and_sector_compared(intent: Any) -> None
     )
 
 
+@pytest.mark.parametrize("source_format", ["raw", "qcow2", "vmdk"])
+@pytest.mark.parametrize("target_format", ["raw", "qcow2", "vmdk"])
+def test_explicit_formats_use_readonly_source_and_sector_equivalence(
+    intent: Any, source_format: str, target_format: str
+) -> None:
+    source, output, p, engine = intent
+    p.update(source_format=source_format, target_format=target_format)
+    original = source.read_bytes()
+    receipt = CopyConverter(engine).convert(source, output, p, lambda: None)
+    assert receipt["format"] == target_format and source.read_bytes() == original
+    assert engine.calls[0] == ["info", "--output=json", "-f", source_format, "/input.img"]
+    assert engine.calls[-1] == [
+        "compare",
+        "-f",
+        source_format,
+        "-F",
+        target_format,
+        "/input.img",
+        "/out/disk." + target_format,
+    ]
+    convert = next(c for c in engine.calls if c[0] == "convert")
+    assert ("subformat=streamOptimized" in convert) == (target_format == "vmdk")
+
+
 @pytest.mark.parametrize(
     "fault", ["backing", "subtype", "corrupt", "sector_mismatch", "source_change", "lost"]
 )
@@ -134,7 +158,7 @@ def test_unsafe_conversion_request_never_executes(intent: Any, fault: str) -> No
 
 def test_sandbox_has_no_network_credentials_or_writable_source() -> None:
     command = Engine().command(
-        ["info", "/input.vmdk"], Path("/custody/source.vmdk"), Path("/custody/result")
+        ["info", "/input.img"], Path("/custody/source.vmdk"), Path("/custody/result")
     )
     assert "--unshare-all" in command and "--clearenv" in command and "--cap-drop" in command
     assert command[command.index("/custody/source.vmdk") - 1] == "--ro-bind"

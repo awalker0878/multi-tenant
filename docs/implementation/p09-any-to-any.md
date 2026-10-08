@@ -12,7 +12,7 @@ obligations and affected P07/P08 outcomes; P11 remains pilot and supported relea
 | A03 | Contextual requirements with downstream consumers | Not started | Not started |
 | A04 | Copy-only guest preparation and independent health probes | Not started | Not started |
 | A05 | Security mapping and individual enterprise-service outcomes | Not started | Not started |
-| A06 | OpenStack source and OpenStack → AHV workload path | Not started | Not started |
+| A06 | OpenStack source and OpenStack → AHV workload path | Capture/export and disk-format conversion implemented; workload path incomplete | Not started |
 | A07 | AHV source and composed destination paths | Not started | Not started |
 | A08 | VMware destination and all nine composed directions | Not started | Not started |
 | A09 | Data consistency, durable continuation and recovery | Not started | Not started |
@@ -52,3 +52,26 @@ exact tuple in every direction, plus every additional advertised variant. Includ
 unsupported combinations, failed prerequisites, lost responses, partial integration,
 process interruption, retry/resume, cutover and both recovery boundaries. Retain all
 failures and source/artifact identities. P10/P11 own operating release acceptance.
+
+## Source capture contracts
+
+OpenStack cold capture uses Nova 2.1 `createImage` for a local root and a separate
+Cinder 3.0 snapshot → isolated volume → image upload for every attached volume.
+It requires a stopped source, exact disk inventory, unencrypted single-attachment
+volumes, private Glance images and SHA-256/SHA-512 integrity. Ephemeral/swap disks
+and unknown encryption or sharing state remain held. No production volume is
+uploaded directly, and a lost POST response is not replayed. Partial resource IDs
+remain in the native custody ledger for reconciliation and cleanup.
+
+The shared archive retains declared raw, qcow2 or VMDK bytes. Version 3 conversion
+uses explicit input/output formats, rejects external backing and encrypted images,
+and compares sectors before accepting its output. This is disk conversion; it does
+not establish a prepared guest. Protected runtime composition wires independent
+source-image readers; image and byte evidence never asserts application readiness.
+
+API basis: [Nova compute reference](https://docs.openstack.org/api-ref/compute/),
+[Cinder v3 reference](https://docs.openstack.org/api-ref/block-storage/v3/),
+[Glance v2 reference](https://docs.openstack.org/api-ref/image/v2/), and
+[QEMU disk image formats](https://www.qemu.org/docs/master/system/images.html).
+The new component peers and local TLS tests are synthetic E2 evidence, not native
+platform qualification.

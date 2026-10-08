@@ -55,6 +55,7 @@ def openstack_fixture() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]
                 "id": volume,
                 "size": 10,
                 "encrypted": False,
+                "multiattach": False,
                 "bootable": "false",
                 "attachments": [{"server_id": vm}],
             }

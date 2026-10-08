@@ -11,6 +11,7 @@ from typing import Any
 
 from inventory_worker.infrastructure.native import CollectionFailure, exchange, secret
 from inventory_worker.infrastructure.native_identity import native_id
+from inventory_worker.infrastructure.openstack_source_contract import configuration
 from inventory_worker.infrastructure.profile_digest import fingerprint
 
 
@@ -111,7 +112,7 @@ def collect_openstack_source(
             not isinstance(attached, list)
             or len(attached) != 1
             or attached[0].get("server_id") != vm
-            or volume.get("multiattach") is True
+            or volume.get("multiattach") is not False
         ):
             holds.append("shared_volume_consistency_required")
         if volume.get("encrypted") is not False:
@@ -170,7 +171,9 @@ def collect_openstack_source(
             "network": "2.0",
             "product": policy["installed"]["product"],
         },
-        "config_sha256": fingerprint({"server": server, "disks": native_disks, "ports": ports}),
+        "config_sha256": fingerprint(
+            {"server": configuration("server", server), "disks": native_disks, "ports": ports}
+        ),
         "observations_sha256": fingerprint(records),
         "observed_at": observed_at,
         "power_state": server.get("status"),
@@ -186,6 +189,7 @@ def collect_openstack_source(
             "disk_records": native_disks,
             "metadata": {
                 "server": server,
+                "server_configuration": configuration("server", server),
                 "ports": ports,
                 "flavor": flavor,
                 "guest_provenance": "native_metadata_declaration",

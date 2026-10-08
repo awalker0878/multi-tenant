@@ -24,6 +24,7 @@ from lifecycle_worker.infrastructure.image_conversion import CopyConverter, Pinn
 from lifecycle_worker.infrastructure.migration_conversion import MigrationConversion
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint
+from lifecycle_worker.infrastructure.native_image_archive import NativeImageArchive
 from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
 from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.native_runtime import (
@@ -32,8 +33,13 @@ from lifecycle_worker.infrastructure.native_runtime import (
     independent_openstack,
 )
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites
+from lifecycle_worker.infrastructure.openstack_capture import OpenStackCapture
 from lifecycle_worker.infrastructure.openstack_image_import import OpenStackImageImport
 from lifecycle_worker.infrastructure.openstack_image_transport import GlanceImport, GlanceReadback
+from lifecycle_worker.infrastructure.openstack_source_images import (
+    CapturedImageObserver,
+    OpenStackCapturedImages,
+)
 from lifecycle_worker.infrastructure.owner_protocol import (
     OwnerProtocolClient,
     OwnerProtocolEffect,
@@ -204,6 +210,74 @@ class MountedMigrationRuntime:
             adapter = VmwareCapture(
                 path, NativeJson(endpoint(config["source"]), "vmware-api-session-id"), self.journal
             )
+        elif kind in {"openstack_capture", "native_image_archive"} and set(config) == (
+            {"writer", "reader", "spool"}
+            if kind == "native_image_archive"
+            else {"writer", "reader"}
+        ):
+            if plan.get("source_platform", "openstack") != "openstack":
+                raise NativeHeld("unsupported_native_image_source")
+            writer, reader = config["writer"], config["reader"]
+            for account in (writer, reader):
+                if not isinstance(account, dict) or set(account) != {
+                    "user_id",
+                    "endpoints",
+                    "image",
+                }:
+                    raise NativeHeld("invalid_source_connection")
+            writer_endpoints, reader_endpoints = (
+                endpoints(writer["endpoints"]),
+                endpoints(reader["endpoints"]),
+            )
+            writer_image, reader_image = endpoint(writer["image"]), endpoint(reader["image"])
+
+            def source_identity_check() -> None:
+                if digest(self.entry(binding)) != digest(entry):
+                    raise NativeHeld("migration_commissioning_changed")
+                if writer["user_id"] == reader["user_id"]:
+                    raise NativeHeld("independent_native_identity_required")
+                independent_openstack(
+                    writer_endpoints | {"image": writer_image},
+                    reader_endpoints | {"image": reader_image},
+                )
+
+            source_identity_check()
+            writer_auth = NativeWrites(
+                writer_endpoints, writer["user_id"], self.clock, source_identity_check
+            )
+            reader_auth = NativeWrites(
+                reader_endpoints, reader["user_id"], self.clock, source_identity_check
+            )
+            writer_source = OpenStackCapturedImages(
+                NativeJson(writer_endpoints["compute"], "X-Auth-Token"),
+                NativeJson(writer_image, "X-Auth-Token"),
+                writer_auth,
+            )
+            reader_source = OpenStackCapturedImages(
+                NativeJson(reader_endpoints["compute"], "X-Auth-Token"),
+                NativeJson(reader_image, "X-Auth-Token"),
+                reader_auth,
+            )
+            if kind == "openstack_capture":
+                adapter = OpenStackCapture(
+                    path,
+                    writer_source.compute,
+                    NativeJson(writer_endpoints["volume"], "X-Auth-Token"),
+                    writer_source.api,
+                    writer_auth,
+                    self.journal,
+                )
+            else:
+                adapter = NativeImageArchive(
+                    path, writer_source, self.journal, self.journal, Path(config["spool"])
+                )
+            capture_observer = CapturedImageObserver(
+                reader_source, plan, self.journal, self.journal, writer["user_id"], self.clock
+            )
+            if entry["observer"] is not None:
+                raise NativeHeld("unexpected_source_observer")
+            adapter.inspect(binding)
+            return self.bound(adapter, binding, entry, source_identity_check), capture_observer
         elif kind == "vmware_export_archive" and set(config) == {"source", "nfc", "spool"}:
             if not isinstance(config["nfc"], dict) or not 1 <= len(config["nfc"]) <= 64:
                 raise NativeHeld("invalid_nfc_registry")
