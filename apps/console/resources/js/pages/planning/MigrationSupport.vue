@@ -66,6 +66,10 @@ const versions = (platform: Platform) => Object.entries(platform.versions).map((
           <div v-for="route in direction.routes" :key="route.route_id" class="mb-4">
             <p>Native qualification: {{ !unavailable && route.native_qualified ? 'Accepted' : 'Held' }}</p>
             <p>Operating acceptance: {{ !unavailable && route.operationally_accepted ? 'Accepted' : 'Pending' }}</p>
+            <p v-if="!route.api_compatibility" role="status" class="text-amber-900">
+              Per-feature API version discovery is not yet enrolled for this historical route.
+              Existing route-level qualification is not a feature-by-feature compatibility claim.
+            </p>
             <section v-if="route.api_compatibility" class="mt-2 border-l-4 border-amber-600 pl-3" aria-label="API feature migration compatibility">
               <p class="font-semibold">Migration API compatibility: {{ unavailable ? 'Unknown — refresh required' : route.api_compatibility.status }}</p>
               <p v-if="route.api_compatibility.administrator_alerts.length && !unavailable" role="alert" class="font-semibold">
