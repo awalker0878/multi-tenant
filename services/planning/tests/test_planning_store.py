@@ -210,6 +210,7 @@ def test_missing_scope_binding_fails_closed_before_any_plan_effects(
     database: Postgres,
 ) -> None:
     identity = str(uuid4())
+    p, _, _ = setup(database)
     with database.transaction() as tx:
         tx.execute(
             "INSERT INTO app.planning_records"
@@ -226,15 +227,9 @@ def test_missing_scope_binding_fails_closed_before_any_plan_effects(
                 NOW,
             ),
         )
-        assert p_scope_unverified(tx, identity)
-
-    p, _, _ = setup(database)
+        assert p.qualification_hold(tx, TENANT, identity) == "qualification_scope_unverified"
     with pytest.raises(Rejected, match="qualification_invalidation_held"):
         p.bound_plan(identity, 1)
     with pytest.raises(Rejected, match="qualification_scope_unverified"):
         p.execution_plan(TENANT, identity, 1)
 
-
-def p_scope_unverified(tx: Any, identity: str) -> bool:
-    p, _, _ = setup(Postgres())
-    return p.qualification_hold(tx, TENANT, identity) == "qualification_scope_unverified"
