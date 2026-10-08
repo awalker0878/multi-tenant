@@ -264,3 +264,26 @@ it('keeps operational approval consent separate from simulation and native write
     }
     expect(fn () => $action->native($this->tenant, $input))->toThrow(IdentityDenied::class);
 })->with(['digest', 'expiry', 'revoked', 'disabled', 'operator', 'reviewer', 'author']);
+
+it('commits approval expiry once when an execution boundary denies expired consent', function (string $lane): void {
+    $binding = $this->plan;
+    unset($binding['digest']);
+    $binding += ['content_digest' => str_repeat('a', 64), 'canonicalization' => 'p05-json-v1', 'lane' => $lane];
+    $this->plan = $binding + ['digest' => GovernanceLedger::digest($binding)];
+    app()->instance(ImmutablePlanSource::class, new SyntheticPlanSource($this->plan));
+    $this->input['plan_digest'] = $this->plan['digest'];
+    $this->input['expires_at'] = now()->addMinute()->toIso8601String();
+    $id = approvePlan($this);
+    $input = ['actor_id' => $this->operatorMember['actor_id'], 'approval_id' => $id, 'plan_id' => $this->plan['plan_id'],
+        'plan_revision' => 1, 'plan_digest' => $this->plan['digest']];
+    $this->travel(2)->minutes();
+    $action = app(InspectExecution::class);
+    $inspect = fn () => $lane === 'operational' ? $action->native($this->tenant, $input) : $action->handle($this->tenant, $input);
+
+    expect($inspect)->toThrow(IdentityDenied::class, 'execution_binding_denied');
+    expect($inspect)->toThrow(IdentityDenied::class, 'execution_binding_denied');
+    $approval = DB::table('app.approvals')->where('id', $id)->sole();
+    expect($approval->state)->toBe('expired')->and($approval->revision)->toBe(3)
+        ->and(DB::table('app.governance_audit')->where('resource_id', $id)->where('event', 'governance.approval.expired')->count())->toBe(1)
+        ->and(DB::table('app.governance_outbox')->where('event', 'governance.approval.expired')->count())->toBe(1);
+})->with(['isolated_campaign', 'operational']);

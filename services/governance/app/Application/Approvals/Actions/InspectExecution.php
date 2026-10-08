@@ -37,7 +37,7 @@ final class InspectExecution
      * @return array<string, mixed> */
     private function inspect(string $tenant, array $input, bool $native): array
     {
-        return DB::transaction(function () use ($tenant, $input, $native): array {
+        $result = DB::transaction(function () use ($tenant, $input, $native): array|IdentityDenied {
             BootstrapAdministrator::query()->lockForUpdate()->findOrFail(1);
             $actor = DB::table('app.federated_actors as a')->join('app.oidc_connections as c', 'c.issuer', '=', 'a.issuer')
                 ->join('app.oidc_installation as i', 'i.active_revision', '=', 'c.revision')
@@ -57,7 +57,8 @@ final class InspectExecution
                 || ! hash_equals($plan->digest, $input['plan_digest'])
                 || ! in_array($actor->id, $plan->binding['executor_ids'], true)
                 || in_array($approval->decided_by, [$actor->id, $approval->requester_id], true)) {
-                throw new IdentityDenied('execution_binding_denied', 403);
+                // Commit any elapsed approval transition before returning the denial.
+                return new IdentityDenied('execution_binding_denied', 403);
             }
             $executor = $this->authority->handle(new FederatedIdentity($actor->id, false), $tenant, 'operation.admit', $plan->scope());
             $requester = $this->authority->handle(new FederatedIdentity($approval->requester_id, false), $tenant, 'approval.request', $plan->scope());
@@ -82,5 +83,10 @@ final class InspectExecution
 
             return $result;
         });
+        if ($result instanceof IdentityDenied) {
+            throw $result;
+        }
+
+        return $result;
     }
 }
