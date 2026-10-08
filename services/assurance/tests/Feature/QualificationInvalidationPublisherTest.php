@@ -64,7 +64,19 @@ it('rejects merely successful HTTP replies and accepts only the exact durable in
         expect(fn () => $publisher->publish($event))
             ->toThrow(RuntimeException::class, 'qualification_invalidation_unconfirmed');
 
+        // The receipt is an exact five-field projection, not a copy of the event.
+        $receipt = [
+            'persisted' => true,
+            'event_id' => $event['event_id'],
+            'scope_sha256' => $event['scope_sha256'],
+            'authority_epoch' => $event['authority_epoch'],
+            'event_sha256' => $event['event_sha256'],
+        ];
         Http::fake(['https://receiving.test/*' => Http::response(['persisted' => true] + $event, 200)]);
+        expect(fn () => $publisher->publish($event))
+            ->toThrow(RuntimeException::class, 'qualification_invalidation_unconfirmed');
+
+        Http::fake(['https://receiving.test/*' => Http::response($receipt, 200)]);
         $publisher->publish($event);
         // The exact persisted acknowledgement above is required for success.
     } finally {
