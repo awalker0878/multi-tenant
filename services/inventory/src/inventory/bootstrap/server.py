@@ -7,8 +7,8 @@ import uvicorn
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from inventory.application.discovery import Discovery
-from inventory.infrastructure.capability_observations import MountedCapabilityObservations
 from inventory.infrastructure.authority import GovernanceAuthority, planning_actor
+from inventory.infrastructure.capability_observations import MountedCapabilityObservations
 from inventory.infrastructure.foundation import database_ready
 from inventory.infrastructure.generated_configuration_streams import configuration_streams
 from inventory.infrastructure.native_readers import capability_reader, native_reader
