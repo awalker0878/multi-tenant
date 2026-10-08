@@ -22,7 +22,9 @@
         "source.api.releases",
         "source.vm.revision",
         "target.api.versions",
-        "source.vmware.compute.hardware_version"
+        "source.vmware.compute.hardware_version",
+        "source.vmware.identity.vcenter_uuid",
+        "target.ahv.target.prism_identity"
       ],
       "operator_attributes": [],
       "qualification": "unqualified",
@@ -39,26 +41,8 @@
         "source.vm.bios_uuid",
         "source.scope.project",
         "source.vm.host",
-        "source.guest.os_identity",
-        "source.disk.native_identity",
         "source.vm.creation_time",
-        "source.vmware.identity.vcenter_uuid",
-        "source.vmware.compute.cpu_hot_add",
-        "target.vmware.target.datacenter_scope",
-        "target.vmware.target.vm_folder",
-        "source.ahv.identity.cluster",
-        "source.ahv.identity.categories",
-        "target.ahv.target.prism_identity",
-        "target.ahv.target.subnet_external",
-        "target.ahv.target.subnet_vpc",
-        "source.openstack.compute.flavor_id",
-        "source.openstack.compute.swap_and_ephemeral",
-        "source.openstack.compute.availability_zone",
-        "target.openstack.target.image_formats",
-        "target.openstack.target.image_import_methods",
-        "target.openstack.target.qos_policies",
-        "target.openstack.target.secret_key_backends",
-        "target.openstack.target.identity_catalog"
+        "source.ahv.identity.cluster"
       ],
       "operator_attributes": [],
       "qualification": "unqualified",
@@ -86,7 +70,9 @@
         "source.vm.memory_mib",
         "target.compute.capacity",
         "source.vmware.compute.memory_hot_add",
-        "target.openstack.placement_traits"
+        "target.openstack.placement_traits",
+        "source.vmware.compute.cpu_hot_add",
+        "source.openstack.compute.flavor_id"
       ],
       "operator_attributes": [],
       "qualification": "unqualified",
@@ -99,7 +85,10 @@
       "criticality": "critical",
       "crosswalk_groups": [
         "target.compute.placement",
-        "owner.placement.native_reserved_capacity"
+        "owner.placement.native_reserved_capacity",
+        "target.vmware.target.datacenter_scope",
+        "target.vmware.target.vm_folder",
+        "source.openstack.compute.availability_zone"
       ],
       "operator_attributes": [
         "placement.native_reserved_capacity"
@@ -128,21 +117,18 @@
       "criticality": "critical",
       "crosswalk_groups": [
         "source.guest.tools",
-        "source.nic.guest_model",
         "target.guest.boot_drivers",
         "owner.guest.boot_drivers",
         "owner.guest.os_activation",
-        "owner.guest.application_health",
-        "source.vmware.network.nic_guest_control",
         "source.openstack.guest.image_id",
         "source.openstack.guest.config_drive",
         "source.openstack.guest.user_key",
-        "source.openstack.guest.image_metadata"
+        "source.openstack.guest.image_metadata",
+        "source.guest.os_identity"
       ],
       "operator_attributes": [
         "guest.boot_drivers",
-        "guest.os_activation",
-        "guest.application_health"
+        "guest.os_activation"
       ],
       "qualification": "unqualified",
       "notes": "Guest identity metadata is not successful target guest boot."
@@ -175,7 +161,8 @@
         "source.vmware.storage.snapshot_supported",
         "source.vmware.storage.clone_from_snapshot",
         "source.openstack.storage.bootable",
-        "source.openstack.storage.volume_metadata"
+        "source.disk.native_identity",
+        "source.openstack.compute.swap_and_ephemeral"
       ],
       "operator_attributes": [],
       "qualification": "unqualified",
@@ -212,7 +199,8 @@
       "criticality": "critical",
       "crosswalk_groups": [
         "source.disk.encryption",
-        "owner.storage.encryption_key_custody"
+        "owner.storage.encryption_key_custody",
+        "target.openstack.target.secret_key_backends"
       ],
       "operator_attributes": [
         "storage.encryption_key_custody"
@@ -228,7 +216,8 @@
       "crosswalk_groups": [
         "target.storage.backend",
         "target.storage.capacity_indicators",
-        "target.ahv.target.storage_encryption"
+        "target.ahv.target.storage_encryption",
+        "target.openstack.target.image_formats"
       ],
       "operator_attributes": [],
       "qualification": "unqualified",
@@ -243,7 +232,8 @@
         "source.disk.capture_method",
         "target.image.ingest",
         "target.vm.create",
-        "source.vmware.storage.ovf_descriptor"
+        "source.vmware.storage.ovf_descriptor",
+        "target.openstack.target.image_import_methods"
       ],
       "operator_attributes": [],
       "qualification": "unqualified",
@@ -256,7 +246,8 @@
       "criticality": "critical",
       "crosswalk_groups": [
         "source.nic.inventory",
-        "source.nic.mac"
+        "source.nic.mac",
+        "source.nic.guest_model"
       ],
       "operator_attributes": [],
       "qualification": "unqualified",
@@ -278,7 +269,9 @@
         "target.openstack.target.network_extensions",
         "target.openstack.target.network_trunks",
         "source.openstack.network.declared_addresses",
-        "target.openstack.target.network_dhcp"
+        "target.openstack.target.network_dhcp",
+        "target.ahv.target.subnet_external",
+        "target.ahv.target.subnet_vpc"
       ],
       "operator_attributes": [
         "network.address_ownership",
@@ -294,7 +287,8 @@
       "criticality": "critical",
       "crosswalk_groups": [
         "source.nic.connected",
-        "owner.network.required_paths"
+        "owner.network.required_paths",
+        "source.vmware.network.nic_guest_control"
       ],
       "operator_attributes": [
         "network.required_paths"
@@ -313,8 +307,7 @@
         "target.network.isolation",
         "owner.network.firewall_flows",
         "owner.security.tenant_isolation",
-        "owner.network.optional_firewall_flows",
-        "source.openstack.network.qos_policy"
+        "owner.network.optional_firewall_flows"
       ],
       "operator_attributes": [
         "network.firewall_flows",
@@ -331,7 +324,8 @@
       "criticality": "critical",
       "crosswalk_groups": [
         "target.permissions.entitlements",
-        "owner.security.credential_scope"
+        "owner.security.credential_scope",
+        "target.openstack.target.identity_catalog"
       ],
       "operator_attributes": [
         "security.credential_scope"
@@ -401,9 +395,13 @@
       "id": "app.validation",
       "label": "Post-migration application behavior",
       "mapping": "operator_and_native",
-      "criticality": "optional",
-      "crosswalk_groups": [],
-      "operator_attributes": [],
+      "criticality": "critical",
+      "crosswalk_groups": [
+        "owner.guest.application_health"
+      ],
+      "operator_attributes": [
+        "guest.application_health"
+      ],
       "qualification": "unqualified",
       "notes": "VM power-on success is insufficient to prove application acceptance."
     },
@@ -480,7 +478,11 @@
         "source.vm.display_name",
         "target.optional.categories",
         "owner.application.optional_tags",
-        "owner.operations.optional_integrations"
+        "owner.operations.optional_integrations",
+        "source.ahv.identity.categories",
+        "target.openstack.target.qos_policies",
+        "source.openstack.storage.volume_metadata",
+        "source.openstack.network.qos_policy"
       ],
       "operator_attributes": [
         "application.optional_tags",
@@ -592,7 +594,7 @@
     },
     {
       "attribute_id": "guest.application_health",
-      "feature_id": "guest.drivers",
+      "feature_id": "app.validation",
       "criticality": "critical",
       "condition": "cutover",
       "max_age_seconds": 300,
@@ -801,7 +803,8 @@
             "identity.vcenter_build",
             "identity.api_release",
             "identity.config_change_version",
-            "compute.hardware_version"
+            "compute.hardware_version",
+            "identity.vcenter_uuid"
           ],
           "target_attributes": [
             "target.api_release"
@@ -816,16 +819,9 @@
             "identity.instance_uuid",
             "identity.bios_uuid",
             "identity.host",
-            "guest.guest_id",
-            "storage.disk_identity",
-            "identity.create_date",
-            "identity.vcenter_uuid",
-            "compute.cpu_hot_add"
+            "identity.create_date"
           ],
-          "target_attributes": [
-            "target.datacenter_scope",
-            "target.vm_folder"
-          ],
+          "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -843,7 +839,8 @@
           "source_attributes": [
             "compute.cpu_count",
             "compute.memory_mib",
-            "compute.memory_hot_add"
+            "compute.memory_hot_add",
+            "compute.cpu_hot_add"
           ],
           "target_attributes": [
             "target.compute_capacity"
@@ -856,9 +853,11 @@
           "source_attributes": [],
           "target_attributes": [
             "target.resource_pool",
-            "target.compute_host"
+            "target.compute_host",
+            "target.datacenter_scope",
+            "target.vm_folder"
           ],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -877,8 +876,7 @@
           "source_attributes": [
             "guest.tools_status",
             "guest.tools_version",
-            "network.nic_model",
-            "network.nic_guest_control"
+            "guest.guest_id"
           ],
           "target_attributes": [
             "target.guest_device_support"
@@ -905,7 +903,8 @@
             "storage.datastore",
             "storage.snapshots",
             "storage.snapshot_supported",
-            "storage.clone_from_snapshot"
+            "storage.clone_from_snapshot",
+            "storage.disk_identity"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -935,7 +934,7 @@
             "storage.disk_encryption"
           ],
           "target_attributes": [],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -964,7 +963,8 @@
           "feature_id": "network.nics",
           "source_attributes": [
             "network.nic_inventory",
-            "network.nic_mac"
+            "network.nic_mac",
+            "network.nic_model"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -984,7 +984,8 @@
         {
           "feature_id": "network.flows",
           "source_attributes": [
-            "network.nic_connection"
+            "network.nic_connection",
+            "network.nic_guest_control"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1096,10 +1097,12 @@
             "identity.vcenter_build",
             "identity.api_release",
             "identity.config_change_version",
-            "compute.hardware_version"
+            "compute.hardware_version",
+            "identity.vcenter_uuid"
           ],
           "target_attributes": [
-            "target.aos_and_ahv_versions"
+            "target.aos_and_ahv_versions",
+            "target.prism_identity"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -1111,17 +1114,9 @@
             "identity.instance_uuid",
             "identity.bios_uuid",
             "identity.host",
-            "guest.guest_id",
-            "storage.disk_identity",
-            "identity.create_date",
-            "identity.vcenter_uuid",
-            "compute.cpu_hot_add"
+            "identity.create_date"
           ],
-          "target_attributes": [
-            "target.prism_identity",
-            "target.subnet_external",
-            "target.subnet_vpc"
-          ],
+          "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -1139,7 +1134,8 @@
           "source_attributes": [
             "compute.cpu_count",
             "compute.memory_mib",
-            "compute.memory_hot_add"
+            "compute.memory_hot_add",
+            "compute.cpu_hot_add"
           ],
           "target_attributes": [],
           "mapping_proposal": "no_direct_field_qualified_alternative_required",
@@ -1152,7 +1148,7 @@
             "target.cluster_identity",
             "target.cluster_availability"
           ],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -1171,8 +1167,7 @@
           "source_attributes": [
             "guest.tools_status",
             "guest.tools_version",
-            "network.nic_model",
-            "network.nic_guest_control"
+            "guest.guest_id"
           ],
           "target_attributes": [
             "target.guest_driver_compat"
@@ -1199,7 +1194,8 @@
             "storage.datastore",
             "storage.snapshots",
             "storage.snapshot_supported",
-            "storage.clone_from_snapshot"
+            "storage.clone_from_snapshot",
+            "storage.disk_identity"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1229,7 +1225,7 @@
             "storage.disk_encryption"
           ],
           "target_attributes": [],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -1261,7 +1257,8 @@
           "feature_id": "network.nics",
           "source_attributes": [
             "network.nic_inventory",
-            "network.nic_mac"
+            "network.nic_mac",
+            "network.nic_model"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1275,7 +1272,9 @@
           "target_attributes": [
             "target.subnets",
             "target.vpc_mapping",
-            "target.ip_configuration"
+            "target.ip_configuration",
+            "target.subnet_external",
+            "target.subnet_vpc"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -1283,7 +1282,8 @@
         {
           "feature_id": "network.flows",
           "source_attributes": [
-            "network.nic_connection"
+            "network.nic_connection",
+            "network.nic_guest_control"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1396,7 +1396,8 @@
             "identity.vcenter_build",
             "identity.api_release",
             "identity.config_change_version",
-            "compute.hardware_version"
+            "compute.hardware_version",
+            "identity.vcenter_uuid"
           ],
           "target_attributes": [
             "target.compute_api_bounds",
@@ -1413,19 +1414,9 @@
             "identity.instance_uuid",
             "identity.bios_uuid",
             "identity.host",
-            "guest.guest_id",
-            "storage.disk_identity",
-            "identity.create_date",
-            "identity.vcenter_uuid",
-            "compute.cpu_hot_add"
+            "identity.create_date"
           ],
-          "target_attributes": [
-            "target.image_formats",
-            "target.image_import_methods",
-            "target.qos_policies",
-            "target.secret_key_backends",
-            "target.identity_catalog"
-          ],
+          "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -1443,7 +1434,8 @@
           "source_attributes": [
             "compute.cpu_count",
             "compute.memory_mib",
-            "compute.memory_hot_add"
+            "compute.memory_hot_add",
+            "compute.cpu_hot_add"
           ],
           "target_attributes": [
             "target.placement_traits"
@@ -1458,7 +1450,7 @@
             "target.availability_zones",
             "target.flavors"
           ],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -1477,8 +1469,7 @@
           "source_attributes": [
             "guest.tools_status",
             "guest.tools_version",
-            "network.nic_model",
-            "network.nic_guest_control"
+            "guest.guest_id"
           ],
           "target_attributes": [
             "target.boot_guest_drivers"
@@ -1505,7 +1496,8 @@
             "storage.datastore",
             "storage.snapshots",
             "storage.snapshot_supported",
-            "storage.clone_from_snapshot"
+            "storage.clone_from_snapshot",
+            "storage.disk_identity"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1534,7 +1526,9 @@
           "source_attributes": [
             "storage.disk_encryption"
           ],
-          "target_attributes": [],
+          "target_attributes": [
+            "target.secret_key_backends"
+          ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -1545,7 +1539,8 @@
             "target.volume_types",
             "target.image_stores",
             "target.placement_inventory",
-            "target.provider_allocations"
+            "target.provider_allocations",
+            "target.image_formats"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -1558,7 +1553,8 @@
           ],
           "target_attributes": [
             "target.image_import_probe",
-            "target.vm_create_probe"
+            "target.vm_create_probe",
+            "target.image_import_methods"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -1567,7 +1563,8 @@
           "feature_id": "network.nics",
           "source_attributes": [
             "network.nic_inventory",
-            "network.nic_mac"
+            "network.nic_mac",
+            "network.nic_model"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1592,7 +1589,8 @@
         {
           "feature_id": "network.flows",
           "source_attributes": [
-            "network.nic_connection"
+            "network.nic_connection",
+            "network.nic_guest_control"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1613,7 +1611,8 @@
           "feature_id": "security.scope",
           "source_attributes": [],
           "target_attributes": [
-            "target.project_quotas"
+            "target.project_quotas",
+            "target.identity_catalog"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -1686,8 +1685,10 @@
           "source_attributes": [
             "identity.display_name"
           ],
-          "target_attributes": [],
-          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "target_attributes": [
+            "target.qos_policies"
+          ],
+          "mapping_proposal": "optional_requires_e4_if_omitted",
           "admission": "unknown_requires_installed_qualification"
         }
       ]
@@ -1718,16 +1719,10 @@
             "identity.bios_uuid",
             "identity.project",
             "identity.host",
-            "guest.os_identity",
-            "storage.disk_backing_identity",
             "identity.create_time",
-            "identity.cluster",
-            "identity.categories"
+            "identity.cluster"
           ],
-          "target_attributes": [
-            "target.datacenter_scope",
-            "target.vm_folder"
-          ],
+          "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -1759,9 +1754,11 @@
           "source_attributes": [],
           "target_attributes": [
             "target.resource_pool",
-            "target.compute_host"
+            "target.compute_host",
+            "target.datacenter_scope",
+            "target.vm_folder"
           ],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -1779,7 +1776,7 @@
           "feature_id": "guest.drivers",
           "source_attributes": [
             "guest.tools",
-            "network.nic_model"
+            "guest.os_identity"
           ],
           "target_attributes": [
             "target.guest_device_support"
@@ -1803,7 +1800,8 @@
             "storage.disk_inventory",
             "storage.disk_capacity",
             "storage.disk_backing_type",
-            "storage.storage_config"
+            "storage.storage_config",
+            "storage.disk_backing_identity"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1834,7 +1832,7 @@
             "storage.encryption"
           ],
           "target_attributes": [],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -1862,7 +1860,8 @@
           "feature_id": "network.nics",
           "source_attributes": [
             "network.nic_inventory",
-            "network.nic_mac"
+            "network.nic_mac",
+            "network.nic_model"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1974,7 +1973,8 @@
         {
           "feature_id": "metadata.optional",
           "source_attributes": [
-            "identity.display_name"
+            "identity.display_name",
+            "identity.categories"
           ],
           "target_attributes": [
             "target.optional_tags"
@@ -1997,7 +1997,8 @@
             "identity.update_time"
           ],
           "target_attributes": [
-            "target.aos_and_ahv_versions"
+            "target.aos_and_ahv_versions",
+            "target.prism_identity"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -2010,17 +2011,10 @@
             "identity.bios_uuid",
             "identity.project",
             "identity.host",
-            "guest.os_identity",
-            "storage.disk_backing_identity",
             "identity.create_time",
-            "identity.cluster",
-            "identity.categories"
+            "identity.cluster"
           ],
-          "target_attributes": [
-            "target.prism_identity",
-            "target.subnet_external",
-            "target.subnet_vpc"
-          ],
+          "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -2052,7 +2046,7 @@
             "target.cluster_identity",
             "target.cluster_availability"
           ],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -2070,7 +2064,7 @@
           "feature_id": "guest.drivers",
           "source_attributes": [
             "guest.tools",
-            "network.nic_model"
+            "guest.os_identity"
           ],
           "target_attributes": [
             "target.guest_driver_compat"
@@ -2094,7 +2088,8 @@
             "storage.disk_inventory",
             "storage.disk_capacity",
             "storage.disk_backing_type",
-            "storage.storage_config"
+            "storage.storage_config",
+            "storage.disk_backing_identity"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -2125,7 +2120,7 @@
             "storage.encryption"
           ],
           "target_attributes": [],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -2156,7 +2151,8 @@
           "feature_id": "network.nics",
           "source_attributes": [
             "network.nic_inventory",
-            "network.nic_mac"
+            "network.nic_mac",
+            "network.nic_model"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -2171,7 +2167,9 @@
           "target_attributes": [
             "target.subnets",
             "target.vpc_mapping",
-            "target.ip_configuration"
+            "target.ip_configuration",
+            "target.subnet_external",
+            "target.subnet_vpc"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -2271,7 +2269,8 @@
         {
           "feature_id": "metadata.optional",
           "source_attributes": [
-            "identity.display_name"
+            "identity.display_name",
+            "identity.categories"
           ],
           "target_attributes": [
             "target.categories"
@@ -2309,19 +2308,10 @@
             "identity.bios_uuid",
             "identity.project",
             "identity.host",
-            "guest.os_identity",
-            "storage.disk_backing_identity",
             "identity.create_time",
-            "identity.cluster",
-            "identity.categories"
+            "identity.cluster"
           ],
-          "target_attributes": [
-            "target.image_formats",
-            "target.image_import_methods",
-            "target.qos_policies",
-            "target.secret_key_backends",
-            "target.identity_catalog"
-          ],
+          "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -2355,7 +2345,7 @@
             "target.availability_zones",
             "target.flavors"
           ],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -2373,7 +2363,7 @@
           "feature_id": "guest.drivers",
           "source_attributes": [
             "guest.tools",
-            "network.nic_model"
+            "guest.os_identity"
           ],
           "target_attributes": [
             "target.boot_guest_drivers"
@@ -2397,7 +2387,8 @@
             "storage.disk_inventory",
             "storage.disk_capacity",
             "storage.disk_backing_type",
-            "storage.storage_config"
+            "storage.storage_config",
+            "storage.disk_backing_identity"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -2427,7 +2418,9 @@
           "source_attributes": [
             "storage.encryption"
           ],
-          "target_attributes": [],
+          "target_attributes": [
+            "target.secret_key_backends"
+          ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -2438,7 +2431,8 @@
             "target.volume_types",
             "target.image_stores",
             "target.placement_inventory",
-            "target.provider_allocations"
+            "target.provider_allocations",
+            "target.image_formats"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -2450,7 +2444,8 @@
           ],
           "target_attributes": [
             "target.image_import_probe",
-            "target.vm_create_probe"
+            "target.vm_create_probe",
+            "target.image_import_methods"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -2459,7 +2454,8 @@
           "feature_id": "network.nics",
           "source_attributes": [
             "network.nic_inventory",
-            "network.nic_mac"
+            "network.nic_mac",
+            "network.nic_model"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -2506,7 +2502,8 @@
           "feature_id": "security.scope",
           "source_attributes": [],
           "target_attributes": [
-            "target.project_quotas"
+            "target.project_quotas",
+            "target.identity_catalog"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -2577,10 +2574,13 @@
         {
           "feature_id": "metadata.optional",
           "source_attributes": [
-            "identity.display_name"
+            "identity.display_name",
+            "identity.categories"
           ],
-          "target_attributes": [],
-          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "target_attributes": [
+            "target.qos_policies"
+          ],
+          "mapping_proposal": "optional_requires_e4_if_omitted",
           "admission": "unknown_requires_installed_qualification"
         }
       ]
@@ -2608,17 +2608,9 @@
           "source_attributes": [
             "identity.server_id",
             "identity.instance_created",
-            "identity.project",
-            "guest.os_metadata",
-            "storage.volume_id",
-            "compute.flavor_id",
-            "compute.swap_and_ephemeral",
-            "compute.availability_zone"
+            "identity.project"
           ],
-          "target_attributes": [
-            "target.datacenter_scope",
-            "target.vm_folder"
-          ],
+          "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -2635,7 +2627,8 @@
           "feature_id": "vm.compute",
           "source_attributes": [
             "compute.vcpus",
-            "compute.memory_mib"
+            "compute.memory_mib",
+            "compute.flavor_id"
           ],
           "target_attributes": [
             "target.compute_capacity"
@@ -2645,10 +2638,14 @@
         },
         {
           "feature_id": "vm.placement",
-          "source_attributes": [],
+          "source_attributes": [
+            "compute.availability_zone"
+          ],
           "target_attributes": [
             "target.resource_pool",
-            "target.compute_host"
+            "target.compute_host",
+            "target.datacenter_scope",
+            "target.vm_folder"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -2665,11 +2662,11 @@
         {
           "feature_id": "guest.drivers",
           "source_attributes": [
-            "network.nic_model",
             "guest.image_id",
             "guest.config_drive",
             "guest.user_key",
-            "guest.image_metadata"
+            "guest.image_metadata",
+            "guest.os_metadata"
           ],
           "target_attributes": [
             "target.guest_device_support"
@@ -2694,7 +2691,8 @@
             "storage.volume_type",
             "storage.volume_image_metadata",
             "storage.bootable",
-            "storage.volume_metadata"
+            "storage.volume_id",
+            "compute.swap_and_ephemeral"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -2725,7 +2723,7 @@
             "storage.encrypted"
           ],
           "target_attributes": [],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -2755,7 +2753,8 @@
           "source_attributes": [
             "network.port_ids",
             "network.ports_complete",
-            "network.nic_mac"
+            "network.nic_mac",
+            "network.nic_model"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -2790,8 +2789,7 @@
           "source_attributes": [
             "network.security_groups",
             "network.port_security",
-            "network.declared_security_groups",
-            "network.qos_policy"
+            "network.declared_security_groups"
           ],
           "target_attributes": [
             "target.security_policies",
@@ -2874,11 +2872,14 @@
         },
         {
           "feature_id": "metadata.optional",
-          "source_attributes": [],
+          "source_attributes": [
+            "storage.volume_metadata",
+            "network.qos_policy"
+          ],
           "target_attributes": [
             "target.optional_tags"
           ],
-          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "mapping_proposal": "optional_requires_e4_if_omitted",
           "admission": "unknown_requires_installed_qualification"
         }
       ]
@@ -2896,7 +2897,8 @@
             "identity.network_api"
           ],
           "target_attributes": [
-            "target.aos_and_ahv_versions"
+            "target.aos_and_ahv_versions",
+            "target.prism_identity"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -2906,18 +2908,9 @@
           "source_attributes": [
             "identity.server_id",
             "identity.instance_created",
-            "identity.project",
-            "guest.os_metadata",
-            "storage.volume_id",
-            "compute.flavor_id",
-            "compute.swap_and_ephemeral",
-            "compute.availability_zone"
+            "identity.project"
           ],
-          "target_attributes": [
-            "target.prism_identity",
-            "target.subnet_external",
-            "target.subnet_vpc"
-          ],
+          "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -2934,7 +2927,8 @@
           "feature_id": "vm.compute",
           "source_attributes": [
             "compute.vcpus",
-            "compute.memory_mib"
+            "compute.memory_mib",
+            "compute.flavor_id"
           ],
           "target_attributes": [],
           "mapping_proposal": "no_direct_field_qualified_alternative_required",
@@ -2942,7 +2936,9 @@
         },
         {
           "feature_id": "vm.placement",
-          "source_attributes": [],
+          "source_attributes": [
+            "compute.availability_zone"
+          ],
           "target_attributes": [
             "target.cluster_identity",
             "target.cluster_availability"
@@ -2962,11 +2958,11 @@
         {
           "feature_id": "guest.drivers",
           "source_attributes": [
-            "network.nic_model",
             "guest.image_id",
             "guest.config_drive",
             "guest.user_key",
-            "guest.image_metadata"
+            "guest.image_metadata",
+            "guest.os_metadata"
           ],
           "target_attributes": [
             "target.guest_driver_compat"
@@ -2991,7 +2987,8 @@
             "storage.volume_type",
             "storage.volume_image_metadata",
             "storage.bootable",
-            "storage.volume_metadata"
+            "storage.volume_id",
+            "compute.swap_and_ephemeral"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -3022,7 +3019,7 @@
             "storage.encrypted"
           ],
           "target_attributes": [],
-          "mapping_proposal": "qualified_adapter_required",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         },
         {
@@ -3055,7 +3052,8 @@
           "source_attributes": [
             "network.port_ids",
             "network.ports_complete",
-            "network.nic_mac"
+            "network.nic_mac",
+            "network.nic_model"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -3073,7 +3071,9 @@
           "target_attributes": [
             "target.subnets",
             "target.vpc_mapping",
-            "target.ip_configuration"
+            "target.ip_configuration",
+            "target.subnet_external",
+            "target.subnet_vpc"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -3092,8 +3092,7 @@
           "source_attributes": [
             "network.security_groups",
             "network.port_security",
-            "network.declared_security_groups",
-            "network.qos_policy"
+            "network.declared_security_groups"
           ],
           "target_attributes": [
             "target.security_policy",
@@ -3177,11 +3176,14 @@
         },
         {
           "feature_id": "metadata.optional",
-          "source_attributes": [],
+          "source_attributes": [
+            "storage.volume_metadata",
+            "network.qos_policy"
+          ],
           "target_attributes": [
             "target.categories"
           ],
-          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "mapping_proposal": "optional_requires_e4_if_omitted",
           "admission": "unknown_requires_installed_qualification"
         }
       ]
@@ -3211,20 +3213,9 @@
           "source_attributes": [
             "identity.server_id",
             "identity.instance_created",
-            "identity.project",
-            "guest.os_metadata",
-            "storage.volume_id",
-            "compute.flavor_id",
-            "compute.swap_and_ephemeral",
-            "compute.availability_zone"
+            "identity.project"
           ],
-          "target_attributes": [
-            "target.image_formats",
-            "target.image_import_methods",
-            "target.qos_policies",
-            "target.secret_key_backends",
-            "target.identity_catalog"
-          ],
+          "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -3241,7 +3232,8 @@
           "feature_id": "vm.compute",
           "source_attributes": [
             "compute.vcpus",
-            "compute.memory_mib"
+            "compute.memory_mib",
+            "compute.flavor_id"
           ],
           "target_attributes": [
             "target.placement_traits"
@@ -3251,7 +3243,9 @@
         },
         {
           "feature_id": "vm.placement",
-          "source_attributes": [],
+          "source_attributes": [
+            "compute.availability_zone"
+          ],
           "target_attributes": [
             "target.availability_zones",
             "target.flavors"
@@ -3271,11 +3265,11 @@
         {
           "feature_id": "guest.drivers",
           "source_attributes": [
-            "network.nic_model",
             "guest.image_id",
             "guest.config_drive",
             "guest.user_key",
-            "guest.image_metadata"
+            "guest.image_metadata",
+            "guest.os_metadata"
           ],
           "target_attributes": [
             "target.boot_guest_drivers"
@@ -3300,7 +3294,8 @@
             "storage.volume_type",
             "storage.volume_image_metadata",
             "storage.bootable",
-            "storage.volume_metadata"
+            "storage.volume_id",
+            "compute.swap_and_ephemeral"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -3330,7 +3325,9 @@
           "source_attributes": [
             "storage.encrypted"
           ],
-          "target_attributes": [],
+          "target_attributes": [
+            "target.secret_key_backends"
+          ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
         },
@@ -3341,7 +3338,8 @@
             "target.volume_types",
             "target.image_stores",
             "target.placement_inventory",
-            "target.provider_allocations"
+            "target.provider_allocations",
+            "target.image_formats"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -3354,7 +3352,8 @@
           ],
           "target_attributes": [
             "target.image_import_probe",
-            "target.vm_create_probe"
+            "target.vm_create_probe",
+            "target.image_import_methods"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -3364,7 +3363,8 @@
           "source_attributes": [
             "network.port_ids",
             "network.ports_complete",
-            "network.nic_mac"
+            "network.nic_mac",
+            "network.nic_model"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -3404,8 +3404,7 @@
           "source_attributes": [
             "network.security_groups",
             "network.port_security",
-            "network.declared_security_groups",
-            "network.qos_policy"
+            "network.declared_security_groups"
           ],
           "target_attributes": [
             "target.security_group_rules",
@@ -3419,7 +3418,8 @@
           "feature_id": "security.scope",
           "source_attributes": [],
           "target_attributes": [
-            "target.project_quotas"
+            "target.project_quotas",
+            "target.identity_catalog"
           ],
           "mapping_proposal": "qualified_adapter_required",
           "admission": "unknown_requires_installed_qualification"
@@ -3489,9 +3489,14 @@
         },
         {
           "feature_id": "metadata.optional",
-          "source_attributes": [],
-          "target_attributes": [],
-          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "source_attributes": [
+            "storage.volume_metadata",
+            "network.qos_policy"
+          ],
+          "target_attributes": [
+            "target.qos_policies"
+          ],
+          "mapping_proposal": "optional_requires_e4_if_omitted",
           "admission": "unknown_requires_installed_qualification"
         }
       ]
