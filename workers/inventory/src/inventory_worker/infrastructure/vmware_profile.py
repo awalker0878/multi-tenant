@@ -1,5 +1,6 @@
 """Read VMware destination resources under an enrolled datacenter scope."""
 
+import re
 from collections.abc import Callable
 from typing import Any
 from urllib.parse import urlencode
@@ -64,6 +65,68 @@ def collect_vmware(
             }
             for r in rows
         ]
+    # Query read-only VI/JSON EnvironmentBrowser options for each observed
+    # destination host. Never expose guessed guestId/vmx values to operators.
+    # A host without a complete API response simply has no selectable values.
+    # Bound the campaign: hosts beyond this limit require a smaller scope.
+    guest_options_by_host: list[dict[str, Any]] = []
+    if len(records["hosts"]) <= 16:
+        for host in records["hosts"]:
+            key = host["host"]
+            if not re.fullmatch(r"host-[0-9]+", key):
+                continue
+            prefix = "/sdk/vim25/" + stream["api_version"] + "/"
+            try:
+                before_request()
+                parent = exchange(stream, prefix + "HostSystem/" + key + "/parent", headers)
+                if (
+                    not isinstance(parent, dict)
+                    or parent.get("type") not in {"ComputeResource", "ClusterComputeResource"}
+                    or not isinstance(parent.get("value"), str)
+                    or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,120}", parent["value"])
+                ):
+                    continue
+                before_request()
+                browser = exchange(
+                    stream, prefix + parent["type"] + "/" + parent["value"] + "/environmentBrowser",
+                    headers,
+                )
+                if (
+                    not isinstance(browser, dict)
+                    or browser.get("type") != "EnvironmentBrowser"
+                    or not isinstance(browser.get("value"), str)
+                    or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,120}", browser["value"])
+                ):
+                    continue
+                before_request()
+                option = exchange(
+                    stream, prefix + "EnvironmentBrowser/" + browser["value"] + "/QueryConfigOption",
+                    headers, method="POST", body={},
+                )
+                if not isinstance(option, dict):
+                    continue
+                guests = option.get("guestOSDescriptor")
+                hardware = option.get("version")
+                if (
+                    not isinstance(guests, list) or not 1 <= len(guests) <= 128
+                    or not isinstance(hardware, str)
+                    or re.fullmatch(r"vmx-[0-9]{2}", hardware) is None
+                ):
+                    continue
+                guest_ids = [
+                    desc["id"] for desc in guests if isinstance(desc, dict)
+                    and isinstance(desc.get("id"), str)
+                    and re.fullmatch(r"[A-Za-z0-9_]{1,80}Guest", desc["id"])
+                ]
+                if guest_ids and len(guest_ids) == len(guests) and len(set(guest_ids)) == len(guest_ids):
+                    guest_options_by_host.append({
+                        "host": key, "guest_ids": sorted(guest_ids),
+                        "hardware_versions": [hardware],
+                        "native_sha256": fingerprint([parent, browser, option]),
+                    })
+            except CollectionFailure:
+                # An unavailable API never becomes an operator-defined option.
+                continue
     return {
         "schema_version": 3,
         "profile_type": "TargetCapabilityProfile",
@@ -75,6 +138,7 @@ def collect_vmware(
         "observed_at": observed_at,
         "observations_sha256": fingerprint([about, records]),
         "inventory_complete": True,
+        "guest_options_by_host": guest_options_by_host,
         "disk_formats": ["vmdk"],
         "image_import_methods": ["vi-json-nfc"],
         **records,
