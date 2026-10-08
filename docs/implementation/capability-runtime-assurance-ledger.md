@@ -12,11 +12,11 @@ do not establish E3 native qualification or E4 receiving acceptance.
 | CT-00a | Required immutable validation composition | Delivered in PR #63 | Audited main CI not green; new branch validation pending |
 | CT-00b / CT-02a | Verified provenance and effect-boundary revalidation | Delivered in PR #63 | E2 RSA controls present; native E3 not supplied |
 | CT-01 | Canonical registry and generated consumers | Delivered in PR #63 | Projection checks exist; full required CI not green |
-| CT-02b | Signed native observation and persistent suspension | Partial | E2 paths exist; durable Assurance decision history and authority epoch still required |
+| CT-02b | Signed native observation and persistent suspension | SQL authority epoch/history, signed publication boundary and outbox producer implemented in draft PR #64 | New PostgreSQL/HTTPS E2 checks pending; downstream receiver, live event replay and native E3 open |
 | CT-03 | Placement, reservation and owner enforcement | Partial; current-capacity admission fix in PR #64 | Fresh-pool regressions added; native exclusivity, cross-owner enforcement and E3 still open |
-| CT-04 | Directed network, isolation and failure domains | Partial | Address family, VRF/VPC, return paths, RBAC, storage/key and fault hierarchy coverage open |
-| CT-05 | Representative measured recovery | Partial; failure-trigger RTO and readiness evidence added in PR #64 | Reviewed bounds binding is E2; independently authenticated native reviewer and E3 campaign still open |
-| CT-06 | Integration and rollout controls | Partial | Source-bound A01–A16, shadow reconciliation and E4 receiving sign-off not complete |
+| CT-04 | Directed network, isolation and failure domains | Expanded code/tests for address family, VRF/VPC, return paths, RBAC, storage/key and fault hierarchy in draft PR #64 | Current-head CI and source-bound native E3 control breadth open |
+| CT-05 | Representative measured recovery | Failure-trigger RTO, application/key/dependency readiness and policy-review digest implemented in draft PR #64 | Reviewed bounds are E2; independently authenticated native reviewer and representative E3 restore still open |
+| CT-06 | Integration and rollout controls | Core E2 integration with new outbox relay/command in draft PR #64 | A01–A16 final evidence, commissioned receiver, shadow reconciliation and E4 sign-off not complete |
 
 ## Acceptance scenarios
 
@@ -221,7 +221,7 @@ code changes, not completed native commissioning or validated full CI.
 | A06–A07 | Directed flow and negative isolation checks partial | E3 native control breadth open |
 | A08 | Typed numeric matching tests present | E3 open |
 | A09 | Failure-trigger RTO and complete readiness tests added | E3 actual representative restore open |
-| A10–A11 | Runtime and admission revocation tests partial | Durable authority epoch open |
+| A10–A11 | Authority epoch/history and fail-closed producer relay now coded; new E2 SQL/transport tests pending | Commissioned receiver, out-of-order inbox reconciliation and E3 open |
 | A12 | Missing validators fail closed in tests | Receiving E4 open |
 | A13–A14 | Owner retry/loss cases partial | E3 multi-owner compensation open |
 | A15–A16 | Unsupported methods fail closed; E2/E3/E4 separate | E3 and E4 open |
@@ -229,3 +229,40 @@ code changes, not completed native commissioning or validated full CI.
 Never mark CT-06 or an E3/E4 scenario accepted solely on a unit-test or CI
 success. Attach native owner custody, signed reviewer decisions, real provider
 exclusivity and receiving-owner sign-off before changing authoritative rollout.
+
+## October 8, 2026 continued implementation — direct draft-branch commits
+
+The following commits target `codex/capability-runtime-assurance-audit-fixes`
+directly; they are **not a native qualification, E3 decision, E4 receipt or a
+completed CI claim**.
+
+- `50bb4d6a`: correct three invalid PL/pgSQL trigger-body delimiters in
+  `002_qualification_authority.sql` so migrations can be executed by PostgreSQL.
+- `045eaec1`: E2-only SQL transaction tests for exact idempotent publication,
+  monotonic epochs, append-only event and outbox history, sticky suspension,
+  independent restoration and stale-epoch rejection.
+- `0d519df3`: dedicated GitHub Actions PostgreSQL lane provisions isolated
+  runtime/migrator roles, installs SQL migrations and runs the feature tests.
+- `c8b07bd4` through `8d2d16c1`: explicit durable-ack publisher contract,
+  scope-ordered `SKIP LOCKED` relay, HTTPS/TLS sink with exact persisted
+  acknowledgment, configuration and registered bounded Artisan command.
+- `5a2121e8` onward: E2 test coverage for failed publication, retry, ordering,
+  wrong acknowledgment and transport fail-closed behavior; corrected a URL-userinfo
+  guard and fixture warnings.
+- See [invalidation commissioning runbook](../operations/runbooks/qualification-invalidation.md)
+  for the required receiving inbox, duplicate/out-of-order handling and operational
+  restrictions.
+
+**Verification is outstanding.** At last inspection, GitHub Actions for the
+current branch were queued with no current-head results. A passing workflow must
+establish source SHA and tested jobs; until then this ledger records code present,
+not tests passed. The new relay is intentionally not scheduled and cannot clear an
+invalidation without a commissioned, explicitly configured receiving endpoint
+returning the exact durable inbox receipt. No downstream consumer or E3 native
+reviewer has been commissioned by these changes.
+
+Follow-up acceptance: run the isolated PostgreSQL job, inspect any PHP
+format/strict-type failures, confirm that a failed/missing/late HTTP receipt keeps
+SQL outbox rows pending, implement recipient inbox custody and monotonic
+invalidation semantics, run A01–A16 composed tests including effect-boundary
+revocations, and complete E3/E4 and shadow-rollout separately.
