@@ -165,6 +165,8 @@ def evaluate(
             cap = required["capability_id"]
             env = envs.get(side)
             status, reason, ref = "unknown", "api_observation_missing", None
+            api_family: str | None = None
+            api_version: str | None = None
             if env is not None:
                 entitlement = env["entitlements"].get(cap, "unknown")
                 candidates = [
@@ -175,29 +177,41 @@ def evaluate(
                     and f["api_version"] in env["apis"].get(f["api_family"], [])
                     and f["expires_at"] > now
                 ]
+                # Several independently negotiated versions may be installed.
+                # A capability is usable if at least one *specific* version
+                # is qualified. Conflicting receipts for the same version hold.
+                identities = [(f["api_family"], f["api_version"]) for f in candidates]
                 if entitlement == "denied":
                     status, reason = "blocked", "api_entitlement_denied"
                 elif entitlement != "allowed":
                     reason = "api_entitlement_unconfirmed"
-                elif len(candidates) > 1:
+                elif len(identities) != len(set(identities)):
                     reason = "api_observation_ambiguous"
-                elif len(candidates) == 1:
-                    observation = candidates[0]
-                    ref = observation["evidence_sha256"]
-                    if observation["result"] == "unsupported":
-                        status, reason = "blocked", "api_operation_unsupported"
-                    elif observation["result"] == "degraded":
+                else:
+                    usable = [
+                        f for f in candidates
+                        if f["result"] == "supported"
+                        and f["source"] == "live_probe"
+                        and f["qualification_level"] in {"E3", "E4"}
+                        and f["qualification_decision"] == "accepted"
+                        and f["qualification_sha256"] is not None
+                    ]
+                    if usable:
+                        observation = max(
+                            usable, key=lambda f: (
+                                f["api_family"], version_tuple(f["api_version"])
+                            )
+                        )
+                        status, reason = "eligible", "api_operation_qualified"
+                        ref = observation["evidence_sha256"]
+                        api_family = observation["api_family"]
+                        api_version = observation["api_version"]
+                    elif any(f["result"] == "degraded" for f in candidates):
                         status, reason = "conditional", "api_behavior_degraded"
-                    elif observation["result"] == "supported":
-                        if (
-                            observation["source"] == "live_probe"
-                            and observation["qualification_level"] in {"E3", "E4"}
-                            and observation["qualification_decision"] == "accepted"
-                            and observation["qualification_sha256"] is not None
-                        ):
-                            status, reason = "eligible", "api_operation_qualified"
-                        else:
-                            reason = "api_declared_but_not_native_qualified"
+                    elif candidates and all(f["result"] == "unsupported" for f in candidates):
+                        status, reason = "blocked", "api_operation_unsupported"
+                    elif candidates:
+                        reason = "api_declared_but_not_native_qualified"
             warning = None
             omission_accepted = False
             if status != "eligible":
@@ -242,6 +256,8 @@ def evaluate(
                 "status": status,
                 "reason": reason,
                 "evidence_sha256": ref,
+                "selected_api_family": api_family,
+                "selected_api_version": api_version,
                 "omission_accepted": omission_accepted,
             })
     return {
