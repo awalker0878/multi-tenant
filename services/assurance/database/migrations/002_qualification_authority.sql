@@ -62,12 +62,31 @@ CREATE FUNCTION app.verify_qualification_head_event()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
     IF NOT EXISTS (
-        SELECT 1 FROM app.qualification_authority_events e
-        WHERE e.scope_sha256 = NEW.scope_sha256
-          AND e.authority_epoch = NEW.authority_epoch
-          AND e.event_sha256 = NEW.last_event_sha256
+        SELECT 1
+          FROM app.qualification_authority_events e
+          JOIN app.qualification_authority_outbox o ON o.event_id = e.event_id
+         WHERE e.scope_sha256 = NEW.scope_sha256
+           AND e.tenant = NEW.tenant
+           AND e.authority_epoch = NEW.authority_epoch
+           AND e.event_sha256 = NEW.last_event_sha256
+           AND e.recorded_at = NEW.updated_at
+           AND (e.result->>'state') = NEW.state
+           AND (e.result->>'authority_epoch')::bigint = NEW.authority_epoch
+           AND (e.result->>'decision_sha256') IS NOT DISTINCT FROM NEW.decision_sha256
+           AND (e.result->>'decision_revision')::bigint = NEW.decision_revision
+           AND (e.result->>'reviewer_id') = NEW.reviewer_id
+           AND e.result->'bundle' = NEW.bundle
+           AND o.scope_sha256 = NEW.scope_sha256
+           AND o.authority_epoch = NEW.authority_epoch
+           AND o.payload->>'event_sha256' = e.event_sha256
+           AND o.payload->>'tenant_id' = NEW.tenant::text
+           AND (
+               (TG_OP = 'INSERT' AND e.previous_event_sha256 IS NULL)
+               OR (TG_OP = 'UPDATE' AND
+                   e.previous_event_sha256 = OLD.last_event_sha256)
+           )
     ) THEN
-        RAISE EXCEPTION 'qualification head has no durable publication event'
+        RAISE EXCEPTION 'qualification head, history, and outbox disagree'
             USING ERRCODE = '23514';
     END IF;
     RETURN NEW;
