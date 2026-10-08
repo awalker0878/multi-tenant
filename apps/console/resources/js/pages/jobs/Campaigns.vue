@@ -89,6 +89,12 @@ async function addPlan() {
     } catch (e) { error.value = e instanceof Error ? e.message.replaceAll('_', ' ') : 'Plan unavailable'; }
     finally { busy.value = false; }
 }
+function removePlan(id: string) {
+    if (disabled.value) return;
+    members.value = members.value.filter(member => member.id !== id).map(member => ({
+        ...member, depends_on: member.depends_on.filter(dependency => dependency !== id),
+    }));
+}
 function utc(rows: { start: string; end: string }[]) {
     return rows.map(row => {
         const start = Date.parse(row.start + 'Z') / 1000, end = Date.parse(row.end + 'Z') / 1000;
@@ -165,7 +171,7 @@ onUnmounted(() => { active = false; clearTimeout(timer); polling?.abort(); docum
       <fieldset :disabled="disabled" class="space-y-5"><legend class="text-xl font-semibold">Create a migration campaign</legend>
         <label>Campaign name<input v-model="name" required maxlength="120" /></label>
         <div class="rounded border p-4 space-y-3"><h3 class="font-semibold">Reviewed plans</h3><p>Add complete operational migration plans from this application and environment. Preparation-only plans remain held.</p><label>Reviewed plan reference<input v-model="planId" maxlength="36" /></label><button type="button" @click="addPlan">Load reviewed plan</button>
-          <section v-for="(m, index) in members" :key="m.id" class="rounded border p-4 space-y-2"><h4 class="font-semibold">Migration {{ index + 1 }} · {{ m.mode }}</h4><p class="break-all text-sm">{{ m.plan_id }}</p><label>Independent approval reference<input v-model="m.approval_id" required maxlength="36" /></label><label>Priority (higher starts first)<input v-model.number="m.priority" type="number" min="0" max="100" /></label><label>Shared outage group (optional)<input v-model="m.outage_group" placeholder="Group reference" maxlength="36" /></label><p class="text-sm">Members of the same group cannot migrate together.</p><label>Wait for completed migrations<select v-model="m.depends_on" multiple><option v-for="(other, j) in members.filter(v => v.id !== m.id)" :key="other.id" :value="other.id">{{ other.plan_id }} ({{ j + 1 }})</option></select></label><button type="button" @click="members = members.filter(v => v.id !== m.id)">Remove plan</button></section>
+          <section v-for="(m, index) in members" :key="m.id" class="rounded border p-4 space-y-2"><h4 class="font-semibold">Migration {{ index + 1 }} · {{ m.mode }}</h4><p class="break-all text-sm">{{ m.plan_id }}</p><label>Independent approval reference<input v-model="m.approval_id" required maxlength="36" /></label><label>Priority (higher starts first)<input v-model.number="m.priority" type="number" min="0" max="100" /></label><label>Shared outage group (optional)<input v-model="m.outage_group" placeholder="Group reference" maxlength="36" /></label><p class="text-sm">Members of the same group cannot migrate together.</p><label>Wait for completed migrations<select v-model="m.depends_on" multiple><option v-for="(other, j) in members.filter(v => v.id !== m.id)" :key="other.id" :value="other.id">{{ other.plan_id }} ({{ j + 1 }})</option></select></label><button type="button" @click="removePlan(m.id)">Remove plan</button></section>
         </div>
         <label>Display time zone<input v-model="zone" required maxlength="100" /></label>
         <p>Enter all windows below in UTC. Saved schedules also display them in your selected time zone.</p>
