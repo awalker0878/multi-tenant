@@ -191,6 +191,7 @@ def test_optional_omission_needs_exact_scope_E4_owner_acceptance() -> None:
         "evidence_level": "E4",
         "expires_at": 150,
         "approval_sha256": "e" * 64,
+        "effect_suppressed_sha256": "1" * 64,
     }
     evidence["omissions"] = [ack]
     result = evaluate(
@@ -206,6 +207,7 @@ def test_optional_omission_needs_exact_scope_E4_owner_acceptance() -> None:
         {"expires_at": 100},
         {"application_id": str(uuid4())},
         {"route_sha256": "f" * 64},
+        {"effect_suppressed_sha256": None},
     ):
         untrusted = deepcopy(evidence)
         untrusted["omissions"] = [ack | changed]
@@ -295,6 +297,7 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
         "evidence_level": "E4",
         "expires_at": 150,
         "approval_sha256": "e" * 64,
+        "effect_suppressed_sha256": "1" * 64,
     }]
     upgraded = next(
         direction for direction in support.read(actor, site)["directions"]
