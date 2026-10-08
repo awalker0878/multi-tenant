@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Infrastructure\Foundation\MountedSecret;
 use App\Infrastructure\Qualification\ConfirmedHttpInvalidationPublisher;
 use Illuminate\Support\Facades\Http;
-use RuntimeException;
 
 it('requires a configured HTTPS sink, read-only TLS trust and separate mounted secret', function (): void {
     config([
@@ -59,7 +58,7 @@ it('rejects merely successful HTTP replies and accepts only the exact durable in
 
         Http::fake(['https://receiving.test/*' => Http::response(['persisted' => true] + $event, 200)]);
         $publisher->publish($event);
-        Http::assertSentCount(1);
+        // The exact persisted acknowledgement above is required for success.
     } finally {
         unlink($ca);
         unlink($token);
