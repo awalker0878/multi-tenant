@@ -42,8 +42,13 @@ final class EvidenceOwners implements EvidenceAuthority
         abort_unless(count($tokens) === 1 && is_string($tokens[0]) && preg_match('/\A[0-9a-f]{64}\z/', $tokens[0]), 403);
         $scope = array_intersect_key($scope, array_flip(['site_id', 'environment', 'resource_id']));
         $result = $this->request('governance', 'POST', '/v1/tenants/'.$tenant.'/delegated-authorizations', ['action' => $action, 'scope' => $scope], $tokens[0]);
+        $returnedScope = $result['scope'] ?? null;
+        if (is_array($returnedScope)) {
+            ksort($returnedScope, SORT_STRING);
+        }
+        ksort($scope, SORT_STRING);
         abort_unless(($result['allowed'] ?? null) === true && ($result['audience'] ?? null) === 'assurance'
-            && ($result['tenant_id'] ?? null) === $tenant && ($result['action'] ?? null) === $action && ($result['scope'] ?? null) == $scope
+            && ($result['tenant_id'] ?? null) === $tenant && ($result['action'] ?? null) === $action && $returnedScope === $scope
             && ($result['authority_use'] ?? null) === 'request_bound' && Carbon::parse($result['expires_at'])->isFuture()
             && Carbon::parse($result['expires_at'])->lessThanOrEqualTo(now()->addSeconds(65))
             && abs(Carbon::parse($result['evaluated_at'])->diffInSeconds(now())) <= 5, 403);
