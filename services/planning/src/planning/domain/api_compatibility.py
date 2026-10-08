@@ -10,7 +10,7 @@ from typing import Any
 
 from planning.domain.model import Rejected, digest, identifier, integer, sha, shape
 
-CAPABILITY = re.compile(r"[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*){1,7}\Z")
+CAPABILITY = re.compile(r"[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*){1,7}\Z")
 API_FAMILY = re.compile(r"[a-z][a-z0-9_.-]{0,63}\Z")
 API_VERSION = re.compile(r"v?[0-9]+(?:\.[0-9]+){0,3}\Z")
 
@@ -150,6 +150,8 @@ def evaluate(
     if not isinstance(facts, list) or len(facts) > 512:
         raise Rejected("migration_api_observation_bound", 422)
     for fact in facts:
+        if not isinstance(fact, dict):
+            raise Rejected("migration_api_observation_invalid", 422)
         record(fact, now)
     omissions = evidence["omissions"]
     if not isinstance(omissions, list) or len(omissions) > 64:
