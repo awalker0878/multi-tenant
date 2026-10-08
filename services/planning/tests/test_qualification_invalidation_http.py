@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import os
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import Mock
@@ -107,4 +108,16 @@ def test_untrusted_payload_fails_before_mutation(
 ) -> None:
     app, inbox = receiver
     assert exchange(app, body, method=method, content_type=content_type)[0] == status
+    inbox.accept.assert_not_called()
+
+
+def test_existing_read_caller_cannot_impersonate_invalidation_receiver(
+    receiver: tuple[QualificationInvalidationApp, Mock], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app, inbox = receiver
+    monkeypatch.setenv(
+        "PLANNING_ASSURANCE_CREDENTIAL_FILE",
+        os.environ["PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE"],
+    )
+    assert exchange(app, b"{}")[0] == 503
     inbox.accept.assert_not_called()
