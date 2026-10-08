@@ -7,16 +7,16 @@ The implementation plan is [capability-runtime-assurance.md](capability-runtime-
 Qualification remains owned by Assurance. Implementation and synthetic verification
 do not establish E3 native qualification or E4 receiving acceptance.
 
-| Increment | Scope | State | Verification |
+| Increment | Scope | Implementation state | Acceptance / evidence state |
 | --- | --- | --- | --- |
-| CT-00a | Required immutable validation composition | Implemented | Planning Ruff, format and strict mypy pass; 383 tests pass locally, 6 PostgreSQL tests await GitHub runner |
-| CT-00b / CT-02a | Verified qualification provenance and current execution revalidation | Implemented | Real RSA positive and eight negative controls pass; Planning 403 tests pass locally, 6 PostgreSQL tests delegated to GitHub |
-| CT-01 | Canonical definition registry, generated consumers and typed matching | Implemented | Generated projections agree; 30 stage combinations preserved; typed maximum/unit and handler tests pass; strict mypy passes in four products |
-| CT-02b | Native observation projection and sticky runtime suspension | In progress | Pending |
-| CT-03 | Concrete placement and authoritative reservation owner integration | Planned | Pending |
-| CT-04 | Evidence-bound network, isolation and failure-domain evaluation | Planned | Pending |
-| CT-05 | Measured recovery profiles and reassessment feedback | Planned | Pending |
-| CT-06 | Composed acceptance tests, compatibility and rollout controls | Planned | Pending |
+| CT-00a | Required immutable validation composition | Delivered in PR #63 | Audited main CI not green; new branch validation pending |
+| CT-00b / CT-02a | Verified provenance and effect-boundary revalidation | Delivered in PR #63 | E2 RSA controls present; native E3 not supplied |
+| CT-01 | Canonical registry and generated consumers | Delivered in PR #63 | Projection checks exist; full required CI not green |
+| CT-02b | Signed native observation and persistent suspension | Partial | E2 paths exist; durable Assurance decision history and authority epoch still required |
+| CT-03 | Placement, reservation and owner enforcement | Partial; current-capacity admission fix in PR #64 | Fresh-pool regressions added; native exclusivity, cross-owner enforcement and E3 still open |
+| CT-04 | Directed network, isolation and failure domains | Partial | Address family, VRF/VPC, return paths, RBAC, storage/key and fault hierarchy coverage open |
+| CT-05 | Representative measured recovery | Partial; failure-trigger RTO and readiness evidence added in PR #64 | Reviewed bounds binding is E2; independently authenticated native reviewer and E3 campaign still open |
+| CT-06 | Integration and rollout controls | Partial | Source-bound A01–A16, shadow reconciliation and E4 receiving sign-off not complete |
 
 ## Acceptance scenarios
 
@@ -180,3 +180,52 @@ E2 only. No receiving environment is commissioned by these tests.
 Placement vectors include storage-class and network/address-family sublimits,
 preventing aggregate storage or address headroom from hiding exhausted classes.
 The runtime observer suspends a decision when the latest restore outcome failed.
+
+## October 8, 2026 audit and remediation branch
+
+Audited `main` revision: `88f77d5b4dd5e4da8ae3e96be09ab8779b9c4843`
+(merged PR #63). The audit found required CI failing (31 checks passed, 22 failed,
+6 still running at its snapshot). **Merged is not equivalent to qualified.**
+The follow-up is draft PR #64 on
+`codex/capability-runtime-assurance-audit-fixes`. Evidence below describes
+code changes, not completed native commissioning or validated full CI.
+
+- **Inventory test collection:** repaired the incomplete signed observer trust
+  fixture and unmatched parenthesis, restoring syntactically valid test source.
+- **Current capacity admission (A04/A05/A10/A13):** every mandatory current
+  capacity finding must be eligible; the original witness is compared against
+  a newly solved placement on fresh observed pools. Exact allocations and
+  ledger revisions must agree before a current owner receipt can admit the
+  plan. Regressions cover headroom shrinking with an unchanged pool identity,
+  exhausted class sublimits, ledger revision drift, summary capacity loss and
+  stale owner receipts.
+- **Measured RTO (A09):** the authoritative clock runs from failure to
+  verified application readiness, never from restore initiation. Evidence
+  must include key availability, native application probe and required
+  dependent-service readiness; absent proof is unknown, observed failure is
+  blocked. Reviewed recovery limits are bound to the protected policy
+  by a digest and distinct reviewer/observer identities in E2 fixtures.
+  These fields alone are **not cryptographic native reviewer attestation**.
+  E3 requires a separately authenticated decision authority.
+- **CI repair:** applied reported formatting adjustments in Planning,
+  Inventory and Lifecycle; narrowed HTTP ASGI scopes for strict typing
+  and asserted non-null SQL test rows. A complete current-head CI matrix
+  and comparison with unrelated baseline failures are still required.
+
+### Source-bound acceptance register
+
+| Scenarios | Engineering tests | Native E3 / operating E4 |
+| --- | --- | --- |
+| A01–A03 | Synthetic RSA and contradiction tests present | E3 open |
+| A04–A05 | SQL races plus new fresh-capacity admission regressions | E3 exclusive owner still open |
+| A06–A07 | Directed flow and negative isolation checks partial | E3 native control breadth open |
+| A08 | Typed numeric matching tests present | E3 open |
+| A09 | Failure-trigger RTO and complete readiness tests added | E3 actual representative restore open |
+| A10–A11 | Runtime and admission revocation tests partial | Durable authority epoch open |
+| A12 | Missing validators fail closed in tests | Receiving E4 open |
+| A13–A14 | Owner retry/loss cases partial | E3 multi-owner compensation open |
+| A15–A16 | Unsupported methods fail closed; E2/E3/E4 separate | E3 and E4 open |
+
+Never mark CT-06 or an E3/E4 scenario accepted solely on a unit-test or CI
+success. Attach native owner custody, signed reviewer decisions, real provider
+exclusivity and receiving-owner sign-off before changing authoritative rollout.
