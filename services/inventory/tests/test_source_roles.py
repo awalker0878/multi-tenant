@@ -90,3 +90,52 @@ def test_ahv_source_enrollment_requires_server_inventory_before_profiles() -> No
     p["streams"].reverse()
     with pytest.raises(Rejected, match="profile_scope_not_ready"):
         parse_policy(p)
+
+
+@pytest.mark.parametrize("source", [True, False])
+def test_legacy_profiles_cannot_cross_the_enrolled_platform(source: bool) -> None:
+    from test_workload_profiles import profile
+
+    p = profile(100, source)
+    stream = {
+        "kind": "source_profile" if source else "target_profile",
+        "vm_ids": ["vm-1"],
+        "api_version": "9.1.1.0",
+    }
+    with pytest.raises(Rejected, match="invalid_workload_profile"):
+        profile_payload(p, stream, "project-a", "ahv")
+
+
+@pytest.mark.parametrize(
+    "fault", ["duplicate_nic", "duplicate_disk", "malformed_disk", "nic_state"]
+)
+def test_source_profiles_reject_ambiguous_device_inventory(fault: str) -> None:
+    p = profiles()[0]
+    if fault == "duplicate_nic":
+        p["nics"].append(deepcopy(p["nics"][0]))
+    elif fault == "duplicate_disk":
+        record = p["native"]["disk_records"][1]
+        record["native_id"] = p["native"]["disk_records"][0]["native_id"]
+        p["disks"][1]["native_sha256"] = digest(record)
+    elif fault == "malformed_disk":
+        p["native"]["disk_records"][0]["key"] = []
+    else:
+        p["nics"][0]["connectable"]["connected"] = "false"
+    stream = {"kind": "source_profile", "vm_ids": [p["vm_id"]], "api_version": p["api_version"]}
+    with pytest.raises(Rejected):
+        profile_payload(p, stream, p["native_scope"], p["platform"])
+
+
+def test_ahv_observed_installed_version_is_part_of_exact_tuple() -> None:
+    p = profiles()[1]
+    profile: dict[str, Any] = {
+        "facts": p,
+        "digest": digest(p),
+        "endpoint_id": str(uuid4()),
+        "collected_at": 100,
+        "expires_at": 200,
+    }
+    app = WorkloadProfiles(Mock())
+    original = app.binding(profile)
+    p["native"]["metadata"]["installed"] = {"cluster": {"buildInfo": {"version": "changed"}}}
+    assert app.binding(profile)["tuple_sha256"] != original["tuple_sha256"]

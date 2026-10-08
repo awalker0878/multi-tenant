@@ -89,7 +89,16 @@ def test_openstack_source_includes_attached_bytes_and_native_keys(
 
 
 @pytest.mark.parametrize(
-    "fault", ["foreign_vm", "foreign_port", "duplicate_volume", "changed", "revoked", "truncated"]
+    "fault",
+    [
+        "foreign_vm",
+        "foreign_port",
+        "duplicate_volume",
+        "duplicate_port",
+        "changed",
+        "revoked",
+        "truncated",
+    ],
 )
 def test_openstack_source_rejects_scope_loss_or_incomplete_collection(
     monkeypatch: pytest.MonkeyPatch, fault: str
@@ -103,6 +112,8 @@ def test_openstack_source_rejects_scope_loss_or_incomplete_collection(
         responses[paths[3]]["ports"][0]["project_id"] = "foreign"
     if fault == "duplicate_volume":
         responses[paths[2]]["volumeAttachments"] *= 2
+    if fault == "duplicate_port":
+        responses[paths[3]]["ports"] *= 2
     if fault == "truncated":
         responses[paths[3]]["ports_links"] = [{"rel": "next", "href": "https://foreign"}]
     requests: list[str] = []
@@ -182,7 +193,11 @@ def test_ahv_source_preserves_native_identity_without_guest_secrets(
         return {
             "data": {
                 "extId": path.rsplit("/", 1)[-1],
-                "config": {"buildInfo": {"version": "synthetic"}},
+                "config": {
+                    "buildInfo": {"version": "synthetic"},
+                    "clusterSoftwareMap": [{"softwareType": "NOS", "version": "synthetic"}],
+                    "hypervisorTypes": ["AHV"],
+                },
             }
         }
 
@@ -191,8 +206,50 @@ def test_ahv_source_preserves_native_identity_without_guest_secrets(
     monkeypatch.setattr(ahv_workload, "secret", lambda _: "synthetic")
     p = collect_profile(policy, stream, None, lambda: permits.append(True))["profile"]
     assert p["cpu"] == 4 and p["firmware"] == "bios" and p["guest_id"] is None
+    assert p["holds"] == []
     assert p["native"]["identity"]["generation_uuid"] == row["generationUuid"]
     assert "guestCustomization" not in p["native"]["metadata"]["vm"] and len(permits) == 4
     row["projectExtId"] = str(uuid4())
     with pytest.raises(CollectionFailure, match="permission_denied"):
         collect_profile(policy, stream, None, lambda: None)
+
+
+@pytest.mark.parametrize("fault", ["duplicate_disk", "malformed_disk", "malformed_scope", "memory"])
+def test_ahv_source_rejects_ambiguous_or_malformed_native_inventory(
+    monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
+    policy, stream, row = ahv_fixture()
+    if fault == "duplicate_disk":
+        row["disks"] *= 2
+    elif fault == "malformed_disk":
+        row["disks"] = [None]
+    elif fault == "malformed_scope":
+        row["cluster"] = None
+    else:
+        row["memorySizeBytes"] = 0
+
+    def read(connection: Any, path: str, headers: Any) -> Any:
+        if "/vms/" in path:
+            return {"data": deepcopy(row)}
+        return {"data": {"extId": path.rsplit("/", 1)[-1], "config": {}}}
+
+    monkeypatch.setattr(ahv_workload, "exchange", read)
+    monkeypatch.setattr(ahv_workload, "secret", lambda _: "synthetic")
+    with pytest.raises(CollectionFailure):
+        collect_profile(policy, stream, None, lambda: None)
+
+
+@pytest.mark.parametrize("firmware", [None, "uefi", "unrecognized"])
+def test_openstack_firmware_is_normalized_without_inventing_native_support(
+    monkeypatch: pytest.MonkeyPatch, firmware: str | None
+) -> None:
+    policy, stream, responses = openstack_fixture()
+    vm = stream["vm_ids"][0]
+    responses[f"/servers/{vm}"]["server"]["metadata"]["hw_firmware_type"] = firmware
+    monkeypatch.setattr(
+        openstack_workload, "exchange", lambda connection, path, headers: deepcopy(responses[path])
+    )
+    monkeypatch.setattr(openstack_workload, "secret", lambda _: "synthetic")
+    p = collect_profile(policy, stream, None, lambda: None)["profile"]
+    assert p["firmware"] == ("efi" if firmware == "uefi" else None)
+    assert ("firmware_unknown" in p["holds"]) is (firmware != "uefi")

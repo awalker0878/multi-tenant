@@ -33,7 +33,9 @@ def test_requirements_follow_operation_method_and_observed_platform() -> None:
     assert "source_writer_ref" in cold and "image_writer_ref" in cold
     assert "delta_ref" not in cold
     assert "delta_ref" in required("migrate", "VM_SNAPSHOT_BASELINE_APP_DELTA")
-    assert "image_writer_ref" not in required("migrate", "VM_COLD_EXPORT", "ahv")
+    for target in ("ahv", "vmware"):
+        assert "image_writer_ref" in required("migrate", "VM_COLD_EXPORT", target)
+        assert "image_observer_ref" in required("migrate", "VM_COLD_EXPORT", target)
     assert "source_writer_ref" not in required("provision")
     assert "guest_recipe_ref" not in required("retire")
     assert "receiving_team_ref" in required("operate")
@@ -67,7 +69,7 @@ def test_evidence_states_do_not_confuse_supplied_with_verified() -> None:
     checks = {c["field_id"]: c for c in check_fields(fields, values, {}, False)}
     assert checks["max_outage_seconds"]["state"] == "unverified"
     assert checks["target_writer_ref"]["state"] == "missing"
-    assert checks["image_writer_ref"]["state"] == "not_applicable"
+    assert checks["image_writer_ref"]["state"] == "missing"
     checks = {
         c["field_id"]: c
         for c in check_fields(fields, values, {"source_writer_ref": {"state": "verified"}}, True)

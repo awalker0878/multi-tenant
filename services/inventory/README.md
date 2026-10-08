@@ -56,3 +56,25 @@ Service-local tests cover authentication ordering, malformed/rotated secrets, re
 ## Discovery operations
 
 See [P04 implementation](../../docs/implementation/p04-inventory.md) and [the operation runbook](../../docs/operations/runbooks/inventory-discovery.md) for explicit supported bounds, independent enrollment inputs, controlled migrations and live evidence. `inventory-publish --limit 100` drains at most 100 confirmed immutable facts.
+
+## Migration profile roles
+
+VMware, OpenStack and AHV can each supply source workload observations or destination
+capability observations. Enrolled platform identity is checked at profile intake;
+native disk identities, NICs and controllers must remain unambiguous. AHV's observed
+installed versions are included in the exact source tuple binding.
+
+Configuration review uses source workload profiles for VMware/AHV source endpoints,
+without requiring destination-resource permissions. Only selected endpoints require
+freshness at configuration confirmation; operation readiness separately requires the
+source for migration and the destination for provisioning and other native tasks.
+Cold export uses image transfer and independent image verification accounts for all
+three destination platforms. It does not require a delta protocol.
+
+Common destination routing lives in `domain/migration.py`; AHV and VMware validation
+remain in their platform modules. Discovery and administrator confirmation never
+establish native qualification or execution authority.
+
+VMware destination discovery restricts import placement to the `VIRTUAL_MACHINE`
+folder hierarchy returned by the [vCenter folder API](https://developer.broadcom.com/xapis/vsphere-automation-api/latest/api/vcenter/folder/get/).
+Host, network, datastore and datacenter folders cannot be selected for VM import.

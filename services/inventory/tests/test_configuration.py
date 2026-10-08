@@ -184,3 +184,36 @@ def test_worker_cannot_attach_configuration_to_resource_stream(campaign: Campaig
     body["configuration"] = {"query": "network_extensions", "status": "observed", "items": []}
     with pytest.raises(Rejected, match="unexpected_configuration"):
         c.service.submit(c.worker, body)
+
+
+def test_source_only_vmware_review_does_not_require_destination_permissions(
+    campaign: Campaign,
+) -> None:
+    from test_workload_profiles import collected
+
+    c = campaign
+    collected(c, True)
+    app = PortingConfiguration(c.service)
+    body = draft(c.endpoint) | {"target_endpoint": None}
+    saved = app.command(c.actor, "configuration_save", body, uid())
+    view = app.read(c.actor)
+    assert view["holds"] == []
+    assert view["source"]["current"] is True
+    assert view["source"]["queries"][0]["query"] == "vmware_source_workloads"
+    assert view["source"]["queries"][0]["items"][0]["id"] == "vm-1"
+    assert all(cap["source_state"] == "unknown" for cap in view["vmware_capabilities"])
+    app.command(c.actor, "configuration_confirm", {"digest": saved["digest"]}, uid(), expected=1)
+    assert app.read(c.actor)["configuration"]["confirmation_current"] is True
+    c.now += 400
+    assert not app.read(c.actor)["configuration"]["confirmation_current"]
+
+
+def test_target_only_configuration_can_be_confirmed_for_provisioning(campaign: Campaign) -> None:
+    c = campaign
+    pull(c)
+    app = PortingConfiguration(c.service)
+    saved = app.command(
+        c.actor, "configuration_save", draft(c.endpoint) | {"source_endpoint": None}, uid()
+    )
+    app.command(c.actor, "configuration_confirm", {"digest": saved["digest"]}, uid(), expected=1)
+    assert app.read(c.actor)["configuration"]["confirmation_current"] is True

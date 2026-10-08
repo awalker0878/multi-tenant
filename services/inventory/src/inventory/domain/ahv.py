@@ -80,9 +80,7 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
 
 def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict[str, Any]) -> None:
     if target["platform"] != "ahv":
-        if body.get("destination") is not None:
-            raise Rejected("unexpected_destination_mapping")
-        return
+        raise Rejected("ahv_target_required")
     d = shape(
         body.get("destination"),
         {
@@ -102,27 +100,10 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
     if (
         d["platform"] != "ahv"
         or body["method"] != "VM_COLD_EXPORT"
-        or d["firmware"] != "bios"
-        or source["firmware"] != "bios"
+        or d["firmware"] not in {"bios", "efi"}
+        or source["firmware"] != d["firmware"]
     ):
-        raise Rejected("ahv_initial_route_requires_bios_cold_export")
-    guest = (source.get("guest_id") or "").lower()
-    if not any(
-        family in guest
-        for family in (
-            "linux",
-            "ubuntu",
-            "debian",
-            "rhel",
-            "centos",
-            "sles",
-            "suse",
-            "oraclelinux",
-            "rocky",
-            "alma",
-        )
-    ):
-        raise Rejected("ahv_initial_route_requires_linux")
+        raise Rejected("ahv_route_requires_matching_firmware_cold_export")
     for key in ("project_id", "prism_central_id", "cluster_id"):
         if native_uuid(d[key]) != target[key]:
             raise Rejected("foreign_ahv_destination", 403)

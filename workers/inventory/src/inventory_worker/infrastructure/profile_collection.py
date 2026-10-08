@@ -40,6 +40,12 @@ def collect_profile(
             ).collect(vm)
         if index + 1 < len(vms):
             next_cursor = vm
+    elif policy["platform"] == "vmware":
+        from inventory_worker.infrastructure.vmware_profile import collect_vmware
+
+        if cursor is not None:
+            raise CollectionFailure("invalid_response")
+        profile = collect_vmware(policy, stream, int(started), before_request)
     elif policy["platform"] == "ahv":
         from inventory_worker.infrastructure.ahv_profile import collect_ahv
 

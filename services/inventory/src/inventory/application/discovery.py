@@ -635,6 +635,8 @@ class Discovery:
                     )
                 if kind == "source_profile" and p.platform == "ahv":
                     minimum_reads = maximum_reads = 4
+                if kind == "target_profile" and p.platform == "vmware":
+                    minimum_reads = maximum_reads = 6
                 if kind == "target_profile" and p.platform == "ahv":
                     minimum_reads = 2 + sum(
                         max(1, (len(profile[field]) + 99) // 100)

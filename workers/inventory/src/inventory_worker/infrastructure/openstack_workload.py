@@ -60,6 +60,9 @@ def collect_openstack_source(
         "ports_links"
     ):
         raise CollectionFailure("invalid_response")
+    port_ids = [native_id(p.get("id")) for p in ports if isinstance(p, dict)]
+    if len(port_ids) != len(ports) or len(set(port_ids)) != len(port_ids):
+        raise CollectionFailure("invalid_response")
     volume_ids = [native_id(a.get("volumeId")) for a in attachments if isinstance(a, dict)]
     if len(volume_ids) != len(attachments) or len(set(volume_ids)) != len(volume_ids):
         raise CollectionFailure("invalid_response")
@@ -111,6 +114,7 @@ def collect_openstack_source(
         if (
             not isinstance(attached, list)
             or len(attached) != 1
+            or not isinstance(attached[0], dict)
             or attached[0].get("server_id") != vm
             or volume.get("multiattach") is not False
         ):
@@ -153,7 +157,16 @@ def collect_openstack_source(
         raise CollectionFailure("invalid_response")
     # Metadata is an API observation of a declaration, not verified guest inspection.
     guest = metadata.get("os_distro")
-    firmware = metadata.get("hw_firmware_type")
+    firmware_value = metadata.get("hw_firmware_type")
+    firmware = (
+        {"uefi": "efi", "efi": "efi", "bios": "bios"}.get(firmware_value)
+        if isinstance(firmware_value, str)
+        else None
+    )
+    if firmware is None:
+        holds.append("firmware_unknown")
+    if server.get("status") not in {"ACTIVE", "SHUTOFF"}:
+        holds.append("source_power_state_unsupported")
     reread = read("compute", "/servers/" + vm, "server")
     if reread != server:
         raise CollectionFailure("invalid_response")

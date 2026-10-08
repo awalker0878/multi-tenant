@@ -5,7 +5,9 @@ from typing import Any
 
 from inventory.domain.ahv import AHV_FIELDS, validate_profile
 from inventory.domain.discovery import Rejected, canonical, identifier, number, shape, text
-from inventory.domain.source_profile import validate_source
+from inventory.domain.source_profile import validate_devices, validate_source
+from inventory.domain.vmware import FIELDS as VMWARE_FIELDS
+from inventory.domain.vmware import validate_profile as validate_vmware_profile
 
 METHODS = (
     "APPLICATION_REBUILD_RESTORE",
@@ -87,12 +89,23 @@ def profile_payload(
     if source and isinstance(value, dict) and value.get("schema_version") == 3:
         return validate_source(value, stream, scope, platform or value.get("platform", ""))
     ahv = not source and isinstance(value, dict) and value.get("platform") == "ahv"
-    p = shape(value, SOURCE_FIELDS if source else AHV_FIELDS if ahv else TARGET_FIELDS)
+    vmware = not source and isinstance(value, dict) and value.get("platform") == "vmware"
+    p = shape(
+        value,
+        SOURCE_FIELDS
+        if source
+        else AHV_FIELDS
+        if ahv
+        else VMWARE_FIELDS
+        if vmware
+        else TARGET_FIELDS,
+    )
     if (
         type(p["schema_version"]) is not int
-        or p["schema_version"] != (2 if ahv else 1)
+        or p["schema_version"] != (3 if vmware else 2 if ahv else 1)
         or p["profile_type"] != ("SourceWorkloadProfile" if source else "TargetCapabilityProfile")
-        or p["platform"] != ("vmware" if source else "ahv" if ahv else "openstack")
+        or p["platform"] != ("vmware" if source or vmware else "ahv" if ahv else "openstack")
+        or (platform is not None and p["platform"] != platform)
         or p["native_qualification"] != "not_established"
         or len(canonical(p).encode()) > 131072
     ):
@@ -128,13 +141,13 @@ def profile_payload(
             if key in keys:
                 raise Rejected("invalid_disk_inventory")
             keys.add(key)
-        for field in ("nics", "controllers"):
-            if not isinstance(p[field], list) or len(p[field]) > 128:
-                raise Rejected("invalid_workload_profile")
+        validate_devices(p)
     elif p["project_id"] != scope:
         raise Rejected("foreign_profile_scope", 403)
     if ahv:
         validate_profile(p, stream)
+    if vmware:
+        validate_vmware_profile(p, stream)
     return p
 
 
@@ -157,7 +170,9 @@ def review_input(body: dict[str, Any], source: dict[str, Any]) -> None:
     if body["method"] not in METHODS:
         raise Rejected("migration_method_required")
     inputs = shape(body["owner_inputs"], set(OWNER_FIELDS))
-    for value in inputs.values():
+    for field, value in inputs.items():
+        if field == "delta_protocol" and body["method"] == "VM_COLD_EXPORT" and value == "":
+            continue
         text(value, 240)
     obj = shape(
         body["objectives"],
@@ -165,7 +180,7 @@ def review_input(body: dict[str, Any], source: dict[str, Any]) -> None:
     )
     identifier(obj["owner_id"])
     checksum(obj["acceptance_sha256"])
-    number(obj["max_outage_seconds"], 1, 31536000)
+    number(obj["max_outage_seconds"], 0, 31536000)
     number(obj["max_data_loss_bytes"], 0, 9007199254740991)
     datasets = body["datasets"]
     if not isinstance(datasets, list) or not 1 <= len(datasets) <= 256:

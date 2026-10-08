@@ -181,8 +181,32 @@ AHV_CAPABILITIES = [
 ]
 
 
+VMWARE_CAPABILITIES = [
+    {
+        "id": "vmware_" + key,
+        "label": "VMware " + label,
+        "query": "vmware_" + key,
+        "match": "",
+        "meaning": "configured",
+    }
+    for key, label in (
+        ("folders", "VM folders"),
+        ("resource_pools", "resource pools"),
+        ("hosts", "hosts"),
+        ("datastores", "datastores"),
+        ("networks", "quarantine and production networks"),
+    )
+]
+
+
 def manual_input(body: dict[str, Any], platform: str = "openstack") -> None:
-    capabilities = AHV_CAPABILITIES if platform == "ahv" else CAPABILITIES
+    capabilities = (
+        AHV_CAPABILITIES
+        if platform == "ahv"
+        else VMWARE_CAPABILITIES
+        if platform == "vmware"
+        else CAPABILITIES
+    )
     shape(body, {"source_endpoint", "target_endpoint", "manual", "choices"})
     shape(body["manual"], set(), set(MANUAL_FIELDS))
     for value in body["manual"].values():

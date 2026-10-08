@@ -203,7 +203,7 @@ class MigrationFleet:
         members = [uuid_value(m) for m in members]
         if len(set(members)) != len(members):
             raise Rejected("duplicate_migration_member")
-        if body["format"] not in {"raw", "qcow2"}:
+        if body["format"] not in {"raw", "qcow2", "vmdk"}:
             raise Rejected("migration_format_invalid")
         bound = digest([operation, actor.site, target, expected, body])
         with self.d.database.transaction() as tx:
@@ -232,7 +232,7 @@ class MigrationFleet:
             destination = self.profiles.profile(tx, actor, body["target_profile_id"])
             if destination["profile_type"] != "TargetCapabilityProfile" or destination["facts"][
                 "platform"
-            ] not in {"openstack", "ahv"}:
+            ] not in {"openstack", "ahv", "vmware"}:
                 raise Rejected("supported_target_required")
             if (
                 not destination["current"]

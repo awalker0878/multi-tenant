@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from typing import Any
 
+from inventory_worker.infrastructure.ahv_source_contract import configuration
 from inventory_worker.infrastructure.native import CollectionFailure, exchange, secret
 from inventory_worker.infrastructure.native_identity import native_id
 from inventory_worker.infrastructure.profile_digest import fingerprint
@@ -45,6 +46,8 @@ def read_vm(stream: dict[str, Any], vm: str, scope: str) -> dict[str, Any]:
     result = document.get("data") if isinstance(document, dict) else None
     if (
         not isinstance(result, dict)
+        or not isinstance(result.get("project", {}), dict)
+        or not isinstance(result.get("cluster"), dict)
         or result.get("extId") != vm
         or result.get("projectExtId", result.get("project", {}).get("extId")) != scope
         or result.get("project", {}).get("extId", scope) != scope
@@ -72,10 +75,28 @@ def collect_ahv_source(
         document = exchange(
             stream, path + stream[key], {"X-Ntnx-Api-Key": secret(stream["credential_file"])}
         )
-        if not isinstance(document, dict) or document.get("data", {}).get("extId") != stream[key]:
+        if (
+            not isinstance(document, dict)
+            or not isinstance(document.get("data"), dict)
+            or document["data"].get("extId") != stream[key]
+            or not isinstance(document["data"].get("config", {}), dict)
+        ):
             raise CollectionFailure("invalid_response")
         installed[kind] = document["data"].get("config", {})
-    disks, native_disks, nics, controllers, holds = [], [], [], [], []
+    disks: list[dict[str, Any]] = []
+    native_disks: list[dict[str, Any]] = []
+    nics: list[dict[str, Any]] = []
+    controllers: list[dict[str, Any]] = []
+    holds: list[str] = []
+    cluster_config = installed["cluster"]
+    if (
+        not cluster_config.get("buildInfo")
+        or not cluster_config.get("clusterSoftwareMap")
+        or not installed["prism_central"].get("buildInfo")
+    ):
+        holds.append("ahv_installed_versions_incomplete")
+    if "AHV" not in (cluster_config.get("hypervisorTypes") or []):
+        holds.append("ahv_hypervisor_unobserved")
     if (
         not isinstance(row.get("disks"), list)
         or len(row["disks"]) > 32
@@ -83,9 +104,17 @@ def collect_ahv_source(
         or len(row["nics"]) > 32
     ):
         raise CollectionFailure("invalid_response")
+    for field in ("disks", "nics"):
+        identities = [
+            native_id(device.get("extId")) for device in row[field] if isinstance(device, dict)
+        ]
+        if len(identities) != len(row[field]) or len(set(identities)) != len(identities):
+            raise CollectionFailure("invalid_response")
     for index, d in enumerate(sorted(row["disks"], key=lambda d: d.get("extId", ""))):
         native_id(d.get("extId"))
         address, backing = d.get("diskAddress", {}), d.get("backingInfo", {})
+        if not isinstance(address, dict) or not isinstance(backing, dict):
+            raise CollectionFailure("invalid_response")
         if backing.get("$objectType") != "vmm.v4.ahv.config.VmDisk":
             holds.append("unsupported_or_shared_disk_backing")
         record = {"key": index, "native_id": d["extId"], "role": "vm_disk", "metadata": d}
@@ -117,6 +146,8 @@ def collect_ahv_source(
     for index, nic in enumerate(sorted(row["nics"], key=lambda n: n.get("extId", ""))):
         native_id(nic.get("extId"))
         backing = nic.get("backingInfo", {})
+        if not isinstance(backing, dict):
+            raise CollectionFailure("invalid_response")
         nics.append(
             {
                 "key": index,
@@ -138,10 +169,21 @@ def collect_ahv_source(
     before_request()
     if read_vm(stream, vm, policy["native_scope"]) != row:
         raise CollectionFailure("invalid_response")
-    boot = row.get("bootConfig", {}).get("$objectType")
-    firmware = {"vmm.v4.ahv.config.LegacyBoot": "bios", "vmm.v4.ahv.config.UefiBoot": "efi"}.get(
-        boot
+    boot_config = row.get("bootConfig", {})
+    if not isinstance(boot_config, dict):
+        raise CollectionFailure("invalid_response")
+    boot = boot_config.get("$objectType")
+    if boot_config.get("isSecureBootEnabled") is True:
+        holds.append("secure_boot_requires_separate_qualification")
+    firmware = (
+        {"vmm.v4.ahv.config.LegacyBoot": "bios", "vmm.v4.ahv.config.UefiBoot": "efi"}.get(boot)
+        if isinstance(boot, str)
+        else None
     )
+    if firmware is None:
+        holds.append("firmware_unknown")
+    if row.get("powerState") not in {"ON", "OFF"}:
+        holds.append("source_power_state_unsupported")
     cores = [row.get(k) for k in ("numSockets", "numCoresPerSocket", "numThreadsPerCore")]
     cpu = 1
     for core in cores:
@@ -149,6 +191,8 @@ def collect_ahv_source(
             raise CollectionFailure("invalid_response")
         cpu *= core
     memory = row.get("memorySizeBytes")
+    if type(memory) is not int or memory < 1024**2:
+        raise CollectionFailure("invalid_response")
     return {
         "schema_version": 3,
         "profile_type": "SourceWorkloadProfile",
@@ -163,7 +207,7 @@ def collect_ahv_source(
             "clustermgmt": "v4.3",
             "product": policy["installed"]["product"],
         },
-        "config_sha256": fingerprint(row),
+        "config_sha256": fingerprint(configuration("vm", row)),
         "observations_sha256": fingerprint([row, installed]),
         "observed_at": observed_at,
         "power_state": row.get("powerState"),

@@ -181,6 +181,16 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
                 server["ca_file"],
             ):
                 raise Rejected("profile_vcenter_scope_mismatch")
+        if (
+            s["kind"] == "target_profile"
+            and p["platform"] == "vmware"
+            and (
+                not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+", s["api_version"])
+                or urlsplit(s["base_url"]).path not in {"", "/"}
+                or not re.fullmatch(r"datacenter-[0-9]+", p["native_scope"])
+            )
+        ):
+            raise Rejected("explicit_vmware_destination_scope_required")
         if p["platform"] == "ahv":
             for field in ("cluster_id", "prism_central_id"):
                 native_uuid(s[field])

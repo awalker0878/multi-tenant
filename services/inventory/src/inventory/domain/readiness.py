@@ -43,7 +43,7 @@ def requirements(
     active = operation in {"provision", "migrate", "adopt", "operate"}
     image = (
         operation == "migrate"
-        and target == "openstack"
+        and target in {"openstack", "ahv", "vmware"}
         and method
         in {"VM_COLD_EXPORT", "VM_SNAPSHOT_BASELINE_APP_DELTA", "VM_SNAPSHOT_BASELINE_FILE_DELTA"}
     )

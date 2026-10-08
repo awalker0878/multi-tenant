@@ -4,8 +4,8 @@ from typing import Any
 
 from inventory.application.discovery import Discovery
 from inventory.application.ports import Transaction
-from inventory.domain.ahv import destination_input
 from inventory.domain.discovery import Actor, Rejected, canonical, digest, identifier, shape
+from inventory.domain.migration import destination_input
 from inventory.domain.source_profile import source_identity
 from inventory.domain.workload import METHODS, OWNER_FIELDS, review_input
 
@@ -88,6 +88,9 @@ class WorkloadProfiles:
         elif p["platform"] == "ahv":
             identity = [p[k] for k in ("project_id", "prism_central_id", "cluster_id")]
             installed = [p["api_versions"], p["installed"]]
+        elif p["platform"] == "vmware":
+            identity = [p[k] for k in ("project_id", "vcenter_uuid")]
+            installed = [p["api_version"], p["installed"]]
         return {
             "profile_sha256": profile["digest"],
             "native_identity_sha256": digest([profile["endpoint_id"], identity]),

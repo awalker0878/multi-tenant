@@ -42,6 +42,40 @@ def checksum(value: Any) -> str:
     return value
 
 
+def validate_devices(p: dict[str, Any]) -> None:
+    """Require unambiguous reviewed NIC and controller identities on every source."""
+    for field, required in (
+        ("nics", {"key", "model", "mac", "backing_sha256", "connectable"}),
+        ("controllers", {"key", "model", "bus", "sharing"}),
+    ):
+        rows = p[field]
+        if not isinstance(rows, list) or len(rows) > 128:
+            raise Rejected("invalid_workload_profile")
+        keys = set()
+        for row in rows:
+            shape(row, required)
+            key = number(row["key"], 0, 2147483647)
+            if key in keys:
+                raise Rejected("duplicate_source_device")
+            keys.add(key)
+            text(row["model"], 160)
+            if field == "nics":
+                checksum(row["backing_sha256"])
+                if row["mac"] is not None:
+                    text(row["mac"], 80)
+                connectable = shape(
+                    row["connectable"], {"connected", "startConnected", "allowGuestControl"}
+                )
+                if any(
+                    value is not None and type(value) is not bool for value in connectable.values()
+                ):
+                    raise Rejected("invalid_nic_connectivity")
+            else:
+                number(row["bus"], 0, 2147483647)
+                if row["sharing"] is not None:
+                    text(row["sharing"], 80)
+
+
 def validate_source(
     value: Any, stream: dict[str, Any], scope: str, platform: str
 ) -> dict[str, Any]:
@@ -86,6 +120,7 @@ def validate_source(
     for field in ("required_owner_inputs", "holds"):
         for item in p[field]:
             text(item, 100)
+    validate_devices(p)
     keys, identities = set(), set()
     for disk in p["disks"]:
         shape(
@@ -118,10 +153,19 @@ def validate_source(
     records = native["disk_records"]
     if not isinstance(records, list) or len(records) != len(keys):
         raise Rejected("invalid_disk_inventory")
-    if {r.get("key") for r in records if isinstance(r, dict)} != keys:
-        raise Rejected("invalid_disk_inventory")
+    native_ids = set()
+    record_keys = set()
     for record in records:
+        shape(record, {"key", "native_id", "role", "metadata"})
+        record_key = number(record["key"], 0, 2147483647)
+        if record_key not in keys or record_key in record_keys:
+            raise Rejected("invalid_disk_inventory")
+        record_keys.add(record_key)
         text(record.get("native_id"))
+        if record["native_id"] in native_ids or not isinstance(record["metadata"], dict):
+            raise Rejected("invalid_disk_inventory")
+        native_ids.add(record["native_id"])
+        text(record["role"], 80)
         disk = next(d for d in p["disks"] if d["key"] == record["key"])
         if digest(record) != disk["native_sha256"]:
             raise Rejected("native_disk_mapping_changed")
@@ -134,7 +178,13 @@ def source_identity(p: dict[str, Any]) -> tuple[Any, Any]:
     if p["schema_version"] == 3:
         return (
             [p["platform"], p["installation_id"], p["native"]["identity"]],
-            [p["versions"], p["api_version"], p["guest_id"], p["firmware"]],
+            [
+                p["versions"],
+                p["api_version"],
+                p["guest_id"],
+                p["firmware"],
+                p["native"]["metadata"].get("installed"),
+            ],
         )
     return (
         [p.get(k) for k in ("vcenter_uuid", "vm_id", "instance_uuid")],

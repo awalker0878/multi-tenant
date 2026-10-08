@@ -9,6 +9,7 @@ from inventory.domain.configuration import (
     CAPABILITIES,
     MANUAL_FIELDS,
     VERSIONS,
+    VMWARE_CAPABILITIES,
     manual_input,
 )
 from inventory.domain.discovery import Actor, Rejected, canonical, digest, identifier, shape
@@ -23,7 +24,7 @@ class PortingConfiguration:
             raise Rejected("action_denied", 403)
 
     def snapshot(
-        self, tx: Transaction, actor: Actor, endpoint: str | None
+        self, tx: Transaction, actor: Actor, endpoint: str | None, role: str = "target"
     ) -> dict[str, Any] | None:
         if endpoint is None:
             return None
@@ -34,9 +35,11 @@ class PortingConfiguration:
             "AND generation=%s ORDER BY query",
             (actor.tenant, endpoint, e["current_generation"]),
         )
-        if e["platform"] == "ahv":
+        if e["platform"] in {"ahv", "vmware"}:
             from inventory.application.workload import WorkloadProfiles
 
+            if role == "source":
+                return self.source_snapshot(tx, actor, e)
             profiles = tx.all(
                 "SELECT id FROM inventory.workload_profiles WHERE tenant=%s AND endpoint=%s "
                 "AND generation=%s AND profile_type='TargetCapabilityProfile'",
@@ -46,20 +49,24 @@ class PortingConfiguration:
                 return None
             profile = WorkloadProfiles(d).profile(tx, actor, str(profiles[0]["id"]))
             queries = []
-            for cap in AHV_CAPABILITIES:
-                field = cap["id"].removeprefix("ahv_")
+            from inventory.domain.vmware import COLLECTIONS
+
+            caps = AHV_CAPABILITIES if e["platform"] == "ahv" else VMWARE_CAPABILITIES
+            for cap in caps:
+                field = cap["id"].removeprefix(e["platform"] + "_")
+                key = "extId" if e["platform"] == "ahv" else COLLECTIONS[field]
                 queries.append(
                     {
                         "query": cap["query"],
                         "status": "observed",
                         "items": [
                             {
-                                "id": row["extId"],
-                                "name": row.get("name") or row.get("value") or row["extId"],
+                                "id": row[key],
+                                "name": row.get("name") or row.get("value") or row[key],
                                 "attributes": [
                                     {"key": k, "value": canonical(v)}
                                     for k, v in row.items()
-                                    if k != "extId"
+                                    if k != key
                                 ],
                             }
                             for row in profile["facts"][field]
@@ -94,6 +101,50 @@ class PortingConfiguration:
                     "expires_at": row["expires_at"],
                 }
                 for row in rows
+            ],
+        }
+
+    def source_snapshot(
+        self, tx: Transaction, actor: Actor, endpoint: dict[str, Any]
+    ) -> dict[str, Any] | None:
+        """Bind source-only discovery without requiring destination permissions."""
+        from inventory.application.workload import WorkloadProfiles
+
+        rows = tx.all(
+            "SELECT id FROM inventory.workload_profiles WHERE tenant=%s AND endpoint=%s "
+            "AND generation=%s AND profile_type='SourceWorkloadProfile' ORDER BY id LIMIT 101",
+            (actor.tenant, endpoint["id"], endpoint["current_generation"]),
+        )
+        if not rows:
+            return None
+        if len(rows) > 100:
+            raise Rejected("configuration_profile_bound", 409)
+        app = WorkloadProfiles(self.discovery)
+        authority_cache: dict[str, bool] = {}
+        profiles = [app.profile(tx, actor, str(row["id"]), authority_cache) for row in rows]
+        return {
+            "endpoint_id": str(endpoint["id"]),
+            "generation_id": str(endpoint["current_generation"]),
+            "current": all(p["current"] for p in profiles),
+            "digest": digest([[p["id"], p["digest"]] for p in profiles]),
+            "queries": [
+                {
+                    "query": endpoint["platform"] + "_source_workloads",
+                    "status": "observed",
+                    "items": [
+                        {
+                            "id": p["native_id"],
+                            "name": p["native_id"],
+                            "attributes": [
+                                {"key": key, "value": canonical(p["facts"][key])}
+                                for key in ("api_version", "guest_id", "firmware", "holds")
+                            ],
+                        }
+                        for p in profiles
+                    ],
+                    "collected_at": min(p["collected_at"] for p in profiles),
+                    "expires_at": min(p["expires_at"] for p in profiles),
+                }
             ],
         }
 
@@ -138,7 +189,9 @@ class PortingConfiguration:
         )
         if len(endpoints) > 50:
             raise Rejected("configuration_endpoint_bound", 409)
-        source = self.snapshot(tx, actor, row["payload"]["source_endpoint"]) if row else None
+        source = (
+            self.snapshot(tx, actor, row["payload"]["source_endpoint"], "source") if row else None
+        )
         target = self.snapshot(tx, actor, row["payload"]["target_endpoint"]) if row else None
         configuration = None
         holds = []
@@ -150,7 +203,14 @@ class PortingConfiguration:
             )
             if row["payload"]["bindings"] != self.bindings(source, target):
                 holds.append("api_configuration_changed")
-            if not source or not target or not source["current"] or not target["current"]:
+            selected = [
+                snapshot
+                for role, snapshot in (("source", source), ("target", target))
+                if row["payload"][role + "_endpoint"] is not None
+            ]
+            if not selected or any(
+                not snapshot or not snapshot["current"] for snapshot in selected
+            ):
                 holds.append("fresh_source_and_target_configuration_required")
             configuration = {
                 "revision": row["revision"],
@@ -195,6 +255,14 @@ class PortingConfiguration:
                     "target_state": self.state(target, cap),
                 }
                 for cap in AHV_CAPABILITIES
+            ],
+            "vmware_capabilities": [
+                {
+                    **cap,
+                    "source_state": self.state(source, cap),
+                    "target_state": self.state(target, cap),
+                }
+                for cap in VMWARE_CAPABILITIES
             ],
             "holds": holds,
             "native_write_authorized": False,
@@ -245,9 +313,9 @@ class PortingConfiguration:
                     endpoint = body[role + "_endpoint"]
                     if endpoint is not None:
                         e = d.endpoint(tx, actor, identifier(endpoint))
-                        if role == "target" and e["platform"] not in {"openstack", "ahv"}:
+                        if role == "target" and e["platform"] not in {"openstack", "ahv", "vmware"}:
                             raise Rejected("supported_target_required")
-                source = self.snapshot(tx, actor, body["source_endpoint"])
+                source = self.snapshot(tx, actor, body["source_endpoint"], "source")
                 destination = self.snapshot(tx, actor, body["target_endpoint"])
                 payload = {**body, "bindings": self.bindings(source, destination)}
                 revision = row["revision"] + 1 if row else 1

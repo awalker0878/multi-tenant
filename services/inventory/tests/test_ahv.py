@@ -6,8 +6,8 @@ from uuid import uuid4
 
 import pytest
 
-from inventory.domain.ahv import destination_input
 from inventory.domain.discovery import Rejected
+from inventory.domain.migration import destination_input
 
 
 def mapping() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:

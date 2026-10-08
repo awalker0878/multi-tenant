@@ -45,6 +45,8 @@ def authorize_read(d: Discovery, worker: Worker, body: dict[str, Any]) -> dict[s
             if stream["kind"] == "source_profile"
             else 2 + 5 * min(p.max_pages, 10)
             if p.platform == "ahv"
+            else 6
+            if p.platform == "vmware"
             else 7
         )
         if (

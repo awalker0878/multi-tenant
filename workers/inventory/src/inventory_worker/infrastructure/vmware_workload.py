@@ -125,6 +125,8 @@ def normalize(vm: str, release: str, records: dict[str, Any], observed_at: int) 
         holds.append("snapshot_configuration_unsupported")
     if records["host_capability"].get("cloneFromSnapshotSupported") is not True:
         holds.append("exact_snapshot_clone_unsupported")
+    if config.get("bootOptions", {}).get("efiSecureBootEnabled") is True:
+        holds.append("secure_boot_requires_separate_qualification")
     if config.get("firmware") not in {"bios", "efi"}:
         holds.append("firmware_unknown")
     if runtime.get("powerState") not in {"poweredOff", "poweredOn"}:
