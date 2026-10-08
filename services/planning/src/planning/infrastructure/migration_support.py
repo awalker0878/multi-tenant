@@ -72,3 +72,47 @@ def qualification_records(
     ):
         raise Rejected("migration_support_scope_changed", 423)
     return list(result["records"])
+
+
+def api_capability_records(
+    actor: Actor, site: str, route: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Read only independently reviewed API evidence from Assurance custody.
+
+    The selected route is not a source of evidence and never supplies a
+    browser-provided native qualification. The exact owner assignment is
+    re-read, so a changed tranche or revoked E3/E4 result fails closed.
+    """
+    selected = selected_tranche(actor, site)
+    from planning.domain.expansion import tranche
+
+    tranche(selected)
+    if sum(1 for item in selected["routes"] if digest(item) == digest(route)) != 1:
+        raise Rejected("migration_api_route_unassigned", 423)
+    scope = {
+        "tenant_id": actor.tenant,
+        "site_id": identifier(site),
+        "resource_id": actor.application,
+        "environment": actor.environment,
+    }
+    response = request(
+        "ASSURANCE",
+        "POST",
+        f"/v1/tenants/{actor.tenant}/migration-qualifications",
+        {
+            "scope": scope,
+            "tranche_sha256": digest(selected),
+            "release_sha256": selected["release_sha256"],
+        },
+        schema_name="migration-support-v1",
+    )
+    if (
+        response["scope"] != scope
+        or response["tranche_sha256"] != digest(selected)
+        or response["release_sha256"] != selected["release_sha256"]
+    ):
+        raise Rejected("migration_api_evidence_owner_changed", 423)
+    matches = response.get("api_evidence", {})
+    if not isinstance(matches, dict) or len(matches) > 512:
+        raise Rejected("migration_api_evidence_invalid", 423)
+    return matches.get(digest(route))
