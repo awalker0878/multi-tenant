@@ -1,11 +1,11 @@
 """Cold AHV disk capture through v4.3 image creation from immutable VM disks.
 
-MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
-
 All disks are captured while the source remains OFF. Shared/external disks and
 passthrough/key-bearing devices require their own route qualification. Native
 task acceptance is retained before polling and uncertain submissions are held.
 """
+
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
 
 import re
 import time
