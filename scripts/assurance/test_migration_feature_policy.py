@@ -194,7 +194,7 @@ class FeaturePolicyTests(unittest.TestCase):
 
     def test_mandatory_feature_classification_and_every_direction(self):
         features, operator = validate(self.policy, self.crosswalk, self.manifest)
-        self.assertEqual((features, operator), (29, 27))
+        self.assertEqual((features, operator), (30, 27))
         rows = {x["id"]: x for x in self.policy["features"]}
         self.assertTrue(all(rows[x]["criticality"] == "critical" for x in CRITICAL_FEATURES))
         self.assertEqual(rows["metadata.optional"]["criticality"], "optional")
