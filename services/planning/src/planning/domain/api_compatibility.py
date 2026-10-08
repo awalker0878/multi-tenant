@@ -252,6 +252,10 @@ def evaluate(
                             and item["expires_at"] > now
                             and isinstance(item.get("approval_sha256"), str)
                             and re.fullmatch(r"[a-f0-9]{64}", item["approval_sha256"])
+                            and isinstance(item.get("effect_suppressed_sha256"), str)
+                            and re.fullmatch(
+                                r"[a-f0-9]{64}", item["effect_suppressed_sha256"]
+                            )
                         ):
                             omission_accepted = True
                     if not omission_accepted:
