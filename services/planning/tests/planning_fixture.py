@@ -277,32 +277,42 @@ def snapshot_fixture(
             for family in nic["address_families"]:
                 key = "addresses:" + nic["network_class"] + ":" + family
                 vector[key] = vector.get(key, 0) + 1
-        pools.append({
-            "id": "pool-" + str(index),
-            "native_ref": "fixture://physical-host-" + str(index),
-            "failure_domain": "rack-" + str(index),
-            "zone": "zone-1",
-            "zone_allowed": True,
-            "architecture": "x86_64",
-            "storage_classes": ["standard"],
-            "network_classes": ["private"],
-            "policy_sha256": digest(policy),
-            "ledger_revision": 1,
-            "total": vector,
-            "used": {k: 0 for k in vector},
-            "pending": {k: 0 for k in vector},
-        })
+        pools.append(
+            {
+                "id": "pool-" + str(index),
+                "native_ref": "fixture://physical-host-" + str(index),
+                "failure_domain": "rack-" + str(index),
+                "zone": "zone-1",
+                "zone_allowed": True,
+                "architecture": "x86_64",
+                "storage_classes": ["standard"],
+                "network_classes": ["private"],
+                "policy_sha256": digest(policy),
+                "ledger_revision": 1,
+                "total": vector,
+                "used": {k: 0 for k in vector},
+                "pending": {k: 0 for k in vector},
+            }
+        )
     communication = [d for d in intent["dependencies"] if d["kind"] == "communication"]
     negative = [policy["forbidden_flows"][0] | {"kind": "tenant"}]
-    negative += [{
-        "from": "foreign-domain-" + str(index), "to": workload["id"],
-        "protocol": "tcp", "port": 22, "kind": "domain",
-        "security_domain_id": workload["security_domain"]["id"],
-    } for index, workload in enumerate(intent["workloads"])]
+    negative += [
+        {
+            "from": "foreign-domain-" + str(index),
+            "to": workload["id"],
+            "protocol": "tcp",
+            "port": 22,
+            "kind": "domain",
+            "security_domain_id": workload["security_domain"]["id"],
+        }
+        for index, workload in enumerate(intent["workloads"])
+    ]
     topology: dict[str, Any] = {
         "nodes": {w["id"]: "fixture://native-port-" + w["id"] for w in intent["workloads"]},
-        "routes": [{"from": d["from"], "to": d["to"], "native_ref": "fixture://route"}
-                   for d in communication],
+        "routes": [
+            {"from": d["from"], "to": d["to"], "native_ref": "fixture://route"}
+            for d in communication
+        ],
     }
     for flow in negative:
         topology["nodes"][flow["from"]] = "fixture://foreign-port-" + flow["from"]
@@ -321,10 +331,14 @@ def snapshot_fixture(
             {k: d[k] for k in ("from", "to", "protocol", "port")}
             | {
                 "outcome": "allow" if d in communication else "deny",
-                "sequence": 1, "observed_at": NOW, "expires_at": NOW + 120,
+                "sequence": 1,
+                "observed_at": NOW,
+                "expires_at": NOW + 120,
                 "native_subjects": ["fixture://native-probe-client"],
-                "policy_sha256": policy_sha, "topology_sha256": digest(topology),
-            } for d in communication + negative
+                "policy_sha256": policy_sha,
+                "topology_sha256": digest(topology),
+            }
+            for d in communication + negative
         ],
     }
     isolation = {
@@ -380,7 +394,9 @@ def snapshot_fixture(
         "observed_at": NOW,
         "expires_at": NOW + 120,
         "data": {
-            "pools": pools, "network": network, "isolation": isolation,
+            "pools": pools,
+            "network": network,
+            "isolation": isolation,
             "recovery_measurements": recoveries,
         },
     }
