@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from typing import Any
 
+from planning.domain.api_compatibility import evaluate as evaluate_api
 from planning.domain.capability_definitions import METHOD_ALIASES as METHODS
 from planning.domain.expansion import matrix, tranche
 from planning.domain.model import Actor, Rejected, digest
@@ -14,17 +15,55 @@ class MigrationSupport:
         scope: Callable[[Actor, str], dict[str, Any]],
         observations: Callable[[Actor, str, dict[str, Any]], list[dict[str, Any]]],
         clock: Callable[[], int],
+        api_observations: Callable[[Actor, str, dict[str, Any]], dict[str, Any] | None]
+        | None = None,
     ) -> None:
         self.scope, self.observations, self.clock = scope, observations, clock
+        self.api_observations = api_observations
+
+    def api_status(
+        self, actor: Actor, site: str, selected: dict[str, Any]
+    ) -> dict[str, Any]:
+        if "api_usage" not in selected:
+            return {
+                "status": "unknown",
+                "operationally_eligible": False,
+                "cases": [],
+                "administrator_alerts": [],
+                "native_write_authorized": False,
+            }
+        evidence = (
+            self.api_observations(actor, site, selected)
+            if self.api_observations is not None
+            else None
+        )
+        return evaluate_api(
+            selected, evidence, self.clock(),
+            tenant_id=actor.tenant, application_id=actor.application,
+            environment_id=actor.environment,
+        )
 
     def read(self, actor: Actor, site: str) -> dict[str, Any]:
         selected = tranche(self.scope(actor, site))
         records = self.observations(actor, site, selected)
+        directions = matrix(selected, records, self.clock())
+        by_id = {route["id"]: route for route in selected["routes"]}
+        for direction in directions:
+            for row in direction["routes"]:
+                route = by_id[row["route_id"]]
+                if "api_usage" not in route:
+                    continue
+                api = self.api_status(actor, site, route)
+                row["api_compatibility"] = api
+                if not api["operationally_eligible"]:
+                    row["blockers"].append("api_capabilities_unresolved")
+                    row["native_qualified"] = False
+                    row["operationally_accepted"] = False
         return {
             "schema_version": 1,
             "tranche_sha256": digest(selected),
             "release_sha256": selected["release_sha256"],
-            "directions": matrix(selected, records, self.clock()),
+            "directions": directions,
             "native_write_authorized": False,
         }
 
@@ -85,6 +124,11 @@ class MigrationSupport:
                 > binding["objectives"]["max_outage_seconds"]
             ):
                 raise Rejected("migration_qualified_artifacts_or_requirements_changed", 423)
+        for candidate in candidates:
+            if "api_usage" in candidate and not self.api_status(
+                actor, site, candidate
+            )["operationally_eligible"]:
+                raise Rejected("migration_api_capabilities_unresolved", 423)
         records = self.observations(actor, site, selected)
         rows = matrix(selected, records, self.clock())
         qualified = [
