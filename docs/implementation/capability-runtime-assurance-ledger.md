@@ -263,9 +263,10 @@ reviewer has been commissioned by these changes.
 
 Follow-up acceptance: run the isolated PostgreSQL job, inspect any PHP
 format/strict-type failures, confirm that a failed/missing/late HTTP receipt keeps
-SQL outbox rows pending, implement recipient inbox custody and monotonic
-invalidation semantics, run A01–A16 composed tests including effect-boundary
-revocations, and complete E3/E4 and shadow-rollout separately.
+SQL outbox rows pending, commission the implemented Planning receiving inbox
+under distinct credentials and verified TLS, then run end-to-end A01–A16 tests
+including scope isolation, reordered events, effect-boundary revocations and
+E3/E4 shadow-rollout acceptance separately.
 
 ### A10/A11 follow-on — Planning receiving inbox (direct branch commits)
 
