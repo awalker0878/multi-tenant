@@ -21,8 +21,12 @@ class NativeJobsApp:
         workflow: NativeWorkflow,
         authority: RequestAuthority,
         resolve: Callable[[str, dict[str, Any]], dict[str, Any]],
+        continuation: Callable[[dict[str, Any]], None] | None = None,
+        progress: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
     ) -> None:
         self.workflow, self.authority, self.resolve = workflow, authority, resolve
+        self.continuation = continuation
+        self.progress = progress
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
@@ -32,15 +36,16 @@ class NativeJobsApp:
         payload: dict[str, Any]
         try:
             route = re.fullmatch(
-                rf"/v1/tenants/({UUID})/native-jobs(?:/({UUID}))?(?:/(stop))?", scope["path"]
+                rf"/v1/tenants/({UUID})/native-jobs(?:/({UUID}))?(?:/(stop|continue-transfer))?",
+                scope["path"],
             )
             if route is None or scope["query_string"]:
                 raise Rejected("not_found", 404)
             tenant, job, command = route.groups()
             if not (
-                (job is None and scope["method"] == "POST")
+                (job is None and command is None and scope["method"] == "POST")
                 or (job and command is None and scope["method"] == "GET")
-                or (job and command == "stop" and scope["method"] == "POST")
+                or (job and command in {"stop", "continue-transfer"} and scope["method"] == "POST")
             ):
                 raise Rejected("not_found", 404)
             headers = list(scope["headers"])
@@ -91,10 +96,24 @@ class NativeJobsApp:
             if job:
                 if command:
                     shape(body, {"expected_revision"})
-                    await asyncio.to_thread(
-                        self.workflow.stop, tenant, job, integer(body["expected_revision"], 1)
+                    revision = integer(body["expected_revision"], 1)
+                    if command == "stop":
+                        await asyncio.to_thread(self.workflow.stop, tenant, job, revision)
+                    else:
+                        if self.continuation is None:
+                            raise Rejected("native_transfer_continuation_unavailable", 423)
+                        await asyncio.to_thread(
+                            self.workflow.continue_transfer,
+                            tenant,
+                            job,
+                            revision,
+                            self.continuation,
+                        )
+                existing = await asyncio.to_thread(self.workflow.read, tenant, job)
+                if self.progress is not None:
+                    existing["measurements"]["transfer"] = await asyncio.to_thread(
+                        self.workflow.transfer_progress, tenant, job, self.progress
                     )
-                    existing = await asyncio.to_thread(self.workflow.read, tenant, job)
                 payload, status = existing, 202 if command else 200
             else:
                 if actor != plan["actor_id"]:

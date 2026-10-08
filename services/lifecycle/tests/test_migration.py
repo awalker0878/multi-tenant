@@ -390,3 +390,43 @@ def test_legacy_application_hold_is_retained_when_recovery_takes_over(
             "SELECT resource_key,job FROM app.native_resource_holds"
         ).fetchall()
     assert len(held) == 1 and held[0][0] == legacy_key and str(held[0][1]) == successor
+
+
+@pytest.mark.parametrize("fault", ["", "revision", "expired", "stopped", "revoked", "wrong_stage"])
+def test_transfer_continuation_preserves_original_redeemed_grant(control: Any, fault: str) -> None:
+    from test_migration_outcomes import selected
+
+    service, owners, p = control
+    p["migration"] = selected()["migration"]
+    tenant = p["scope"]["tenant_id"]
+    job = service.admit(p, str(uuid4()))
+    grant = advance(service, p, job, "capture" if fault == "wrong_stage" else "export_copy")
+    service.hold(tenant, job)
+    revision = service.read(tenant, job)["revision"]
+    if fault == "revision":
+        revision -= 1
+    if fault == "expired":
+        owners.now = grant["expires_at"]
+    if fault == "stopped":
+        service.stop(tenant, job)
+        revision = service.read(tenant, job)["revision"]
+    if fault == "revoked":
+        owners.authority_changes["approval_current"] = False
+    calls = []
+
+    def effect(current: dict[str, Any]) -> None:
+        assert current == grant
+        service.boundary(tenant, current, p["executor_id"], "during_api_sequence")
+        calls.append(current)
+
+    if fault:
+        with pytest.raises(Rejected):
+            service.continue_transfer(tenant, job, revision, effect)
+        assert not calls
+    else:
+        service.continue_transfer(tenant, job, revision, effect)
+        assert calls == [grant]
+        assert service.read(tenant, job)["state"] == "running"
+        with pytest.raises(Rejected):
+            service.continue_transfer(tenant, job, revision, effect)
+        assert calls == [grant]

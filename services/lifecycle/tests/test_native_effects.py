@@ -4,6 +4,7 @@ import json
 import ssl
 import subprocess
 import threading
+import time
 from collections.abc import Iterator
 from dataclasses import replace
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -200,3 +201,42 @@ def test_migration_wait_is_bounded_by_grant_expiry_without_renewal() -> None:
     for expiry in (1000, 999, True, "4600", None):
         with pytest.raises(Rejected):
             effect_seconds({"schema_version": 2, "expires_at": expiry}, 1000)
+
+
+@pytest.mark.parametrize(
+    "fault", ["", "grant", "binding", "stale", "bytes", "disks", "boolean", "extra"]
+)
+def test_native_progress_is_fresh_exact_and_bound_to_original_grant(peer: Any, fault: str) -> None:
+    endpoint, fixture = peer
+    worker = str(uuid4())
+    grant = {"executor_id": worker, "native_binding": {"operation_id": str(uuid4())}}
+    value: dict[str, Any] = {
+        "grant_sha256": digest(grant),
+        "binding_sha256": digest(grant["native_binding"]),
+        "measured_at": int(time.time()),
+        "bytes_completed": 4096,
+        "disks_completed": 1,
+        "artifact_complete": False,
+        "evidence_source": "worker_custody_journal",
+    }
+    if fault in {"grant", "binding"}:
+        value[fault + "_sha256"] = digest("foreign")
+    if fault == "stale":
+        value["measured_at"] -= 60
+    if fault == "bytes":
+        value["bytes_completed"] = -1
+    if fault == "disks":
+        value["disks_completed"] = 33
+    if fault == "boolean":
+        value["artifact_complete"] = 1
+    if fault == "extra":
+        value["estimated_percent"] = 90
+    fixture["body"] = json.dumps(value).encode()
+    effects = NativeWorkerEffects({worker: endpoint})
+    if fault:
+        with pytest.raises(Rejected, match="native_progress_unavailable"):
+            effects.progress(grant)
+    else:
+        assert effects.progress(grant) == value
+    assert fixture["requests"][0][0] == "/internal/native-progress"
+    assert len(fixture["requests"]) == 1

@@ -99,7 +99,12 @@ def route(value: Any) -> dict[str, Any]:
             "constraints",
             "requirement_ids",
             "exclusions",
-        },
+        }
+        | (
+            {"guest_outcomes_sha256"}
+            if isinstance(value, dict) and "guest_outcomes_sha256" in value
+            else set()
+        ),
     )
     identifier(row["id"])
     platform_tuple(row["source"])
@@ -122,7 +127,12 @@ def route(value: Any) -> dict[str, Any]:
             "target_write_recovery",
             "maximum_outage_seconds",
             "maximum_data_loss_seconds",
-        },
+        }
+        | (
+            {"maximum_data_loss_bytes"}
+            if "maximum_data_loss_bytes" in row["constraints"]
+            else set()
+        ),
     )
     for key in ("boot", "disk_format", "driver_profile", "encryption", "data_consistency"):
         text(constraints[key])
@@ -134,6 +144,8 @@ def route(value: Any) -> dict[str, Any]:
         sha(constraints[key])
     for key in ("maximum_outage_seconds", "maximum_data_loss_seconds"):
         integer(constraints[key])
+    if "maximum_data_loss_bytes" in constraints:
+        integer(constraints["maximum_data_loss_bytes"])
     distinct(row["requirement_ids"], {f"R{i:02}" for i in range(1, 36)})
     exclusions = row["exclusions"]
     if not isinstance(exclusions, list) or len(exclusions) > 64:
@@ -255,6 +267,8 @@ def matrix(value: dict[str, Any], records: list[dict[str, Any]], now: int) -> li
                 blockers.append("missing_or_ambiguous_exact_qualification")
             if baseline["expires_at"] <= now:
                 blockers.append("tranche_expired")
+            if r["source"]["installation_id"] == r["target"]["installation_id"]:
+                blockers.append("distinct_migration_environments_required")
             if (
                 q.get("level") != "E3"
                 or q.get("decision") != "accepted"

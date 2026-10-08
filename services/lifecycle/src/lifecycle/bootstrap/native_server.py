@@ -76,7 +76,11 @@ class NativeControl:
         self.dispatcher = CampaignDispatcher(self.campaigns, self.workflow, self.owners.resolve)
         self.boundary = NativeBoundaryApp(self.workflow, self.authorize_worker)
         self.native_jobs = NativeJobsApp(
-            self.workflow, NativeRequestAuthority(), self.owners.resolve
+            self.workflow,
+            NativeRequestAuthority(),
+            self.owners.resolve,
+            self.continue_transfer,
+            self.progress,
         )
         self.campaign_app = CampaignApp(
             self.campaigns,
@@ -92,6 +96,22 @@ class NativeControl:
         return self.configuration.authorize_worker(token)
 
     def execute(self, grant: dict[str, Any]) -> None:
+        self.effect(grant, continuation=False)
+
+    def continue_transfer(self, grant: dict[str, Any]) -> None:
+        self.effect(grant, continuation=True)
+
+    def effect(self, grant: dict[str, Any], *, continuation: bool) -> None:
+        effects = self.worker_effects(grant)
+        if continuation:
+            effects.continue_transfer(grant)
+        else:
+            effects.execute(grant)
+
+    def progress(self, grant: dict[str, Any]) -> dict[str, Any]:
+        return self.worker_effects(grant).progress(grant)
+
+    def worker_effects(self, grant: dict[str, Any]) -> NativeWorkerEffects:
         if digest(configuration(self.path)) != self.config_digest:
             raise Rejected("native_service_configuration_changed", 423)
         config = self.configuration.load()
@@ -103,9 +123,7 @@ class NativeControl:
         ]
         if len(workers) != 1:
             raise Rejected("native_worker_scope_denied", 403)
-        NativeWorkerEffects({workers[0]["executor_id"]: endpoint(workers[0]["endpoint"])}).execute(
-            grant
-        )
+        return NativeWorkerEffects({workers[0]["executor_id"]: endpoint(workers[0]["endpoint"])})
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable

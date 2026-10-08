@@ -109,8 +109,16 @@ def validate_plan(plan: dict[str, Any], now: int) -> None:
         },
     )
     for key, value in scope.items():
-        if key == "project_id" and isinstance(value, str) and re.fullmatch(r"[a-f0-9]{32}", value):
-            continue
+        if key == "project_id" and isinstance(value, str):
+            if re.fullmatch(r"[a-f0-9]{32}", value):
+                continue
+            if re.fullmatch(r"datacenter-[1-9][0-9]{0,18}", value):
+                if (
+                    migration
+                    and plan["migration"].get("outcomes", {}).get("target_platform") == "vmware"
+                ):
+                    continue
+                raise Rejected("invalid_native_destination_scope", 422)
         identity(value)
     for key in (
         "plan_id",
@@ -247,6 +255,11 @@ def observations(
     required = required_observations(plan, stage, phase)
     if not isinstance(records, list) or len(records) != len(required):
         raise Rejected("native_observations_incomplete", 423)
+    outcome_requirements = {}
+    if plan.get("migration", {}).get("schema_version") == 4:
+        from lifecycle.domain.migration_outcomes import requirements
+
+        outcome_requirements = requirements(plan["migration"]["outcomes"])
     seen = set()
     for record in records:
         exact(
@@ -262,7 +275,8 @@ def observations(
                 "outcome",
                 "evidence_sha256",
                 "policy_results",
-            },
+            }
+            | ({"requirement_sha256"} if record.get("case") in outcome_requirements else set()),
         )
         name = record["case"]
         if not isinstance(name, str) or name not in required or name in seen:
@@ -281,6 +295,11 @@ def observations(
             }
         ):
             raise Rejected("native_observation_not_independent_and_bound", 423)
+        if (
+            name in outcome_requirements
+            and record["requirement_sha256"] != outcome_requirements[name]
+        ):
+            raise Rejected("native_outcome_requirement_changed", 423)
         checksum(record["evidence_sha256"])
         if (
             not 0 <= now - integer(record["observed_at"]) <= 60

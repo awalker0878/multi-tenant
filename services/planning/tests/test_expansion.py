@@ -141,6 +141,25 @@ def test_qualification_cannot_cross_direction_or_guest() -> None:
     )
 
 
+def test_same_platform_migration_requires_distinct_installations_even_with_evidence() -> None:
+    value = baseline()
+    selected = value["routes"][0]
+    selected["target"]["installation_id"] = selected["source"]["installation_id"]
+    proof = {
+        "route_sha256": digest(selected),
+        "tranche_sha256": digest(value),
+        "release_sha256": value["release_sha256"],
+        "level": "E3",
+        "decision": "accepted",
+        "revoked": False,
+        "expires_at": 180,
+        "evidence_sha256": "d" * 64,
+    }
+    row = matrix(value, [proof], 100)[0]["routes"][0]
+    assert not row["native_qualified"]
+    assert "distinct_migration_environments_required" in row["blockers"]
+
+
 def test_all_unselected_directions_must_be_explicit() -> None:
     value = baseline()
     removed = value["routes"].pop()

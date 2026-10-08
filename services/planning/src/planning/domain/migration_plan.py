@@ -95,10 +95,11 @@ def compose_migration(
             "native",
             "campaign",
         }
-        | ({"destination_sha256"} if "destination_sha256" in bound else set()),
+        | ({"destination_sha256"} if "destination_sha256" in bound else set())
+        | ({"outcomes"} if "outcomes" in recipe else set()),
     )
     if type(recipe["schema_version"]) is not int or recipe["schema_version"] != (
-        2 if "destination_sha256" in bound else 1
+        3 if "outcomes" in recipe else 2 if "destination_sha256" in bound else 1
     ):
         raise Rejected("invalid_migration_recipe", 422)
     if "destination_sha256" in bound and (
@@ -144,7 +145,7 @@ def compose_migration(
     if "destination_sha256" in bound and recipe["mode"] not in RECOVERY:
         destination_plan = base["native_api"].get("operation_plan", {})
         if (
-            destination_plan.get("kind") != "ahv_destination"
+            destination_plan.get("kind") not in {"ahv_destination", "vmware_destination"}
             or destination_plan.get("destination_sha256") != bound["destination_sha256"]
             or digest(destination_plan) != intents.get("import_target")
         ):
@@ -161,6 +162,13 @@ def compose_migration(
         recipe["artifacts"], {"capture", "transfer", "conversion", "guest", "delta", "recovery"}
     ).values():
         sha(value)
+    if "outcomes" in recipe:
+        from planning.domain.migration_outcomes import validate_outcomes
+
+        validate_outcomes(recipe["outcomes"], bound, recipe["artifacts"])
+        if "destination_sha256" in bound and recipe["mode"] not in RECOVERY:
+            if destination_plan["kind"] != recipe["outcomes"]["target_platform"] + "_destination":
+                raise Rejected("migration_destination_platform_changed", 423)
     if recipe["mode"] == "cutover":
         sha(recipe["rehearsal_sha256"])
     elif recipe["rehearsal_sha256"] is not None:
@@ -224,6 +232,8 @@ def compose_migration(
         raise Rejected("migration_policy_coverage_incomplete", 422)
     campaign = shape(recipe["campaign"], {"route_sha256", "sizes", "demands"})
     sha(campaign["route_sha256"])
+    if "outcomes" in recipe and campaign["route_sha256"] != recipe["outcomes"]["route_sha256"]:
+        raise Rejected("migration_campaign_route_changed", 423)
     for value in shape(campaign["sizes"], PHASES).values():
         integer(value, 0, 2**60)
     # These are approved infrastructure budgets, never browser-supplied rates or observations.
@@ -249,7 +259,8 @@ def compose_migration(
     if expiry <= now:
         raise Rejected("migration_plan_expired", 423)
     migration = {
-        "schema_version": 3 if "destination_sha256" in bound else 2,
+        "schema_version": 4 if "outcomes" in recipe else 3 if "destination_sha256" in bound else 2,
+        **({"outcomes": recipe["outcomes"]} if "outcomes" in recipe else {}),
         **bound,
         **{
             k: recipe[k]

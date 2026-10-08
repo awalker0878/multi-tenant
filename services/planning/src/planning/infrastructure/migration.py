@@ -33,7 +33,7 @@ def prepare_migration(
         path,
         delegation=delegation,
         action=action,
-        schema_name="migration-input-v2",
+        schema_name="migration-input-v3",
     )
     if (inputs["tenant_id"], inputs["site_id"], inputs["revision"], inputs["digest"]) != (
         tenant,

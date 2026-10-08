@@ -76,18 +76,58 @@ class NativeWorkerEffects:
         self.workers = {identity(worker): endpoint for worker, endpoint in workers.items()}
 
     def execute(self, grant: dict[str, Any]) -> None:
+        self.send(grant, "/internal/native-effects")
+
+    def continue_transfer(self, grant: dict[str, Any]) -> None:
+        self.send(grant, "/internal/native-transfer-continuations")
+
+    def progress(self, grant: dict[str, Any]) -> dict[str, Any]:
+        try:
+            value = self.send(grant, "/internal/native-progress")
+            if (
+                set(value)
+                != {
+                    "grant_sha256",
+                    "binding_sha256",
+                    "measured_at",
+                    "bytes_completed",
+                    "disks_completed",
+                    "artifact_complete",
+                    "evidence_source",
+                }
+                or value["grant_sha256"] != digest(grant)
+                or value["binding_sha256"] != digest(grant["native_binding"])
+                or value["evidence_source"] != "worker_custody_journal"
+                or type(value["measured_at"]) is not int
+                or not 0 <= int(time.time()) - value["measured_at"] <= 5
+                or type(value["bytes_completed"]) is not int
+                or not 0 <= value["bytes_completed"] <= 2**60
+                or type(value["disks_completed"]) is not int
+                or not 0 <= value["disks_completed"] <= 32
+                or type(value["artifact_complete"]) is not bool
+            ):
+                raise ValueError
+            return value
+        except Exception:
+            raise Rejected("native_progress_unavailable", 423) from None
+
+    def send(self, grant: dict[str, Any], path: str) -> dict[str, Any]:
         connection = None
         try:
             endpoint = self.workers[identity(grant["executor_id"])]
             data = json.dumps({"grant": grant}, allow_nan=False, separators=(",", ":")).encode()
             if len(data) > 16384:
                 raise Rejected("native_effect_request_bound", 423)
-            timeout = effect_seconds(grant, int(time.time()))
+            timeout = (
+                5
+                if path == "/internal/native-progress"
+                else effect_seconds(grant, int(time.time()))
+            )
             token = credential(endpoint.credential_file)
             connection = NativeEffectConnection(endpoint)
             connection.request(
                 "POST",
-                "/internal/native-effects",
+                path,
                 data,
                 {
                     "Authorization": "Bearer " + token,
@@ -130,8 +170,10 @@ class NativeWorkerEffects:
                 "readiness_established": False,
                 "retry_authorized": False,
             }
-            if digest(decode(bytes(raw))) != digest(expected):
+            result = decode(bytes(raw))
+            if path != "/internal/native-progress" and digest(result) != digest(expected):
                 raise Rejected("native_effect_receipt_mismatch", 423)
+            return result
         except Exception:
             raise Rejected("native_effect_requires_reconciliation", 423) from None
         finally:

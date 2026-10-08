@@ -250,6 +250,40 @@ def cases(plan: dict[str, Any], stage: str, phase: str) -> tuple[str, ...]:
         required += ("no_target_divergence",)
     if plan["migration"]["mode"] == "reverse_recovery" and stage == "restore_source":
         required += ("accepted_target_changes_retained",)
+    if plan["migration"].get("schema_version") == 4:
+        from lifecycle.domain.migration_outcomes import requirements
+
+        o = plan["migration"]["outcomes"]
+        additional = requirements(o)
+        expanded: list[str] = []
+        for case in required:
+            if case == "required_services":
+                expanded.extend(k for k in additional if k.startswith("service_"))
+            else:
+                expanded.append(case)
+            if case == "guest_ready":
+                expanded.extend(k for k in additional if k.startswith("guest_"))
+            if case == "policy_paths":
+                expanded.extend(k for k in additional if k.startswith("security_rule_"))
+            if case in {
+                "final_integrity",
+                "rehearsal_integrity",
+                "recovered_integrity",
+                "source_return_integrity",
+            }:
+                expanded.extend(k for k in additional if k.startswith("dataset_"))
+        required = tuple(expanded)
+        if o["source_platform"] != "vmware":
+            required = tuple(
+                {
+                    "snapshot_bound": "source_capture_bound",
+                    "ovf_bound": "source_manifest_bound",
+                    "snapshot_owned": "source_capture_owned",
+                    "snapshot_absent": "source_capture_absent",
+                    "snapshot_consolidated": "source_capture_released",
+                }.get(k, k)
+                for k in required
+            )
     return tuple(dict.fromkeys(required))
 
 
@@ -272,10 +306,11 @@ def validate(m: dict[str, Any], now: int) -> None:
             "rehearsal_sha256",
             "recovery_of_sha256",
         }
-        | ({"destination_sha256"} if "destination_sha256" in m else set()),
+        | ({"destination_sha256"} if "destination_sha256" in m else set())
+        | ({"outcomes"} if "outcomes" in m else set()),
     )
     if type(m["schema_version"]) is not int or m["schema_version"] != (
-        3 if "destination_sha256" in m else 2
+        4 if "outcomes" in m else 3 if "destination_sha256" in m else 2
     ):
         raise Rejected("invalid_migration_version", 422)
     review = exact(m["review"], {"revision", "digest"})
@@ -339,6 +374,10 @@ def validate(m: dict[str, Any], now: int) -> None:
     )
     for value in artifacts.values():
         checksum(value)
+    if "outcomes" in m:
+        from lifecycle.domain.migration_outcomes import validate_outcomes
+
+        validate_outcomes(m["outcomes"], m, artifacts)
     delta = exact(m["delta"], {"kind", "requires_running_guest", "qualification_sha256"})
     expected = {
         "VM_SNAPSHOT_BASELINE_APP_DELTA": "application",
@@ -358,7 +397,7 @@ def validate(m: dict[str, Any], now: int) -> None:
     )
     identity(objectives["owner_id"])
     checksum(objectives["acceptance_sha256"])
-    integer(objectives["max_outage_seconds"], 1)
+    integer(objectives["max_outage_seconds"])
     integer(objectives["max_data_loss_bytes"])
     if m["mode"] == "cutover":
         checksum(m["rehearsal_sha256"])
@@ -372,6 +411,19 @@ def validate(m: dict[str, Any], now: int) -> None:
 
 def recovery_matches(original: dict[str, Any], replacement: dict[str, Any]) -> bool:
     """Recovery can change authority/artifacts, but cannot switch datasets or migration method."""
+    if "outcomes" in original:
+        before, after = original["outcomes"], replacement.get("outcomes", {})
+        if any(
+            before[key] != after.get(key)
+            for key in ("source_platform", "target_platform", "datasets")
+        ):
+            return False
+        # Recovery may replace the target implementation under a fresh approval,
+        # but cannot silently remove a security objective or change its meaning.
+        if {r["id"]: r["semantics_sha256"] for r in before["security"]} != {
+            r["id"]: r["semantics_sha256"] for r in after.get("security", [])
+        }:
+            return False
     keys = ("method", "datasets", "disks")
     return all(digest(original[k]) == digest(replacement[k]) for k in keys) and all(
         original[side][key] == replacement[side][key]
@@ -401,6 +453,13 @@ def current_profiles(plan: dict[str, Any], evidence: Any, now: int) -> None:
         raise Rejected("migration_review_binding_changed", 423)
     if digest(evidence.get("owner_inputs")) != m["owner_inputs_sha256"]:
         raise Rejected("migration_owner_inputs_changed", 423)
+    destination = evidence.get("destination")
+    if (
+        (destination is not None) != ("destination_sha256" in m)
+        or destination is not None
+        and digest(destination) != m["destination_sha256"]
+    ):
+        raise Rejected("migration_destination_mapping_changed", 423)
     for side in ("source", "target"):
         if m[side]["expires_at"] <= now:
             raise Rejected("migration_profile_stale", 423)

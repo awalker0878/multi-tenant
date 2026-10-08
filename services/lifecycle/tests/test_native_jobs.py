@@ -95,3 +95,40 @@ def test_stop_requires_current_control_authority_and_expected_revision() -> None
     workflow.stop.reset_mock()
     assert request(app, path + "/" + job + "/stop", {"expected_revision": 1})[0] == 403
     workflow.stop.assert_not_called()
+
+
+def test_transfer_continuation_requires_control_revision_and_configured_callback() -> None:
+    app, workflow, authority, _, path, _ = setup()
+    target = path + "/" + workflow.admit.return_value + "/continue-transfer"
+    assert request(app, target, {"expected_revision": 1})[0] == 423
+    workflow.continue_transfer.assert_not_called()
+    callback = Mock()
+    app.continuation = callback
+    assert request(app, target, {"expected_revision": 1})[0] == 202
+    assert workflow.continue_transfer.call_args.args[-2:] == (1, callback)
+    assert authority.actor.call_args.args[2] == "operation.control"
+    authority.actor.side_effect = Rejected("denied", 403)
+    workflow.continue_transfer.reset_mock()
+    assert request(app, target, {"expected_revision": 1})[0] == 403
+    workflow.continue_transfer.assert_not_called()
+
+
+def test_progress_owner_read_occurs_only_after_scoped_actor_authority() -> None:
+    app, workflow, authority, _, path, _ = setup()
+    app.progress = Mock()
+    workflow.read.return_value["measurements"] = {"transfer": None}
+    workflow.transfer_progress.return_value = None
+    target = path + "/" + workflow.admit.return_value
+    authority.actor.side_effect = Rejected("denied", 403)
+    assert request(app, target, method="GET")[0] == 403
+    workflow.transfer_progress.assert_not_called()
+    authority.actor.side_effect = None
+    assert request(app, target, method="GET")[0] == 200
+    workflow.transfer_progress.assert_called_once()
+
+
+@pytest.mark.parametrize("command", ["stop", "continue-transfer"])
+def test_native_commands_require_job_in_the_route(command: str) -> None:
+    app, workflow, _, _, path, body = setup()
+    assert request(app, path + "/" + command, body)[0] == 404
+    workflow.admit.assert_not_called()

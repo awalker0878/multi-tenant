@@ -59,7 +59,7 @@ class NativeWorkflow:
 
     def load(self, tx: Transaction, tenant: str, job: str) -> dict[str, Any]:
         row = tx.one(
-            "SELECT j.*,p.state,p.stopped,p.revision FROM app.native_jobs j "
+            "SELECT j.*,p.state,p.stopped,p.revision,p.reason FROM app.native_jobs j "
             "JOIN app.native_projection p ON p.job=j.id WHERE j.id=%s AND j.tenant=%s",
             (identity(job), identity(tenant)),
         )
@@ -512,25 +512,126 @@ class NativeWorkflow:
             self.project(tx, job, "stopped", "native_stop_requested")
             self.event(tx, job, "stop_requested", {"provider_drain_required": True})
 
+    def continue_transfer(
+        self,
+        tenant: str,
+        job: str,
+        expected_revision: int,
+        effect: Callable[[dict[str, Any]], None],
+    ) -> None:
+        """Explicit immutable-read continuation; never create or renew a native grant."""
+        with self.database.transaction() as tx:
+            self.lock(tx)
+            row = self.load(tx, tenant, job)
+            if row["revision"] != expected_revision:
+                raise Rejected("native_job_revision_changed", 409)
+            migration = row["plan"].get("migration", {})
+            if (
+                row["state"] != "held"
+                or row["stopped"]
+                or migration.get("outcomes", {}).get("source_platform") not in {"ahv", "openstack"}
+            ):
+                raise Rejected("native_transfer_continuation_unavailable", 423)
+            pending = tx.all(
+                "SELECT o.binding FROM app.native_operations o "
+                "JOIN app.native_redemptions r ON r.operation=o.id "
+                "LEFT JOIN app.native_observations v ON v.operation=o.id "
+                "WHERE o.job=%s AND v.operation IS NULL",
+                (job,),
+            )
+            if len(pending) != 1 or pending[0]["binding"]["stage"] != "export_copy":
+                raise Rejected("native_transfer_continuation_unavailable", 423)
+            binding = pending[0]["binding"]
+            if binding["expires_at"] <= self.clock():
+                raise Rejected("native_grant_expired", 423)
+            self.require(tx, row, binding)
+            campaign_boundary(tx, job, "export_copy", self.clock())
+            self.project(tx, job, "running")
+            tx.execute(
+                "UPDATE app.migration_members SET state='admitted',reason=NULL WHERE job=%s", (job,)
+            )
+            self.event(
+                tx,
+                job,
+                "immutable_transfer_continuation",
+                {
+                    "operation_id": binding["operation_id"],
+                    "grant_sha256": digest(binding),
+                    "original_expires_at": binding["expires_at"],
+                },
+            )
+        try:
+            effect(binding)
+            self.reconcile(tenant, binding)
+        except Exception:
+            self.hold(tenant, job)
+            raise Rejected("native_attempt_requires_reconciliation", 423) from None
+
     def read(self, tenant: str, job: str) -> dict[str, Any]:
         with self.database.transaction() as tx:
             row = self.load(tx, tenant, job)
             operations = tx.all(
-                "SELECT o.stage,o.id, r.operation AS redeemed,v.digest AS observation_digest "
+                "SELECT o.stage,o.id,o.created_at,r.operation AS redeemed,r.redeemed_at,"
+                "v.digest AS observation_digest,v.observed_at "
                 "FROM app.native_operations o LEFT JOIN app.native_redemptions r "
                 "ON r.operation=o.id "
                 "LEFT JOIN app.native_observations v ON v.operation=o.id "
                 "WHERE o.job=%s ORDER BY o.created_at,o.stage",
                 (job,),
             )
+            now = self.clock()
+            stages = stages_for(row["plan"])
+            operations.sort(key=lambda operation: stages.index(operation["stage"]))
             return {
                 "job_id": job,
                 "tenant_id": tenant,
                 "state": row["state"],
                 "revision": row["revision"],
                 "stopped": row["stopped"],
+                "hold_reason": row.get("reason"),
+                "transfer_continuation_candidate": (
+                    row["state"] == "held"
+                    and not row["stopped"]
+                    and row["plan"]["expires_at"] > self.clock()
+                    and row["plan"].get("migration", {}).get("outcomes", {}).get("source_platform")
+                    in {"ahv", "openstack"}
+                    and any(
+                        o["stage"] == "export_copy"
+                        and o["redeemed"] is not None
+                        and o["observation_digest"] is None
+                        for o in operations
+                    )
+                ),
                 "plan_sha256": row["fingerprint"],
                 "scope": row["plan"]["scope"],
+                "measurements": {
+                    "transfer": None,
+                    "observed_at": now,
+                    "started_at": row["created_at"],
+                    "total_stages": len(stages),
+                    "completed_stages": sum(
+                        o["observation_digest"] is not None for o in operations
+                    ),
+                    "operations": [
+                        {
+                            "stage": o["stage"],
+                            "operation_id": str(o["id"]),
+                            "prepared_at": o["created_at"],
+                            "started_at": o["redeemed_at"],
+                            "observed_at": o["observed_at"],
+                            "elapsed_seconds": (
+                                max(
+                                    0,
+                                    (o["observed_at"] if o["observed_at"] is not None else now)
+                                    - o["redeemed_at"],
+                                )
+                                if o["redeemed_at"] is not None
+                                else None
+                            ),
+                        }
+                        for o in operations
+                    ],
+                },
                 "operations": [
                     {
                         "stage": o["stage"],
@@ -543,6 +644,55 @@ class NativeWorkflow:
                 "retry_authorized": False,
                 "native_qualification": "not_established",
             }
+
+    def transfer_progress(
+        self,
+        tenant: str,
+        job: str,
+        read: Callable[[dict[str, Any]], dict[str, Any]],
+    ) -> dict[str, Any] | None:
+        """Read current, redeemed export counters after Console actor authorization.
+
+        Bytes are completed-disk receipts, never the route's historical throughput.
+        The worker checks the original grant live; unavailable readings stay absent.
+        No transaction is held while the worker calls back to the authority boundary.
+        """
+        try:
+            with self.database.transaction() as tx:
+                row = self.load(tx, tenant, job)
+                if row["state"] != "running" or row["stopped"]:
+                    return None
+                operation = tx.one(
+                    "SELECT o.binding FROM app.native_operations o "
+                    "JOIN app.native_redemptions r ON r.operation=o.id "
+                    "WHERE o.job=%s AND o.stage='export_copy'",
+                    (job,),
+                )
+                if operation is None or operation["binding"]["expires_at"] <= self.clock():
+                    return None
+                binding = operation["binding"]
+            value = read(binding)
+            if (
+                value["grant_sha256"] != digest(binding)
+                or value["binding_sha256"] != digest(binding["native_binding"])
+                or not 0 <= self.clock() - value["measured_at"] <= 5
+            ):
+                return None
+            return {
+                "operation_id": binding["operation_id"],
+                **{
+                    key: value[key]
+                    for key in (
+                        "measured_at",
+                        "bytes_completed",
+                        "disks_completed",
+                        "artifact_complete",
+                        "evidence_source",
+                    )
+                },
+            }
+        except Exception:
+            return None
 
     def migration_admission(
         self, tx: Transaction, plan: dict[str, Any], held: dict[str, Any] | None

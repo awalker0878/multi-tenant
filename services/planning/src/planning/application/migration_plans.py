@@ -76,6 +76,8 @@ class MigrationPlans:
                 if self.planning.validity(actor, plan, {site: delegation})["current"] is not True:
                     continue
                 content = compose_migration(plan["content"], bound, recipe, self.planning.clock())
+                if self.support is not None:
+                    self.support(actor, site, content["native_migration"]["migration"])
             except Rejected as error:
                 if error.status in {401, 403, 404}:
                     raise
@@ -189,6 +191,8 @@ class MigrationPlans:
             self.support(actor, site, bound)
         recipe = self.recipes(actor, site, body["recipe_id"])
         content = compose_migration(base["content"], bound, recipe, self.planning.clock())
+        if self.support is not None:
+            self.support(actor, site, content["native_migration"]["migration"])
         content["native_migration"].update(base_plan_id=base["id"], recipe_id=body["recipe_id"])
         plan_id = str(uuid4())
         payload = {

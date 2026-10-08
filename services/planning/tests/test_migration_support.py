@@ -149,3 +149,99 @@ def test_support_http_uses_read_delegation_and_cannot_accept_browser_evidence() 
         == 403
     )
     support.read.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "",
+        "services",
+        "security",
+        "datasets",
+        "guest",
+        "recovery",
+        "format",
+        "outage",
+        "route",
+        "missing",
+        "loss_bytes",
+        "loss_units",
+        "accepted_byte_bound",
+        "qualified_variant",
+        "guest_checks",
+    ],
+)
+def test_execution_support_binds_entire_qualified_artifact_set(fault: str) -> None:
+    from test_migration_outcomes import outcomes
+    from test_migration_plans import values
+
+    _, bound, recipe = values()
+    selected = baseline()
+    for index, r in enumerate(selected["routes"]):
+        r["source"]["profile_sha256"] = digest([index, "source"])
+        r["target"]["profile_sha256"] = digest([index, "target"])
+    route = selected["routes"][0]
+    bound.update(artifacts=recipe["artifacts"])
+    for side in ("source", "target"):
+        bound[side]["profile_sha256"] = route[side]["profile_sha256"]
+    o = outcomes(
+        bound, recipe["artifacts"], route["source"]["platform"], route["target"]["platform"]
+    )
+    route.update(
+        guest_profile_sha256=bound["artifacts"]["guest"],
+        guest_outcomes_sha256=digest(o["guest"]),
+        artifacts_sha256=digest(bound["artifacts"]),
+        services_sha256=digest(o["services"]),
+        policy_sha256=digest(o["security"]),
+        data_sha256=digest(o["datasets"]),
+        recovery_sha256=bound["artifacts"]["recovery"],
+    )
+    route["constraints"]["disk_format"] = bound["disks"][0]["format"]
+    if fault in {"loss_bytes", "accepted_byte_bound"}:
+        route["constraints"]["maximum_data_loss_seconds"] = 60
+        route["constraints"]["maximum_data_loss_bytes"] = 1024
+        bound["objectives"]["max_data_loss_bytes"] = 1024 if fault == "accepted_byte_bound" else 0
+    if fault == "loss_units":
+        route["constraints"]["maximum_data_loss_seconds"] = 1
+    if fault == "qualified_variant":
+        variant = deepcopy(route)
+        variant.update(id=str(uuid4()), guest="windows", guest_profile_sha256=digest("windows"))
+        selected["routes"].append(variant)
+    o["route_sha256"] = digest(route)
+    bound["outcomes"] = o
+    proof = {
+        "route_sha256": digest(route),
+        "tranche_sha256": digest(selected),
+        "release_sha256": selected["release_sha256"],
+        "level": "E3",
+        "decision": "accepted",
+        "revoked": False,
+        "expires_at": 180,
+        "evidence_sha256": "a" * 64,
+    }
+    actor = Actor(str(uuid4()), str(uuid4()), "plan.read", str(uuid4()), str(uuid4()))
+    support = MigrationSupport(lambda *_: selected, lambda *_: [proof], lambda: 100)
+    if fault in {"services", "datasets"}:
+        key = next(iter(o[fault]))
+        o[fault][key] = digest("changed")
+    if fault == "guest_checks":
+        o["guest"]["boot"] = digest("unqualified-boot-check")
+    if fault == "security":
+        o["security"][0]["semantics_sha256"] = digest("changed")
+    if fault in {"guest", "recovery"}:
+        bound["artifacts"][fault] = digest("changed")
+    if fault == "format":
+        bound["disks"][0]["format"] = "vmdk"
+    if fault == "outage":
+        bound["objectives"]["max_outage_seconds"] = 0
+    if fault == "route":
+        o["route_sha256"] = digest("other-route")
+    if fault == "missing":
+        bound.pop("outcomes")
+    if fault not in {"", "accepted_byte_bound", "qualified_variant"}:
+        with pytest.raises(Rejected):
+            support.require(actor, SITE, bound)
+    else:
+        support.require(actor, SITE, bound)
+        # Before recipe selection the review may match several qualified variants.
+        support.require(actor, SITE, {k: bound[k] for k in ("source", "target", "method")})
