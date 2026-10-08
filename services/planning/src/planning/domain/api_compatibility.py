@@ -56,12 +56,25 @@ def version_tuple(value: Any) -> tuple[int, ...]:
 
 
 def environment(profile: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, Any]:
-    shape(snapshot, {"installation_id", "profile_sha256", "apis", "entitlements"})
+    shape(
+        snapshot,
+        {
+            "installation_id", "profile_sha256", "apis", "entitlements",
+            "observed_at", "expires_at", "source", "evidence_sha256",
+        },
+    )
     if (
         identifier(snapshot["installation_id"]) != profile["installation_id"]
         or sha(snapshot["profile_sha256"]) != profile["profile_sha256"]
     ):
         raise Rejected("migration_api_environment_scope_changed", 423)
+    integer(snapshot["observed_at"])
+    integer(snapshot["expires_at"])
+    sha(snapshot["evidence_sha256"])
+    if snapshot["source"] not in {"live_probe", "operator"}:
+        raise Rejected("migration_api_environment_source_invalid", 422)
+    if snapshot["expires_at"] <= snapshot["observed_at"]:
+        raise Rejected("migration_api_environment_time_invalid", 422)
     apis = snapshot["apis"]
     if not isinstance(apis, dict) or len(apis) > 32:
         raise Rejected("migration_api_version_inventory_invalid", 422)
@@ -165,6 +178,11 @@ def evaluate(
             cap = required["capability_id"]
             env = envs.get(side)
             status, reason, ref = "unknown", "api_observation_missing", None
+            if env is not None and (
+                env["observed_at"] > now or env["expires_at"] <= now
+            ):
+                env = None
+                reason = "api_environment_discovery_stale"
             api_family: str | None = None
             api_version: str | None = None
             if env is not None:
