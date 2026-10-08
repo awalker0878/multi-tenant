@@ -19,7 +19,7 @@ final class PlanningClient implements PlanningGateway
 
     public function call(string $session, string $tenant, string $application, string $environment, string $method, string $tail, array $sites, array $body = [], ?string $key = null): array
     {
-        $migration = in_array($tail, ['migration-preparations', 'migration-plans', 'migration-plan-options'], true);
+        $migration = in_array($tail, ['migration-preparations', 'migration-plans', 'migration-plan-options', 'migration-support'], true);
         if (($migration && ($method !== 'POST' || count($sites) !== 1)) || count($sites) < 1 || count($sites) > 3 || ! in_array($method, ['GET', 'POST'], true)
             || (! $migration && ! preg_match('/\A(?:assessments|plans)(?:\/[0-9a-f-]{36})?(?:\/(?:validity|diff))?\z/', $tail))) {
             throw new PlanningFailure(422, 'invalid_scope');
@@ -40,7 +40,7 @@ final class PlanningClient implements PlanningGateway
         }
         try {
             $tokens = [];
-            $action = $method === 'POST' && ! str_ends_with($tail, '/validity') && ! str_ends_with($tail, '/diff') ? 'plan.create' : 'plan.read';
+            $action = $method === 'POST' && $tail !== 'migration-support' && ! str_ends_with($tail, '/validity') && ! str_ends_with($tail, '/diff') ? 'plan.create' : 'plan.read';
             foreach (array_unique($sites) as $site) {
                 $d = $this->governance->send('POST', '/v1/tenants/'.$tenant.'/actor-delegations', $session, ['audience' => 'planning', 'action' => $action,
                     'scope' => ['site_id' => $site, 'environment' => $environment, 'resource_id' => $application]]);
@@ -75,10 +75,11 @@ final class PlanningClient implements PlanningGateway
                 throw new PlanningFailure;
             }
 
-            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v1.3.json' : 'contracts/planning-v1.2.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
+            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v1.4.json' : 'contracts/planning-v1.2.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
             $schemaName = $migration ? match ($tail) {
                 'migration-plans' => 'Receipt',
                 'migration-plan-options' => 'MigrationOptions',
+                'migration-support' => 'MigrationSupport',
                 default => 'Preparation',
             } : ($response->status() === 201 ? 'Receipt' : (str_ends_with($tail, '/validity') ? 'Validity' : (str_ends_with($tail, '/diff') ? 'Diff' : (str_starts_with($tail, 'plans/') ? 'Plan' : 'Assessment'))));
             $schema = ['$ref' => '#/components/schemas/'.$schemaName, 'components' => $api['components']];

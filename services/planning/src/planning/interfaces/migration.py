@@ -9,6 +9,7 @@ from typing import Any
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from planning.application.migration_plans import MigrationPlans
+from planning.application.migration_support import MigrationSupport
 from planning.application.ports import Authority
 from planning.domain.model import Rejected, decode, identifier, integer, sha, shape
 from planning.interfaces.planning import UUID, single
@@ -20,9 +21,10 @@ class MigrationPreparationApp:
         authority: Authority,
         prepare: Callable[..., dict[str, Any]],
         plans: MigrationPlans | None = None,
+        support: MigrationSupport | None = None,
     ) -> None:
         self.authority, self.prepare = authority, prepare
-        self.plans = plans
+        self.plans, self.support = plans, support
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
@@ -31,7 +33,7 @@ class MigrationPreparationApp:
             return
         try:
             route = re.fullmatch(
-                rf"/v1/tenants/({UUID})/applications/({UUID})/environments/({UUID})/(migration-preparations|migration-plans|migration-plan-options)",
+                rf"/v1/tenants/({UUID})/applications/({UUID})/environments/({UUID})/(migration-preparations|migration-plans|migration-plan-options|migration-support)",
                 scope["path"],
             )
             if route is None or scope["method"] != "POST" or scope["query_string"]:
@@ -59,10 +61,10 @@ class MigrationPreparationApp:
             complete = route[4] == "migration-plans"
             body = shape(
                 decode(bytes(chunks)),
-                {"site_id", "review", "disks"}
+                ({"site_id"} if route[4] == "migration-support" else {"site_id", "review", "disks"})
                 | ({"base_plan_id", "recipe_id"} if complete else set()),
             )
-            review = shape(body["review"], {"revision", "digest"})
+            review = shape(body["review"], {"revision", "digest"}) if "review" in body else {}
             site = identifier(body["site_id"])
             tenant, application, environment = route.groups()[:3]
             delegation = single(headers, b"x-actor-delegation")
@@ -71,12 +73,17 @@ class MigrationPreparationApp:
                 auth[7:],
                 delegation,
                 tenant,
-                "plan.create",
+                "plan.read" if route[4] == "migration-support" else "plan.create",
                 application,
                 environment,
                 site,
             )
-            if route[4] == "migration-plan-options":
+            if route[4] == "migration-support":
+                if self.support is None:
+                    raise Rejected("migration_support_unavailable", 503)
+                payload = await asyncio.to_thread(self.support.read, actor, site)
+                status = 200
+            elif route[4] == "migration-plan-options":
                 if self.plans is None:
                     raise Rejected("migration_plan_composition_unavailable", 503)
                 payload = await asyncio.to_thread(self.plans.options, actor, body, delegation)

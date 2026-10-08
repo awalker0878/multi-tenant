@@ -247,9 +247,11 @@ def matrix(value: dict[str, Any], records: list[dict[str, Any]], now: int) -> li
                 and q.get("tranche_sha256") == digest(baseline)
                 and q.get("release_sha256") == baseline["release_sha256"]
             ]
+            native = [q for q in matches if q.get("level") == "E3"]
+            operating = [q for q in matches if q.get("level") == "E4"]
             blockers = []
-            q = matches[0] if len(matches) == 1 else {}
-            if len(matches) != 1:
+            q = native[0] if len(native) == 1 else {}
+            if len(native) != 1:
                 blockers.append("missing_or_ambiguous_exact_qualification")
             if baseline["expires_at"] <= now:
                 blockers.append("tranche_expired")
@@ -270,9 +272,22 @@ def matrix(value: dict[str, Any], records: list[dict[str, Any]], now: int) -> li
                 | {
                     "guest": r["guest"],
                     "method": r["method"],
+                    "source": r["source"],
+                    "target": r["target"],
+                    "guest_profile_sha256": r["guest_profile_sha256"],
+                    "constraints": r["constraints"],
+                    "requirement_ids": r["requirement_ids"],
+                    "exclusions": r["exclusions"],
                     "blockers": blockers,
                     "native_qualified": not blockers,
-                    "operationally_accepted": False,
+                    "operationally_accepted": not blockers
+                    and len(operating) == 1
+                    and operating[0].get("decision") == "accepted"
+                    and operating[0].get("revoked") is False
+                    and type(operating[0].get("expires_at")) is int
+                    and operating[0]["expires_at"] > now
+                    and isinstance(operating[0].get("evidence_sha256"), str)
+                    and sha(operating[0]["evidence_sha256"]) is not None,
                 }
             )
         result.append({"direction": source + "->" + target, "state": "selected", "routes": rows})

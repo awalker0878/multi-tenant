@@ -17,9 +17,10 @@ class MigrationPlans:
         prepare: Callable[..., dict[str, Any]],
         recipes: Callable[[Actor, str, str], dict[str, Any]],
         available: Callable[[Actor, str], list[dict[str, Any]]] | None = None,
+        support: Callable[[Actor, str, dict[str, Any]], None] | None = None,
     ) -> None:
         self.planning, self.prepare, self.recipes = planning, prepare, recipes
-        self.available = available
+        self.available, self.support = available, support
 
     def options(self, actor: Actor, body: dict[str, Any], delegation: str) -> dict[str, Any]:
         """Return only currently composable choices; never expose registry paths or intents."""
@@ -36,6 +37,8 @@ class MigrationPlans:
             delegation,
             body["disks"],
         )
+        if self.support is not None:
+            self.support(actor, site, bound)
         if self.available is None:
             raise Rejected("migration_recipes_unavailable", 503)
         candidates = [
@@ -100,6 +103,8 @@ class MigrationPlans:
             scope["environment"],
         )
         composition = plan["content"]["native_migration"]
+        if self.support is not None:
+            self.support(actor, scope["site_id"], composition["migration"])
         recipe = self.recipes(actor, scope["site_id"], composition["recipe_id"])
         if (
             digest(recipe) != composition["recipe_sha256"]
@@ -118,6 +123,8 @@ class MigrationPlans:
         ):
             raise Rejected("migration_recipe_changed", 423)
         migration = composition["migration"]
+        if self.support is not None:
+            self.support(actor, site, migration)
         bound = self.prepare(
             actor.tenant,
             actor.application,
@@ -178,6 +185,8 @@ class MigrationPlans:
             delegation,
             body["disks"],
         )
+        if self.support is not None:
+            self.support(actor, site, bound)
         recipe = self.recipes(actor, site, body["recipe_id"])
         content = compose_migration(base["content"], bound, recipe, self.planning.clock())
         content["native_migration"].update(base_plan_id=base["id"], recipe_id=body["recipe_id"])

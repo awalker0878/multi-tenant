@@ -11,6 +11,7 @@ use App\Http\Controllers\LocalIdentityController;
 use App\Http\Controllers\MigrationCampaignController;
 use App\Http\Controllers\MigrationFleetController;
 use App\Http\Controllers\MigrationReviewController;
+use App\Http\Controllers\MigrationSupportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OidcController;
 use App\Http\Controllers\OperatorInputsController;
@@ -88,6 +89,8 @@ Route::prefix('/tenants/{tenant}/inventory')->whereUuid('tenant')->middleware(Re
 
 Route::prefix('/tenants/{tenant}/applications/{application}/environments/{environment}/planning')->whereUuid(['tenant', 'application', 'environment'])->middleware(RequireIdentity::class)->group(function (): void {
     $c = PlanningController::class;
+    Route::get('/migration-support/{site}', [MigrationSupportController::class, 'show'])->whereUuid('site');
+    Route::get('/migration-support/{site}/status', [MigrationSupportController::class, 'status'])->whereUuid('site');
     Route::get('/', [$c, 'index']);
     Route::get('/destinations/{site}', [$c, 'destinations'])->whereUuid('site');
     Route::get('/{kind}/{record}', [$c, 'show'])->whereIn('kind', ['assessments', 'plans'])->whereUuid('record');

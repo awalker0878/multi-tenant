@@ -157,6 +157,7 @@ async function completeGroup(operation: 'options' | 'compose') {
 
 <template>
   <CatalogueLayout title="Migrate virtual machines" :tenant-id="tenantId">
+    <Link v-if="group" :href="`/tenants/${tenantId}/applications/${group.input.application_id}/environments/${group.input.environment_id}/planning/migration-support/${siteId}`" class="mb-4 block text-teal-800 underline">Review directional support and qualification</Link>
     <div class="flex flex-wrap gap-4"><Link :href="siteBase" class="text-teal-800 underline">Site inventory</Link><Link :href="siteBase + '/configuration'" class="text-teal-800 underline">Source and target connections</Link></div>
     <p class="my-4 max-w-4xl">Discover source VMs through the enrolled platform APIs, organize them into migration groups, and prepare selected machines for the selected destination. Each VM keeps its own disk mapping, method and readiness review.</p>
     <p v-if="notice" role="status" class="my-4 rounded border border-teal-600 bg-teal-50 p-4">{{ notice }}</p>

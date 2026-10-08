@@ -72,7 +72,7 @@ final class MigrationFleetController
             $this->failure($error);
         }
 
-        return redirect($this->base($tenant, $site).'/groups/'.$saved['id'])->with('inventory_notice', 'Migration group saved. Review each VM, then prepare the group for OpenStack.');
+        return redirect($this->base($tenant, $site).'/groups/'.$saved['id'])->with('inventory_notice', 'Migration group saved. Review each VM, then prepare the group for the selected destination.');
     }
 
     public function prepare(Request $request, string $tenant, string $site, string $group, InventoryGateway $inventory, PlanningGateway $planning): JsonResponse

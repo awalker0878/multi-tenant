@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "tranche_sha256",
+    "release_sha256",
+    "records",
+    "native_write_authorized"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenant_id",
+        "site_id",
+        "resource_id",
+        "environment"
+      ],
+      "properties": {
+        "tenant_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "site_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "resource_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "environment": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "tranche_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "release_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "records": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "route_sha256",
+          "tranche_sha256",
+          "release_sha256",
+          "level",
+          "decision",
+          "revoked",
+          "expires_at",
+          "evidence_sha256"
+        ],
+        "properties": {
+          "route_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "tranche_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "level": {
+            "enum": [
+              "E0",
+              "E1",
+              "E2",
+              "E3",
+              "E4"
+            ]
+          },
+          "decision": {
+            "enum": [
+              "accepted",
+              "rejected",
+              "not_reviewed"
+            ]
+          },
+          "revoked": {
+            "type": "boolean"
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "evidence_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "native_write_authorized": {
+      "const": false
+    }
+  }
+}

@@ -79,7 +79,10 @@ def request(
                     "ASSURANCE": "qualification-v1",
                 }[owner]
                 if schema_name is not None:
-                    if owner != "INVENTORY" or schema_name != "migration-input-v2":
+                    if (owner, schema_name) not in {
+                        ("INVENTORY", "migration-input-v2"),
+                        ("ASSURANCE", "migration-support-v1"),
+                    }:
                         raise ValueError
                     name = schema_name
                 schema = json.loads(
