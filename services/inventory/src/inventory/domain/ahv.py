@@ -134,7 +134,14 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
         key for key, policy in inventories["policies"].items()
         if policy.get("state") == "ENFORCE"
     }
-    selected = select_security_mappings(d["security_mappings"], source_ids, verified)
+    if source_ids is None:
+        # An unknown source policy set is not an empty one. Allow a draft,
+        # but reject synthetic selections and hold review confirmation.
+        if d["security_mappings"] != [] or d["policy_ids"] != []:
+            raise Rejected("source_security_policy_observation_required")
+        selected = []
+    else:
+        selected = select_security_mappings(d["security_mappings"], source_ids, verified)
     if d["policy_ids"] != selected:
         raise Rejected("security_policy_mapping_changed")
     for field in ("disks", "nics"):
