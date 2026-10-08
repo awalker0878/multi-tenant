@@ -90,6 +90,36 @@ def test_hidden_diff_destination_requires_its_own_current_authority() -> None:
     assert authority.actor.call_count == 2
 
 
+def test_diff_cannot_combine_delegations_from_different_actors() -> None:
+    app, planning, authority = setup()
+    original = planning.get.return_value
+    other = dict(original, candidates=[dict(CANDIDATE, site_id=str(uuid4()))])
+    planning.get.side_effect = [original, other]
+    authority.actor.side_effect = [
+        Actor(TENANT, ACTOR, "plan.read", APP, ENV),
+        Actor(TENANT, str(uuid4()), "plan.read", APP, ENV),
+    ]
+    assert exchange(
+        app,
+        "/plans/" + str(uuid4()) + "/diff",
+        json.dumps({"other_plan_id": str(uuid4())}).encode(),
+    ) == (403, {"error": "actor_mismatch"})
+
+
+def test_diff_allows_same_actor_across_authorized_sites() -> None:
+    app, planning, _ = setup()
+    original = planning.get.return_value
+    planning.get.side_effect = [
+        original,
+        dict(original, candidates=[dict(CANDIDATE, site_id=str(uuid4()))]),
+    ]
+    assert exchange(
+        app,
+        "/plans/" + str(uuid4()) + "/diff",
+        json.dumps({"other_plan_id": str(uuid4())}).encode(),
+    ) == (200, {"changes": [], "approval_reusable": True})
+
+
 @pytest.mark.parametrize(
     "payload,expected",
     [
