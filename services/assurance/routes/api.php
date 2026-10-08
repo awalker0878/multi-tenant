@@ -8,6 +8,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\MigrationQualificationController;
 use App\Http\Controllers\PlanningQualificationController;
 use App\Http\Controllers\QualificationCurrentController;
+use App\Http\Controllers\QualificationPublicationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health/live', [HealthController::class, 'live'])->name('health.live');
