@@ -129,6 +129,12 @@ class MigrationCollectionManifestTests(unittest.TestCase):
                         self.assertEqual(
                             row["collection_status"], "external_evidence_required"
                         )
+                    if row["collection_method"] in {"operator", "independent"}:
+                        # Manual and independently measured acceptance is not
+                        # masquerading as a vendor API response.
+                        self.assertIsNone(row["api_field"])
+                        self.assertIsNone(row["api_family"])
+                        self.assertTrue(row["owner_evidence_field"])
                 self.assertGreaterEqual(phases["source"], 35)
                 self.assertGreaterEqual(phases["target"], 14)
                 self.assertGreaterEqual(phases["owner"], 23)
