@@ -18,6 +18,15 @@ def bind_migration(
         ):
             raise Rejected("migration_profile_stale", 409)
     observed = {sha(d["native_sha256"]): d for d in inputs["disks"]}
+    disk_keys = {integer(d["key"]) for d in inputs["disks"]}
+    if len(observed) != len(inputs["disks"]) or len(disk_keys) != len(observed):
+        raise Rejected("migration_disk_identity_ambiguous", 422)
+    dataset_ids = [identifier(d["id"]) for d in inputs["datasets"]]
+    if len(set(dataset_ids)) != len(dataset_ids) or any(
+        not dataset["disk_keys"] or set(dataset["disk_keys"]) - disk_keys
+        for dataset in inputs["datasets"]
+    ):
+        raise Rejected("migration_datasets_incomplete", 422)
     if not isinstance(mapping, list) or len(mapping) != len(observed) or not mapping:
         raise Rejected("migration_disks_incomplete", 422)
     seen, targets, disks = set(), set(), []
