@@ -199,6 +199,31 @@ def test_native_facts_and_incomplete_disks_cannot_be_manually_accepted() -> None
             review_input(body, source)
 
 
+def test_mandatory_console_owner_fields_enforced_by_inventory_not_only_vue() -> None:
+    source = profile(1000)
+    for field in OWNER_FIELDS:
+        document = review(uid(), uid())
+        document["owner_inputs"][field] = ""
+        if field == "delta_protocol":
+            # Cold-export does not require an invented delta protocol.
+            review_input(document, source)
+            document["method"] = "VM_SNAPSHOT_BASELINE_APP_DELTA"
+        with pytest.raises(Rejected):
+            review_input(document, source)
+    for mutation in ("dataset_mapping", "owner_approval", "outage", "data_loss"):
+        document = review(uid(), uid())
+        if mutation == "dataset_mapping":
+            document["datasets"][0]["disk_keys"] = []
+        elif mutation == "owner_approval":
+            document["objectives"]["acceptance_sha256"] = ""
+        elif mutation == "outage":
+            document["objectives"]["max_outage_seconds"] = -1
+        else:
+            document["objectives"]["max_data_loss_bytes"] = -1
+        with pytest.raises(Rejected):
+            review_input(document, source)
+
+
 def test_profile_collection_charges_each_read_and_denies_replay_and_revocation(
     campaign: Campaign,
 ) -> None:
