@@ -285,9 +285,9 @@ def test_native_json_clients_reject_incomplete_or_ambiguous_replies(
 ) -> None:
     from dataclasses import replace
 
-    from lifecycle_worker.infrastructure.migration_protocol import OwnerProtocolClient
     from lifecycle_worker.infrastructure.native_authority import LifecycleNativeBoundary
-    from lifecycle_worker.infrastructure.native_copy import NativeJson
+    from lifecycle_worker.infrastructure.native_json import NativeJson
+    from lifecycle_worker.infrastructure.owner_protocol import OwnerProtocolClient
     from lifecycle_worker.infrastructure.platform_api import PlatformHttp
 
     reads, fixture = native_tls

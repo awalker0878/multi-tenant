@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import Any
 
 from inventory_worker.infrastructure.native import CollectionFailure, exchange, secret
-from inventory_worker.infrastructure.workload_profile import fingerprint
+from inventory_worker.infrastructure.profile_digest import fingerprint
 
 # Independently versioned namespaces. No SDK negotiation or fallback to legacy APIs.
 VERSIONS = dict.fromkeys(("vmm", "prism", "clustermgmt", "networking", "microseg"), "v4.3")

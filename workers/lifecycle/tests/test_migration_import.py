@@ -12,8 +12,8 @@ from test_native import binding as binding
 from test_native_copy import copy_campaign as copy_campaign
 
 from lifecycle_worker.application.native import NativeHeld, digest
-from lifecycle_worker.infrastructure.migration_import import MigrationImport
-from lifecycle_worker.infrastructure.native_copy import NativeVmCopy
+from lifecycle_worker.infrastructure.openstack_image_import import OpenStackImageImport
+from lifecycle_worker.infrastructure.vmware_glance_copy import NativeVmCopy
 
 
 @pytest.mark.parametrize("version", [1, 2])
@@ -68,7 +68,7 @@ def test_retained_image_import_exact_method_and_custody(
     plan_file.write_text(json.dumps(p))
     bound = replace(b, operation_plan_sha256=digest(p))
     journal.claim(bound)
-    adapter = MigrationImport(plan_file, old.destination, journal, Custody(), old.spool)
+    adapter = OpenStackImageImport(plan_file, old.destination, journal, Custody(), old.spool)
     if fault == "digest":
         receipt["sha256"] = "a" * 64
     if fault == "format":

@@ -23,9 +23,9 @@ from lifecycle_worker.application.native import (
     sha256,
 )
 from lifecycle_worker.infrastructure.migration_budget import seconds
-from lifecycle_worker.infrastructure.native_copy import VmwareExport
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.vmware_capture import NICS, devices, moref
+from lifecycle_worker.infrastructure.vmware_export import VmwareExport
 
 OVF = "{http://schemas.dmtf.org/ovf/envelope/1}"
 
@@ -99,7 +99,7 @@ class RateBound:
         return self.stream.seek(offset, whence)
 
 
-class MigrationArchive:
+class VmwareExportArchive:
     def __init__(
         self,
         plan_file: Path,

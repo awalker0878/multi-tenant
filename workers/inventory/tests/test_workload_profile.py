@@ -7,11 +7,8 @@ from uuid import uuid4
 import pytest
 
 from inventory_worker.infrastructure.native import CollectionFailure
-from inventory_worker.infrastructure.workload_profile import (
-    VmwareWorkloadDiscovery,
-    fingerprint,
-    normalize,
-)
+from inventory_worker.infrastructure.profile_digest import fingerprint
+from inventory_worker.infrastructure.vmware_workload import VmwareWorkloadDiscovery, normalize
 
 
 def records() -> dict[str, Any]:
@@ -118,7 +115,7 @@ def test_source_scope_and_configuration_change_are_denied() -> None:
 
 
 def test_target_formats_and_import_routes_are_observed_not_inferred() -> None:
-    from inventory_worker.infrastructure.workload_profile import target_profile
+    from inventory_worker.infrastructure.openstack_capabilities import target_profile
 
     r: dict[str, Any] = {
         "image_schema": {"properties": {"disk_format": {"enum": ["raw", "qcow2"]}}},

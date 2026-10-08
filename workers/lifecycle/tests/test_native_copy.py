@@ -23,15 +23,12 @@ from lifecycle_worker.application.native import (
     NativeHeld,
     digest,
 )
-from lifecycle_worker.infrastructure.native_copy import (
-    GlanceImport,
-    GlanceReadback,
-    NativeJson,
-    NativeVmCopy,
-    VmwareExport,
-)
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint
+from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites
+from lifecycle_worker.infrastructure.openstack_image_transport import GlanceImport, GlanceReadback
+from lifecycle_worker.infrastructure.vmware_export import VmwareExport
+from lifecycle_worker.infrastructure.vmware_glance_copy import NativeVmCopy
 
 
 @pytest.fixture

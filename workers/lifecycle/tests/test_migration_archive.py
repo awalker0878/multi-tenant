@@ -13,8 +13,12 @@ from test_native_copy import copy_campaign as copy_campaign
 from test_vmware_capture import config
 
 from lifecycle_worker.application.native import NativeBinding, NativeHeld, digest
-from lifecycle_worker.infrastructure.migration_archive import MigrationArchive, validate_descriptor
-from lifecycle_worker.infrastructure.native_copy import DownloadSink, NativeVmCopy, VmwareExport
+from lifecycle_worker.infrastructure.vmware_export import DownloadSink, VmwareExport
+from lifecycle_worker.infrastructure.vmware_export_archive import (
+    VmwareExportArchive,
+    validate_descriptor,
+)
+from lifecycle_worker.infrastructure.vmware_glance_copy import NativeVmCopy
 
 
 def ovf(size: int) -> str:
@@ -118,7 +122,7 @@ class Source(VmwareExport):
 @pytest.fixture
 def archive(
     binding: NativeBinding, tmp_path: Path
-) -> tuple[NativeBinding, MigrationArchive, Source, Journal]:
+) -> tuple[NativeBinding, VmwareExportArchive, Source, Journal]:
     source = Source()
 
     class Custody:
@@ -152,7 +156,7 @@ def archive(
     b = replace(binding, operation_plan_sha256=digest(p))
     journal = Journal()
     journal.claim(b)
-    return b, MigrationArchive(plan_file, source, journal, Custody(), spool), source, journal
+    return b, VmwareExportArchive(plan_file, source, journal, Custody(), spool), source, journal
 
 
 def test_descriptor_precedes_completion_and_archive_is_retained(archive: Any) -> None:
@@ -245,7 +249,7 @@ def test_retained_archive_over_real_tls(
     plan_file.write_text(json.dumps(p))
     bound = replace(b, operation_plan_sha256=digest(p))
     journal.claim(bound)
-    tool = MigrationArchive(plan_file, old.source, journal, Custody(), old.spool)
+    tool = VmwareExportArchive(plan_file, old.source, journal, Custody(), old.spool)
     tool.execute(bound, lambda: None)
     assert (old.spool / bound.operation_id / "machine.ovf").is_file()
     paths = [r["path"].rsplit("/", 1)[-1] for r in fixture["calls"]]

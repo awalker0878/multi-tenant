@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 from test_workload_profile import records
 
-from inventory_worker.infrastructure import workload_profile
+from inventory_worker.infrastructure import vmware_workload
 from inventory_worker.infrastructure.native import CollectionFailure, collect
 from inventory_worker.infrastructure.profile_collection import collect_profile
 
@@ -33,8 +33,8 @@ def test_revocation_between_vi_reads_stops_the_native_sequence(
         if len(requests) == 2:
             raise CollectionFailure("permission_denied")
 
-    monkeypatch.setattr(workload_profile, "exchange", exchange)
-    monkeypatch.setattr(workload_profile, "secret", lambda _: "fixture")
+    monkeypatch.setattr(vmware_workload, "exchange", exchange)
+    monkeypatch.setattr(vmware_workload, "secret", lambda _: "fixture")
     stream = {
         "kind": "source_profile",
         "vm_ids": ["vm-1"],

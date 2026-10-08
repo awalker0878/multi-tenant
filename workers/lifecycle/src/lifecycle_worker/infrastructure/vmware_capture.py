@@ -19,8 +19,8 @@ from lifecycle_worker.application.native import (
     digest,
     identity,
 )
-from lifecycle_worker.infrastructure.native_copy import NativeJson
 from lifecycle_worker.infrastructure.native_files import protected_read
+from lifecycle_worker.infrastructure.native_json import NativeJson
 
 NICS = {
     "VirtualE1000",

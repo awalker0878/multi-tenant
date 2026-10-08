@@ -6,7 +6,8 @@ from typing import Any
 
 from inventory_worker.infrastructure.generated_configuration_streams import configuration_streams
 from inventory_worker.infrastructure.native import CollectionFailure, exchange, secret
-from inventory_worker.infrastructure.workload_profile import VmwareWorkloadDiscovery, target_profile
+from inventory_worker.infrastructure.openstack_capabilities import target_profile
+from inventory_worker.infrastructure.vmware_workload import VmwareWorkloadDiscovery
 
 
 def collect_profile(

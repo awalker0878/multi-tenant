@@ -22,11 +22,11 @@ from lifecycle_worker.application.native import (
 from lifecycle_worker.infrastructure.image_conversion import file_digest
 from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.migration_conversion import ArtifactCustody
-from lifecycle_worker.infrastructure.native_copy import GlanceImport
 from lifecycle_worker.infrastructure.native_files import protected_read
+from lifecycle_worker.infrastructure.openstack_image_transport import GlanceImport
 
 
-class MigrationImport:
+class OpenStackImageImport:
     def __init__(
         self,
         plan_file: Path,

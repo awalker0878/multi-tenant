@@ -21,30 +21,25 @@ from lifecycle_worker.application.native import (
 )
 from lifecycle_worker.infrastructure.extension_trust import ExtensionTrust
 from lifecycle_worker.infrastructure.image_conversion import CopyConverter, PinnedQemuSandbox
-from lifecycle_worker.infrastructure.migration_archive import MigrationArchive
 from lifecycle_worker.infrastructure.migration_conversion import MigrationConversion
-from lifecycle_worker.infrastructure.migration_import import MigrationImport
-from lifecycle_worker.infrastructure.migration_protocol import (
-    OwnerProtocolClient,
-    OwnerProtocolEffect,
-    OwnerProtocolObserver,
-    distinct_owner_credentials,
-)
-from lifecycle_worker.infrastructure.native_copy import (
-    GlanceImport,
-    GlanceReadback,
-    NativeJson,
-    VmwareExport,
-)
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint
 from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
+from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.native_runtime import (
     MountedNativeRuntime,
     endpoints,
     independent_openstack,
 )
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites
+from lifecycle_worker.infrastructure.openstack_image_import import OpenStackImageImport
+from lifecycle_worker.infrastructure.openstack_image_transport import GlanceImport, GlanceReadback
+from lifecycle_worker.infrastructure.owner_protocol import (
+    OwnerProtocolClient,
+    OwnerProtocolEffect,
+    OwnerProtocolObserver,
+    distinct_owner_credentials,
+)
 from lifecycle_worker.infrastructure.platform_api import (
     PlatformApi,
     PlatformHttp,
@@ -52,6 +47,8 @@ from lifecycle_worker.infrastructure.platform_api import (
     distinct_credentials,
 )
 from lifecycle_worker.infrastructure.vmware_capture import VmwareCapture
+from lifecycle_worker.infrastructure.vmware_export import VmwareExport
+from lifecycle_worker.infrastructure.vmware_export_archive import VmwareExportArchive
 
 
 def endpoint(value: Any) -> NativeEndpoint:
@@ -214,7 +211,7 @@ class MountedMigrationRuntime:
                 NativeJson(endpoint(config["source"]), "vmware-api-session-id"),
                 {k: endpoint(v) for k, v in config["nfc"].items()},
             )
-            adapter = MigrationArchive(
+            adapter = VmwareExportArchive(
                 path, source, self.journal, self.journal, Path(config["spool"])
             )
         elif kind == "migration_copy_conversion" and set(config) == {"converter", "spool"}:
@@ -260,7 +257,7 @@ class MountedMigrationRuntime:
             observer = GlanceReadback(
                 independent, plan, self.journal, writer["user_id"], self.clock
             )
-            adapter = MigrationImport(
+            adapter = OpenStackImageImport(
                 path, destination, self.journal, self.journal, Path(config["spool"])
             )
             if entry["observer"] is not None:

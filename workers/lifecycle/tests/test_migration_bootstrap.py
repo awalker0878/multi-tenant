@@ -21,13 +21,13 @@ from lifecycle_worker.infrastructure.migration_bootstrap import (
     MountedMigrationRuntime,
     MountedNativeCallers,
 )
-from lifecycle_worker.infrastructure.migration_protocol import (
+from lifecycle_worker.infrastructure.native_http import NativeReads
+from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
+from lifecycle_worker.infrastructure.owner_protocol import (
     OwnerProtocolClient,
     OwnerProtocolEffect,
     OwnerProtocolObserver,
 )
-from lifecycle_worker.infrastructure.native_http import NativeReads
-from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
 from lifecycle_worker.infrastructure.vmware_capture import VmwareCapture
 
 

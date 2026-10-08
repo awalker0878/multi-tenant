@@ -12,7 +12,7 @@ from test_native import Journal
 from test_native import binding as binding
 
 from lifecycle_worker.application.native import NativeBinding, NativeHeld, digest
-from lifecycle_worker.infrastructure.native_copy import NativeJson
+from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.vmware_capture import VmwareCapture, disk_inventory, reference
 
 

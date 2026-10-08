@@ -22,9 +22,9 @@ from lifecycle_worker.application.native import (
     native_identity,
 )
 from lifecycle_worker.infrastructure.migration_bootstrap import endpoint
-from lifecycle_worker.infrastructure.native_copy import NativeJson
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeReads
+from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.native_runtime import endpoints
 
 ROLES = {"collector", "writer", "observer"}
