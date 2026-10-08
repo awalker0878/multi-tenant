@@ -17,12 +17,14 @@ class PoolSnapshots(Protocol):
 
 def vector(value: dict[str, Any]) -> dict[str, int]:
     kinds = {"vcpus", "memory_mib", "storage_gib", "addresses"}
-    if not kinds <= set(value) or any(
-        k not in kinds and not re.fullmatch(
-            r"storage_gib:[^:]{1,64}|addresses:[^:]{1,64}:(?:ipv4|ipv6)", k
-        ) for k in value
-    ) or any(
-        type(v) is not int or v < 0 or v > 2**53 - 1 for v in value.values()
+    if (
+        not kinds <= set(value)
+        or any(
+            k not in kinds
+            and not re.fullmatch(r"storage_gib:[^:]{1,64}|addresses:[^:]{1,64}:(?:ipv4|ipv6)", k)
+            for k in value
+        )
+        or any(type(v) is not int or v < 0 or v > 2**53 - 1 for v in value.values())
     ):
         raise Held("placement_vector_invalid")
     return dict(value)
@@ -34,9 +36,7 @@ class PlacementReservations:
     ) -> None:
         self.database, self.snapshots, self.clock = database, snapshots, clock
 
-    def event(
-        self, tx: Transaction, identity: str, state: str, facts: dict[str, Any]
-    ) -> None:
+    def event(self, tx: Transaction, identity: str, state: str, facts: dict[str, Any]) -> None:
         tx.execute(
             "INSERT INTO app.placement_events(id,reservation,state,facts,occurred_at) "
             "VALUES(%s,%s,%s,%s::jsonb,%s)",
@@ -123,8 +123,15 @@ class PlacementReservations:
             tx.execute(
                 "INSERT INTO app.placement_reservations(id,tenant,plan_digest,request_digest,"
                 "request,state,expires_at,revision) VALUES(%s,%s,%s,%s,%s::jsonb,%s,%s,1)",
-                (identity, tenant, request["plan_digest"], request_digest, json.dumps(request),
-                 state, self.clock() + 300),
+                (
+                    identity,
+                    tenant,
+                    request["plan_digest"],
+                    request_digest,
+                    json.dumps(request),
+                    state,
+                    self.clock() + 300,
+                ),
             )
             if state == "reserved":
                 for pool_id, values in demand.items():
@@ -228,8 +235,12 @@ class PlacementReservations:
             raise Held("placement_provider_allocation_changed")
         if operation == "confirm" and observed["in_use"] is not True:
             raise Held("placement_provider_allocation_required")
-        state = "released" if operation == "release" else (
-            "confirmed" if operation == "confirm" or observed["in_use"] is True else "reserved"
+        state = (
+            "released"
+            if operation == "release"
+            else (
+                "confirmed" if operation == "confirm" or observed["in_use"] is True else "reserved"
+            )
         )
         with self.database.transaction() as tx:
             tx.execute("SELECT pg_advisory_xact_lock(7503016)")
