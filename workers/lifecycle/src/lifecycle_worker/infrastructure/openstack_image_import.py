@@ -4,7 +4,7 @@ Cinder/Nova consume the planned image UUIDs through the existing OpenStack creat
 adapter. This adapter does not change route when image staging/import fails.
 """
 
-MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
+
 
 import time
 from collections.abc import Callable
@@ -26,6 +26,9 @@ from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.openstack_image_transport import GlanceImport
+
+
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
 
 
 class OpenStackImageImport:
