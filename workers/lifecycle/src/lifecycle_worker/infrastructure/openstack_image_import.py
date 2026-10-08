@@ -1,5 +1,7 @@
 """Explicit Glance-direct import from this job's completed conversion receipts.
 
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
+
 Cinder/Nova consume the planned image UUIDs through the existing OpenStack create
 adapter. This adapter does not change route when image staging/import fails.
 """
