@@ -65,3 +65,33 @@ it('rejects merely successful HTTP replies and accepts only the exact durable in
         unlink($token);
     }
 });
+
+
+it('rejects use of reviewer credentials for downstream invalidation publication', function (): void {
+    $ca = tempnam(sys_get_temp_dir(), 'authority-ca-');
+    $token = tempnam(sys_get_temp_dir(), 'authority-token-');
+    try {
+        file_put_contents($ca, 'fixture-ca');
+        file_put_contents($token, str_repeat('q', 64));
+        config([
+            'planning.qualification_invalidation_url' => 'https://receiving.test/internal/qualification-events',
+            'planning.qualification_invalidation_ca_file' => $ca,
+            'planning.qualification_invalidation_credential_file' => $token,
+            'planning.qualification_reviewer_credential_file' => $token,
+        ]);
+        Http::fake();
+        $event = [
+            'event_id' => '10000000-0000-4000-8000-000000000001',
+            'tenant_id' => '10000000-0000-4000-8000-000000000002',
+            'scope_sha256' => str_repeat('a', 64),
+            'authority_epoch' => 1,
+            'event_sha256' => str_repeat('b', 64),
+        ];
+        expect(fn () => (new ConfirmedHttpInvalidationPublisher(new MountedSecret))->publish($event))
+            ->toThrow(\RuntimeException::class, 'qualification_invalidation_authority_not_independent');
+        Http::assertNothingSent();
+    } finally {
+        unlink($ca);
+        unlink($token);
+    }
+});
