@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 import type { Candidate, Endpoint, PlanningRecord } from '../../features/planning/contracts';
@@ -10,6 +10,13 @@ const query=`?sites=${props.sites.join(',')}`;
 const kind=props.record?.binding?'plans':'assessments';
 const {validity,now,unavailable}=usePlanningAccess(props.record?`${base}/${kind}/${props.record.id}/status${query}`:null,props.record?.validity);
 const rows=ref([{site:'',endpoint:'',endpoints:[] as Endpoint[]},{site:'',endpoint:'',endpoints:[] as Endpoint[]}]);
+const destinationRequests = new Map<number, AbortController>();
+function resetDestination(index: number) {
+  destinationRequests.get(index)?.abort();
+  destinationRequests.delete(index);
+  rows.value[index].endpoints = []; rows.value[index].endpoint = '';
+}
+onUnmounted(() => { for (const request of destinationRequests.values()) request.abort(); });
 const selectionError=ref('');
 const action=ref('application.provision');const method=ref('native_api');const executor=ref('');const lane=ref('operational');const compare=ref('');
 type CommandBody = {revision_id?:string;action?:string;method?:string;candidates?:{site_id:string;endpoint_id:string;generation_id:string}[];assessment_id?:string;candidate?:number;request?:{action:string;method:string;lane:string;executor_ids:string[];valid_until:number};plan_id?:string;plan_digest?:string;other_plan_id?:string};
@@ -20,12 +27,17 @@ const blocked=computed(()=>command.processing || unavailable.value || uncertain.
 const canApprove=computed(()=>props.record?.content?.execution_ready && validity.value?.current && props.record.content.valid_until>now.value && props.record.content.input_fresh_until>now.value && !blocked.value);
 async function load(index:number) {
   selectionError.value='';
-  const row=rows.value[index];row.endpoints=[];row.endpoint='';
+  resetDestination(index);
+  const row=rows.value[index], site=row.site, controller=new AbortController();
+  destinationRequests.set(index, controller);
+  const deadline=setTimeout(()=>controller.abort(),12000);
   try {
-    const response=await fetch(`${base}/destinations/${row.site}`,{headers:{Accept:'application/json'},cache:'no-store',redirect:'manual'});
+    const response=await fetch(`${base}/destinations/${site}`,{headers:{Accept:'application/json'},cache:'no-store',redirect:'manual',signal:controller.signal});
     if(!response.ok || !response.headers.get('Content-Type')?.includes('application/json'))throw new Error();
-    row.endpoints=(await response.json() as {items:Endpoint[]}).items;
-  }catch{selectionError.value='This site is unavailable or outside your current access.';}
+    const result=await response.json() as {items:Endpoint[]};
+    if(!controller.signal.aborted && row.site===site && destinationRequests.get(index)===controller)row.endpoints=result.items;
+  }catch{if(destinationRequests.get(index)===controller)selectionError.value='This site is unavailable or outside your current access.';}
+  finally{clearTimeout(deadline);if(destinationRequests.get(index)===controller)destinationRequests.delete(index);}
 }
 function send(operation:string, body:CommandBody, sites:string[]) {
   if(blocked.value)return;
@@ -52,7 +64,7 @@ function compile(index:number){if(!props.record)return;send('plans',{assessment_
     <fieldset :disabled="blocked"><legend class="text-xl font-semibold">Compare collected destinations</legend>
       <div class="grid gap-5 md:grid-cols-2"><section v-for="(row,index) in rows" :key="index" class="mt-4 rounded-xl border border-slate-300 p-5">
         <h2 class="font-semibold">Destination {{index+1}}{{index===1?' (optional)':''}}</h2>
-        <label :for="`site-${index}`">Approved site ID<input :id="`site-${index}`" v-model="row.site" maxlength="36" :required="index===0" /></label>
+        <label :for="`site-${index}`">Approved site ID<input :id="`site-${index}`" v-model="row.site" maxlength="36" :required="index===0" @input="resetDestination(index)" /></label>
         <button type="button" class="secondary" @click="load(index)">Load collected endpoints</button>
         <label :for="`endpoint-${index}`">Endpoint<select :id="`endpoint-${index}`" v-model="row.endpoint" :required="index===0"><option value="">Choose a collected endpoint</option><option v-for="e in row.endpoints" :key="e.endpoint_id" :value="e.endpoint_id" :disabled="!e.generation_id">{{e.label}} · {{e.platform}} · {{e.reason??'current collection'}}</option></select></label>
       </section></div>
