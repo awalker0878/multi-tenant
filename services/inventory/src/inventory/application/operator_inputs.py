@@ -1,17 +1,111 @@
 """Persist attributable operator inputs without granting execution or review authority."""
 
+from collections.abc import Callable
 from typing import Any
 
 from inventory.application.configuration import PortingConfiguration
 from inventory.application.discovery import Discovery
 from inventory.domain.discovery import Actor, Rejected, canonical, digest, identifier, shape
 from inventory.domain.operator_inputs import FIELDS, GROUPS, missing_fields, validate_values
+from inventory.domain.readiness import (
+    METHODS,
+    OPERATIONS,
+    check_fields,
+    requirements,
+    validate_context,
+)
 
 
 class OperatorInputs:
-    def __init__(self, discovery: Discovery) -> None:
+    def __init__(
+        self, discovery: Discovery, evidence: Callable[..., dict[str, Any]] | None = None
+    ) -> None:
         self.discovery = discovery
         self.configuration = PortingConfiguration(discovery)
+        self.evidence = evidence
+
+    def readiness(self, actor: Actor) -> dict[str, Any]:
+        self.configuration.authorize(actor)
+        view = self.read(actor)
+        record, config = view["record"], view["configuration"]
+        context = None
+        platforms: dict[str, str | None] = {"source": None, "target": None}
+        with self.discovery.database.transaction() as tx:
+            if record:
+                row = tx.one(
+                    "SELECT payload FROM inventory.operator_input_revisions "
+                    "WHERE tenant=%s AND site=%s AND revision=%s",
+                    (actor.tenant, actor.site, record["revision"]),
+                )
+                assert row is not None
+                context = row["payload"].get("context")
+            if config:
+                for side in platforms:
+                    endpoint = config[side + "_endpoint"]
+                    if endpoint:
+                        platforms[side] = self.discovery.endpoint(tx, actor, endpoint)["platform"]
+        fields = requirements(context, platforms["source"], platforms["target"])
+        values = record["values"] if record else {}
+        evidence = (
+            self.evidence(
+                actor.tenant,
+                actor.site,
+                record["digest"],
+                record["configuration_digest"],
+                values,
+                self.discovery.clock(),
+            )
+            if record and self.evidence
+            else {}
+        )
+        stale = bool(record) and (
+            "environment_review_changed" in view["holds"]
+            or "environment_review_required" in view["holds"]
+        )
+        checks = check_fields(fields, values, evidence, stale)
+        holds = [h for h in view["holds"] if h != "required_operator_inputs_missing"]
+        if context is None:
+            holds.append("readiness_context_required")
+        if context and context["operation"] == "migrate" and not platforms["source"]:
+            holds.append("source_environment_required")
+        if context and context["operation"] != "discover" and not platforms["target"]:
+            holds.append("destination_environment_required")
+        missing = [c["field_id"] for c in checks if c["state"] == "missing"]
+        if missing:
+            holds.append("required_operator_inputs_missing")
+        unresolved = [c for c in checks if c["state"] not in {"verified", "not_applicable"}]
+        if unresolved:
+            holds.append("owner_verification_required")
+        return {
+            **view,
+            "fields": fields,
+            "context": context,
+            "operations": OPERATIONS,
+            "methods": METHODS,
+            "platforms": platforms,
+            "checks": checks,
+            "contexts": [
+                {
+                    "operation": operation["id"],
+                    "method": method,
+                    "required_fields": [
+                        field["id"]
+                        for field in requirements(
+                            {"operation": operation["id"], "method": method},
+                            platforms["source"],
+                            platforms["target"],
+                        )
+                        if field["required"]
+                    ],
+                }
+                for operation in OPERATIONS
+                for method in (METHODS if operation["id"] == "migrate" else [None])
+            ],
+            "missing_fields": missing,
+            "holds": holds,
+            "collection_complete": bool(record and context) and not missing and not stale,
+            "evidence_current": bool(record and context) and not holds,
+        }
 
     def read(self, actor: Actor) -> dict[str, Any]:
         self.configuration.authorize(actor)
@@ -76,9 +170,18 @@ class OperatorInputs:
     ) -> dict[str, Any]:
         self.configuration.authorize(actor)
         identifier(key)
-        if operation != "operator_inputs_save" or target is not None:
+        if (
+            operation not in {"operator_inputs_save", "operator_readiness_save"}
+            or target is not None
+        ):
             raise Rejected("invalid_operation")
-        shape(body, {"values", "configuration_digest"})
+        shape(
+            body,
+            {"values", "configuration_digest"}
+            | ({"context"} if operation == "operator_readiness_save" else set()),
+        )
+        if operation == "operator_readiness_save":
+            validate_context(body["context"])
         validate_values(body["values"])
         bound = digest([operation, actor.site, expected, body])
         d = self.discovery

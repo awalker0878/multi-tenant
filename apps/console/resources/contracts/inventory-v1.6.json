@@ -1,0 +1,6989 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Inventory read-only commissioning and observations",
+    "version": "1.6.0",
+    "description": "Inventory observations and API-first porting configuration review. Administrator interpretation never grants native authority. Adds immutable site-scoped operator input packets without changing existing contracts."
+  },
+  "paths": {
+    "/v1/tenants/{tenant}/sites": {
+      "get": {
+        "operationId": "listSites",
+        "x-inventory-action": "inventory.read",
+        "x-response-schema": "SiteList",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/policies": {
+      "get": {
+        "operationId": "listPolicies",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PolicyList",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints": {
+      "get": {
+        "operationId": "listEndpoints",
+        "x-inventory-action": "inventory.read",
+        "x-response-schema": "EndpointList",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndpointList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "enrollEndpoint",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "EndpointCommand",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndpointCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Enroll"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/health": {
+      "get": {
+        "operationId": "siteHealth",
+        "x-inventory-action": "inventory.read",
+        "x-response-schema": "Health",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/discoveries": {
+      "get": {
+        "operationId": "listDiscoveries",
+        "x-inventory-action": "inventory.read",
+        "x-response-schema": "DiscoveryList",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "requestDiscovery",
+        "x-inventory-action": "inventory.discover",
+        "x-response-schema": "DiscoveryCommand",
+        "x-status": 202,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/generations/{generation}/resources": {
+      "get": {
+        "operationId": "listResources",
+        "x-inventory-action": "inventory.read",
+        "x-response-schema": "ResourceList",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "generation",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/renewals": {
+      "post": {
+        "operationId": "renewEndpoint",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "EndpointCommand",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]{0,8}\"$"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndpointCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/revocation": {
+      "post": {
+        "operationId": "revokeEndpoint",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "EndpointCommand",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]{0,8}\"$"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndpointCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/matches": {
+      "post": {
+        "operationId": "proposeMatch",
+        "x-inventory-action": "inventory.match",
+        "x-response-schema": "MatchCommand",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Match"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/porting-configuration": {
+      "get": {
+        "operationId": "getPortingConfiguration",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PortingWorkspace",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortingWorkspace"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "savePortingConfiguration",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PortingResult",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 11
+            },
+            "description": "Quoted current revision; required when a saved configuration exists."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortingResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortingInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/porting-configuration/confirmations": {
+      "post": {
+        "operationId": "confirmPortingConfiguration",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PortingResult",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 11
+            },
+            "description": "Quoted current revision; required when a saved configuration exists."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortingResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortingConfirm"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/configuration-pulls": {
+      "post": {
+        "operationId": "pullPortingConfiguration",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "DiscoveryCommand",
+        "x-status": 202,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/migration-review": {
+      "get": {
+        "operationId": "getMigrationReview",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "MigrationWorkspace",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationWorkspace"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "getMigrationReview"
+      },
+      "post": {
+        "operationId": "saveMigrationReview",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PortingResult",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 11
+            },
+            "description": "Quoted current revision; required when a saved configuration exists."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortingResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationReviewInput"
+              }
+            }
+          }
+        },
+        "summary": "saveMigrationReview"
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/migration-review/confirmations": {
+      "post": {
+        "operationId": "confirmMigrationReview",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PortingResult",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 11
+            },
+            "description": "Quoted current revision; required when a saved configuration exists."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortingResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortingConfirm"
+              }
+            }
+          }
+        },
+        "summary": "confirmMigrationReview"
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/migration-inventory": {
+      "get": {
+        "operationId": "getMigrationFleet",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "MigrationFleet",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationFleet"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "getMigrationReview"
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/migration-groups": {
+      "post": {
+        "operationId": "createMigrationGroup",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "MigrationGroupResult",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 11
+            },
+            "description": "Quoted current revision; required when a saved configuration exists."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationGroupResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationGroupInput"
+              }
+            }
+          }
+        },
+        "summary": "saveMigrationReview"
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/migration-groups/{group}": {
+      "post": {
+        "operationId": "updateMigrationGroup",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "MigrationGroupResult",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 11
+            },
+            "description": "Quoted current revision; required when a saved configuration exists."
+          },
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationGroupResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationGroupInput"
+              }
+            }
+          }
+        },
+        "summary": "saveMigrationReview"
+      },
+      "get": {
+        "operationId": "getMigrationGroup",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "MigrationGroupDetail",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationGroupDetail"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "getMigrationReview"
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/migration-reviews/{profile}": {
+      "get": {
+        "operationId": "getVmMigrationReview",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "MigrationWorkspace",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "profile",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationWorkspace"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "getMigrationReview"
+      },
+      "post": {
+        "operationId": "saveVmMigrationReview",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PortingResult",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 11
+            },
+            "description": "Quoted current revision; required when a saved configuration exists."
+          },
+          {
+            "name": "profile",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortingResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationReviewInput"
+              }
+            }
+          }
+        },
+        "summary": "saveMigrationReview"
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/migration-reviews/{profile}/confirmations": {
+      "post": {
+        "operationId": "confirmVmMigrationReview",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PortingResult",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 11
+            },
+            "description": "Quoted current revision; required when a saved configuration exists."
+          },
+          {
+            "name": "profile",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortingResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortingConfirm"
+              }
+            }
+          }
+        },
+        "summary": "confirmMigrationReview"
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/operator-inputs": {
+      "get": {
+        "operationId": "getOperatorInputs",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "OperatorWorkspace",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorWorkspace"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "saveOperatorInputs",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PortingResult",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 11
+            },
+            "description": "Quoted current revision; required when a saved configuration exists."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortingResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/operator-readiness": {
+      "get": {
+        "operationId": "getOperatorReadiness",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "ReadinessWorkspace",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessWorkspace"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "saveOperatorReadiness",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PortingResult",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 11
+            },
+            "description": "Quoted current revision; required when a saved configuration exists."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortingResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadinessInput"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Workload": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "ActorDelegation": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Actor-Delegation"
+      }
+    },
+    "schemas": {
+      "Profile": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "platform",
+          "dimensions",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "platform": {
+            "enum": [
+              "openstack",
+              "vmware",
+              "ahv"
+            ]
+          },
+          "dimensions": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "installed_identity",
+              "compute_placement",
+              "storage_datasets",
+              "network_vpc",
+              "security_edge",
+              "guest_image",
+              "lifecycle_adoption",
+              "mobility",
+              "shared_services",
+              "resilience_operations",
+              "assurance_sovereignty"
+            ],
+            "properties": {
+              "installed_identity": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "compute_placement": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "storage_datasets": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "network_vpc": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "security_edge": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "guest_image": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "lifecycle_adoption": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "mobility": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "shared_services": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "resilience_operations": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "assurance_sovereignty": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              }
+            }
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        }
+      },
+      "Site": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "site_id"
+        ],
+        "properties": {
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "SiteList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Site"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Policy": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "policy_id",
+          "site_id",
+          "owner_id",
+          "platform",
+          "native_scope",
+          "epoch",
+          "profile",
+          "coverage_reference",
+          "policy_digest"
+        ],
+        "properties": {
+          "policy_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "owner_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "platform": {
+            "enum": [
+              "openstack",
+              "vmware",
+              "ahv"
+            ]
+          },
+          "native_scope": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "epoch": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/Profile"
+          },
+          "coverage_reference": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "policy_digest": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      },
+      "PolicyList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Policy"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Endpoint": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "endpoint_id",
+          "site_id",
+          "label",
+          "platform",
+          "native_scope",
+          "revision",
+          "generation_id",
+          "expires_at",
+          "state",
+          "reason",
+          "coverage_reference",
+          "profile",
+          "native_write_authorized",
+          "observed_capacity_reserved"
+        ],
+        "properties": {
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "platform": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "native_scope": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "generation_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "held",
+              "read_only_ready"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coverage_reference": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "profile": {
+            "$ref": "#/components/schemas/Profile"
+          },
+          "native_write_authorized": {
+            "const": false
+          },
+          "observed_capacity_reserved": {
+            "const": false
+          }
+        }
+      },
+      "EndpointList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Endpoint"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Discovery": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "reason",
+          "created_at",
+          "updated_at",
+          "page_count",
+          "failures"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "partial",
+              "complete"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "number"
+          },
+          "updated_at": {
+            "type": "number"
+          },
+          "page_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "failures": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "DiscoveryList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Discovery"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Observation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "native_id",
+          "incarnation",
+          "name",
+          "scope",
+          "facts"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "server",
+              "network",
+              "volume",
+              "datastore"
+            ]
+          },
+          "native_id": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "incarnation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "scope": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "facts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [],
+            "properties": {
+              "power": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "cpu": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "memory_mib": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "size_gib": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "status": {
+                "type": "string",
+                "maxLength": 255
+              }
+            }
+          }
+        }
+      },
+      "Resource": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resource_id",
+          "observation",
+          "collected_at",
+          "expires_at",
+          "holds",
+          "proposed_matches",
+          "ownership",
+          "reserved"
+        ],
+        "properties": {
+          "resource_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/Observation"
+          },
+          "collected_at": {
+            "type": "number"
+          },
+          "expires_at": {
+            "type": "number"
+          },
+          "holds": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            }
+          },
+          "proposed_matches": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ownership": {
+            "const": "observation_only"
+          },
+          "reserved": {
+            "const": false
+          }
+        }
+      },
+      "ResourceList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor",
+          "generation_id",
+          "completion",
+          "reason",
+          "endpoint_id",
+          "policy_digest",
+          "consistency"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Resource"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "generation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "completion": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "policy_digest": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "consistency": {
+            "const": "bounded_observation_window"
+          }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "observed_at"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "count",
+                "last_activity"
+              ],
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "last_activity": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "observed_at": {
+            "type": "number"
+          }
+        }
+      },
+      "EndpointCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "endpoint_id",
+          "revision",
+          "state",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "state": {
+            "enum": [
+              "registered",
+              "revoked"
+            ]
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        }
+      },
+      "DiscoveryCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "discovery_id",
+          "status",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "discovery_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "const": "queued"
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        }
+      },
+      "MatchCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "match_id",
+          "state",
+          "ownership_granted"
+        ],
+        "properties": {
+          "match_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "const": "proposed_unverified"
+          },
+          "ownership_granted": {
+            "const": false
+          }
+        }
+      },
+      "Enroll": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "policy_id",
+          "label"
+        ],
+        "properties": {
+          "policy_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        }
+      },
+      "Empty": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {}
+      },
+      "Match": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resource_id",
+          "application_id",
+          "intent_revision",
+          "generation_id"
+        ],
+        "properties": {
+          "resource_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "application_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "intent_revision": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "generation_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      },
+      "ConfigurationItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "value": {
+                  "type": "string",
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "key",
+                "value"
+              ]
+            },
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "attributes"
+        ]
+      },
+      "ConfigurationQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConfigurationItem"
+            },
+            "maxItems": 1000
+          },
+          "item_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "collected_at": {
+            "type": "number"
+          },
+          "expires_at": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "query",
+          "status",
+          "items",
+          "item_count",
+          "collected_at",
+          "expires_at"
+        ]
+      },
+      "ConfigurationSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "generation_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "digest": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "queries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConfigurationQuery"
+            },
+            "maxItems": 18
+          }
+        },
+        "required": [
+          "endpoint_id",
+          "generation_id",
+          "current",
+          "digest",
+          "queries"
+        ]
+      },
+      "PortingChoice": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "compute",
+              "zones",
+              "volumes",
+              "subnets",
+              "ports",
+              "routers",
+              "security_groups",
+              "trunks",
+              "qos",
+              "port_security",
+              "provider_networks",
+              "image_import",
+              "image_stores",
+              "placement",
+              "load_balancer",
+              "dns",
+              "key_manager",
+              "shared_files",
+              "object_store",
+              "orchestration",
+              "ahv_storage_containers",
+              "ahv_subnets",
+              "ahv_vpcs",
+              "ahv_categories",
+              "ahv_policies"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "interpretation": {
+            "type": "string",
+            "enum": [
+              "observed",
+              "include",
+              "exclude"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 240
+          }
+        },
+        "required": [
+          "id",
+          "required",
+          "interpretation",
+          "reason"
+        ]
+      },
+      "PortingManual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source_distribution": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "target_distribution": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "backend_release_reference": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "support_entitlement_reference": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "ownership_reference": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "network_mapping_reference": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "guest_mapping_reference": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "service_mapping_reference": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "automation_reference": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "backup_reference": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "activation_reference": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "retirement_reference": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "campaign_reference": {
+            "type": "string",
+            "maxLength": 240
+          }
+        },
+        "required": []
+      },
+      "PortingInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source_endpoint": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "target_endpoint": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "manual": {
+            "$ref": "#/components/schemas/PortingManual"
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortingChoice"
+            },
+            "maxItems": 20,
+            "minItems": 5
+          }
+        },
+        "required": [
+          "source_endpoint",
+          "target_endpoint",
+          "manual",
+          "choices"
+        ]
+      },
+      "PortingRevision": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source_endpoint": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "target_endpoint": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "manual": {
+            "$ref": "#/components/schemas/PortingManual"
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortingChoice"
+            },
+            "maxItems": 20,
+            "minItems": 5
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "digest": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "confirmed_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confirmed_at": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confirmation_current": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "source_endpoint",
+          "target_endpoint",
+          "manual",
+          "choices",
+          "revision",
+          "digest",
+          "confirmed_by",
+          "confirmed_at",
+          "confirmation_current"
+        ]
+      },
+      "PortingResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "digest": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "native_write_authorized": {
+            "type": "boolean",
+            "const": false
+          }
+        },
+        "required": [
+          "revision",
+          "digest",
+          "native_write_authorized"
+        ]
+      },
+      "PortingConfirm": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "digest"
+        ]
+      },
+      "PortingWorkspace": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "versions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "release": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "nova_max": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "documentation": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "native_qualification": {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                "source": {
+                  "type": "string",
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "release",
+                "name",
+                "nova_max",
+                "documentation",
+                "native_qualification",
+                "source"
+              ]
+            },
+            "maxItems": 10
+          },
+          "manual_fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "id",
+                "label"
+              ]
+            },
+            "maxItems": 20
+          },
+          "endpoints": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "platform": {
+                  "type": "string",
+                  "enum": [
+                    "openstack",
+                    "vmware",
+                    "ahv"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "label",
+                "platform"
+              ]
+            },
+            "maxItems": 50
+          },
+          "configuration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PortingRevision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConfigurationSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConfigurationSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "query": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "match": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "meaning": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "source_state": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "target_state": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "id",
+                "label",
+                "query",
+                "match",
+                "meaning",
+                "source_state",
+                "target_state"
+              ]
+            },
+            "maxItems": 20
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "maxItems": 10
+          },
+          "native_write_authorized": {
+            "type": "boolean",
+            "const": false
+          },
+          "ahv_capabilities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "query": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "match": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "meaning": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "source_state": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "target_state": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "id",
+                "label",
+                "query",
+                "match",
+                "meaning",
+                "source_state",
+                "target_state"
+              ]
+            },
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "versions",
+          "manual_fields",
+          "endpoints",
+          "configuration",
+          "source",
+          "target",
+          "capabilities",
+          "holds",
+          "native_write_authorized",
+          "ahv_capabilities"
+        ]
+      },
+      "SourceWorkloadProfile": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "instance_uuid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bios_uuid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vcenter_uuid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vcenter_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "native_api_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "power_state": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "guest_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tools_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tools_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "firmware": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_version": {
+            "const": 1
+          },
+          "profile_type": {
+            "const": "SourceWorkloadProfile"
+          },
+          "platform": {
+            "const": "vmware"
+          },
+          "vm_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "api_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "config_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "observations_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "cpu": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "memory_mb": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "disks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "capacity_bytes": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "controller_key": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "unit_number": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "backing_chain": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "type": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 240
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "mode": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 240
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "identity_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "encrypted": {
+                        "type": "boolean"
+                      },
+                      "datastore": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "maxLength": 240
+                              },
+                              "value": {
+                                "type": "string",
+                                "maxLength": 240
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "value"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "sharing": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 240
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "mode",
+                      "identity_sha256",
+                      "encrypted",
+                      "datastore",
+                      "sharing"
+                    ]
+                  },
+                  "maxItems": 32
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "key",
+                "capacity_bytes",
+                "controller_key",
+                "unit_number",
+                "backing_chain",
+                "native_sha256"
+              ]
+            },
+            "maxItems": 32
+          },
+          "nics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "model": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "mac": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 240
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "backing_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "connectable": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "connected": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "startConnected": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "allowGuestControl": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "connected",
+                    "startConnected",
+                    "allowGuestControl"
+                  ]
+                }
+              },
+              "required": [
+                "key",
+                "model",
+                "mac",
+                "backing_sha256",
+                "connectable"
+              ]
+            },
+            "maxItems": 128
+          },
+          "controllers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "model": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "bus": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "sharing": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 240
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "key",
+                "model",
+                "bus",
+                "sharing"
+              ]
+            },
+            "maxItems": 128
+          },
+          "snapshot_tree_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "key_custody_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "required_owner_inputs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 20
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 64
+          },
+          "native_qualification": {
+            "const": "not_established"
+          }
+        },
+        "required": [
+          "instance_uuid",
+          "bios_uuid",
+          "vcenter_uuid",
+          "vcenter_version",
+          "native_api_version",
+          "power_state",
+          "guest_id",
+          "tools_status",
+          "tools_version",
+          "firmware",
+          "schema_version",
+          "profile_type",
+          "platform",
+          "vm_id",
+          "api_version",
+          "config_sha256",
+          "observations_sha256",
+          "observed_at",
+          "cpu",
+          "memory_mb",
+          "disks",
+          "nics",
+          "controllers",
+          "snapshot_tree_sha256",
+          "key_custody_sha256",
+          "required_owner_inputs",
+          "holds",
+          "native_qualification"
+        ]
+      },
+      "TargetCapabilityProfile": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/OpenStackTargetCapabilityProfile"
+          },
+          {
+            "$ref": "#/components/schemas/AhvTargetCapabilityProfile"
+          }
+        ]
+      },
+      "WorkloadProfile": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "generation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "native_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "profile_type": {
+            "enum": [
+              "SourceWorkloadProfile",
+              "TargetCapabilityProfile"
+            ]
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "expires_at": {
+            "type": "number",
+            "minimum": 0
+          },
+          "collected_at": {
+            "type": "number",
+            "minimum": 0
+          },
+          "facts": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceWorkloadProfile"
+              },
+              {
+                "$ref": "#/components/schemas/TargetCapabilityProfile"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "endpoint_id",
+          "generation_id",
+          "native_id",
+          "profile_type",
+          "digest",
+          "current",
+          "expires_at",
+          "collected_at",
+          "facts"
+        ]
+      },
+      "MigrationDataset": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "disk_keys": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "maxItems": 32,
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "mounts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 32,
+            "minItems": 1
+          },
+          "consistency_group": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "validation_reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "disk_keys",
+          "mounts",
+          "consistency_group",
+          "validation_reference"
+        ]
+      },
+      "MigrationObjectives": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "owner_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "acceptance_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "max_outage_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 31536000
+          },
+          "max_data_loss_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "owner_id",
+          "acceptance_sha256",
+          "max_outage_seconds",
+          "max_data_loss_bytes"
+        ]
+      },
+      "MigrationReviewInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source_profile_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target_profile_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "method": {
+            "enum": [
+              "APPLICATION_REBUILD_RESTORE",
+              "VM_SNAPSHOT_BASELINE_APP_DELTA",
+              "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+              "VM_COLD_EXPORT",
+              "EXTERNAL_BLOCK_REPLICATION"
+            ]
+          },
+          "datasets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MigrationDataset"
+            },
+            "maxItems": 256,
+            "minItems": 1
+          },
+          "owner_inputs": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "application_consistency": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "dependencies": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "guest_transformation_profile": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "delta_protocol": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "recovery_protocol": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "service_and_policy_validation": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "writer_fencing": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "retention_and_cleanup": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              }
+            },
+            "required": [
+              "application_consistency",
+              "dependencies",
+              "guest_transformation_profile",
+              "delta_protocol",
+              "recovery_protocol",
+              "service_and_policy_validation",
+              "writer_fencing",
+              "retention_and_cleanup"
+            ]
+          },
+          "objectives": {
+            "$ref": "#/components/schemas/MigrationObjectives"
+          },
+          "overrides": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "field": {
+                  "enum": [
+                    "application_consistency",
+                    "dependencies",
+                    "guest_transformation_profile",
+                    "delta_protocol",
+                    "recovery_protocol",
+                    "service_and_policy_validation",
+                    "writer_fencing",
+                    "retention_and_cleanup"
+                  ]
+                },
+                "interpretation": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "field",
+                "interpretation",
+                "reason"
+              ]
+            },
+            "maxItems": 8
+          },
+          "destination": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AhvDestinationSelection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "source_profile_id",
+          "target_profile_id",
+          "method",
+          "datasets",
+          "owner_inputs",
+          "objectives",
+          "overrides"
+        ]
+      },
+      "MigrationReview": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "input": {
+            "$ref": "#/components/schemas/MigrationReviewInput"
+          },
+          "source": {
+            "$ref": "#/components/schemas/WorkloadProfile"
+          },
+          "target": {
+            "$ref": "#/components/schemas/WorkloadProfile"
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 128
+          },
+          "confirmed_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confirmed_at": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confirmation_current": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "revision",
+          "digest",
+          "input",
+          "source",
+          "target",
+          "holds",
+          "confirmed_by",
+          "confirmed_at",
+          "confirmation_current"
+        ]
+      },
+      "MigrationWorkspace": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "profiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkloadProfile"
+            },
+            "maxItems": 50
+          },
+          "review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MigrationReview"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "methods": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "APPLICATION_REBUILD_RESTORE",
+                "VM_SNAPSHOT_BASELINE_APP_DELTA",
+                "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+                "VM_COLD_EXPORT",
+                "EXTERNAL_BLOCK_REPLICATION"
+              ]
+            },
+            "maxItems": 5
+          },
+          "owner_fields": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "application_consistency",
+                "dependencies",
+                "guest_transformation_profile",
+                "delta_protocol",
+                "recovery_protocol",
+                "service_and_policy_validation",
+                "writer_fencing",
+                "retention_and_cleanup"
+              ]
+            },
+            "maxItems": 8
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        },
+        "required": [
+          "profiles",
+          "review",
+          "methods",
+          "owner_fields",
+          "native_write_authorized"
+        ]
+      },
+      "MigrationCandidate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resource_id",
+          "endpoint_id",
+          "endpoint_label",
+          "native_scope",
+          "native_id",
+          "name",
+          "generation_id",
+          "profile_id",
+          "source_identity_sha256",
+          "power_state",
+          "cpu",
+          "memory_mb",
+          "guest_id",
+          "disk_count",
+          "disk_bytes",
+          "collected_at",
+          "expires_at",
+          "holds",
+          "readiness"
+        ],
+        "properties": {
+          "resource_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "endpoint_label": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "native_scope": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "native_id": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "generation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "profile_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_identity_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "power_state": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cpu": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "memory_mb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "guest_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "disk_count": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "disk_bytes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "collected_at": {
+            "type": "number"
+          },
+          "expires_at": {
+            "type": "number"
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "maxItems": 150
+          },
+          "readiness": {
+            "enum": [
+              "held",
+              "review_required"
+            ]
+          }
+        }
+      },
+      "MigrationTarget": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "native_id",
+          "current",
+          "expires_at",
+          "holds",
+          "disk_formats",
+          "platform"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "native_id": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "expires_at": {
+            "type": "number"
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "maxItems": 150
+          },
+          "disk_formats": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "maxItems": 100
+          },
+          "platform": {
+            "enum": [
+              "openstack",
+              "ahv"
+            ]
+          }
+        }
+      },
+      "MigrationGroupInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "application_id",
+          "environment_id",
+          "target_profile_id",
+          "format",
+          "resource_ids"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "application_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target_profile_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "format": {
+            "enum": [
+              "raw",
+              "qcow2"
+            ]
+          },
+          "resource_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      },
+      "MigrationGroupStored": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "application_id",
+          "environment_id",
+          "target_profile_id",
+          "format",
+          "members"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "application_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target_profile_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "format": {
+            "enum": [
+              "raw",
+              "qcow2"
+            ]
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "resource_id",
+                "source_identity_sha256"
+              ],
+              "properties": {
+                "resource_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "source_identity_sha256": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "maxItems": 50
+          }
+        }
+      },
+      "MigrationGroup": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "revision",
+          "digest",
+          "input"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "input": {
+            "$ref": "#/components/schemas/MigrationGroupStored"
+          }
+        }
+      },
+      "MigrationGroupResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "revision",
+          "digest",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        }
+      },
+      "MigrationFleet": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor",
+          "targets",
+          "groups",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MigrationCandidate"
+            },
+            "maxItems": 50
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "targets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MigrationTarget"
+            },
+            "maxItems": 50
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MigrationGroup"
+            },
+            "maxItems": 100
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        }
+      },
+      "MigrationPreparationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "site_id",
+          "review",
+          "disks"
+        ],
+        "properties": {
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "review": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "revision",
+              "digest"
+            ],
+            "properties": {
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "disks": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "source_disk_sha256",
+                "target_key",
+                "format"
+              ],
+              "properties": {
+                "source_disk_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "target_key": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "format": {
+                  "type": "string",
+                  "enum": [
+                    "raw",
+                    "qcow2",
+                    "vmdk"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "MigrationGroupDetail": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "group",
+          "members",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "group": {
+            "$ref": "#/components/schemas/MigrationGroup"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "candidate",
+                "holds",
+                "preparation"
+              ],
+              "properties": {
+                "candidate": {
+                  "$ref": "#/components/schemas/MigrationCandidate"
+                },
+                "holds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "maxItems": 150
+                },
+                "preparation": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MigrationPreparationRequest"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "maxItems": 50
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        }
+      },
+      "OperatorValues": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source_writer_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "source_observer_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "target_writer_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "target_observer_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "image_writer_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "image_observer_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "account_scope_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "trust_bundle_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "custody_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "worker_fencing_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "reservation_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "guest_recipe_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "service_protocol_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "measurement_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "consistency_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "delta_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "writer_fencing_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "traffic_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "restore_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "recovery_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "retention_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "objectives_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "campaign_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "artifact_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "security_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "alert_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "receiving_team_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "support_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+          },
+          "max_outage_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 604800
+          },
+          "max_data_loss_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "recovery_time_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2592000
+          },
+          "max_active_migrations": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          }
+        },
+        "required": []
+      },
+      "OperatorInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "values": {
+            "$ref": "#/components/schemas/OperatorValues"
+          },
+          "configuration_digest": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "values",
+          "configuration_digest"
+        ]
+      },
+      "OperatorField": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "help": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reference",
+              "integer"
+            ]
+          },
+          "minimum": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "maximum": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "group",
+          "label",
+          "help",
+          "kind",
+          "minimum",
+          "maximum"
+        ]
+      },
+      "OperatorGroup": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "owner",
+          "scope"
+        ]
+      },
+      "OperatorRecord": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "values": {
+            "$ref": "#/components/schemas/OperatorValues"
+          },
+          "configuration_digest": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "saved_at": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "revision",
+          "digest",
+          "values",
+          "configuration_digest",
+          "saved_at"
+        ]
+      },
+      "OperatorConfiguration": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "digest": {
+            "type": "string"
+          },
+          "source_endpoint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target_endpoint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "confirmation_current": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "revision",
+          "digest",
+          "source_endpoint",
+          "target_endpoint",
+          "confirmation_current"
+        ]
+      },
+      "OperatorWorkspace": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenant_id": {
+            "type": "string"
+          },
+          "site_id": {
+            "type": "string"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperatorGroup"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperatorField"
+            }
+          },
+          "record": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OperatorRecord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "configuration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OperatorConfiguration"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "missing_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "collection_complete": {
+            "type": "boolean"
+          },
+          "native_write_authorized": {
+            "type": "boolean",
+            "const": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "site_id",
+          "groups",
+          "fields",
+          "record",
+          "configuration",
+          "missing_fields",
+          "holds",
+          "collection_complete",
+          "native_write_authorized"
+        ]
+      },
+      "OpenStackTargetCapabilityProfile": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": 1
+          },
+          "profile_type": {
+            "const": "TargetCapabilityProfile"
+          },
+          "platform": {
+            "const": "openstack"
+          },
+          "project_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "observations_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "disk_formats": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 30
+          },
+          "image_import_methods": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 30
+          },
+          "flavors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 240
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "vcpus": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "ram": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "disk": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "OS-FLV-EXT-DATA:ephemeral": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "vcpus",
+                "ram",
+                "disk",
+                "OS-FLV-EXT-DATA:ephemeral"
+              ]
+            },
+            "maxItems": 100
+          },
+          "volume_types": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 240
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "is_public": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "constraints_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "id",
+                "is_public",
+                "constraints_sha256"
+              ]
+            },
+            "maxItems": 100
+          },
+          "network_extensions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 100
+          },
+          "compute_version": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "min_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "min_version",
+              "version"
+            ]
+          },
+          "volume_version": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "min_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "min_version",
+              "version"
+            ]
+          },
+          "required_capability_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 20
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "maxItems": 64
+          },
+          "native_qualification": {
+            "const": "not_established"
+          }
+        },
+        "required": [
+          "schema_version",
+          "profile_type",
+          "platform",
+          "project_id",
+          "observed_at",
+          "observations_sha256",
+          "disk_formats",
+          "image_import_methods",
+          "flavors",
+          "volume_types",
+          "network_extensions",
+          "compute_version",
+          "volume_version",
+          "required_capability_evidence",
+          "holds",
+          "native_qualification"
+        ]
+      },
+      "AhvTargetCapabilityProfile": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": 2
+          },
+          "profile_type": {
+            "const": "TargetCapabilityProfile"
+          },
+          "platform": {
+            "const": "ahv"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "prism_central_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cluster_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cluster_name": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "api_versions": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "vmm": {
+                "const": "v4.3"
+              },
+              "prism": {
+                "const": "v4.3"
+              },
+              "clustermgmt": {
+                "const": "v4.3"
+              },
+              "networking": {
+                "const": "v4.3"
+              },
+              "microseg": {
+                "const": "v4.3"
+              }
+            },
+            "required": [
+              "vmm",
+              "prism",
+              "clustermgmt",
+              "networking",
+              "microseg"
+            ]
+          },
+          "installed": {
+            "type": "object"
+          },
+          "observed_at": {
+            "type": "integer"
+          },
+          "observations_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "inventory_complete": {
+            "const": true
+          },
+          "disk_formats": {
+            "const": [
+              "raw"
+            ]
+          },
+          "image_import_methods": {
+            "const": [
+              "prism-image-url"
+            ]
+          },
+          "required_capability_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "minItems": 0,
+            "maxItems": 32
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "minItems": 0,
+            "maxItems": 64
+          },
+          "native_qualification": {
+            "const": "not_established"
+          },
+          "storage_containers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "extId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "clusterExtId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "isMarkedForRemoval": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "isInternal": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "maxCapacityBytes": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "isEncrypted": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "replicationFactor": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "extId",
+                "native_sha256",
+                "name",
+                "clusterExtId",
+                "isMarkedForRemoval",
+                "isInternal",
+                "maxCapacityBytes",
+                "isEncrypted",
+                "replicationFactor"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          },
+          "subnets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "extId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "subnetType": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "clusterReference": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "clusterReferenceList": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "minItems": 0,
+                      "maxItems": 100
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "vpcReference": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "projectExtId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "sharedWithProjects": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "minItems": 0,
+                      "maxItems": 100
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "isExternal": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "ipConfig": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "minItems": 0,
+                      "maxItems": 100
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "extId",
+                "native_sha256",
+                "name",
+                "subnetType",
+                "clusterReference",
+                "clusterReferenceList",
+                "vpcReference",
+                "projectExtId",
+                "sharedWithProjects",
+                "isExternal",
+                "ipConfig"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          },
+          "vpcs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "extId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "projectExtId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "extId",
+                "native_sha256",
+                "name",
+                "projectExtId"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "extId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "key": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "extId",
+                "native_sha256",
+                "key",
+                "value"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          },
+          "policies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "extId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "state": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "type": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "projectExtId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "isSharedWithAllProjects": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "scope": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 512
+                },
+                "scopeReferences": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 512
+                      },
+                      "minItems": 0,
+                      "maxItems": 100
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "vpcReferences": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 512
+                      },
+                      "minItems": 0,
+                      "maxItems": 100
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "securedGroups": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 512
+                      },
+                      "minItems": 0,
+                      "maxItems": 100
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "extId",
+                "native_sha256",
+                "name",
+                "state",
+                "type",
+                "projectExtId",
+                "isSharedWithAllProjects",
+                "scope",
+                "scopeReferences",
+                "vpcReferences",
+                "securedGroups"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "schema_version",
+          "profile_type",
+          "platform",
+          "project_id",
+          "prism_central_id",
+          "cluster_id",
+          "cluster_name",
+          "api_versions",
+          "installed",
+          "observed_at",
+          "observations_sha256",
+          "inventory_complete",
+          "disk_formats",
+          "image_import_methods",
+          "required_capability_evidence",
+          "holds",
+          "native_qualification",
+          "storage_containers",
+          "subnets",
+          "vpcs",
+          "categories",
+          "policies"
+        ]
+      },
+      "AhvDestinationSelection": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "platform": {
+            "const": "ahv"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "prism_central_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cluster_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "vpc_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "storage_container_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "category_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "maxItems": 32
+          },
+          "policy_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "maxItems": 32
+          },
+          "firmware": {
+            "const": "bios"
+          },
+          "disks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_key": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "index": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
+                }
+              },
+              "required": [
+                "source_key",
+                "index"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 32
+          },
+          "nics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_key": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "quarantine_subnet_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "production_subnet_id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "source_key",
+                "quarantine_subnet_id",
+                "production_subnet_id"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 32
+          }
+        },
+        "required": [
+          "platform",
+          "project_id",
+          "prism_central_id",
+          "cluster_id",
+          "vpc_id",
+          "storage_container_id",
+          "category_ids",
+          "policy_ids",
+          "firmware",
+          "disks",
+          "nics"
+        ]
+      },
+      "ReadinessContext": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "discover",
+              "provision",
+              "migrate",
+              "adopt",
+              "operate",
+              "retire"
+            ]
+          },
+          "method": {
+            "enum": [
+              "APPLICATION_REBUILD_RESTORE",
+              "VM_SNAPSHOT_BASELINE_APP_DELTA",
+              "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+              "VM_COLD_EXPORT",
+              "EXTERNAL_BLOCK_REPLICATION",
+              null
+            ]
+          }
+        },
+        "required": [
+          "operation",
+          "method"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "operation": {
+                  "const": "migrate"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method": {
+                  "type": "string"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "method": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ReadinessInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "values": {
+            "$ref": "#/components/schemas/OperatorValues"
+          },
+          "configuration_digest": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "context": {
+            "$ref": "#/components/schemas/ReadinessContext"
+          }
+        },
+        "required": [
+          "values",
+          "configuration_digest",
+          "context"
+        ]
+      },
+      "ReadinessField": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "help": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reference",
+              "integer"
+            ]
+          },
+          "minimum": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "maximum": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "applicability": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "example": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "group",
+          "label",
+          "help",
+          "kind",
+          "minimum",
+          "maximum",
+          "required",
+          "applicability",
+          "owner",
+          "example",
+          "format"
+        ]
+      },
+      "ReadinessCheck": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "field_id": {
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "missing",
+              "unverified",
+              "verified",
+              "stale",
+              "failed",
+              "unavailable",
+              "not_applicable"
+            ]
+          },
+          "action": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "observed_at": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "expires_at": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "evidence_sha256": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "field_id",
+          "state",
+          "action",
+          "owner",
+          "observed_at",
+          "expires_at",
+          "evidence_sha256"
+        ]
+      },
+      "ReadinessWorkspace": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenant_id": {
+            "type": "string"
+          },
+          "site_id": {
+            "type": "string"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperatorGroup"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadinessField"
+            },
+            "maxItems": 32
+          },
+          "record": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OperatorRecord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "configuration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OperatorConfiguration"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "missing_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "collection_complete": {
+            "type": "boolean"
+          },
+          "native_write_authorized": {
+            "type": "boolean",
+            "const": false
+          },
+          "context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReadinessContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "enum": [
+                    "discover",
+                    "provision",
+                    "migrate",
+                    "adopt",
+                    "operate",
+                    "retire"
+                  ]
+                },
+                "label": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "label"
+              ]
+            },
+            "maxItems": 6
+          },
+          "methods": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "APPLICATION_REBUILD_RESTORE",
+                "VM_SNAPSHOT_BASELINE_APP_DELTA",
+                "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+                "VM_COLD_EXPORT",
+                "EXTERNAL_BLOCK_REPLICATION"
+              ]
+            },
+            "maxItems": 5
+          },
+          "platforms": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "source": {
+                "enum": [
+                  "vmware",
+                  "openstack",
+                  "ahv",
+                  null
+                ]
+              },
+              "target": {
+                "enum": [
+                  "vmware",
+                  "openstack",
+                  "ahv",
+                  null
+                ]
+              }
+            },
+            "required": [
+              "source",
+              "target"
+            ]
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadinessCheck"
+            },
+            "maxItems": 32
+          },
+          "contexts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "operation": {
+                  "enum": [
+                    "discover",
+                    "provision",
+                    "migrate",
+                    "adopt",
+                    "operate",
+                    "retire"
+                  ]
+                },
+                "method": {
+                  "enum": [
+                    "APPLICATION_REBUILD_RESTORE",
+                    "VM_SNAPSHOT_BASELINE_APP_DELTA",
+                    "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+                    "VM_COLD_EXPORT",
+                    "EXTERNAL_BLOCK_REPLICATION",
+                    null
+                  ]
+                },
+                "required_fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 32
+                }
+              },
+              "required": [
+                "operation",
+                "method",
+                "required_fields"
+              ]
+            },
+            "maxItems": 10
+          },
+          "evidence_current": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "site_id",
+          "groups",
+          "fields",
+          "record",
+          "configuration",
+          "missing_fields",
+          "holds",
+          "collection_complete",
+          "native_write_authorized",
+          "context",
+          "operations",
+          "methods",
+          "platforms",
+          "checks",
+          "contexts",
+          "evidence_current"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "Workload": [],
+      "ActorDelegation": []
+    }
+  ]
+}

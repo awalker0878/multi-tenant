@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
-import IdentityLayout from '../../shared/ui/IdentityLayout.vue';
+import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 import ChangeNotice from '../../shared/ui/ChangeNotice.vue';
 
 type Member = { id: string; subject: string; role: string; state: string; revision: number; site_id: string | null; environment: string | null; expires_at: string | null };
@@ -24,7 +24,8 @@ const edit = (value: Member) => {
 };
 </script>
 <template>
-  <IdentityLayout :title="tenant.name" description="Tenant membership and entitlement settings.">
+  <CatalogueLayout :title="tenant.name" :tenant-id="tenant.id">
+    <p class="text-sm text-slate-600">Tenant membership and entitlement settings.</p>
     <Link href="/account" class="mt-5 inline-block text-teal-800 underline">All your tenants</Link>
     <nav class="mt-4 flex flex-wrap gap-4" aria-label="Tenant workspaces"><Link :href="`/tenants/${tenant.id}/applications${membership.environment ? '?environment=' + encodeURIComponent(membership.environment) : ''}`" class="text-teal-800 underline">Application catalogue</Link><Link :href="`/tenants/${tenant.id}/catalogue-references`" class="text-teal-800 underline">Environments and domains</Link><Link :href="`/tenants/${tenant.id}/inventory${membership.site_id ? '/sites/' + membership.site_id : ''}`" class="text-teal-800 underline">Observed inventory</Link></nav>
     <p class="mt-3 text-sm text-slate-600">Your role: {{ membership.role.replaceAll('_', ' ') }}<span v-if="membership.site_id"> · {{ membership.site_id }}</span><span v-if="membership.environment"> · {{ membership.environment }}</span></p>
@@ -72,6 +73,5 @@ const edit = (value: Member) => {
       </form>
       <button type="button" :disabled="state.processing" @click="state.post('/tenants/' + tenant.id + '/state', { preserveState: false })">Suspend tenant access</button>
     </template>
-    <Link href="/logout" method="post" as="button">Sign out</Link>
-  </IdentityLayout>
+  </CatalogueLayout>
 </template>

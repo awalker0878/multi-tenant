@@ -22,7 +22,7 @@ beforeEach(function (): void {
 });
 
 it('renders operator inputs through current site authority with encrypted cleared history', function (): void {
-    $this->inventory->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->tenant, 'getOperatorInputs', ['site' => $this->site])->andReturn(['record' => null]);
+    $this->inventory->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->tenant, 'getOperatorReadiness', ['site' => $this->site])->andReturn(['record' => null]);
     $this->get($this->base)->assertOk()->assertViewHas('page', fn (array $p): bool => $p['clearHistory'] && $p['encryptHistory'])
         ->assertInertia(fn (Assert $p) => $p->component('inventory/OperatorInputs')->where('workspace.record', null)->missing('session_token'));
 });
@@ -40,7 +40,7 @@ it('forwards zero targets and safe references without inventing empty values', f
 });
 
 it('preserves an empty object on the wire and reauthorizes packet downloads', function (): void {
-    $this->inventory->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->tenant, 'getOperatorInputs', ['site' => $this->site])->andReturn(['record' => ['values' => []], 'native_write_authorized' => false]);
+    $this->inventory->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->tenant, 'getOperatorReadiness', ['site' => $this->site])->andReturn(['record' => ['values' => []], 'native_write_authorized' => false]);
     $response = $this->get($this->base.'/download')->assertOk()->assertHeader('Content-Disposition', 'attachment; filename="operator-inputs.json"')
         ->assertJsonPath('qualification_status', 'not_established')->assertJsonPath('native_write_authorized', false);
     expect($response->headers->get('Cache-Control'))->toContain('no-store');
@@ -74,3 +74,22 @@ it('protects operator input saves with CSRF verification', function (): void {
     $this->inventory->shouldNotReceive('call');
     $this->post($this->base, ['command_key' => $this->key])->assertStatus(419);
 });
+
+it('forwards the selected task with the exact saved values and revision', function (): void {
+    $this->inventory->shouldReceive('call')->once()->withArgs(function ($token, $tenant, $operation, $parameters, $body, $key, $revision): bool {
+        return $operation === 'saveOperatorReadiness' && $tenant === $this->tenant && $parameters === ['site' => $this->site]
+            && $body['context'] === ['operation' => 'migrate', 'method' => 'VM_COLD_EXPORT']
+            && $body['values']->max_outage_seconds === 0 && $key === $this->key && $revision === 1;
+    })->andReturn(['revision' => 2]);
+    $this->post($this->base, ['command_key' => $this->key, 'revision' => 1, 'input' => ['configuration_digest' => null, 'values' => ['max_outage_seconds' => 0], 'context' => ['operation' => 'migrate', 'method' => 'VM_COLD_EXPORT']]])
+        ->assertRedirect($this->base)->assertSessionHas('inventory_notice');
+});
+
+it('rejects authority fields in task selection and unknown task names', function (array $context): void {
+    $this->inventory->shouldNotReceive('call');
+    $this->from($this->base)->post($this->base, ['command_key' => $this->key, 'input' => ['configuration_digest' => null, 'values' => [], 'context' => $context]])
+        ->assertSessionHasErrors();
+})->with([
+    [['operation' => 'migrate', 'method' => 'VM_COLD_EXPORT', 'native_write_authorized' => true]],
+    [['operation' => 'arbitrary', 'method' => null]],
+]);

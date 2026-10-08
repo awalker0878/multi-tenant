@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.invalid/inventory/commissioning-evidence-v1.json",
+  "title": "Owner commissioning evidence version 1",
+  "description": "Protected owner-side observations, signed envelopes and public-key enrollment. Never browser input or native authority. Runtime additionally checks signatures, exact packet/value bindings, file permissions, timestamps, byte digests, unique identities and aggregate resource limits.",
+  "$defs": {
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "producer_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,80}$"
+        },
+        "tenant_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "site_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "packet_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "configuration_digest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "field_id": {
+                "enum": [
+                  "source_writer_ref",
+                  "source_observer_ref",
+                  "target_writer_ref",
+                  "target_observer_ref",
+                  "image_writer_ref",
+                  "image_observer_ref",
+                  "account_scope_ref",
+                  "trust_bundle_ref",
+                  "custody_ref",
+                  "worker_fencing_ref",
+                  "reservation_ref",
+                  "guest_recipe_ref",
+                  "service_protocol_ref",
+                  "measurement_ref",
+                  "consistency_ref",
+                  "delta_ref",
+                  "writer_fencing_ref",
+                  "traffic_ref",
+                  "restore_ref",
+                  "recovery_ref",
+                  "retention_ref",
+                  "objectives_ref",
+                  "campaign_ref",
+                  "artifact_ref",
+                  "security_ref",
+                  "alert_ref",
+                  "receiving_team_ref",
+                  "support_ref",
+                  "max_outage_seconds",
+                  "max_data_loss_bytes",
+                  "recovery_time_seconds",
+                  "max_active_migrations"
+                ]
+              },
+              "value_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "result": {
+                "enum": [
+                  "verified",
+                  "failed"
+                ]
+              },
+              "observed_at": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "expires_at": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "evidence_file": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 4096,
+                "pattern": "^/"
+              },
+              "evidence_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "field_id",
+              "value_sha256",
+              "result",
+              "observed_at",
+              "expires_at",
+              "evidence_file",
+              "evidence_sha256"
+            ]
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "producer_id",
+        "tenant_id",
+        "site_id",
+        "packet_digest",
+        "configuration_digest",
+        "checks"
+      ]
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "payload": {
+          "$ref": "#/$defs/observation"
+        },
+        "signature": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9+/]{86}==$"
+        }
+      },
+      "required": [
+        "payload",
+        "signature"
+      ]
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "producers": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "public_key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9+/]{43}=$"
+              },
+              "expires_at": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "fields": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 32,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "source_writer_ref",
+                    "source_observer_ref",
+                    "target_writer_ref",
+                    "target_observer_ref",
+                    "image_writer_ref",
+                    "image_observer_ref",
+                    "account_scope_ref",
+                    "trust_bundle_ref",
+                    "custody_ref",
+                    "worker_fencing_ref",
+                    "reservation_ref",
+                    "guest_recipe_ref",
+                    "service_protocol_ref",
+                    "measurement_ref",
+                    "consistency_ref",
+                    "delta_ref",
+                    "writer_fencing_ref",
+                    "traffic_ref",
+                    "restore_ref",
+                    "recovery_ref",
+                    "retention_ref",
+                    "objectives_ref",
+                    "campaign_ref",
+                    "artifact_ref",
+                    "security_ref",
+                    "alert_ref",
+                    "receiving_team_ref",
+                    "support_ref",
+                    "max_outage_seconds",
+                    "max_data_loss_bytes",
+                    "recovery_time_seconds",
+                    "max_active_migrations"
+                  ]
+                }
+              },
+              "receipts": {
+                "type": "array",
+                "maxItems": 128,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 4096,
+                  "pattern": "^/"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "public_key",
+              "expires_at",
+              "fields",
+              "receipts"
+            ]
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "producers"
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/observation"
+    },
+    {
+      "$ref": "#/$defs/receipt"
+    },
+    {
+      "$ref": "#/$defs/registry"
+    }
+  ]
+}

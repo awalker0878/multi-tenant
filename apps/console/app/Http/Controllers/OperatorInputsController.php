@@ -35,7 +35,7 @@ final class OperatorInputsController
         $workspace = $this->read($request, $tenant, $site, $inventory);
         abort_if($workspace['record'] === null, 404);
 
-        return response()->json(['schema_version' => 1, 'packet_type' => 'operator-input-handoff', 'qualification_status' => 'not_established', ...$workspace], 200, [
+        return response()->json(['schema_version' => 2, 'packet_type' => 'operator-input-handoff', 'qualification_status' => 'not_established', ...$workspace], 200, [
             'Content-Disposition' => 'attachment; filename="operator-inputs.json"',
             'Cache-Control' => 'no-store, private',
         ], JSON_PRETTY_PRINT);
@@ -46,14 +46,17 @@ final class OperatorInputsController
         $input = $request->validate([
             'command_key' => ['required', 'uuid', 'lowercase'],
             'revision' => ['nullable', 'integer', 'min:1', 'max:999999999'],
-            'input' => ['required', 'array:values,configuration_digest'],
+            'input' => ['required', 'array:values,configuration_digest,context'],
+            'input.context' => ['sometimes', 'required', 'array:operation,method'],
+            'input.context.operation' => ['required_with:input.context', 'in:discover,provision,migrate,adopt,operate,retire'],
+            'input.context.method' => ['present_with:input.context', 'nullable', 'in:APPLICATION_REBUILD_RESTORE,VM_SNAPSHOT_BASELINE_APP_DELTA,VM_SNAPSHOT_BASELINE_FILE_DELTA,VM_COLD_EXPORT,EXTERNAL_BLOCK_REPLICATION'],
             'input.values' => ['present', 'array', 'max:32'],
             'input.configuration_digest' => ['present', 'nullable', 'regex:/\A[0-9a-f]{64}\z/'],
         ]);
         $body = $input['input'];
         $body['values'] = (object) array_filter($body['values'], fn ($value) => $value !== '' && $value !== null);
         try {
-            $inventory->call($this->session($request), $tenant, 'saveOperatorInputs', ['site' => $site], $body, $input['command_key'], isset($input['revision']) ? (int) $input['revision'] : null);
+            $inventory->call($this->session($request), $tenant, isset($body['context']) ? 'saveOperatorReadiness' : 'saveOperatorInputs', ['site' => $site], $body, $input['command_key'], isset($input['revision']) ? (int) $input['revision'] : null);
         } catch (InventoryFailure $error) {
             if (in_array($error->status, [403, 404], true)) {
                 return redirect('/account')->with('tenant_notice', 'Your inventory access changed.');
@@ -63,6 +66,7 @@ final class OperatorInputsController
                 $error->status === 503 => 'The result is uncertain. Recover the unchanged save before editing further.',
                 $error->reason === 'independent_verification_account_required' => 'Verification accounts must use separate references from every execution account.',
                 $error->reason === 'invalid_operator_reference' => 'Use a record identifier of up to 240 characters. Do not enter secret values, spaces, query strings or credential bundles.',
+                $error->reason === 'invalid_readiness_method' => 'Select one migration method for migration tasks; other tasks do not use a migration method.',
                 $error->reason === 'invalid_operator_target' => 'Enter whole numbers within the displayed target limits. Zero is valid for outage and data loss.',
                 default => 'These inputs could not be saved. Review the field values and try again.',
             }, 'inventory_status' => (string) $error->status]);
@@ -74,7 +78,7 @@ final class OperatorInputsController
     /** @return array<string,mixed> */
     private function read(Request $request, string $tenant, string $site, InventoryGateway $inventory): array
     {
-        $workspace = $inventory->call($this->session($request), $tenant, 'getOperatorInputs', ['site' => $site]);
+        $workspace = $inventory->call($this->session($request), $tenant, 'getOperatorReadiness', ['site' => $site]);
         if (is_array($workspace['record'] ?? null)) {
             $workspace['record']['values'] = (object) $workspace['record']['values'];
         }
