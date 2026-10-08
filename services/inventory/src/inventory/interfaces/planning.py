@@ -55,14 +55,21 @@ class PlanningInputApp:
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", auth):
                 raise Rejected("invalid_workload", 401)
             capability_internal = (
-                scope["path"].startswith("/internal/") and "/planning-capability-inputs/" in scope["path"]
+                scope["path"].startswith("/internal/")
+                and "/planning-capability-inputs/" in scope["path"]
             )
             if capability_internal:
                 if self.capability_authority is None:
                     raise Rejected("capability_reader_not_commissioned", 423)
                 await asyncio.to_thread(
-                    self.capability_authority, auth[7:], tenant, application, environment,
-                    site, endpoint, generation,
+                    self.capability_authority,
+                    auth[7:],
+                    tenant,
+                    application,
+                    environment,
+                    site,
+                    endpoint,
+                    generation,
                 )
             elif scope["path"].startswith("/internal/"):
                 if self.native_authority is None:
