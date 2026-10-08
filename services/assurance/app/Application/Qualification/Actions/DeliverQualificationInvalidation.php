@@ -23,8 +23,11 @@ final readonly class DeliverQualificationInvalidation
             DB::statement("SET LOCAL statement_timeout = '10s'");
             DB::statement("SET LOCAL idle_in_transaction_session_timeout = '15s'");
             $row = DB::selectOne(<<<'SQL'
-                SELECT pending.event_id, pending.scope_sha256, pending.authority_epoch, pending.payload
+                SELECT pending.event_id, pending.scope_sha256, pending.authority_epoch,
+                       pending.payload, history.tenant
                   FROM app.qualification_authority_outbox pending
+                  JOIN app.qualification_authority_events history
+                    ON history.event_id = pending.event_id
                  WHERE pending.delivered_at IS NULL
                    AND NOT EXISTS (
                         SELECT 1 FROM app.qualification_authority_outbox earlier
@@ -42,6 +45,7 @@ final readonly class DeliverQualificationInvalidation
             $event = json_decode((string) $row->payload, true, 64, JSON_THROW_ON_ERROR);
             if (! is_array($event)
                 || ($event['event_id'] ?? null) !== (string) $row->event_id
+                || ($event['tenant_id'] ?? null) !== (string) $row->tenant
                 || ($event['scope_sha256'] ?? null) !== $row->scope_sha256
                 || ($event['authority_epoch'] ?? null) !== (int) $row->authority_epoch
                 || ! is_string($event['event_sha256'] ?? null)) {
