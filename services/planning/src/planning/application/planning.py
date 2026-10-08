@@ -129,11 +129,34 @@ class Planning:
                     # A scope with insufficient provenance must never escape
                     # invalidation. The nullable index forces a tenant hold.
                     pass
+                if scope_sha256 is not None:
+                    # Serialize plan creation with incoming negative authority.
+                    # Otherwise a commit can race an invalidation's plan scan.
+                    tx.execute(
+                        "SELECT pg_advisory_xact_lock(hashtext(%s))",
+                        (scope_sha256,),
+                    )
                 tx.execute(
                     "INSERT INTO app.planning_plan_qualification_scopes"
                     "(plan,tenant,scope_sha256) VALUES(%s,%s,%s)",
                     (payload["id"], actor.tenant, scope_sha256),
                 )
+                if scope_sha256 is not None:
+                    head = tx.one(
+                        "SELECT e.event_id FROM app.planning_qualification_heads h "
+                        "JOIN app.planning_qualification_inbox e "
+                        "ON e.scope_sha256=h.scope_sha256 "
+                        "AND e.authority_epoch=h.authority_epoch "
+                        "WHERE h.scope_sha256=%s AND h.tenant=%s "
+                        "AND h.state IN ('suspended','revoked')",
+                        (scope_sha256, actor.tenant),
+                    )
+                    if head is not None:
+                        tx.execute(
+                            "INSERT INTO app.planning_invalidations(tenant,plan,event_id) "
+                            "VALUES(%s,%s,%s)",
+                            (actor.tenant, payload["id"], head["event_id"]),
+                        )
             tx.execute(
                 (
                     "INSERT INTO "
