@@ -37,6 +37,8 @@ The runtime requires PHP extensions declared by the manifest and its dependency 
 
 Copy `.env.example` to `.env` for local use and set an application key locally if adding behavior that needs encryption; never commit keys. Debug responses are disabled even if an environment variable requests them. Only controlled runtime paths under `bootstrap/cache` and `storage` should be writable. The tracked directory markers supply these paths; HTTP bootstrap does not create missing directories or change permissions. The built-in server is a development command, not the production image or ingress design.
 
+Supply the database password through an absolute `DB_PASSWORD_FILE` path. Missing or malformed mounted credentials never fall back to `DB_PASSWORD`. The application loads the file during configuration bootstrap; rebuild cached configuration and restart workers after rotation. Separately authorized recovery processes must use their own migration credential file.
+
 ## Ownership and checks
 
 The service owns `App\` and `Tests\` autoload roots, its framework configuration, routes, manifest and lock. It never loads sibling service source. Normal Laravel HTTP/Providers directories contain the implemented source. Add `Domain/<Capability>`, `Application/<Capability>/Actions` and `Infrastructure` only when implementing the owning behavior under [ADR-024](../../docs/decisions/adr-024-pragmatic-laravel-domain-convention.md); no sample domain, permissive administrator or synthetic business API is installed.

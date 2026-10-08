@@ -37,10 +37,12 @@ beforeEach(function (): void {
     while (($message = $this->channel->basic_get('p02.support')) !== null) {
         $message->ack();
     }
+    $this->databasePasswordFile = tempnam(sys_get_temp_dir(), 'p02-broker-password-');
+    file_put_contents($this->databasePasswordFile, (string) getenv('P02_TEST_PASSWORD'));
     $this->process = function (string $mode = 'publish'): Process {
         $process = new Process([PHP_BINARY, '-c', php_ini_loaded_file(), base_path('../../scripts/p02/event_process.php'), $mode, 'support'], base_path(), [
             'DB_HOST' => '127.0.0.1', 'DB_PORT' => getenv('P02_TEST_PORT') ?: '5432',
-            'DB_DATABASE' => 'p02_identity_test', 'DB_USERNAME' => 'postgres', 'DB_PASSWORD' => getenv('P02_TEST_PASSWORD'),
+            'DB_DATABASE' => 'p02_identity_test', 'DB_USERNAME' => 'postgres', 'DB_PASSWORD_FILE' => $this->databasePasswordFile,
             'DB_SSLMODE' => 'prefer', 'APP_ENV' => 'testing',
         ]);
         $process->setTimeout(25);
@@ -53,6 +55,9 @@ afterEach(function (): void {
     if (isset($this->broker)) {
         $this->broker->close();
         unlink($this->credentialFile);
+    }
+    if (isset($this->databasePasswordFile)) {
+        unlink($this->databasePasswordFile);
     }
 });
 

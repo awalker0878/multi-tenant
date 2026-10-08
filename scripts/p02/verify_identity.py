@@ -236,7 +236,13 @@ def main() -> int:
                     'DB_PASSWORD': runtime_password, 'DB_PASSWORD_FILE': str(password_file), 'DB_SSLMODE': 'verify-full', 'DB_SSLROOTCERT': str(certificate), 'CONSOLE_CREDENTIAL_FILE': str(credential_file),
                     'GOVERNANCE_URL': 'http://127.0.0.1:8032', 'SESSION_DRIVER': 'database', 'CACHE_STORE': 'database', 'SESSION_SECURE_COOKIE': 'false'}
                 if name == 'governance':
-                    recovery_owner_environment = environments[name] | {'DB_USERNAME': 'governance_migrator', 'DB_PASSWORD': migration_password}
+                    migration_password_file = private_path / (name + '-migration-db-password')
+                    migration_password_file.write_text(migration_password)
+                    migration_password_file.chmod(0o600)
+                    recovery_owner_environment = environments[name] | {
+                        'DB_USERNAME': 'governance_migrator', 'DB_PASSWORD': migration_password,
+                        'DB_PASSWORD_FILE': str(migration_password_file),
+                    }
             for label, statement in [('inbox-update', "UPDATE app.notification_inbox SET event_type='forged';"),
                                      ('inbox-delete', 'DELETE FROM app.notification_inbox;'),
                                      ('quarantine-delete', 'DELETE FROM app.notification_quarantine;'),

@@ -21,6 +21,8 @@ Both endpoints return JSON with `Cache-Control: no-store`; readiness also return
 
 The candidate uses PHP 8.5 with the measured Laravel 13.34.0 and exact development tool versions. A private PostgreSQL driver is declared for the intended persistence boundary, but no connection or credentials are configured and no database is created. Runtime deployment must supply its own environment, application key and writable cache/storage paths.
 
+Supply the database password through an absolute `DB_PASSWORD_FILE` path. Missing or malformed mounted credentials never fall back to `DB_PASSWORD`. The application loads the file during configuration bootstrap; rebuild cached configuration and restart workers after rotation.
+
 The service-private Composer lock is retained. Run from this directory with the pinned runtime:
 
 ```sh
