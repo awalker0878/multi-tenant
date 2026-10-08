@@ -1,6 +1,7 @@
 """Pure execution invariants. E2 simulation never grants native authority."""
 
 import json
+import math
 import re
 from typing import Any
 from uuid import UUID
@@ -34,7 +35,16 @@ def decode(raw: bytes) -> dict[str, Any]:
             result[key] = value
         return result
 
-    value = json.loads(raw, object_pairs_hook=pairs, parse_constant=lambda _: None)
+    def constant(_: str) -> Any:
+        raise ValueError("nonfinite_json_number")
+
+    def number(raw_number: str) -> float:
+        parsed = float(raw_number)
+        if not math.isfinite(parsed):
+            raise ValueError("nonfinite_json_number")
+        return parsed
+
+    value = json.loads(raw, object_pairs_hook=pairs, parse_constant=constant, parse_float=number)
     if not isinstance(value, dict):
         raise Rejected("invalid_shape", 422)
     return value
