@@ -40,6 +40,16 @@ final readonly class ConfirmedHttpInvalidationPublisher implements ConfirmedInva
             || $token === '') {
             throw new RuntimeException('qualification_invalidation_sink_unavailable');
         }
+        foreach ([
+            'planning.qualification_reviewer_credential_file',
+            'planning.qualification_observer_credential_file',
+            'planning.credential_file',
+        ] as $otherPath) {
+            $other = $this->secrets->read(config($otherPath));
+            if (is_string($other) && hash_equals($token, $other)) {
+                throw new RuntimeException('qualification_invalidation_authority_not_independent');
+            }
+        }
 
         $response = Http::withOptions(['verify' => $ca, 'allow_redirects' => false])
             ->connectTimeout(2)->timeout(5)->acceptJson()->withToken($token)
