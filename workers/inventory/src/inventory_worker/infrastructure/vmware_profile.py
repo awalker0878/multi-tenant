@@ -124,8 +124,16 @@ def collect_vmware(
                         "hardware_versions": [hardware],
                         "native_sha256": fingerprint([parent, browser, option]),
                     })
-            except CollectionFailure:
-                # An unavailable API never becomes an operator-defined option.
+            except CollectionFailure as error:
+                # A refused/revoked native read cannot be interpreted as an
+                # absent compatibility option. Stop the campaign immediately.
+                if error.reason in {
+                    "permission_denied", "transport_unavailable", "throttled",
+                    "unsafe_destination",
+                }:
+                    raise
+                # Explicitly missing method/unsupported data is not an
+                # operator-definable value: this host offers no selection.
                 continue
     return {
         "schema_version": 3,
