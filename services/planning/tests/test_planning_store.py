@@ -20,6 +20,7 @@ from planning_fixture import (
 )
 
 from planning.application.planning import Planning
+from planning.application.qualification_invalidations import QualificationInvalidations
 from planning.application.validation import PlanValidation
 from planning.domain.model import Actor, Rejected, digest
 from planning.infrastructure.store import Postgres
@@ -127,3 +128,38 @@ def test_expiry_and_unavailable_inputs_preserve_plan(database: Postgres) -> None
     p.clock = lambda: NOW + 5000
     assert "plan_or_facts_expired" in p.validity(a, saved, {})["holds"]
     assert p.get(TENANT, APP, ENV, r["id"], "plan") == saved
+
+
+def test_negative_qualification_arriving_before_plan_save_cannot_be_missed(
+    database: Postgres,
+) -> None:
+    p, actor, body = setup(database)
+    result = p.assessment(actor, str(uuid4()), body, {})
+    assessed = p.get(TENANT, APP, ENV, result["id"], "assessment")
+    scope_sha256 = digest(assessed["inputs"][0]["qualification"]["scope"])
+    incoming = {
+        "event_id": str(uuid4()),
+        "tenant_id": TENANT,
+        "scope_sha256": scope_sha256,
+        "authority_epoch": 1,
+        "operation": "revoke",
+        "state": "revoked",
+        "decision_sha256": "a" * 64,
+        "event_sha256": "b" * 64,
+    }
+    QualificationInvalidations(database).accept(incoming)
+
+    planned = p.plan(
+        actor,
+        str(uuid4()),
+        {"assessment_id": result["id"], "candidate": 0, "request": request()},
+        assessed,
+    )
+    with database.transaction() as tx:
+        holds = tx.one(
+            "SELECT count(*) AS n FROM app.planning_invalidations WHERE plan=%s",
+            (planned["id"],),
+        )
+    assert holds is not None and holds["n"] == 1
+    saved = p.get(TENANT, APP, ENV, planned["id"], "plan")
+    assert not p.validity(actor, saved, {})["current"]
