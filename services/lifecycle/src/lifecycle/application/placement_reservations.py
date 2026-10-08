@@ -99,6 +99,8 @@ class PlacementReservations:
                 ):
                     raise Held("placement_native_authority_unavailable")
                 limits, used = vector(pool["limits"]), vector(pool["provider_used"])
+                if set(used) != set(limits) or not set(requested) <= set(limits):
+                    raise Held("placement_pool_class_limit_missing")
                 debits = tx.all(
                     "SELECT d.native_ref,d.vector,r.id,r.state FROM app.placement_debits d "
                     "JOIN app.placement_reservations r ON r.id=d.reservation "
@@ -116,6 +118,8 @@ class PlacementReservations:
                     ):
                         continue
                     for kind, value in vector(debit["vector"]).items():
+                        if kind not in held:
+                            raise Held("placement_pool_class_limit_missing")
                         held[kind] += value
                 if any(used[k] + held[k] + requested[k] > limits[k] for k in limits):
                     state = "denied"
@@ -209,6 +213,8 @@ class PlacementReservations:
                 # another tenant's debits can change after its original receipt.
                 limits = vector(pool["limits"])
                 used = vector(pool["provider_used"])
+                if set(used) != set(limits) or not set(allocation["vector"]) <= set(limits):
+                    raise Held("placement_pool_class_limit_missing")
                 with self.database.transaction() as ledger:
                     ledger.execute("SELECT pg_advisory_xact_lock(7503016)")
                     debits = ledger.all(
