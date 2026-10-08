@@ -196,3 +196,43 @@ it('delivers immutable invalidations in order and does not clear uncertain ackno
         ->and(DB::table('app.qualification_authority_outbox')
             ->where('scope_sha256', $scopeHash)->whereNotNull('delivered_at')->count())->toBe(2);
 });
+
+
+it('rejects a head-only epoch advance without matching immutable event and outbox', function (): void {
+    $this->ledger->mutate(
+        $this->scope, 'publish', (string) Str::uuid(), 0, 'fixture',
+        ['source' => 'e2'], str_repeat('a', 64), 1, 'reviewer-one'
+    );
+    $hash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
+    try {
+        DB::transaction(function () use ($hash): void {
+            // A +1 epoch passes the immediate monotonicity guard, but commit
+            // must still reject a missing matching event and outbox.
+            DB::table('app.qualification_authority_heads')
+                ->where('scope_sha256', $hash)->update([
+                    'authority_epoch' => 2,
+                    'state' => 'revoked',
+                ]);
+        });
+        $this->fail('Unjournaled authority head was accepted.');
+    } catch (QueryException) {
+        // Deferred trigger verifies the event + outbox at commit.
+    }
+    expect($this->ledger->current($this->scope)['authority_epoch'])->toBe(1);
+});
+
+it('rejects runtime deletion or alteration of an immutable outbox event payload', function (): void {
+    $this->ledger->mutate(
+        $this->scope, 'publish', (string) Str::uuid(), 0, 'fixture',
+        ['source' => 'e2'], str_repeat('a', 64), 1, 'reviewer-one'
+    );
+    $hash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
+    try {
+        DB::table('app.qualification_authority_outbox')
+            ->where('scope_sha256', $hash)
+            ->update(['payload' => '{}']);
+        $this->fail('Outbox wire payload was altered.');
+    } catch (QueryException) {
+        // Only the delivered_at field is mutable by the runtime principal.
+    }
+});
