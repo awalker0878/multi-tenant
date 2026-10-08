@@ -22,8 +22,6 @@
         "source.api.releases",
         "source.vm.revision",
         "target.api.versions",
-        "source.vmware.compute.hardware_version",
-        "source.vmware.identity.vcenter_uuid",
         "target.ahv.target.prism_identity"
       ],
       "operator_attributes": [],
@@ -42,7 +40,8 @@
         "source.scope.project",
         "source.vm.host",
         "source.vm.creation_time",
-        "source.ahv.identity.cluster"
+        "source.ahv.identity.cluster",
+        "source.vmware.identity.vcenter_uuid"
       ],
       "operator_attributes": [],
       "qualification": "unqualified",
@@ -72,7 +71,8 @@
         "source.vmware.compute.memory_hot_add",
         "target.openstack.placement_traits",
         "source.vmware.compute.cpu_hot_add",
-        "source.openstack.compute.flavor_id"
+        "source.openstack.compute.flavor_id",
+        "source.vmware.compute.hardware_version"
       ],
       "operator_attributes": [],
       "qualification": "unqualified",
@@ -480,9 +480,7 @@
         "owner.application.optional_tags",
         "owner.operations.optional_integrations",
         "source.ahv.identity.categories",
-        "target.openstack.target.qos_policies",
-        "source.openstack.storage.volume_metadata",
-        "source.openstack.network.qos_policy"
+        "source.openstack.storage.volume_metadata"
       ],
       "operator_attributes": [
         "application.optional_tags",
@@ -490,6 +488,19 @@
       ],
       "qualification": "unqualified",
       "notes": "Only proven nonfunctional optional omissions with E4 suppression are permitted."
+    },
+    {
+      "id": "network.qos",
+      "label": "Nonessential network QoS and bandwidth settings",
+      "mapping": "conditional_optional",
+      "criticality": "optional",
+      "crosswalk_groups": [
+        "source.openstack.network.qos_policy",
+        "target.openstack.target.qos_policies"
+      ],
+      "operator_attributes": [],
+      "qualification": "unqualified",
+      "notes": "QoS can be optional only when its loss does not breach application performance, rate-limit or security requirements. Otherwise classify the actual flow and policy as critical."
     }
   ],
   "operator_requirements": [
@@ -802,9 +813,7 @@
             "identity.vcenter_version",
             "identity.vcenter_build",
             "identity.api_release",
-            "identity.config_change_version",
-            "compute.hardware_version",
-            "identity.vcenter_uuid"
+            "identity.config_change_version"
           ],
           "target_attributes": [
             "target.api_release"
@@ -819,7 +828,8 @@
             "identity.instance_uuid",
             "identity.bios_uuid",
             "identity.host",
-            "identity.create_date"
+            "identity.create_date",
+            "identity.vcenter_uuid"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -840,7 +850,8 @@
             "compute.cpu_count",
             "compute.memory_mib",
             "compute.memory_hot_add",
-            "compute.cpu_hot_add"
+            "compute.cpu_hot_add",
+            "compute.hardware_version"
           ],
           "target_attributes": [
             "target.compute_capacity"
@@ -1083,6 +1094,13 @@
           ],
           "mapping_proposal": "optional_requires_e4_if_omitted",
           "admission": "unknown_requires_installed_qualification"
+        },
+        {
+          "feature_id": "network.qos",
+          "source_attributes": [],
+          "target_attributes": [],
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "admission": "unknown_requires_installed_qualification"
         }
       ]
     },
@@ -1096,9 +1114,7 @@
             "identity.vcenter_version",
             "identity.vcenter_build",
             "identity.api_release",
-            "identity.config_change_version",
-            "compute.hardware_version",
-            "identity.vcenter_uuid"
+            "identity.config_change_version"
           ],
           "target_attributes": [
             "target.aos_and_ahv_versions",
@@ -1114,7 +1130,8 @@
             "identity.instance_uuid",
             "identity.bios_uuid",
             "identity.host",
-            "identity.create_date"
+            "identity.create_date",
+            "identity.vcenter_uuid"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1135,7 +1152,8 @@
             "compute.cpu_count",
             "compute.memory_mib",
             "compute.memory_hot_add",
-            "compute.cpu_hot_add"
+            "compute.cpu_hot_add",
+            "compute.hardware_version"
           ],
           "target_attributes": [],
           "mapping_proposal": "no_direct_field_qualified_alternative_required",
@@ -1382,6 +1400,13 @@
           ],
           "mapping_proposal": "optional_requires_e4_if_omitted",
           "admission": "unknown_requires_installed_qualification"
+        },
+        {
+          "feature_id": "network.qos",
+          "source_attributes": [],
+          "target_attributes": [],
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "admission": "unknown_requires_installed_qualification"
         }
       ]
     },
@@ -1395,9 +1420,7 @@
             "identity.vcenter_version",
             "identity.vcenter_build",
             "identity.api_release",
-            "identity.config_change_version",
-            "compute.hardware_version",
-            "identity.vcenter_uuid"
+            "identity.config_change_version"
           ],
           "target_attributes": [
             "target.compute_api_bounds",
@@ -1414,7 +1437,8 @@
             "identity.instance_uuid",
             "identity.bios_uuid",
             "identity.host",
-            "identity.create_date"
+            "identity.create_date",
+            "identity.vcenter_uuid"
           ],
           "target_attributes": [],
           "mapping_proposal": "qualified_adapter_required",
@@ -1435,7 +1459,8 @@
             "compute.cpu_count",
             "compute.memory_mib",
             "compute.memory_hot_add",
-            "compute.cpu_hot_add"
+            "compute.cpu_hot_add",
+            "compute.hardware_version"
           ],
           "target_attributes": [
             "target.placement_traits"
@@ -1685,10 +1710,17 @@
           "source_attributes": [
             "identity.display_name"
           ],
+          "target_attributes": [],
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "admission": "unknown_requires_installed_qualification"
+        },
+        {
+          "feature_id": "network.qos",
+          "source_attributes": [],
           "target_attributes": [
             "target.qos_policies"
           ],
-          "mapping_proposal": "optional_requires_e4_if_omitted",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         }
       ]
@@ -1981,6 +2013,13 @@
           ],
           "mapping_proposal": "optional_requires_e4_if_omitted",
           "admission": "unknown_requires_installed_qualification"
+        },
+        {
+          "feature_id": "network.qos",
+          "source_attributes": [],
+          "target_attributes": [],
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "admission": "unknown_requires_installed_qualification"
         }
       ]
     },
@@ -2276,6 +2315,13 @@
             "target.categories"
           ],
           "mapping_proposal": "optional_requires_e4_if_omitted",
+          "admission": "unknown_requires_installed_qualification"
+        },
+        {
+          "feature_id": "network.qos",
+          "source_attributes": [],
+          "target_attributes": [],
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         }
       ]
@@ -2577,10 +2623,17 @@
             "identity.display_name",
             "identity.categories"
           ],
+          "target_attributes": [],
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "admission": "unknown_requires_installed_qualification"
+        },
+        {
+          "feature_id": "network.qos",
+          "source_attributes": [],
           "target_attributes": [
             "target.qos_policies"
           ],
-          "mapping_proposal": "optional_requires_e4_if_omitted",
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         }
       ]
@@ -2873,13 +2926,21 @@
         {
           "feature_id": "metadata.optional",
           "source_attributes": [
-            "storage.volume_metadata",
-            "network.qos_policy"
+            "storage.volume_metadata"
           ],
           "target_attributes": [
             "target.optional_tags"
           ],
           "mapping_proposal": "optional_requires_e4_if_omitted",
+          "admission": "unknown_requires_installed_qualification"
+        },
+        {
+          "feature_id": "network.qos",
+          "source_attributes": [
+            "network.qos_policy"
+          ],
+          "target_attributes": [],
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         }
       ]
@@ -3177,13 +3238,21 @@
         {
           "feature_id": "metadata.optional",
           "source_attributes": [
-            "storage.volume_metadata",
-            "network.qos_policy"
+            "storage.volume_metadata"
           ],
           "target_attributes": [
             "target.categories"
           ],
           "mapping_proposal": "optional_requires_e4_if_omitted",
+          "admission": "unknown_requires_installed_qualification"
+        },
+        {
+          "feature_id": "network.qos",
+          "source_attributes": [
+            "network.qos_policy"
+          ],
+          "target_attributes": [],
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
           "admission": "unknown_requires_installed_qualification"
         }
       ]
@@ -3490,7 +3559,15 @@
         {
           "feature_id": "metadata.optional",
           "source_attributes": [
-            "storage.volume_metadata",
+            "storage.volume_metadata"
+          ],
+          "target_attributes": [],
+          "mapping_proposal": "no_direct_field_qualified_alternative_required",
+          "admission": "unknown_requires_installed_qualification"
+        },
+        {
+          "feature_id": "network.qos",
+          "source_attributes": [
             "network.qos_policy"
           ],
           "target_attributes": [
