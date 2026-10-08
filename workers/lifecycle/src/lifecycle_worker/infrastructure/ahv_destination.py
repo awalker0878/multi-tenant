@@ -1,5 +1,7 @@
 """Native image URL import and powered-off AHV VM creation with durable task receipts."""
 
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
+
 import time
 from collections.abc import Callable
 from pathlib import Path
