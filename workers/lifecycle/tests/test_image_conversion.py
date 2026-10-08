@@ -8,7 +8,30 @@ from typing import Any
 import pytest
 
 from lifecycle_worker.application.native import NativeHeld, digest
-from lifecycle_worker.infrastructure.image_conversion import CopyConverter, PinnedQemuSandbox
+from lifecycle_worker.infrastructure.image_conversion import (
+    CopyConverter,
+    PinnedQemuSandbox,
+    file_digest,
+    rootfs_digest,
+)
+
+
+def test_rootfs_inventory_accepts_and_pins_empty_files(tmp_path: Path) -> None:
+    empty = tmp_path / "empty-config"
+    empty.touch(mode=0o644)
+    assert rootfs_digest(tmp_path, lambda: None) == digest(
+        [["empty-config", 0o644, hashlib.sha256(b"").hexdigest()]]
+    )
+    initial = rootfs_digest(tmp_path, lambda: None)
+    empty.write_bytes(b"changed")
+    assert rootfs_digest(tmp_path, lambda: None) != initial
+
+
+def test_empty_migration_disk_remains_rejected(tmp_path: Path) -> None:
+    disk = tmp_path / "disk.raw"
+    disk.touch()
+    with pytest.raises(NativeHeld, match="conversion_file_bound"):
+        file_digest(disk, 1048576, lambda: None)
 
 
 class Engine(PinnedQemuSandbox):
