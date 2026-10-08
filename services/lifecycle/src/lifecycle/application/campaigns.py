@@ -582,15 +582,24 @@ def campaign_boundary(tx: Transaction, job: str, stage: str, now: int) -> dict[s
     if prediction["phases"][phase] is None:
         raise Rejected("campaign_stage_measurement_required", 423)
     observations = tx.all(
-        "SELECT DISTINCT ON(tenant,pool_key) tenant,pool_key,paused,expires_at "
+        "SELECT DISTINCT ON(tenant,pool_key) tenant,pool_key,capacity,paused,expires_at "
         "FROM app.migration_pool_observations WHERE pool_key=ANY(%s) "
-        "ORDER BY tenant,pool_key,observed_at DESC,paused DESC,expires_at",
+        "ORDER BY tenant,pool_key,observed_at DESC,paused DESC,capacity,expires_at",
         (list(member["specification"]["demands"]),),
     )
     if any(o["paused"] or o["expires_at"] <= now for o in observations) or {
         o["pool_key"] for o in observations if str(o["tenant"]) == str(member["tenant"])
     } != set(member["specification"]["demands"]):
         raise Rejected("campaign_resource_observation_required", 423)
+    allocations = tx.all(
+        "SELECT a.pool_key,sum(a.amount) AS amount FROM app.migration_allocations a "
+        "LEFT JOIN app.migration_allocation_releases r USING(member,pool_key) "
+        "WHERE r.member IS NULL AND a.pool_key=ANY(%s) GROUP BY a.pool_key",
+        (list(member["specification"]["demands"]),),
+    )
+    used = {a["pool_key"]: int(a["amount"]) for a in allocations}
+    if any(used.get(o["pool_key"], 0) > o["capacity"] for o in observations):
+        raise Rejected("campaign_capacity_wait", 423)
     return member
 
 
@@ -648,7 +657,8 @@ def stage_complete(tx: Transaction, job: str, operation: str, terminal: bool, no
         )
     if terminal:
         tx.execute(
-            "UPDATE app.migration_members SET state='complete',completed_at=%s WHERE job=%s",
+            "UPDATE app.migration_members SET state='complete',reason=NULL,completed_at=%s "
+            "WHERE job=%s",
             (now, job),
         )
         tx.execute(

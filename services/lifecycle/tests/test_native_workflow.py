@@ -543,3 +543,22 @@ def test_previous_stage_observation_cannot_clear_later_unknown_hold(native: Any)
         service.reconcile(tenant, b)
     assert service.reconcile(tenant, prior) == "held"
     assert service.read(tenant, job)["state"] == "held"
+
+
+def test_completed_grant_cannot_authorize_writes_during_a_later_stage(native: Any) -> None:
+    service, owners, p, tenant, job = admitted(native)
+    prior = complete(service, p, tenant, job, "reserve")
+    service.prepare(tenant, job, "provision")
+    with pytest.raises(Rejected, match="native_grant_completed"):
+        service.boundary(tenant, prior, p["executor_id"], "during_effect")
+
+
+def test_late_activity_hold_cannot_regress_accepted_terminal_result(native: Any) -> None:
+    service, owners, p, tenant, job = admitted(native)
+    for stage in PROVISION:
+        complete(service, p, tenant, job, stage)
+    accepted = service.read(tenant, job)
+    service.hold(tenant, job)
+    current = service.read(tenant, job)
+    assert current["state"] == "active"
+    assert current["revision"] == accepted["revision"]
