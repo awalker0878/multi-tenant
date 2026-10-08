@@ -162,3 +162,30 @@ def test_provider_tenant_authorization_withdrawal_rejects_current_receipt(
     source.withdrawn_tenants.add(selected["scope"]["tenant_id"])
     with pytest.raises(Held, match="native_authority_unavailable"):
         service.check(selected["scope"]["tenant_id"], selected["plan_digest"])
+
+
+def test_missing_class_specific_limit_cannot_accept_physical_address_vector(
+    database: Postgres,
+) -> None:
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    selected["allocations"][0]["vector"]["addresses:private:ipv6"] = 1
+    selected["placement_sha256"] = digest(selected["allocations"])
+    with pytest.raises(Held, match="class_limit_missing"):
+        service.reserve(selected["scope"]["tenant_id"], selected)
+    with database.transaction() as tx:
+        saved = tx.one("SELECT count(*) AS n FROM app.placement_reservations")
+    assert saved is not None and saved["n"] == 0
+
+
+def test_provider_usage_class_not_in_limits_invalidates_existing_receipt(
+    database: Postgres,
+) -> None:
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    assert service.reserve(selected["scope"]["tenant_id"], selected)["state"] == "reserved"
+    source.used["storage_gib:premium"] = 10
+    with pytest.raises(Held, match="class_limit_missing"):
+        service.check(selected["scope"]["tenant_id"], selected["plan_digest"])
