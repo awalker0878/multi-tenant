@@ -1113,6 +1113,32 @@
           "condition": "when:present",
           "collector_source": "services/inventory/src/inventory/domain/source_profile.py",
           "collection_status": "external_evidence_required"
+        },
+        {
+          "id": "identity.display_name",
+          "scope": "source",
+          "api_family": "vim",
+          "api_field": "VirtualMachine.config.name",
+          "owner_evidence_field": null,
+          "collection_method": "native_get",
+          "max_age_seconds": 300,
+          "severity": "optional",
+          "condition": "when:present",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/vmware_workload.py",
+          "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "identity.create_date",
+          "scope": "source",
+          "api_family": "vim",
+          "api_field": "VirtualMachine.config.createDate",
+          "owner_evidence_field": null,
+          "collection_method": "native_get",
+          "max_age_seconds": 3600,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/vmware_workload.py",
+          "collection_status": "native_field_candidate"
         }
       ]
     },
@@ -2211,6 +2237,58 @@
           "condition": "when:present",
           "collector_source": "services/inventory/src/inventory/domain/source_profile.py",
           "collection_status": "external_evidence_required"
+        },
+        {
+          "id": "identity.display_name",
+          "scope": "source",
+          "api_family": "vmm",
+          "api_field": "data.name",
+          "owner_evidence_field": null,
+          "collection_method": "native_get",
+          "max_age_seconds": 300,
+          "severity": "optional",
+          "condition": "when:present",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_workload.py",
+          "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "identity.create_time",
+          "scope": "source",
+          "api_family": "vmm",
+          "api_field": "data.createTime",
+          "owner_evidence_field": null,
+          "collection_method": "native_get",
+          "max_age_seconds": 3600,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_workload.py",
+          "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "target.subnet_external",
+          "scope": "target",
+          "api_family": "networking",
+          "api_field": "subnets[*].isExternal",
+          "owner_evidence_field": null,
+          "collection_method": "native_list",
+          "max_age_seconds": 60,
+          "severity": "critical",
+          "condition": "when:external_connectivity",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_profile.py",
+          "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "target.subnet_vpc",
+          "scope": "target",
+          "api_family": "networking",
+          "api_field": "subnets[*].vpcReference",
+          "owner_evidence_field": null,
+          "collection_method": "native_list",
+          "max_age_seconds": 60,
+          "severity": "critical",
+          "condition": "when:vpc_required",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_profile.py",
+          "collection_status": "native_field_candidate"
         }
       ]
     },
@@ -3452,6 +3530,84 @@
           "condition": "when:present",
           "collector_source": "services/inventory/src/inventory/domain/source_profile.py",
           "collection_status": "external_evidence_required"
+        },
+        {
+          "id": "network.declared_addresses",
+          "scope": "source",
+          "api_family": "nova",
+          "api_field": "server.addresses",
+          "owner_evidence_field": null,
+          "collection_method": "native_get",
+          "max_age_seconds": 60,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_workload.py",
+          "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "network.declared_security_groups",
+          "scope": "source",
+          "api_family": "nova",
+          "api_field": "server.security_groups",
+          "owner_evidence_field": null,
+          "collection_method": "native_get",
+          "max_age_seconds": 60,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_workload.py",
+          "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "guest.image_metadata",
+          "scope": "source",
+          "api_family": "nova",
+          "api_field": "server.metadata",
+          "owner_evidence_field": null,
+          "collection_method": "native_get",
+          "max_age_seconds": 300,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_workload.py",
+          "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "target.identity_catalog",
+          "scope": "target",
+          "api_family": "keystone",
+          "api_field": "GET /auth/catalog",
+          "owner_evidence_field": null,
+          "collection_method": "native_list",
+          "max_age_seconds": 3600,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+          "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "target.network_dhcp",
+          "scope": "target",
+          "api_family": "neutron",
+          "api_field": "subnets[*].enable_dhcp + dns_nameservers + allocation_pools",
+          "owner_evidence_field": null,
+          "collection_method": "native_list",
+          "max_age_seconds": 60,
+          "severity": "critical",
+          "condition": "when:ip_assignment",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+          "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "target.security_stateful",
+          "scope": "target",
+          "api_family": "neutron",
+          "api_field": "security_groups[*].stateful",
+          "owner_evidence_field": null,
+          "collection_method": "native_list",
+          "max_age_seconds": 60,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+          "collection_status": "native_field_candidate"
         }
       ]
     }
