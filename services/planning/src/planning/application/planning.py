@@ -9,8 +9,8 @@ from uuid import uuid4
 from planning.application.ports import Database, Sources, Transaction
 from planning.application.validation import PlanValidation
 from planning.domain.assessment import assess
-from planning.domain.placement import fit
 from planning.domain.compilation import bind, compile_plan
+from planning.domain.placement import fit
 from planning.domain.model import Actor, Rejected, canonical, digest, identifier, integer, shape
 
 
