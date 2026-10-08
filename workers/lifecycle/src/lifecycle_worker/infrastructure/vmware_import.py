@@ -1,10 +1,10 @@
 """Native VI JSON import spec and NFC upload into a powered-off isolated VM.
 
-MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
-
 No VDDK, production guest mutation, default network, automatic activation or
 uncertain write replay. Every upload maps one retained disk to one lease device.
 """
+
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
 
 import hashlib
 import http.client
