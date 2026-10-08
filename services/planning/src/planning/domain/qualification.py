@@ -18,3 +18,17 @@ def verified(qualification: dict[str, Any], now: int) -> bool:
         and 0 <= now - verification["resolved_at"] <= 5
         and verification.get("expires_at", 0) > now
     )
+
+
+def binding_digest(qualification: dict[str, Any]) -> str:
+    """Pin reviewed record bytes; independently recheck current runtime on every read."""
+    receipt = qualification.get("verification") or {}
+    record = {k: v for k, v in qualification.items() if k != "verification"}
+    return digest(
+        {
+            "record": record,
+            "valid": receipt.get("valid"),
+            "definition_sha256": receipt.get("definition_sha256"),
+            "decision_sha256": receipt.get("decision_sha256"),
+        }
+    )

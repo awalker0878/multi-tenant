@@ -5,7 +5,7 @@ from typing import Any
 from planning.domain.capability_definitions import STRATEGIES
 from planning.domain.matching import matches
 from planning.domain.model import ACTIONS, DIMENSIONS, Rejected, digest, integer
-from planning.domain.qualification import verified
+from planning.domain.qualification import binding_digest, verified
 
 
 def requirements(intent: dict[str, Any]) -> list[dict[str, Any]]:
@@ -111,7 +111,7 @@ def assess(
         "inventory": digest(destination),
         "profile": profile["digest"],
         "policy": digest(policy),
-        "qualification": digest(qualification),
+        "qualification": binding_digest(qualification),
         "intent": digest(intent),
     }
     for key, ok, reason in (

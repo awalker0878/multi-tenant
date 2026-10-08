@@ -86,3 +86,18 @@ def test_unattended_plan_read_holds_when_current_owner_revokes_support() -> None
     with pytest.raises(Rejected, match="current_qualification_required"):
         planner.check_native_recipe({"content": content, "binding": {"requested_by": "actor"}})
     recipes.assert_not_called()
+
+
+def test_runtime_refresh_does_not_change_the_reviewed_record_binding() -> None:
+    from copy import deepcopy
+
+    from planning.domain.qualification import binding_digest, verified
+
+    record = inputs()[4]
+    refreshed = deepcopy(record)
+    refreshed["verification"].update(resolved_at=NOW + 2, runtime_sha256="c" * 64)
+    assert binding_digest(record) == binding_digest(refreshed)
+    assert verified(refreshed, NOW + 2)
+    assert not verified(record, NOW + 6)
+    refreshed["verification"]["decision_sha256"] = "d" * 64
+    assert binding_digest(record) != binding_digest(refreshed)
