@@ -114,6 +114,18 @@ it('expires approval authoritatively and records the transition once', function 
     expect(DB::table('app.governance_audit')->where('event', 'governance.approval.expired')->count())->toBe(1);
 });
 
+it('refuses a decision at the exact approval deadline', function (): void {
+    $deadline = now()->addMinute()->startOfSecond();
+    $this->input['expires_at'] = $deadline->toIso8601String();
+    $id = requestApproval($this);
+    $this->travelTo($deadline);
+
+    tenantCommand($this, $this->path.'/'.$id.'/approve', ['revision' => 1, 'reason' => 'Elapsed deadline'], $this->reviewer)
+        ->assertStatus(409)->assertJsonPath('error', 'approval_expired');
+    expect(DB::table('app.approvals')->where('id', $id)->value('state'))->toBe('requested')
+        ->and(DB::table('app.governance_audit')->where('event', 'governance.approval.approved')->count())->toBe(0);
+});
+
 it('requires fresh authority and cannot resurrect an approval after membership regrant', function (): void {
     $id = approvePlan($this);
     tenantMember($this, $this->tenant, 'reviewer', 'reviewer', [], 1, 'revoked');
