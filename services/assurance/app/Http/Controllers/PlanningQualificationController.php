@@ -24,9 +24,18 @@ final class PlanningQualificationController
         // An absent registry is an explicit absence of qualification, never an allow-all default.
         $matches = [];
         if ($path !== null) {
-            abort_unless(is_string($path) && str_starts_with($path, '/') && is_readable($path) && filesize($path) <= 524288, 503);
+            abort_unless(is_string($path) && str_starts_with($path, '/') && ! is_link($path) && is_file($path) && is_readable($path), 503);
+            for ($parent = dirname($path); $parent !== '/'; $parent = dirname($parent)) {
+                abort_if(is_link($parent), 503);
+            }
+            $handle = fopen($path, 'rb');
+            abort_unless($handle !== false, 503);
             try {
-                $registry = json_decode(file_get_contents($path) ?: '', true, 64, JSON_THROW_ON_ERROR);
+                $info = fstat($handle);
+                abort_unless(is_array($info) && ($info['mode'] & 0170000) === 0100000 && ($info['mode'] & 0022) === 0 && $info['size'] <= 524288, 503);
+                $raw = stream_get_contents($handle, 524289);
+                abort_unless(is_string($raw) && strlen($raw) <= 524288, 503);
+                $registry = json_decode($raw, true, 64, JSON_THROW_ON_ERROR);
                 abort_unless(is_array($registry) && ($registry['schema_version'] ?? null) === 1 && is_array($registry['records'] ?? null), 503);
                 foreach ($registry['records'] as $record) {
                     if (is_array($record) && $this->canonical($record['scope'] ?? null) === $this->canonical($input['qualification_scope'])) {
@@ -36,6 +45,8 @@ final class PlanningQualificationController
                 }
             } catch (Throwable) {
                 abort(503);
+            } finally {
+                fclose($handle);
             }
         }
         abort_if(count($matches) > 1, 503, 'qualification_conflict');
