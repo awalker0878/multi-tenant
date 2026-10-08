@@ -11,6 +11,7 @@ from planning.application.migration_plans import MigrationPlans
 from planning.application.migration_support import MigrationSupport
 from planning.application.native_plans import NativePlans
 from planning.application.planning import Planning
+from planning.application.qualification_invalidations import QualificationInvalidations
 from planning.application.validation import MigrationValidation, NativeValidation, PlanValidation
 from planning.infrastructure.foundation import database_ready
 from planning.infrastructure.migration import prepare_migration
@@ -23,6 +24,7 @@ from planning.interfaces.http import FoundationApp
 from planning.interfaces.migration import MigrationPreparationApp
 from planning.interfaces.native_plans import NativePlansApp
 from planning.interfaces.planning import PlanningApp
+from planning.interfaces.qualification_invalidations import QualificationInvalidationApp
 from planning.interfaces.telemetry import RequestTelemetry
 
 
@@ -46,6 +48,7 @@ class PlanningRouter:
             Planning(Postgres(), OwnerSources(), clock, validation), GovernanceAuthority()
         )
         self.foundation = FoundationApp(database_ready)
+        self.invalidations = QualificationInvalidationApp(QualificationInvalidations(Postgres()))
         migrations = MigrationPlans(self.planning.planning, validation.migration, visible_recipes)
         self.migration = MigrationPreparationApp(
             self.planning.authority, prepare_migration, migrations, self.support
@@ -56,7 +59,9 @@ class PlanningRouter:
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        if scope["type"] == "http" and scope["path"].endswith("/native-plans"):
+        if scope["type"] == "http" and scope["path"] == "/internal/qualification-events":
+            await self.invalidations(scope, receive, send)
+        elif scope["type"] == "http" and scope["path"].endswith("/native-plans"):
             await self.native(scope, receive, send)
         elif scope["type"] == "http" and scope["path"].endswith(
             (
