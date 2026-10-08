@@ -5,6 +5,7 @@ from typing import Any
 from uuid import UUID
 
 from inventory.domain.discovery import Rejected, number, shape, text
+from inventory.domain.destination_security import select_security_mappings, source_security_ids
 
 AHV_FIELDS = {
     "schema_version",
@@ -92,6 +93,7 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
             "storage_container_id",
             "category_ids",
             "policy_ids",
+            "security_mappings",
             "disks",
             "nics",
             "firmware",
@@ -115,17 +117,26 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
         raise Rejected("ahv_storage_mapping_unobserved")
     if d["vpc_id"] is not None and d["vpc_id"] not in inventories["vpcs"]:
         raise Rejected("ahv_vpc_mapping_unobserved")
-    for field, inventory in (("category_ids", "categories"), ("policy_ids", "policies")):
-        values = d[field]
-        if (
-            not isinstance(values, list)
-            or not 1 <= len(values) <= 32
-            or len(set(values)) != len(values)
-            or not set(values) <= inventories[inventory].keys()
-        ):
-            raise Rejected("ahv_security_mapping_unobserved")
-    if any(inventories["policies"][key].get("state") != "ENFORCE" for key in d["policy_ids"]):
-        raise Rejected("ahv_policy_not_enforced")
+    # Source categories are optional only when they were actually observed.
+    # No source category => no destination category selector or assignment.
+    native = source.get("native")
+    metadata = native.get("metadata") if isinstance(native, dict) else None
+    vm = metadata.get("vm") if isinstance(metadata, dict) else None
+    source_categories = vm.get("categories") if isinstance(vm, dict) else None
+    if not isinstance(d["category_ids"], list) or len(d["category_ids"]) > 32 or (
+        len(d["category_ids"]) != len(set(d["category_ids"]))
+    ):
+        raise Rejected("ahv_category_selection_invalid")
+    if (not source_categories and d["category_ids"]) or not set(d["category_ids"]) <= inventories["categories"].keys():
+        raise Rejected("unobserved_source_or_destination_category")
+    source_ids = source_security_ids(source)
+    verified = {
+        key for key, policy in inventories["policies"].items()
+        if policy.get("state") == "ENFORCE"
+    }
+    selected = select_security_mappings(d["security_mappings"], source_ids, verified)
+    if d["policy_ids"] != selected:
+        raise Rejected("security_policy_mapping_changed")
     for field in ("disks", "nics"):
         rows = d[field]
         if not isinstance(rows, list) or len(rows) != len(source[field]) or len(rows) > 32:
