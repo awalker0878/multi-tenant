@@ -23,7 +23,13 @@ def capability_input(
     base["capability_snapshot"] = None
     if observed is not None:
         inventory = observed.pop("inventory")
-        for key in ("dimensions", "capabilities", "capacity", "domain_bindings", "workload_bindings"):
+        for key in (
+            "dimensions",
+            "capabilities",
+            "capacity",
+            "domain_bindings",
+            "workload_bindings",
+        ):
             base[key] = inventory[key]
         base["installed_provenance"] = "observed"
         base["expires_at"] = min(base["expires_at"], observed["expires_at"])

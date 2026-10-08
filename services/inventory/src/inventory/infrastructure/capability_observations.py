@@ -60,7 +60,13 @@ class MountedCapabilityObservations:
                 inventory = observed.get("inventory", {})
                 if any(
                     inventory.get(k) != base[k]
-                    for k in ("tenant_id", "site_id", "endpoint_id", "generation_id", "native_scope")
+                    for k in (
+                        "tenant_id",
+                        "site_id",
+                        "endpoint_id",
+                        "generation_id",
+                        "native_scope",
+                    )
                 ):
                     continue
                 key = trust["keys"][envelope["key_id"]]
@@ -94,9 +100,7 @@ class MountedCapabilityObservations:
                     or not now < observed["expires_at"] <= observed["observed_at"] + 120
                     or observed["expires_at"] > key["expires_at"]
                     or set(observed["dimensions"]) != set(DIMENSIONS)
-                    or any(
-                        observed["cases"].get("dimension:" + d) != "passed" for d in DIMENSIONS
-                    )
+                    or any(observed["cases"].get("dimension:" + d) != "passed" for d in DIMENSIONS)
                 ):
                     raise ValueError
                 results.append(

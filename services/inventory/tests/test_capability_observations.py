@@ -20,13 +20,22 @@ from inventory.infrastructure.capability_observations import MountedCapabilityOb
 def test_projection_preserves_discovery_holds_and_expiry() -> None:
     base = {"holds": ["ownership_collision"], "expires_at": 1000}
     observed = {
-        "inventory": {k: {} for k in (
-            "dimensions", "capabilities", "capacity", "domain_bindings", "workload_bindings"
-        )},
+        "inventory": {
+            k: {}
+            for k in (
+                "dimensions",
+                "capabilities",
+                "capacity",
+                "domain_bindings",
+                "workload_bindings",
+            )
+        },
         "expires_at": 900,
     }
     with patch("inventory.application.capability_observations.planning_input", return_value=base):
-        result = capability_input(Mock(), "t", "s", "e", "g", Mock(read=Mock(return_value=observed)))
+        result = capability_input(
+            Mock(), "t", "s", "e", "g", Mock(read=Mock(return_value=observed))
+        )
     assert result["holds"] == ["ownership_collision"]
     assert result["expires_at"] == 900
 
@@ -76,23 +85,16 @@ def test_signed_observation_is_not_an_adapter_assertion(
         envelope["signature_base64"] = base64.b64encode(b"wrong").decode()
     evidence = tmp_path / "runtime.json"
     trust = tmp_path / "trust.json"
-    evidence.write_text(json.dumps({
-        "schema_version": 1,
-        "records": {"a" * 64: envelope},
-        "suspended": {"a" * 64: "failed"} if fault == "suspended" else {},
-    }))
-    trust.write_text(json.dumps({
-        "schema_version": 1,
-        "keys": {"observer-key": {
-            "public_key_pem": key.public_key().public_bytes(
-                serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo
-            ).decode(),
-            "role": "observer",
-            "subject_id": "observer",
-            "scope": {k: base[k] for k in ("tenant_id", "site_id", "endpoint_id")},
-            "expires_at": now + 3600,
-        }},
-    }))
+    evidence.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "records": {"a" * 64: envelope},
+                "suspended": {"a" * 64: "failed"} if fault == "suspended" else {},
+            }
+        )
+    )
+    trust.write_text(
     monkeypatch.setenv("INVENTORY_CAPABILITY_EVIDENCE_FILE", str(evidence))
     monkeypatch.setenv("INVENTORY_CAPABILITY_TRUST_FILE", str(trust))
     owner = MountedCapabilityObservations()

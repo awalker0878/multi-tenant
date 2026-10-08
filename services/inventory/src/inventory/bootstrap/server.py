@@ -48,7 +48,8 @@ class InventoryRouter:
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
         if scope["type"] == "http" and any(
-            p in scope["path"] for p in ("/planning-inputs/", "/planning-capability-inputs/", "/migration-inputs/")
+            p in scope["path"]
+            for p in ("/planning-inputs/", "/planning-capability-inputs/", "/migration-inputs/")
         ):
             await self.planning(scope, receive, send)
         elif scope["type"] == "http" and (
