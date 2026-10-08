@@ -144,7 +144,7 @@ Successful migration never implicitly retires the source.
 | M10 | Application-native/file-delta framework and final consistency receipts |
 | M11 | Both recovery boundaries, retained data and explicit cleanup workflows |
 | M12 | VMware → OpenStack Q07 qualification campaign |
-| M13 | Separately qualified VMware → Nutanix / VMware destinations |
+| M13 | [AHV destination components](ahv-destination.md) for Linux cold export; AHV native Q08 and the VMware destination remain separately required |
 | M14 | Optional approved external block-replication adapters; VDDK only if entitled |
 
 The [implementation record](p08-execution.md) now covers read-only profile

@@ -1,0 +1,2768 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Planning assessment and immutable review API",
+    "version": "1.2.0",
+    "description": "Planning v1.1 includes immutable native migration composition and campaign requirements. Published v1 bytes remain unchanged."
+  },
+  "security": [
+    {
+      "ConsoleWorkload": []
+    }
+  ],
+  "paths": {
+    "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments": {
+      "post": {
+        "operationId": "createAssessment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Delegations",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Current authorized result; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "403": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "404": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "409": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "413": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "422": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "429": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "503": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "application.provision",
+                      "application.migrate",
+                      "application.recover",
+                      "application.retire"
+                    ]
+                  },
+                  "method": {
+                    "type": "string"
+                  },
+                  "candidates": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "site_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "endpoint_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "generation_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      },
+                      "required": [
+                        "site_id",
+                        "endpoint_id",
+                        "generation_id"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "action",
+                  "method",
+                  "candidates"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments/{record}": {
+      "get": {
+        "operationId": "getAssessment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "record",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Delegations",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current authorized result; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Assessment"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "403": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "404": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "409": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "413": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "422": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "429": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "503": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans": {
+      "post": {
+        "operationId": "createPlan",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Delegations",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Current authorized result; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "403": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "404": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "409": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "413": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "422": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "429": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "503": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "assessment_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "candidate": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2
+                  },
+                  "request": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "application.provision",
+                          "application.migrate",
+                          "application.recover",
+                          "application.retire"
+                        ]
+                      },
+                      "method": {
+                        "type": "string"
+                      },
+                      "lane": {
+                        "enum": [
+                          "operational",
+                          "isolated_campaign"
+                        ]
+                      },
+                      "executor_ids": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 32,
+                        "items": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      },
+                      "valid_until": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "method",
+                      "lane",
+                      "executor_ids",
+                      "valid_until"
+                    ]
+                  }
+                },
+                "required": [
+                  "assessment_id",
+                  "candidate",
+                  "request"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}": {
+      "get": {
+        "operationId": "getPlan",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "record",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Delegations",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current authorized result; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plan"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "403": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "404": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "409": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "413": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "422": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "429": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "503": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}/validity": {
+      "post": {
+        "operationId": "checkPlanValidity",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "record",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Delegations",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current authorized result; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Validity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "403": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "404": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "409": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "413": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "422": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "429": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "503": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}/diff": {
+      "post": {
+        "operationId": "comparePlans",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "record",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Delegations",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current authorized result; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Diff"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "403": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "404": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "409": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "413": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "422": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "429": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          },
+          "503": {
+            "description": "Denied, held or unavailable; no native dispatch"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "other_plan_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "other_plan_id"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ConsoleWorkload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "BoundPlan": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "plan_id",
+          "revision",
+          "tenant_id",
+          "action",
+          "site_id",
+          "environment",
+          "resource_id",
+          "requested_by",
+          "executor_ids",
+          "valid_until",
+          "digest",
+          "content_digest",
+          "canonicalization",
+          "lane"
+        ],
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "application.provision",
+              "application.migrate",
+              "application.recover",
+              "application.retire"
+            ]
+          },
+          "site_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+          },
+          "environment": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+          },
+          "resource_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+          },
+          "requested_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "executor_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 32,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "valid_until": {
+            "type": "integer"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "content_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "canonicalization": {
+            "const": "p05-json-v1"
+          },
+          "lane": {
+            "enum": [
+              "operational",
+              "isolated_campaign"
+            ]
+          }
+        }
+      },
+      "Content": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": 1
+          },
+          "canonicalization": {
+            "const": "p05-json-v1"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "endpoint_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "native_scope": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "site_id",
+              "environment",
+              "resource_id",
+              "endpoint_id",
+              "native_scope"
+            ]
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "application.provision",
+              "application.migrate",
+              "application.recover",
+              "application.retire"
+            ]
+          },
+          "method": {
+            "type": "string"
+          },
+          "lane": {
+            "enum": [
+              "operational",
+              "isolated_campaign"
+            ]
+          },
+          "executor_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "maxItems": 1000
+          },
+          "valid_until": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "input_fresh_until": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "input_digests": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "inventory": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "profile": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "policy": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "qualification": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "intent": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "inventory",
+              "profile",
+              "policy",
+              "qualification",
+              "intent"
+            ]
+          },
+          "intent_revision": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "inventory_generation": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "installed_tuple": {
+            "type": "object"
+          },
+          "artifacts": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "compiler": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "adapter": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "automation": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "contracts": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "compiler",
+              "adapter",
+              "automation",
+              "contracts"
+            ]
+          },
+          "native_api": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "operation_plan": {
+                    "type": "object"
+                  },
+                  "operation_plan_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "api_contracts_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "adapter_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "custody_ref": {
+                    "type": "string"
+                  },
+                  "custody_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "custody_generation": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "fence_owner": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "operation_plan",
+                  "operation_plan_sha256",
+                  "api_contracts_sha256",
+                  "adapter_sha256",
+                  "custody_ref",
+                  "custody_id",
+                  "custody_generation",
+                  "fence_owner"
+                ]
+              }
+            ]
+          },
+          "ownership": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "maxItems": 1000
+          },
+          "mappings": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "maxItems": 1000
+          },
+          "effects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "after": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 1000
+                },
+                "owner": {
+                  "type": "string"
+                },
+                "scope": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "tenant_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "site_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "environment": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "resource_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "endpoint_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "native_scope": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "tenant_id",
+                    "site_id",
+                    "environment",
+                    "resource_id",
+                    "endpoint_id",
+                    "native_scope"
+                  ]
+                },
+                "artifact_digest": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "destructive": {
+                  "type": "boolean"
+                },
+                "boundary": {
+                  "type": "string"
+                },
+                "on_unknown": {
+                  "const": "hold_and_observe_before_retry"
+                },
+                "authority_recheck": {
+                  "const": "immediately_before_effect"
+                }
+              },
+              "required": [
+                "id",
+                "after",
+                "owner",
+                "scope",
+                "artifact_digest",
+                "destructive",
+                "boundary",
+                "on_unknown",
+                "authority_recheck"
+              ]
+            },
+            "maxItems": 1000
+          },
+          "reservation_intents": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "maxItems": 1000
+          },
+          "budgets": {
+            "type": "object"
+          },
+          "recovery": {
+            "type": "object"
+          },
+          "execution_ready": {
+            "type": "boolean"
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 1000
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        },
+        "required": [
+          "schema_version",
+          "canonicalization",
+          "scope",
+          "action",
+          "method",
+          "lane",
+          "executor_ids",
+          "valid_until",
+          "input_fresh_until",
+          "input_digests",
+          "intent_revision",
+          "inventory_generation",
+          "installed_tuple",
+          "artifacts",
+          "native_api",
+          "ownership",
+          "mappings",
+          "effects",
+          "reservation_intents",
+          "budgets",
+          "recovery",
+          "execution_ready",
+          "holds",
+          "native_write_authorized"
+        ]
+      },
+      "Assessment": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "application_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environment": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "intent": {
+            "type": "object"
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "maxItems": 1000
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "site_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "endpoint_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "generation_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "platform": {
+                  "enum": [
+                    "vmware",
+                    "ahv",
+                    "openstack"
+                  ]
+                },
+                "status": {
+                  "enum": [
+                    "eligible",
+                    "conditional",
+                    "blocked",
+                    "unknown"
+                  ]
+                },
+                "operationally_eligible": {
+                  "type": "boolean"
+                },
+                "findings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "requirement": {
+                        "type": "string"
+                      },
+                      "source": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": [
+                          "eligible",
+                          "conditional",
+                          "blocked",
+                          "unknown"
+                        ]
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "remediation": {
+                        "type": "string"
+                      },
+                      "mandatory": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "requirement",
+                      "source",
+                      "status",
+                      "reason",
+                      "remediation",
+                      "mandatory"
+                    ]
+                  },
+                  "maxItems": 1000
+                },
+                "input_digests": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "inventory": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "profile": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "policy": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "qualification": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "intent": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "inventory",
+                    "profile",
+                    "policy",
+                    "qualification",
+                    "intent"
+                  ]
+                },
+                "demand": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "vcpus": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "memory_mib": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "storage_gib": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "addresses": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "vcpus",
+                    "memory_mib",
+                    "storage_gib",
+                    "addresses"
+                  ]
+                },
+                "reserved": {
+                  "const": false
+                },
+                "expires_at": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "site_id",
+                "endpoint_id",
+                "generation_id",
+                "platform",
+                "status",
+                "operationally_eligible",
+                "findings",
+                "input_digests",
+                "demand",
+                "reserved",
+                "expires_at"
+              ]
+            },
+            "maxItems": 1000
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "site_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "endpoint_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "generation_id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "site_id",
+                "endpoint_id",
+                "generation_id"
+              ]
+            },
+            "maxItems": 1000
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "application.provision",
+              "application.migrate",
+              "application.recover",
+              "application.retire"
+            ]
+          },
+          "method": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "application_id",
+          "environment",
+          "created_at",
+          "intent",
+          "inputs",
+          "results",
+          "candidates",
+          "action",
+          "method"
+        ]
+      },
+      "Plan": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assessment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "schema_version": {
+                "const": 1
+              },
+              "canonicalization": {
+                "const": "p05-json-v1"
+              },
+              "scope": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tenant_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "site_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "environment": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "resource_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "endpoint_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "native_scope": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "tenant_id",
+                  "site_id",
+                  "environment",
+                  "resource_id",
+                  "endpoint_id",
+                  "native_scope"
+                ]
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              },
+              "method": {
+                "type": "string"
+              },
+              "lane": {
+                "enum": [
+                  "operational",
+                  "isolated_campaign"
+                ]
+              },
+              "executor_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "maxItems": 1000
+              },
+              "valid_until": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "input_fresh_until": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "input_digests": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "inventory": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "profile": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "policy": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "qualification": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "intent": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "inventory",
+                  "profile",
+                  "policy",
+                  "qualification",
+                  "intent"
+                ]
+              },
+              "intent_revision": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "inventory_generation": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "installed_tuple": {
+                "type": "object"
+              },
+              "artifacts": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "compiler": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "adapter": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "automation": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "contracts": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "compiler",
+                  "adapter",
+                  "automation",
+                  "contracts"
+                ]
+              },
+              "native_api": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "operation_plan": {
+                        "type": "object"
+                      },
+                      "operation_plan_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "api_contracts_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "adapter_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "custody_ref": {
+                        "type": "string"
+                      },
+                      "custody_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "custody_generation": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "fence_owner": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "operation_plan",
+                      "operation_plan_sha256",
+                      "api_contracts_sha256",
+                      "adapter_sha256",
+                      "custody_ref",
+                      "custody_id",
+                      "custody_generation",
+                      "fence_owner"
+                    ]
+                  }
+                ]
+              },
+              "ownership": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "maxItems": 1000
+              },
+              "mappings": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "maxItems": 1000
+              },
+              "effects": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "after": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 1000
+                    },
+                    "owner": {
+                      "type": "string"
+                    },
+                    "scope": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "tenant_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "site_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "environment": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "resource_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "endpoint_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "native_scope": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "tenant_id",
+                        "site_id",
+                        "environment",
+                        "resource_id",
+                        "endpoint_id",
+                        "native_scope"
+                      ]
+                    },
+                    "artifact_digest": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "destructive": {
+                      "type": "boolean"
+                    },
+                    "boundary": {
+                      "type": "string"
+                    },
+                    "on_unknown": {
+                      "const": "hold_and_observe_before_retry"
+                    },
+                    "authority_recheck": {
+                      "const": "immediately_before_effect"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "after",
+                    "owner",
+                    "scope",
+                    "artifact_digest",
+                    "destructive",
+                    "boundary",
+                    "on_unknown",
+                    "authority_recheck"
+                  ]
+                },
+                "maxItems": 1000
+              },
+              "reservation_intents": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "maxItems": 1000
+              },
+              "budgets": {
+                "type": "object"
+              },
+              "recovery": {
+                "type": "object"
+              },
+              "execution_ready": {
+                "type": "boolean"
+              },
+              "holds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 1000
+              },
+              "native_write_authorized": {
+                "const": false
+              },
+              "native_migration": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "schema_version": {
+                    "const": 1
+                  },
+                  "scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "tenant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "environment": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "resource_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "project_id": {
+                        "type": "string",
+                        "pattern": "^(?:[a-f0-9]{32}|[a-f0-9-]{36})$"
+                      }
+                    },
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "environment",
+                      "resource_id",
+                      "project_id"
+                    ]
+                  },
+                  "migration": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "review",
+                      "method",
+                      "source",
+                      "target",
+                      "datasets",
+                      "disks",
+                      "objectives",
+                      "owner_inputs_sha256",
+                      "schema_version",
+                      "mode",
+                      "delta",
+                      "artifacts",
+                      "rehearsal_sha256",
+                      "recovery_of_sha256"
+                    ],
+                    "properties": {
+                      "review": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "revision",
+                          "digest"
+                        ],
+                        "properties": {
+                          "revision": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740991
+                          },
+                          "digest": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        }
+                      },
+                      "method": {
+                        "enum": [
+                          "APPLICATION_REBUILD_RESTORE",
+                          "VM_SNAPSHOT_BASELINE_APP_DELTA",
+                          "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+                          "VM_COLD_EXPORT",
+                          "EXTERNAL_BLOCK_REPLICATION"
+                        ]
+                      },
+                      "source": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "profile_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "native_identity_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "tuple_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "observed_at": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "expires_at": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "profile_sha256",
+                          "native_identity_sha256",
+                          "tuple_sha256",
+                          "observed_at",
+                          "expires_at"
+                        ]
+                      },
+                      "target": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "profile_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "native_identity_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "tuple_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "observed_at": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "expires_at": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "profile_sha256",
+                          "native_identity_sha256",
+                          "tuple_sha256",
+                          "observed_at",
+                          "expires_at"
+                        ]
+                      },
+                      "datasets": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 256,
+                        "uniqueItems": true,
+                        "items": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      },
+                      "disks": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 32,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "source_disk_sha256",
+                            "target_key",
+                            "format",
+                            "capacity_bytes",
+                            "datasets"
+                          ],
+                          "properties": {
+                            "source_disk_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "target_key": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "format": {
+                              "type": "string",
+                              "enum": [
+                                "raw",
+                                "qcow2",
+                                "vmdk"
+                              ]
+                            },
+                            "capacity_bytes": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
+                            },
+                            "datasets": {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 256,
+                              "uniqueItems": true,
+                              "items": {
+                                "type": "string",
+                                "format": "uuid"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "objectives": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "owner_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "acceptance_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "max_outage_seconds": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 31536000
+                          },
+                          "max_data_loss_bytes": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "owner_id",
+                          "acceptance_sha256",
+                          "max_outage_seconds",
+                          "max_data_loss_bytes"
+                        ]
+                      },
+                      "owner_inputs_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "schema_version": {
+                        "enum": [
+                          2,
+                          3
+                        ]
+                      },
+                      "mode": {
+                        "enum": [
+                          "rehearsal",
+                          "cutover",
+                          "rollback",
+                          "forward_recovery",
+                          "reverse_recovery",
+                          "cleanup"
+                        ]
+                      },
+                      "delta": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "none",
+                              "application",
+                              "file",
+                              "restore",
+                              "block"
+                            ]
+                          },
+                          "requires_running_guest": {
+                            "type": "boolean"
+                          },
+                          "qualification_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "requires_running_guest",
+                          "qualification_sha256"
+                        ]
+                      },
+                      "artifacts": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "capture": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "transfer": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "conversion": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "guest": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "delta": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "recovery": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          }
+                        },
+                        "required": [
+                          "capture",
+                          "transfer",
+                          "conversion",
+                          "guest",
+                          "delta",
+                          "recovery"
+                        ]
+                      },
+                      "rehearsal_sha256": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "recovery_of_sha256": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "destination_sha256": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      }
+                    }
+                  },
+                  "intents": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 32,
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  },
+                  "native": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "configuration": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "revision": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "digest": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          }
+                        },
+                        "required": [
+                          "revision",
+                          "digest"
+                        ]
+                      },
+                      "tuple_digest": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      "source_revision": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{40}$"
+                      },
+                      "ownership_digest": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      "custody_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "custody_generation": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "policy_cases": {
+                        "type": "array",
+                        "minItems": 6,
+                        "maxItems": 256,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_-]{1,80}$"
+                            },
+                            "boundary": {
+                              "enum": [
+                                "same_host_subnet",
+                                "inter_host",
+                                "edge"
+                              ]
+                            },
+                            "expectation": {
+                              "enum": [
+                                "allow",
+                                "deny"
+                              ]
+                            },
+                            "family": {
+                              "enum": [
+                                "ipv4",
+                                "ipv6"
+                              ]
+                            },
+                            "direction": {
+                              "enum": [
+                                "forward",
+                                "return"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "boundary",
+                            "expectation",
+                            "family",
+                            "direction"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "configuration",
+                      "tuple_digest",
+                      "source_revision",
+                      "ownership_digest",
+                      "custody_id",
+                      "custody_generation",
+                      "policy_cases"
+                    ]
+                  },
+                  "source_job_id": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "recipe_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "recipe_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "base_plan_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "scope",
+                  "migration",
+                  "intents",
+                  "native",
+                  "source_job_id",
+                  "recipe_sha256",
+                  "recipe_id",
+                  "base_plan_id"
+                ]
+              },
+              "migration_campaign": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "route_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "sizes": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "capture": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "transfer": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "conversion": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "import": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "validation": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "cutover": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "capture",
+                      "transfer",
+                      "conversion",
+                      "import",
+                      "validation",
+                      "cutover"
+                    ]
+                  },
+                  "demands": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 32,
+                    "additionalProperties": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "mode": {
+                    "enum": [
+                      "rehearsal",
+                      "cutover",
+                      "rollback",
+                      "forward_recovery",
+                      "reverse_recovery",
+                      "cleanup"
+                    ]
+                  },
+                  "method": {
+                    "enum": [
+                      "APPLICATION_REBUILD_RESTORE",
+                      "VM_SNAPSHOT_BASELINE_APP_DELTA",
+                      "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+                      "VM_COLD_EXPORT",
+                      "EXTERNAL_BLOCK_REPLICATION"
+                    ]
+                  }
+                },
+                "required": [
+                  "route_sha256",
+                  "sizes",
+                  "demands",
+                  "mode",
+                  "method"
+                ]
+              }
+            },
+            "required": [
+              "schema_version",
+              "canonicalization",
+              "scope",
+              "action",
+              "method",
+              "lane",
+              "executor_ids",
+              "valid_until",
+              "input_fresh_until",
+              "input_digests",
+              "intent_revision",
+              "inventory_generation",
+              "installed_tuple",
+              "artifacts",
+              "native_api",
+              "ownership",
+              "mappings",
+              "effects",
+              "reservation_intents",
+              "budgets",
+              "recovery",
+              "execution_ready",
+              "holds",
+              "native_write_authorized"
+            ]
+          },
+          "binding": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "plan_id",
+              "revision",
+              "tenant_id",
+              "action",
+              "site_id",
+              "environment",
+              "resource_id",
+              "requested_by",
+              "executor_ids",
+              "valid_until",
+              "digest",
+              "content_digest",
+              "canonicalization",
+              "lane"
+            ],
+            "properties": {
+              "plan_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              },
+              "site_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+              },
+              "environment": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+              },
+              "resource_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+              },
+              "requested_by": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "executor_ids": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "valid_until": {
+                "type": "integer"
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "content_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "canonicalization": {
+                "const": "p05-json-v1"
+              },
+              "lane": {
+                "enum": [
+                  "operational",
+                  "isolated_campaign"
+                ]
+              }
+            }
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "site_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "endpoint_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "generation_id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "site_id",
+                "endpoint_id",
+                "generation_id"
+              ]
+            },
+            "maxItems": 1000
+          },
+          "candidate": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "application_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environment": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "validity": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "current": {
+                "type": "boolean"
+              },
+              "holds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 1000
+              },
+              "evaluated_at": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "approval_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "native_write_authorized": {
+                "const": false
+              }
+            },
+            "required": [
+              "current",
+              "holds",
+              "evaluated_at",
+              "approval_digest",
+              "native_write_authorized"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "assessment_id",
+          "content",
+          "binding",
+          "candidates",
+          "candidate",
+          "application_id",
+          "environment",
+          "tenant_id",
+          "validity"
+        ]
+      },
+      "Validity": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "current": {
+            "type": "boolean"
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 1000
+          },
+          "evaluated_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "approval_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        },
+        "required": [
+          "current",
+          "holds",
+          "evaluated_at",
+          "approval_digest",
+          "native_write_authorized"
+        ]
+      },
+      "Receipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "enum": [
+              "assessment",
+              "plan"
+            ]
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "native_write_authorized": {
+            "const": false
+          },
+          "binding": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "plan_id",
+              "revision",
+              "tenant_id",
+              "action",
+              "site_id",
+              "environment",
+              "resource_id",
+              "requested_by",
+              "executor_ids",
+              "valid_until",
+              "digest",
+              "content_digest",
+              "canonicalization",
+              "lane"
+            ],
+            "properties": {
+              "plan_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              },
+              "site_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+              },
+              "environment": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+              },
+              "resource_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+              },
+              "requested_by": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "executor_ids": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "valid_until": {
+                "type": "integer"
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "content_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "canonicalization": {
+                "const": "p05-json-v1"
+              },
+              "lane": {
+                "enum": [
+                  "operational",
+                  "isolated_campaign"
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "digest",
+          "native_write_authorized"
+        ]
+      },
+      "Diff": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "change": {
+                  "enum": [
+                    "added",
+                    "removed",
+                    "changed"
+                  ]
+                }
+              },
+              "required": [
+                "path",
+                "change"
+              ]
+            },
+            "maxItems": 1000
+          },
+          "approval_reusable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "changes",
+          "approval_reusable"
+        ]
+      },
+      "Candidate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "generation_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "site_id",
+          "endpoint_id",
+          "generation_id"
+        ]
+      }
+    }
+  }
+}

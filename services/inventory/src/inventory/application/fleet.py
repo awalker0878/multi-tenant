@@ -130,6 +130,7 @@ class MigrationFleet:
                     {
                         "id": p["id"],
                         "native_id": p["native_id"],
+                        "platform": p["facts"]["platform"],
                         "current": p["current"],
                         "expires_at": p["expires_at"],
                         "holds": p["facts"]["holds"],
@@ -225,11 +226,10 @@ class MigrationFleet:
                 if count and count["n"] >= 100:
                     raise Rejected("migration_workspace_bound", 409)
             destination = self.profiles.profile(tx, actor, body["target_profile_id"])
-            if (
-                destination["profile_type"] != "TargetCapabilityProfile"
-                or destination["facts"]["platform"] != "openstack"
-            ):
-                raise Rejected("openstack_target_required")
+            if destination["profile_type"] != "TargetCapabilityProfile" or destination["facts"][
+                "platform"
+            ] not in {"openstack", "ahv"}:
+                raise Rejected("supported_target_required")
             if (
                 not destination["current"]
                 or body["format"] not in destination["facts"]["disk_formats"]

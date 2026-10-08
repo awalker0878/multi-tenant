@@ -11,7 +11,7 @@ test('maps every observed disk, preserves uncertain commands, confirms exact rev
   await expect(page.getByLabel('Explicit migration method')).toHaveValue('');
   await expect(page.getByRole('button', { name: 'Confirm migration review', exact: true })).toBeDisabled();
   await page.getByLabel('Source VM profile').selectOption(state.workspace.profiles[0].id);
-  await page.getByLabel('OpenStack target profile').selectOption(state.workspace.profiles[1].id);
+  await page.getByLabel('Destination profile').selectOption(state.workspace.profiles[1].id);
   await page.getByLabel('Explicit migration method').selectOption('VM_COLD_EXPORT');
   await expect(page.getByRole('button', { name: 'Save migration review', exact: true })).toBeDisabled();
   await page.getByRole('button', { name: 'Add dataset', exact: true }).click();
@@ -56,5 +56,46 @@ test('maps every observed disk, preserves uncertain commands, confirms exact rev
   await expect(page.getByRole('button', { name: 'Confirm migration review', exact: true })).toBeDisabled();
   await request.post('/__fixture', { data: { access: 403 } });
   await expect(page).toHaveURL(/\/account$/, { timeout: 25_000 });
+  expect(errors).toEqual([]);
+});
+
+test('selects AHV resources and saves complete quarantine mappings without authorizing migration', async ({ page, request }, info) => {
+  await request.post('/__fixture', { data: { reset: true, ahv: true } });
+  const state = await (await request.get('/__fixture')).json();
+  const source = state.workspace.profiles[0], target = state.workspace.profiles[1];
+  const errors: string[] = [];
+  page.on('pageerror', e => errors.push(e.message));
+  await page.goto(base);
+  await page.getByLabel('Source VM profile').selectOption(source.id);
+  await page.getByRole('combobox', { name: 'Destination profile', exact: true }).selectOption(target.id);
+  await expect(page.getByLabel('Explicit migration method')).toHaveValue('VM_COLD_EXPORT');
+  await expect(page.getByText('AHV destination mapping', { exact: true })).toBeVisible();
+  await page.getByRole('combobox', { name: 'Storage container', exact: true }).selectOption(target.facts.storage_containers[0].extId);
+  await page.getByLabel('Migration: Quarantine', { exact: true }).check();
+  await page.getByLabel('Synthetic isolation · ENFORCE', { exact: true }).check();
+  for (const nic of source.facts.nics) {
+    await page.getByRole('combobox', { name: `NIC ${nic.key} quarantine subnet`, exact: true }).selectOption(target.facts.subnets[0].extId);
+    await page.getByRole('combobox', { name: `NIC ${nic.key} production subnet`, exact: true }).selectOption(target.facts.subnets[1].extId);
+  }
+  await page.getByRole('button', { name: 'Add dataset', exact: true }).click();
+  await page.getByLabel('Name', { exact: true }).fill('All application data');
+  await page.getByLabel('Consistency group', { exact: true }).fill('app');
+  await page.getByLabel('Mounts or dataset paths (one per line)').fill('/');
+  await page.getByLabel('Correctness check reference').fill('synthetic-only');
+  for (const disk of source.facts.disks) await page.getByLabel(`Disk ${disk.key}`, { exact: true }).check();
+  for (const field of state.workspace.owner_fields) await page.getByLabel(field.replaceAll('_', ' '), { exact: true }).fill('owner-approved-reference');
+  await page.getByLabel('Application owner ID').fill('cccccccc-cccc-4ccc-8ccc-cccccccccccc');
+  await page.getByLabel('Acceptance record SHA-256').fill('c'.repeat(64));
+  await page.getByLabel('Maximum outage (seconds)').fill('300');
+  await page.getByLabel('Maximum data loss (bytes)').fill('0');
+  await page.getByRole('button', { name: 'Save migration review', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('Migration review saved.');
+  const saved = (await (await request.get('/__fixture')).json()).posts[0].review;
+  expect(saved.destination.project_id).toBe(target.facts.project_id);
+  expect(saved.destination.disks).toHaveLength(source.facts.disks.length);
+  expect(saved.destination.nics).toHaveLength(source.facts.nics.length);
+  expect(saved.destination.nics.every((n: any) => n.quarantine_subnet_id !== n.production_subnet_id)).toBe(true);
+  await expect(page.getByRole('button', { name: 'Confirm migration review', exact: true })).toBeEnabled();
+  await page.screenshot({ path: info.outputPath('ahv-destination.png'), fullPage: true });
   expect(errors).toEqual([]);
 });

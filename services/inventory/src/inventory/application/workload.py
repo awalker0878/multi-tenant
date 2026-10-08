@@ -4,6 +4,7 @@ from typing import Any
 
 from inventory.application.discovery import Discovery
 from inventory.application.ports import Transaction
+from inventory.domain.ahv import destination_input
 from inventory.domain.discovery import Actor, Rejected, canonical, digest, identifier, shape
 from inventory.domain.workload import METHODS, OWNER_FIELDS, review_input
 
@@ -81,6 +82,9 @@ class WorkloadProfiles:
                 else ("compute_version", "volume_version")
             )
         ]
+        if p["platform"] == "ahv":
+            identity = [p[k] for k in ("project_id", "prism_central_id", "cluster_id")]
+            installed = [p["api_versions"], p["installed"]]
         return {
             "profile_sha256": profile["digest"],
             "native_identity_sha256": digest([profile["endpoint_id"], identity]),
@@ -210,6 +214,7 @@ class WorkloadProfiles:
                 ):
                     raise Rejected("invalid_profile_pair")
                 review_input(body, source["facts"])
+                destination_input(body, source["facts"], destination["facts"])
                 latest = tx.one(
                     "SELECT COALESCE(MAX(revision),0) AS revision FROM inventory.migration_reviews "
                     "WHERE tenant=%s AND site=%s",
@@ -290,6 +295,11 @@ class WorkloadProfiles:
                 "site_id": site,
                 "revision": expected,
                 "digest": content_digest,
+                **(
+                    {"destination": review["input"]["destination"]}
+                    if review["input"].get("destination") is not None
+                    else {}
+                ),
                 "method": review["input"]["method"],
                 "target_disk_formats": target["facts"]["disk_formats"],
                 "source": self.binding(source),

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick } from 'vue';
+import { computed, nextTick, watch } from 'vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
 import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 import type { PortingInput, PortingWorkspace } from '../../features/inventory/contracts';
@@ -9,11 +9,18 @@ const base = `/tenants/${props.tenantId}/inventory/sites/${props.siteId}/configu
 const { unavailable, now } = useInventoryAccess(base + '/status');
 const saved = props.workspace.configuration;
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
+const initialPlatform = props.workspace.endpoints.find(e => e.id === saved?.target_endpoint)?.platform;
+const initialCapabilities = initialPlatform === 'ahv' ? props.workspace.ahv_capabilities : props.workspace.capabilities;
 const initial: PortingInput = { source_endpoint: saved?.source_endpoint ?? null, target_endpoint: saved?.target_endpoint ?? null,
-  manual: { ...(saved?.manual ?? {}) }, choices: props.workspace.capabilities.map(c => clone(saved?.choices.find(choice => choice.id === c.id)
+  manual: { ...(saved?.manual ?? {}) }, choices: initialCapabilities.map(c => clone(saved?.choices.find(choice => choice.id === c.id)
     ?? { id: c.id as PortingInput['choices'][number]['id'], required: false, interpretation: 'observed' as const, reason: '' })) };
 const form = useForm({ operation: 'save', command_key: crypto.randomUUID(), revision: saved?.revision ?? null,
   endpoint_id: null as string | null, digest: saved?.digest ?? null, configuration: initial });
+const platform = computed(() => props.workspace.endpoints.find(e => e.id === form.configuration.target_endpoint)?.platform);
+const capabilities = computed(() => platform.value === 'ahv' ? props.workspace.ahv_capabilities : props.workspace.capabilities);
+watch(platform, () => {
+  form.configuration.choices = capabilities.value.map(c => ({ id: c.id as PortingInput['choices'][number]['id'], required: false, interpretation: 'observed', reason: '' }));
+});
 const initialJson = JSON.stringify(initial);
 const dirty = computed(() => JSON.stringify(form.configuration) !== initialJson);
 const errors = computed(() => form.errors as Record<string, string>);
@@ -51,13 +58,13 @@ const overrideChanged = (index: number) => { if (form.configuration.choices[inde
         <Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}`" class="text-teal-800 underline">Manage approved connections</Link>
         <div class="grid gap-5 md:grid-cols-2">
           <div><label for="source-endpoint">Source environment<select id="source-endpoint" v-model="form.configuration.source_endpoint"><option :value="null">Select source</option><option v-for="e in workspace.endpoints" :key="e.id" :value="e.id">{{ e.label }} ({{ e.platform }})</option></select></label><button type="button" class="secondary mt-3" :disabled="!form.configuration.source_endpoint || dirty" @click="act('pull', form.configuration.source_endpoint)">Pull source configuration</button></div>
-          <div><label for="target-endpoint">OpenStack destination<select id="target-endpoint" v-model="form.configuration.target_endpoint"><option :value="null">Select destination</option><option v-for="e in workspace.endpoints.filter(e => e.platform === 'openstack')" :key="e.id" :value="e.id">{{ e.label }}</option></select></label><button type="button" class="secondary mt-3" :disabled="!form.configuration.target_endpoint || dirty" @click="act('pull', form.configuration.target_endpoint)">Pull destination configuration</button></div>
+          <div><label for="target-endpoint">Destination environment<select id="target-endpoint" v-model="form.configuration.target_endpoint"><option :value="null">Select destination</option><option v-for="e in workspace.endpoints.filter(e => ['openstack', 'ahv'].includes(e.platform))" :key="e.id" :value="e.id">{{ e.label }} ({{ e.platform }})</option></select></label><button type="button" class="secondary mt-3" :disabled="!form.configuration.target_endpoint || dirty" @click="act('pull', form.configuration.target_endpoint)">Pull destination configuration</button></div>
         </div>
         <p v-if="dirty" class="text-sm">Save the selected environments and edits before pulling or confirming.</p>
         <h2 class="text-xl font-semibold">2. Required destination capabilities</h2>
         <p>“Configured” means resources were returned. “Advertised” means an extension, import method, trait or service was listed. Neither proves the feature works for this workload. Unknown results need API access or further qualification.</p>
         <div class="overflow-x-auto"><table class="w-full text-left"><thead><tr><th class="p-2">Capability</th><th class="p-2">Source API</th><th class="p-2">Destination API</th><th class="p-2">Porting review</th></tr></thead><tbody>
-          <tr v-for="(cap, index) in workspace.capabilities" :key="cap.id" class="border-t border-slate-300">
+          <tr v-for="(cap, index) in capabilities" :key="cap.id" class="border-t border-slate-300">
             <td class="p-3"><label :for="'required-' + cap.id" class="flex items-center gap-2"><input :id="'required-' + cap.id" v-model="form.configuration.choices[index].required" type="checkbox" class="w-auto" />{{ cap.label }} required</label></td>
             <td class="p-3">{{ expired ? 'Refresh required' : cap.source_state.replaceAll('_', ' ') }}</td><td class="p-3">{{ expired ? 'Refresh required' : cap.target_state.replaceAll('_', ' ') }}</td>
             <td class="p-3"><label :for="'interpretation-' + cap.id" class="sr-only">{{ cap.label }} interpretation</label><select :id="'interpretation-' + cap.id" v-model="form.configuration.choices[index].interpretation" @change="overrideChanged(index)"><option value="observed">Use API finding</option><option value="include">Include by administrator review</option><option value="exclude">Exclude by administrator review</option></select><label v-if="form.configuration.choices[index].interpretation !== 'observed'" :for="'reason-' + cap.id">Override reason and evidence reference<input :id="'reason-' + cap.id" v-model="form.configuration.choices[index].reason" required maxlength="240" /></label></td>
@@ -78,6 +85,6 @@ const overrideChanged = (index: number) => { if (form.configuration.choices[inde
     <section class="my-8" aria-labelledby="api-title"><h2 id="api-title" class="text-xl font-semibold">API observations</h2>
       <div v-for="role in (['source', 'target'] as const)" :key="role" class="my-4"><h3 class="font-semibold capitalize">{{ role }}</h3><p v-if="!workspace[role]">No environment selected.</p><details v-for="query in workspace[role]?.queries ?? []" :key="query.query" class="my-2 rounded border border-slate-300 p-3"><summary>{{ query.query.replaceAll('_', ' ') }} — {{ query.status.replaceAll('_', ' ') }} · {{ query.item_count }} items · {{ observedTime(query.collected_at) }}</summary><p class="my-2 text-sm">Up to five examples are shown. Confirmation binds the complete stored response projection.</p><ul><li v-for="item in query.items" :key="item.id" class="my-3"><strong>{{ item.name }}</strong><dl v-for="attr in item.attributes" :key="attr.key" class="break-words text-sm"><dt>{{ attr.key }}</dt><dd>{{ attr.value }}</dd></dl></li></ul></details></div>
     </section>
-    <section class="my-8" aria-labelledby="versions-title"><h2 id="versions-title" class="text-xl font-semibold">OpenStack version qualification — newest first</h2><p class="my-3">Documentation baseline reviewed October 6, 2026. A release or API version does not establish installed backend support. No native environment is qualified by this list.</p><div class="overflow-x-auto"><table class="w-full text-left"><thead><tr><th>Release</th><th>Nova API maximum</th><th>Documentation</th><th>Native qualification</th></tr></thead><tbody><tr v-for="version in workspace.versions" :key="version.release" class="border-t"><td class="p-3"><a :href="version.source" rel="noreferrer" class="text-teal-800 underline">{{ version.release }} {{ version.name }}</a></td><td>{{ version.nova_max }}</td><td>{{ version.documentation.replaceAll('_', ' ') }}</td><td>{{ version.native_qualification.replaceAll('_', ' ') }}</td></tr></tbody></table></div></section>
+    <section v-if="platform !== 'ahv'" class="my-8" aria-labelledby="versions-title"><h2 id="versions-title" class="text-xl font-semibold">OpenStack version qualification — newest first</h2><p class="my-3">Documentation baseline reviewed October 6, 2026. A release or API version does not establish installed backend support. No native environment is qualified by this list.</p><div class="overflow-x-auto"><table class="w-full text-left"><thead><tr><th>Release</th><th>Nova API maximum</th><th>Documentation</th><th>Native qualification</th></tr></thead><tbody><tr v-for="version in workspace.versions" :key="version.release" class="border-t"><td class="p-3"><a :href="version.source" rel="noreferrer" class="text-teal-800 underline">{{ version.release }} {{ version.name }}</a></td><td>{{ version.nova_max }}</td><td>{{ version.documentation.replaceAll('_', ' ') }}</td><td>{{ version.native_qualification.replaceAll('_', ' ') }}</td></tr></tbody></table></div></section>
   </CatalogueLayout>
 </template>

@@ -105,9 +105,7 @@ def profile(platform: str, installed: dict[str, Any]) -> dict[str, Any]:
         "dimensions": {
             key: {
                 "state": "UNASSESSED",
-                "reason": "native_qualification_required"
-                if platform != "ahv"
-                else "collector_not_implemented",
+                "reason": "native_qualification_required",
                 "facts": installed if key == "installed_identity" else {},
                 "provenance": "site_policy_declaration"
                 if key == "installed_identity"

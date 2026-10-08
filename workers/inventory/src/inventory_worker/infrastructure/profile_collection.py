@@ -30,6 +30,12 @@ def collect_profile(
         ).collect(vm)
         if index + 1 < len(vms):
             next_cursor = vm
+    elif policy["platform"] == "ahv":
+        from inventory_worker.infrastructure.ahv_profile import collect_ahv
+
+        if cursor is not None:
+            raise CollectionFailure("invalid_response")
+        profile = collect_ahv(policy, stream, int(started), before_request)
     else:
         if cursor is not None:
             raise CollectionFailure("invalid_response")

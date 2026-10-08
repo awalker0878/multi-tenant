@@ -91,3 +91,10 @@ def test_migration_preparation_requires_scoped_actor_before_owner_read() -> None
     authority.actor.side_effect = Rejected("denied", 403)
     assert exchange(app, "/migration-preparations", json.dumps(body).encode(), headers)[0] == 403
     prepare.assert_not_called()
+
+
+def test_ahv_owner_mapping_is_bound_into_preparation() -> None:
+    i = inputs()
+    i["destination"] = {"platform": "ahv", "cluster_id": str(uuid4()), "nics": []}
+    bound = bind_migration(i, mapping(), 1000)
+    assert bound["destination_sha256"] == digest(i["destination"])

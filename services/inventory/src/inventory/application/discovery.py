@@ -138,8 +138,6 @@ class Discovery:
                 if operation in {"discover", "configuration_pull"}:
                     shape(body, set())
                     p = self.policy(row)
-                    if p.platform == "ahv":
-                        raise Rejected("collector_not_implemented", 409)
                     if tx.one(
                         (
                             "SELECT id FROM inventory.jobs WHERE endpoint=%s AND "

@@ -8,7 +8,7 @@ export function fleetFixture(): Plugin {
   let state: any;
   function reset() {
     const now = Math.floor(Date.now() / 1000);
-    const target = { id: randomUUID(), native_id: 'OpenStack · project-finance', current: true, expires_at: now + 600, holds: [], disk_formats: ['raw', 'qcow2'] };
+    const target = { platform: 'openstack', id: randomUUID(), native_id: 'OpenStack · project-finance', current: true, expires_at: now + 600, holds: [], disk_formats: ['raw', 'qcow2'] };
     const items = ['accounts-api', 'accounts-db', 'legacy <img src=x onerror=alert(1)>'].map((name, i) => ({ resource_id: randomUUID(), endpoint_id: site, endpoint_label: 'vCenter Ottawa', native_scope: 'datacenter-1', native_id: `vm-${i + 1}`, name, generation_id: randomUUID(), profile_id: i === 2 ? null : randomUUID(), source_identity_sha256: i === 2 ? null : 'a'.repeat(64), power_state: i === 0 ? 'poweredOff' : 'poweredOn', cpu: i === 1 ? 8 : 2, memory_mb: i === 1 ? 16384 : 4096, guest_id: i === 2 ? null : 'ubuntu64Guest', disk_count: i === 2 ? null : 2, disk_bytes: i === 2 ? null : 85899345920, collected_at: now, expires_at: now + 600, holds: i === 2 ? ['source_profile_required'] : [], readiness: i === 2 ? 'held' : 'review_required' }));
     state = { posts: [], preparations: [], plan_requests: [], plan_uncertain: false, plan_id: randomUUID(),
       plan_options: ['rehearsal', 'cutover'].map(mode => ({recipe_id: randomUUID(), base_plan_id: randomUUID(), mode, method: 'VM_COLD_EXPORT', expires_at: now + 600, stages: 8})),

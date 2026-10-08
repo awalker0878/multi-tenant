@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from inventory.domain.ahv import native_uuid
 from inventory.domain.configuration import CONFIGURATION_QUERIES
 from inventory.domain.discovery import (
     EnrollmentPolicy,
@@ -103,7 +104,7 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
     required = {
         "openstack": {"server", "network", "volume"},
         "vmware": {"server", "network", "datastore"},
-        "ahv": set(),
+        "ahv": {"target_profile"},
     }[p["platform"]]
     allowed = (
         required
@@ -111,7 +112,7 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
             {"source_profile"}
             if p["platform"] == "vmware"
             else {"target_profile"}
-            if p["platform"] == "openstack"
+            if p["platform"] in {"openstack", "ahv"}
             else set()
         )
         | (
@@ -135,7 +136,12 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
         shape(
             s,
             {"kind", "base_url", "addresses", "ca_file", "credential_file", "api_version"}
-            | ({"vm_ids"} if s["kind"] == "source_profile" else set()),
+            | ({"vm_ids"} if s["kind"] == "source_profile" else set())
+            | (
+                {"cluster_id", "prism_central_id", "shared_resource_ids"}
+                if p["platform"] == "ahv"
+                else set()
+            ),
         )
         if s["kind"] == "source_profile":
             vms = s["vm_ids"]
@@ -164,8 +170,21 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
                 server["ca_file"],
             ):
                 raise Rejected("profile_vcenter_scope_mismatch")
-        if s["kind"] == "target_profile" and (
-            s["api_version"] != "2" or urlsplit(s["base_url"]).path.rstrip("/") != "/v2"
+        if p["platform"] == "ahv":
+            for field in ("cluster_id", "prism_central_id"):
+                native_uuid(s[field])
+            native_uuid(p["native_scope"])
+            shared = s["shared_resource_ids"]
+            if not isinstance(shared, list) or len(shared) > 100 or len(set(shared)) != len(shared):
+                raise Rejected("invalid_ahv_shared_resources")
+            for key in shared:
+                native_uuid(key)
+            if s["api_version"] != "v4.3" or urlsplit(s["base_url"]).path not in {"", "/"}:
+                raise Rejected("explicit_ahv_v43_required")
+        if (
+            s["kind"] == "target_profile"
+            and p["platform"] == "openstack"
+            and (s["api_version"] != "2" or urlsplit(s["base_url"]).path.rstrip("/") != "/v2")
         ):
             raise Rejected("explicit_glance_v2_required")
         u = urlsplit(text(s["base_url"], 512))

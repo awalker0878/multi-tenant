@@ -4,7 +4,13 @@ from typing import Any
 
 from inventory.application.discovery import Discovery
 from inventory.application.ports import Transaction
-from inventory.domain.configuration import CAPABILITIES, MANUAL_FIELDS, VERSIONS, manual_input
+from inventory.domain.configuration import (
+    AHV_CAPABILITIES,
+    CAPABILITIES,
+    MANUAL_FIELDS,
+    VERSIONS,
+    manual_input,
+)
 from inventory.domain.discovery import Actor, Rejected, canonical, digest, identifier, shape
 
 
@@ -28,6 +34,47 @@ class PortingConfiguration:
             "AND generation=%s ORDER BY query",
             (actor.tenant, endpoint, e["current_generation"]),
         )
+        if e["platform"] == "ahv":
+            from inventory.application.workload import WorkloadProfiles
+
+            profiles = tx.all(
+                "SELECT id FROM inventory.workload_profiles WHERE tenant=%s AND endpoint=%s "
+                "AND generation=%s AND profile_type='TargetCapabilityProfile'",
+                (actor.tenant, endpoint, e["current_generation"]),
+            )
+            if len(profiles) != 1:
+                return None
+            profile = WorkloadProfiles(d).profile(tx, actor, str(profiles[0]["id"]))
+            queries = []
+            for cap in AHV_CAPABILITIES:
+                field = cap["id"].removeprefix("ahv_")
+                queries.append(
+                    {
+                        "query": cap["query"],
+                        "status": "observed",
+                        "items": [
+                            {
+                                "id": row["extId"],
+                                "name": row.get("name") or row.get("value") or row["extId"],
+                                "attributes": [
+                                    {"key": k, "value": canonical(v)}
+                                    for k, v in row.items()
+                                    if k != "extId"
+                                ],
+                            }
+                            for row in profile["facts"][field]
+                        ],
+                        "collected_at": profile["collected_at"],
+                        "expires_at": profile["expires_at"],
+                    }
+                )
+            return {
+                "endpoint_id": endpoint,
+                "generation_id": profile["generation_id"],
+                "current": profile["current"],
+                "digest": profile["digest"],
+                "queries": queries,
+            }
         current = False
         try:
             p = d.policy(e)
@@ -141,6 +188,14 @@ class PortingConfiguration:
             "source": source,
             "target": target,
             "capabilities": capabilities,
+            "ahv_capabilities": [
+                {
+                    **cap,
+                    "source_state": self.state(source, cap),
+                    "target_state": self.state(target, cap),
+                }
+                for cap in AHV_CAPABILITIES
+            ],
             "holds": holds,
             "native_write_authorized": False,
         }
@@ -180,13 +235,18 @@ class PortingConfiguration:
             if expected != (row["revision"] if row else None):
                 raise Rejected("stale_revision", 412)
             if operation == "configuration_save":
-                manual_input(body)
+                platform = "openstack"
+                if body.get("target_endpoint") is not None:
+                    platform = d.endpoint(tx, actor, identifier(body["target_endpoint"]))[
+                        "platform"
+                    ]
+                manual_input(body, platform)
                 for role in ("source", "target"):
                     endpoint = body[role + "_endpoint"]
                     if endpoint is not None:
                         e = d.endpoint(tx, actor, identifier(endpoint))
-                        if role == "target" and e["platform"] != "openstack":
-                            raise Rejected("openstack_target_required")
+                        if role == "target" and e["platform"] not in {"openstack", "ahv"}:
+                            raise Rejected("supported_target_required")
                 source = self.snapshot(tx, actor, body["source_endpoint"])
                 destination = self.snapshot(tx, actor, body["target_endpoint"])
                 payload = {**body, "bindings": self.bindings(source, destination)}

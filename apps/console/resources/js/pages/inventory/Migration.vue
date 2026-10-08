@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, nextTick } from 'vue';
+import { computed, nextTick, watch } from 'vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
+import AhvDestination from '../../features/inventory/AhvDestination.vue';
 import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 import type { MigrationReviewInput, MigrationWorkspace } from '../../features/inventory/contracts';
 import { observedTime, useInventoryAccess } from '../../features/inventory/useAccess';
@@ -22,6 +23,18 @@ const blocked = computed(() => form.processing || unavailable.value || uncertain
 const source = computed(() => props.workspace.profiles.find(p => p.id === form.review.source_profile_id) ?? (saved?.source.id === form.review.source_profile_id ? saved.source : null));
 const target = computed(() => props.workspace.profiles.find(p => p.id === form.review.target_profile_id) ?? (saved?.target.id === form.review.target_profile_id ? saved.target : null));
 const disks = computed(() => source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.disks : []);
+const ahv = computed(() => target.value?.facts.platform === 'ahv' ? target.value.facts : null);
+watch(() => [form.review.source_profile_id, form.review.target_profile_id], (_, previous) => {
+  if (!ahv.value) { delete form.review.destination; return; }
+  if (!previous && form.review.destination) return;
+  form.review.destination = {
+    platform: 'ahv', project_id: ahv.value.project_id, prism_central_id: ahv.value.prism_central_id,
+    cluster_id: ahv.value.cluster_id, vpc_id: null, storage_container_id: '', category_ids: [], policy_ids: [], firmware: 'bios',
+    disks: disks.value.map((d, index) => ({ source_key: d.key, index })),
+    nics: (source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.nics : []).map(n => ({ source_key: n.key, quarantine_subnet_id: '', production_subnet_id: '' })),
+  };
+  form.review.method = 'VM_COLD_EXPORT';
+}, { immediate: true });
 const expired = computed(() => [source.value, target.value].some(p => !p?.current || p.expires_at <= now.value));
 const missing = computed(() => disks.value.filter(d => !form.review.datasets.some(set => set.disk_keys.includes(d.key))));
 const submit = () => form.post(base, { preserveState: 'errors', onError: async () => { await nextTick(); document.getElementById('migration-errors')?.focus(); } });
@@ -42,11 +55,12 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
     <form @submit.prevent="act('save')"><fieldset :disabled="blocked" class="space-y-5">
       <legend class="text-xl font-semibold">Source, destination and method</legend>
       <div class="grid gap-4 md:grid-cols-2">
-        <label>Source VM profile<select v-model="form.review.source_profile_id" :disabled="!!profileId" required><option value="">Select observed source</option><option v-if="saved && !workspace.profiles.some(p => p.id === saved?.source.id)" :value="saved.source.id">{{ saved.source.native_id }} — refresh required</option><option v-for="p in workspace.profiles.filter(p => p.profile_type === 'SourceWorkloadProfile')" :key="p.id" :value="p.id">{{ p.native_id }} · {{ observedTime(p.collected_at) }}{{ p.current ? '' : ' · stale' }}</option></select></label>
-        <label>OpenStack target profile<select v-model="form.review.target_profile_id" required><option value="">Select observed destination</option><option v-if="saved && !workspace.profiles.some(p => p.id === saved?.target.id)" :value="saved.target.id">{{ saved.target.native_id }} — refresh required</option><option v-for="p in workspace.profiles.filter(p => p.profile_type === 'TargetCapabilityProfile')" :key="p.id" :value="p.id">{{ p.native_id }} · {{ observedTime(p.collected_at) }}{{ p.current ? '' : ' · stale' }}</option></select></label>
+        <label>Source VM profile<select v-model="form.review.source_profile_id" :disabled="!!profileId" required><option value="">Select observed source</option><option v-if="saved && !workspace.profiles.some(p => p.id === saved?.source.id)" :value="saved.source.id">{{ saved.source.native_id }} — refresh required</option><option v-for="p in workspace.profiles.filter(p => p.profile_type === 'SourceWorkloadProfile')" :key="p.id" :value="p.id">{{ p.facts.platform }} · {{ p.native_id }} · {{ observedTime(p.collected_at) }}{{ p.current ? '' : ' · stale' }}</option></select></label>
+        <label>Destination profile<select v-model="form.review.target_profile_id" required><option value="">Select observed destination</option><option v-if="saved && !workspace.profiles.some(p => p.id === saved?.target.id)" :value="saved.target.id">{{ saved.target.native_id }} — refresh required</option><option v-for="p in workspace.profiles.filter(p => p.profile_type === 'TargetCapabilityProfile')" :key="p.id" :value="p.id">{{ p.facts.platform }} · {{ p.native_id }} · {{ observedTime(p.collected_at) }}{{ p.current ? '' : ' · stale' }}</option></select></label>
       </div>
-      <label>Explicit migration method<select v-model="form.review.method" required><option value="">Select a method</option><option v-for="method in workspace.methods" :key="method" :value="method">{{ method.replaceAll('_', ' ') }}</option></select></label>
+      <label>Explicit migration method<select v-model="form.review.method" required><option value="">Select a method</option><option v-for="method in (ahv ? ['VM_COLD_EXPORT'] : workspace.methods)" :key="method" :value="method">{{ method.replaceAll('_', ' ') }}</option></select></label>
       <p>Methods require their own qualification. A failed method never selects another method automatically. Cold export retains the source outage throughout movement; delta methods require a qualified final synchronization protocol.</p>
+      <AhvDestination v-if="ahv && form.review.destination" v-model="form.review.destination" :profile="ahv" :source-firmware="source?.facts.profile_type === 'SourceWorkloadProfile' ? source.facts.firmware : null" />
       <h2 class="text-xl font-semibold">All disks and application datasets</h2>
       <table class="w-full text-left"><thead><tr><th>Disk key</th><th>Capacity (bytes)</th><th>Dataset coverage</th></tr></thead><tbody><tr v-for="disk in disks" :key="disk.key" class="border-t"><td class="p-2">{{ disk.key }}</td><td>{{ disk.capacity_bytes ?? 'Unknown' }}</td><td>{{ missing.some(d => d.key === disk.key) ? 'Mapping required' : 'Accounted for' }}</td></tr></tbody></table>
       <p v-if="missing.length" role="status">{{ missing.length }} disks still require dataset mapping.</p>

@@ -104,6 +104,27 @@ class PostgresNativeJournal:
             result[key] = {"kind": facts["kind"], "id": native_identity(facts["native_id"])}
         return result
 
+    def ahv_tasks(self, binding: NativeBinding) -> dict[str, dict[str, Any]]:
+        with self.connect() as connection:
+            prior = connection.execute(
+                "SELECT fingerprint FROM native.attempts WHERE operation_id=%s",
+                (binding.operation_id,),
+            ).fetchone()
+            if prior is None or prior["fingerprint"] != binding.fingerprint:
+                raise NativeHeld("native_attempt_not_bound")
+            rows = connection.execute(
+                "SELECT facts FROM native.events WHERE operation_id=%s "
+                "AND kind='ahv_task_accepted' ORDER BY sequence",
+                (binding.operation_id,),
+            ).fetchall()
+        result = {}
+        for row in rows:
+            facts = row["facts"]
+            if facts["resource_key"] in result or facts["kind"] not in {"image", "server"}:
+                raise NativeHeld("ambiguous_ahv_task_receipt")
+            result[facts["resource_key"]] = facts
+        return result
+
     def transfers(self, binding: NativeBinding) -> dict[str, dict[str, Any]]:
         with self.connect() as connection:
             prior = connection.execute(

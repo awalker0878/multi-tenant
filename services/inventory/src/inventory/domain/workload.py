@@ -3,6 +3,7 @@
 import re
 from typing import Any
 
+from inventory.domain.ahv import AHV_FIELDS, validate_profile
 from inventory.domain.discovery import Rejected, canonical, identifier, number, shape, text
 
 METHODS = (
@@ -80,12 +81,13 @@ def checksum(value: Any) -> str:
 
 def profile_payload(value: Any, stream: dict[str, Any], scope: str) -> dict[str, Any]:
     source = stream["kind"] == "source_profile"
-    p = shape(value, SOURCE_FIELDS if source else TARGET_FIELDS)
+    ahv = not source and isinstance(value, dict) and value.get("platform") == "ahv"
+    p = shape(value, SOURCE_FIELDS if source else AHV_FIELDS if ahv else TARGET_FIELDS)
     if (
         type(p["schema_version"]) is not int
-        or p["schema_version"] != 1
+        or p["schema_version"] != (2 if ahv else 1)
         or p["profile_type"] != ("SourceWorkloadProfile" if source else "TargetCapabilityProfile")
-        or p["platform"] != ("vmware" if source else "openstack")
+        or p["platform"] != ("vmware" if source else "ahv" if ahv else "openstack")
         or p["native_qualification"] != "not_established"
         or len(canonical(p).encode()) > 131072
     ):
@@ -126,6 +128,8 @@ def profile_payload(value: Any, stream: dict[str, Any], scope: str) -> dict[str,
                 raise Rejected("invalid_workload_profile")
     elif p["project_id"] != scope:
         raise Rejected("foreign_profile_scope", 403)
+    if ahv:
+        validate_profile(p, stream)
     return p
 
 
@@ -140,7 +144,8 @@ def review_input(body: dict[str, Any], source: dict[str, Any]) -> None:
             "owner_inputs",
             "objectives",
             "overrides",
-        },
+        }
+        | ({"destination"} if "destination" in body else set()),
     )
     identifier(body["source_profile_id"])
     identifier(body["target_profile_id"])

@@ -389,3 +389,25 @@ def test_completed_artifact_cannot_gain_unbound_disks(postgres: dict[str, Any], 
         j.record(export, "disk_transferred", {"resource_key": "disk-2001", **receipt})
     with pytest.raises(NativeHeld):
         j.artifact(export, export.operation_plan_sha256, "archive")
+
+
+def test_ahv_tasks_survive_reconnect_and_remain_bound_to_the_attempt(
+    postgres: dict[str, Any],
+) -> None:
+    b = binding()
+    j = journal(postgres)
+    assert j.claim(b)
+    task = {
+        "resource_key": "disk-1",
+        "kind": "image",
+        "task_id": "ergon:" + str(uuid4()),
+        "request_id": str(uuid4()),
+    }
+    j.record(b, "ahv_task_accepted", task)
+    assert journal(postgres).ahv_tasks(b) == {"disk-1": task}
+    assert j.resources(b) == {}  # Task acceptance is not native image completion.
+    with pytest.raises(NativeHeld, match="not_bound"):
+        j.ahv_tasks(replace(b, tenant_id=str(uuid4())))
+    j.record(b, "ahv_task_accepted", task)
+    with pytest.raises(NativeHeld, match="ambiguous"):
+        j.ahv_tasks(b)

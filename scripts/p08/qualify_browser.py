@@ -22,7 +22,7 @@ def main():
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
     report = {'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'observed_at': datetime.now(timezone.utc).isoformat(), 'evidence_level': 'E2', 'native_write_authorized': False,
-              'source_bindings': {p: sha(ROOT/p) for p in paths if p.startswith(('apps/console/', 'scripts/p08/', 'contracts/fixtures/inventory/migration-', '.github/workflows/p08-')) and (ROOT/p).is_file()},
+              'source_bindings': {p: sha(ROOT/p) for p in paths if p.startswith(('apps/console/', 'scripts/p08/', 'contracts/fixtures/inventory/migration-', 'contracts/fixtures/inventory/ahv-', '.github/workflows/p08-', '.github/workflows/ahv-destination.yml')) and (ROOT/p).is_file()},
               'commands': [], 'limitations': ['Actual Vue/Inertia review page with isolated synthetic HTTP observations.', 'Service persistence/authority is qualified separately; no native migration, representative-user review or assistive-tool acceptance.']}
     commands = [['node', '--version'], ['npm', 'run', 'typecheck'], ['npm', 'run', 'test:boundaries'], ['npm', 'run', 'build'], ['npx', 'playwright', 'test', '--config', 'tests/browser-p08/playwright.config.ts']]
     for index, argv in enumerate(commands):
@@ -42,7 +42,7 @@ def main():
     if artifacts.exists():
         shutil.copytree(artifacts, output/'browser', dirs_exist_ok=True)
     stats = report.get('stats', {})
-    report['result'] = 'PASSED' if all(c['exit_code'] == 0 for c in report['commands']) and stats.get('expected') == 4 and not any(stats.get(k, 1) for k in ('unexpected', 'flaky', 'skipped')) else 'FAILED'
+    report['result'] = 'PASSED' if all(c['exit_code'] == 0 for c in report['commands']) and stats.get('expected') == 5 and not any(stats.get(k, 1) for k in ('unexpected', 'flaky', 'skipped')) else 'FAILED'
     report['artifact_sha256'] = {str(p.relative_to(output)): sha(p) for p in output.rglob('*') if p.is_file() and p.name != 'report.json' and not any(part.startswith('.') for part in p.relative_to(output).parts)}
     (output/'report.json').write_text(json.dumps(report, indent=2)+'\n')
     return 0 if report['result'] == 'PASSED' else 1
