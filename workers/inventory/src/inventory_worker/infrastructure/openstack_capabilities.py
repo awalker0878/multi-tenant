@@ -3,6 +3,7 @@
 from typing import Any
 
 from inventory_worker.infrastructure.native import CollectionFailure
+from inventory_worker.infrastructure.openstack_security import security_semantics
 from inventory_worker.infrastructure.profile_digest import fingerprint
 
 
@@ -119,6 +120,7 @@ def target_profile(project_id: str, records: dict[str, Any], observed_at: int) -
             {"id": group["id"], "name": group["name"], "project_id": project_id,
              "stateful": group.get("stateful"),
              "rules_sha256": fingerprint(group["security_group_rules"]),
+             "semantics_sha256": security_semantics(group),
              "native_sha256": fingerprint(group)}
             for group in sorted(security_groups, key=lambda item: item["id"])
         ],
