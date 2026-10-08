@@ -5,14 +5,15 @@ import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { operatorFixture } from './operator-fixture.ts';
 import { fleetFixture } from './fleet-fixture.ts';
+import { nativeFixture } from './native-fixture.ts';
 import { campaignFixture } from './campaign-fixture.ts';
 
 export const tenant = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 export const site = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
 export const route = `/tenants/${tenant}/inventory/sites/${site}/migration`;
 let state: any;
-function reset(ahv = false) {
-  const fixture = JSON.parse(readFileSync(`../../contracts/fixtures/inventory/${ahv ? 'ahv-destination-v1' : 'migration-profile-v1'}.json`, 'utf8'));
+function reset(ahv = false, vmware = false) {
+  const fixture = JSON.parse(readFileSync(`../../contracts/fixtures/inventory/${vmware ? 'vmware-destination-v1' : ahv ? 'ahv-destination-v1' : 'migration-profile-v1'}.json`, 'utf8'));
   const now = Math.floor(Date.now() / 1000);
   state = { posts: [], errors: {}, notice: null, uncertain: false, access: 200,
     workspace: { methods: ['VM_COLD_EXPORT', 'VM_SNAPSHOT_BASELINE_APP_DELTA'], owner_fields: Object.keys(fixture.review.owner_inputs), review: null,
@@ -20,7 +21,7 @@ function reset(ahv = false) {
 }
 reset();
 export default defineConfig({
-  plugins: [vue(), tailwindcss(), fleetFixture(), campaignFixture(), operatorFixture(), { name: 'p08-isolated-observations', configureServer(server) {
+  plugins: [vue(), tailwindcss(), fleetFixture(), campaignFixture(), nativeFixture(), operatorFixture(), { name: 'p08-isolated-observations', configureServer(server) {
     server.middlewares.use(async (req, res, next) => {
       const path = req.url?.split('?')[0];
       if (path !== route && path !== route + '/status' && path !== '/__fixture' && path !== '/account') return next();
@@ -30,9 +31,10 @@ export default defineConfig({
       if (path === '/__fixture') {
         if (req.method === 'POST') {
           const control = JSON.parse(body);
-          if (control.reset) reset(!!control.ahv);
+          if (control.reset) reset(!!control.ahv, !!control.vmware);
           if (control.uncertain) state.uncertain = true;
           if (control.access) state.access = control.access;
+          if (['vmware', 'openstack', 'ahv'].includes(control.source_platform)) state.workspace.profiles[0].facts.platform = control.source_platform;
           if (control.expire) state.workspace.profiles.forEach((p: any) => { p.expires_at = Math.floor(Date.now()/1000) - 1; p.current = false; });
         }
         return send(state);
@@ -55,5 +57,5 @@ export default defineConfig({
       res.setHeader('Content-Type', 'text/html'); res.end(html);
     });
   } }],
-  server: { host: '127.0.0.1', port: 4188, strictPort: true },
+  server: { watch: { ignored: ['**/vendor/**', '**/storage/**', '**/test-results/**', '**/services/**'] }, host: '127.0.0.1', port: 4188, strictPort: true },
 });

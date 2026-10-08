@@ -20,11 +20,12 @@ final class JobsClient implements JobsGateway
     public function call(string $session, string $tenant, array $scope, string $method, string $tail, array $body = [], ?string $key = null): array
     {
         $evidence = str_starts_with($tail, 'evidence/');
+        $native = str_starts_with($tail, 'native-jobs/');
         $campaign = str_starts_with($tail, 'migration-campaigns');
         if ($evidence && $method !== 'GET') {
             throw new JobsFailure(422, 'invalid_command');
         }
-        if (! in_array($method, ['GET', 'POST'], true) || ! preg_match('/\A(?:(?:jobs|migration-campaigns)(?:\/[0-9a-f-]{36})?(?:\/commands)?|evidence\/[0-9a-f-]{36})\z/', $tail)) {
+        if (! in_array($method, ['GET', 'POST'], true) || ! preg_match('/\A(?:(?:jobs|migration-campaigns)(?:\/[0-9a-f-]{36})?(?:\/commands)?|native-jobs\/[0-9a-f-]{36}(?:\/(?:stop|continue-transfer))?|evidence\/[0-9a-f-]{36})\z/', $tail)) {
             throw new JobsFailure(422, 'invalid_command');
         }
         foreach ([$tenant, ...array_values($scope)] as $id) {
@@ -73,13 +74,16 @@ final class JobsClient implements JobsGateway
             if (! is_array($result) || array_is_list($result)) {
                 throw new JobsFailure;
             }
-            $contract = json_decode(file_get_contents(resource_path($campaign ? 'contracts/lifecycle-migration-campaigns-v1.json' : 'contracts/lifecycle-v1.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
-            $schemaName = $campaign ? ($method === 'POST' ? 'CampaignReceipt' : ($tail === 'migration-campaigns' ? 'CampaignList' : 'Campaign')) : ($evidence ? 'EvidenceRecord' : (str_ends_with($tail, '/commands') ? 'CommandReceipt' : 'Job'));
+            $contract = json_decode(file_get_contents(resource_path($native ? 'contracts/lifecycle-native-jobs-v1.1.json' : ($campaign ? 'contracts/lifecycle-migration-campaigns-v1.json' : 'contracts/lifecycle-v1.json'))) ?: '', true, 64, JSON_THROW_ON_ERROR);
+            $schemaName = $native ? 'NativeJob' : ($campaign ? ($method === 'POST' ? 'CampaignReceipt' : ($tail === 'migration-campaigns' ? 'CampaignList' : 'Campaign')) : ($evidence ? 'EvidenceRecord' : (str_ends_with($tail, '/commands') ? 'CommandReceipt' : 'Job')));
             $schema = ['$ref' => '#/components/schemas/'.$schemaName, 'components' => $contract['components']];
             if (! (new Validator)->validate(json_decode($raw), json_decode(json_encode($schema, JSON_THROW_ON_ERROR)))->isValid()) {
                 throw new JobsFailure;
             }
             if (($campaign || ! str_ends_with($tail, '/commands')) && (($result['tenant_id'] ?? null) !== $tenant || array_intersect_key($result['scope'], $scope) != $scope)) {
+                throw new JobsFailure(403, 'scope_mismatch');
+            }
+            if ($native && (($result['job_id'] ?? null) !== explode('/', $tail)[1] || ($result['scope']['tenant_id'] ?? null) !== $tenant)) {
                 throw new JobsFailure(403, 'scope_mismatch');
             }
 

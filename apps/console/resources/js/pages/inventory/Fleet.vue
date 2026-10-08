@@ -4,6 +4,7 @@ import { Link, router, useForm } from '@inertiajs/vue3';
 import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 import type { EndpointList, MigrationCandidate, MigrationFleet, MigrationGroupDetail } from '../../features/inventory/contracts';
 import { observedTime, useInventoryAccess } from '../../features/inventory/useAccess';
+import { migrationHold } from '../../features/inventory/migration-holds';
 
 const props = defineProps<{ tenantId: string; siteId: string; workspace: MigrationFleet; detail: MigrationGroupDetail | null; endpoints: EndpointList; notice: string | null }>();
 const base = `/tenants/${props.tenantId}/inventory/sites/${props.siteId}/migration-fleet`;
@@ -104,7 +105,7 @@ async function prepareGroup() {
       if (response.ok && result.binding && result.native_write_authorized === false) {
         results.value[id] = { status: 'Prepared', reason: 'Current VM review and disk mappings verified by Planning.' }; bindings.value[id] = result.binding;
       } else {
-        results.value[id] = { status: 'Held', reason: (result.holds ?? [result.error ?? 'preparation_unavailable']).join(', ').replaceAll('_', ' ') };
+        results.value[id] = { status: 'Held', reason: (result.holds ?? [result.error ?? 'preparation_unavailable']).map(migrationHold).join(' ') };
         if (response.status === 412 || response.status >= 500) { message.value = 'Batch paused. Refresh current findings before preparing again.'; break; }
       }
     }
@@ -142,7 +143,7 @@ async function completeGroup(operation: 'options' | 'compose') {
         plans.value[id] = result.id; bindings.value[id] = result.binding; delete pending.value[id];
         results.value[id] = { status: 'Plan created', reason: 'Review the complete plan and request independent approval.' };
       } else {
-        results.value[id] = { status: 'Held', reason: (result.holds ?? [result.error ?? 'planning_unavailable']).join(', ').replaceAll('_', ' ') };
+        results.value[id] = { status: 'Held', reason: (result.holds ?? [result.error ?? 'planning_unavailable']).map(migrationHold).join(' ') };
         if (response.status >= 500 || response.status === 412 || response.ok) {
           message.value = operation === 'compose' ? 'Batch paused. Retry plan creation unchanged to resolve an uncertain result.' : 'Batch paused. Refresh current findings before finding plans again.'; break;
         }
@@ -165,7 +166,7 @@ async function completeGroup(operation: 'options' | 'compose') {
     <p v-if="unavailable" role="status">Access cannot currently be verified. Selection and preparation are paused.</p>
     <p v-if="message" role="status" class="my-4 rounded bg-amber-50 p-4">{{ message }}</p>
     <section class="my-6 flex flex-wrap items-end gap-3 rounded-xl border border-slate-300 bg-slate-50 p-5" aria-label="API source collection">
-      <label class="min-w-64">Source connection<select aria-label="Source connection" v-model="refreshForm.endpoint_id" :disabled="blocked"><option value="">Choose an enrolled source</option><option v-for="endpoint in endpoints.items.filter(e => ['vmware', 'openstack', 'ahv'].includes(e.platform))" :key="endpoint.endpoint_id" :value="endpoint.endpoint_id">{{ endpoint.label }} · {{ endpoint.native_scope }}</option></select></label>
+      <label class="min-w-64">Source connection<select aria-label="Source connection" v-model="refreshForm.endpoint_id" :disabled="blocked"><option value="">Choose an enrolled source</option><option v-for="endpoint in endpoints.items.filter(e => ['vmware', 'openstack', 'ahv'].includes(e.platform))" :key="endpoint.endpoint_id" :value="endpoint.endpoint_id">{{ endpoint.platform }} · {{ endpoint.label }} · {{ endpoint.native_scope }}</option></select></label>
       <button :disabled="blocked || !refreshForm.endpoint_id" @click="refreshApi">Refresh from API</button>
       <button class="secondary" :disabled="blocked" @click="router.get(group ? `${base}/groups/${group.id}` : base)">Refresh findings</button>
       <p class="w-full text-sm text-slate-600">Collection uses existing read permissions and scope. Only complete generations appear below. Additional connections are available through Site inventory.</p>
@@ -189,7 +190,7 @@ async function completeGroup(operation: 'options' | 'compose') {
             <td class="p-3"><strong>{{ vm.name }}</strong><p>{{ vm.native_id }} · {{ vm.native_scope }}</p><p class="mt-1 text-xs text-slate-500">Observed {{ observedTime(vm.collected_at) }}</p></td>
             <td class="p-3">{{ vm.power_state ?? 'Unknown' }}<p class="text-xs">{{ vm.guest_id ?? 'Guest profile required' }}</p></td>
             <td class="p-3">{{ vm.cpu ?? '?' }} vCPU · {{ vm.memory_mb === null ? '?' : (vm.memory_mb / 1024).toFixed(1) }} GiB<p class="text-xs">{{ vm.disk_count ?? '?' }} disks</p></td>
-            <td class="max-w-sm p-3"><span :class="vm.holds.length || vm.expires_at <= now ? 'text-amber-900' : 'text-teal-900'">{{ vm.holds.length || vm.expires_at <= now ? 'Held' : 'Owner review required' }}</span><ul class="mt-1 text-xs"><li v-if="vm.expires_at <= now">Refresh required</li><li v-for="hold in vm.holds" :key="hold">{{ hold.replaceAll('_', ' ') }}</li></ul></td>
+            <td class="max-w-sm p-3"><span :class="vm.holds.length || vm.expires_at <= now ? 'text-amber-900' : 'text-teal-900'">{{ vm.holds.length || vm.expires_at <= now ? 'Held' : 'Owner review required' }}</span><ul class="mt-1 text-xs"><li v-if="vm.expires_at <= now">Refresh required</li><li v-for="hold in vm.holds" :key="hold">{{ migrationHold(hold) }}</li></ul></td>
             <td class="p-3"><Link v-if="vm.profile_id && !running" :href="reviewUrl(vm.profile_id)" class="text-teal-800 underline">Review VM</Link><span v-else-if="!vm.profile_id">Collect detailed profile</span></td>
           </tr>
         </tbody></table></div>
@@ -202,7 +203,8 @@ async function completeGroup(operation: 'options' | 'compose') {
         <label>Group name<input v-model="form.selection.name" required maxlength="120" placeholder="Finance · production · wave 1" /></label>
         <label>Destination profile<select v-model="form.selection.target_profile_id" required><option value="">Select a current target project</option><option v-for="target in targets" :key="target.id" :value="target.id">{{ target.platform }} · {{ target.native_id }}{{ target.holds.length ? ' · held' : '' }}</option></select></label>
         <label>Catalogue application ID<input v-model="form.selection.application_id" required /></label><label>Catalogue environment ID<input v-model="form.selection.environment_id" required /></label>
-        <label>Target disk format<select v-model="form.selection.format"><option v-for="format in ['raw', 'qcow2']" :key="format" :value="format" :disabled="!selectedTarget?.disk_formats.includes(format)">{{ format.toUpperCase() }}</option></select></label>
+        <label>Target disk format<select v-model="form.selection.format"><option v-for="format in ['raw', 'qcow2', 'vmdk']" :key="format" :value="format" :disabled="!selectedTarget?.disk_formats.includes(format)">{{ format.toUpperCase() }}</option></select></label>
+        <p v-if="selectedTarget && !selectedTarget.disk_formats.includes(form.selection.format)" role="status">Select a disk format observed for this destination: {{ selectedTarget.disk_formats.join(', ') || 'none available; refresh destination capabilities' }}.</p>
         <div class="self-end"><button type="submit" :disabled="!form.selection.resource_ids.length || !selectedTarget?.disk_formats.includes(form.selection.format)">Save migration group</button></div>
       </fieldset></form>
     </section>
@@ -211,7 +213,7 @@ async function completeGroup(operation: 'options' | 'compose') {
       <div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="text-xl font-semibold">{{ group.input.name }}</h2><p class="text-sm">Saved revision {{ group.revision }} · {{ detail.members.length }} VMs</p></div><button :disabled="blocked || dirty" @click="prepareGroup">{{ running ? 'Preparing group…' : 'Prepare group for the selected destination' }}</button></div>
       <p class="my-4">Preparation checks every selected VM independently. Ready members receive exact disk bindings; held members keep their reasons. Starting migrations still requires complete plans, approval and the P08 execution checks.</p>
       <p v-if="dirty" role="status" class="my-3 text-amber-900">Save your changes before preparing this group.</p>
-      <table class="w-full text-left text-sm"><thead><tr><th class="p-2">VM</th><th class="p-2">Outcome</th><th class="p-2">Details</th></tr></thead><tbody><tr v-for="member in detail.members" :key="member.candidate.resource_id" class="border-t"><td class="p-2">{{ member.candidate.name }}<p><Link v-if="member.candidate.profile_id && !running" :href="reviewUrl(member.candidate.profile_id)" class="text-teal-800 underline">Review this VM</Link></p></td><td class="p-2">{{ results[member.candidate.resource_id]?.status ?? (member.holds.length ? 'Held' : 'Ready to prepare') }}</td><td class="p-2">{{ results[member.candidate.resource_id]?.reason ?? member.holds.map(h => h.replaceAll('_', ' ')).join(', ') }}</td></tr></tbody></table>
+      <table class="w-full text-left text-sm"><thead><tr><th class="p-2">VM</th><th class="p-2">Outcome</th><th class="p-2">Details</th></tr></thead><tbody><tr v-for="member in detail.members" :key="member.candidate.resource_id" class="border-t"><td class="p-2">{{ member.candidate.name }}<p><Link v-if="member.candidate.profile_id && !running" :href="reviewUrl(member.candidate.profile_id)" class="text-teal-800 underline">Review this VM</Link></p></td><td class="p-2">{{ results[member.candidate.resource_id]?.status ?? (member.holds.length ? 'Held' : 'Ready to prepare') }}</td><td class="p-2">{{ results[member.candidate.resource_id]?.reason ?? member.holds.map(migrationHold).join(' ') }}</td></tr></tbody></table>
       <p class="mt-3" role="status">{{ Object.values(results).filter(r => r.status === 'Prepared').length }} prepared · {{ Object.values(results).filter(r => r.status === 'Held').length }} held</p>
       <details v-if="Object.keys(bindings).length" class="mt-4"><summary>Inspect prepared VM bindings</summary><pre class="mt-3 max-h-96 overflow-auto text-xs">{{ JSON.stringify(bindings, null, 2) }}</pre></details>
       <div class="mt-6 border-t pt-5" aria-label="Complete migration plans">

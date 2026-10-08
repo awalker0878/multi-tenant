@@ -12,6 +12,7 @@ use App\Http\Controllers\MigrationCampaignController;
 use App\Http\Controllers\MigrationFleetController;
 use App\Http\Controllers\MigrationReviewController;
 use App\Http\Controllers\MigrationSupportController;
+use App\Http\Controllers\NativeJobController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OidcController;
 use App\Http\Controllers\OperatorInputsController;
@@ -118,4 +119,11 @@ Route::prefix('/tenants/{tenant}/sites/{site}/applications/{application}/environ
     Route::get('/{campaign}', [$c, 'show'])->whereUuid('campaign');
     Route::get('/{campaign}/status', [$c, 'status'])->whereUuid('campaign');
     Route::post('/{campaign}/commands', [$c, 'command'])->whereUuid('campaign');
+});
+
+Route::prefix('/tenants/{tenant}/sites/{site}/applications/{application}/environments/{environment}/native-jobs')->whereUuid(['tenant', 'site', 'application', 'environment'])->middleware(RequireIdentity::class)->group(function (): void {
+    $c = NativeJobController::class;
+    Route::get('/{job}', [$c, 'show'])->whereUuid('job');
+    Route::get('/{job}/status', [$c, 'status'])->whereUuid('job');
+    Route::post('/{job}/commands', [$c, 'command'])->whereUuid('job');
 });

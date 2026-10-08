@@ -12,8 +12,8 @@ function changeVpc() {
   <fieldset class="space-y-4 rounded border border-slate-300 p-4">
     <legend class="text-xl font-semibold">AHV destination mapping</legend>
     <p>Project {{ profile.project_id }} · Cluster {{ profile.cluster_name || profile.cluster_id }} · Prism Central {{ profile.prism_central_id }}</p>
-    <p>Initial route: Linux cold export, BIOS, raw disks on SCSI, VirtIO NICs. The imported VM starts powered off with disconnected NICs on quarantine networks. Native qualification and activation approval are required separately.</p>
-    <p v-if="sourceFirmware !== 'bios'" role="alert">This source firmware is outside the initial AHV route.</p>
+    <p>Cold export preserves the selected firmware, with raw disks on SCSI and VirtIO NICs. Guest preparation must match the approved operating system and driver profile. The imported VM starts powered off with disconnected NICs on quarantine networks. Native qualification and activation approval are required separately.</p>
+    <p v-if="sourceFirmware !== model.firmware" role="alert">Source and destination firmware must match.</p>
     <div class="grid gap-4 md:grid-cols-2">
       <label>Storage container<select v-model="model.storage_container_id" required><option value="">Select observed storage</option><option v-for="row in profile.storage_containers" :key="row.extId" :value="row.extId">{{ row.name || row.extId }}</option></select></label>
       <label>Network scope<select v-model="model.vpc_id" @change="changeVpc"><option :value="null">Cluster VLAN networks</option><option v-for="row in profile.vpcs" :key="row.extId" :value="row.extId">{{ row.name || row.extId }}</option></select></label>

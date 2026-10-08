@@ -1,0 +1,37 @@
+import { test, expect } from '@playwright/test';
+import { nativeRoute } from './native-fixture';
+test('shows independent stages, continues once after uncertainty, stops, and clears revoked access', async ({ page, request }, info) => {
+  await request.post('/__native', { data: { reset: true } });
+  await page.goto(nativeRoute);
+  await expect(page.getByRole('heading', { name: 'Native migration stages', exact: true })).toBeVisible();
+  await expect(page.getByText('Awaiting verification', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '1 of 8 stages independently verified', exact: true })).toBeVisible();
+  await expect(page.getByRole('table')).toContainText('1 min 0 s');
+  await expect(page.getByText(/1,073,741,824 bytes \(1.00 GiB\)/)).toBeVisible();
+  await expect(page.getByRole('progressbar', { name: 'Independently verified stages' })).toHaveAttribute('value', '1');
+  await request.post('/__native', { data: { uncertain: true } });
+  await page.getByRole('button', { name: 'Continue immutable download', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('Refresh current state');
+  await expect(page.getByRole('heading', { name: 'Migration state: running', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '2 of 8 stages independently verified', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Continue immutable download', exact: true })).toHaveCount(0);
+  expect((await (await request.get('/__native')).json()).posts).toEqual([{ action: 'continue-transfer', expected_revision: 3 }]);
+  await page.getByRole('button', { name: 'Stop migration', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Migration state: stopped', exact: true })).toBeVisible();
+  await page.screenshot({ path: info.outputPath('native-job.png'), fullPage: true });
+  await request.post('/__native', { data: { access: 403 } });
+  await page.getByRole('button', { name: 'Refresh current state', exact: true }).click();
+  await expect(page).toHaveURL(/\/account$/);
+});
+
+test('rejects stale revisions and keeps read-only operators from sending native controls', async ({ page, request }) => {
+  await request.post('/__native', { data: { reset: true, control_allowed: false } });
+  await page.goto(nativeRoute);
+  await expect(page.getByRole('button', { name: 'Stop migration', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Continue immutable download', exact: true })).toHaveCount(0);
+  await request.post('/__native', { data: { revision: 2 } });
+  await page.getByRole('button', { name: 'Refresh current state', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('Current state is unavailable');
+  await expect(page.getByText('Revision 3. Each completed stage requires independent observations.')).toBeVisible();
+  expect((await (await request.get('/__native')).json()).posts).toEqual([]);
+});

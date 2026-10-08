@@ -42,7 +42,7 @@ final class MigrationReviewController
             'review.datasets' => ['required_if:operation,save', 'array', 'min:1', 'max:256'],
             'review.owner_inputs' => ['required_if:operation,save', 'array', 'size:8'],
             'review.objectives' => ['required_if:operation,save', 'array'],
-            'review.destination' => ['sometimes', 'nullable', 'array:platform,project_id,prism_central_id,cluster_id,vpc_id,storage_container_id,category_ids,policy_ids,disks,nics,firmware'],
+            'review.destination' => ['sometimes', 'nullable', 'array:platform,project_id,prism_central_id,cluster_id,vpc_id,storage_container_id,category_ids,policy_ids,vcenter_uuid,folder_id,resource_pool_id,host_id,datastore_id,guest_id,hardware_version,disks,nics,firmware'],
             'review.overrides' => ['present_if:operation,save', 'array', 'max:8'],
             'digest' => ['required_if:operation,confirm', 'nullable', 'regex:/\A[0-9a-f]{64}\z/'],
         ]);

@@ -45,6 +45,24 @@ it('rejects manual replacement of observed profiles', function (): void {
         ->assertRedirect($this->base)->assertSessionHasErrors('review');
 });
 
+it('forwards VMware destination mappings intact for authoritative inventory validation', function (): void {
+    $destination = [
+        'platform' => 'vmware', 'project_id' => 'datacenter-1', 'vcenter_uuid' => $this->site,
+        'folder_id' => 'group-v3', 'resource_pool_id' => 'resgroup-2', 'host_id' => 'host-1',
+        'datastore_id' => 'datastore-1', 'guest_id' => 'rhel9_64Guest', 'hardware_version' => 'vmx-21',
+        'firmware' => 'efi', 'disks' => [['source_key' => 0, 'index' => 0]],
+        'nics' => [['source_key' => 0, 'quarantine_network_id' => 'network-1', 'production_network_id' => 'network-2']],
+    ];
+    $review = ['source_profile_id' => $this->key, 'target_profile_id' => $this->site,
+        'method' => 'VM_COLD_EXPORT', 'datasets' => [['id' => $this->key]],
+        'owner_inputs' => array_fill_keys(['application_consistency', 'quiesce', 'health', 'delta_protocol', 'cutover', 'rollback', 'backup', 'owner'], 'reviewed'),
+        'objectives' => ['max_outage_seconds' => 0], 'overrides' => [], 'destination' => $destination];
+    $this->inventory->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->tenant,
+        'saveMigrationReview', ['site' => $this->site], $review, $this->key, null)->andReturn([]);
+    $this->post($this->base, ['operation' => 'save', 'command_key' => $this->key, 'review' => $review])
+        ->assertRedirect($this->base)->assertSessionHasNoErrors();
+});
+
 it('rechecks access on polling and applies csrf to migration writes', function (): void {
     $this->inventory->shouldReceive('call')->once()->andThrow(new InventoryFailure(403));
     $this->get($this->base.'/status')->assertRedirect('/account');
