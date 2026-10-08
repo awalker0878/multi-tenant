@@ -1139,6 +1139,19 @@
           "condition": "always",
           "collector_source": "workers/inventory/src/inventory_worker/infrastructure/vmware_workload.py",
           "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "placement.native_reserved_capacity",
+          "scope": "owner",
+          "api_family": null,
+          "api_field": null,
+          "owner_evidence_field": "native_owner_available_capacity_and_exclusive_reservation",
+          "collection_method": "independent",
+          "max_age_seconds": 15,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "services/inventory/src/inventory/domain/source_profile.py",
+          "collection_status": "external_evidence_required"
         }
       ]
     },
@@ -2289,6 +2302,19 @@
           "condition": "when:vpc_required",
           "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_profile.py",
           "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "placement.native_reserved_capacity",
+          "scope": "owner",
+          "api_family": null,
+          "api_field": null,
+          "owner_evidence_field": "native_owner_available_capacity_and_exclusive_reservation",
+          "collection_method": "independent",
+          "max_age_seconds": 15,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "services/inventory/src/inventory/domain/source_profile.py",
+          "collection_status": "external_evidence_required"
         }
       ]
     },
@@ -3621,6 +3647,19 @@
           "condition": "always",
           "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_workload.py",
           "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "placement.native_reserved_capacity",
+          "scope": "owner",
+          "api_family": null,
+          "api_field": null,
+          "owner_evidence_field": "native_owner_available_capacity_and_exclusive_reservation",
+          "collection_method": "independent",
+          "max_age_seconds": 15,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "services/inventory/src/inventory/domain/source_profile.py",
+          "collection_status": "external_evidence_required"
         }
       ]
     }
