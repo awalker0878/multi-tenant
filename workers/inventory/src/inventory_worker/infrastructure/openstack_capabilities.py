@@ -18,6 +18,7 @@ def target_profile(project_id: str, records: dict[str, Any], observed_at: int) -
         "flavors",
         "volume_types",
         "network_extensions",
+        "security_groups",
         "compute_version",
         "volume_version",
     }
@@ -48,26 +49,48 @@ def target_profile(project_id: str, records: dict[str, Any], observed_at: int) -
     flavors = records["flavors"].get("flavors")
     types = records["volume_types"].get("volume_types")
     extensions = records["network_extensions"].get("extensions")
-    for response in (records["flavors"], records["volume_types"], records["network_extensions"]):
+    security_groups = records["security_groups"].get("security_groups")
+    for response in (records["flavors"], records["volume_types"], records["network_extensions"], records["security_groups"]):
         for key, links in response.items():
             if key.endswith("links") and (
                 not isinstance(links, list)
                 or any(not isinstance(link, dict) or link.get("rel") == "next" for link in links)
             ):
                 raise CollectionFailure("invalid_response")
-    for rows in (flavors, types, extensions):
+    for rows in (flavors, types, extensions, security_groups):
         if (
             not isinstance(rows, list)
             or len(rows) >= 100
             or not all(isinstance(v, dict) for v in rows)
         ):
             raise CollectionFailure("invalid_response")
-    for rows, identity in ((flavors, "id"), (types, "id"), (extensions, "alias")):
+    for rows, identity in ((flavors, "id"), (types, "id"), (extensions, "alias"), (security_groups, "id")):
         identities = [row.get(identity) for row in rows]
         if any(not isinstance(value, str) or not value for value in identities) or len(
             set(identities)
         ) != len(identities):
             raise CollectionFailure("invalid_response")
+    # Only complete, project-owned, API-discovered security groups may be offered.
+    # A rule is a policy *candidate*, never independent proof of equivalent flows.
+    for group in security_groups:
+        if (
+            group.get("project_id", group.get("tenant_id")) != project_id
+            or not isinstance(group.get("security_group_rules"), list)
+            or len(group["security_group_rules"]) > 512
+            or not isinstance(group.get("name"), str)
+        ):
+            raise CollectionFailure("invalid_response")
+        rule_ids = set()
+        for rule in group["security_group_rules"]:
+            if (
+                not isinstance(rule, dict)
+                or not isinstance(rule.get("id"), str)
+                or rule.get("security_group_id") != group["id"]
+                or rule.get("project_id", rule.get("tenant_id")) != project_id
+                or rule["id"] in rule_ids
+            ):
+                raise CollectionFailure("invalid_response")
+            rule_ids.add(rule["id"])
     # These services can hide deployment choices behind policy or custom backends.
     # The API advertises what was observed, never an assumed firmware/driver tuple.
     return {
@@ -92,6 +115,13 @@ def target_profile(project_id: str, records: dict[str, Any], observed_at: int) -
             for row in types
         ],
         "network_extensions": sorted(row["alias"] for row in extensions),
+        "security_groups": [
+            {"id": group["id"], "name": group["name"], "project_id": project_id,
+             "stateful": group.get("stateful"),
+             "rules_sha256": fingerprint(group["security_group_rules"]),
+             "native_sha256": fingerprint(group)}
+            for group in sorted(security_groups, key=lambda item: item["id"])
+        ],
         "compute_version": {
             k: records["compute_version"].get(k) for k in ("min_version", "version")
         },
