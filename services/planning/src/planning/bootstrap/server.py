@@ -16,7 +16,11 @@ from planning.application.validation import MigrationValidation, NativeValidatio
 from planning.infrastructure.foundation import database_ready
 from planning.infrastructure.migration import prepare_migration
 from planning.infrastructure.migration_recipes import recipe_for, visible_recipes
-from planning.infrastructure.migration_support import qualification_records, selected_tranche
+from planning.infrastructure.migration_support import (
+    api_capability_records,
+    qualification_records,
+    selected_tranche,
+)
 from planning.infrastructure.owners import GovernanceAuthority, OwnerSources, qualification_current
 from planning.infrastructure.store import Postgres
 from planning.infrastructure.telemetry import BoundedSignalBuffer
@@ -33,7 +37,9 @@ class PlanningRouter:
         def clock() -> int:
             return int(time.time())
 
-        self.support = MigrationSupport(selected_tranche, qualification_records, clock)
+        self.support = MigrationSupport(
+            selected_tranche, qualification_records, clock, api_capability_records
+        )
         validation = PlanValidation(
             NativeValidation(
                 lambda actor, site, recipe: recipe_for(
