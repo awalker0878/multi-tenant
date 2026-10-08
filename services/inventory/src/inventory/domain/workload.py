@@ -149,7 +149,7 @@ def profile_payload(
             raise Rejected("invalid_openstack_security_inventory")
         seen_groups = set()
         for group in groups:
-            shape(group, {"id", "name", "project_id", "stateful", "rules_sha256", "native_sha256"})
+            shape(group, {"id", "name", "project_id", "stateful", "rules_sha256", "semantics_sha256", "native_sha256"})
             if (not isinstance(group["id"], str) or not group["id"]
                 or group["id"] in seen_groups or group["project_id"] != p["project_id"]
                 or type(group["name"]) is not str
@@ -157,6 +157,8 @@ def profile_payload(
             ):
                 raise Rejected("foreign_openstack_security_inventory", 403)
             checksum(group["rules_sha256"])
+            if group["semantics_sha256"] is not None:
+                checksum(group["semantics_sha256"])
             checksum(group["native_sha256"])
             seen_groups.add(group["id"])
     if ahv:
