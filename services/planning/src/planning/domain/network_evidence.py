@@ -5,9 +5,33 @@ from typing import Any
 from planning.domain.model import digest
 
 
+FLOW_KEYS = ("from", "to", "protocol", "port")
+CONTEXT_KEYS = ("address_family", "vrf_id", "direction", "return_path_policy")
+
+
+def flow_context(flow: dict[str, Any], policy: dict[str, Any]) -> dict[str, str] | None:
+    """No four-tuple may authorize traffic outside its reviewed network context."""
+    mapping = policy.get("network_flow_contexts")
+    if not isinstance(mapping, dict):
+        return None
+    identity = digest({k: flow[k] for k in FLOW_KEYS})
+    context = mapping.get(identity)
+    if (
+        not isinstance(context, dict)
+        or set(context) != set(CONTEXT_KEYS)
+        or any(not isinstance(context[k], str) or not context[k] for k in CONTEXT_KEYS)
+        or context["address_family"] not in {"ipv4", "ipv6"}
+        or context["direction"] != "source_to_destination"
+        or context["return_path_policy"] != "stateful_allow"
+    ):
+        return None
+    return context
+
+
 def traffic(flow: dict[str, Any], network: dict[str, Any], policy: dict[str, Any], now: int) -> str:
     topology = network["topology"]
-    if (
+    context = flow_context(flow, policy)
+    if context is None or (
         network["policy_sha256"] != digest(policy)
         or network["topology_sha256"] != digest(topology)
         or network["default_action"] != "deny"
@@ -24,25 +48,34 @@ def traffic(flow: dict[str, Any], network: dict[str, Any], policy: dict[str, Any
     reached = {flow["from"]}
     for _ in range(len(nodes)):
         added = {
-            e["to"] for e in edges if e["from"] in reached and e["to"] in nodes and e["native_ref"]
+            edge["to"]
+            for edge in edges
+            if edge["from"] in reached
+            and edge["to"] in nodes
+            and edge["native_ref"]
+            and edge.get("context") == context
         }
         if added <= reached:
             break
         reached |= added
     allowed = flow["to"] in reached and any(
-        all(rule.get(k) == flow[k] for k in ("from", "to", "protocol", "port"))
+        all(rule.get(k) == flow[k] for k in FLOW_KEYS)
+        and rule.get("context") == context
         and rule.get("action") == "allow"
+        and rule.get("egress_action") == "allow"
+        and rule.get("ingress_action") == "allow"
         and rule.get("native_ref")
         for rule in network["firewall_rules"]
     )
     rows = [
-        m
-        for m in network["measurements"]
-        if all(m.get(k) == flow[k] for k in ("from", "to", "protocol", "port"))
+        row
+        for row in network["measurements"]
+        if all(row.get(k) == flow[k] for k in FLOW_KEYS)
+        and row.get("context") == context
     ]
     if not rows:
         return "unknown"
-    latest = max(rows, key=lambda m: m["sequence"])
+    latest = max(rows, key=lambda row: row["sequence"])
     if (
         type(latest["sequence"]) is not int
         or type(latest["observed_at"]) is not int
@@ -56,8 +89,32 @@ def traffic(flow: dict[str, Any], network: dict[str, Any], policy: dict[str, Any
     expected = flow.get("expectation", "allow")
     if latest["outcome"] != expected:
         return "blocked"
-    if expected == "allow" and not allowed:
-        return "blocked"
+    if expected == "allow":
+        if not allowed:
+            return "blocked"
+        reverse = [
+            row
+            for row in network.get("return_paths", [])
+            if row.get("from") == flow["to"]
+            and row.get("to") == flow["from"]
+            and row.get("protocol") == flow["protocol"]
+            and row.get("port") == flow["port"]
+            and row.get("context") == context
+        ]
+        if not reverse:
+            return "unknown"
+        current = max(reverse, key=lambda row: row["sequence"])
+        if (
+            type(current.get("observed_at")) is not int
+            or not 0 <= now - current["observed_at"] <= 60
+            or current.get("expires_at", 0) <= now
+            or current.get("topology_sha256") != network["topology_sha256"]
+            or current.get("policy_sha256") != network["policy_sha256"]
+            or not current.get("native_ref")
+        ):
+            return "unknown"
+        if current.get("outcome") != "allow":
+            return "blocked"
     if expected == "deny" and allowed:
         return "blocked"
     return "eligible"
