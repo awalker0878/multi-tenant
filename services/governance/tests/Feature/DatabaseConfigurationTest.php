@@ -19,7 +19,7 @@ it('loads the mounted database password and never falls back to an environment c
             'empty' => file_put_contents($path, ''),
             'multiline' => file_put_contents($path, $password."\nextra"),
             'oversize' => file_put_contents($path, str_repeat('a', 4097)),
-            'unconfigured' => $_ENV['DB_PASSWORD_FILE'] = $_SERVER['DB_PASSWORD_FILE'] = null,
+            'unconfigured' => $_ENV['DB_PASSWORD_FILE'] = $_SERVER['DB_PASSWORD_FILE'] = '(null)',
             'wrapper' => $_ENV['DB_PASSWORD_FILE'] = $_SERVER['DB_PASSWORD_FILE'] = 'data://text/plain,'.$password,
         };
         $loaded = require base_path('config/database.php');
