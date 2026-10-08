@@ -91,3 +91,12 @@ when its selected component list is empty. The selector compares changed paths
 between revisions against the current candidate/owner mapping; it does not claim
 a versioned consumer graph across both revisions. Contract changes therefore
 select all registered candidates conservatively.
+
+The foundation contract check requires complete Git history. Its explicit base
+commit selects the branch history; each published contract is frozen to the bytes
+from its first appearance on that history's first-parent chain. A merge publishes
+its resulting contract bytes, not unpublished draft versions on its side branch.
+Renaming or deleting a published path remains a removal. Prior in-place edits do
+not reset this baseline: restore the originally published artifact and put any
+extensions in a new version. The report records the publication revision and
+SHA-256 for every frozen artifact. Shallow or incomplete history fails the check.
