@@ -40,6 +40,54 @@ CREATE TABLE app.qualification_authority_outbox (
     delivered_at bigint
 );
 
+-- A runtime writer cannot roll the publication head backwards or skip an epoch.
+CREATE FUNCTION app.guard_qualification_head_epoch()
+RETURNS trigger LANGUAGE plpgsql AS $
+BEGIN
+    IF TG_OP = 'INSERT' AND NEW.authority_epoch <> 1 THEN
+        RAISE EXCEPTION 'initial qualification epoch must be one' USING ERRCODE = '23514';
+    END IF;
+    IF TG_OP = 'UPDATE' AND NEW.authority_epoch <> OLD.authority_epoch + 1 THEN
+        RAISE EXCEPTION 'qualification authority epoch must increase exactly once'
+            USING ERRCODE = '23514';
+    END IF;
+    RETURN NEW;
+END;
+$;
+CREATE TRIGGER qualification_head_monotonic
+    BEFORE INSERT OR UPDATE ON app.qualification_authority_heads
+    FOR EACH ROW EXECUTE FUNCTION app.guard_qualification_head_epoch();
+
+CREATE FUNCTION app.verify_qualification_head_event()
+RETURNS trigger LANGUAGE plpgsql AS $
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM app.qualification_authority_events e
+        WHERE e.scope_sha256 = NEW.scope_sha256
+          AND e.authority_epoch = NEW.authority_epoch
+          AND e.event_sha256 = NEW.last_event_sha256
+    ) THEN
+        RAISE EXCEPTION 'qualification head has no durable publication event'
+            USING ERRCODE = '23514';
+    END IF;
+    RETURN NEW;
+END;
+$;
+CREATE CONSTRAINT TRIGGER qualification_head_requires_event
+    AFTER INSERT OR UPDATE ON app.qualification_authority_heads
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW EXECUTE FUNCTION app.verify_qualification_head_event();
+
+CREATE FUNCTION app.reject_qualification_head_delete()
+RETURNS trigger LANGUAGE plpgsql AS $
+BEGIN
+    RAISE EXCEPTION 'qualification history head cannot be deleted' USING ERRCODE = '23514';
+END;
+$;
+CREATE TRIGGER qualification_head_undeletable
+    BEFORE DELETE ON app.qualification_authority_heads
+    FOR EACH ROW EXECUTE FUNCTION app.reject_qualification_head_delete();
+
 CREATE FUNCTION app.reject_qualification_history_mutation()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
@@ -55,6 +103,6 @@ REVOKE ALL ON app.qualification_authority_heads,
     FROM assurance_runtime;
 GRANT SELECT, INSERT, UPDATE ON app.qualification_authority_heads TO assurance_runtime;
 GRANT SELECT, INSERT ON app.qualification_authority_events TO assurance_runtime;
-GRANT SELECT, INSERT, UPDATE (delivered_at) ON app.qualification_authority_outbox
-    TO assurance_runtime;
+GRANT SELECT, INSERT ON app.qualification_authority_outbox TO assurance_runtime;
+GRANT UPDATE (delivered_at) ON app.qualification_authority_outbox TO assurance_runtime;
 COMMIT;
