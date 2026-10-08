@@ -305,27 +305,28 @@ class Planning:
             ):
                 raise Rejected("migration_plan_expired", 423)
 
-    def placement_proposal(
-        self, tenant: str, identity: str, revision: int
-    ) -> dict[str, Any]:
+    def placement_proposal(self, tenant: str, identity: str, revision: int) -> dict[str, Any]:
         """Expose a deterministic witness; a proposal is never an owner receipt."""
         if revision != 1:
             raise Rejected("not_found", 404)
         with self.database.transaction() as tx:
             row = tx.one(
                 "SELECT payload FROM app.planning_records WHERE id=%s AND tenant=%s "
-                "AND kind='plan'", (identifier(identity), identifier(tenant)),
+                "AND kind='plan'",
+                (identifier(identity), identifier(tenant)),
             )
             if row is None:
                 raise Rejected("not_found", 404)
             plan = row["payload"]
             retained = tx.one(
                 "SELECT payload FROM app.planning_records WHERE id=%s AND tenant=%s "
-                "AND kind='assessment'", (plan["assessment_id"], tenant),
+                "AND kind='assessment'",
+                (plan["assessment_id"], tenant),
             )
         content = plan["content"]
         if (
-            retained is None or content["execution_ready"] is not True
+            retained is None
+            or content["execution_ready"] is not True
             or content["lane"] != "operational"
             or min(content["valid_until"], content["input_fresh_until"]) <= self.clock()
         ):
@@ -336,7 +337,8 @@ class Planning:
             placed = fit(
                 assessment["intent"]["intent"],
                 inputs["destination"]["capability_snapshot"]["data"]["pools"],
-                inputs["policy"], self.clock(),
+                inputs["policy"],
+                self.clock(),
             )
         except (KeyError, TypeError, ValueError):
             raise Rejected("placement_proposal_unverified", 423) from None
