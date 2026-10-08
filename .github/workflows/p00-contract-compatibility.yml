@@ -2,7 +2,7 @@ name: P00 contract tooling
 
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths:
       - spikes/compatibility/contracts/**
       - spikes/compatibility/run-contracts.py

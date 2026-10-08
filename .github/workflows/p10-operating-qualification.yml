@@ -1,10 +1,10 @@
 name: P10 operating qualification engineering
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: ['services/**', 'workers/**', 'apps/**', 'contracts/**', 'deploy/**', 'architecture/**', 'scripts/**', 'release/**', '.github/workflows/p10-operating-qualification.yml']
   pull_request:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
   workflow_dispatch:
 permissions:
   contents: read

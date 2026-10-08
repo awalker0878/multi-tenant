@@ -2,9 +2,9 @@ name: Context policy
 
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
   pull_request:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
   workflow_dispatch:
 
 permissions:

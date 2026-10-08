@@ -1,7 +1,7 @@
 name: P01 isolated stateful dependencies
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: [scripts/p01/stateful/**, scripts/p01/run_stateful.py, scripts/p01/test_stateful.py, scripts/p01/run_local.py, scripts/p01/local_runtime.py, deploy/fixtures/stateful/**, deploy/dependencies/stateful/inputs.lock.json, deploy/dependencies/inputs.lock.json, .github/workflows/p01-stateful-integration.yml]
   workflow_dispatch:
 permissions:

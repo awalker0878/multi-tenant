@@ -2,7 +2,7 @@ name: P00 candidate images
 
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths:
       - spikes/compatibility/images/**
       - spikes/compatibility/php/**

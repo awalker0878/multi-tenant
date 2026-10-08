@@ -1,7 +1,7 @@
 name: P01 image remediation observation
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths:
       - deploy/build/remediation-candidates.json
       - scripts/p01/artifacts/observe_remediation.py

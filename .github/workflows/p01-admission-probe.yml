@@ -1,7 +1,7 @@
 name: P01 admission deployment probe
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths:
       - release/admission-probe.json
       - scripts/p01/admission/probe_pr.py

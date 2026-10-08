@@ -1,7 +1,7 @@
 name: P01 dependency input observation
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: [deploy/dependencies/candidates.json, scripts/p01/resolve_dependencies.py, .github/workflows/p01-dependency-inputs.yml]
   workflow_dispatch:
 permissions:

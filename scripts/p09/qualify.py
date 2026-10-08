@@ -20,7 +20,7 @@ def main():
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    files = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
+    files = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
     prefixes = ('services/planning/', 'services/lifecycle/', 'workers/lifecycle/',
                 'scripts/p09/', 'contracts/schemas/expansion/', 'contracts/fixtures/expansion/',
                 'contracts/openapi/expansion-', '.github/workflows/p09-')
@@ -82,6 +82,7 @@ def main():
             if totals['tests'] == 0 or any(totals[k] for k in ('failures', 'errors', 'skipped')):
                 raise RuntimeError(suite + ' not fully passing')
         command('services/planning', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p09/check_contract.py')])
+        command('services/planning', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p09/check_directional_workflow.py')])
     except Exception as error:
         report['error'] = str(error)
     report['result'] = 'PASSED' if report['commands'] and not report.get('error') and all(c['exit_code'] == 0 for c in report['commands']) else 'FAILED'

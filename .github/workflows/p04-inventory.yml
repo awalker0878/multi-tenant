@@ -1,10 +1,10 @@
 name: P04 inventory
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: ['services/inventory/**', 'workers/inventory/**', 'services/governance/**', 'apps/console/**', 'contracts/**', 'scripts/p04/**', '.github/workflows/p04-inventory.yml']
   pull_request:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
   workflow_dispatch:
 permissions:
   contents: read

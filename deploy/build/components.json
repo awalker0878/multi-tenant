@@ -177,7 +177,8 @@
         "lifecycle-simulator": "lifecycle_worker.bootstrap.simulation:main",
         "lifecycle-native-inspect": "lifecycle_worker.bootstrap.native_inspect:main",
         "lifecycle-worker-native": "lifecycle_worker.bootstrap.native:main",
-        "lifecycle-migration-accounts": "lifecycle_worker.bootstrap.migration_accounts:main"
+        "lifecycle-migration-accounts": "lifecycle_worker.bootstrap.migration_accounts:main",
+        "lifecycle-worker-observer": "lifecycle_worker.bootstrap.observations:main"
       }
     },
     {

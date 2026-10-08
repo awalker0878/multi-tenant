@@ -1,10 +1,10 @@
 name: P05 planning
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: ['services/planning/**', 'services/lifecycle/**', 'services/inventory/**', 'services/governance/**', 'services/catalogue/**', 'services/assurance/**', 'apps/console/**', 'contracts/**', 'scripts/p05/**', '.github/workflows/p05-planning.yml']
   pull_request:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
   workflow_dispatch:
 permissions:
   contents: read

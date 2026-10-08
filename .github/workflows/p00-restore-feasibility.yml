@@ -2,7 +2,7 @@ name: P00 rebuild restore fixture
 
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths:
       - spikes/compatibility/restore/**
       - .github/workflows/p00-restore-feasibility.yml

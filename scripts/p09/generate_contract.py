@@ -32,12 +32,14 @@ def schema():
                        'guest_mutation': {'enum': ['copy_only', 'prohibited']}, 'writer_fencing': sha,
                        'target_write_recovery': sha, 'maximum_outage_seconds': integer,
                        'maximum_data_loss_seconds': integer})
+    constraints['properties']['maximum_data_loss_bytes'] = integer
     route = obj({'id': uid, 'source': installed, 'target': installed,
                  'guest': {'enum': ['linux', 'windows', 'appliance']},
                  'method': {'enum': ['cold_export', 'rebuild_restore', 'application_delta', 'file_delta', 'block_replication']},
                  **{k + '_sha256': sha for k in ['guest_profile', 'topology', 'data', 'policy', 'services', 'recovery', 'artifacts']},
                  'constraints': constraints, 'requirement_ids': array({'enum': [f'R{i:02}' for i in range(1, 36)]}, 1, 35),
                  'exclusions': array(label, 0, 64)})
+    route['properties']['guest_outcomes_sha256'] = sha
     route['allOf'] = [{'if': {'properties': {'guest': {'const': 'appliance'}}},
                        'then': {'properties': {'constraints': {'properties': {'guest_mutation': {'const': 'prohibited'}}}}}}]
     triggers = ['artifact', 'platform', 'api', 'backend', 'guest', 'method', 'policy', 'service', 'topology', 'recovery', 'ownership', 'expiry', 'revocation']

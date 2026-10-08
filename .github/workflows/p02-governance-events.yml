@@ -2,10 +2,10 @@ name: P02 Governance events
 
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: ['services/governance/**', 'contracts/schemas/events/governance-*.json', 'contracts/schemas/events/identity-*.json', 'contracts/asyncapi/governance.yaml', 'contracts/asyncapi/identity.yaml', 'contracts/schemas/events/support-*.json', 'contracts/asyncapi/support.yaml', 'scripts/p02/**', '.github/workflows/p02-governance-events.yml']
   pull_request:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
   workflow_dispatch:
 
 permissions:

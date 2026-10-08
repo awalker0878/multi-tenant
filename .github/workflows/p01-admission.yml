@@ -1,7 +1,7 @@
 name: P01 trusted-base admission
 on:
   pull_request_target:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     types: [opened, synchronize, reopened, ready_for_review]
 permissions:
   contents: read

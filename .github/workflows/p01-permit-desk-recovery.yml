@@ -1,7 +1,7 @@
 name: P01 Permit Desk application recovery
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: [scripts/p01/**, deploy/fixtures/permit-desk/**, deploy/dependencies/inputs.lock.json, .github/workflows/p01-permit-desk-recovery.yml]
   workflow_dispatch:
 permissions:

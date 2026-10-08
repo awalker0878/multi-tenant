@@ -1,7 +1,7 @@
 name: P06 execution
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths:
       - 'services/lifecycle/**'
       - 'workers/lifecycle/**'
@@ -21,7 +21,7 @@ on:
       - '.github/workflows/p05-planning.yml'
       - '.github/workflows/p06-execution.yml'
   pull_request:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
   workflow_dispatch:
 permissions:
   contents: read

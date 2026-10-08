@@ -1,7 +1,7 @@
 name: P01 isolated Compose integration
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: [services/**, apps/console/**, deploy/**, scripts/p01/**, .github/workflows/p01-local-integration.yml]
   workflow_dispatch:
 permissions:

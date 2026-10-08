@@ -2,7 +2,7 @@ name: P00 PHP compatibility
 
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths:
       - spikes/compatibility/php/**
       - spikes/compatibility/frontend/**

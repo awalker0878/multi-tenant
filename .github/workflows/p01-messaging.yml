@@ -1,10 +1,10 @@
 name: P01 transactional messaging
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: [contracts/**, tests/contracts/**, services/catalogue/**, services/planning/**, scripts/p01/messaging/**, scripts/p01/run_messaging.py, scripts/p01/run_images.py, scripts/p01/php_image_probe.php, scripts/p01/run_local.py, scripts/p01/local_runtime.py, deploy/build/**, deploy/dependencies/**, .github/workflows/p01-messaging.yml]
   pull_request:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: [contracts/**, tests/contracts/**, services/catalogue/**, services/planning/**, scripts/p01/messaging/**, scripts/p01/run_messaging.py, scripts/p01/run_images.py, scripts/p01/php_image_probe.php, scripts/p01/run_local.py, scripts/p01/local_runtime.py, deploy/build/**, deploy/dependencies/**, .github/workflows/p01-messaging.yml]
   workflow_dispatch:
 permissions:

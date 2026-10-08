@@ -1,10 +1,10 @@
 name: P03 catalogue
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: ['services/catalogue/**', 'services/governance/**', 'apps/console/**', 'contracts/**', 'scripts/p03/**', '.github/workflows/p03-catalogue.yml']
   pull_request:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
   workflow_dispatch:
 permissions:
   contents: read

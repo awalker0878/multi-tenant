@@ -1,7 +1,7 @@
 name: P01 stateful dependency input observation
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
     paths: [deploy/dependencies/stateful/candidates.json, scripts/p01/stateful/resolve.py, scripts/p01/stateful/requirements.in, .github/workflows/p01-stateful-inputs.yml]
   workflow_dispatch:
 permissions:

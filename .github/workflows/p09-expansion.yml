@@ -1,10 +1,10 @@
 name: P09 platform expansion conformance
 on:
   push:
-    branches: [greenfield/enterprise-microservices-plan, implementation/p09-expansion-20261007]
+    branches: [main, greenfield/enterprise-microservices-plan, implementation/p09-expansion-20261007]
     paths: ['services/planning/**', 'services/lifecycle/**', 'workers/lifecycle/**', 'contracts/**', 'scripts/p09/**', '.github/workflows/p09-expansion.yml']
   pull_request:
-    branches: [greenfield/enterprise-microservices-plan]
+    branches: [main, greenfield/enterprise-microservices-plan]
   workflow_dispatch:
 permissions:
   contents: read
