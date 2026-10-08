@@ -14,7 +14,7 @@ from inventory.domain.migration import destination_input
 def source(groups=("source-g",), *, port_security=True):
     return {
         "platform": "openstack",
-        "schema_version": 3,
+        "schema_version": 3, "native_scope": "project-1",
         "guest_id": "otherLinux64Guest",
         "nics": [{"key": 0}],
         "native": {"metadata": {
