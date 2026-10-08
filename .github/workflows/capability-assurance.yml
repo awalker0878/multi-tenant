@@ -48,3 +48,17 @@ jobs:
           P04_POSTGRES_BIN: /usr/lib/postgresql/16/bin
           P08_POSTGRES_BIN: /usr/lib/postgresql/16/bin
         run: uv run --frozen pytest -q
+
+  shadow-reconciliation:
+    name: Read-only qualification drift contract (E2)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - name: Validate fail-closed source-bound shadow reconciliation
+        run: python -m unittest discover -s scripts/assurance -p 'test_*.py' -v
