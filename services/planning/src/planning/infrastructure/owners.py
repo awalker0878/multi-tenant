@@ -345,21 +345,47 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
         intent = plan.get("source_intent")
     if not isinstance(intent, dict):
         raise Rejected("placement_intent_unavailable", 423)
+    now = int(time.time())
     result = assess(
-        intent, destination, pinned["profile"], pinned["policy"], current,
-        content["action"], content["method"], int(time.time()),
+        intent,
+        destination,
+        pinned["profile"],
+        pinned["policy"],
+        current,
+        content["action"],
+        content["method"],
+        now,
     )
+    # Capacity is a mandatory current observation, not an exception to revalidation.
     if any(
-        f["mandatory"] and f["status"] != "eligible"
-        for f in result["findings"] if not f["requirement"].startswith("capacity.")
+        finding["mandatory"] and finding["status"] != "eligible"
+        for finding in result["findings"]
     ):
         raise Rejected("current_native_measurement_required", 423)
-    placed = fit(
-        intent, pinned["destination"]["capability_snapshot"]["data"]["pools"],
-        pinned["policy"], int(time.time()),
-    )
-    if placed["status"] != "eligible":
+    try:
+        pinned_placement = fit(
+            intent,
+            pinned["destination"]["capability_snapshot"]["data"]["pools"],
+            pinned["policy"],
+            now,
+        )
+        current_placement = fit(
+            intent,
+            destination["capability_snapshot"]["data"]["pools"],
+            pinned["policy"],
+            now,
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise Rejected("placement_binding_invalid", 423) from error
+    if (
+        pinned_placement["status"] != "eligible"
+        or current_placement["status"] != "eligible"
+        or current_placement["allocations"] != pinned_placement["allocations"]
+    ):
+        # A valid older witness cannot survive a changed pool ledger revision,
+        # class limit, fault domain, resource headroom or placement decision.
         raise Rejected("placement_binding_invalid", 423)
+    placed = current_placement
     receipt = request(
         "CAPACITY", "POST",
         f"/internal/tenants/{scope['tenant_id']}/placement-reservations/checks",
