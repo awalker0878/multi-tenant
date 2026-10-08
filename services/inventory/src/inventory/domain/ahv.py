@@ -127,7 +127,9 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
         len(d["category_ids"]) != len(set(d["category_ids"]))
     ):
         raise Rejected("ahv_category_selection_invalid")
-    if (not source_categories and d["category_ids"]) or not set(d["category_ids"]) <= inventories["categories"].keys():
+    if (
+        (not isinstance(source_categories, list) or not source_categories) and d["category_ids"]
+    ) or not set(d["category_ids"]) <= inventories["categories"].keys():
         raise Rejected("unobserved_source_or_destination_category")
     source_ids = source_security_ids(source)
     verified = {
