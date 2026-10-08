@@ -1,25 +1,66 @@
-# Console foundation
+# Workload Mobility console
 
-The Console is the browser entrypoint for Enterprise Workload Mobility and Secure Hosting. It will compose tenant-scoped provisioning, migration, approval and recovery journeys through the owning service APIs. It owns presentation and server-side browser sessions; Governance and the other contexts retain their authorization decisions and business records. See the [Console specification](../../docs/services/console.md) and [frontend standard](../../docs/engineering/frontend.md).
+The console provides tenant-scoped application, environment, provisioning,
+migration, approval and recovery journeys through the owning service APIs.
+Laravel/Inertia owns presentation and browser sessions; Governance, Inventory,
+Planning, Lifecycle and Assurance retain their records and authorization.
 
-This P01 increment provides an independently packaged Laravel/Inertia application and a compiled Vue/TypeScript/Tailwind interface. The public foundation page describes the intended product and makes its development state clear. Sign-in, tenant selection, service calls and workload operations are not implemented. There are no sample users, privileged identities, copied business aggregates or enabled mutation endpoints.
+The shared Workload Mobility theme supplies navy workspace navigation, teal
+controls, a consistent brand mark and responsive layouts. Site administrators
+reach **Operator readiness** from **Observed inventory → Site inventory**.
 
-## Routes
+## Site commissioning
 
-| Request | Behavior |
+1. Enroll approved connections in **Site inventory**. Trust policies and scoped
+   secret-store records must already exist under their owning administrators.
+2. Use **Environment configuration** to pull native API findings and review
+   required capabilities. Supply only the configuration references that cannot
+   be discovered from the APIs.
+3. Use **Operator readiness** to collect the 32 account, trust, execution,
+   recovery, target and service-handover inputs. Save partial drafts and download
+   the saved, revision-bound packet for the commissioning team.
+4. Review workload profiles and datasets, prepare migration groups, review exact
+   plans and schedule approved migration campaigns through their existing pages.
+
+A saved reference is not verified evidence. API discovery, operator-input
+collection, native qualification and execution approval remain distinct. The
+console never mounts a credential or grants native authority from these inputs.
+Supply protected record identifiers, not passwords, tokens or private keys.
+
+| Site route suffix | Purpose |
 | --- | --- |
-| `GET /` | Inertia `Foundation` page. Explicit props are `productName` and `implementationState`; the adapter also supplies its standard error props. No actor, tenant, secret or service record is shared. |
-| `GET /health/live` | `200`, `{service: console, status: alive, scope: process}`. Does not query a dependency or start a session. |
-| `GET /health/ready` | `503`, `{service: console, status: not_ready, scope: service, reason: foundation_only}` with `Retry-After: 10`. A caller or environment switch cannot enable readiness. |
+| `/configuration` | API findings, capability requirements and saved environment review |
+| `/operator-inputs` | Owner references, operating targets and missing-input checklist |
+| `/operator-inputs/download` | Freshly authorized JSON handoff for the saved packet |
+| `/migration` | Workload method, dataset and application-owner review |
+| `/migration-fleet` | Source inventory, grouping and bulk preparation |
 
-Web responses are private and non-cacheable and set `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` and a same-origin referrer policy. Process probes are non-cacheable. The server-session cookie defaults to Secure, HttpOnly and SameSite=Lax. The file session driver is a local foundation choice; it does not establish a multi-replica session architecture. Debug and Inertia devtools are disabled. No fixed CSRF meta tag, browser token store or self-registration flow is added.
+Site routes are under `/tenants/{tenant}/inventory/sites/{site}`. Operator-input
+reads, saves, polling and exports require current site administration. Saves use
+CSRF protection, revision preconditions and idempotent command identities. After
+an uncertain response the UI freezes edits until the same command is recovered.
+Tenant changes/revocation clear the previous browser context. Authenticated pages
+and downloads are private and non-cacheable. Browser storage holds no input drafts.
+
+## Deployment
+
+Deploy the matching Inventory service and apply
+`services/inventory/migrations/007_operator_inputs.sql` through the existing
+migration owner before enabling this increment. The runtime role has immutable
+SELECT/INSERT access. The additive Inventory 1.4 contract preserves all published
+1.3 operations and schemas. Existing native readiness and approval controls remain
+in force. Merge to main does not deploy an installation.
+
+Production requires HTTPS, protected generated keys, secure session cookies and
+the commissioned service dependencies. The loopback development server does not
+establish the production ingress or multi-replica architecture.
 
 ## Install and verify
 
-Run these commands in this directory with the accepted PHP 8.5.11, Composer 2.10.3 and Node 24.19.0 family:
+Use the repository's accepted PHP 8.5.11, Composer 2.10.3, Node 24.19.0 and npm 11
+family. Dependencies are owned and locked by this application.
 
 ```sh
-composer validate --strict --no-check-all
 composer install --no-interaction --no-progress --prefer-dist
 composer check-platform-reqs
 npm ci --ignore-scripts --no-audit --no-fund
@@ -31,27 +72,17 @@ composer test:types
 composer test:architecture
 composer test:canaries
 composer test
+npx playwright install --with-deps --only-shell chromium
+npx playwright test --config tests/browser-p08/playwright.config.ts
 ```
 
-The Composer and npm locks are private to this application. [Package run 37239193553](../../docs/implementation/p01-laravel-foundations.md) passed clean lock replay, unchanged dependency versions/references, PHP/frontend quality, 24 Pest tests / 86 assertions, production asset compilation and one Chromium test. Ordinary PHP checks use replay; later dependency resolution is explicit and followed by replay. See the [Console record](../../docs/implementation/p01-console-foundation.md) for exact source and scope. The [image record](../../docs/implementation/p01-laravel-images.md) separately retains the missing Inertia page packaging failure and corrective execution.
+The P08 browser suite renders actual Vue/Inertia pages with an isolated HTTP
+fixture. It covers migration review, inventory grouping, campaigns and operator
+inputs, including desktop/mobile layout, unchanged retry, stale edits and revoked
+access. Inventory's separate PostgreSQL tests cover owner persistence and tenant
+isolation. Native platform qualification and independent receiving review require
+their original live observations; neither is inferred from the browser suite.
 
-For local development, copy `.env.example` to `.env`, generate an application key with `php artisan key:generate`, build the frontend, and run `php artisan serve --host=127.0.0.1 --port=8000`. The example disables Secure cookies only for loopback HTTP. A hosted deployment must use HTTPS, a protected generated key and Secure cookies. Do not commit `.env` or a generated key. PHP's development server is not the production ingress design.
-
-The browser suite uses a separately running application and production-built assets:
-
-```sh
-npm run browser:install
-npm run browser:test
-```
-
-`CONSOLE_BASE_URL` can select another local test address. The browser test checks real hydration, title, foundation disclosure, viewport overflow and JavaScript errors. It does not establish accessibility conformance or authenticated workflow behavior.
-
-## Structure and controls
-
-The service owns its `App\` namespace, Composer autoload root, npm dependencies, PHP configuration and compiled assets. PHP HTTP entrypoints and providers follow ordinary Laravel placement. Add Console-owned `Domain/<Capability>`, `Application/<Capability>/Actions` and Infrastructure adapters only when implementing actual behavior under [ADR-024](../../docs/decisions/adr-024-pragmatic-laravel-domain-convention.md). No development package from the convention's author is installed.
-
-The browser bootstrap is in `resources/js/app/`; route pages are in `resources/js/pages/`. Future feature source belongs in `contexts/<context>/features/<capability>/`, exposed through a reviewed context `index.ts`. Journeys/pages compose those public interfaces. Shared technical/UI code cannot import upward into application presentation. The TypeScript AST check covers static imports/exports, type imports, literal dynamic imports and the one reviewed page glob. Unregistered packages/aliases, computed imports, sibling-service paths, context-private imports, cross-context feature coupling, upward shared imports and additional globs fail the check. SFC scripts are inspected and external script sources rejected. Bundle/type checks remain separate from this source policy; it is not a runtime sandbox or full proof against arbitrary JavaScript execution.
-
-The regular PHP test command runs actual HTTP and architecture tests. CSRF controls use a test-only mutation route and explicitly disable Laravel's testing-environment bypass, checking both a rejected missing token and an accepted session token. This proves the configured middleware branch, not a completed business mutation or real-browser privilege transition. The separate private Deptrac canaries verify four permitted convention dependencies and nine intended rule rejections and restore the original source. They do not invent implemented Domain/Application behavior.
-
-Remaining P01/P02 work includes independently deployed service/dependency behavior and deployment controls, federation/delegation, authenticated session lifecycle, service readiness checks, proxy trust/CSP, shared session availability, tenant/context transitions, actual browser support, accessibility assessment and authorized workflows. Readiness stays closed while these dependencies are absent.
+See the [console specification](../../docs/services/console.md),
+[frontend standard](../../docs/engineering/frontend.md) and
+[operator-input handoff](../../docs/implementation/console-operator-readiness.md).

@@ -28,6 +28,7 @@ test('collects operator inputs, preserves zero and uncertain saves, and remains 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: 'Workspace navigation', exact: true }).click();
   await expect(page.getByRole('link', { name: 'Observed inventory', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Sign out', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Close navigation', exact: true }).click();
   expect(await page.locator('body').evaluate(el => el.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: info.outputPath('operator-readiness-mobile.png'), fullPage: true });

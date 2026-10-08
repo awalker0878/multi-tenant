@@ -69,6 +69,7 @@
   .console-sidebar nav.is-open { display: block; }
   .mobile-menu { display: block; align-self: flex-start; margin-top: 15px; border: 1px solid #63808f; border-radius: 5px; padding: 10px; font-size: 12px; }
   .sidebar-foot { display: none; }
+  .sidebar-foot.is-open { display: block; padding: 20px 12px 0; }
   .console-topbar { padding: 0 20px; height: 52px; }
   .catalogue { padding: 25px 20px 40px; }
   .console-footer { margin: 0 20px; flex-wrap: wrap; }

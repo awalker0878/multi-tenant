@@ -26,7 +26,7 @@ onMounted(async () => { await nextTick(); document.getElementById('catalogue-hea
         <p class="nav-caption">WORKSPACE</p>
         <Link v-for="item in nav" :key="item.href" :href="item.href" :aria-current="active(item.href) ? 'page' : undefined" class="nav-item"><span aria-hidden="true">{{ item.short }}</span>{{ item.label }}</Link>
       </nav>
-      <div class="sidebar-foot"><p>Tenant workspace</p><code>{{ tenantId.slice(0, 8) }}</code><Link href="/logout" method="post" as="button" class="signout">Sign out</Link></div>
+      <div class="sidebar-foot" :class="{ 'is-open': menuOpen }"><p>Tenant workspace</p><code>{{ tenantId.slice(0, 8) }}</code><Link href="/logout" method="post" as="button" class="signout">Sign out</Link></div>
     </aside>
     <div class="console-content">
       <header class="console-topbar"><span>OPERATIONS CONSOLE</span><span class="context-badge">Tenant scoped</span></header>
