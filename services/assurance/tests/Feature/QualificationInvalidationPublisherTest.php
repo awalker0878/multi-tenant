@@ -18,6 +18,9 @@ it('requires a configured HTTPS sink, read-only TLS trust and separate mounted s
         'tenant_id' => '10000000-0000-4000-8000-000000000002',
         'scope_sha256' => str_repeat('a', 64),
         'authority_epoch' => 1,
+        'operation' => 'publish',
+        'state' => 'qualified',
+        'decision_sha256' => str_repeat('c', 64),
         'event_sha256' => str_repeat('b', 64),
     ];
 
@@ -38,8 +41,12 @@ it('rejects merely successful HTTP replies and accepts only the exact durable in
         ]);
         $event = [
             'event_id' => '10000000-0000-4000-8000-000000000001',
+            'tenant_id' => '10000000-0000-4000-8000-000000000002',
             'scope_sha256' => str_repeat('a', 64),
             'authority_epoch' => 7,
+            'operation' => 'publish',
+            'state' => 'qualified',
+            'decision_sha256' => str_repeat('c', 64),
             'event_sha256' => str_repeat('b', 64),
         ];
         $publisher = new ConfirmedHttpInvalidationPublisher(new MountedSecret);
@@ -85,6 +92,9 @@ it('rejects use of reviewer credentials for downstream invalidation publication'
             'tenant_id' => '10000000-0000-4000-8000-000000000002',
             'scope_sha256' => str_repeat('a', 64),
             'authority_epoch' => 1,
+            'operation' => 'publish',
+            'state' => 'qualified',
+            'decision_sha256' => str_repeat('c', 64),
             'event_sha256' => str_repeat('b', 64),
         ];
         expect(fn () => (new ConfirmedHttpInvalidationPublisher(new MountedSecret))->publish($event))
@@ -94,4 +104,27 @@ it('rejects use of reviewer credentials for downstream invalidation publication'
         unlink($ca);
         unlink($token);
     }
+});
+
+it('refuses incomplete wire contracts before the HTTP request', function (): void {
+    Http::fake();
+    $wire = [
+        'event_id' => '10000000-0000-4000-8000-000000000001',
+        'tenant_id' => '10000000-0000-4000-8000-000000000002',
+        'scope_sha256' => str_repeat('a', 64),
+        'authority_epoch' => 1,
+        'operation' => 'revoke',
+        'state' => 'qualified',
+        'decision_sha256' => str_repeat('c', 64),
+        'event_sha256' => str_repeat('b', 64),
+    ];
+    expect(fn () => (new ConfirmedHttpInvalidationPublisher(new MountedSecret))->publish($wire))
+        ->toThrow(\RuntimeException::class, 'qualification_invalidation_invalid_wire');
+    Http::assertNothingSent();
+
+    $missingTenant = $wire;
+    unset($missingTenant['tenant_id']);
+    expect(fn () => (new ConfirmedHttpInvalidationPublisher(new MountedSecret))->publish($missingTenant))
+        ->toThrow(\RuntimeException::class, 'qualification_invalidation_invalid_wire');
+    Http::assertNothingSent();
 });
