@@ -6,7 +6,8 @@ import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 
 type Platform = { platform: string; installation_id: string; versions: Record<string, string> };
 type ApiAlert = { capability_id: string; side: 'source' | 'target'; severity: 'blocker' | 'warning'; reason: string; impact: string; action: string; omission_accepted: boolean };
-type ApiAssessment = { status: 'eligible' | 'conditional' | 'blocked' | 'unknown'; operationally_eligible: boolean; administrator_alerts: ApiAlert[] };
+type ApiCase = { capability_id: string; side: 'source' | 'target'; criticality: 'critical' | 'optional'; status: string; reason: string; selected_api_family: string | null; selected_api_version: string | null; evidence_sha256: string | null; omission_accepted: boolean };
+type ApiAssessment = { status: 'eligible' | 'conditional' | 'blocked' | 'unknown'; operationally_eligible: boolean; cases: ApiCase[]; administrator_alerts: ApiAlert[] };
 type Route = { route_id: string; guest: string; guest_profile_sha256: string; method: string; source: Platform; target: Platform; constraints: Record<string, string | number>; exclusions: string[]; blockers: string[]; native_qualified: boolean; operationally_accepted: boolean; api_compatibility?: ApiAssessment };
 type Support = { tranche_sha256: string; release_sha256: string; directions: { direction: string; state: string; routes: Route[] }[] };
 const props = defineProps<{ tenantId: string; siteId: string; applicationId: string; environment: string; support: Support }>();
@@ -79,6 +80,21 @@ const versions = (platform: Platform) => Object.entries(platform.versions).map((
                   <span v-else>{{ alert.action.replaceAll('_', ' ') }}.</span>
                 </li>
               </ul>
+              <details v-if="!unavailable" class="mt-2">
+                <summary class="cursor-pointer underline">Required API operations and selected versions</summary>
+                <table class="w-full text-xs">
+                  <thead><tr><th scope="col">Feature</th><th scope="col">Side</th><th scope="col">Importance</th><th scope="col">Evidence status</th><th scope="col">Selected API</th></tr></thead>
+                  <tbody>
+                    <tr v-for="operation in route.api_compatibility.cases" :key="operation.side + ':' + operation.capability_id">
+                      <td>{{ operation.capability_id }}</td>
+                      <td>{{ operation.side }}</td>
+                      <td>{{ operation.criticality }}</td>
+                      <td>{{ operation.status }}</td>
+                      <td>{{ operation.selected_api_family && operation.selected_api_version ? operation.selected_api_family + ' ' + operation.selected_api_version : 'Unknown — no qualified release' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </details>
               <p v-if="route.api_compatibility.status !== 'eligible' || unavailable" class="text-red-800">
                 No migration approval or native write is permitted until every critical requirement is qualified and optional omissions are explicitly accepted.
               </p>
