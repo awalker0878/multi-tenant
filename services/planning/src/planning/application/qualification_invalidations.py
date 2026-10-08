@@ -39,7 +39,9 @@ class QualificationInvalidations:
         if (
             type(epoch) is not int
             or not 1 <= epoch <= 2**53 - 1
+            or not isinstance(event["operation"], str)
             or event["operation"] not in OPERATIONS
+            or not isinstance(event["state"], str)
             or event["state"] != OPERATIONS[event["operation"]]
         ):
             raise Rejected("invalid_qualification_invalidation")
