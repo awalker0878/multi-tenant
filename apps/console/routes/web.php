@@ -13,6 +13,7 @@ use App\Http\Controllers\MigrationFleetController;
 use App\Http\Controllers\MigrationReviewController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OidcController;
+use App\Http\Controllers\OperatorInputsController;
 use App\Http\Controllers\PlanningController;
 use App\Http\Controllers\PortingConfigurationController;
 use App\Http\Controllers\TenantController;
@@ -71,6 +72,10 @@ Route::prefix('/tenants/{tenant}/inventory')->whereUuid('tenant')->middleware(Re
     Route::get('/sites/{site}/migration', [MigrationReviewController::class, 'show'])->whereUuid('site');
     Route::get('/sites/{site}/migration/status', [MigrationReviewController::class, 'status'])->whereUuid('site');
     Route::post('/sites/{site}/migration', [MigrationReviewController::class, 'command'])->whereUuid('site');
+    Route::get('/sites/{site}/operator-inputs', [OperatorInputsController::class, 'show'])->whereUuid('site');
+    Route::get('/sites/{site}/operator-inputs/status', [OperatorInputsController::class, 'status'])->whereUuid('site');
+    Route::get('/sites/{site}/operator-inputs/download', [OperatorInputsController::class, 'download'])->whereUuid('site');
+    Route::post('/sites/{site}/operator-inputs', [OperatorInputsController::class, 'save'])->whereUuid('site');
     Route::get('/sites/{site}/configuration', [PortingConfigurationController::class, 'show'])->whereUuid('site');
     Route::get('/sites/{site}/configuration/status', [PortingConfigurationController::class, 'status'])->whereUuid('site');
     Route::post('/sites/{site}/configuration', [PortingConfigurationController::class, 'command'])->whereUuid('site');

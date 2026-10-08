@@ -141,3 +141,26 @@ preparation. Every member reports prepared or held; stale group, lost access or 
 unavailable owner pauses the batch. Preparation results remain inspectable in the
 current page; saved membership persists independently. A preparation is not a complete
 approved migration plan or a submitted Lifecycle job.
+
+## Operator readiness workspace
+
+Site administrators use **Site inventory → Operator readiness** to collect 32
+owner-supplied references and targets in five sections: accounts/trust, execution
+controls, application recovery/cutover, operating targets and service handover.
+The Inventory owner persists immutable tenant/site revisions through the additive
+`inventory-v1.4.json` contract. API facts remain authoritative in Environment
+configuration and VM-specific migration reviews; this form cannot replace them.
+
+Partial drafts retain missing-field guidance. Zero outage/data-loss values are
+valid supplied targets. Execution and verification references must be distinct;
+operators must still commission independent principals behind those references.
+Numbers are bounded whole integers. References are bounded record identifiers,
+not secret values, arbitrary URLs with query credentials or evidence contents.
+Each save binds the configuration digest read by the operator, with optimistic
+concurrency and idempotent retry. A changed environment review requires a new
+input revision. Downloads recheck site administration and return a no-store
+packet with its scope, revision, digest and remaining holds. Collection completeness
+never supplies native qualification, receiving acceptance or execution authority.
+
+See [the operator-input handoff](../implementation/console-operator-readiness.md)
+for the commissioning boundary and deployment prerequisite.

@@ -34,6 +34,7 @@ const overrideChanged = (index: number) => { if (form.configuration.choices[inde
   <CatalogueLayout title="Environment configuration and porting review" :tenant-id="tenantId">
     <Link :href="`/tenants/${tenantId}/inventory`" class="text-teal-800 underline">Inventory sites</Link>
     <div class="mt-3"><Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}/migration`" class="text-teal-800 underline">Review workload profiles and migration datasets</Link></div>
+    <Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}/operator-inputs`" class="action secondary mt-3">Complete required operator inputs</Link>
     <p class="my-4 max-w-4xl">Pull the configured options and installed features from each environment. Review the findings, select what must be ported, and explain any interpretation that differs from the API. Original observations remain visible.</p>
     <p v-if="notice" role="status" class="my-4 rounded border border-teal-600 bg-teal-50 p-4">{{ notice }}</p>
     <div v-if="Object.keys(errors).length" id="configuration-errors" role="alert" tabindex="-1" class="my-4 border border-red-600 p-4"><p v-for="(error, key) in errors" :key="key">{{ key === 'inventory_status' ? '' : error }}</p></div>
@@ -44,7 +45,7 @@ const overrideChanged = (index: number) => { if (form.configuration.choices[inde
     </div>
     <form @submit.prevent="act('save')">
       <fieldset :disabled="blocked" class="space-y-6">
-        <legend class="text-xl font-semibold">1. Environments</legend>
+        <legend class="text-xl font-semibold">1. Source and destination environments</legend>
         <p>Select approved connections. Connection addresses and credential references come from the enrolled trust configuration; returned service-catalog addresses cannot redirect collection.</p>
         <p v-if="!workspace.endpoints.length">Enroll a connection from the site inventory to enable API collection. You can save manual inputs while connection setup is pending.</p>
         <Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}`" class="text-teal-800 underline">Manage approved connections</Link>
@@ -53,7 +54,7 @@ const overrideChanged = (index: number) => { if (form.configuration.choices[inde
           <div><label for="target-endpoint">OpenStack destination<select id="target-endpoint" v-model="form.configuration.target_endpoint"><option :value="null">Select destination</option><option v-for="e in workspace.endpoints.filter(e => e.platform === 'openstack')" :key="e.id" :value="e.id">{{ e.label }}</option></select></label><button type="button" class="secondary mt-3" :disabled="!form.configuration.target_endpoint || dirty" @click="act('pull', form.configuration.target_endpoint)">Pull destination configuration</button></div>
         </div>
         <p v-if="dirty" class="text-sm">Save the selected environments and edits before pulling or confirming.</p>
-        <h2 class="text-xl font-semibold">2. Features to port</h2>
+        <h2 class="text-xl font-semibold">2. Required destination capabilities</h2>
         <p>“Configured” means resources were returned. “Advertised” means an extension, import method, trait or service was listed. Neither proves the feature works for this workload. Unknown results need API access or further qualification.</p>
         <div class="overflow-x-auto"><table class="w-full text-left"><thead><tr><th class="p-2">Capability</th><th class="p-2">Source API</th><th class="p-2">Destination API</th><th class="p-2">Porting review</th></tr></thead><tbody>
           <tr v-for="(cap, index) in workspace.capabilities" :key="cap.id" class="border-t border-slate-300">
@@ -62,10 +63,10 @@ const overrideChanged = (index: number) => { if (form.configuration.choices[inde
             <td class="p-3"><label :for="'interpretation-' + cap.id" class="sr-only">{{ cap.label }} interpretation</label><select :id="'interpretation-' + cap.id" v-model="form.configuration.choices[index].interpretation" @change="overrideChanged(index)"><option value="observed">Use API finding</option><option value="include">Include by administrator review</option><option value="exclude">Exclude by administrator review</option></select><label v-if="form.configuration.choices[index].interpretation !== 'observed'" :for="'reason-' + cap.id">Override reason and evidence reference<input :id="'reason-' + cap.id" v-model="form.configuration.choices[index].reason" required maxlength="240" /></label></td>
           </tr>
         </tbody></table></div>
-        <h2 class="text-xl font-semibold">3. Inputs outside the standard APIs</h2>
+        <h2 class="text-xl font-semibold">3. Owner-supplied configuration references</h2>
         <p>Supply implementation choices and references for information the APIs cannot determine. Enter references, not passwords, access tokens or private keys.</p>
         <div class="grid gap-4 md:grid-cols-2"><label v-for="field in workspace.manual_fields" :key="field.id" :for="'manual-' + field.id">{{ field.label }}<input :id="'manual-' + field.id" :value="manualValue(field.id)" maxlength="240" @input="updateManual(field.id, $event)" /></label></div>
-        <button type="submit">Save revision for review</button>
+        <button type="submit">Save configuration review</button>
       </fieldset>
     </form>
     <section class="my-8 rounded-xl border border-slate-300 p-5" aria-labelledby="confirm-title"><h2 id="confirm-title" class="text-xl font-semibold">4. Confirm the saved review</h2>

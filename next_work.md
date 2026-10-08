@@ -1,3 +1,13 @@
+# Console operator-input handoff
+
+Site administrators can now collect the required owner inputs through
+**Site inventory → Operator readiness**. The immutable, revision-bound packet
+collects 32 references/targets across access, execution, recovery, operating
+objectives and service handover. The [implementation record](docs/implementation/console-operator-readiness.md)
+explains deployment and the remaining commissioning steps. The user's latest
+instruction authorizes merging this branch to main after validation. Native
+effects and receiving acceptance still require their existing exact-scope authority.
+
 # Next work — P10 operating qualification
 
 Latest engineering source `b1ee0355` passes P07/P08/P09 and all nine P10 campaign

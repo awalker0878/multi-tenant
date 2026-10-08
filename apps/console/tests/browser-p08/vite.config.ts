@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue';
 import tailwindcss from '@tailwindcss/vite';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
+import { operatorFixture } from './operator-fixture.ts';
 import { fleetFixture } from './fleet-fixture.ts';
 import { campaignFixture } from './campaign-fixture.ts';
 
@@ -19,7 +20,7 @@ function reset() {
 }
 reset();
 export default defineConfig({
-  plugins: [vue(), tailwindcss(), fleetFixture(), campaignFixture(), { name: 'p08-isolated-observations', configureServer(server) {
+  plugins: [vue(), tailwindcss(), fleetFixture(), campaignFixture(), operatorFixture(), { name: 'p08-isolated-observations', configureServer(server) {
     server.middlewares.use(async (req, res, next) => {
       const path = req.url?.split('?')[0];
       if (path !== route && path !== route + '/status' && path !== '/__fixture' && path !== '/account') return next();

@@ -139,3 +139,20 @@ Reviewed 2026-10-04. Sources describe upstream capabilities; the stricter tenanc
 - **S21:** [Vue performance](https://vuejs.org/guide/best-practices/performance.html).
 - **S22:** [Inertia testing](https://inertiajs.com/docs/v3/advanced/testing).
 - **S23:** [Vue testing](https://vuejs.org/guide/scaling-up/testing.html).
+
+## Console theme and operator inputs
+
+The console uses shared navy/teal theme tokens, a common Workload Mobility brand
+mark, tenant-scoped navigation, consistent controls and responsive cards. The
+sidebar becomes an explicit keyboard-accessible navigation disclosure on narrow
+screens. Focus outlines, skip navigation, labels, text status indicators and
+minimum 44-pixel controls are part of the shared shell. This is implementation
+coverage, not an assertion of complete WCAG conformance.
+
+The Operator readiness page consumes Inventory-provided field metadata and
+requirements. It keeps drafts in component memory, preserves zero targets,
+freezes an uncertain command for exact retry and shows stale-save errors without
+discarding the user's edits. A deliberate refresh discards those edits. Saved
+packet downloads use a fresh authenticated request; no draft or evidence enters
+browser local storage. Existing native authorization and polling boundaries remain
+owned by their services.

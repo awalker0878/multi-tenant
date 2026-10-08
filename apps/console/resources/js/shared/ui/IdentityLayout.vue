@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BrandMark from './BrandMark.vue';
 import { Head, router } from '@inertiajs/vue3';
 import { nextTick, onMounted, onUnmounted } from 'vue';
 
@@ -20,8 +21,8 @@ onUnmounted(() => stopNavigation?.());
 <template>
   <Head :title="`${title} | Workload Mobility`" />
   <main class="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-6 py-16">
-    <a href="/" class="mb-8 text-sm font-semibold uppercase tracking-widest text-teal-800">Workload Mobility</a>
-    <section class="identity-card rounded-2xl border border-slate-300 bg-white p-6 shadow-sm sm:p-9" aria-labelledby="identity-heading">
+    <a href="/" class="mb-8 text-teal-800" aria-label="Workload Mobility home"><BrandMark /></a>
+    <section class="identity-card rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-9" aria-labelledby="identity-heading">
       <h1 id="identity-heading" tabindex="-1" class="text-3xl font-semibold tracking-tight text-slate-950">{{ title }}</h1>
       <p class="mt-3 leading-7 text-slate-700">{{ description }}</p>
       <slot />

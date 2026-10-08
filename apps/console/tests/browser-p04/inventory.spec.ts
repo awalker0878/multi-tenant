@@ -43,7 +43,7 @@ test('browses scoped observations, preserves uncertain enrollment and clears rev
   await expect(page.getByRole('status')).toContainText('Command accepted');
   await expect(page.getByRole('heading', { name: 'Browser enrolled scope', exact: true })).toHaveCount(1);
 
-  await page.getByRole('link', { name: 'Configure porting', exact: true }).click();
+  await page.getByRole('link', { name: 'Environment configuration', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Environment configuration and porting review' })).toBeVisible();
   await expect(page.getByText('2026.2 Hibiscus', { exact: true })).toBeVisible();
   await expect(page.getByLabel('Compute flavors required', { exact: true })).toBeChecked();
@@ -53,7 +53,7 @@ test('browses scoped observations, preserves uncertain enrollment and clears rev
   await page.getByLabel('Compute flavors interpretation', { exact: true }).selectOption('include');
   await page.getByLabel('Override reason and evidence reference', { exact: true }).fill('Operator review R1; portable compute requirement');
   await page.getByLabel('Compute flavors required', { exact: true }).check();
-  await page.getByRole('button', { name: 'Save revision for review', exact: true }).click();
+  await page.getByRole('button', { name: 'Save configuration review', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Revision saved');
   await page.reload();
   await expect(page.getByLabel('Application and integration owners reference', { exact: true })).toHaveValue('browser-owner-record');

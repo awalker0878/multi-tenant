@@ -1,29 +1,40 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { nextTick, onMounted } from 'vue';
-defineProps<{ title: string; tenantId: string }>();
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { computed, nextTick, onMounted, ref } from 'vue';
+import BrandMark from './BrandMark.vue';
+const props = defineProps<{ title: string; tenantId: string }>();
+const page = usePage();
+const menuOpen = ref(false);
+const nav = computed(() => [
+  { label: 'Your tenants', href: '/account', short: '01' },
+  { label: 'Applications', href: `/tenants/${props.tenantId}/applications`, short: '02' },
+  { label: 'Environments and domains', href: `/tenants/${props.tenantId}/catalogue-references`, short: '03' },
+  { label: 'Observed inventory', href: `/tenants/${props.tenantId}/inventory`, short: '04' },
+  { label: 'Tenant settings', href: `/tenants/${props.tenantId}`, short: '05' },
+]);
+const active = (href: string) => href.endsWith(props.tenantId) ? page.url.split('?')[0] === href : page.url.split('?')[0].startsWith(href);
 onMounted(async () => { await nextTick(); document.getElementById('catalogue-heading')?.focus(); });
 </script>
 <template>
- <Head :title="`${title} | Workload Mobility`" />
- <main class="catalogue mx-auto min-h-screen max-w-6xl px-5 py-10 text-slate-900">
-  <nav aria-label="Workspace navigation" class="mb-8 flex flex-wrap gap-5 text-sm font-semibold text-teal-800">
-   <Link href="/account">Your tenants</Link><Link :href="`/tenants/${tenantId}`">Tenant settings</Link><Link :href="`/tenants/${tenantId}/applications`">Applications</Link><Link :href="`/tenants/${tenantId}/catalogue-references`">Environments and domains</Link>
-   <Link :href="`/tenants/${tenantId}/inventory`">Observed inventory</Link>
-   <Link href="/logout" method="post" as="button" class="ml-auto">Sign out</Link>
-  </nav>
-  <h1 id="catalogue-heading" tabindex="-1" class="mb-7 text-3xl font-semibold tracking-tight">{{ title }}</h1><slot />
- </main>
+  <Head :title="`${title} | Workload Mobility`" />
+  <a class="skip-link" href="#workspace-main">Skip to workspace</a>
+  <div class="console-shell">
+    <aside class="console-sidebar">
+      <Link href="/account" class="sidebar-brand" aria-label="Workload Mobility home"><BrandMark /></Link>
+      <button class="mobile-menu" type="button" :aria-expanded="menuOpen" aria-controls="workspace-navigation" @click="menuOpen = !menuOpen">{{ menuOpen ? 'Close navigation' : 'Workspace navigation' }}</button>
+      <nav id="workspace-navigation" aria-label="Workspace navigation" :class="{ 'is-open': menuOpen }">
+        <p class="nav-caption">WORKSPACE</p>
+        <Link v-for="item in nav" :key="item.href" :href="item.href" :aria-current="active(item.href) ? 'page' : undefined" class="nav-item"><span aria-hidden="true">{{ item.short }}</span>{{ item.label }}</Link>
+      </nav>
+      <div class="sidebar-foot"><p>Tenant workspace</p><code>{{ tenantId.slice(0, 8) }}</code><Link href="/logout" method="post" as="button" class="signout">Sign out</Link></div>
+    </aside>
+    <div class="console-content">
+      <header class="console-topbar"><span>OPERATIONS CONSOLE</span><span class="context-badge">Tenant scoped</span></header>
+      <main id="workspace-main" class="catalogue" tabindex="-1">
+        <div class="page-heading"><p class="eyebrow">Workload Mobility / Workspace</p><h1 id="catalogue-heading" tabindex="-1">{{ title }}</h1></div>
+        <slot />
+      </main>
+      <footer class="console-footer">Workload Mobility<span>Provision · Migrate · Verify</span></footer>
+    </div>
+  </div>
 </template>
-<style scoped>
-.catalogue :deep(label) { display: block; font-weight: 600; font-size: .9rem; }
-.catalogue :deep(input:not([type=checkbox])), .catalogue :deep(select), .catalogue :deep(textarea) { display: block; width: 100%; margin-top: .4rem; min-height: 44px; border: 1px solid #64748b; border-radius: .45rem; padding: .6rem; background: white; font-weight: 400; }
-.catalogue :deep(input[type=checkbox]) { width: 20px; height: 20px; vertical-align: middle; margin-right: .5rem; }
-.catalogue :deep(button), .catalogue :deep(.action) { display: inline-block; margin-top: .65rem; min-height: 44px; border-radius: .45rem; padding: .6rem 1rem; background: #115e59; color: white; font-weight: 600; cursor: pointer; }
-.catalogue :deep(.secondary) { background: white; border: 1px solid #64748b; color: #134e4a; }
-.catalogue :deep(:focus-visible) { outline: 3px solid #0f766e; outline-offset: 3px; }
-.catalogue :deep(button:disabled) { cursor: not-allowed; opacity: .55; }
-.catalogue :deep([role=alert]) { padding: 1rem; border: 1px solid #be123c; border-radius: .5rem; background: #fff1f2; color: #881337; }
-.catalogue :deep(th), .catalogue :deep(td) { padding: .8rem; text-align: left; vertical-align: top; border-bottom: 1px solid #cbd5e1; overflow-wrap: anywhere; }
-.catalogue :deep(nav button) { margin: 0; background: transparent; color: #115e59; padding: 0; min-height: 24px; }
-</style>
