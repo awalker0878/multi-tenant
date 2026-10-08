@@ -21,6 +21,9 @@ def record() -> dict:
         "decision_sha256": "b" * 64,
         "evidence_level": "E2",
         "definition_sha256": "c" * 64,
+        "adapter_sha256": "e" * 64,
+        "runtime_sha256": "f" * 64,
+        "native_tuple_sha256": "1" * 64,
         "platform": "openstack",
         "method": "native_api",
         "expires_at": 2000000000,
@@ -61,6 +64,16 @@ class ShadowCompareTests(unittest.TestCase):
         self.assertIn("positive_support_change_requires_review", reasons)
         self.assertIn("authority_epoch_changed", reasons)
 
+    def test_adapter_runtime_and_native_tuple_drift_cannot_silently_pass(self) -> None:
+        old, new = manifest(), manifest()
+        new["records"][0]["adapter_sha256"] = "2" * 64
+        new["records"][0]["runtime_sha256"] = "3" * 64
+        new["records"][0]["native_tuple_sha256"] = "4" * 64
+        reasons = reconcile(old, new)[0]["reasons"]
+        self.assertIn("adapter_bytes_changed", reasons)
+        self.assertIn("runtime_observation_changed", reasons)
+        self.assertIn("installed_native_tuple_changed", reasons)
+
     def test_new_and_missing_scopes_cannot_silently_pass(self) -> None:
         before = manifest([])
         after = manifest()
@@ -86,7 +99,9 @@ class ShadowCompareTests(unittest.TestCase):
     def test_cli_writes_bounded_non_authoritative_diff_and_returns_review_required(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            old_path, new_path, output = (root / n for n in ("before.json", "after.json", "out.json"))
+            old_path, new_path, output = (
+                root / n for n in ("before.json", "after.json", "out.json")
+            )
             before, after = manifest(), manifest()
             after["records"][0]["state"] = "suspended"
             old_path.write_text(json.dumps(before), encoding="utf-8")
