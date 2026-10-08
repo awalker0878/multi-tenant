@@ -33,10 +33,12 @@ configuration.
 
 ## Receiving inbox protocol
 
-Each event contains `event_id`, `scope_sha256`, `authority_epoch`,
+Each event contains `event_id`, `tenant_id`, `scope_sha256`, `authority_epoch`,
 `operation`, `state`, `decision_sha256` and `event_sha256`.
-The receiver must independently authenticate the source, persist the event
-and its scope/epoch before responding, and reject any conflicting reuse of an
+The Planning receiver requires a dedicated mounted token at
+`PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE` and receives the publisher
+only over commissioned HTTPS. It persists the event and its scope/epoch in
+PostgreSQL before responding, and rejects any conflicting reuse of an
 event identity. A duplicate delivery with identical bytes may acknowledge the
 original persisted event. An old or reordered scope epoch must not roll back
 current negative authority or restore stale qualification.
@@ -55,8 +57,19 @@ Only after durable acceptance may it respond HTTP 200 with the exact fields:
 
 The producer requires **all** fields to match and will retry otherwise.
 An HTTP success or broker receipt without downstream durability is not enough.
-The receiver must enforce its own tenant/scope authorization and monotonic
-inbox constraints; this PR does **not** supply that receiving implementation.
+Planning now implements a private HTTP receiver and monotonic per-scope inbox,
+with E2 tests for authenticated transport, replay, out-of-order epochs and tenant
+boundaries. This is **code only**; its external TLS ingress, token custody,
+operating monitoring and receiving owner have not been commissioned. The
+receiver treats every event as a conservative hold hint, never an E3/E4
+qualification or a request to restore existing approved plans.
+
+New plan records store the hash of their pinned assessment qualification scope
+in a separate index, without changing immutable plan bytes. Existing plans are
+invalidated only for the matching qualification scope. Unknown/unindexed plans
+fail closed; plans pinned to unrelated, known scopes remain unaffected.
+New plan creation serializes with incoming events on the scope lock and retains
+current negative authority. Native effects still independently re-read Assurance.
 
 ## Failure operations and completion gate
 
@@ -66,7 +79,8 @@ unavailable, stop dispatch and preserve the outbox and current support holds.
 Never mark delivered rows manually to work around a failed receiver.
 
 To close A10/A11 and CT-06, exercise real and reordered/duplicated/lost deliveries
-against a commissioned consumer, verify that downstream Planning marks affected
-plans stale, and verify Lifecycle independently rechecks current Assurance authority
+against a commissioned Planning consumer, verify that downstream Planning marks
+exact-scope plans stale without holding unrelated known scopes, and verify Lifecycle
+independently rechecks current Assurance authority
 at every applicable native effect. The E2 PostgreSQL workflow tests only producer
 transactions and a mock receiving acknowledgment; it cannot grant E3 or E4.
