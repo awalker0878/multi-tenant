@@ -31,7 +31,8 @@ def inventory_digest(destination: dict[str, Any]) -> str:
     current = data.get("capability_snapshot")
     if isinstance(current, dict):
         data["capability_snapshot"] = {
-            k: v for k, v in current.items()
+            k: v
+            for k, v in current.items()
             if k not in {"source_sha256", "observed_at", "expires_at"}
         }
     return digest(data)
