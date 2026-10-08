@@ -8,6 +8,8 @@ from inventory_worker.infrastructure.workload_profile import fingerprint
 
 # Independently versioned namespaces. No SDK negotiation or fallback to legacy APIs.
 VERSIONS = dict.fromkeys(("vmm", "prism", "clustermgmt", "networking", "microseg"), "v4.3")
+PAGE_SIZE = 100
+MAX_LIST_PAGES = 10
 FIELDS = {
     "storage_containers": (
         "extId",
@@ -48,28 +50,56 @@ FIELDS = {
 }
 
 
-def complete_list(document: Any) -> list[dict[str, Any]]:
-    if not isinstance(document, dict):
-        raise CollectionFailure("invalid_response")
-    rows, metadata = document.get("data"), document.get("metadata", {})
-    if (
-        not isinstance(rows, list)
-        or len(rows) >= 100
-        or not isinstance(metadata, dict)
-        or type(metadata.get("totalAvailableResults")) is not int
-        or metadata["totalAvailableResults"] != len(rows)
-        or not isinstance(metadata.get("links", []), list)
-        or any(not isinstance(r, dict) or not isinstance(r.get("extId"), str) for r in rows)
-        or len({r["extId"] for r in rows}) != len(rows)
-        or any(
-            not isinstance(link, dict) or link.get("rel") == "next"
-            for link in metadata.get("links", [])
+def collect_list(
+    stream: dict[str, Any],
+    route: str,
+    max_pages: int,
+    before_request: Callable[[], None],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Collect numbered pages within the enrolled budget; never follow response URLs.
+
+    This is a bounded observation window, not a transactional native snapshot.
+    Changed totals, repeated identities or short pages invalidate the whole profile.
+    """
+    rows: list[dict[str, Any]] = []
+    documents: list[dict[str, Any]] = []
+    identities: set[str] = set()
+    total: int | None = None
+    for page in range(max_pages):
+        before_request()
+        document = exchange(
+            stream,
+            f"{route}?$limit={PAGE_SIZE}&$page={page}",
+            {"X-Ntnx-Api-Key": secret(stream["credential_file"])},
         )
-    ):
-        # One leased profile has seven separately budgeted reads. Never truncate a
-        # larger inventory, follow native links, or claim a partial list is complete.
-        raise CollectionFailure("invalid_response")
-    return rows
+        if not isinstance(document, dict) or not isinstance(document.get("metadata"), dict):
+            raise CollectionFailure("invalid_response")
+        count = document["metadata"].get("totalAvailableResults")
+        items = document.get("data")
+        if (
+            type(count) is not int
+            or not 0 <= count <= max_pages * PAGE_SIZE
+            or (total is not None and count != total)
+            or not isinstance(items, list)
+            or len(items) != min(PAGE_SIZE, count - page * PAGE_SIZE)
+            or any(
+                not isinstance(item, dict)
+                or not isinstance(item.get("extId"), str)
+                or not item["extId"]
+                for item in items
+            )
+        ):
+            raise CollectionFailure("invalid_response")
+        total = count
+        for item in items:
+            if item["extId"] in identities:
+                raise CollectionFailure("invalid_response")
+            identities.add(item["extId"])
+        rows.extend(items)
+        documents.append(document)
+        if len(rows) == total:
+            return rows, documents
+    raise CollectionFailure("invalid_response")
 
 
 def collect_ahv(
@@ -82,22 +112,34 @@ def collect_ahv(
     routes = {
         "cluster": "/api/clustermgmt/v4.3/config/clusters/" + stream["cluster_id"],
         "prism_central": "/api/prism/v4.3/config/domain-managers/" + stream["prism_central_id"],
-        "storage_containers": "/api/clustermgmt/v4.3/config/storage-containers?$limit=100",
-        "subnets": "/api/networking/v4.3/config/subnets?$limit=100",
-        "vpcs": "/api/networking/v4.3/config/vpcs?$limit=100",
-        "categories": "/api/prism/v4.3/config/categories?$limit=100",
-        "policies": "/api/microseg/v4.3/config/policies?$limit=100",
+        "storage_containers": "/api/clustermgmt/v4.3/config/storage-containers",
+        "subnets": "/api/networking/v4.3/config/subnets",
+        "vpcs": "/api/networking/v4.3/config/vpcs",
+        "categories": "/api/prism/v4.3/config/categories",
+        "policies": "/api/microseg/v4.3/config/policies",
     }
+    inventory: dict[str, list[dict[str, Any]]] = {}
+    maximum = policy.get("max_pages", 1)
+    if type(maximum) is not int or not 1 <= maximum <= 100:
+        raise CollectionFailure("invalid_response")
     for key, path in routes.items():
-        before_request()
-        records[key] = exchange(stream, path, {"X-Ntnx-Api-Key": secret(stream["credential_file"])})
+        if key in FIELDS:
+            inventory[key], records[key] = collect_list(
+                stream, path, min(maximum, MAX_LIST_PAGES), before_request
+            )
+        else:
+            before_request()
+            records[key] = exchange(
+                stream, path, {"X-Ntnx-Api-Key": secret(stream["credential_file"])}
+            )
+            if not isinstance(records[key], dict) or not isinstance(records[key].get("data"), dict):
+                raise CollectionFailure("invalid_response")
     cluster, pc = (records[k].get("data", {}) for k in ("cluster", "prism_central"))
     if (
         cluster.get("extId") != stream["cluster_id"]
         or pc.get("extId") != stream["prism_central_id"]
     ):
         raise CollectionFailure("invalid_response")
-    inventory = {k: complete_list(records[k]) for k in FIELDS}
     inventory["storage_containers"] = [
         r
         for r in inventory["storage_containers"]

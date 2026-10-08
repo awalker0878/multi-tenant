@@ -21,8 +21,9 @@ pytest_plugins = ["test_discovery"]
 
 
 @pytest.mark.parametrize("operation", ["discover", "configuration_pull"])
+@pytest.mark.parametrize("pages", [1, 2])
 def test_ahv_destination_roundtrip_binds_profiles_and_revokes_with_enrollment(
-    campaign: Campaign, monkeypatch: pytest.MonkeyPatch, operation: str
+    campaign: Campaign, monkeypatch: pytest.MonkeyPatch, operation: str, pages: int
 ) -> None:
     c = campaign
     monkeypatch.setattr(
@@ -36,6 +37,8 @@ def test_ahv_destination_roundtrip_binds_profiles_and_revokes_with_enrollment(
         ).read_text()
     )
     target = fixture["target"]
+    if pages == 2:
+        target["categories"].extend({**target["categories"][0], "extId": uid()} for _ in range(100))
     document = asdict(c.policy)
     document.pop("policy_digest")
     base = document["streams"][0]
@@ -43,6 +46,7 @@ def test_ahv_destination_roundtrip_binds_profiles_and_revokes_with_enrollment(
         policy_id=uid(),
         platform="ahv",
         native_scope=target["project_id"],
+        max_pages=pages,
         streams=[
             {
                 **base,
@@ -78,6 +82,13 @@ def test_ahv_destination_roundtrip_binds_profiles_and_revokes_with_enrollment(
         c.now += 1
     target["observed_at"] = int(observed)
     body = c.page(lease, []) | {"profile": target, "collected_at": observed}
+    if pages == 2:
+        with pytest.raises(Rejected, match="incomplete_profile_collection"):
+            c.service.submit(c.worker, body)
+        assert authorize_read(c.service, c.worker, read_request(lease, 8))["allowed"]
+    else:
+        with pytest.raises(Rejected, match="profile_request_not_admitted"):
+            authorize_read(c.service, c.worker, read_request(lease, 8))
     assert c.service.submit(c.worker, body)["status"] == "complete"
     app, fleet = WorkloadProfiles(c.service), MigrationFleet(c.service)
     profile_id = next(

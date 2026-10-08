@@ -54,7 +54,7 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
         raise Rejected("invalid_ahv_profile")
     for field in ("storage_containers", "subnets", "vpcs", "categories", "policies"):
         rows = p[field]
-        if not isinstance(rows, list) or len(rows) >= 100:
+        if not isinstance(rows, list) or len(rows) > 1000:
             raise Rejected("invalid_ahv_inventory")
         ids = []
         for row in rows:

@@ -10,7 +10,7 @@ def authorize_read(d: Discovery, worker: Worker, body: dict[str, Any]) -> dict[s
     shape(body, {"discovery_id", "lease_token", "sequence", "request_number"})
     job_id, lease = identifier(body["discovery_id"]), identifier(body["lease_token"])
     sequence = number(body["sequence"], 0, 100)
-    request = number(body["request_number"], 1, 8)
+    request = number(body["request_number"], 1, 52)
     with d.database.transaction() as tx:
         tx.execute("SELECT pg_advisory_xact_lock(7404001)")
         j = tx.one("SELECT * FROM inventory.jobs WHERE id=%s", (job_id,))
@@ -40,10 +40,17 @@ def authorize_read(d: Discovery, worker: Worker, body: dict[str, Any]) -> dict[s
             else p.streams
         )
         stream = streams[j["stream"]]
+        limit = (
+            8
+            if stream["kind"] == "source_profile"
+            else 2 + 5 * min(p.max_pages, 10)
+            if p.platform == "ahv"
+            else 7
+        )
         if (
             stream["kind"] not in {"source_profile", "target_profile"}
             or request != j["profile_reads"] + 1
-            or request > (8 if stream["kind"] == "source_profile" else 7)
+            or request > limit
         ):
             raise Rejected("profile_request_not_admitted", 403)
         if stream["kind"] == "source_profile":
