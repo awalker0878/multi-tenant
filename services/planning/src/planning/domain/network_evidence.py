@@ -3,6 +3,7 @@
 from typing import Any
 
 from planning.domain.model import digest
+from planning.domain.placement import PlacementUnknown, fit
 
 
 FLOW_KEYS = ("from", "to", "protocol", "port")
@@ -159,54 +160,140 @@ def isolation_checks(
 ) -> list[tuple[str, str, str, bool]]:
     isolation = data["isolation"]
     scope = destination["native_scope"]
-    tenant_ok = (
-        isolation["native_scope"] == scope
-        and isolation["tenant_id"] == destination["tenant_id"]
-        and bool(isolation["native_project_id"])
-        and isolation["policy_sha256"] == digest(policy)
-        and isolation["observer_principal"] != isolation["writer_principal"]
-        and bool(isolation["observer_principal"])
-        and bool(isolation["writer_principal"])
-        and type(isolation["observed_at"]) is int
+    freshness = (
+        type(isolation.get("observed_at")) is int
         and 0 <= now - isolation["observed_at"] <= 60
+        and type(isolation.get("expires_at")) is int
         and isolation["expires_at"] > now
     )
-    domains = isolation["domains"]
-    domain_ok = all(
-        domains.get(w["security_domain"]["id"])
-        == destination["domain_bindings"].get(w["security_domain"]["id"])
-        and bool(domains.get(w["security_domain"]["id"]))
-        for w in intent["workloads"]
-    )
-    distinct = {w["security_domain"]["id"] for w in intent["workloads"]}
-    domain_ok = domain_ok and len({domains.get(d) for d in distinct}) == len(distinct)
-    negative = isolation["negative_flows"]
+    if not freshness:
+        tenant_status = "unknown"
+    elif (
+        isolation.get("native_scope") != scope
+        or isolation.get("tenant_id") != destination["tenant_id"]
+        or isolation.get("policy_sha256") != digest(policy)
+        or isolation.get("observer_principal") == isolation.get("writer_principal")
+    ):
+        tenant_status = "blocked"
+    elif not all(
+        isolation.get(k)
+        for k in ("native_project_id", "observer_principal", "writer_principal")
+    ):
+        tenant_status = "unknown"
+    else:
+        tenant_status = "eligible"
+
+    domains = isolation.get("domains")
     expected_domains = {w["security_domain"]["id"] for w in intent["workloads"]}
-    covered = {f.get("security_domain_id") for f in negative if f.get("kind") == "domain"}
-    tenant_controls = any(f.get("kind") == "tenant" for f in negative)
-    controls_ok = (
-        tenant_controls
-        and expected_domains <= covered
-        and all(
-            traffic(flow | {"expectation": "deny"}, data["network"], policy, now) == "eligible"
-            for flow in negative
-        )
-    )
-    return [
+    if not isinstance(domains, dict) or any(not domains.get(d) for d in expected_domains):
+        domain_status = "unknown"
+    elif any(
+        domains.get(d) != destination["domain_bindings"].get(d) for d in expected_domains
+    ) or len({domains[d] for d in expected_domains}) != len(expected_domains):
+        domain_status = "blocked"
+    else:
+        domain_status = "eligible"
+
+    negative = isolation.get("negative_flows")
+    if not isinstance(negative, list):
+        negative_status = "unknown"
+    else:
+        covered = {f.get("security_domain_id") for f in negative if f.get("kind") == "domain"}
+        tenant_controls = any(f.get("kind") == "tenant" for f in negative)
+        if not tenant_controls or not expected_domains <= covered:
+            negative_status = "unknown"
+        else:
+            states = [
+                traffic(flow | {"expectation": "deny"}, data["network"], policy, now)
+                for flow in negative
+            ]
+            negative_status = (
+                "blocked" if "blocked" in states else
+                "unknown" if "unknown" in states else "eligible"
+            )
+
+    def combine(*states: str) -> str:
+        if "blocked" in states:
+            return "blocked"
+        if "unknown" in states:
+            return "unknown"
+        return "eligible"
+
+    checks = [
         (
             "placement.tenant_boundary",
-            "eligible" if tenant_ok and controls_ok else "blocked",
+            combine(tenant_status, negative_status),
             "measured_tenant_isolation"
-            if tenant_ok and controls_ok
+            if combine(tenant_status, negative_status) == "eligible"
             else "tenant_isolation_unverified",
             True,
         ),
         (
             "placement.security_domains",
-            "eligible" if domain_ok and controls_ok else "blocked",
+            combine(domain_status, negative_status),
             "measured_domain_isolation"
-            if domain_ok and controls_ok
+            if combine(domain_status, negative_status) == "eligible"
             else "domain_isolation_unverified",
             True,
         ),
     ]
+    controls = isolation.get("boundary_controls")
+    for kind in ("rbac", "storage", "keys"):
+        proof = controls.get(kind) if isinstance(controls, dict) else None
+        if not isinstance(proof, dict) or not proof.get("native_ref") or (
+            type(proof.get("observed_at")) is not int
+            or not 0 <= now - proof["observed_at"] <= 60
+            or proof.get("expires_at", 0) <= now
+            or proof.get("policy_sha256") != digest(policy)
+            or proof.get("native_scope") != scope
+        ):
+            status = "unknown"
+        else:
+            status = "eligible" if proof.get("outcome") == "passed" else "blocked"
+        checks.append((
+            "placement.isolation." + kind,
+            status,
+            "measured_" + kind + "_isolation" if status == "eligible"
+            else kind + "_isolation_unverified",
+            True,
+        ))
+
+    hierarchy = isolation.get("fault_hierarchy")
+    hierarchy_status = "unknown"
+    if isinstance(hierarchy, dict):
+        try:
+            placed = fit(intent, data["pools"], policy, now)
+            if placed["status"] != "eligible":
+                hierarchy_status = "blocked"
+            else:
+                pools = {pool["id"]: pool for pool in data["pools"]}
+                if any(alloc["workload_id"] not in hierarchy for alloc in placed["allocations"]):
+                    hierarchy_status = "unknown"
+                else:
+                    hierarchy_status = "eligible"
+                    for allocation in placed["allocations"]:
+                        row = hierarchy[allocation["workload_id"]]
+                        pool = pools[allocation["pool_id"]]
+                        if not isinstance(row, dict) or not all(
+                            row.get(k) for k in ("native_ref", "rack", "zone", "site_id")
+                        ):
+                            hierarchy_status = "unknown"
+                            break
+                        if (
+                            row["native_ref"] != allocation["native_ref"]
+                            or row["rack"] != allocation["failure_domain"]
+                            or row["zone"] != pool["zone"]
+                            or row["site_id"] != destination["site_id"]
+                        ):
+                            hierarchy_status = "blocked"
+                            break
+        except (PlacementUnknown, KeyError, TypeError, ValueError):
+            hierarchy_status = "unknown"
+    checks.append((
+        "placement.fault_hierarchy",
+        hierarchy_status,
+        "verified_native_fault_hierarchy" if hierarchy_status == "eligible"
+        else "native_fault_hierarchy_unverified",
+        True,
+    ))
+    return checks
