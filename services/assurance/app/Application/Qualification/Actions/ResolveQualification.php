@@ -13,23 +13,33 @@ final class ResolveQualification
      * @return array<string, mixed> */
     public function handle(array $scope): array
     {
-        $path = config('planning.qualification_registry_file');
         $unknown = ['id' => null, 'version' => 2, 'status' => 'unknown', 'scope' => $scope,
             'evidence_level' => null, 'expires_at' => 0, 'revoked' => false, 'evidence_refs' => [],
             'dimensions' => [], 'capabilities' => (object) [], 'verification' => null];
-        if ($path === null) {
-            return $unknown;
-        }
-        $registry = $this->read($path);
-        // Legacy import is explicitly unverified, even when it says E3 and qualified.
-        if (($registry['schema_version'] ?? null) === 1) {
-            $legacy = array_filter($registry['records'] ?? [], fn (array $row): bool => NativeQualification::canonical($row['scope'] ?? null) === NativeQualification::canonical($scope));
-            abort_if(count($legacy) > 1, 503, 'qualification_conflict');
 
-            return $unknown;
+        $authorityHead = null;
+        if (config('planning.qualification_authority_mode') === 'database') {
+            $authorityHead = (new QualificationAuthorityLedger)->current($scope);
+            if ($authorityHead === null || $authorityHead['state'] !== 'qualified') {
+                return $unknown;
+            }
+            $records = [$authorityHead['bundle']];
+        } else {
+            // Mounted registries are explicitly a read-only legacy admission path.
+            $path = config('planning.qualification_registry_file');
+            if ($path === null) {
+                return $unknown;
+            }
+            $registry = $this->read($path);
+            if (($registry['schema_version'] ?? null) === 1) {
+                $legacy = array_filter($registry['records'] ?? [], fn (array $row): bool => NativeQualification::canonical($row['scope'] ?? null) === NativeQualification::canonical($scope));
+                abort_if(count($legacy) > 1, 503, 'qualification_conflict');
+
+                return $unknown;
+            }
+            abort_unless(($registry['schema_version'] ?? null) === 2 && is_array($registry['records'] ?? null), 503);
+            $records = array_values(array_filter($registry['records'], fn (array $row): bool => NativeQualification::canonical($row['record']['scope'] ?? null) === NativeQualification::canonical($scope)));
         }
-        abort_unless(($registry['schema_version'] ?? null) === 2 && is_array($registry['records'] ?? null), 503);
-        $records = array_values(array_filter($registry['records'], fn (array $row): bool => NativeQualification::canonical($row['record']['scope'] ?? null) === NativeQualification::canonical($scope)));
         abort_if(count($records) > 1, 503, 'qualification_conflict');
         if ($records === []) {
             return $unknown;
@@ -41,10 +51,31 @@ final class ResolveQualification
         $decision = $records[0]['decision']['sha256'] ?? '';
         $records[0]['runtime'] = $runtime['records'][$decision] ?? [];
         try {
-            return (new NativeQualification)->resolve($records[0], $trust['keys'], $scope, time());
+            $resolved = (new NativeQualification)->resolve($records[0], $trust['keys'], $scope, time());
+            if ($authorityHead !== null) {
+                $resolved['verification']['authority_epoch'] = $authorityHead['authority_epoch'];
+            }
+
+            return $resolved;
         } catch (Throwable) {
             return $unknown;
         }
+    }
+
+    /** Independently verify signed proposed decisions before SQL publication.
+     * @param array<string, mixed> $bundle
+     * @param array<string, mixed> $scope
+     * @return array<string, mixed> */
+    public function verifyProposed(array $bundle, array $scope): array
+    {
+        $trust = $this->read(config('planning.qualification_trust_file'));
+        abort_unless(($trust['schema_version'] ?? null) === 1 && is_array($trust['keys'] ?? null), 503);
+        $runtime = $this->read(config('planning.qualification_runtime_file'));
+        abort_unless(($runtime['schema_version'] ?? null) === 1, 503);
+        $decision = $bundle['decision']['sha256'] ?? '';
+        $bundle['runtime'] = $runtime['records'][$decision] ?? [];
+
+        return (new NativeQualification)->resolve($bundle, $trust['keys'], $scope, time());
     }
 
     /** @return array<string, mixed> */
