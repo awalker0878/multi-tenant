@@ -32,7 +32,10 @@ def test_vmware_target_uses_datacenter_scope_and_per_request_authority(
         if path.endswith("/ComputeResource/resgroup-1/environmentBrowser"):
             return {"type": "EnvironmentBrowser", "value": "env-1"}
         if path.endswith("/EnvironmentBrowser/env-1/QueryConfigOption"):
-            assert kwargs == {"method": "POST", "body": {}}
+            assert kwargs == {"method": "POST", "body": {
+                "host": {"_typeName": "ManagedObjectReference",
+                         "type": "HostSystem", "value": "host-1"},
+            }}
             return {"version": "vmx-21", "guestOSDescriptor": [
                 {"id": "otherLinux64Guest"}, {"id": "rhel9_64Guest"}
             ]}
