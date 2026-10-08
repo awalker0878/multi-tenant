@@ -42,7 +42,7 @@ CREATE TABLE app.qualification_authority_outbox (
 
 -- A runtime writer cannot roll the publication head backwards or skip an epoch.
 CREATE FUNCTION app.guard_qualification_head_epoch()
-RETURNS trigger LANGUAGE plpgsql AS $
+RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
     IF TG_OP = 'INSERT' AND NEW.authority_epoch <> 1 THEN
         RAISE EXCEPTION 'initial qualification epoch must be one' USING ERRCODE = '23514';
@@ -53,13 +53,13 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$;
+$$;
 CREATE TRIGGER qualification_head_monotonic
     BEFORE INSERT OR UPDATE ON app.qualification_authority_heads
     FOR EACH ROW EXECUTE FUNCTION app.guard_qualification_head_epoch();
 
 CREATE FUNCTION app.verify_qualification_head_event()
-RETURNS trigger LANGUAGE plpgsql AS $
+RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM app.qualification_authority_events e
@@ -72,18 +72,18 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$;
+$$;
 CREATE CONSTRAINT TRIGGER qualification_head_requires_event
     AFTER INSERT OR UPDATE ON app.qualification_authority_heads
     DEFERRABLE INITIALLY DEFERRED
     FOR EACH ROW EXECUTE FUNCTION app.verify_qualification_head_event();
 
 CREATE FUNCTION app.reject_qualification_head_delete()
-RETURNS trigger LANGUAGE plpgsql AS $
+RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
     RAISE EXCEPTION 'qualification history head cannot be deleted' USING ERRCODE = '23514';
 END;
-$;
+$$;
 CREATE TRIGGER qualification_head_undeletable
     BEFORE DELETE ON app.qualification_authority_heads
     FOR EACH ROW EXECUTE FUNCTION app.reject_qualification_head_delete();
