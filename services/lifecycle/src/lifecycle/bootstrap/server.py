@@ -58,7 +58,9 @@ class Router:
         self.placement = PlacementReservationApp(
             PlacementReservations(
                 Postgres(),
-                NativePoolSnapshots(Path(os.environ.get("LIFECYCLE_POOL_OWNERS_FILE", "/uncommissioned"))),
+                NativePoolSnapshots(
+                    Path(os.environ.get("LIFECYCLE_POOL_OWNERS_FILE", "/uncommissioned"))
+                ),
                 lambda: int(time.time()),
             ),
             capacity_caller,
