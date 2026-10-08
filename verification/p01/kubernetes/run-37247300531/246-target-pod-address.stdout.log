@@ -1,0 +1,364 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-05T00:26:42Z",
+                "generateName": "governance-5875dc9cc9-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/part-of": "p01-foundation",
+                    "p01.role": "app",
+                    "p01.service": "governance",
+                    "pod-template-hash": "5875dc9cc9"
+                },
+                "name": "governance-5875dc9cc9-6hthp",
+                "namespace": "p01-c9c202786437-601e9835",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "governance-5875dc9cc9",
+                        "uid": "d4cbb47c-27a3-45b8-a082-fbdb6fe63018"
+                    }
+                ],
+                "resourceVersion": "1645",
+                "uid": "f8580130-a73b-48c0-99e5-e459bcb68b72"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "args": [
+                            "sh",
+                            "-ec",
+                            "php artisan config:cache \u0026\u0026 exec php-fpm -F"
+                        ],
+                        "env": [
+                            {
+                                "name": "APP_DEBUG",
+                                "value": "false"
+                            },
+                            {
+                                "name": "APP_ENV",
+                                "value": "production"
+                            },
+                            {
+                                "name": "APP_KEY_FILE",
+                                "value": "/run/secrets/app-key"
+                            },
+                            {
+                                "name": "DB_DATABASE",
+                                "value": "governance"
+                            },
+                            {
+                                "name": "DB_HOST",
+                                "value": "postgres"
+                            },
+                            {
+                                "name": "DB_PASSWORD_FILE",
+                                "value": "/run/secrets/db-password"
+                            },
+                            {
+                                "name": "DB_PORT",
+                                "value": "5432"
+                            },
+                            {
+                                "name": "DB_SSLMODE",
+                                "value": "verify-full"
+                            },
+                            {
+                                "name": "DB_SSLROOTCERT",
+                                "value": "/run/secrets/ca.crt"
+                            },
+                            {
+                                "name": "DB_USERNAME",
+                                "value": "governance_runtime"
+                            },
+                            {
+                                "name": "HEALTH_TOKEN_FILE",
+                                "value": "/run/secrets/health-token"
+                            }
+                        ],
+                        "image": "p01.local/governance:sha256-c7c60039d43bcedd2536f8d29964ebd4316362f279095bcc851379712a621f0d",
+                        "imagePullPolicy": "Never",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "tcpSocket": {
+                                "port": 9000
+                            },
+                            "timeoutSeconds": 2
+                        },
+                        "name": "governance",
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "php",
+                                    "-r",
+                                    "try { require '/app/vendor/autoload.php'; $app = require '/app/bootstrap/app.php';\n$app-\u003emake(Illuminate\\Contracts\\Console\\Kernel::class)-\u003ebootstrap();\n$token = trim((string) file_get_contents('/run/secrets/health-token'));\n$status = $app-\u003emake(App\\Application\\Foundation\\Actions\\InspectDependencies::class)-\u003ehandle($token);\nexit($status === App\\Application\\Foundation\\Data\\DependencyStatus::Ready ? 0 : 1);\n} catch (Throwable) { exit(1); }"
+                                ]
+                            },
+                            "failureThreshold": 1,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 8
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "512Mi"
+                            },
+                            "requests": {
+                                "cpu": "25m",
+                                "memory": "64Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true,
+                            "runAsGroup": 10001,
+                            "runAsNonRoot": true,
+                            "runAsUser": 10001
+                        },
+                        "startupProbe": {
+                            "failureThreshold": 60,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "tcpSocket": {
+                                "port": 9000
+                            },
+                            "timeoutSeconds": 1
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/run/secrets",
+                                "name": "secrets",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            },
+                            {
+                                "mountPath": "/app/storage",
+                                "name": "storage"
+                            },
+                            {
+                                "mountPath": "/app/bootstrap/cache",
+                                "name": "config-cache"
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "nodeName": "p01-c9c202786437-601e9835-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 10001,
+                    "runAsGroup": 10001,
+                    "runAsNonRoot": true,
+                    "runAsUser": 10001,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "governance",
+                "serviceAccountName": "governance",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "secrets",
+                        "secret": {
+                            "defaultMode": 292,
+                            "secretName": "governance-runtime"
+                        }
+                    },
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "32Mi"
+                        },
+                        "name": "tmp"
+                    },
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "32Mi"
+                        },
+                        "name": "storage"
+                    },
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "16Mi"
+                        },
+                        "name": "config-cache"
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "25m",
+                    "memory": "64Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T00:26:43Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T00:26:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T00:26:57Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T00:26:57Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T00:26:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "25m",
+                            "memory": "64Mi"
+                        },
+                        "containerID": "containerd://ed78e6016760ee12b7025db0efbaf355b573f7dec689c90e26aa7408ad5ae196",
+                        "image": "p01.local/governance:sha256-c7c60039d43bcedd2536f8d29964ebd4316362f279095bcc851379712a621f0d",
+                        "imageID": "docker.io/library/import-2026-10-05@sha256:262bd4e155e323d1952603bd949f3887438171d81b9f0631eb0d600f43c16373",
+                        "lastState": {},
+                        "name": "governance",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "512Mi"
+                            },
+                            "requests": {
+                                "cpu": "25m",
+                                "memory": "64Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-05T00:26:43Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 10001,
+                                "supplementalGroups": [
+                                    10001
+                                ],
+                                "uid": 10001
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/run/secrets",
+                                "name": "secrets",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            },
+                            {
+                                "mountPath": "/app/storage",
+                                "name": "storage"
+                            },
+                            {
+                                "mountPath": "/app/bootstrap/cache",
+                                "name": "config-cache"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.2",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.2"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.1.246",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.246"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi"
+                    },
+                    "requests": {
+                        "memory": "64Mi"
+                    }
+                },
+                "startTime": "2026-10-05T00:26:42Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

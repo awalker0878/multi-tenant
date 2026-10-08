@@ -1,0 +1,1 @@
+{"stage": "broker-revoked", "result": "PASS", "checks": [{"name": "revoked-broker-user-denied", "passed": true, "observation": {"error_type": "ProbableAuthenticationError", "code": null}}], "state": {}}

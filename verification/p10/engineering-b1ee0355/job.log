@@ -1,0 +1,285 @@
+﻿2026-10-08T00:33:02.1330820Z Current runner version: '2.337.0'
+2026-10-08T00:33:02.1349817Z ##[group]Runner Image Provisioner
+2026-10-08T00:33:02.1350397Z Hosted Compute Agent
+2026-10-08T00:33:02.1350833Z Version: 20261002.596
+2026-10-08T00:33:02.1351209Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+2026-10-08T00:33:02.1351673Z Build Date: 2026-10-02T22:28:27Z
+2026-10-08T00:33:02.1352125Z Worker ID: {df99002d-0d57-4587-93c6-95bddbbd86fb}
+2026-10-08T00:33:02.1352558Z Region: centralus
+2026-10-08T00:33:02.1352928Z Cloud: Azure
+2026-10-08T00:33:02.1353288Z ##[endgroup]
+2026-10-08T00:33:02.1354385Z ##[group]Operating System
+2026-10-08T00:33:02.1354802Z Ubuntu
+2026-10-08T00:33:02.1355123Z 24.04.5
+2026-10-08T00:33:02.1355473Z LTS
+2026-10-08T00:33:02.1355787Z ##[endgroup]
+2026-10-08T00:33:02.1356106Z ##[group]Runner Image
+2026-10-08T00:33:02.1356543Z Image: ubuntu-24.04
+2026-10-08T00:33:02.1356885Z Version: 20261004.327.1
+2026-10-08T00:33:02.1357980Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-08T00:33:02.1358872Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+2026-10-08T00:33:02.1359529Z ##[endgroup]
+2026-10-08T00:33:02.1360209Z ##[group]GITHUB_TOKEN Permissions
+2026-10-08T00:33:02.1361599Z Contents: read
+2026-10-08T00:33:02.1361976Z Metadata: read
+2026-10-08T00:33:02.1362407Z ##[endgroup]
+2026-10-08T00:33:02.1364069Z Secret source: Actions
+2026-10-08T00:33:02.1364738Z Cache mode: write
+2026-10-08T00:33:02.1365197Z Prepare workflow directory
+2026-10-08T00:33:02.1595934Z Prepare all required actions
+2026-10-08T00:33:02.1630574Z Getting action download info
+2026-10-08T00:33:02.3885151Z Download action repository 'actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09' (SHA:fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09)
+2026-10-08T00:33:02.4749892Z Download action repository 'actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1' (SHA:ece7cb06caefa5fff74198d8649806c4678c61a1)
+2026-10-08T00:33:02.5825261Z Download action repository 'astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78' (SHA:37802adc94f370d6bfd71619e3f0bf239e1f3b78)
+2026-10-08T00:33:03.2928783Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-08T00:33:03.8302321Z Complete job name: qualification
+2026-10-08T00:33:03.8827909Z ##[group]Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+2026-10-08T00:33:03.8828319Z with:
+2026-10-08T00:33:03.8828508Z   persist-credentials: false
+2026-10-08T00:33:03.8828700Z   repository: awalker0878/multi-tenant
+2026-10-08T00:33:03.8830351Z   token: ***
+2026-10-08T00:33:03.8830503Z   ssh-strict: true
+2026-10-08T00:33:03.8830659Z   ssh-user: git
+2026-10-08T00:33:03.8830805Z   clean: true
+2026-10-08T00:33:03.8830964Z   sparse-checkout-cone-mode: true
+2026-10-08T00:33:03.8831152Z   fetch-depth: 1
+2026-10-08T00:33:03.8831304Z   fetch-tags: false
+2026-10-08T00:33:03.8831460Z   show-progress: true
+2026-10-08T00:33:03.8831653Z   lfs: false
+2026-10-08T00:33:03.8831803Z   submodules: false
+2026-10-08T00:33:03.8831957Z   set-safe-directory: true
+2026-10-08T00:33:03.8832149Z   allow-unsafe-pr-checkout: false
+2026-10-08T00:33:03.8832399Z ##[endgroup]
+2026-10-08T00:33:03.9523023Z Syncing repository: awalker0878/multi-tenant
+2026-10-08T00:33:03.9524842Z ##[group]Getting Git version info
+2026-10-08T00:33:03.9525275Z Working directory is '/home/runner/work/multi-tenant/multi-tenant'
+2026-10-08T00:33:03.9526024Z [command]/usr/bin/git version
+2026-10-08T00:33:03.9584058Z git version 2.55.0
+2026-10-08T00:33:03.9600740Z ##[endgroup]
+2026-10-08T00:33:03.9612722Z Temporarily overriding HOME='/home/runner/work/_temp/92376d2f-6178-463b-b047-9add645051be' before making global git config changes
+2026-10-08T00:33:03.9613393Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-08T00:33:03.9618494Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/multi-tenant/multi-tenant
+2026-10-08T00:33:04.0474890Z Deleting the contents of '/home/runner/work/multi-tenant/multi-tenant'
+2026-10-08T00:33:04.0478073Z ##[group]Initializing the repository
+2026-10-08T00:33:04.0481535Z [command]/usr/bin/git init /home/runner/work/multi-tenant/multi-tenant
+2026-10-08T00:33:04.0979072Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-08T00:33:04.0979574Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-08T00:33:04.0979908Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-08T00:33:04.0980152Z hint: call:
+2026-10-08T00:33:04.0980507Z hint:
+2026-10-08T00:33:04.0980766Z hint: 	git config --global init.defaultBranch <name>
+2026-10-08T00:33:04.0981024Z hint:
+2026-10-08T00:33:04.0981231Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-08T00:33:04.0981543Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-08T00:33:04.0981803Z hint:
+2026-10-08T00:33:04.0981977Z hint: 	git branch -m <name>
+2026-10-08T00:33:04.0982156Z hint:
+2026-10-08T00:33:04.0982393Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-08T00:33:04.0985073Z Initialized empty Git repository in /home/runner/work/multi-tenant/multi-tenant/.git/
+2026-10-08T00:33:04.0995442Z [command]/usr/bin/git remote add origin https://github.com/awalker0878/multi-tenant
+2026-10-08T00:33:04.1169259Z ##[endgroup]
+2026-10-08T00:33:04.1169896Z ##[group]Disabling automatic garbage collection
+2026-10-08T00:33:04.1173764Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-08T00:33:04.1268923Z ##[endgroup]
+2026-10-08T00:33:04.1269264Z ##[group]Setting up auth
+2026-10-08T00:33:04.1274185Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-08T00:33:04.1304825Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-08T00:33:04.1610245Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-08T00:33:04.1643344Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-08T00:33:04.1849076Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-08T00:33:04.1885416Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-08T00:33:04.2097362Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-08T00:33:04.2172971Z ##[endgroup]
+2026-10-08T00:33:04.2173504Z ##[group]Fetching the repository
+2026-10-08T00:33:04.2180348Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b1ee0355580f06620fc723f7120f11725fade743:refs/remotes/origin/greenfield/enterprise-microservices-plan
+2026-10-08T00:33:06.1374814Z From https://github.com/awalker0878/multi-tenant
+2026-10-08T00:33:06.1376201Z  * [new ref]         b1ee0355580f06620fc723f7120f11725fade743 -> origin/greenfield/enterprise-microservices-plan
+2026-10-08T00:33:06.1392424Z ##[endgroup]
+2026-10-08T00:33:06.1392740Z ##[group]Determining the checkout info
+2026-10-08T00:33:06.1393034Z ##[endgroup]
+2026-10-08T00:33:06.1393236Z [command]/usr/bin/git sparse-checkout disable
+2026-10-08T00:33:06.1578775Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-08T00:33:06.1773762Z ##[group]Checking out the ref
+2026-10-08T00:33:06.1778216Z [command]/usr/bin/git checkout --progress --force -B greenfield/enterprise-microservices-plan refs/remotes/origin/greenfield/enterprise-microservices-plan
+2026-10-08T00:33:06.7067327Z Switched to a new branch 'greenfield/enterprise-microservices-plan'
+2026-10-08T00:33:06.7071650Z branch 'greenfield/enterprise-microservices-plan' set up to track 'origin/greenfield/enterprise-microservices-plan'.
+2026-10-08T00:33:06.7105194Z ##[endgroup]
+2026-10-08T00:33:06.7148785Z [command]/usr/bin/git log -1 --format=%H
+2026-10-08T00:33:06.7174100Z b1ee0355580f06620fc723f7120f11725fade743
+2026-10-08T00:33:06.7182894Z ##[group]Removing auth
+2026-10-08T00:33:06.7184903Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-08T00:33:06.7215680Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-08T00:33:06.7420651Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-08T00:33:06.7454709Z http.https://github.com/.extraheader
+2026-10-08T00:33:06.7455894Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-08T00:33:06.7484990Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-08T00:33:06.7705712Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-08T00:33:06.7784731Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-08T00:33:06.7918833Z ##[endgroup]
+2026-10-08T00:33:06.8188995Z ##[group]Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+2026-10-08T00:33:06.8189251Z with:
+2026-10-08T00:33:06.8189375Z   python-version: 3.12.14
+2026-10-08T00:33:06.8189508Z   check-latest: false
+2026-10-08T00:33:06.8190950Z   token: ***
+2026-10-08T00:33:06.8191103Z   update-environment: true
+2026-10-08T00:33:06.8191284Z   allow-prereleases: false
+2026-10-08T00:33:06.8191416Z   freethreaded: false
+2026-10-08T00:33:06.8191559Z ##[endgroup]
+2026-10-08T00:33:06.9081092Z ##[group]Installed versions
+2026-10-08T00:33:06.9176027Z Version 3.12.14 was not found in the local cache
+2026-10-08T00:33:07.7172249Z Version 3.12.14 is available for downloading
+2026-10-08T00:33:07.7173226Z Download from "https://github.com/actions/python-versions/releases/download/3.12.14-31661455385/python-3.12.14-linux-24.04-x64.tar.gz"
+2026-10-08T00:33:08.4893008Z Extract downloaded archive
+2026-10-08T00:33:08.4986495Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/6b4637fa-d7c2-4909-beb8-3df71a5b5d3d -f /home/runner/work/_temp/cb8b84a5-32a7-4636-a60c-07e32d102221
+2026-10-08T00:33:10.1793214Z Execute installation script
+2026-10-08T00:33:10.1879112Z Check if Python hostedtoolcache folder exist...
+2026-10-08T00:33:10.1879466Z Create Python 3.12.14 folder
+2026-10-08T00:33:10.1893942Z Copy Python binaries to hostedtoolcache folder
+2026-10-08T00:33:10.5734349Z Create additional symlinks (Required for the UsePythonVersion Azure Pipelines task and the setup-python GitHub Action)
+2026-10-08T00:33:10.5770074Z Upgrading pip...
+2026-10-08T00:33:13.1542382Z Collecting pip
+2026-10-08T00:33:13.2064680Z Downloading pip-26.2.1-py3-none-any.whl.metadata (4.6 kB)
+2026-10-08T00:33:13.2298044Z Downloading pip-26.2.1-py3-none-any.whl (1.8 MB)
+2026-10-08T00:33:13.3138143Z ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 27.0 MB/s eta 0:00:00
+2026-10-08T00:33:13.3138456Z 
+2026-10-08T00:33:13.3267560Z Installing collected packages: pip
+2026-10-08T00:33:13.3268032Z Attempting uninstall: pip
+2026-10-08T00:33:13.3280949Z Found existing installation: pip 25.0.1
+2026-10-08T00:33:13.3493198Z Uninstalling pip-25.0.1:
+2026-10-08T00:33:13.3529624Z Successfully uninstalled pip-25.0.1
+2026-10-08T00:33:13.9890419Z Successfully installed pip-26.2.1
+2026-10-08T00:33:14.0580492Z Create complete file
+2026-10-08T00:33:14.0615716Z Successfully set up CPython (3.12.14)
+2026-10-08T00:33:14.0617019Z ##[endgroup]
+2026-10-08T00:33:14.0801879Z ##[group]Run astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+2026-10-08T00:33:14.0802270Z with:
+2026-10-08T00:33:14.0802385Z   version: 0.12.19
+2026-10-08T00:33:14.0802504Z   enable-cache: false
+2026-10-08T00:33:14.0802634Z   activate-environment: false
+2026-10-08T00:33:14.0802830Z   working-directory: /home/runner/work/multi-tenant/multi-tenant
+2026-10-08T00:33:14.0804824Z   github-token: ***
+2026-10-08T00:33:14.0805141Z   cache-dependency-glob: **/*requirements*.txt
+**/*requirements*.in
+**/*constraints*.txt
+**/*constraints*.in
+**/pyproject.toml
+**/uv.lock
+**/*.py.lock
+
+2026-10-08T00:33:14.0805477Z   restore-cache: true
+2026-10-08T00:33:14.0805601Z   save-cache: true
+2026-10-08T00:33:14.0805716Z   prune-cache: true
+2026-10-08T00:33:14.0805833Z   cache-python: false
+2026-10-08T00:33:14.0805966Z   ignore-nothing-to-cache: false
+2026-10-08T00:33:14.0806115Z   ignore-empty-workdir: false
+2026-10-08T00:33:14.0806260Z   add-problem-matchers: true
+2026-10-08T00:33:14.0806437Z   resolution-strategy: highest
+2026-10-08T00:33:14.0806583Z env:
+2026-10-08T00:33:14.0806731Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:14.0806983Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-08T00:33:14.0807220Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:14.0807431Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:14.0807648Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:14.0807866Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-08T00:33:14.0808046Z ##[endgroup]
+2026-10-08T00:33:14.2056052Z Fetching version data from https://raw.githubusercontent.com/astral-sh/versions/main/v1/uv.ndjson ...
+2026-10-08T00:33:14.2920705Z Downloading uv from "https://releases.astral.sh/github/uv/releases/download/0.12.19/uv-x86_64-unknown-linux-gnu.tar.gz" ...
+2026-10-08T00:33:14.8419303Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/c7f35ace-7019-4473-b60c-432627af11f2 -f /home/runner/work/_temp/8d629f83-e82a-4944-8369-a351a5f4e622
+2026-10-08T00:33:15.3641848Z Added /home/runner/.local/bin to the path
+2026-10-08T00:33:15.3647343Z Added /opt/hostedtoolcache/uv/0.12.19/x86_64 to the path
+2026-10-08T00:33:15.3648113Z Set UV_PYTHON_INSTALL_DIR to /home/runner/work/_temp/uv-python-dir
+2026-10-08T00:33:15.3648491Z Added /home/runner/work/_temp/uv-python-dir to the path
+2026-10-08T00:33:15.3656761Z Successfully installed uv version 0.12.19
+2026-10-08T00:33:15.4728125Z ##[group]Run python -m pip install --requirement requirements-docs.txt
+2026-10-08T00:33:15.4728474Z [36;1mpython -m pip install --requirement requirements-docs.txt[0m
+2026-10-08T00:33:15.4986196Z shell: /usr/bin/bash -e {0}
+2026-10-08T00:33:15.4986400Z env:
+2026-10-08T00:33:15.4986578Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:15.4986825Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-08T00:33:15.4987062Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:15.4987293Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:15.4987500Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:15.4987711Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-08T00:33:15.4987925Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+2026-10-08T00:33:15.4988109Z ##[endgroup]
+2026-10-08T00:33:15.8914245Z Collecting PyYAML==6.0.3 (from -r requirements-docs.txt (line 1))
+2026-10-08T00:33:15.9470286Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-10-08T00:33:15.9607150Z Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-10-08T00:33:16.0458363Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 11.1 MB/s  0:00:00
+2026-10-08T00:33:16.0619856Z Installing collected packages: PyYAML
+2026-10-08T00:33:16.1010658Z Successfully installed PyYAML-6.0.3
+2026-10-08T00:33:16.1420295Z ##[group]Run python scripts/p10/qualify.py --output "$RUNNER_TEMP/p10-qualification"
+2026-10-08T00:33:16.1420646Z [36;1mpython scripts/p10/qualify.py --output "$RUNNER_TEMP/p10-qualification"[0m
+2026-10-08T00:33:16.1473314Z shell: /usr/bin/bash -e {0}
+2026-10-08T00:33:16.1473449Z env:
+2026-10-08T00:33:16.1473601Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:16.1473986Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-08T00:33:16.1474217Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:16.1474426Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:16.1474634Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:33:16.1474844Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-08T00:33:16.1475061Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+2026-10-08T00:33:16.1475296Z   P05_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+2026-10-08T00:33:16.1475457Z ##[endgroup]
+2026-10-08T00:33:17.8202978Z 00: PASS /opt/hostedtoolcache/Python/3.12.14/x64/bin/python .
+2026-10-08T00:35:36.4099263Z 01: PASS /opt/hostedtoolcache/Python/3.12.14/x64/bin/python .
+2026-10-08T00:35:36.4100762Z P10_SUITES=[{"errors":0,"failures":0,"name":"planning","skipped":0,"tests":325},{"errors":0,"failures":0,"name":"lifecycle","skipped":0,"tests":371},{"errors":0,"failures":0,"name":"worker","skipped":0,"tests":354}]
+2026-10-08T00:35:36.9005476Z 02: PASS uv scripts/p01/contracts
+2026-10-08T00:35:37.5412002Z 03: PASS /home/runner/work/multi-tenant/multi-tenant/scripts/p01/contracts/.venv/bin/python .
+2026-10-08T00:35:37.6930908Z 04: PASS /home/runner/work/multi-tenant/multi-tenant/services/planning/.venv/bin/python .
+2026-10-08T00:35:37.8875778Z 05: PASS /home/runner/work/multi-tenant/multi-tenant/services/planning/.venv/bin/python .
+2026-10-08T00:35:40.5220823Z 06: PASS /opt/hostedtoolcache/Python/3.12.14/x64/bin/python .
+2026-10-08T00:35:42.6144054Z 07: PASS /opt/hostedtoolcache/Python/3.12.14/x64/bin/python .
+2026-10-08T00:35:44.7430211Z 08: PASS /opt/hostedtoolcache/Python/3.12.14/x64/bin/python .
+2026-10-08T00:35:44.7436078Z P10_MEASUREMENTS={"capacity_claim":false,"error_fraction":0.0,"jain_fairness":1.0,"latency_ms":{"max":12.442028,"p50":11.000506,"p95":11.884417,"p99":12.442028},"measurement_seconds":2.001952558,"non_success":0,"percentile_method":"nearest_rank_all_attempts_no_warmup_exclusion","samples":48,"slo_result":"NOT_EVALUATED","succeeded":48,"tenant_attempts":{"0020255a-6fcc-4955-b58b-af862480b26f":4,"018361e9-c448-4391-94b0-7f1473469910":4,"0520c919-4b82-4c8e-beb7-687632440c6e":4,"12968bab-eaff-4f92-bb17-bce9906ce9fa":4,"151542d7-8a17-4d7e-8676-5e670048316b":4,"685951e4-ef4e-44d9-898a-7808a7a73907":4,"6d09ed28-592e-48bc-8f0d-2a5b78d93bfb":4,"7df1453d-5bb3-469d-8654-365d7a4d66bd":4,"a1daec1c-8dd0-41f0-b871-654cb54f0182":4,"a2d1340d-0fe4-4c01-b315-5d55ca56f2a2":4,"ef27c871-5d2b-4d76-a141-f2ebf2b97eae":4,"fcfce662-5564-427e-9951-371b96fa11b9":4},"tenant_successes":{"0020255a-6fcc-4955-b58b-af862480b26f":4,"018361e9-c448-4391-94b0-7f1473469910":4,"0520c919-4b82-4c8e-beb7-687632440c6e":4,"12968bab-eaff-4f92-bb17-bce9906ce9fa":4,"151542d7-8a17-4d7e-8676-5e670048316b":4,"685951e4-ef4e-44d9-898a-7808a7a73907":4,"6d09ed28-592e-48bc-8f0d-2a5b78d93bfb":4,"7df1453d-5bb3-469d-8654-365d7a4d66bd":4,"a1daec1c-8dd0-41f0-b871-654cb54f0182":4,"a2d1340d-0fe4-4c01-b315-5d55ca56f2a2":4,"ef27c871-5d2b-4d76-a141-f2ebf2b97eae":4,"fcfce662-5564-427e-9951-371b96fa11b9":4},"throughput_per_second":23.97659215658596,"unserved_tenants":[]}
+2026-10-08T00:35:44.7439041Z P10_RESTORE={"scope": "single_lifecycle_database_real_pg_dump_restore_synthetic_custody", "restore_and_denial_ms": 220.996131, "old_grant_denied": true, "accepted_synthetic_effects": 1, "native_write_authorized": false, "full_control_plane_rto_claim": false}
+2026-10-08T00:35:44.7461242Z {"result": "PASSED_ENGINEERING_CHECKS", "g10_status": "HELD", "release_authorized": false}
+2026-10-08T00:35:44.7578745Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-08T00:35:44.7578980Z with:
+2026-10-08T00:35:44.7579115Z   name: p10-qualification-37708345920-1
+2026-10-08T00:35:44.7579296Z   path: /home/runner/work/_temp/p10-qualification/
+2026-10-08T00:35:44.7579470Z   if-no-files-found: error
+2026-10-08T00:35:44.7579604Z   retention-days: 90
+2026-10-08T00:35:44.7579726Z   compression-level: 6
+2026-10-08T00:35:44.7579846Z   overwrite: false
+2026-10-08T00:35:44.7579969Z   include-hidden-files: false
+2026-10-08T00:35:44.7580103Z env:
+2026-10-08T00:35:44.7580246Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:35:44.7580480Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-08T00:35:44.7580714Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:35:44.7580926Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:35:44.7581161Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-08T00:35:44.7581377Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-08T00:35:44.7581592Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+2026-10-08T00:35:44.7581768Z ##[endgroup]
+2026-10-08T00:35:44.8697595Z (node:5497) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-08T00:35:44.8698073Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-08T00:35:44.8786816Z With the provided path, there will be 39 files uploaded
+2026-10-08T00:35:44.8794786Z Artifact name is valid!
+2026-10-08T00:35:44.8795113Z Root directory input is valid!
+2026-10-08T00:35:45.1537915Z Beginning upload of artifact content to blob storage
+2026-10-08T00:35:45.1970093Z (node:5497) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-08T00:35:45.3956347Z Uploaded bytes 126899
+2026-10-08T00:35:45.4319694Z Finished uploading artifact content to blob storage!
+2026-10-08T00:35:45.4320292Z SHA256 digest of uploaded artifact zip is f32a0677c50db397e1a10d4efdc6bd940bcddb6d3bdc0178763c35de2b8bdbb0
+2026-10-08T00:35:45.4321114Z Finalizing artifact upload
+2026-10-08T00:35:45.6852508Z Artifact p10-qualification-37708345920-1.zip successfully finalized. Artifact ID 11520831923
+2026-10-08T00:35:45.6853142Z Artifact p10-qualification-37708345920-1 has been successfully uploaded! Final size is 126899 bytes. Artifact ID is 11520831923
+2026-10-08T00:35:45.6857720Z Artifact download URL: https://github.com/awalker0878/multi-tenant/actions/runs/37708345920/artifacts/11520831923
+2026-10-08T00:35:45.7022253Z Post job cleanup.
+2026-10-08T00:35:45.7744776Z UV_PYTHON_INSTALL_DIR is already set to /home/runner/work/_temp/uv-python-dir
+2026-10-08T00:35:45.7869264Z Post job cleanup.
+2026-10-08T00:35:45.8984087Z Post job cleanup.
+2026-10-08T00:35:45.9664102Z [command]/usr/bin/git version
+2026-10-08T00:35:45.9683652Z git version 2.55.0
+2026-10-08T00:35:45.9714533Z Temporarily overriding HOME='/home/runner/work/_temp/ec9a86c5-be73-45b0-aba2-318133689d3e' before making global git config changes
+2026-10-08T00:35:45.9715325Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-08T00:35:45.9718404Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/multi-tenant/multi-tenant
+2026-10-08T00:35:45.9757515Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-08T00:35:45.9792528Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-08T00:35:46.0027259Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-08T00:35:46.0064570Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-08T00:35:46.0289322Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-08T00:35:46.0324539Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-08T00:35:46.0659565Z Cleaning up orphan processes
+2026-10-08T00:35:46.0875213Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

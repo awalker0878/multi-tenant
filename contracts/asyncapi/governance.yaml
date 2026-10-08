@@ -1,0 +1,127 @@
+asyncapi: 3.0.0
+info:
+  title: Governance committed change notifications
+  version: 1.0.0
+  description: P02 reference events. Stable event identity; at-least-once, unordered
+    delivery; never current authorization.
+channels:
+  tenant_changed:
+    address: governance.tenant.changed.v1
+    description: Private governance.events topic exchange; consumer-owned durable
+      queues. Notification only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  membership_changed:
+    address: governance.membership.changed.v1
+    description: Private governance.events topic exchange; consumer-owned durable
+      queues. Notification only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  grant_changed:
+    address: governance.grant.changed.v1
+    description: Private governance.events topic exchange; consumer-owned durable
+      queues. Notification only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  grant_revoked:
+    address: governance.grant.revoked.v1
+    description: Private governance.events topic exchange; consumer-owned durable
+      queues. Notification only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  quota_changed:
+    address: governance.quota.changed.v1
+    description: Private governance.events topic exchange; consumer-owned durable
+      queues. Notification only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  approval_requested:
+    address: governance.approval.requested.v1
+    description: Private governance.events topic exchange; consumer-owned durable
+      queues. Notification only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  approval_approved:
+    address: governance.approval.approved.v1
+    description: Private governance.events topic exchange; consumer-owned durable
+      queues. Notification only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  approval_rejected:
+    address: governance.approval.rejected.v1
+    description: Private governance.events topic exchange; consumer-owned durable
+      queues. Notification only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  approval_revoked:
+    address: governance.approval.revoked.v1
+    description: Private governance.events topic exchange; consumer-owned durable
+      queues. Notification only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  approval_expired:
+    address: governance.approval.expired.v1
+    description: Private governance.events topic exchange; consumer-owned durable
+      queues. Notification only.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+operations:
+  publish_tenant_changed:
+    action: send
+    channel:
+      $ref: '#/channels/tenant_changed'
+  publish_membership_changed:
+    action: send
+    channel:
+      $ref: '#/channels/membership_changed'
+  publish_grant_changed:
+    action: send
+    channel:
+      $ref: '#/channels/grant_changed'
+  publish_grant_revoked:
+    action: send
+    channel:
+      $ref: '#/channels/grant_revoked'
+  publish_quota_changed:
+    action: send
+    channel:
+      $ref: '#/channels/quota_changed'
+  publish_approval_requested:
+    action: send
+    channel:
+      $ref: '#/channels/approval_requested'
+  publish_approval_approved:
+    action: send
+    channel:
+      $ref: '#/channels/approval_approved'
+  publish_approval_rejected:
+    action: send
+    channel:
+      $ref: '#/channels/approval_rejected'
+  publish_approval_revoked:
+    action: send
+    channel:
+      $ref: '#/channels/approval_revoked'
+  publish_approval_expired:
+    action: send
+    channel:
+      $ref: '#/channels/approval_expired'
+components:
+  messages:
+    Change:
+      name: GovernanceChangeV1
+      contentType: application/json
+      payload:
+        schemaFormat: application/schema+json;version=draft-2020-12
+        schema:
+          $ref: ../schemas/events/governance-change-v1.json

@@ -1,0 +1,33 @@
+{
+  "grant": {
+    "job_id": "00000000-0000-4000-8000-000000000004",
+    "operation_id": "00000000-0000-4000-8000-000000000005",
+    "attempt_id": "00000000-0000-4000-8000-000000000006",
+    "epoch": "00000000-0000-4000-8000-000000000009",
+    "executor_id": "00000000-0000-4000-8000-000000000008",
+    "expires_at": 2000,
+    "grant_id": "00000000-0000-4000-8000-00000000004d",
+    "stage": "provision",
+    "plan_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "intent_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "native_binding": {
+      "tenant_id": "00000000-0000-4000-8000-000000000001",
+      "site_id": "00000000-0000-4000-8000-000000000002",
+      "resource_id": "00000000-0000-4000-8000-000000000003",
+      "job_id": "00000000-0000-4000-8000-000000000004",
+      "operation_id": "00000000-0000-4000-8000-000000000005",
+      "attempt_id": "00000000-0000-4000-8000-000000000006",
+      "campaign_id": "00000000-0000-4000-8000-000000000007",
+      "executor_id": "00000000-0000-4000-8000-000000000008",
+      "epoch": "00000000-0000-4000-8000-000000000009",
+      "custody_id": "00000000-0000-4000-8000-00000000000a",
+      "project_id": "00000000-0000-4000-8000-00000000000b",
+      "plan_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "operation_plan_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "ownership_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "custody_generation": 1,
+      "expires_at": 2000
+    }
+  },
+  "boundary": "before_api_sequence"
+}

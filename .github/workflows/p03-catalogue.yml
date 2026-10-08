@@ -1,0 +1,119 @@
+name: P03 catalogue
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: ['services/catalogue/**', 'services/governance/**', 'apps/console/**', 'contracts/**', 'scripts/p03/**', '.github/workflows/p03-catalogue.yml']
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  catalogue:
+    name: P03 catalogue integrity and persistence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d
+        env:
+          POSTGRES_PASSWORD: synthetic-p03-disposable-postgres
+          POSTGRES_DB: p03_catalogue_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, mbstring, openssl, pdo, pdo_pgsql, pdo_sqlite, sockets, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+      - name: Install the independent locked Catalogue and Governance packages
+        run: |
+          for component in services/catalogue services/governance; do
+            mkdir -p "$component/bootstrap/cache" "$component/storage/framework/"{cache,sessions,views} "$component/storage/logs"
+            touch "$component/.env"
+            composer install --working-dir="$component" --no-scripts --no-interaction --prefer-dist --no-progress
+          done
+      - name: Exercise controlled migrations and PostgreSQL TLS persistence
+        env:
+          P03_TEST_POSTGRES: '1'
+          P03_ADMIN_PASSWORD: synthetic-p03-disposable-postgres
+          P03_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: python scripts/p03/verify_catalogue.py --output "$RUNNER_TEMP/p03-catalogue"
+      - name: Retain exact-source redacted results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p03-catalogue-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p03-catalogue/
+          if-no-files-found: error
+          retention-days: 14
+
+  live:
+    name: P03 live authoring, concurrency and delivery (${{ matrix.browser }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      P03_BROWSER_ENGINE: ${{ matrix.browser }}
+    services:
+      postgres:
+        image: postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d
+        env:
+          POSTGRES_PASSWORD: synthetic-p03-disposable-postgres
+          POSTGRES_DB: p03_live_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, mbstring, openssl, pdo, pdo_pgsql, pdo_sqlite, sockets, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24.19.0'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - name: Install the three independent locked applications
+        run: |
+          for component in services/governance services/catalogue apps/console; do
+            mkdir -p "$component/bootstrap/cache" "$component/storage/framework/"{cache,sessions,views} "$component/storage/logs"
+            touch "$component/.env"
+            composer install --working-dir="$component" --no-scripts --no-interaction --prefer-dist --no-progress
+          done
+          npm ci --prefix apps/console --ignore-scripts --no-audit --no-fund
+          npm run build --prefix apps/console
+          cd apps/console
+          npx playwright install --with-deps "${P03_BROWSER_ENGINE}"
+      - name: Exercise PostgreSQL, live TLS service authorization, broker replay and compiled browser journeys
+        env:
+          P03_TEST_POSTGRES: '1'
+          P03_ADMIN_PASSWORD: synthetic-p03-disposable-postgres
+          P03_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: uv run --project scripts/p01/contracts --frozen python scripts/p03/verify_live.py --output "$RUNNER_TEMP/p03-live"
+      - name: Retain redacted exact-source evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p03-live-${{ matrix.browser }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p03-live/
+          if-no-files-found: error
+          retention-days: 14

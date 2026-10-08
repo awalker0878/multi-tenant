@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": 1
+    },
+    "admissible": {
+      "type": "boolean"
+    },
+    "holds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 1000
+    },
+    "plan_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "content_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tenant_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "site_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "environment": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "resource_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "endpoint_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "native_scope": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "tenant_id",
+        "site_id",
+        "environment",
+        "resource_id",
+        "endpoint_id",
+        "native_scope"
+      ]
+    },
+    "lane": {
+      "enum": [
+        "operational",
+        "isolated_campaign"
+      ]
+    },
+    "evaluated_at": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "current_receipts_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "native_write_authorized": {
+      "const": false
+    },
+    "atomic_record_required": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 1000
+    },
+    "recheck_boundaries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 1000
+    }
+  },
+  "required": [
+    "contract_version",
+    "admissible",
+    "holds",
+    "plan_digest",
+    "content_digest",
+    "scope",
+    "lane",
+    "evaluated_at",
+    "current_receipts_digest",
+    "native_write_authorized",
+    "atomic_record_required",
+    "recheck_boundaries"
+  ]
+}

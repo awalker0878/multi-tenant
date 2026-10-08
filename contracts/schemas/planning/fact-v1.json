@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "specversion": {
+      "const": "1.0"
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "tenant_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "event_type": {
+      "enum": [
+        "planning.assessment.created",
+        "planning.plan.created"
+      ]
+    },
+    "aggregate_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "occurred_at": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "kind": {
+          "enum": [
+            "assessment",
+            "plan"
+          ]
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "native_write_authorized": {
+          "const": false
+        },
+        "binding": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "plan_id",
+            "revision",
+            "tenant_id",
+            "action",
+            "site_id",
+            "environment",
+            "resource_id",
+            "requested_by",
+            "executor_ids",
+            "valid_until",
+            "digest",
+            "content_digest",
+            "canonicalization",
+            "lane"
+          ],
+          "properties": {
+            "plan_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "tenant_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "application.provision",
+                "application.migrate",
+                "application.recover",
+                "application.retire"
+              ]
+            },
+            "site_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "environment": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "resource_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "requested_by": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "executor_ids": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 32,
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "valid_until": {
+              "type": "integer"
+            },
+            "digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "content_digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "canonicalization": {
+              "const": "p05-json-v1"
+            },
+            "lane": {
+              "enum": [
+                "operational",
+                "isolated_campaign"
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "digest",
+        "native_write_authorized"
+      ]
+    }
+  },
+  "required": [
+    "specversion",
+    "event_id",
+    "tenant_id",
+    "event_type",
+    "aggregate_id",
+    "occurred_at",
+    "sequence",
+    "data"
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "source_revision": "36a14811b5afa23717566d5e8a08632e011f44a5",
+  "artifacts": [
+    {
+      "id": 11331327306,
+      "name": "p01-http-contracts-36a14811b5afa23717566d5e8a08632e011f44a5",
+      "size_in_bytes": 16021,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11331327306",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11331327306/zip",
+      "expired": false,
+      "created_at": "2026-10-05T07:38:12Z",
+      "expires_at": "2026-10-19T07:38:11Z",
+      "updated_at": "2026-10-05T07:38:12Z",
+      "digest": "sha256:108de0836c9f6a45321c34d655caff19bfb3055e241b74269c643a73cd252ecd",
+      "workflow_run": {
+        "id": 37278731866,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "36a14811b5afa23717566d5e8a08632e011f44a5"
+      }
+    },
+    {
+      "id": 11330997961,
+      "name": "p01-permit-desk-36a14811b5afa23717566d5e8a08632e011f44a5",
+      "size_in_bytes": 81013,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11330997961",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11330997961/zip",
+      "expired": false,
+      "created_at": "2026-10-05T07:37:47Z",
+      "expires_at": "2026-10-19T07:37:47Z",
+      "updated_at": "2026-10-05T07:37:47Z",
+      "digest": "sha256:9bd297f9d1af7b30e42bb5e01532f93e733f3f42e09cb71c7a7cc4c4271351e2",
+      "workflow_run": {
+        "id": 37278731970,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "36a14811b5afa23717566d5e8a08632e011f44a5"
+      }
+    },
+    {
+      "id": 11331655619,
+      "name": "p01-repository-secrets-36a14811b5afa23717566d5e8a08632e011f44a5",
+      "size_in_bytes": 218941,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11331655619",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11331655619/zip",
+      "expired": false,
+      "created_at": "2026-10-05T07:37:14Z",
+      "expires_at": "2026-10-19T07:37:13Z",
+      "updated_at": "2026-10-05T07:37:14Z",
+      "digest": "sha256:9911816807a814a31525f31fe42721fffe5e551d1bcd64f343f84bc8242b932f",
+      "workflow_run": {
+        "id": 37278731953,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "36a14811b5afa23717566d5e8a08632e011f44a5"
+      }
+    },
+    {
+      "id": 11330883346,
+      "name": "p01-policy-controls-36a14811b5afa23717566d5e8a08632e011f44a5",
+      "size_in_bytes": 5316,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11330883346",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11330883346/zip",
+      "expired": false,
+      "created_at": "2026-10-05T07:37:10Z",
+      "expires_at": "2026-10-19T07:37:09Z",
+      "updated_at": "2026-10-05T07:37:10Z",
+      "digest": "sha256:68eeb70a75eea8a7d20b661ed8119b1dacc166133990f22fa8fc45df89ae7a80",
+      "workflow_run": {
+        "id": 37278731953,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "36a14811b5afa23717566d5e8a08632e011f44a5"
+      }
+    }
+  ],
+  "retained_file_sha256": {
+    "report.json": "1184988594554fabacf4f2f0daf0cdee784646f3b622f482dfdcbd930aaebba5",
+    "p01-permit-desk.zip": "9bd297f9d1af7b30e42bb5e01532f93e733f3f42e09cb71c7a7cc4c4271351e2",
+    "p01-http-contracts.zip": "108de0836c9f6a45321c34d655caff19bfb3055e241b74269c643a73cd252ecd",
+    "p01-repository-secrets.zip": "9911816807a814a31525f31fe42721fffe5e551d1bcd64f343f84bc8242b932f",
+    "p01-policy-controls.zip": "68eeb70a75eea8a7d20b661ed8119b1dacc166133990f22fa8fc45df89ae7a80"
+  },
+  "limitations": [
+    "Original complete ZIPs retained; declared command logs and source bindings verified before retention.",
+    "Synthetic fixture campaigns and heuristic repository scan do not establish operated acceptance, production trust or independent G01 approval."
+  ]
+}

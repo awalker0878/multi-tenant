@@ -1,0 +1,14 @@
+serviceaccount/console-probe created
+deployment.apps/console-probe created
+serviceaccount/governance-probe created
+deployment.apps/governance-probe created
+serviceaccount/catalogue-probe created
+deployment.apps/catalogue-probe created
+serviceaccount/assurance-probe created
+deployment.apps/assurance-probe created
+serviceaccount/planning-probe created
+deployment.apps/planning-probe created
+serviceaccount/inventory-probe created
+deployment.apps/inventory-probe created
+serviceaccount/lifecycle-probe created
+deployment.apps/lifecycle-probe created

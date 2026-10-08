@@ -1,0 +1,164 @@
+{
+  "config": {
+    "argv": [
+      "/opt/hostedtoolcache/node/24.19.0/x64/bin/node",
+      "/home/runner/work/multi-tenant/multi-tenant/apps/console/node_modules/.bin/playwright",
+      "test",
+      "--config=tests/browser-p05/playwright.config.ts"
+    ],
+    "configFile": "/home/runner/work/multi-tenant/multi-tenant/apps/console/tests/browser-p05/playwright.config.ts",
+    "rootDir": "/home/runner/work/multi-tenant/multi-tenant/apps/console/tests/browser-p05",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 180000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/awalker0878/multi-tenant/commit/3a9c136639426087d060845184048f52850fcfc7",
+        "commitHash": "3a9c136639426087d060845184048f52850fcfc7",
+        "buildHref": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991249"
+      },
+      "gitCommit": {
+        "shortHash": "3a9c136",
+        "hash": "3a9c136639426087d060845184048f52850fcfc7",
+        "subject": "fix(assurance): bound custody review projections to the published contract",
+        "body": "fix(assurance): bound custody review projections to the published contract",
+        "author": {
+          "name": "awalker0878",
+          "email": "52688461+awalker0878@users.noreply.github.com",
+          "time": 1791313843000
+        },
+        "committer": {
+          "name": "awalker0878",
+          "email": "52688461+awalker0878@users.noreply.github.com",
+          "time": 1791313843000
+        },
+        "branch": "greenfield/enterprise-microservices-plan"
+      },
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/multi-tenant/multi-tenant/apps/console/test-results/p05-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/awalker0878/multi-tenant/commit/3a9c136639426087d060845184048f52850fcfc7",
+            "commitHash": "3a9c136639426087d060845184048f52850fcfc7",
+            "buildHref": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991249"
+          },
+          "gitCommit": {
+            "shortHash": "3a9c136",
+            "hash": "3a9c136639426087d060845184048f52850fcfc7",
+            "subject": "fix(assurance): bound custody review projections to the published contract",
+            "body": "fix(assurance): bound custody review projections to the published contract",
+            "author": {
+              "name": "awalker0878",
+              "email": "52688461+awalker0878@users.noreply.github.com",
+              "time": 1791313843000
+            },
+            "committer": {
+              "name": "awalker0878",
+              "email": "52688461+awalker0878@users.noreply.github.com",
+              "time": 1791313843000
+            },
+            "branch": "greenfield/enterprise-microservices-plan"
+          },
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/home/runner/work/multi-tenant/multi-tenant/apps/console/tests/browser-p05",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 150000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../../test-results/p05-browser.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "planning.spec.ts",
+      "file": "planning.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "compare exact destinations, retain uncertain command, review bound approval and hold revoked evidence",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 150000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 36781,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-06T19:12:36.548Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8b0549e55fb6efa6229e-7164c7fd43e794cb06f2",
+          "file": "planning.spec.ts",
+          "line": 5,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-06T19:12:36.042Z",
+    "duration": 38224.826,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

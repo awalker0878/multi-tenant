@@ -1,0 +1,38 @@
+[
+  {
+    "archive": "archives/p08-campaign-components-first.zip",
+    "archive_sha256": "f11a597275664042bf2c578558877970c80f5152392aed03632cf83d6be1fbe9",
+    "kind": "components",
+    "run_id": "37650245430",
+    "artifact_id": "11496442299",
+    "source_revision": "9c1adaa3ade546b4f187420ee588204f128387e1",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37650245430"
+  },
+  {
+    "archive": "archives/p08-campaign-components-pass.zip",
+    "archive_sha256": "b6f5ae0c1d6385484fa7f298cda2323177b15f4d58132e3b39e2321fcbc91ada",
+    "kind": "components",
+    "run_id": "37656060398",
+    "artifact_id": "11498084794",
+    "source_revision": "5e2b4a62f2c940bbdb06432c8922d43301e3482c",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37656060398"
+  },
+  {
+    "archive": "archives/p08-campaign-browser-pass.zip",
+    "archive_sha256": "c0abefc040a65c323a3c754d5cff6858425c6ec57a14ec033aa604891792689e",
+    "kind": "browser",
+    "run_id": "37656060398",
+    "artifact_id": "11499050516",
+    "source_revision": "5e2b4a62f2c940bbdb06432c8922d43301e3482c",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37656060398"
+  },
+  {
+    "archive": "archives/p08-campaign-console-pass.zip",
+    "archive_sha256": "e3244083c8578c4247a73204dd3d7fb6d3887874eb49fafb5eabd3700146ab98",
+    "kind": "console",
+    "run_id": "37656060087",
+    "artifact_id": "11499660064",
+    "source_revision": "5e2b4a62f2c940bbdb06432c8922d43301e3482c",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37656060087"
+  }
+]

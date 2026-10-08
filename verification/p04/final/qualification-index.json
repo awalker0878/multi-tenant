@@ -1,0 +1,100 @@
+{
+  "qualification_source": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+  "verified_at": "2026-10-06T09:00:14.342666+00:00",
+  "result": "PASS",
+  "level": "E1/E2",
+  "native_platforms_tested": [],
+  "local": {
+    "source_revision": "fb37bb225d07516e7c4e277ec4a140a7d09186c6",
+    "report": "local/report.json",
+    "report_sha256": "8f02c396ee7ab380439a161232c89fbde699b49693b6e6cd80f486d9b16cc723",
+    "commands": 20,
+    "impact_review": "Product source is byte-identical to the qualification source; subsequent changes only correct the separate campaign session bootstrap and its assertion."
+  },
+  "core": {
+    "run_id": 37439404279,
+    "artifact_id": 11399794610,
+    "archive_sha256": "4144d82a17d3b57b4e41cf423167b0eed1706ac783c155df9b701a80ac41493d",
+    "source_revision": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+    "report_sha256": "eaccce423b4646794b4c0ae2fdf42ec4b7612f598107109d921b0d0813a29d8a",
+    "report": "core/report.json"
+  },
+  "live": [
+    {
+      "engine": "chromium",
+      "source_revision": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+      "run_id": "37439404279",
+      "artifact_id": 11399989410,
+      "archive_sha256": "a799382a2008164754bbc8b93ec7a2f0d62c7a3798d3fe41ea854602d3630587",
+      "report": "chromium/report.json",
+      "report_sha256": "82824bce3873b659a47aa2ebf1b85f8e79970f7cdbaf562dde75777263c252b1",
+      "checks": 60,
+      "source_files": 637,
+      "commands": 29,
+      "browser": {
+        "startTime": "2026-10-06T08:57:36.510Z",
+        "duration": 20711.743000000002,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "broker_deliveries": 10,
+      "unique_events": 9,
+      "observed_at": "2026-10-06T08:57:01.908510+00:00"
+    },
+    {
+      "engine": "firefox",
+      "source_revision": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+      "run_id": "37439404279",
+      "artifact_id": 11400069074,
+      "archive_sha256": "b156d41517b1e2057e428b26c9bda540286f2eb1dfca1eb4e33164dcef1a4d6c",
+      "report": "firefox/report.json",
+      "report_sha256": "6d2ae7af2b0aa4e6a96f1301e209b7d9457611fee065f3d69914282c3da382ce",
+      "checks": 60,
+      "source_files": 637,
+      "commands": 29,
+      "browser": {
+        "startTime": "2026-10-06T08:57:39.094Z",
+        "duration": 22249.574,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "broker_deliveries": 10,
+      "unique_events": 9,
+      "observed_at": "2026-10-06T08:57:11.519412+00:00"
+    },
+    {
+      "engine": "webkit",
+      "source_revision": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+      "run_id": "37439404279",
+      "artifact_id": 11401025956,
+      "archive_sha256": "db3d964d82247ded5fdc81619a7123cc97723bfdfbcc47d4185eebda2afcc85f",
+      "report": "webkit/report.json",
+      "report_sha256": "1141f80a7761620c01325d6cc63ae7abb5c6e0bf1d5a3e2a7d8b4f88330c82a1",
+      "checks": 60,
+      "source_files": 637,
+      "commands": 29,
+      "browser": {
+        "startTime": "2026-10-06T08:57:45.987Z",
+        "duration": 27276.211,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "broker_deliveries": 10,
+      "unique_events": 9,
+      "observed_at": "2026-10-06T08:57:16.579340+00:00"
+    }
+  ],
+  "verified_source_bindings": 1180,
+  "limitations": [
+    "No actual VMware/OpenStack or AHV installation was accessed. E3 and G04 receiving remain open.",
+    "Native TLS fixture scope contains four observed resources; approved installation load, privilege completeness and before/after evidence are not inferred.",
+    "Planning fact consumer is not implemented by P04.",
+    "Automated browser tasks do not replace representative operator, managed-policy or assistive-technology reviews."
+  ]
+}

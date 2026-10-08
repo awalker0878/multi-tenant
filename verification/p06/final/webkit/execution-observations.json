@@ -1,0 +1,2624 @@
+{
+  "simulation": true,
+  "jobs": [
+    {
+      "id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+      "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+      "actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71",
+      "requested_by": "7c9d73ce-63fe-4d1a-8bc2-670db879d9ff",
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "scope": {
+        "site_id": "5285fb5d-7f56-438a-b3bd-0a010d4bac57",
+        "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+        "endpoint_id": "275af1a0-dd23-43ae-8637-ef490d93b984",
+        "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+        "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+        "native_scope": "project:synthetic"
+      },
+      "plan_id": "6f45b9ce-71ee-4f48-bb88-2a3bda890e23",
+      "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+      "approval_id": "bd074528-ce06-460d-b3a5-76853a8cc85d",
+      "workflow_id": "p06/0c77c7cd-305c-44a6-9863-4938a36b9591/120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+      "workflow_run_id": "01a112a3-8ba8-79fa-b761-ff63c83f9332",
+      "state": "completed",
+      "reason": null,
+      "revision": 23,
+      "observed_at": 1791314099,
+      "updated_at": 1791314092,
+      "simulation": true,
+      "evidence_level": "E2",
+      "native_write_authorized": false,
+      "cancel_requested": false,
+      "pause_requested": false,
+      "stop_requested": false,
+      "evidence": {
+        "id": "2063dd2f-32d1-41c4-9e42-fe5a0065b7b8",
+        "scope": {
+          "site_id": "5285fb5d-7f56-438a-b3bd-0a010d4bac57",
+          "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+          "endpoint_id": "275af1a0-dd23-43ae-8637-ef490d93b984",
+          "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+          "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+          "native_scope": "project:synthetic"
+        },
+        "state": "finalized",
+        "digest": "d572c2842914fd06893c164915fd9faf08441ca43987b3e6d8e409de54b7eb96",
+        "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+        "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+        "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+        "finalized_at": 1791314092,
+        "requested_by": "7c9d73ce-63fe-4d1a-8bc2-670db879d9ff",
+        "evidence_level": "E2",
+        "native_support": false,
+        "retention_until": 1822850092,
+        "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+        "producer_actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71"
+      },
+      "recovery_mode": "forward_recovery_required",
+      "operations": [
+        {
+          "id": "046a932e-9f4f-4dfa-86d0-d618100f72a1",
+          "step": "reserve",
+          "ordinal": 0,
+          "outcome": "confirmed_succeeded",
+          "revision": 7,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "6709db15-4e70-4f17-bfa8-821cfe5dbb5b",
+            "simulation": true,
+            "observed_at": 1791314072,
+            "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+            "effect_count": 1,
+            "operation_id": "046a932e-9f4f-4dfa-86d0-d618100f72a1"
+          }
+        },
+        {
+          "id": "18474276-b01f-4aca-b9e2-92fba1b33caf",
+          "step": "preflight",
+          "ordinal": 1,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "bb9533a3-15a4-4b00-b345-b30bb5eb0e1a",
+            "simulation": true,
+            "observed_at": 1791314073,
+            "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+            "effect_count": 1,
+            "operation_id": "18474276-b01f-4aca-b9e2-92fba1b33caf"
+          }
+        },
+        {
+          "id": "fd23002e-0031-451f-8aae-cf45ce4ce32e",
+          "step": "apply_reviewed_saved_plan",
+          "ordinal": 2,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "f8919ce0-7456-4e24-8228-1ab09434aeed",
+            "simulation": true,
+            "observed_at": 1791314074,
+            "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+            "effect_count": 1,
+            "operation_id": "fd23002e-0031-451f-8aae-cf45ce4ce32e"
+          }
+        },
+        {
+          "id": "9eea554e-beac-407b-96ce-8f78f8490556",
+          "step": "configure_and_restore",
+          "ordinal": 3,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "5227b082-8636-4278-9543-c74fdedabfca",
+            "simulation": true,
+            "observed_at": 1791314074,
+            "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+            "effect_count": 1,
+            "operation_id": "9eea554e-beac-407b-96ce-8f78f8490556"
+          }
+        },
+        {
+          "id": "fdd63a94-7557-4a7e-820f-fe7a8933dc3f",
+          "step": "verify_application",
+          "ordinal": 4,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "cf162b9f-0c14-4323-a928-0077f3e789a6",
+            "simulation": true,
+            "observed_at": 1791314075,
+            "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+            "effect_count": 1,
+            "operation_id": "fdd63a94-7557-4a7e-820f-fe7a8933dc3f"
+          }
+        },
+        {
+          "id": "3cb01519-ffa1-4903-a79c-16d42e0297d8",
+          "step": "activate_target",
+          "ordinal": 5,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "a4316038-6398-4ed3-aafd-a8d6130e32bf",
+            "simulation": true,
+            "observed_at": 1791314076,
+            "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+            "effect_count": 1,
+            "operation_id": "3cb01519-ffa1-4903-a79c-16d42e0297d8"
+          }
+        },
+        {
+          "id": "ff213232-226e-471b-8a90-fbddcb8ed52e",
+          "step": "confirm_owner_allocations",
+          "ordinal": 6,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "e3f42a9f-4bf6-4fc2-8709-3f6a3a498ced",
+            "simulation": true,
+            "observed_at": 1791314076,
+            "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+            "effect_count": 1,
+            "operation_id": "ff213232-226e-471b-8a90-fbddcb8ed52e"
+          }
+        }
+      ],
+      "events": [
+        {
+          "id": "4f98d4ae-d58b-4f5f-a49d-f392ae80f07b",
+          "kind": "admitted",
+          "facts": {
+            "simulation": true,
+            "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+            "workflow_id": "p06/0c77c7cd-305c-44a6-9863-4938a36b9591/120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+            "reservation_bindings": [
+              {
+                "kind": "addresses",
+                "owner": "synthetic-addresses",
+                "scope": {
+                  "site_id": "5285fb5d-7f56-438a-b3bd-0a010d4bac57",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "275af1a0-dd23-43ae-8637-ef490d93b984",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 2,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314937,
+                "receipt_id": "c8b04216-0e45-4ef4-83cb-8d2cb530db09",
+                "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "memory_mib",
+                "owner": "synthetic-memory_mib",
+                "scope": {
+                  "site_id": "5285fb5d-7f56-438a-b3bd-0a010d4bac57",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "275af1a0-dd23-43ae-8637-ef490d93b984",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 8192,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314937,
+                "receipt_id": "fe922311-8f4e-4841-8eab-1c4a55fb3b66",
+                "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "storage_gib",
+                "owner": "synthetic-storage_gib",
+                "scope": {
+                  "site_id": "5285fb5d-7f56-438a-b3bd-0a010d4bac57",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "275af1a0-dd23-43ae-8637-ef490d93b984",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 80,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314937,
+                "receipt_id": "a7c3468a-bff1-4bec-81cd-150605ddd7c1",
+                "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "vcpus",
+                "owner": "synthetic-vcpus",
+                "scope": {
+                  "site_id": "5285fb5d-7f56-438a-b3bd-0a010d4bac57",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "275af1a0-dd23-43ae-8637-ef490d93b984",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 4,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314937,
+                "receipt_id": "30bf8f9a-8596-4e94-ac3c-58e74dbac6e7",
+                "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+                "ttl_seconds": 300
+              }
+            ]
+          },
+          "occurred_at": 1791314037
+        },
+        {
+          "id": "427af181-08e0-4aa2-8e05-14d8f8076a08",
+          "kind": "running",
+          "facts": {
+            "reason": null
+          },
+          "occurred_at": 1791314042
+        },
+        {
+          "id": "b6fa2b9b-f0dd-4afe-9562-1243afc5f6d7",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "reserve",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "1db657e6-8e33-494c-91cd-dd84fd8e3b7a",
+            "operation_id": "046a932e-9f4f-4dfa-86d0-d618100f72a1"
+          },
+          "occurred_at": 1791314042
+        },
+        {
+          "id": "7ef4bbb9-df48-4a6f-9b22-3645102c7115",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+              "sealed": true,
+              "outcome": "confirmed_failed",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "1db657e6-8e33-494c-91cd-dd84fd8e3b7a",
+              "simulation": true,
+              "observed_at": 1791314043,
+              "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+              "effect_count": 0,
+              "operation_id": "046a932e-9f4f-4dfa-86d0-d618100f72a1"
+            },
+            "operation_id": "046a932e-9f4f-4dfa-86d0-d618100f72a1"
+          },
+          "occurred_at": 1791314043
+        },
+        {
+          "id": "fef48d9e-750a-418c-ac2b-e787559509b4",
+          "kind": "held",
+          "facts": {
+            "reason": "confirmed_failed"
+          },
+          "occurred_at": 1791314043
+        },
+        {
+          "id": "9715017d-97e4-407c-8c53-279266124f66",
+          "kind": "operator_request",
+          "facts": {
+            "action": "retry_unstarted",
+            "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+            "accepted": true,
+            "actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71",
+            "command_id": "2aae3baf-810e-4b1c-884d-96d03272ab3d",
+            "effect_undone": false
+          },
+          "occurred_at": 1791314044
+        },
+        {
+          "id": "8a1d95c6-884a-42c9-8566-866ecda5ed3d",
+          "kind": "running",
+          "facts": {
+            "reason": null
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "8286f278-0d1c-45c7-b3f7-254525a7953b",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "reserve",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "6709db15-4e70-4f17-bfa8-821cfe5dbb5b",
+            "operation_id": "046a932e-9f4f-4dfa-86d0-d618100f72a1"
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "5e00092f-79aa-4769-91a6-17891653fb5f",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "6709db15-4e70-4f17-bfa8-821cfe5dbb5b",
+            "operation_id": "046a932e-9f4f-4dfa-86d0-d618100f72a1"
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "443bcbfa-2e7b-4dd4-a347-0b3da5c9f350",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "6709db15-4e70-4f17-bfa8-821cfe5dbb5b",
+              "simulation": true,
+              "observed_at": 1791314072,
+              "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+              "effect_count": 1,
+              "operation_id": "046a932e-9f4f-4dfa-86d0-d618100f72a1"
+            },
+            "operation_id": "046a932e-9f4f-4dfa-86d0-d618100f72a1"
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "bdca064e-4964-40b0-9e86-7e1fbd70e51f",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "preflight",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "bb9533a3-15a4-4b00-b345-b30bb5eb0e1a",
+            "operation_id": "18474276-b01f-4aca-b9e2-92fba1b33caf"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "f6eb29a6-fa7e-4b69-acb7-325be840480d",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "bb9533a3-15a4-4b00-b345-b30bb5eb0e1a",
+            "operation_id": "18474276-b01f-4aca-b9e2-92fba1b33caf"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "991e26b1-aa69-4200-85d8-d88f7d23befa",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "bb9533a3-15a4-4b00-b345-b30bb5eb0e1a",
+              "simulation": true,
+              "observed_at": 1791314073,
+              "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+              "effect_count": 1,
+              "operation_id": "18474276-b01f-4aca-b9e2-92fba1b33caf"
+            },
+            "operation_id": "18474276-b01f-4aca-b9e2-92fba1b33caf"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "09d44594-33d5-4f7c-a424-4b033f3a4283",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "apply_reviewed_saved_plan",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "f8919ce0-7456-4e24-8228-1ab09434aeed",
+            "operation_id": "fd23002e-0031-451f-8aae-cf45ce4ce32e"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "0afb4d1a-0292-4904-b882-7e7d917e699c",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "f8919ce0-7456-4e24-8228-1ab09434aeed",
+            "operation_id": "fd23002e-0031-451f-8aae-cf45ce4ce32e"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "fffbf3a9-16f5-4fd8-a357-5e11a2667a37",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "f8919ce0-7456-4e24-8228-1ab09434aeed",
+              "simulation": true,
+              "observed_at": 1791314074,
+              "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+              "effect_count": 1,
+              "operation_id": "fd23002e-0031-451f-8aae-cf45ce4ce32e"
+            },
+            "operation_id": "fd23002e-0031-451f-8aae-cf45ce4ce32e"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "4810fe0d-3609-4789-902c-7b97bf064dfa",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "configure_and_restore",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "5227b082-8636-4278-9543-c74fdedabfca",
+            "operation_id": "9eea554e-beac-407b-96ce-8f78f8490556"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "7f5c3abd-775b-4eb4-b8dc-58b83b877221",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "5227b082-8636-4278-9543-c74fdedabfca",
+            "operation_id": "9eea554e-beac-407b-96ce-8f78f8490556"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "5ff20510-4393-41f8-90c9-b493587e8b6c",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "5227b082-8636-4278-9543-c74fdedabfca",
+              "simulation": true,
+              "observed_at": 1791314074,
+              "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+              "effect_count": 1,
+              "operation_id": "9eea554e-beac-407b-96ce-8f78f8490556"
+            },
+            "operation_id": "9eea554e-beac-407b-96ce-8f78f8490556"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "a54fb29c-cb24-4875-ab71-db21c6c9c3d6",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "verify_application",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "cf162b9f-0c14-4323-a928-0077f3e789a6",
+            "operation_id": "fdd63a94-7557-4a7e-820f-fe7a8933dc3f"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "b81888af-74bc-46c6-930f-1b97057de6fb",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "cf162b9f-0c14-4323-a928-0077f3e789a6",
+            "operation_id": "fdd63a94-7557-4a7e-820f-fe7a8933dc3f"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "c74d8c02-8a52-4a76-95c1-3a3cd16df56a",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "cf162b9f-0c14-4323-a928-0077f3e789a6",
+              "simulation": true,
+              "observed_at": 1791314075,
+              "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+              "effect_count": 1,
+              "operation_id": "fdd63a94-7557-4a7e-820f-fe7a8933dc3f"
+            },
+            "operation_id": "fdd63a94-7557-4a7e-820f-fe7a8933dc3f"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "2a254852-f12a-43bd-8e25-d5c0ff7cdc05",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "activate_target",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "a4316038-6398-4ed3-aafd-a8d6130e32bf",
+            "operation_id": "3cb01519-ffa1-4903-a79c-16d42e0297d8"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "0bb582a9-800a-4d16-89f0-6171d146f9b6",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "a4316038-6398-4ed3-aafd-a8d6130e32bf",
+            "operation_id": "3cb01519-ffa1-4903-a79c-16d42e0297d8"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "0a3fb459-3142-4900-a90d-56edc11dd388",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "a4316038-6398-4ed3-aafd-a8d6130e32bf",
+              "simulation": true,
+              "observed_at": 1791314076,
+              "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+              "effect_count": 1,
+              "operation_id": "3cb01519-ffa1-4903-a79c-16d42e0297d8"
+            },
+            "operation_id": "3cb01519-ffa1-4903-a79c-16d42e0297d8"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "0d00b1ea-3f78-4619-b066-16fd3519396f",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "confirm_owner_allocations",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "e3f42a9f-4bf6-4fc2-8709-3f6a3a498ced",
+            "operation_id": "ff213232-226e-471b-8a90-fbddcb8ed52e"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "290c2ace-6ed8-4c75-8092-678e3860eaa2",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "e3f42a9f-4bf6-4fc2-8709-3f6a3a498ced",
+            "operation_id": "ff213232-226e-471b-8a90-fbddcb8ed52e"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "0677c1b9-0b82-4f0c-b0bc-7c41d84dee29",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "120b1e09-97a1-4839-abf7-056bfc1fb8e4",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "e3f42a9f-4bf6-4fc2-8709-3f6a3a498ced",
+              "simulation": true,
+              "observed_at": 1791314076,
+              "plan_digest": "7118b73491daad4e8d3f15174a20f3cd6b2e4d4ff7c58e55f8069e36de635837",
+              "effect_count": 1,
+              "operation_id": "ff213232-226e-471b-8a90-fbddcb8ed52e"
+            },
+            "operation_id": "ff213232-226e-471b-8a90-fbddcb8ed52e"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "35b2eb53-b285-44e9-ba63-87292bb6b06b",
+          "kind": "held",
+          "facts": {
+            "reason": "evidence_pending"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "227d1b5a-f6aa-4467-a005-cedc234bb332",
+          "kind": "completed",
+          "facts": {
+            "reason": null
+          },
+          "occurred_at": 1791314092
+        }
+      ],
+      "resources_retained": true
+    },
+    {
+      "id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+      "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+      "actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71",
+      "requested_by": "7c9d73ce-63fe-4d1a-8bc2-670db879d9ff",
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "scope": {
+        "site_id": "45be2ff0-3e7f-4a79-af80-1fd70973631e",
+        "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+        "endpoint_id": "76fdd66d-2a00-4c36-b449-3d0cf20fa249",
+        "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+        "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+        "native_scope": "project:synthetic"
+      },
+      "plan_id": "688cc71c-2c16-4579-974a-a2158d74ad5e",
+      "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+      "approval_id": "51a282b2-a377-458d-af1f-6d6de7a1f2f0",
+      "workflow_id": "p06/0c77c7cd-305c-44a6-9863-4938a36b9591/f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+      "workflow_run_id": "01a112a3-8e17-7593-97fe-eabefc885f9e",
+      "state": "cancelled",
+      "reason": "effects_and_allocations_retained",
+      "revision": 23,
+      "observed_at": 1791314099,
+      "updated_at": 1791314072,
+      "simulation": true,
+      "evidence_level": "E2",
+      "native_write_authorized": false,
+      "cancel_requested": true,
+      "pause_requested": false,
+      "stop_requested": true,
+      "evidence": null,
+      "recovery_mode": "forward_recovery_required",
+      "operations": [
+        {
+          "id": "e330566e-3fb9-4869-9b41-419d5a0126fe",
+          "step": "reserve",
+          "ordinal": 0,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "fc0f92ee-07d3-44a4-aba6-a205753f42e4",
+            "simulation": true,
+            "observed_at": 1791314044,
+            "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+            "effect_count": 1,
+            "operation_id": "e330566e-3fb9-4869-9b41-419d5a0126fe"
+          }
+        },
+        {
+          "id": "dee0fae1-223e-4c37-a3e2-3adf8961fa85",
+          "step": "preflight",
+          "ordinal": 1,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "ab99a2dd-4764-477e-a53c-5a371cb9c6a7",
+            "simulation": true,
+            "observed_at": 1791314045,
+            "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+            "effect_count": 1,
+            "operation_id": "dee0fae1-223e-4c37-a3e2-3adf8961fa85"
+          }
+        },
+        {
+          "id": "398524d6-14a9-47fd-8e89-c768c5e8adc6",
+          "step": "fence_source_writers",
+          "ordinal": 2,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "f87ef386-9d24-439b-90f1-596e96a8f836",
+            "simulation": true,
+            "observed_at": 1791314046,
+            "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+            "effect_count": 1,
+            "operation_id": "398524d6-14a9-47fd-8e89-c768c5e8adc6"
+          }
+        },
+        {
+          "id": "aba0e584-cf89-434e-82c7-793eb2ffc5ab",
+          "step": "final_data_checkpoint",
+          "ordinal": 3,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "8cac7dc9-2937-46d3-8187-7172bb481deb",
+            "simulation": true,
+            "observed_at": 1791314047,
+            "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+            "effect_count": 1,
+            "operation_id": "aba0e584-cf89-434e-82c7-793eb2ffc5ab"
+          }
+        },
+        {
+          "id": "9011d92d-ccaf-49f5-82c8-ec4d334d2300",
+          "step": "apply_reviewed_saved_plan",
+          "ordinal": 4,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "42956cff-2f4f-4bc0-8ba2-626592a8dcc7",
+            "simulation": true,
+            "observed_at": 1791314048,
+            "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+            "effect_count": 1,
+            "operation_id": "9011d92d-ccaf-49f5-82c8-ec4d334d2300"
+          }
+        },
+        {
+          "id": "0f541909-dda9-4aff-8e53-ebf64b0e5c55",
+          "step": "configure_and_restore",
+          "ordinal": 5,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "3fb0bc66-2c2a-44ab-85dc-b17737bc1516",
+            "simulation": true,
+            "observed_at": 1791314049,
+            "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+            "effect_count": 1,
+            "operation_id": "0f541909-dda9-4aff-8e53-ebf64b0e5c55"
+          }
+        },
+        {
+          "id": "139e59ec-4294-4a8d-a645-c7a45df9a92f",
+          "step": "verify_application",
+          "ordinal": 6,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "957f34c8-b1f2-412f-81e2-5a7ea7dd2125",
+            "simulation": true,
+            "observed_at": 1791314050,
+            "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+            "effect_count": 1,
+            "operation_id": "139e59ec-4294-4a8d-a645-c7a45df9a92f"
+          }
+        },
+        {
+          "id": "86678a9d-d480-4eab-8105-e59031b9bd0d",
+          "step": "activate_target",
+          "ordinal": 7,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "bdb39e0c-a8d7-45e3-8b35-d3b8a6e05552",
+            "simulation": true,
+            "observed_at": 1791314069,
+            "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+            "effect_count": 1,
+            "operation_id": "86678a9d-d480-4eab-8105-e59031b9bd0d"
+          }
+        },
+        {
+          "id": "7308d509-a39b-41ce-ad9a-30519b65fd47",
+          "step": "confirm_owner_allocations",
+          "ordinal": 8,
+          "outcome": "not_started",
+          "revision": 1,
+          "observation": null
+        }
+      ],
+      "events": [
+        {
+          "id": "6a9bbd96-11f4-489a-bc51-6c01ccf76ee6",
+          "kind": "admitted",
+          "facts": {
+            "simulation": true,
+            "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+            "workflow_id": "p06/0c77c7cd-305c-44a6-9863-4938a36b9591/f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "reservation_bindings": [
+              {
+                "kind": "addresses",
+                "owner": "synthetic-addresses",
+                "scope": {
+                  "site_id": "45be2ff0-3e7f-4a79-af80-1fd70973631e",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "76fdd66d-2a00-4c36-b449-3d0cf20fa249",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 2,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314938,
+                "receipt_id": "a76380c6-6c52-4d8d-956f-e61936932ff1",
+                "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "memory_mib",
+                "owner": "synthetic-memory_mib",
+                "scope": {
+                  "site_id": "45be2ff0-3e7f-4a79-af80-1fd70973631e",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "76fdd66d-2a00-4c36-b449-3d0cf20fa249",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 8192,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314938,
+                "receipt_id": "96323e17-7e96-43fd-a157-956a388a4472",
+                "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "storage_gib",
+                "owner": "synthetic-storage_gib",
+                "scope": {
+                  "site_id": "45be2ff0-3e7f-4a79-af80-1fd70973631e",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "76fdd66d-2a00-4c36-b449-3d0cf20fa249",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 80,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314938,
+                "receipt_id": "c8d83a7d-09bf-4634-91fd-802fcc7deb00",
+                "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "vcpus",
+                "owner": "synthetic-vcpus",
+                "scope": {
+                  "site_id": "45be2ff0-3e7f-4a79-af80-1fd70973631e",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "76fdd66d-2a00-4c36-b449-3d0cf20fa249",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 4,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314938,
+                "receipt_id": "76ff545d-1dfe-4b3b-b79a-33db81295ec2",
+                "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+                "ttl_seconds": 300
+              }
+            ]
+          },
+          "occurred_at": 1791314038
+        },
+        {
+          "id": "e97a770e-9e9b-49bb-80ff-ba92545145a1",
+          "kind": "running",
+          "facts": {
+            "reason": null
+          },
+          "occurred_at": 1791314044
+        },
+        {
+          "id": "43ac4e56-4a8b-4b52-ae32-9fc30c6791af",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "reserve",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "fc0f92ee-07d3-44a4-aba6-a205753f42e4",
+            "operation_id": "e330566e-3fb9-4869-9b41-419d5a0126fe"
+          },
+          "occurred_at": 1791314044
+        },
+        {
+          "id": "5f99d5c9-8d67-4fbe-9809-2748c39cebd5",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "fc0f92ee-07d3-44a4-aba6-a205753f42e4",
+            "operation_id": "e330566e-3fb9-4869-9b41-419d5a0126fe"
+          },
+          "occurred_at": 1791314044
+        },
+        {
+          "id": "cf660a22-353e-4ac3-986e-a07bfae32304",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "fc0f92ee-07d3-44a4-aba6-a205753f42e4",
+              "simulation": true,
+              "observed_at": 1791314044,
+              "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+              "effect_count": 1,
+              "operation_id": "e330566e-3fb9-4869-9b41-419d5a0126fe"
+            },
+            "operation_id": "e330566e-3fb9-4869-9b41-419d5a0126fe"
+          },
+          "occurred_at": 1791314044
+        },
+        {
+          "id": "76ba84c4-e8fe-4e9a-bd26-974ab18d37ff",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "preflight",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "ab99a2dd-4764-477e-a53c-5a371cb9c6a7",
+            "operation_id": "dee0fae1-223e-4c37-a3e2-3adf8961fa85"
+          },
+          "occurred_at": 1791314045
+        },
+        {
+          "id": "ff91d6aa-b40b-4868-b0fd-3cb15baedf03",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "ab99a2dd-4764-477e-a53c-5a371cb9c6a7",
+            "operation_id": "dee0fae1-223e-4c37-a3e2-3adf8961fa85"
+          },
+          "occurred_at": 1791314045
+        },
+        {
+          "id": "9a6ec948-0a48-485c-b4d9-e914b55ef19e",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "ab99a2dd-4764-477e-a53c-5a371cb9c6a7",
+              "simulation": true,
+              "observed_at": 1791314045,
+              "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+              "effect_count": 1,
+              "operation_id": "dee0fae1-223e-4c37-a3e2-3adf8961fa85"
+            },
+            "operation_id": "dee0fae1-223e-4c37-a3e2-3adf8961fa85"
+          },
+          "occurred_at": 1791314045
+        },
+        {
+          "id": "32545239-271b-47ef-86d2-e2d59a9758e1",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "fence_source_writers",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "f87ef386-9d24-439b-90f1-596e96a8f836",
+            "operation_id": "398524d6-14a9-47fd-8e89-c768c5e8adc6"
+          },
+          "occurred_at": 1791314046
+        },
+        {
+          "id": "e04e1900-7ce6-455f-89d7-3c12331dab90",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "f87ef386-9d24-439b-90f1-596e96a8f836",
+            "operation_id": "398524d6-14a9-47fd-8e89-c768c5e8adc6"
+          },
+          "occurred_at": 1791314046
+        },
+        {
+          "id": "eedd444d-43fe-47e3-831e-b8a8557595ec",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "f87ef386-9d24-439b-90f1-596e96a8f836",
+              "simulation": true,
+              "observed_at": 1791314046,
+              "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+              "effect_count": 1,
+              "operation_id": "398524d6-14a9-47fd-8e89-c768c5e8adc6"
+            },
+            "operation_id": "398524d6-14a9-47fd-8e89-c768c5e8adc6"
+          },
+          "occurred_at": 1791314046
+        },
+        {
+          "id": "5534ec23-e091-472a-94d8-c06346367472",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "final_data_checkpoint",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "8cac7dc9-2937-46d3-8187-7172bb481deb",
+            "operation_id": "aba0e584-cf89-434e-82c7-793eb2ffc5ab"
+          },
+          "occurred_at": 1791314047
+        },
+        {
+          "id": "e541f651-a3db-40e1-91c3-873dd9fc4db3",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "8cac7dc9-2937-46d3-8187-7172bb481deb",
+            "operation_id": "aba0e584-cf89-434e-82c7-793eb2ffc5ab"
+          },
+          "occurred_at": 1791314047
+        },
+        {
+          "id": "6e613eab-ff68-49b5-9fd6-3586a2e011f2",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "8cac7dc9-2937-46d3-8187-7172bb481deb",
+              "simulation": true,
+              "observed_at": 1791314047,
+              "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+              "effect_count": 1,
+              "operation_id": "aba0e584-cf89-434e-82c7-793eb2ffc5ab"
+            },
+            "operation_id": "aba0e584-cf89-434e-82c7-793eb2ffc5ab"
+          },
+          "occurred_at": 1791314047
+        },
+        {
+          "id": "eb05e049-79c3-4591-a1a6-edd023130fdf",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "apply_reviewed_saved_plan",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "42956cff-2f4f-4bc0-8ba2-626592a8dcc7",
+            "operation_id": "9011d92d-ccaf-49f5-82c8-ec4d334d2300"
+          },
+          "occurred_at": 1791314048
+        },
+        {
+          "id": "5996608b-a1af-43ef-8975-f3528a53e8b1",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "42956cff-2f4f-4bc0-8ba2-626592a8dcc7",
+            "operation_id": "9011d92d-ccaf-49f5-82c8-ec4d334d2300"
+          },
+          "occurred_at": 1791314048
+        },
+        {
+          "id": "b089ecff-b0b2-4668-9b49-f70f7c964136",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "42956cff-2f4f-4bc0-8ba2-626592a8dcc7",
+              "simulation": true,
+              "observed_at": 1791314048,
+              "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+              "effect_count": 1,
+              "operation_id": "9011d92d-ccaf-49f5-82c8-ec4d334d2300"
+            },
+            "operation_id": "9011d92d-ccaf-49f5-82c8-ec4d334d2300"
+          },
+          "occurred_at": 1791314048
+        },
+        {
+          "id": "ffda799d-fbb2-4a12-b62c-280f63d29916",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "configure_and_restore",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "3fb0bc66-2c2a-44ab-85dc-b17737bc1516",
+            "operation_id": "0f541909-dda9-4aff-8e53-ebf64b0e5c55"
+          },
+          "occurred_at": 1791314049
+        },
+        {
+          "id": "cca128c8-c119-4e45-9b01-51ed557294e7",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "3fb0bc66-2c2a-44ab-85dc-b17737bc1516",
+            "operation_id": "0f541909-dda9-4aff-8e53-ebf64b0e5c55"
+          },
+          "occurred_at": 1791314049
+        },
+        {
+          "id": "866def7b-e5b0-436b-8a1d-17e683f65112",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "3fb0bc66-2c2a-44ab-85dc-b17737bc1516",
+              "simulation": true,
+              "observed_at": 1791314049,
+              "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+              "effect_count": 1,
+              "operation_id": "0f541909-dda9-4aff-8e53-ebf64b0e5c55"
+            },
+            "operation_id": "0f541909-dda9-4aff-8e53-ebf64b0e5c55"
+          },
+          "occurred_at": 1791314049
+        },
+        {
+          "id": "e601781a-aea3-42af-bb67-df3204a5a9a7",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "verify_application",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "957f34c8-b1f2-412f-81e2-5a7ea7dd2125",
+            "operation_id": "139e59ec-4294-4a8d-a645-c7a45df9a92f"
+          },
+          "occurred_at": 1791314050
+        },
+        {
+          "id": "f06d15f5-b1bf-4f3e-a82c-720c71012cf9",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "957f34c8-b1f2-412f-81e2-5a7ea7dd2125",
+            "operation_id": "139e59ec-4294-4a8d-a645-c7a45df9a92f"
+          },
+          "occurred_at": 1791314050
+        },
+        {
+          "id": "2e93e61f-2f94-4086-baba-0d14763a9aa6",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "957f34c8-b1f2-412f-81e2-5a7ea7dd2125",
+              "simulation": true,
+              "observed_at": 1791314050,
+              "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+              "effect_count": 1,
+              "operation_id": "139e59ec-4294-4a8d-a645-c7a45df9a92f"
+            },
+            "operation_id": "139e59ec-4294-4a8d-a645-c7a45df9a92f"
+          },
+          "occurred_at": 1791314050
+        },
+        {
+          "id": "4579ab34-5b31-49a3-8ffc-7ee64ff6268e",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "activate_target",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "bdb39e0c-a8d7-45e3-8b35-d3b8a6e05552",
+            "operation_id": "86678a9d-d480-4eab-8105-e59031b9bd0d"
+          },
+          "occurred_at": 1791314050
+        },
+        {
+          "id": "171564d6-1fd9-4cec-ab36-23819715585c",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "bdb39e0c-a8d7-45e3-8b35-d3b8a6e05552",
+            "operation_id": "86678a9d-d480-4eab-8105-e59031b9bd0d"
+          },
+          "occurred_at": 1791314051
+        },
+        {
+          "id": "1c113134-3e8c-45f2-8069-a98efca8df69",
+          "kind": "operator_request",
+          "facts": {
+            "action": "stop",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "accepted": true,
+            "actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71",
+            "command_id": "f0979a29-54f4-4645-914f-c4a28f77b4df",
+            "effect_undone": false
+          },
+          "occurred_at": 1791314059
+        },
+        {
+          "id": "2cd51edd-4d6c-4b34-821b-d8e1765eedca",
+          "kind": "held",
+          "facts": {
+            "reason": "operator_stop"
+          },
+          "occurred_at": 1791314059
+        },
+        {
+          "id": "5b5116eb-a624-4705-8ece-a7b92c1f9b9d",
+          "kind": "operator_request",
+          "facts": {
+            "action": "cancel",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "accepted": true,
+            "actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71",
+            "command_id": "1e88d5ce-c97f-4e68-9e51-f681eac91e05",
+            "effect_undone": false
+          },
+          "occurred_at": 1791314061
+        },
+        {
+          "id": "49cb9dee-5459-47fe-9e02-f47a01112284",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "bdb39e0c-a8d7-45e3-8b35-d3b8a6e05552",
+              "simulation": true,
+              "observed_at": 1791314069,
+              "plan_digest": "27535801742cea22d8e01923b8386e07d150346b3b65e071b35b7300903e9dc7",
+              "effect_count": 1,
+              "operation_id": "86678a9d-d480-4eab-8105-e59031b9bd0d"
+            },
+            "operation_id": "86678a9d-d480-4eab-8105-e59031b9bd0d"
+          },
+          "occurred_at": 1791314069
+        },
+        {
+          "id": "43e16042-7ded-4a43-ad9d-fd5831e31385",
+          "kind": "operator_request",
+          "facts": {
+            "action": "cancel",
+            "job_id": "f9d9b7b7-2fe7-459c-8c72-587b1c5d90fb",
+            "accepted": true,
+            "actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71",
+            "command_id": "4e560923-e916-4614-8a7b-ce2c3f41ddb1",
+            "effect_undone": false
+          },
+          "occurred_at": 1791314069
+        },
+        {
+          "id": "fe46c098-acf1-4100-a54e-15a32a9ce1db",
+          "kind": "cancelled",
+          "facts": {
+            "reason": "effects_and_allocations_retained"
+          },
+          "occurred_at": 1791314072
+        }
+      ],
+      "resources_retained": true
+    },
+    {
+      "id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+      "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+      "actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71",
+      "requested_by": "7c9d73ce-63fe-4d1a-8bc2-670db879d9ff",
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "scope": {
+        "site_id": "c8893d63-4546-49da-a556-b28b71b2a2ef",
+        "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+        "endpoint_id": "68dbb648-6aef-41d1-a176-655c59713479",
+        "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+        "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+        "native_scope": "project:synthetic"
+      },
+      "plan_id": "aed1c598-0af9-4c78-8ce5-b4b987f0bd47",
+      "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+      "approval_id": "ca976885-f8c8-4087-a789-cb93f3821101",
+      "workflow_id": "p06/0c77c7cd-305c-44a6-9863-4938a36b9591/ec8bfa78-f859-4acc-8777-c8b428d254c5",
+      "workflow_run_id": "01a112a3-8e3c-7c8a-8fb2-9a0090d0fd28",
+      "state": "completed",
+      "reason": null,
+      "revision": 22,
+      "observed_at": 1791314099,
+      "updated_at": 1791314092,
+      "simulation": true,
+      "evidence_level": "E2",
+      "native_write_authorized": false,
+      "cancel_requested": false,
+      "pause_requested": false,
+      "stop_requested": false,
+      "evidence": {
+        "id": "32d5e936-bd20-410c-8dab-ae3ae303ce88",
+        "scope": {
+          "site_id": "c8893d63-4546-49da-a556-b28b71b2a2ef",
+          "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+          "endpoint_id": "68dbb648-6aef-41d1-a176-655c59713479",
+          "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+          "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+          "native_scope": "project:synthetic"
+        },
+        "state": "finalized",
+        "digest": "737ddb10506e2428bbd05efa24ec678be42b3a282d5c37ecca76dc4b04320e06",
+        "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+        "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+        "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+        "finalized_at": 1791314092,
+        "requested_by": "7c9d73ce-63fe-4d1a-8bc2-670db879d9ff",
+        "evidence_level": "E2",
+        "native_support": false,
+        "retention_until": 1822850092,
+        "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+        "producer_actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71"
+      },
+      "recovery_mode": "forward_recovery_required",
+      "operations": [
+        {
+          "id": "2d324e01-7f1d-49bd-ba6e-592b39118f53",
+          "step": "reserve",
+          "ordinal": 0,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "2728a608-3cfc-412f-bb77-bfb53c442309",
+            "simulation": true,
+            "observed_at": 1791314072,
+            "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+            "effect_count": 1,
+            "operation_id": "2d324e01-7f1d-49bd-ba6e-592b39118f53"
+          }
+        },
+        {
+          "id": "485a1426-6bea-4c19-9223-b5ba6f78bc20",
+          "step": "preflight",
+          "ordinal": 1,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "24ce0113-c395-44f4-b189-c56beb3c24ee",
+            "simulation": true,
+            "observed_at": 1791314073,
+            "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+            "effect_count": 1,
+            "operation_id": "485a1426-6bea-4c19-9223-b5ba6f78bc20"
+          }
+        },
+        {
+          "id": "560682a4-fb0e-41ee-939c-6afc68132212",
+          "step": "fence_source_writers",
+          "ordinal": 2,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "9ebdabbc-9565-4e30-af53-4a398801c9b7",
+            "simulation": true,
+            "observed_at": 1791314074,
+            "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+            "effect_count": 1,
+            "operation_id": "560682a4-fb0e-41ee-939c-6afc68132212"
+          }
+        },
+        {
+          "id": "491b0d4a-d9f4-48ef-abb1-e152bc07e1a3",
+          "step": "final_data_checkpoint",
+          "ordinal": 3,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "6b73f516-c6cb-41e8-8056-616e411e6f78",
+            "simulation": true,
+            "observed_at": 1791314074,
+            "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+            "effect_count": 1,
+            "operation_id": "491b0d4a-d9f4-48ef-abb1-e152bc07e1a3"
+          }
+        },
+        {
+          "id": "2ca8643d-2686-4b05-ae9c-e95b010a7a4f",
+          "step": "apply_reviewed_saved_plan",
+          "ordinal": 4,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "7e58f9bf-2cf1-4d2d-a5b7-b33cf8eee947",
+            "simulation": true,
+            "observed_at": 1791314075,
+            "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+            "effect_count": 1,
+            "operation_id": "2ca8643d-2686-4b05-ae9c-e95b010a7a4f"
+          }
+        },
+        {
+          "id": "f637b4e9-9c92-4fb1-91ec-2cd5394fb049",
+          "step": "configure_and_restore",
+          "ordinal": 5,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "6a9198ce-2547-498b-a4dd-d25a22a4f672",
+            "simulation": true,
+            "observed_at": 1791314076,
+            "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+            "effect_count": 1,
+            "operation_id": "f637b4e9-9c92-4fb1-91ec-2cd5394fb049"
+          }
+        },
+        {
+          "id": "51130985-29d3-45de-9171-28adf91c75f0",
+          "step": "verify_application",
+          "ordinal": 6,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "a8cbab0f-9abf-4ff8-b170-71369e7002e2",
+            "simulation": true,
+            "observed_at": 1791314076,
+            "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+            "effect_count": 1,
+            "operation_id": "51130985-29d3-45de-9171-28adf91c75f0"
+          }
+        },
+        {
+          "id": "247144fb-1748-41a2-8dc3-9dc67acc48ef",
+          "step": "activate_target",
+          "ordinal": 7,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "7be3d096-f239-4534-a976-7a4a9b0fa998",
+            "simulation": true,
+            "observed_at": 1791314077,
+            "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+            "effect_count": 1,
+            "operation_id": "247144fb-1748-41a2-8dc3-9dc67acc48ef"
+          }
+        },
+        {
+          "id": "31aab19e-0ddb-4612-b969-f4e5b93a7d49",
+          "step": "confirm_owner_allocations",
+          "ordinal": 8,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "779ec460-7a1a-4ac9-b3c8-18e5e0f5cc06",
+            "simulation": true,
+            "observed_at": 1791314077,
+            "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+            "effect_count": 1,
+            "operation_id": "31aab19e-0ddb-4612-b969-f4e5b93a7d49"
+          }
+        }
+      ],
+      "events": [
+        {
+          "id": "cf636203-2ca0-477b-a3ae-c25e6a862e4d",
+          "kind": "admitted",
+          "facts": {
+            "simulation": true,
+            "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+            "workflow_id": "p06/0c77c7cd-305c-44a6-9863-4938a36b9591/ec8bfa78-f859-4acc-8777-c8b428d254c5",
+            "reservation_bindings": [
+              {
+                "kind": "addresses",
+                "owner": "synthetic-addresses",
+                "scope": {
+                  "site_id": "c8893d63-4546-49da-a556-b28b71b2a2ef",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "68dbb648-6aef-41d1-a176-655c59713479",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 2,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314939,
+                "receipt_id": "31eea2c1-6dba-492c-a422-210f6f732031",
+                "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "memory_mib",
+                "owner": "synthetic-memory_mib",
+                "scope": {
+                  "site_id": "c8893d63-4546-49da-a556-b28b71b2a2ef",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "68dbb648-6aef-41d1-a176-655c59713479",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 8192,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314939,
+                "receipt_id": "2a0bb568-e2d9-44c5-8063-e6abf1604ed8",
+                "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "storage_gib",
+                "owner": "synthetic-storage_gib",
+                "scope": {
+                  "site_id": "c8893d63-4546-49da-a556-b28b71b2a2ef",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "68dbb648-6aef-41d1-a176-655c59713479",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 80,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314939,
+                "receipt_id": "0275f301-a4cf-435f-97d9-e3eedbcb1e5c",
+                "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "vcpus",
+                "owner": "synthetic-vcpus",
+                "scope": {
+                  "site_id": "c8893d63-4546-49da-a556-b28b71b2a2ef",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "68dbb648-6aef-41d1-a176-655c59713479",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 4,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314939,
+                "receipt_id": "36f12986-e144-4e45-9f69-17b751eec25c",
+                "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+                "ttl_seconds": 300
+              }
+            ]
+          },
+          "occurred_at": 1791314040
+        },
+        {
+          "id": "89efce92-0ce8-4846-8eb3-552fcbf0f68a",
+          "kind": "running",
+          "facts": {
+            "reason": null
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "9c72a27e-ed50-44ed-87d2-8d160e093243",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "reserve",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "2728a608-3cfc-412f-bb77-bfb53c442309",
+            "operation_id": "2d324e01-7f1d-49bd-ba6e-592b39118f53"
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "0f4ab9b7-4724-47aa-8034-c698510d56e6",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "2728a608-3cfc-412f-bb77-bfb53c442309",
+            "operation_id": "2d324e01-7f1d-49bd-ba6e-592b39118f53"
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "b13e9913-c005-44df-a26e-69e10f1c24a5",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "2728a608-3cfc-412f-bb77-bfb53c442309",
+              "simulation": true,
+              "observed_at": 1791314072,
+              "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+              "effect_count": 1,
+              "operation_id": "2d324e01-7f1d-49bd-ba6e-592b39118f53"
+            },
+            "operation_id": "2d324e01-7f1d-49bd-ba6e-592b39118f53"
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "86440bb6-586d-487e-b832-0969f716ded9",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "preflight",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "24ce0113-c395-44f4-b189-c56beb3c24ee",
+            "operation_id": "485a1426-6bea-4c19-9223-b5ba6f78bc20"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "aeaf9a1f-aa55-4d04-a2de-df145b01ca05",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "24ce0113-c395-44f4-b189-c56beb3c24ee",
+            "operation_id": "485a1426-6bea-4c19-9223-b5ba6f78bc20"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "b0bd1ce3-0df7-42cc-938d-1a08b7d595b0",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "24ce0113-c395-44f4-b189-c56beb3c24ee",
+              "simulation": true,
+              "observed_at": 1791314073,
+              "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+              "effect_count": 1,
+              "operation_id": "485a1426-6bea-4c19-9223-b5ba6f78bc20"
+            },
+            "operation_id": "485a1426-6bea-4c19-9223-b5ba6f78bc20"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "626024f2-bbd9-4ba4-8c94-c4922465d887",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "fence_source_writers",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "9ebdabbc-9565-4e30-af53-4a398801c9b7",
+            "operation_id": "560682a4-fb0e-41ee-939c-6afc68132212"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "84211c8a-b4b1-4b5f-919c-6f51567edb6a",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "9ebdabbc-9565-4e30-af53-4a398801c9b7",
+            "operation_id": "560682a4-fb0e-41ee-939c-6afc68132212"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "091bccf4-e66c-439f-8faf-8c43a1bb7cac",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "9ebdabbc-9565-4e30-af53-4a398801c9b7",
+              "simulation": true,
+              "observed_at": 1791314074,
+              "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+              "effect_count": 1,
+              "operation_id": "560682a4-fb0e-41ee-939c-6afc68132212"
+            },
+            "operation_id": "560682a4-fb0e-41ee-939c-6afc68132212"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "d7c61c25-d345-44d2-9a57-4e6e5dec7e8f",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "final_data_checkpoint",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "6b73f516-c6cb-41e8-8056-616e411e6f78",
+            "operation_id": "491b0d4a-d9f4-48ef-abb1-e152bc07e1a3"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "e15f1f28-7c59-4088-90c9-fe5726134607",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "6b73f516-c6cb-41e8-8056-616e411e6f78",
+            "operation_id": "491b0d4a-d9f4-48ef-abb1-e152bc07e1a3"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "6ef9d23f-340c-4471-9245-7e5e0a131e14",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "6b73f516-c6cb-41e8-8056-616e411e6f78",
+              "simulation": true,
+              "observed_at": 1791314074,
+              "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+              "effect_count": 1,
+              "operation_id": "491b0d4a-d9f4-48ef-abb1-e152bc07e1a3"
+            },
+            "operation_id": "491b0d4a-d9f4-48ef-abb1-e152bc07e1a3"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "8bf47154-15dd-4527-ad9b-482208ee8ac3",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "apply_reviewed_saved_plan",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "7e58f9bf-2cf1-4d2d-a5b7-b33cf8eee947",
+            "operation_id": "2ca8643d-2686-4b05-ae9c-e95b010a7a4f"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "d62f52a8-2802-4bbd-bea7-d3af525e3fb9",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "7e58f9bf-2cf1-4d2d-a5b7-b33cf8eee947",
+            "operation_id": "2ca8643d-2686-4b05-ae9c-e95b010a7a4f"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "d0682028-c5ab-46df-9895-46be1570dc5c",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "7e58f9bf-2cf1-4d2d-a5b7-b33cf8eee947",
+              "simulation": true,
+              "observed_at": 1791314075,
+              "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+              "effect_count": 1,
+              "operation_id": "2ca8643d-2686-4b05-ae9c-e95b010a7a4f"
+            },
+            "operation_id": "2ca8643d-2686-4b05-ae9c-e95b010a7a4f"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "0fdfc926-30b2-4eec-8a36-fcc7ced4c1c2",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "configure_and_restore",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "6a9198ce-2547-498b-a4dd-d25a22a4f672",
+            "operation_id": "f637b4e9-9c92-4fb1-91ec-2cd5394fb049"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "95776df1-e126-410a-b13c-04bd440d4619",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "6a9198ce-2547-498b-a4dd-d25a22a4f672",
+            "operation_id": "f637b4e9-9c92-4fb1-91ec-2cd5394fb049"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "d6754e92-64ff-4048-8f92-644ae0268a41",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "6a9198ce-2547-498b-a4dd-d25a22a4f672",
+              "simulation": true,
+              "observed_at": 1791314076,
+              "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+              "effect_count": 1,
+              "operation_id": "f637b4e9-9c92-4fb1-91ec-2cd5394fb049"
+            },
+            "operation_id": "f637b4e9-9c92-4fb1-91ec-2cd5394fb049"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "7a1377bd-8c3e-4f38-b533-77ca8db8547b",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "verify_application",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "a8cbab0f-9abf-4ff8-b170-71369e7002e2",
+            "operation_id": "51130985-29d3-45de-9171-28adf91c75f0"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "74d77544-99a9-489e-8ba3-09ae8291a3a8",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "a8cbab0f-9abf-4ff8-b170-71369e7002e2",
+            "operation_id": "51130985-29d3-45de-9171-28adf91c75f0"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "b874759a-0414-419e-8901-c2093a706f1b",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "a8cbab0f-9abf-4ff8-b170-71369e7002e2",
+              "simulation": true,
+              "observed_at": 1791314076,
+              "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+              "effect_count": 1,
+              "operation_id": "51130985-29d3-45de-9171-28adf91c75f0"
+            },
+            "operation_id": "51130985-29d3-45de-9171-28adf91c75f0"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "e4d748c9-5f41-424f-aa20-a9ae33e2cd35",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "activate_target",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "7be3d096-f239-4534-a976-7a4a9b0fa998",
+            "operation_id": "247144fb-1748-41a2-8dc3-9dc67acc48ef"
+          },
+          "occurred_at": 1791314076
+        },
+        {
+          "id": "555914e2-6a05-4ed1-b854-43814dc601d5",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "7be3d096-f239-4534-a976-7a4a9b0fa998",
+            "operation_id": "247144fb-1748-41a2-8dc3-9dc67acc48ef"
+          },
+          "occurred_at": 1791314077
+        },
+        {
+          "id": "27e7fe69-62c3-41cf-8e78-38d22d85ca04",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "7be3d096-f239-4534-a976-7a4a9b0fa998",
+              "simulation": true,
+              "observed_at": 1791314077,
+              "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+              "effect_count": 1,
+              "operation_id": "247144fb-1748-41a2-8dc3-9dc67acc48ef"
+            },
+            "operation_id": "247144fb-1748-41a2-8dc3-9dc67acc48ef"
+          },
+          "occurred_at": 1791314077
+        },
+        {
+          "id": "86662ad6-615e-49ec-b79b-47a868eb5b2c",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "confirm_owner_allocations",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "779ec460-7a1a-4ac9-b3c8-18e5e0f5cc06",
+            "operation_id": "31aab19e-0ddb-4612-b969-f4e5b93a7d49"
+          },
+          "occurred_at": 1791314077
+        },
+        {
+          "id": "a23938ef-8850-4a9c-954d-5097985c1846",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "779ec460-7a1a-4ac9-b3c8-18e5e0f5cc06",
+            "operation_id": "31aab19e-0ddb-4612-b969-f4e5b93a7d49"
+          },
+          "occurred_at": 1791314077
+        },
+        {
+          "id": "6a77d381-6d89-47ec-a5c1-55e25dfe7a24",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "ec8bfa78-f859-4acc-8777-c8b428d254c5",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "779ec460-7a1a-4ac9-b3c8-18e5e0f5cc06",
+              "simulation": true,
+              "observed_at": 1791314077,
+              "plan_digest": "4cf8a4e0d586b158a5053a030f5bed986d5fedd5ed2d6ada5e56d65406100b28",
+              "effect_count": 1,
+              "operation_id": "31aab19e-0ddb-4612-b969-f4e5b93a7d49"
+            },
+            "operation_id": "31aab19e-0ddb-4612-b969-f4e5b93a7d49"
+          },
+          "occurred_at": 1791314077
+        },
+        {
+          "id": "48877458-14bb-4e38-814d-3da908a789dd",
+          "kind": "held",
+          "facts": {
+            "reason": "evidence_pending"
+          },
+          "occurred_at": 1791314077
+        },
+        {
+          "id": "ed224a07-c773-4e67-9d42-1a4ed04ba341",
+          "kind": "completed",
+          "facts": {
+            "reason": null
+          },
+          "occurred_at": 1791314092
+        }
+      ],
+      "resources_retained": true
+    },
+    {
+      "id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+      "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+      "actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71",
+      "requested_by": "7c9d73ce-63fe-4d1a-8bc2-670db879d9ff",
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "scope": {
+        "site_id": "ff6b9218-a766-414c-a039-3ee6fadb6390",
+        "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+        "endpoint_id": "3b08f4c8-627d-46a8-8050-4284eda5001f",
+        "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+        "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+        "native_scope": "project:synthetic"
+      },
+      "plan_id": "d036176b-2325-4334-a693-bd0ccdd4f362",
+      "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+      "approval_id": "2d3592a7-7887-468e-9110-2c50350cd437",
+      "workflow_id": "p06/0c77c7cd-305c-44a6-9863-4938a36b9591/39ffa343-4804-45bd-85d1-fc955ee552dc",
+      "workflow_run_id": "01a112a3-8e62-7457-b84d-59289b92677b",
+      "state": "completed",
+      "reason": null,
+      "revision": 14,
+      "observed_at": 1791314099,
+      "updated_at": 1791314091,
+      "simulation": true,
+      "evidence_level": "E2",
+      "native_write_authorized": false,
+      "cancel_requested": false,
+      "pause_requested": false,
+      "stop_requested": false,
+      "evidence": {
+        "id": "7fb5a620-1b5a-4a65-8001-7358a5eec657",
+        "scope": {
+          "site_id": "ff6b9218-a766-414c-a039-3ee6fadb6390",
+          "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+          "endpoint_id": "3b08f4c8-627d-46a8-8050-4284eda5001f",
+          "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+          "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+          "native_scope": "project:synthetic"
+        },
+        "state": "finalized",
+        "digest": "55f852db287f29388902c14a072ba6b174b69e5b8d3d09ef0d6cc8dc4723cfd3",
+        "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+        "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+        "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+        "finalized_at": 1791314091,
+        "requested_by": "7c9d73ce-63fe-4d1a-8bc2-670db879d9ff",
+        "evidence_level": "E2",
+        "native_support": false,
+        "retention_until": 1822850091,
+        "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+        "producer_actor_id": "226670a9-4dff-45d7-a192-f2e60b1e2c71"
+      },
+      "recovery_mode": "pre_target_write_reconciliation",
+      "operations": [
+        {
+          "id": "6d7ef73e-88a9-4538-a314-405b2c6a7b80",
+          "step": "reserve",
+          "ordinal": 0,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "fce7c1dc-23aa-492a-b7b4-bd957e04e919",
+            "simulation": true,
+            "observed_at": 1791314072,
+            "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+            "effect_count": 1,
+            "operation_id": "6d7ef73e-88a9-4538-a314-405b2c6a7b80"
+          }
+        },
+        {
+          "id": "726ec69b-7e11-4f2d-9d9c-2af72ff6863a",
+          "step": "preflight",
+          "ordinal": 1,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "a1203be1-3d35-4e19-b4d5-a44cc8f90ee8",
+            "simulation": true,
+            "observed_at": 1791314073,
+            "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+            "effect_count": 1,
+            "operation_id": "726ec69b-7e11-4f2d-9d9c-2af72ff6863a"
+          }
+        },
+        {
+          "id": "4e8c11e9-8fd8-46aa-a192-19fc72a139f3",
+          "step": "apply_reviewed_saved_plan",
+          "ordinal": 2,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "cee55411-115a-4a15-ab2e-7e1de975a81b",
+            "simulation": true,
+            "observed_at": 1791314074,
+            "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+            "effect_count": 1,
+            "operation_id": "4e8c11e9-8fd8-46aa-a192-19fc72a139f3"
+          }
+        },
+        {
+          "id": "5ae68ef1-5c60-48e6-8284-c3178ec9647e",
+          "step": "verify_retention_and_deletion",
+          "ordinal": 3,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "722a158f-6272-47ad-8cdb-72039520e9f3",
+            "simulation": true,
+            "observed_at": 1791314074,
+            "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+            "effect_count": 1,
+            "operation_id": "5ae68ef1-5c60-48e6-8284-c3178ec9647e"
+          }
+        },
+        {
+          "id": "cb5e0f3c-ae0e-4043-96cf-ac58102aede6",
+          "step": "confirm_owner_allocations",
+          "ordinal": 4,
+          "outcome": "confirmed_succeeded",
+          "revision": 4,
+          "observation": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+            "sealed": true,
+            "outcome": "confirmed_succeeded",
+            "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+            "attempt_id": "65dd4594-f960-456d-8c82-775d3159fff4",
+            "simulation": true,
+            "observed_at": 1791314075,
+            "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+            "effect_count": 1,
+            "operation_id": "cb5e0f3c-ae0e-4043-96cf-ac58102aede6"
+          }
+        }
+      ],
+      "events": [
+        {
+          "id": "746ceaf9-39a9-4e07-84fa-7607626e0f99",
+          "kind": "admitted",
+          "facts": {
+            "simulation": true,
+            "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+            "workflow_id": "p06/0c77c7cd-305c-44a6-9863-4938a36b9591/39ffa343-4804-45bd-85d1-fc955ee552dc",
+            "reservation_bindings": [
+              {
+                "kind": "addresses",
+                "owner": "synthetic-addresses",
+                "scope": {
+                  "site_id": "ff6b9218-a766-414c-a039-3ee6fadb6390",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "3b08f4c8-627d-46a8-8050-4284eda5001f",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 2,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314941,
+                "receipt_id": "dd3fa40e-e185-4243-98f4-35ccf6f243e7",
+                "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "memory_mib",
+                "owner": "synthetic-memory_mib",
+                "scope": {
+                  "site_id": "ff6b9218-a766-414c-a039-3ee6fadb6390",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "3b08f4c8-627d-46a8-8050-4284eda5001f",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 8192,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314941,
+                "receipt_id": "e327228d-a717-48df-a51b-406b4c2b874e",
+                "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "storage_gib",
+                "owner": "synthetic-storage_gib",
+                "scope": {
+                  "site_id": "ff6b9218-a766-414c-a039-3ee6fadb6390",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "3b08f4c8-627d-46a8-8050-4284eda5001f",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 80,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314941,
+                "receipt_id": "12e66e5e-b965-4b19-ba86-2ca80f9a661d",
+                "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+                "ttl_seconds": 300
+              },
+              {
+                "kind": "vcpus",
+                "owner": "synthetic-vcpus",
+                "scope": {
+                  "site_id": "ff6b9218-a766-414c-a039-3ee6fadb6390",
+                  "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+                  "endpoint_id": "3b08f4c8-627d-46a8-8050-4284eda5001f",
+                  "environment": "44823011-c6bf-4632-9c7c-34145b080cdc",
+                  "resource_id": "af7bcfb2-9612-4caa-a606-6122e4bf55a5",
+                  "native_scope": "project:synthetic"
+                },
+                "state": "reserved",
+                "amount": 4,
+                "authority": "intent_only",
+                "on_expiry": "hold_until_owner_readback",
+                "expires_at": 1791314941,
+                "receipt_id": "60107433-159e-4657-9e44-f3e7610eac83",
+                "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+                "ttl_seconds": 300
+              }
+            ]
+          },
+          "occurred_at": 1791314041
+        },
+        {
+          "id": "ec032a44-8f24-419b-bc6e-8079f986243c",
+          "kind": "running",
+          "facts": {
+            "reason": null
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "3d781ec7-a4ee-4fa4-a53d-233f5c302f48",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "reserve",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "fce7c1dc-23aa-492a-b7b4-bd957e04e919",
+            "operation_id": "6d7ef73e-88a9-4538-a314-405b2c6a7b80"
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "191b9c9d-5b87-4f84-983d-b6c631135dac",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "fce7c1dc-23aa-492a-b7b4-bd957e04e919",
+            "operation_id": "6d7ef73e-88a9-4538-a314-405b2c6a7b80"
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "f9ec61bb-56aa-4a64-8a77-99762c7fb116",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "fce7c1dc-23aa-492a-b7b4-bd957e04e919",
+              "simulation": true,
+              "observed_at": 1791314072,
+              "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+              "effect_count": 1,
+              "operation_id": "6d7ef73e-88a9-4538-a314-405b2c6a7b80"
+            },
+            "operation_id": "6d7ef73e-88a9-4538-a314-405b2c6a7b80"
+          },
+          "occurred_at": 1791314072
+        },
+        {
+          "id": "4e53c00b-053a-40fd-93a1-b464bf6097f6",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "preflight",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "a1203be1-3d35-4e19-b4d5-a44cc8f90ee8",
+            "operation_id": "726ec69b-7e11-4f2d-9d9c-2af72ff6863a"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "879e6ffb-cc6c-425f-862f-e6b5d7912ea2",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "a1203be1-3d35-4e19-b4d5-a44cc8f90ee8",
+            "operation_id": "726ec69b-7e11-4f2d-9d9c-2af72ff6863a"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "cb2918c7-be09-4898-b411-5cddca73d701",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "a1203be1-3d35-4e19-b4d5-a44cc8f90ee8",
+              "simulation": true,
+              "observed_at": 1791314073,
+              "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+              "effect_count": 1,
+              "operation_id": "726ec69b-7e11-4f2d-9d9c-2af72ff6863a"
+            },
+            "operation_id": "726ec69b-7e11-4f2d-9d9c-2af72ff6863a"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "1e378d42-2bdf-4755-864e-b128e2ff70e4",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "apply_reviewed_saved_plan",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "cee55411-115a-4a15-ab2e-7e1de975a81b",
+            "operation_id": "4e8c11e9-8fd8-46aa-a192-19fc72a139f3"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "b4db4415-c531-4d8e-a9ef-38c21b64d65f",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "cee55411-115a-4a15-ab2e-7e1de975a81b",
+            "operation_id": "4e8c11e9-8fd8-46aa-a192-19fc72a139f3"
+          },
+          "occurred_at": 1791314073
+        },
+        {
+          "id": "1bcebd7b-b803-40d5-bd9f-460f01360cf6",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "cee55411-115a-4a15-ab2e-7e1de975a81b",
+              "simulation": true,
+              "observed_at": 1791314074,
+              "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+              "effect_count": 1,
+              "operation_id": "4e8c11e9-8fd8-46aa-a192-19fc72a139f3"
+            },
+            "operation_id": "4e8c11e9-8fd8-46aa-a192-19fc72a139f3"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "8489b95c-ff58-4bcd-bf83-f313ca807b91",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "verify_retention_and_deletion",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "722a158f-6272-47ad-8cdb-72039520e9f3",
+            "operation_id": "5ae68ef1-5c60-48e6-8284-c3178ec9647e"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "391baf2c-e412-4f34-b620-77fe684fdad2",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "722a158f-6272-47ad-8cdb-72039520e9f3",
+            "operation_id": "5ae68ef1-5c60-48e6-8284-c3178ec9647e"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "df3268d6-e26f-42bd-970b-a60f11cd6c92",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "722a158f-6272-47ad-8cdb-72039520e9f3",
+              "simulation": true,
+              "observed_at": 1791314074,
+              "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+              "effect_count": 1,
+              "operation_id": "5ae68ef1-5c60-48e6-8284-c3178ec9647e"
+            },
+            "operation_id": "5ae68ef1-5c60-48e6-8284-c3178ec9647e"
+          },
+          "occurred_at": 1791314074
+        },
+        {
+          "id": "7ab7e7d5-55a0-4d27-89fd-3d8ebad15810",
+          "kind": "attempt_committed",
+          "facts": {
+            "step": "confirm_owner_allocations",
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "worker": "sim-worker",
+            "attempt_id": "65dd4594-f960-456d-8c82-775d3159fff4",
+            "operation_id": "cb5e0f3c-ae0e-4043-96cf-ac58102aede6"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "a04a144d-5254-4dcd-a841-263af3207876",
+          "kind": "grant_redeemed",
+          "facts": {
+            "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+            "attempt_id": "65dd4594-f960-456d-8c82-775d3159fff4",
+            "operation_id": "cb5e0f3c-ae0e-4043-96cf-ac58102aede6"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "429cfce6-4f62-4414-bc15-6524534d80a5",
+          "kind": "outcome_recorded",
+          "facts": {
+            "observation": {
+              "epoch": "284ed157-379b-4a6e-a03f-bb1e1dac8b23",
+              "job_id": "39ffa343-4804-45bd-85d1-fc955ee552dc",
+              "sealed": true,
+              "outcome": "confirmed_succeeded",
+              "tenant_id": "0c77c7cd-305c-44a6-9863-4938a36b9591",
+              "attempt_id": "65dd4594-f960-456d-8c82-775d3159fff4",
+              "simulation": true,
+              "observed_at": 1791314075,
+              "plan_digest": "b923447b9c49ebc89875250ddfc82efc9b12331e6503c18c1a81c8bef0eea298",
+              "effect_count": 1,
+              "operation_id": "cb5e0f3c-ae0e-4043-96cf-ac58102aede6"
+            },
+            "operation_id": "cb5e0f3c-ae0e-4043-96cf-ac58102aede6"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "7b9f8a0b-6560-48ce-8108-85f261467484",
+          "kind": "held",
+          "facts": {
+            "reason": "evidence_pending"
+          },
+          "occurred_at": 1791314075
+        },
+        {
+          "id": "c69051d1-3015-469a-8107-5675f808d65e",
+          "kind": "completed",
+          "facts": {
+            "reason": null
+          },
+          "occurred_at": 1791314091
+        }
+      ],
+      "resources_retained": true
+    }
+  ],
+  "effect_count": 29
+}

@@ -1,0 +1,2 @@
+> pint --test
+Script pint --test handling the test:format event returned with error code 1

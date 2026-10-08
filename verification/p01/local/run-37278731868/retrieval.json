@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "source_revision": "36a14811b5afa23717566d5e8a08632e011f44a5",
+  "run_id": 37278731868,
+  "retrieved_at": "2026-10-05T07:43:44.191726+00:00",
+  "artifacts": [
+    {
+      "id": 11331312818,
+      "name": "p01-local-36a14811b5afa23717566d5e8a08632e011f44a5",
+      "size_in_bytes": 388821,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11331312818",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11331312818/zip",
+      "expired": false,
+      "created_at": "2026-10-05T07:39:56Z",
+      "expires_at": "2026-10-19T07:39:55Z",
+      "updated_at": "2026-10-05T07:39:56Z",
+      "digest": "sha256:118f60d7b0d0cf8ea3b67ea689f728700d3aeadea49e4b88626bad5ba07c46f6",
+      "workflow_run": {
+        "id": 37278731868,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "36a14811b5afa23717566d5e8a08632e011f44a5"
+      }
+    }
+  ],
+  "verified_command_logs": 610,
+  "source_verification_sha256": "fe420015a2839876da39fbe8cf20668815fe02b478716d0c35f63ab3aa13f3e2",
+  "retained_file_sha256": {
+    "report.json": "15b7a4888387df5898e8621a2364d3f39cb4fd4f343d682816635d49b2a8834f",
+    "campaign.zip": "118f60d7b0d0cf8ea3b67ea689f728700d3aeadea49e4b88626bad5ba07c46f6",
+    "source-verification.json": "fe420015a2839876da39fbe8cf20668815fe02b478716d0c35f63ab3aa13f3e2"
+  },
+  "limitations": [
+    "Complete downloaded campaign ZIP retained, including command logs and build reports; report.json is an identical extracted copy.",
+    "Resource counters are sequential point-in-time synthetic observations; restarts reset counters. No sizing, accepted recovery objective or operated acceptance is inferred."
+  ]
+}

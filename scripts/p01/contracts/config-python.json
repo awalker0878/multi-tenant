@@ -1,0 +1,8 @@
+{
+  "packageName": "p01_health_client",
+  "projectName": "p01-foundation-health-client",
+  "library": "httpx",
+  "hideGenerationTimestamp": true,
+  "disallowAdditionalPropertiesIfNotPresent": false,
+  "generateSourceCodeOnly": true
+}

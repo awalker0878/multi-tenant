@@ -1,0 +1,262 @@
+{
+  "observed_at": "2026-10-07T20:55:53Z",
+  "sources": [
+    {
+      "source_revision": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+      "runs": [
+        {
+          "id": 37684328353,
+          "name": "P01 foundation contracts",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684328353",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684327980,
+          "name": "Context policy",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684327980",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684327945,
+          "name": "P02 Governance events",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684327945",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684327881,
+          "name": "P07 native readiness preparation",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684327881",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684328037,
+          "name": "P04 inventory",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684328037",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684328155,
+          "name": "P05 planning",
+          "status": "in_progress",
+          "conclusion": null,
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684328155",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684327933,
+          "name": "P01 isolated Compose integration",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684327933",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684327919,
+          "name": "P01 policy controls",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684327919",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684328077,
+          "name": "P03 catalogue",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684328077",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684328226,
+          "name": "P01 transactional messaging",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684328226",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684327959,
+          "name": "P01 foundation packages",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684327959",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684327948,
+          "name": "P01 bootstrap images",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684327948",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684328102,
+          "name": "P08 native migration components",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684328102",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684327900,
+          "name": "P06 execution",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684327900",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684327893,
+          "name": "P02 identity",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684327893",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684328231,
+          "name": "P01 isolated Kubernetes integration",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684328231",
+          "head_sha": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+          "run_attempt": 1
+        }
+      ]
+    },
+    {
+      "source_revision": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+      "runs": [
+        {
+          "id": 37684992905,
+          "name": "P01 isolated Kubernetes integration",
+          "status": "pending",
+          "conclusion": null,
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992905",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684993030,
+          "name": "P01 foundation contracts",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684993030",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684992879,
+          "name": "P06 execution",
+          "status": "in_progress",
+          "conclusion": null,
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992879",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684992923,
+          "name": "P01 policy controls",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992923",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684992982,
+          "name": "Context policy",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992982",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684992865,
+          "name": "P08 native migration components",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992865",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684992872,
+          "name": "P05 planning",
+          "status": "in_progress",
+          "conclusion": null,
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992872",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684992864,
+          "name": "P01 bootstrap images",
+          "status": "in_progress",
+          "conclusion": null,
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992864",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684992863,
+          "name": "P01 foundation packages",
+          "status": "in_progress",
+          "conclusion": null,
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992863",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684992901,
+          "name": "P01 isolated Compose integration",
+          "status": "in_progress",
+          "conclusion": null,
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992901",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        },
+        {
+          "id": 37684992906,
+          "name": "P07 native readiness preparation",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992906",
+          "head_sha": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+          "run_attempt": 1
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This is an observed status snapshot. Queued and in-progress workflows are not passes.",
+    "The original architecture failure is retained with its corrected passing source."
+  ]
+}

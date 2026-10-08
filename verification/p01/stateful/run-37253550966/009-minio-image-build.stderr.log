@@ -1,0 +1,302 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.01kB done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${GO_IMAGE} results in empty or invalid base image name (line 2)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc
+#3 ...
+
+#4 [auth] library/golang:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc
+#3 DONE 1.8s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [stage-1 1/4] FROM docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#6 CACHED
+
+#7 [build 1/4] FROM docker.io/library/golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc
+#7 resolve docker.io/library/golang@sha256:966278043a40889499db9b0cd196fc789c37c385d41bd9a10cb1e7764af60cdc done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 24.24MB 0.1s done
+#8 DONE 0.2s
+
+#9 [build 2/4] WORKDIR /source
+#9 DONE 0.3s
+
+#10 [build 3/4] COPY source.tar.gz /tmp/source.tar.gz
+#10 DONE 0.1s
+
+#11 [build 4/4] RUN echo "45521908307306e925c98d629e1c17d78c8b72b6ee242b1bfb1409f7d8ee5841  /tmp/source.tar.gz" | sha256sum -c - && tar -xzf /tmp/source.tar.gz --strip-components=1 && go build -mod=readonly -trimpath -o /out/minio . && go version -m /out/minio > /out/build-info.txt && sha256sum go.mod go.sum > /out/module-digests.txt
+#11 0.196 /tmp/source.tar.gz: OK
+#11 0.507 go: downloading cloud.google.com/go/storage v1.52.0
+#11 0.515 go: downloading github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.0
+#11 0.516 go: downloading github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.9.0
+#11 0.755 go: downloading github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.6.1
+#11 0.791 go: downloading github.com/cespare/xxhash/v2 v2.3.0
+#11 0.796 go: downloading cloud.google.com/go v0.120.1
+#11 0.821 go: downloading github.com/cheggaaa/pb v1.0.29
+#11 0.913 go: downloading github.com/coreos/go-oidc/v3 v3.14.1
+#11 0.913 go: downloading github.com/coreos/go-systemd/v22 v22.5.0
+#11 0.962 go: downloading github.com/cosnicolaou/pbzip2 v1.0.5
+#11 0.971 go: downloading github.com/dchest/siphash v1.2.3
+#11 1.035 go: downloading github.com/dustin/go-humanize v1.0.1
+#11 1.064 go: downloading github.com/fatih/color v1.18.0
+#11 1.064 go: downloading github.com/felixge/fgprof v0.9.5
+#11 1.091 go: downloading github.com/go-openapi/loads v0.22.0
+#11 1.127 go: downloading github.com/golang-jwt/jwt/v4 v4.5.2
+#11 1.178 go: downloading github.com/google/uuid v1.6.0
+#11 1.198 go: downloading github.com/inconshreveable/mousetrap v1.1.0
+#11 1.203 go: downloading github.com/json-iterator/go v1.1.12
+#11 1.208 go: downloading github.com/klauspost/compress v1.18.0
+#11 2.068 go: downloading github.com/klauspost/pgzip v1.2.6
+#11 2.068 go: downloading github.com/klauspost/filepathx v1.1.1
+#11 2.068 go: downloading github.com/klauspost/readahead v1.4.0
+#11 2.068 go: downloading github.com/klauspost/reedsolomon v1.12.4
+#11 2.100 go: downloading github.com/lithammer/shortuuid/v4 v4.2.0
+#11 2.100 go: downloading github.com/miekg/dns v1.1.65
+#11 2.145 go: downloading github.com/minio/cli v1.24.2
+#11 2.162 go: downloading github.com/minio/console v1.7.7-0.20250905210349-2017f33b26e1
+#11 2.836 go: downloading github.com/minio/dnscache v0.1.1
+#11 2.836 go: downloading github.com/minio/dperf v0.6.3
+#11 2.836 go: downloading github.com/minio/highwayhash v1.0.3
+#11 2.836 go: downloading github.com/minio/kms-go/kes v0.3.1
+#11 2.896 go: downloading github.com/minio/madmin-go/v3 v3.0.109
+#11 3.010 go: downloading github.com/minio/minio-go/v7 v7.0.91
+#11 3.129 go: downloading github.com/minio/mux v1.9.2
+#11 3.129 go: downloading github.com/minio/pkg/v3 v3.1.3
+#11 3.270 go: downloading github.com/minio/selfupdate v0.6.0
+#11 3.270 go: downloading github.com/minio/sio v0.4.1
+#11 3.270 go: downloading github.com/minio/xxml v0.0.3
+#11 3.270 go: downloading github.com/minio/zipindex v0.4.0
+#11 3.340 go: downloading github.com/mitchellh/go-homedir v1.1.0
+#11 3.343 go: downloading github.com/philhofer/fwd v1.2.0
+#11 3.352 go: downloading github.com/pierrec/lz4/v4 v4.1.22
+#11 3.373 go: downloading github.com/pkg/errors v0.9.1
+#11 3.401 go: downloading github.com/pkg/sftp v1.13.9
+#11 3.406 go: downloading github.com/pkg/xattr v0.4.10
+#11 3.459 go: downloading github.com/prometheus/client_golang v1.22.0
+#11 3.575 go: downloading github.com/prometheus/common v0.63.0
+#11 3.575 go: downloading github.com/prometheus/client_model v0.6.2
+#11 3.576 go: downloading github.com/prometheus/procfs v0.16.1
+#11 3.655 go: downloading github.com/puzpuzpuz/xsync/v3 v3.5.1
+#11 3.689 go: downloading github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9
+#11 3.698 go: downloading github.com/rs/cors v1.11.1
+#11 3.743 go: downloading github.com/secure-io/sio-go v0.3.1
+#11 3.752 go: downloading github.com/shirou/gopsutil/v3 v3.24.5
+#11 3.878 go: downloading github.com/tinylib/msgp v1.4.0
+#11 3.878 go: downloading github.com/valyala/bytebufferpool v1.0.0
+#11 3.878 go: downloading github.com/zeebo/xxh3 v1.0.2
+#11 3.906 go: downloading go.etcd.io/etcd/api/v3 v3.5.21
+#11 3.980 go: downloading go.etcd.io/etcd/client/v3 v3.5.21
+#11 3.991 go: downloading go.uber.org/atomic v1.11.0
+#11 3.996 go: downloading goftp.io/server/v2 v2.0.1
+#11 4.025 go: downloading golang.org/x/crypto v0.37.0
+#11 4.079 go: downloading golang.org/x/oauth2 v0.29.0
+#11 4.170 go: downloading golang.org/x/sync v0.13.0
+#11 4.199 go: downloading golang.org/x/sys v0.32.0
+#11 4.204 go: downloading golang.org/x/term v0.31.0
+#11 4.204 go: downloading google.golang.org/api v0.230.0
+#11 4.797 go: downloading gopkg.in/yaml.v2 v2.4.0
+#11 4.833 go: downloading gopkg.in/yaml.v3 v3.0.1
+#11 4.923 go: downloading github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.1
+#11 5.014 go: downloading github.com/AzureAD/microsoft-authentication-library-for-go v1.4.2
+#11 5.118 go: downloading github.com/mattn/go-runewidth v0.0.16
+#11 5.148 go: downloading cloud.google.com/go/compute/metadata v0.6.0
+#11 5.259 go: downloading cloud.google.com/go/iam v1.5.2
+#11 5.412 go: downloading github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0
+#11 5.474 go: downloading github.com/googleapis/gax-go/v2 v2.14.1
+#11 5.558 go: downloading go.opentelemetry.io/contrib/detectors/gcp v1.35.0
+#11 5.622 go: downloading go.opentelemetry.io/otel v1.35.0
+#11 5.865 go: downloading go.opentelemetry.io/otel/sdk/metric v1.35.0
+#11 5.924 go: downloading go.opentelemetry.io/otel/sdk v1.35.0
+#11 6.056 go: downloading go.opentelemetry.io/otel/trace v1.35.0
+#11 6.782 go: downloading google.golang.org/genproto v0.0.0-20250422160041-2d3770c4ea7f
+#11 6.782 go: downloading google.golang.org/grpc v1.72.0
+#11 7.135 go: downloading google.golang.org/protobuf v1.36.6
+#11 7.454 go: downloading github.com/go-jose/go-jose/v4 v4.1.0
+#11 7.454 go: downloading github.com/mattn/go-colorable v0.1.14
+#11 7.455 go: downloading github.com/mattn/go-isatty v0.0.20
+#11 7.455 go: downloading github.com/google/pprof v0.0.0-20250422154841-e1f9c1950416
+#11 7.484 go: downloading github.com/go-openapi/analysis v0.23.0
+#11 7.484 go: downloading github.com/go-openapi/spec v0.21.0
+#11 7.577 go: downloading github.com/go-openapi/swag v0.23.1
+#11 7.640 go: downloading github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+#11 7.650 go: downloading github.com/modern-go/reflect2 v1.0.2
+#11 7.658 go: downloading golang.org/x/net v0.39.0
+#11 7.686 go: downloading github.com/klauspost/cpuid/v2 v2.2.10
+#11 7.733 go: downloading github.com/go-openapi/errors v0.22.1
+#11 7.750 go: downloading github.com/go-openapi/runtime v0.28.0
+#11 7.843 go: downloading github.com/jessevdk/go-flags v1.6.1
+#11 7.844 go: downloading github.com/minio/mc v0.0.0-20250313080218-cf909e1063a9
+#11 7.987 go: downloading github.com/minio/websocket v1.6.0
+#11 7.987 go: downloading github.com/unrolled/secure v1.17.0
+#11 8.029 go: downloading github.com/go-openapi/strfmt v0.23.0
+#11 8.029 go: downloading github.com/ncw/directio v1.0.5
+#11 8.068 go: downloading aead.dev/mem v0.2.0
+#11 8.070 go: downloading github.com/prometheus/prom2json v1.4.2
+#11 8.095 go: downloading github.com/safchain/ethtool v0.5.10
+#11 8.107 go: downloading github.com/goccy/go-json v0.10.5
+#11 8.148 go: downloading github.com/minio/crc64nvme v1.0.1
+#11 8.148 go: downloading github.com/minio/md5-simd v1.1.2
+#11 8.158 go: downloading github.com/rs/xid v1.6.0
+#11 8.174 go: downloading github.com/go-ini/ini v1.67.0
+#11 8.180 go: downloading golang.org/x/time v0.11.0
+#11 8.185 go: downloading github.com/beevik/ntp v1.4.3
+#11 8.206 go: downloading go.uber.org/zap v1.27.0
+#11 8.218 go: downloading github.com/go-ldap/ldap/v3 v3.4.11
+#11 8.245 go: downloading github.com/rabbitmq/amqp091-go v1.10.0
+#11 8.261 go: downloading github.com/IBM/sarama v1.45.1
+#11 8.320 go: downloading github.com/eclipse/paho.mqtt.golang v1.5.0
+#11 8.331 go: downloading github.com/elastic/go-elasticsearch/v7 v7.17.10
+#11 8.377 go: downloading github.com/go-sql-driver/mysql v1.9.2
+#11 8.377 go: downloading github.com/gomodule/redigo v1.9.2
+#11 8.420 go: downloading github.com/lib/pq v1.10.9
+#11 8.456 go: downloading github.com/nats-io/nats.go v1.41.2
+#11 8.458 go: downloading github.com/nats-io/stan.go v0.10.4
+#11 8.473 go: downloading github.com/nsqio/go-nsq v1.1.0
+#11 8.497 go: downloading github.com/xdg/scram v1.0.5
+#11 8.536 go: downloading github.com/gobwas/ws v1.4.0
+#11 8.558 go: downloading github.com/buger/jsonparser v1.1.1
+#11 8.590 go: downloading aead.dev/mtls v0.2.1
+#11 8.615 go: downloading github.com/minio/kms-go/kms v0.5.1-0.20250225090116-4e64ce8d0f35
+#11 8.629 go: downloading github.com/minio/simdjson-go v0.4.5
+#11 8.630 go: downloading github.com/rjeczalik/notify v0.9.3
+#11 8.658 go: downloading github.com/fatih/structs v1.1.0
+#11 8.693 go: downloading github.com/lestrrat-go/jwx/v2 v2.1.4
+#11 8.729 go: downloading aead.dev/minisign v0.3.0
+#11 8.787 go: downloading github.com/kr/fs v0.1.0
+#11 8.814 go: downloading github.com/beorn7/perks v1.0.1
+#11 8.827 go: downloading github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+#11 8.828 go: downloading github.com/tklauser/go-sysconf v0.3.15
+#11 8.828 go: downloading github.com/gogo/protobuf v1.3.2
+#11 8.842 go: downloading github.com/golang/protobuf v1.5.4
+#11 8.855 go: downloading go.etcd.io/etcd/client/pkg/v3 v3.5.21
+#11 8.938 go: downloading github.com/kylelemons/godebug v1.1.0
+#11 8.938 go: downloading github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
+#11 8.939 go: downloading github.com/rivo/uniseg v0.4.7
+#11 8.967 go: downloading google.golang.org/genproto/googleapis/api v0.0.0-20250422160041-2d3770c4ea7f
+#11 8.969 go: downloading google.golang.org/genproto/googleapis/rpc v0.0.0-20250422160041-2d3770c4ea7f
+#11 9.007 go: downloading cloud.google.com/go/monitoring v1.24.2
+#11 9.062 go: downloading github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0
+#11 9.080 go: downloading github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.27.0
+#11 9.117 go: downloading github.com/go-logr/logr v1.4.2
+#11 9.131 go: downloading go.opentelemetry.io/otel/metric v1.35.0
+#11 9.153 go: downloading cloud.google.com/go/auth v0.16.0
+#11 9.190 go: downloading cloud.google.com/go/auth/oauth2adapt v0.2.8
+#11 9.250 go: downloading go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.60.0
+#11 9.251 go: downloading github.com/go-openapi/jsonpointer v0.21.1
+#11 9.251 go: downloading github.com/mailru/easyjson v0.9.0
+#11 9.321 go: downloading github.com/go-openapi/jsonreference v0.21.0
+#11 9.329 go: downloading github.com/docker/go-units v0.5.0
+#11 9.345 go: downloading github.com/go-openapi/validate v0.24.0
+#11 9.347 go: downloading github.com/charmbracelet/bubbles v0.20.0
+#11 9.437 go: downloading github.com/charmbracelet/bubbletea v1.3.4
+#11 9.437 go: downloading github.com/charmbracelet/lipgloss v1.0.0
+#11 9.488 go: downloading github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
+#11 9.509 go: downloading github.com/jedib0t/go-pretty/v6 v6.6.7
+#11 9.527 go: downloading github.com/mattn/go-ieproxy v0.0.12
+#11 9.527 go: downloading github.com/minio/colorjson v1.0.8
+#11 9.588 go: downloading github.com/minio/filepath v1.0.0
+#11 9.603 go: downloading github.com/muesli/reflow v0.3.0
+#11 9.612 go: downloading github.com/muesli/termenv v0.16.0
+#11 9.634 go: downloading github.com/olekukonko/tablewriter v0.0.5
+#11 9.634 go: downloading github.com/posener/complete v1.2.3
+#11 9.656 go: downloading github.com/tidwall/gjson v1.18.0
+#11 9.664 go: downloading github.com/vbauerster/mpb/v8 v8.9.3
+#11 9.701 go: downloading golang.org/x/text v0.24.0
+#11 9.701 go: downloading github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
+#11 9.743 go: downloading github.com/mitchellh/mapstructure v1.5.0
+#11 9.743 go: downloading github.com/oklog/ulid v1.3.1
+#11 9.772 go: downloading go.mongodb.org/mongo-driver v1.17.3
+#11 10.23 go: downloading github.com/matttproud/golang_protobuf_extensions v1.0.4
+#11 10.23 go: downloading github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358
+#11 10.23 go: downloading github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667
+#11 10.30 go: downloading go.uber.org/multierr v1.11.0
+#11 10.30 go: downloading github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
+#11 10.31 go: downloading github.com/eapache/go-resiliency v1.7.0
+#11 10.34 go: downloading github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3
+#11 10.37 go: downloading github.com/eapache/queue v1.1.0
+#11 10.37 go: downloading github.com/hashicorp/go-multierror v1.1.1
+#11 10.38 go: downloading github.com/jcmturner/gofork v1.7.6
+#11 10.41 go: downloading github.com/jcmturner/gokrb5/v8 v8.4.4
+#11 10.50 go: downloading github.com/gorilla/websocket v1.5.3
+#11 10.50 go: downloading filippo.io/edwards25519 v1.1.0
+#11 10.50 go: downloading github.com/nats-io/nuid v1.0.1
+#11 10.51 go: downloading github.com/golang/snappy v1.0.0
+#11 10.55 go: downloading github.com/xdg/stringprep v1.0.3
+#11 10.55 go: downloading github.com/nats-io/nkeys v0.4.11
+#11 10.55 go: downloading github.com/gobwas/httphead v0.1.0
+#11 10.58 go: downloading github.com/gobwas/pool v0.2.1
+#11 10.64 go: downloading github.com/minio/csvparser v1.0.0
+#11 10.65 go: downloading github.com/fraugster/parquet-go v0.12.0
+#11 10.65 go: downloading github.com/alecthomas/participle v0.7.1
+#11 10.73 go: downloading github.com/lestrrat-go/option v1.0.1
+#11 10.73 go: downloading github.com/lestrrat-go/blackmagic v1.0.2
+#11 10.75 go: downloading github.com/lestrrat-go/httprc v1.0.6
+#11 10.75 go: downloading github.com/lestrrat-go/iter v1.0.2
+#11 10.78 go: downloading github.com/coreos/go-semver v0.3.1
+#11 10.78 go: downloading github.com/tklauser/numcpus v0.10.0
+#11 10.80 go: downloading github.com/golang-jwt/jwt/v5 v5.2.2
+#11 10.81 go: downloading go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.60.0
+#11 10.90 go: downloading github.com/go-logr/stdr v1.2.2
+#11 10.91 go: downloading go.opentelemetry.io/auto/sdk v1.1.0
+#11 10.91 go: downloading github.com/google/s2a-go v0.1.9
+#11 10.97 go: downloading github.com/googleapis/enterprise-certificate-proxy v0.3.6
+#11 11.01 go: downloading github.com/envoyproxy/go-control-plane/envoy v1.32.4
+#11 11.05 go: downloading github.com/felixge/httpsnoop v1.0.4
+#11 11.08 go: downloading github.com/josharian/intern v1.0.0
+#11 11.17 go: downloading github.com/charmbracelet/x/ansi v0.8.0
+#11 11.28 go: downloading github.com/charmbracelet/x/term v0.2.1
+#11 11.40 go: downloading github.com/muesli/ansi v0.0.0-20230316100256-276c6243b2f6
+#11 11.43 go: downloading github.com/muesli/cancelreader v0.2.2
+#11 11.49 go: downloading github.com/juju/ratelimit v1.0.2
+#11 11.57 go: downloading github.com/aymanbagabas/go-osc52/v2 v2.0.1
+#11 11.58 go: downloading github.com/lucasb-eyer/go-colorful v1.2.0
+#11 11.58 go: downloading github.com/tidwall/match v1.1.1
+#11 11.58 go: downloading github.com/tidwall/pretty v1.2.1
+#11 11.61 go: downloading github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
+#11 11.65 go: downloading github.com/VividCortex/ewma v1.2.0
+#11 11.65 go: downloading github.com/prometheus/prometheus v0.303.0
+#11 11.71 go: downloading github.com/hashicorp/errwrap v1.1.0
+#11 11.74 go: downloading github.com/jcmturner/dnsutils/v2 v2.0.0
+#11 11.74 go: downloading github.com/hashicorp/go-uuid v1.0.3
+#11 11.79 go: downloading github.com/apache/thrift v0.21.0
+#11 11.81 go: downloading github.com/lestrrat-go/httpcc v1.0.1
+#11 11.81 go: downloading github.com/spiffe/go-spiffe/v2 v2.5.0
+#11 11.85 go: downloading github.com/cncf/xds/go v0.0.0-20250326154945-ae57f3c0d45f
+#11 12.00 go: downloading github.com/envoyproxy/protoc-gen-validate v1.2.1
+#11 12.00 go: downloading github.com/jcmturner/rpc/v2 v2.0.3
+#11 12.11 go: downloading github.com/zeebo/errs v1.4.0
+#11 12.13 go: downloading cel.dev/expr v0.23.1
+#11 12.20 go: downloading github.com/jcmturner/aescts/v2 v2.0.0
+#11 DONE 108.7s
+
+#12 [stage-1 2/4] COPY --from=build /out/ /usr/local/bin/
+#12 DONE 0.8s
+
+#13 [stage-1 3/4] COPY --from=build /source/LICENSE /usr/share/licenses/fixture/LICENSE
+#13 DONE 0.0s
+
+#14 [stage-1 4/4] RUN mkdir /data && chown 10001:10001 /data && chmod 0700 /data
+#14 DONE 0.1s
+
+#15 exporting to image
+#15 exporting layers
+#15 exporting layers 0.9s done
+#15 writing image sha256:72968ee2c43b8fcfdb448fe7c475a164d7becc697e67779dd0ef4c7e9e7c8aea done
+#15 DONE 0.9s
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG ${GO_IMAGE} results in empty or invalid base image name (line 2)

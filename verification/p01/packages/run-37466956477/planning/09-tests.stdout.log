@@ -1,0 +1,1571 @@
+.....................................FFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFF [ 76%]
+FFFF.F.....ssss.......                                                   [100%]
+=================================== FAILURES ===================================
+__________________ test_two_destinations_explain_constraints ___________________
+
+    def test_two_destinations_explain_constraints() -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:12: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+____________ test_each_missing_dimension_holds[installed_identity] _____________
+
+dimension = 'installed_identity'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____________ test_each_missing_dimension_holds[compute_placement] _____________
+
+dimension = 'compute_placement'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____________ test_each_missing_dimension_holds[storage_datasets] ______________
+
+dimension = 'storage_datasets'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+________________ test_each_missing_dimension_holds[network_vpc] ________________
+
+dimension = 'network_vpc'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________ test_each_missing_dimension_holds[security_edge] _______________
+
+dimension = 'security_edge'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+________________ test_each_missing_dimension_holds[guest_image] ________________
+
+dimension = 'guest_image'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+____________ test_each_missing_dimension_holds[lifecycle_adoption] _____________
+
+dimension = 'lifecycle_adoption'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_________________ test_each_missing_dimension_holds[mobility] __________________
+
+dimension = 'mobility'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______________ test_each_missing_dimension_holds[shared_services] ______________
+
+dimension = 'shared_services'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+___________ test_each_missing_dimension_holds[resilience_operations] ___________
+
+dimension = 'resilience_operations'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+___________ test_each_missing_dimension_holds[assurance_sovereignty] ___________
+
+dimension = 'assurance_sovereignty'
+
+    @pytest.mark.parametrize("dimension", DIMENSIONS)
+    def test_each_missing_dimension_holds(dimension: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________________ test_fail_closed_inputs[expired] _______________________
+
+fault = 'expired'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________________ test_fail_closed_inputs[revoked] _______________________
+
+fault = 'revoked'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________________ test_fail_closed_inputs[absent] ________________________
+
+fault = 'absent'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____________________ test_fail_closed_inputs[wrong_site] ______________________
+
+fault = 'wrong_site'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+___________________ test_fail_closed_inputs[wrong_artifact] ____________________
+
+fault = 'wrong_artifact'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________________ test_fail_closed_inputs[reverse] _______________________
+
+fault = 'reverse'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_________________________ test_fail_closed_inputs[E2] __________________________
+
+fault = 'E2'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________________ test_fail_closed_inputs[partial] _______________________
+
+fault = 'partial'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_________________________ test_fail_closed_inputs[old] _________________________
+
+fault = 'old'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______________________ test_fail_closed_inputs[declared] _______________________
+
+fault = 'declared'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+___________________ test_fail_closed_inputs[policy_expired] ____________________
+
+fault = 'policy_expired'
+
+    @pytest.mark.parametrize(
+        "fault",
+        [
+            "expired",
+            "revoked",
+            "absent",
+            "wrong_site",
+            "wrong_artifact",
+            "reverse",
+            "E2",
+            "partial",
+            "old",
+            "declared",
+            "policy_expired",
+        ],
+    )
+    def test_fail_closed_inputs(fault: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_ test_security_service_and_custody_never_default_allow[placement.tenant_isolation] _
+
+key = 'placement.tenant_isolation'
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "placement.tenant_isolation",
+            "placement.domain_isolation",
+            "sovereignty.custody",
+            "sovereignty.location",
+            "sovereignty.data_path",
+            "service.backup.owner",
+        ],
+    )
+    def test_security_service_and_custody_never_default_allow(key: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_ test_security_service_and_custody_never_default_allow[placement.domain_isolation] _
+
+key = 'placement.domain_isolation'
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "placement.tenant_isolation",
+            "placement.domain_isolation",
+            "sovereignty.custody",
+            "sovereignty.location",
+            "sovereignty.data_path",
+            "service.backup.owner",
+        ],
+    )
+    def test_security_service_and_custody_never_default_allow(key: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+__ test_security_service_and_custody_never_default_allow[sovereignty.custody] __
+
+key = 'sovereignty.custody'
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "placement.tenant_isolation",
+            "placement.domain_isolation",
+            "sovereignty.custody",
+            "sovereignty.location",
+            "sovereignty.data_path",
+            "service.backup.owner",
+        ],
+    )
+    def test_security_service_and_custody_never_default_allow(key: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_ test_security_service_and_custody_never_default_allow[sovereignty.location] __
+
+key = 'sovereignty.location'
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "placement.tenant_isolation",
+            "placement.domain_isolation",
+            "sovereignty.custody",
+            "sovereignty.location",
+            "sovereignty.data_path",
+            "service.backup.owner",
+        ],
+    )
+    def test_security_service_and_custody_never_default_allow(key: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_ test_security_service_and_custody_never_default_allow[sovereignty.data_path] _
+
+key = 'sovereignty.data_path'
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "placement.tenant_isolation",
+            "placement.domain_isolation",
+            "sovereignty.custody",
+            "sovereignty.location",
+            "sovereignty.data_path",
+            "service.backup.owner",
+        ],
+    )
+    def test_security_service_and_custody_never_default_allow(key: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_ test_security_service_and_custody_never_default_allow[service.backup.owner] __
+
+key = 'service.backup.owner'
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "placement.tenant_isolation",
+            "placement.domain_isolation",
+            "sovereignty.custody",
+            "sovereignty.location",
+            "sovereignty.data_path",
+            "service.backup.owner",
+        ],
+    )
+    def test_security_service_and_custody_never_default_allow(key: str) -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+___________ test_preference_retained_and_conditional_is_not_eligible ___________
+
+    def test_preference_retained_and_conditional_is_not_eligible() -> None:
+>       i, d, p, policy, q = inputs()
+                             ^^^^^^^^
+
+tests/test_planning.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+____________ test_semantic_content_determinism_and_approval_binding ____________
+
+    def test_semantic_content_determinism_and_approval_binding() -> None:
+>       a = assessment()
+            ^^^^^^^^^^^^
+
+tests/test_planning.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:138: in assessment
+    intent, d, p, policy, q = inputs()
+                              ^^^^^^^^
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________ test_changed_pinned_input_changes_digest[intent] _______________
+
+field = 'intent'
+
+    @pytest.mark.parametrize("field", ["intent", "inventory", "profile", "policy", "qualification"])
+    def test_changed_pinned_input_changes_digest(field: str) -> None:
+>       a = assessment()
+            ^^^^^^^^^^^^
+
+tests/test_planning.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:138: in assessment
+    intent, d, p, policy, q = inputs()
+                              ^^^^^^^^
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____________ test_changed_pinned_input_changes_digest[inventory] ______________
+
+field = 'inventory'
+
+    @pytest.mark.parametrize("field", ["intent", "inventory", "profile", "policy", "qualification"])
+    def test_changed_pinned_input_changes_digest(field: str) -> None:
+>       a = assessment()
+            ^^^^^^^^^^^^
+
+tests/test_planning.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:138: in assessment
+    intent, d, p, policy, q = inputs()
+                              ^^^^^^^^
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______________ test_changed_pinned_input_changes_digest[profile] _______________
+
+field = 'profile'
+
+    @pytest.mark.parametrize("field", ["intent", "inventory", "profile", "policy", "qualification"])
+    def test_changed_pinned_input_changes_digest(field: str) -> None:
+>       a = assessment()
+            ^^^^^^^^^^^^
+
+tests/test_planning.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:138: in assessment
+    intent, d, p, policy, q = inputs()
+                              ^^^^^^^^
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________ test_changed_pinned_input_changes_digest[policy] _______________
+
+field = 'policy'
+
+    @pytest.mark.parametrize("field", ["intent", "inventory", "profile", "policy", "qualification"])
+    def test_changed_pinned_input_changes_digest(field: str) -> None:
+>       a = assessment()
+            ^^^^^^^^^^^^
+
+tests/test_planning.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:138: in assessment
+    intent, d, p, policy, q = inputs()
+                              ^^^^^^^^
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+___________ test_changed_pinned_input_changes_digest[qualification] ____________
+
+field = 'qualification'
+
+    @pytest.mark.parametrize("field", ["intent", "inventory", "profile", "policy", "qualification"])
+    def test_changed_pinned_input_changes_digest(field: str) -> None:
+>       a = assessment()
+            ^^^^^^^^^^^^
+
+tests/test_planning.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:138: in assessment
+    intent, d, p, policy, q = inputs()
+                              ^^^^^^^^
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________ test_ownership_collision_and_missing_state_hold ________________
+
+    def test_ownership_collision_and_missing_state_hold() -> None:
+>       a = assessment()
+            ^^^^^^^^^^^^
+
+tests/test_planning.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/planning_fixture.py:138: in assessment
+    intent, d, p, policy, q = inputs()
+                              ^^^^^^^^
+tests/planning_fixture.py:28: in inputs
+    ).read_text()
+      ^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/pathlib.py:1013: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_planning.py::test_two_destinations_explain_constraints - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[installed_identity] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[compute_placement] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[storage_datasets] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[network_vpc] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[security_edge] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[guest_image] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[lifecycle_adoption] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[mobility] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[shared_services] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[resilience_operations] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_each_missing_dimension_holds[assurance_sovereignty] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[expired] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[revoked] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[absent] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[wrong_site] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[wrong_artifact] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[reverse] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[E2] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[partial] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[old] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[declared] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_fail_closed_inputs[policy_expired] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_security_service_and_custody_never_default_allow[placement.tenant_isolation] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_security_service_and_custody_never_default_allow[placement.domain_isolation] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_security_service_and_custody_never_default_allow[sovereignty.custody] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_security_service_and_custody_never_default_allow[sovereignty.location] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_security_service_and_custody_never_default_allow[sovereignty.data_path] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_security_service_and_custody_never_default_allow[service.backup.owner] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_preference_retained_and_conditional_is_not_eligible - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_semantic_content_determinism_and_approval_binding - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_changed_pinned_input_changes_digest[intent] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_changed_pinned_input_changes_digest[inventory] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_changed_pinned_input_changes_digest[profile] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_changed_pinned_input_changes_digest[policy] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_changed_pinned_input_changes_digest[qualification] - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+FAILED tests/test_planning.py::test_ownership_collision_and_missing_state_hold - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/_temp/contracts/fixtures/catalogue/permit-desk-v1.json'
+37 failed, 53 passed, 4 skipped in 2.50s

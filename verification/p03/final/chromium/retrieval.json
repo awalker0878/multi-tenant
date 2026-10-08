@@ -1,0 +1,11 @@
+{
+  "run_id": 37405120516,
+  "artifact_id": 11387060740,
+  "artifact_archive_sha256": "8c8d5d2b6104768a30492cec160a2afe5939b640bed0ac018d3a6f6582626a32",
+  "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+  "retrieved_at": "2026-10-06T02:42:22.455249+00:00",
+  "result": "PASS",
+  "verified_source_files": 475,
+  "report_sha256": "40ff11eb8f5bb61aa1e9d90bc90d5964c541dd73eea42dfd889aa00303674ecf",
+  "method": "GitHub connector artifact download; archive, retained command logs and source bytes independently matched."
+}

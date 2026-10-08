@@ -1,0 +1,397 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Worker migration stage boundary",
+    "version": "2.0.0",
+    "description": "Separate internal P07 worker component. Requires authenticated caller, current native grant authority, protected tooling and independent observer. The simulation API and inspection CLI do not expose this route."
+  },
+  "security": [
+    {
+      "Lifecycle": []
+    }
+  ],
+  "paths": {
+    "/internal/native-effects": {
+      "post": {
+        "operationId": "submitNativeSavedPlan",
+        "description": "Tenant and worker are derived from trusted caller identity. Only the provision stage is implemented by this adapter. No commands, credentials, identity overrides or caller evidence are accepted. Maximum request 16384 bytes.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EffectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bounded submission receipt; no independent readiness or retry authority. Content-Length is mandatory and at most 4096 bytes.",
+            "headers": {
+              "Content-Length": {
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4096
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EffectReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied or unavailable. An uncertain submission must be reconciled; no transport retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied or unavailable. An uncertain submission must be reconciled; no transport retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Denied or unavailable. An uncertain submission must be reconciled; no transport retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Denied or unavailable. An uncertain submission must be reconciled; no transport retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Denied or unavailable. An uncertain submission must be reconciled; no transport retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied or unavailable. An uncertain submission must be reconciled; no transport retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Denied or unavailable. An uncertain submission must be reconciled; no transport retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied or unavailable. An uncertain submission must be reconciled; no transport retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Lifecycle": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "EffectRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "grant"
+        ],
+        "properties": {
+          "grant": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "attempt_id",
+              "epoch",
+              "executor_id",
+              "expires_at",
+              "grant_id",
+              "intent_digest",
+              "job_id",
+              "native_binding",
+              "operation_id",
+              "plan_sha256",
+              "schema_version",
+              "stage"
+            ],
+            "properties": {
+              "job_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "operation_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "attempt_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "grant_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "epoch": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "executor_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[a-f0-9-]{36}$"
+              },
+              "stage": {
+                "type": "string",
+                "enum": [
+                  "admit_writes",
+                  "capture",
+                  "convert_copy",
+                  "export_copy",
+                  "fence_source",
+                  "fence_target",
+                  "final_sync",
+                  "import_target",
+                  "preserve_target",
+                  "recover_target",
+                  "rehearsal_validate",
+                  "remove_copy",
+                  "remove_snapshot",
+                  "restart_baseline_source",
+                  "restore_source",
+                  "retain_rehearsal",
+                  "reverse_sync",
+                  "revoke_migration_access",
+                  "shutdown_source",
+                  "source_prepare",
+                  "transform_copy",
+                  "validate_target",
+                  "verify_activation",
+                  "verify_consolidation",
+                  "verify_no_divergence",
+                  "verify_recovery",
+                  "verify_source",
+                  "verify_source_data"
+                ]
+              },
+              "plan_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "intent_digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "expires_at": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9223372036854775807
+              },
+              "native_binding": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "tenant_id",
+                  "site_id",
+                  "resource_id",
+                  "job_id",
+                  "operation_id",
+                  "attempt_id",
+                  "campaign_id",
+                  "executor_id",
+                  "epoch",
+                  "custody_id",
+                  "project_id",
+                  "plan_digest",
+                  "operation_plan_sha256",
+                  "ownership_digest",
+                  "custody_generation",
+                  "expires_at"
+                ],
+                "properties": {
+                  "tenant_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "site_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "resource_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "job_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "operation_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "attempt_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "campaign_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "executor_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "epoch": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "custody_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[a-f0-9-]{36}$"
+                  },
+                  "project_id": {
+                    "type": "string",
+                    "pattern": "^([a-f0-9]{32}|[a-f0-9-]{36})$"
+                  },
+                  "plan_digest": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "operation_plan_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "ownership_digest": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "custody_generation": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9223372036854775807
+                  },
+                  "expires_at": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9223372036854775807
+                  }
+                }
+              },
+              "schema_version": {
+                "type": "integer",
+                "const": 2
+              }
+            }
+          }
+        }
+      },
+      "EffectReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "grant_sha256",
+          "submitted",
+          "readiness_established",
+          "retry_authorized"
+        ],
+        "properties": {
+          "grant_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "submitted": {
+            "type": "boolean",
+            "const": true
+          },
+          "readiness_established": {
+            "type": "boolean",
+            "const": false
+          },
+          "retry_authorized": {
+            "type": "boolean",
+            "const": false
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "enum": [
+              "native_effect_held",
+              "native_effect_unavailable",
+              "invalid_native_request"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

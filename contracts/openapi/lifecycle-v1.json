@@ -1,0 +1,1435 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "P06 Lifecycle simulation execution",
+    "version": "1.0.0",
+    "description": "E2 isolated simulation only. Controls are requests, never proof of native undo or release. Exact live Governance authority is rechecked at each effect."
+  },
+  "security": [
+    {
+      "Workload": []
+    }
+  ],
+  "paths": {
+    "/v1/tenants/{tenant}/jobs": {
+      "post": {
+        "operationId": "admitSimulation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Bounded current result; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "plan_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "plan_revision": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 999999999
+                  },
+                  "plan_digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "approval_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "campaign_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "plan_id",
+                  "plan_revision",
+                  "plan_digest",
+                  "approval_id",
+                  "campaign_id"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/jobs/{job}": {
+      "get": {
+        "operationId": "readSimulation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "job",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded current result; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/jobs/{job}/commands": {
+      "post": {
+        "operationId": "controlSimulation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "job",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Bounded current result; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandReceipt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Held or unavailable; no mutation authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "pause",
+                      "cancel",
+                      "stop",
+                      "reconcile",
+                      "resume",
+                      "retry_unstarted"
+                    ]
+                  },
+                  "expected_revision": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "required": [
+                  "action",
+                  "expected_revision"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Workload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Job": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "requested_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "approval_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_revision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "endpoint_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "native_scope": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "required": [
+              "tenant_id",
+              "site_id",
+              "environment",
+              "resource_id",
+              "endpoint_id",
+              "native_scope"
+            ]
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "workflow_id": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "workflow_run_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4096
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "admitted",
+              "running",
+              "held",
+              "completed",
+              "cancelled"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4096
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "updated_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "simulation": {
+            "const": true
+          },
+          "evidence_level": {
+            "const": "E2"
+          },
+          "native_write_authorized": {
+            "const": false
+          },
+          "cancel_requested": {
+            "type": "boolean"
+          },
+          "pause_requested": {
+            "type": "boolean"
+          },
+          "stop_requested": {
+            "type": "boolean"
+          },
+          "resources_retained": {
+            "const": true
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "tenant_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "job_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "producer_actor_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "requested_by": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "plan_digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "source_revision": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40}$"
+                  },
+                  "evidence_level": {
+                    "const": "E2"
+                  },
+                  "state": {
+                    "const": "finalized"
+                  },
+                  "native_support": {
+                    "const": false
+                  },
+                  "scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "tenant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "environment": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "resource_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "endpoint_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "native_scope": {
+                        "type": "string",
+                        "maxLength": 4096
+                      }
+                    },
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "environment",
+                      "resource_id",
+                      "endpoint_id",
+                      "native_scope"
+                    ]
+                  },
+                  "retention_until": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "finalized_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "id",
+                  "tenant_id",
+                  "job_id",
+                  "producer_actor_id",
+                  "requested_by",
+                  "plan_digest",
+                  "digest",
+                  "source_revision",
+                  "evidence_level",
+                  "state",
+                  "native_support",
+                  "scope",
+                  "retention_until",
+                  "finalized_at"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recovery_mode": {
+            "enum": [
+              "forward_recovery_required",
+              "pre_target_write_reconciliation"
+            ]
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "step": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "ordinal": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "outcome": {
+                  "enum": [
+                    "not_started",
+                    "attempting",
+                    "outcome_unknown",
+                    "confirmed_succeeded",
+                    "confirmed_failed"
+                  ]
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "observation": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "tenant_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "job_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "operation_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "attempt_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "epoch": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "plan_digest": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "simulation": {
+                          "const": true
+                        },
+                        "sealed": {
+                          "const": true
+                        },
+                        "effect_count": {
+                          "enum": [
+                            0,
+                            1
+                          ]
+                        },
+                        "observed_at": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "outcome": {
+                          "enum": [
+                            "confirmed_succeeded",
+                            "confirmed_failed"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "tenant_id",
+                        "job_id",
+                        "operation_id",
+                        "attempt_id",
+                        "epoch",
+                        "plan_digest",
+                        "simulation",
+                        "sealed",
+                        "effect_count",
+                        "observed_at",
+                        "outcome"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "step",
+                "ordinal",
+                "outcome",
+                "revision",
+                "observation"
+              ]
+            },
+            "maxItems": 32
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "kind": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "facts": {
+                  "type": "object"
+                },
+                "occurred_at": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "facts",
+                "occurred_at"
+              ]
+            },
+            "maxItems": 300
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "actor_id",
+          "requested_by",
+          "plan_id",
+          "approval_id",
+          "source_revision",
+          "scope",
+          "plan_digest",
+          "workflow_id",
+          "workflow_run_id",
+          "state",
+          "reason",
+          "revision",
+          "observed_at",
+          "updated_at",
+          "simulation",
+          "evidence_level",
+          "native_write_authorized",
+          "cancel_requested",
+          "pause_requested",
+          "stop_requested",
+          "resources_retained",
+          "evidence",
+          "recovery_mode",
+          "operations",
+          "events"
+        ]
+      },
+      "CommandReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action": {
+            "enum": [
+              "pause",
+              "cancel",
+              "stop",
+              "reconcile",
+              "resume",
+              "retry_unstarted"
+            ]
+          },
+          "accepted": {
+            "const": true
+          },
+          "effect_undone": {
+            "const": false
+          }
+        },
+        "required": [
+          "command_id",
+          "job_id",
+          "action",
+          "accepted",
+          "effect_undone"
+        ]
+      },
+      "Evidence": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "producer_actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "requested_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_revision": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "evidence_level": {
+            "const": "E2"
+          },
+          "state": {
+            "const": "finalized"
+          },
+          "native_support": {
+            "const": false
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "endpoint_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "native_scope": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "required": [
+              "tenant_id",
+              "site_id",
+              "environment",
+              "resource_id",
+              "endpoint_id",
+              "native_scope"
+            ]
+          },
+          "retention_until": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "finalized_at": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "job_id",
+          "producer_actor_id",
+          "requested_by",
+          "plan_digest",
+          "digest",
+          "source_revision",
+          "evidence_level",
+          "state",
+          "native_support",
+          "scope",
+          "retention_until",
+          "finalized_at"
+        ]
+      },
+      "EvidenceRecord": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "producer_actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "requested_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_revision": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "evidence_level": {
+            "const": "E2"
+          },
+          "state": {
+            "const": "finalized"
+          },
+          "native_support": {
+            "const": false
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "endpoint_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "native_scope": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "required": [
+              "tenant_id",
+              "site_id",
+              "environment",
+              "resource_id",
+              "endpoint_id",
+              "native_scope"
+            ]
+          },
+          "retention_until": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "finalized_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "observations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "tenant_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "job_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "operation_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "attempt_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "epoch": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "plan_digest": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "simulation": {
+                  "const": true
+                },
+                "sealed": {
+                  "const": true
+                },
+                "effect_count": {
+                  "enum": [
+                    0,
+                    1
+                  ]
+                },
+                "observed_at": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "outcome": {
+                  "enum": [
+                    "confirmed_succeeded",
+                    "confirmed_failed"
+                  ]
+                }
+              },
+              "required": [
+                "tenant_id",
+                "job_id",
+                "operation_id",
+                "attempt_id",
+                "epoch",
+                "plan_digest",
+                "simulation",
+                "sealed",
+                "effect_count",
+                "observed_at",
+                "outcome"
+              ]
+            },
+            "maxItems": 32
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "evidence": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "reviewer": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "decision": {
+                  "enum": [
+                    "accepted_simulation",
+                    "rejected"
+                  ]
+                },
+                "recorded_at": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "id",
+                "evidence",
+                "reviewer",
+                "decision",
+                "recorded_at"
+              ]
+            },
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "job_id",
+          "producer_actor_id",
+          "requested_by",
+          "plan_digest",
+          "digest",
+          "source_revision",
+          "evidence_level",
+          "state",
+          "native_support",
+          "scope",
+          "retention_until",
+          "finalized_at",
+          "observations",
+          "reviews"
+        ]
+      },
+      "Observation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attempt_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "epoch": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "simulation": {
+            "const": true
+          },
+          "sealed": {
+            "const": true
+          },
+          "effect_count": {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "outcome": {
+            "enum": [
+              "confirmed_succeeded",
+              "confirmed_failed"
+            ]
+          }
+        },
+        "required": [
+          "tenant_id",
+          "job_id",
+          "operation_id",
+          "attempt_id",
+          "epoch",
+          "plan_digest",
+          "simulation",
+          "sealed",
+          "effect_count",
+          "observed_at",
+          "outcome"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "result": "FAIL",
+  "source_sha": "88e44414e4add9706435e49d869090cc1b5f81c5",
+  "observer": "Codex via GitHub connector; original archive and retained bytes verified against declared hashes and committed source",
+  "run_id": 37371171458,
+  "artifact_id": 11370711398,
+  "archive_sha256": "091a5c27473d2b651441393e8283137669f98c7b26398730946dea69398b0ca8",
+  "report_sha256": "2831858784c9ee9fa8720fbd9ba13f342242c39539b530fbd9a535b7c2ecfb1b",
+  "matched_unique_source_bindings": 388,
+  "matched_command_logs": 86,
+  "failure": "Console image Composer platform validation rejects missing ext-sockets required by php-amqplib; installation never starts.",
+  "correction": "Compile sockets in the Console image and declare its root platform requirement; keep dependency/platform checks enabled. Corrected-image replay is separate evidence."
+}

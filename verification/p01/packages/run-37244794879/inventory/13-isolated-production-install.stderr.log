@@ -1,0 +1,9 @@
+Using Python 3.12.14 environment at: /home/runner/work/_temp/p01-quality/runtime
+Resolved 6 packages in 76ms
+Installed 6 packages in 3ms
+ + click==8.5.0
+ + h11==0.16.0
+ + psycopg==3.3.6
+ + psycopg-binary==3.3.6
+ + typing-extensions==4.16.0
+ + uvicorn==0.53.0

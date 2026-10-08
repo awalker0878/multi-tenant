@@ -1,0 +1,21 @@
+docker.io/temporalio/server@sha256:ca47d4de249b9cc28137628dba77ae5e75e8b313ebb5c801c64615c1c99cbb09: Pulling from temporalio/server
+55afa1ecc21d: Already exists
+fa58b7f909a2: Pulling fs layer
+390716d35991: Pulling fs layer
+f798dc7f8236: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+4f4fb700ef54: Waiting
+fa58b7f909a2: Download complete
+f798dc7f8236: Verifying Checksum
+f798dc7f8236: Download complete
+4f4fb700ef54: Verifying Checksum
+4f4fb700ef54: Download complete
+390716d35991: Verifying Checksum
+390716d35991: Download complete
+fa58b7f909a2: Pull complete
+390716d35991: Pull complete
+f798dc7f8236: Pull complete
+4f4fb700ef54: Pull complete
+Digest: sha256:ca47d4de249b9cc28137628dba77ae5e75e8b313ebb5c801c64615c1c99cbb09
+Status: Downloaded newer image for temporalio/server@sha256:ca47d4de249b9cc28137628dba77ae5e75e8b313ebb5c801c64615c1c99cbb09
+docker.io/temporalio/server@sha256:ca47d4de249b9cc28137628dba77ae5e75e8b313ebb5c801c64615c1c99cbb09

@@ -1,0 +1,988 @@
+{
+  "intent": {
+    "schema_version": 1,
+    "deployment_id": "00000000-0000-4000-8000-000000000003",
+    "environment": {
+      "id": "00000000-0000-4000-8000-000000000010",
+      "version": 1
+    },
+    "service_owner_id": "00000000-0000-4000-8000-000000000002",
+    "acceptance_criteria": [
+      "Submit and retrieve a permit with its attachment"
+    ],
+    "workloads": [
+      {
+        "id": "00000000-0000-4000-8000-000000000100",
+        "name": "Web",
+        "role": "web",
+        "wsd": {
+          "id": "00000000-0000-4000-8000-000000000011",
+          "version": 1
+        },
+        "security_domain": {
+          "id": "00000000-0000-4000-8000-000000000021",
+          "version": 1
+        },
+        "compute": {
+          "vcpus": 2,
+          "memory_mib": 4096,
+          "architecture": "x86_64"
+        },
+        "guest": {
+          "os": "linux",
+          "image": "approved-image-v1",
+          "firmware": "uefi",
+          "secure_boot": true,
+          "hardening_profile": "linux-baseline-v1"
+        },
+        "disks": [
+          {
+            "id": "00000000-0000-4000-8000-000000000200",
+            "order": 0,
+            "size_gib": 40,
+            "storage_class": "standard",
+            "boot": true,
+            "dataset_id": null,
+            "encryption": "required"
+          }
+        ],
+        "nics": [
+          {
+            "id": "00000000-0000-4000-8000-000000000400",
+            "order": 0,
+            "security_domain_id": "00000000-0000-4000-8000-000000000021",
+            "address_families": [
+              "ipv4"
+            ],
+            "address_intent": "reserved",
+            "network_class": "private"
+          }
+        ],
+        "requirements": [],
+        "failure_domain": {
+          "group": "permit",
+          "mode": "anti_affinity",
+          "strength": "required"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000101",
+        "name": "Database",
+        "role": "database",
+        "wsd": {
+          "id": "00000000-0000-4000-8000-000000000012",
+          "version": 1
+        },
+        "security_domain": {
+          "id": "00000000-0000-4000-8000-000000000022",
+          "version": 1
+        },
+        "compute": {
+          "vcpus": 2,
+          "memory_mib": 4096,
+          "architecture": "x86_64"
+        },
+        "guest": {
+          "os": "linux",
+          "image": "approved-image-v1",
+          "firmware": "uefi",
+          "secure_boot": true,
+          "hardening_profile": "linux-baseline-v1"
+        },
+        "disks": [
+          {
+            "id": "00000000-0000-4000-8000-000000000201",
+            "order": 0,
+            "size_gib": 40,
+            "storage_class": "standard",
+            "boot": true,
+            "dataset_id": "00000000-0000-4000-8000-000000000300",
+            "encryption": "required"
+          }
+        ],
+        "nics": [
+          {
+            "id": "00000000-0000-4000-8000-000000000401",
+            "order": 0,
+            "security_domain_id": "00000000-0000-4000-8000-000000000022",
+            "address_families": [
+              "ipv4"
+            ],
+            "address_intent": "reserved",
+            "network_class": "private"
+          }
+        ],
+        "requirements": [],
+        "failure_domain": {
+          "group": "permit",
+          "mode": "anti_affinity",
+          "strength": "required"
+        }
+      }
+    ],
+    "datasets": [
+      {
+        "id": "00000000-0000-4000-8000-000000000300",
+        "name": "Permit data",
+        "owner_id": "00000000-0000-4000-8000-000000000002",
+        "consistency_group": "permit",
+        "consistency": "application",
+        "recovery": {
+          "rpo_seconds": 0,
+          "rto_seconds": 3600,
+          "method": "native_api_export_import",
+          "strength": "required"
+        }
+      }
+    ],
+    "dependencies": [
+      {
+        "from": "00000000-0000-4000-8000-000000000100",
+        "to": "00000000-0000-4000-8000-000000000101",
+        "kind": "startup",
+        "readiness": "Database accepts queries",
+        "protocol": "none",
+        "port": null,
+        "controlled_interface": false,
+        "dataset_id": "00000000-0000-4000-8000-000000000300",
+        "strength": "required"
+      },
+      {
+        "from": "00000000-0000-4000-8000-000000000100",
+        "to": "00000000-0000-4000-8000-000000000101",
+        "kind": "communication",
+        "readiness": "Database accepts application connection",
+        "protocol": "tcp",
+        "port": 5432,
+        "controlled_interface": true,
+        "dataset_id": "00000000-0000-4000-8000-000000000300",
+        "strength": "required"
+      }
+    ],
+    "services": [
+      {
+        "name": "backup",
+        "owner_id": "00000000-0000-4000-8000-000000000002",
+        "workload_id": "00000000-0000-4000-8000-000000000101",
+        "requirements": [
+          {
+            "key": "service.backup",
+            "strength": "required",
+            "value": "commvault",
+            "reason": "Protect the application data"
+          }
+        ]
+      }
+    ],
+    "requirements": []
+  },
+  "destination": {
+    "tenant_id": "10000000-0000-4000-8000-000000000001",
+    "site_id": "10000000-0000-4000-8000-000000000004",
+    "endpoint_id": "10000000-0000-4000-8000-000000000005",
+    "generation_id": "10000000-0000-4000-8000-000000000006",
+    "platform": "openstack",
+    "native_scope": "project:10000000-0000-4000-8000-000000000020",
+    "current": true,
+    "completion": "complete",
+    "expires_at": 2000001800,
+    "holds": [],
+    "installed_provenance": "observed",
+    "installed_tuple": {
+      "platform": "openstack",
+      "release": "synthetic",
+      "compute_api": "2.1",
+      "network_api": "2.0",
+      "storage_api": "3",
+      "network_backend": "synthetic",
+      "storage_backend": "synthetic",
+      "guest": "synthetic"
+    },
+    "dimensions": {
+      "installed_identity": "observed",
+      "compute_placement": "observed",
+      "storage_datasets": "observed",
+      "network_vpc": "observed",
+      "security_edge": "observed",
+      "guest_image": "observed",
+      "lifecycle_adoption": "observed",
+      "mobility": "observed",
+      "shared_services": "observed",
+      "resilience_operations": "observed",
+      "assurance_sovereignty": "observed"
+    },
+    "capabilities": {
+      "compute.architecture": {
+        "status": "observed",
+        "values": [
+          "x86_64"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "guest.os": {
+        "status": "observed",
+        "values": [
+          "linux"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "guest.image": {
+        "status": "observed",
+        "values": [
+          "approved-image-v1"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "guest.firmware": {
+        "status": "observed",
+        "values": [
+          "uefi"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "guest.secure_boot": {
+        "status": "observed",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "guest.hardening_profile": {
+        "status": "observed",
+        "values": [
+          "linux-baseline-v1"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "placement.tenant_isolation": {
+        "status": "observed",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "placement.domain_isolation": {
+        "status": "observed",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "placement.zone_allowed": {
+        "status": "observed",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "placement.failure_domain.anti_affinity": {
+        "status": "observed",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "storage.class": {
+        "status": "observed",
+        "values": [
+          "standard"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "storage.encryption": {
+        "status": "observed",
+        "values": [
+          "required"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "network.class": {
+        "status": "observed",
+        "values": [
+          "private"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "network.family": {
+        "status": "observed",
+        "values": [
+          "ipv4"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "network.address_intent": {
+        "status": "observed",
+        "values": [
+          "reserved"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "data.consistency": {
+        "status": "observed",
+        "values": [
+          "application"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "recovery.method": {
+        "status": "observed",
+        "values": [
+          "native_api_export_import"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "recovery.rpo_seconds": {
+        "status": "observed",
+        "values": [
+          0
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "recovery.rto_seconds": {
+        "status": "observed",
+        "values": [
+          3600
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "service.backup.owner": {
+        "status": "observed",
+        "values": [
+          "00000000-0000-4000-8000-000000000002"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "service.backup": {
+        "status": "observed",
+        "values": [
+          "commvault"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "network.controlled_interface": {
+        "status": "observed",
+        "values": [
+          {
+            "from": "00000000-0000-4000-8000-000000000100",
+            "to": "00000000-0000-4000-8000-000000000101",
+            "protocol": "tcp",
+            "port": 5432
+          }
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "sovereignty.location": {
+        "status": "observed",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "sovereignty.custody": {
+        "status": "observed",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "sovereignty.data_path": {
+        "status": "observed",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      }
+    },
+    "capacity": {
+      "vcpus": 4,
+      "memory_mib": 8192,
+      "storage_gib": 80,
+      "addresses": 2
+    },
+    "domain_bindings": {
+      "00000000-0000-4000-8000-000000000021": "synthetic-domain-0",
+      "00000000-0000-4000-8000-000000000022": "synthetic-domain-1"
+    },
+    "workload_bindings": {}
+  },
+  "profile": {
+    "platform": "openstack",
+    "version": "synthetic-v1",
+    "dimensions": [
+      {
+        "dimension": "installed_identity",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      },
+      {
+        "dimension": "compute_placement",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      },
+      {
+        "dimension": "storage_datasets",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      },
+      {
+        "dimension": "network_vpc",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      },
+      {
+        "dimension": "security_edge",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      },
+      {
+        "dimension": "guest_image",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      },
+      {
+        "dimension": "lifecycle_adoption",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      },
+      {
+        "dimension": "mobility",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      },
+      {
+        "dimension": "shared_services",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      },
+      {
+        "dimension": "resilience_operations",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      },
+      {
+        "dimension": "assurance_sovereignty",
+        "declaration": {
+          "status": "declared",
+          "operations": [
+            "application.provision",
+            "application.migrate",
+            "application.recover",
+            "application.retire"
+          ]
+        }
+      }
+    ],
+    "digest": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876"
+  },
+  "policy": {
+    "id": "synthetic-policy",
+    "version": 1,
+    "expires_at": 2000003600,
+    "requirements": [],
+    "artifacts": {
+      "compiler": "8d9aa3ce74652dc4e69fac8954afd3f92db75062429b870d650291969189b46e",
+      "adapter": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+      "automation": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
+      "contracts": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f"
+    },
+    "downtime_seconds": 3600,
+    "reservation_owners": {
+      "vcpus": "synthetic-vcpus",
+      "memory_mib": "synthetic-memory_mib",
+      "storage_gib": "synthetic-storage_gib",
+      "addresses": "synthetic-addresses"
+    },
+    "ownership": [
+      {
+        "resource": "00000000-0000-4000-8000-000000000100",
+        "fields": [
+          "infrastructure"
+        ],
+        "writer": "lifecycle",
+        "custody_ref": "evidence://fixture/custody",
+        "native_identity": null
+      },
+      {
+        "resource": "00000000-0000-4000-8000-000000000101",
+        "fields": [
+          "infrastructure"
+        ],
+        "writer": "lifecycle",
+        "custody_ref": "evidence://fixture/custody",
+        "native_identity": null
+      }
+    ],
+    "native_api": {
+      "operation_plan": {
+        "schema_version": 1,
+        "project_id": "10000000-0000-4000-8000-000000000020",
+        "ownership_digest": "1913f004ce18d5c4aa0f93a9dc314e53b55b6b93a1a277a6dc6100be552653d1",
+        "custody_id": "10000000-0000-4000-8000-000000000021",
+        "custody_generation": 1,
+        "api_versions": {
+          "compute": "2.1",
+          "network": "2.0",
+          "volume": "3.0"
+        },
+        "resources": [
+          {
+            "key": "workload0_port",
+            "kind": "port",
+            "spec": {
+              "name": "workload0-port",
+              "network_id": "10000000-0000-4000-8000-000000000004",
+              "security_groups": [
+                "10000000-0000-4000-8000-000000000005"
+              ],
+              "fixed_ips": [
+                {
+                  "subnet_id": "10000000-0000-4000-8000-000000000006",
+                  "ip_address": "192.0.2.10"
+                }
+              ],
+              "admin_state_up": false,
+              "port_security_enabled": true
+            }
+          },
+          {
+            "key": "workload0_boot",
+            "kind": "volume",
+            "spec": {
+              "name": "workload0-boot",
+              "size": 40,
+              "volume_type": "qualified",
+              "availability_zone": "nova",
+              "imageRef": "10000000-0000-4000-8000-000000000007"
+            }
+          },
+          {
+            "key": "workload0_vm",
+            "kind": "server",
+            "spec": {
+              "name": "workload0-vm",
+              "flavorRef": "2",
+              "availability_zone": "nova",
+              "config_drive": true,
+              "ports": [
+                "workload0_port"
+              ],
+              "volumes": [
+                {
+                  "key": "workload0_boot",
+                  "boot_index": 0
+                }
+              ]
+            }
+          },
+          {
+            "key": "workload1_port",
+            "kind": "port",
+            "spec": {
+              "name": "workload1-port",
+              "network_id": "10000000-0000-4000-8000-000000000004",
+              "security_groups": [
+                "10000000-0000-4000-8000-000000000005"
+              ],
+              "fixed_ips": [
+                {
+                  "subnet_id": "10000000-0000-4000-8000-000000000006",
+                  "ip_address": "192.0.2.11"
+                }
+              ],
+              "admin_state_up": false,
+              "port_security_enabled": true
+            }
+          },
+          {
+            "key": "workload1_boot",
+            "kind": "volume",
+            "spec": {
+              "name": "workload1-boot",
+              "size": 40,
+              "volume_type": "qualified",
+              "availability_zone": "nova",
+              "imageRef": "10000000-0000-4000-8000-000000000007"
+            }
+          },
+          {
+            "key": "workload1_vm",
+            "kind": "server",
+            "spec": {
+              "name": "workload1-vm",
+              "flavorRef": "2",
+              "availability_zone": "nova",
+              "config_drive": true,
+              "ports": [
+                "workload1_port"
+              ],
+              "volumes": [
+                {
+                  "key": "workload1_boot",
+                  "boot_index": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "operation_plan_sha256": "c5476ea04af38a9ba297f89c764aae61b6a55706ca71764194eb05d7f8f1d228",
+      "api_contracts_sha256": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f",
+      "adapter_sha256": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+      "custody_ref": "evidence://fixture/custody",
+      "custody_id": "10000000-0000-4000-8000-000000000021",
+      "custody_generation": 1,
+      "fence_owner": "lifecycle"
+    }
+  },
+  "qualification": {
+    "id": "synthetic-evidence",
+    "version": 1,
+    "status": "qualified",
+    "evidence_level": "E3",
+    "expires_at": 2000001800,
+    "revoked": false,
+    "scope": {
+      "tenant_id": "10000000-0000-4000-8000-000000000001",
+      "site_id": "10000000-0000-4000-8000-000000000004",
+      "endpoint_id": "10000000-0000-4000-8000-000000000005",
+      "native_scope": "project:10000000-0000-4000-8000-000000000020",
+      "installed_tuple": {
+        "platform": "openstack",
+        "release": "synthetic",
+        "compute_api": "2.1",
+        "network_api": "2.0",
+        "storage_api": "3",
+        "network_backend": "synthetic",
+        "storage_backend": "synthetic",
+        "guest": "synthetic"
+      },
+      "action": "application.provision",
+      "method": "native_api",
+      "profile_digest": "66dc8a20ae097f49ec11587ec54a726c8a122c131e6acf5c3e70d6c49ef6f876",
+      "artifacts": {
+        "compiler": "8d9aa3ce74652dc4e69fac8954afd3f92db75062429b870d650291969189b46e",
+        "adapter": "105369b84ef82bacbab6866422bbeb5e88539f3e80373b63e8d7bf97f0b5e88c",
+        "automation": "bf7ed6f371faf815dfd447c46cb4479326a3492b6195df73e31083af22ea72f4",
+        "contracts": "278071d4c97a31613d69a92410216eabb9c18b40fa5d1ee6f24f5f4fa7926e9f"
+      }
+    },
+    "evidence_refs": [
+      "fixture://not-native-evidence"
+    ],
+    "dimensions": [
+      "installed_identity",
+      "compute_placement",
+      "storage_datasets",
+      "network_vpc",
+      "security_edge",
+      "guest_image",
+      "lifecycle_adoption",
+      "mobility",
+      "shared_services",
+      "resilience_operations",
+      "assurance_sovereignty"
+    ],
+    "capabilities": {
+      "compute.architecture": {
+        "status": "supported",
+        "values": [
+          "x86_64"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "guest.os": {
+        "status": "supported",
+        "values": [
+          "linux"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "guest.image": {
+        "status": "supported",
+        "values": [
+          "approved-image-v1"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "guest.firmware": {
+        "status": "supported",
+        "values": [
+          "uefi"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "guest.secure_boot": {
+        "status": "supported",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "guest.hardening_profile": {
+        "status": "supported",
+        "values": [
+          "linux-baseline-v1"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "placement.tenant_isolation": {
+        "status": "supported",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "placement.domain_isolation": {
+        "status": "supported",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "placement.zone_allowed": {
+        "status": "supported",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "placement.failure_domain.anti_affinity": {
+        "status": "supported",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "storage.class": {
+        "status": "supported",
+        "values": [
+          "standard"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "storage.encryption": {
+        "status": "supported",
+        "values": [
+          "required"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "network.class": {
+        "status": "supported",
+        "values": [
+          "private"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "network.family": {
+        "status": "supported",
+        "values": [
+          "ipv4"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "network.address_intent": {
+        "status": "supported",
+        "values": [
+          "reserved"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "data.consistency": {
+        "status": "supported",
+        "values": [
+          "application"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "recovery.method": {
+        "status": "supported",
+        "values": [
+          "native_api_export_import"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "recovery.rpo_seconds": {
+        "status": "supported",
+        "values": [
+          0
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "recovery.rto_seconds": {
+        "status": "supported",
+        "values": [
+          3600
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "service.backup.owner": {
+        "status": "supported",
+        "values": [
+          "00000000-0000-4000-8000-000000000002"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "service.backup": {
+        "status": "supported",
+        "values": [
+          "commvault"
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "network.controlled_interface": {
+        "status": "supported",
+        "values": [
+          {
+            "from": "00000000-0000-4000-8000-000000000100",
+            "to": "00000000-0000-4000-8000-000000000101",
+            "protocol": "tcp",
+            "port": 5432
+          }
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "sovereignty.location": {
+        "status": "supported",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "sovereignty.custody": {
+        "status": "supported",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      },
+      "sovereignty.data_path": {
+        "status": "supported",
+        "values": [
+          true
+        ],
+        "expires_at": 2000001800,
+        "dependencies": []
+      }
+    }
+  }
+}

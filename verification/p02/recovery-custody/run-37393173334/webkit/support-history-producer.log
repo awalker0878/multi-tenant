@@ -1,0 +1,7 @@
+
+   PASS  Tests\Feature\SupportAccessTest
+  ✓ it retains nonempty terminal support history for recovery qualifica… 1.28s  
+
+  Tests:    1 passed (46 assertions)
+  Duration: 1.32s
+

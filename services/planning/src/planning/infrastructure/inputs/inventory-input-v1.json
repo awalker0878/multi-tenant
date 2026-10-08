@@ -1,0 +1,243 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "tenant_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "site_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "endpoint_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "generation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "platform": {
+      "enum": [
+        "vmware",
+        "ahv",
+        "openstack"
+      ]
+    },
+    "native_scope": {
+      "type": "string"
+    },
+    "current": {
+      "type": "boolean"
+    },
+    "completion": {
+      "type": "string"
+    },
+    "expires_at": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "holds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 1000
+    },
+    "installed_provenance": {
+      "enum": [
+        "declaration",
+        "observed",
+        "unknown"
+      ]
+    },
+    "installed_tuple": {
+      "type": "object"
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "installed_identity": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        },
+        "compute_placement": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        },
+        "storage_datasets": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        },
+        "network_vpc": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        },
+        "security_edge": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        },
+        "guest_image": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        },
+        "lifecycle_adoption": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        },
+        "mobility": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        },
+        "shared_services": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        },
+        "resilience_operations": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        },
+        "assurance_sovereignty": {
+          "enum": [
+            "observed",
+            "unassessed",
+            "unsupported"
+          ]
+        }
+      },
+      "required": [
+        "installed_identity",
+        "compute_placement",
+        "storage_datasets",
+        "network_vpc",
+        "security_edge",
+        "guest_image",
+        "lifecycle_adoption",
+        "mobility",
+        "shared_services",
+        "resilience_operations",
+        "assurance_sovereignty"
+      ]
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "enum": [
+              "observed",
+              "supported",
+              "unsupported",
+              "unknown"
+            ]
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "values": {
+            "type": "array",
+            "items": {},
+            "maxItems": 1000
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "status",
+          "expires_at",
+          "values",
+          "dependencies"
+        ]
+      },
+      "maxProperties": 1000
+    },
+    "capacity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vcpus": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "memory_mib": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "storage_gib": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "addresses": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "domain_bindings": {
+      "type": "object"
+    },
+    "workload_bindings": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "site_id",
+    "endpoint_id",
+    "generation_id",
+    "platform",
+    "native_scope",
+    "current",
+    "completion",
+    "expires_at",
+    "holds",
+    "installed_provenance",
+    "installed_tuple",
+    "dimensions",
+    "capabilities",
+    "capacity",
+    "domain_bindings",
+    "workload_bindings"
+  ]
+}

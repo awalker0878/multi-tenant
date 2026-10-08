@@ -1,0 +1,232 @@
+[
+  {
+    "id": "sample-valid",
+    "schema": "Sample",
+    "valid": true,
+    "value": {
+      "sample_id": "sample_a1",
+      "schema_version": 1,
+      "phase": "ready",
+      "revision": "9007199254740993",
+      "note": null
+    }
+  },
+  {
+    "id": "sample-additive-field",
+    "schema": "Sample",
+    "valid": true,
+    "value": {
+      "sample_id": "sample_a1",
+      "schema_version": 1,
+      "phase": "ready",
+      "revision": "9007199254740993",
+      "note": null,
+      "future_display": "ignored-or-preserved-by-adapter"
+    }
+  },
+  {
+    "id": "sample-unknown-enum",
+    "schema": "Sample",
+    "valid": false,
+    "value": {
+      "sample_id": "sample_a1",
+      "schema_version": 1,
+      "phase": "executing",
+      "revision": "9007199254740993",
+      "note": null
+    }
+  },
+  {
+    "id": "sample-unknown-version",
+    "schema": "Sample",
+    "valid": false,
+    "value": {
+      "sample_id": "sample_a1",
+      "schema_version": 2,
+      "phase": "ready",
+      "revision": "9007199254740993",
+      "note": null
+    }
+  },
+  {
+    "id": "sample-numeric-precision",
+    "schema": "Sample",
+    "valid": false,
+    "value": {
+      "sample_id": "sample_a1",
+      "schema_version": 1,
+      "phase": "ready",
+      "revision": 9007199254740993,
+      "note": null
+    }
+  },
+  {
+    "id": "sample-required-missing",
+    "schema": "Sample",
+    "valid": false,
+    "value": {
+      "schema_version": 1,
+      "phase": "ready",
+      "revision": "9007199254740993",
+      "note": null
+    }
+  },
+  {
+    "id": "request-valid",
+    "schema": "CreateSample",
+    "valid": true,
+    "value": {
+      "label": "Synthetic sample",
+      "note": null
+    }
+  },
+  {
+    "id": "request-unknown-field",
+    "schema": "CreateSample",
+    "valid": false,
+    "value": {
+      "label": "Synthetic sample",
+      "actor_id": "untrusted"
+    }
+  },
+  {
+    "id": "request-empty-label",
+    "schema": "CreateSample",
+    "valid": false,
+    "value": {
+      "label": ""
+    }
+  },
+  {
+    "id": "request-wrong-type",
+    "schema": "CreateSample",
+    "valid": false,
+    "value": {
+      "label": 1
+    }
+  },
+  {
+    "id": "problem-valid",
+    "schema": "Problem",
+    "valid": true,
+    "value": {
+      "type": "https://contract.invalid/problems/missing",
+      "status": 404,
+      "code": "sample_missing",
+      "retryable": false
+    }
+  },
+  {
+    "id": "problem-invalid-status",
+    "schema": "Problem",
+    "valid": false,
+    "value": {
+      "type": "https://contract.invalid/problems/missing",
+      "status": 200,
+      "code": "sample_missing",
+      "retryable": false
+    }
+  },
+  {
+    "id": "event-valid",
+    "schema": "Event",
+    "valid": true,
+    "value": {
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174000",
+      "occurred_at": "2026-10-04T12:00:00Z",
+      "revision": "9007199254740993",
+      "producer": "p00-synthetic",
+      "tenant_id": "tenant_probe",
+      "aggregate_id": "sample_a1",
+      "aggregate_version": 1,
+      "correlation_id": "correlation_probe",
+      "causation_id": "command_probe"
+    }
+  },
+  {
+    "id": "event-invalid-date",
+    "schema": "Event",
+    "valid": false,
+    "value": {
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174000",
+      "occurred_at": "yesterday",
+      "revision": "9007199254740993",
+      "producer": "p00-synthetic",
+      "tenant_id": "tenant_probe",
+      "aggregate_id": "sample_a1",
+      "aggregate_version": 1,
+      "correlation_id": "correlation_probe",
+      "causation_id": "command_probe"
+    }
+  },
+  {
+    "id": "event-unknown-version",
+    "schema": "Event",
+    "valid": false,
+    "value": {
+      "schema_version": 2,
+      "event_id": "123e4567-e89b-42d3-a456-426614174000",
+      "occurred_at": "2026-10-04T12:00:00Z",
+      "revision": "9007199254740993",
+      "producer": "p00-synthetic",
+      "tenant_id": "tenant_probe",
+      "aggregate_id": "sample_a1",
+      "aggregate_version": 1,
+      "correlation_id": "correlation_probe",
+      "causation_id": "command_probe"
+    }
+  },
+  {
+    "id": "event-missing-tenant",
+    "schema": "Event",
+    "valid": false,
+    "value": {
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174000",
+      "occurred_at": "2026-10-04T12:00:00Z",
+      "revision": "9007199254740993",
+      "producer": "p00-synthetic",
+      "aggregate_id": "sample_a1",
+      "aggregate_version": 1,
+      "correlation_id": "correlation_probe",
+      "causation_id": "command_probe"
+    }
+  },
+  {
+    "id": "event-unknown-field",
+    "schema": "Event",
+    "valid": false,
+    "value": {
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174000",
+      "occurred_at": "2026-10-04T12:00:00Z",
+      "revision": "9007199254740993",
+      "producer": "p00-synthetic",
+      "tenant_id": "tenant_probe",
+      "aggregate_id": "sample_a1",
+      "aggregate_version": 1,
+      "correlation_id": "correlation_probe",
+      "causation_id": "command_probe",
+      "credential": "forbidden-synthetic-value"
+    }
+  },
+  {
+    "id": "event-invalid-aggregate-version",
+    "schema": "Event",
+    "valid": false,
+    "value": {
+      "schema_version": 1,
+      "event_id": "123e4567-e89b-42d3-a456-426614174000",
+      "occurred_at": "2026-10-04T12:00:00Z",
+      "revision": "9007199254740993",
+      "producer": "p00-synthetic",
+      "tenant_id": "tenant_probe",
+      "aggregate_id": "sample_a1",
+      "aggregate_version": 0,
+      "correlation_id": "correlation_probe",
+      "causation_id": "command_probe"
+    }
+  }
+]

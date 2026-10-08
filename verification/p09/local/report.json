@@ -1,0 +1,1005 @@
+{
+  "schema_version": 1,
+  "source_revision": "86fb17a7154caa23dd4f67728bc6b068f518d111",
+  "observed_at": "2026-10-07T21:55:51.805256+00:00",
+  "environment": {
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "postgres_available": false
+  },
+  "evidence_level": "E2",
+  "source_bindings": {
+    ".github/workflows/p09-expansion.yml": "20df5ef131641289129b299178029312368ee4543d3a375423dc56fdf2a4fa24",
+    "contracts/schemas/expansion/adapter-package-v1.json": "a217011afb976945a4b17480892b3b1ace1555409e57dd0700503f54bc20789e",
+    "contracts/schemas/expansion/tranche-v1.json": "feeb27b557070490a4858952d5b9578494ec766d833e24c569fe7d1b0a1cbe8b",
+    "scripts/p09/check_contract.py": "2089628f8d104b088fc49266f9e0b87986fe96f68dd51fa30481a47562b5996f",
+    "scripts/p09/generate_contract.py": "95c2763713c448dab4eb9ea4090ca1568872acaefdcd34627a9191bffc778568",
+    "scripts/p09/qualify.py": "a688f2e9ed606ed8a8c9b656d7e6675a2b635e58b9a6a0ee2589f8681f1445c0",
+    "services/lifecycle/.dockerignore": "fe73f11478a4bff4efd3ba35718d1102b36eaca32a5b55cf3267b2a6eadbe91a",
+    "services/lifecycle/.gitignore": "c95d538d814abdee4b85b0190ecdff09a9cf312e47e64374c78f984994ab34b6",
+    "services/lifecycle/.python-version": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "services/lifecycle/Dockerfile": "9ea7ae813e208f09f21c3fe3fa7467d51f4ca84fbc0c5799a55e603048de05a6",
+    "services/lifecycle/README.md": "a113d147ea9778a1e6e067da139c713a962469f0264383240b85a8fba6e49c9b",
+    "services/lifecycle/migrations/001_reservations.sql": "7dc99e276436692552143fa40558d081a3e75434d4815f4428e2345cbf2210f5",
+    "services/lifecycle/migrations/002_execution.sql": "c1bc036f22d8d674025baac5bb7d34e581631f4c97ec7990e89e99324f2d84fd",
+    "services/lifecycle/migrations/003_event_order.sql": "903553f36e0db82f3d1fa9bce32efb01a25ed7c1dec4759acee3c5993fb451a7",
+    "services/lifecycle/migrations/004_native_workflows.sql": "f7a8c8c2c000b03179887a45ad5172cf4064b5ec0b10408462e7319428865d12",
+    "services/lifecycle/migrations/005_native_dispatch.sql": "05d74da4ced512bce648261f7842c598dbc402a648eb17f84d6d169ae7d681b0",
+    "services/lifecycle/migrations/006_migration_boundaries.sql": "4277116839729d95d619982d6778e0b4fa6fba97044385da41e0f98bfd533229",
+    "services/lifecycle/migrations/007_migration_campaigns.sql": "b60cb216bf9666797357fde3cb315c62f56394856fc9ee0186b1375e580cd4dc",
+    "services/lifecycle/migrations/008_campaign_dispatch.sql": "4b0b36f26a66af8136d8d28ab67de2314f437e80e7356cf679bedb3fb506d630",
+    "services/lifecycle/migrations/009_expansion.sql": "947ff5448201ca5c635ace80ee34f5b139bb007de3d2316eaa996c9ab889e765",
+    "services/lifecycle/pyproject.toml": "37fbc295905b46b7fc375e080d64c7938a9296d549b829e6af761d993201809f",
+    "services/lifecycle/src/lifecycle/__init__.py": "6ef74fd0e8a102879b2b7dfea8ad56a3d8a35c5fb67561e5774aa8b986db2263",
+    "services/lifecycle/src/lifecycle/application/__init__.py": "1f5ae340d751c791e5b1bea85bdeaa0fa9cbb7a2900d7f3473f42e0c2f48047f",
+    "services/lifecycle/src/lifecycle/application/adoption.py": "e4870598d3e991b5382190d471e5df491c73058a186d46b7235607345436379f",
+    "services/lifecycle/src/lifecycle/application/campaign_dispatch.py": "810c26a176841053eb54d87fac1adf27fe7e96540a8e3d359d569d06f67b0d5a",
+    "services/lifecycle/src/lifecycle/application/campaigns.py": "064cc5b40ef31cb02466f269bf26167a683a42ac6236d6113701cfcb9d427fca",
+    "services/lifecycle/src/lifecycle/application/enterprise.py": "ef49b8231fe55a2df187776a23705225f3b179a820d779dfd82f79f2fc00e200",
+    "services/lifecycle/src/lifecycle/application/enterprise_dispatch.py": "2dcfbf4173fabd182edc7bc51729bdaa6fa617142aa732ef03526cb015b11a6d",
+    "services/lifecycle/src/lifecycle/application/execution.py": "150cc56f122496f3e6ee149e4a8bc1b94d824a2d635c136b2e4f4b488914575c",
+    "services/lifecycle/src/lifecycle/application/execution_ports.py": "79c743901a1ddc9fb5006c69f37cc955a4c12f421baa3850ac7e2361ce6b74bb",
+    "services/lifecycle/src/lifecycle/application/foundation.py": "f3774527b6898bf92837c1607552c20f3791981e3f5fc518abf4090ed1e2dc3c",
+    "services/lifecycle/src/lifecycle/application/native_workflow.py": "cbe6cb737d625ab5440537dd766c14eb97112a9d58405024ebd713bd1a0a1bce",
+    "services/lifecycle/src/lifecycle/application/reservations.py": "49dcd1397b964866d0faea670aee56e4afd3f52c59f5dad393af358c0368bcb4",
+    "services/lifecycle/src/lifecycle/bootstrap/__init__.py": "ef6adabd1f5e063e8fc84022c413520bedb752a95eedc2181ea1fcaadbe5ec84",
+    "services/lifecycle/src/lifecycle/bootstrap/commissioning.py": "897e90df7832b7582a5b63dc3ad059267bb2b5b24852b894624c3b8d62fbb132",
+    "services/lifecycle/src/lifecycle/bootstrap/expansion.py": "f4889a768b940980167b9db6bb2a4504be3e866a3b72ce87c1149127234f72a6",
+    "services/lifecycle/src/lifecycle/bootstrap/health.py": "c9d0d3a850c41373c168d85edbf35b5472d5aaedf24c5659134c7b1c6f968e67",
+    "services/lifecycle/src/lifecycle/bootstrap/native_preflight.py": "956fda7694ef05454298bd95094b6b52e0565464abafccac606c5d23e4d230bc",
+    "services/lifecycle/src/lifecycle/bootstrap/native_server.py": "7738486cff5f9b75ef3c6c6420dff5dd3e92ccd0d1a7e28f4242541d6d44587a",
+    "services/lifecycle/src/lifecycle/bootstrap/native_workflow.py": "ceff7bc6ea2d00f9a5a911bd6c8d12b9ae25ede4581010689f413182dfa346b0",
+    "services/lifecycle/src/lifecycle/bootstrap/server.py": "cb1dcc76ff93c39ff574dbfd9a7c35d59beab0283b966766b81e143fbd53f370",
+    "services/lifecycle/src/lifecycle/bootstrap/workflow.py": "3b9cbf1773fdc6e61e7ef5be73a264eeadb65d7fb2d1968738cd2691cfaf7a19",
+    "services/lifecycle/src/lifecycle/domain/__init__.py": "7dafc82e0cb8fc2d2f4a7a946ab8e24739881ec3e40ff44f7fd420a2e8ef71a7",
+    "services/lifecycle/src/lifecycle/domain/admission.py": "4e9be18bd1f96634f2553f29e17fc806edeb848c9d4b54e5b52b78660511d3fc",
+    "services/lifecycle/src/lifecycle/domain/campaign.py": "7e3237cdb7168491190654a770f1dfa222e79a98fc95a8e77e1bb1785de2f39c",
+    "services/lifecycle/src/lifecycle/domain/campaign_plan.py": "6c2e1bbf626176b7ad3695cee433e5e68ca79a15160bd6cb5fb63dceb0d00bf3",
+    "services/lifecycle/src/lifecycle/domain/commissioning.py": "56a0374514a5ae44eed9fe418fd3339385677b8f4bedafd04dee18e387e9ad2f",
+    "services/lifecycle/src/lifecycle/domain/execution.py": "9e08c72a3ded4bd3ffe901d2124f936215e0522f60d783f3a9b42cb60d43a2b3",
+    "services/lifecycle/src/lifecycle/domain/expansion.py": "26c23e79961ecbcd1a4c0d866cc38203f122c5d49823ab9f5177f14507f8eccf",
+    "services/lifecycle/src/lifecycle/domain/migration.py": "dc622bfbaae27ed677037e6af848be4cde0e53baaf4c4c3789c5735e6d36c725",
+    "services/lifecycle/src/lifecycle/domain/native_preflight.py": "1352b9d71e0e23cdcecd4c94a4f4b95a3158eb119c0e15fffff278ca9215212e",
+    "services/lifecycle/src/lifecycle/domain/native_workflow.py": "6e645229686d9d469cdead72372a1faa1d62cfe50ff827639e4d8158b6631150",
+    "services/lifecycle/src/lifecycle/infrastructure/__init__.py": "ec32a7399e0c702770c6372d86b55a54ec146fe993eaff22ce17546839b06eaa",
+    "services/lifecycle/src/lifecycle/infrastructure/campaign_observers.py": "6fb7df38a28958f0a910d10d5efbcf810eac83d82576fcde13bee02d1877bc30",
+    "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py": "d0ea461e295298f4452d2d0d093d17415c5487ad86c45dcc5047ca18f8217d05",
+    "services/lifecycle/src/lifecycle/infrastructure/expansion_owners.py": "870117b086f1c29eca41bbededf32107bd3ba197b17ffb2f56fe6549795db1c8",
+    "services/lifecycle/src/lifecycle/infrastructure/foundation.py": "3da357be9b1c77dd92682e2e9d5946a3b484062bfc0cae4fad3b44521b5ea97f",
+    "services/lifecycle/src/lifecycle/infrastructure/native_effects.py": "ca7d2310a4c259f2ff7d23988cdc85820daa9c9d5d806883c4fbc808bca3e2d0",
+    "services/lifecycle/src/lifecycle/infrastructure/native_journey.py": "a5a47c9cebeef324f291a0f1307338cd785552281b834adaebbd16a65ea3baeb",
+    "services/lifecycle/src/lifecycle/infrastructure/native_owners.py": "11336712ce0ee407bb8ced53ed1cd464c6f98af30009db42d20ccc8d1e466bc9",
+    "services/lifecycle/src/lifecycle/infrastructure/native_temporal.py": "6ff4296c85ea3a126e227a59bb8f0fbf4abc89ab2a292d50c9cfa9e8adf09505",
+    "services/lifecycle/src/lifecycle/infrastructure/store.py": "9007ad53acb5b26d6b2cf0f9afbc3e46848d92f4053557af67eebb1fc8cc2ec1",
+    "services/lifecycle/src/lifecycle/infrastructure/telemetry.py": "c696d8aa49355e07825de2525c77ed3f0878ef4a7bfb32be4537e40e415b77d3",
+    "services/lifecycle/src/lifecycle/infrastructure/temporal.py": "8388c10abc659f8c9c1f6d3463edb76d4c5b949698c277f1a94795a9cdfe4c3d",
+    "services/lifecycle/src/lifecycle/infrastructure/workflows.py": "c853cfe1509d45e3c123064842d99e6573dfb2ce8f03cb65132097a0bd0c6eff",
+    "services/lifecycle/src/lifecycle/interfaces/__init__.py": "36c59f445f3f701ece7b2016379abbbfabfd269ac5f6e2dac30860791a7d6a42",
+    "services/lifecycle/src/lifecycle/interfaces/campaign_observations.py": "571407444f1337e24cdaee8b72254f69647e0fed499fb99753f8d3b241d90aa4",
+    "services/lifecycle/src/lifecycle/interfaces/campaigns.py": "e71983a6a8d209e3860ee82dd1db8d3864aee7477e7d41d9d96457596bc4e489",
+    "services/lifecycle/src/lifecycle/interfaces/commissioning.py": "9b377eb8b8d0bd7e429db6f3de9ea193fdae974b32a1a0d55fd92ccbea7e5fd9",
+    "services/lifecycle/src/lifecycle/interfaces/execution.py": "71a6070a1972ca0379738359ce992addfc76892060ce2521e1781f395f7424af",
+    "services/lifecycle/src/lifecycle/interfaces/expansion.py": "df9a7ac97fc8e29c9e7133e4f197b2b1efba0edd7d2f4c1a841d8ec1a9875771",
+    "services/lifecycle/src/lifecycle/interfaces/health.py": "2ff7d45481e2926fd48f825546d55b05b6fa5034a8afc1082fe8960ef426766c",
+    "services/lifecycle/src/lifecycle/interfaces/http.py": "2a1dddea8c58dead4324c32879627587ad3faf7eab6424a801072010b05ee937",
+    "services/lifecycle/src/lifecycle/interfaces/native.py": "884a31205a718a828b0d815f2a25e2a1341dd24b543d7235526ffe2b1ce6c8a6",
+    "services/lifecycle/src/lifecycle/interfaces/telemetry.py": "04e00f79d421c7ddf84bfd46f7457b406c5cf8f9dd92c669953a127211de0d15",
+    "services/lifecycle/tests/conftest.py": "b6c1917a576492597cae4046e81366eb943c8606578afcdf2cccf2ce37bb5247",
+    "services/lifecycle/tests/fixtures/synthetic-plan-v1.json": "df71e419c03c282c11b5b351f607f9596e3eec3b027e62bec5d03886f741b20c",
+    "services/lifecycle/tests/test_admission.py": "73c99083143488dc14f297bab74273d9047f627e4a5b19893d0cb634b8f35ba0",
+    "services/lifecycle/tests/test_campaign.py": "72980885ce83aef068ffea5bfea165f6c22d8e1b2056a1bcc5a11f0b1c408eff",
+    "services/lifecycle/tests/test_campaign_http.py": "c62a5c26b4224f8f0a9f1618c4d47488c9333d147c866100567d2fbe8607844e",
+    "services/lifecycle/tests/test_commissioning.py": "17b825daaeb15a3f6477b92b2eb714bdb66c292b74d8b29e990dd42d36f2f620",
+    "services/lifecycle/tests/test_expansion.py": "400f8250ee500d3f3398f45a51cf03720b73b42f67a8e205fb6229ebb981e82c",
+    "services/lifecycle/tests/test_expansion_http.py": "8e580b9198e5dd5f8560ca97a4a547d09e4e395f19769ab4e69cc976dd5843e9",
+    "services/lifecycle/tests/test_foundation.py": "45a192c2864ca6c4e2705a72b07460be76ca5ec5682c321a8f6d6e4f9cc193bc",
+    "services/lifecycle/tests/test_health.py": "30fe8c535732cd4a452ce1f41e07af257475f1e570aa717c7cfe95e79b018e98",
+    "services/lifecycle/tests/test_migration.py": "5ae1dbff257905c0af8b777335c09eee5356ad73b39090049d496bc7e7665c2c",
+    "services/lifecycle/tests/test_native_dispatch.py": "45eee30e6b34fcc47f4c9baba28ed96339a7edaeda475aa7afece8abc0ce9270",
+    "services/lifecycle/tests/test_native_effects.py": "8af7a6b90e657ffb475e0fd2a34a257a69aeb1deed330f544821d422496b0a67",
+    "services/lifecycle/tests/test_native_owners.py": "d032c1152eca57b10acfed7f95a386186855467966fddf8d51d4b126b699a511",
+    "services/lifecycle/tests/test_native_preflight.py": "7beea8775cf8fe6d00d0c9608154b4d5ee4a99f6f0e19a3c45e525c4ff47cd8c",
+    "services/lifecycle/tests/test_native_workflow.py": "89eea84a63422776d98e6f8a1ebedf72ec218a1cf1721a239af7c3f481378f49",
+    "services/lifecycle/tests/test_reservations.py": "fd04c32947cc21fc357461eef652649632272266ab110c88231fcb46f6fb2122",
+    "services/lifecycle/tests/test_telemetry.py": "251e86303b45bf550bcfe1c9a26a445a2134b6fc317bb705d4ea854804fb9d22",
+    "services/lifecycle/uv.lock": "43fd96d9b4b5fc0347558d548d07c35d9887dd759399cc1f954a36090c135749",
+    "services/lifecycle/verification/bootstrap-20261004/01-python.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/01-python.stdout.log": "4c3569f5da09975434dd9fd9a91fadbc4367a91d8f3c3fab59e9241ab9ee4bd8",
+    "services/lifecycle/verification/bootstrap-20261004/02-uv.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/02-uv.stdout.log": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6",
+    "services/lifecycle/verification/bootstrap-20261004/03-lock-check.stderr.log": "6ca67a1a90baee31d9ab30e35e418bcdf35c1589eadfb921660330df2fa9af0f",
+    "services/lifecycle/verification/bootstrap-20261004/03-lock-check.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/04-clean-frozen-install.stderr.log": "b8b9630b4d79d09cd444d56a2b3028506961f5a85a94d19eafc027fc7cec822d",
+    "services/lifecycle/verification/bootstrap-20261004/04-clean-frozen-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/05-ruff.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/05-ruff.stdout.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "services/lifecycle/verification/bootstrap-20261004/06-format.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/06-format.stdout.log": "cfe5c6461b42a90595a492aed11f2c8e6eb98b7c4caf2cc9f47e3333185e3f33",
+    "services/lifecycle/verification/bootstrap-20261004/07-mypy.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/07-mypy.stdout.log": "ab35ee42183d4d6d3ba483825ab037d18a5a15622d03be01d82220b1564851ff",
+    "services/lifecycle/verification/bootstrap-20261004/08-tests.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/08-tests.stdout.log": "b0312056bd52a988aea1222bdee92f5e4664454d315ddd8af10ca760c4a1126f",
+    "services/lifecycle/verification/bootstrap-20261004/09-wheel-build.stderr.log": "f5f96d281ca25d653bfbd5fd0a3b053f27bb02066b44e0028281461d0819e62f",
+    "services/lifecycle/verification/bootstrap-20261004/09-wheel-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/10-empty-runtime.stderr.log": "3ca283fb352a77353eadec791bbd909cdcdc6e031c3c0fd65b46918123e45a14",
+    "services/lifecycle/verification/bootstrap-20261004/10-empty-runtime.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/11-wheel-install.stderr.log": "a1a7011092276337510590e16cd758d6484c36a642a10a326f16b25cd7c1c73a",
+    "services/lifecycle/verification/bootstrap-20261004/11-wheel-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/12-runtime-inventory.stderr.log": "85075b3f99bf05d7124c312ddaaf086bf9c5adf49ef2a95296a8289ff8732e79",
+    "services/lifecycle/verification/bootstrap-20261004/12-runtime-inventory.stdout.log": "d29a30c896f9a410ea2715d8690d37da893062c55138fc5de24d62a167614a32",
+    "services/lifecycle/verification/bootstrap-20261004/13-isolated-import.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/13-isolated-import.stdout.log": "9244166232733bca8268bcbda5cc6b753b889f221046aa3ae15726332e1d51fc",
+    "services/lifecycle/verification/bootstrap-20261004/14-isolated-liveness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/14-isolated-liveness.stdout.log": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+    "services/lifecycle/verification/bootstrap-20261004/15-isolated-readiness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/15-isolated-readiness.stdout.log": "0a577cc36a0f23fc6200b5f008f18c398b3c4701b67beffd59088e451db93402",
+    "services/lifecycle/verification/bootstrap-20261004/16-isolated-invalid-input.stderr.log": "db2ce41829f676bbf3c305ee5c139ef7bfb24f38fe6c5742815bb5835efbb736",
+    "services/lifecycle/verification/bootstrap-20261004/16-isolated-invalid-input.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/17-installed-entrypoint.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/17-installed-entrypoint.stdout.log": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+    "services/lifecycle/verification/bootstrap-20261004/18-isolated-siblings-absent.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/lifecycle/verification/bootstrap-20261004/18-isolated-siblings-absent.stdout.log": "c3188f30ce3a3e886448ddf6b6cc93d76c966e1cde7aaa66eb985bb2e912a829",
+    "services/lifecycle/verification/bootstrap-20261004/report.json": "45e169e446437bea9196cd1592a4fd420f0bb3068d6e00d35d29ecde6d232a64",
+    "services/lifecycle/verification/bootstrap-20261004/wheel-envelope.json": "5b6192647aa67d881d2bdfebe7da68f9e8382c4cff137920aff5e476b2c76f92",
+    "services/planning/.dockerignore": "fe73f11478a4bff4efd3ba35718d1102b36eaca32a5b55cf3267b2a6eadbe91a",
+    "services/planning/.gitignore": "c95d538d814abdee4b85b0190ecdff09a9cf312e47e64374c78f984994ab34b6",
+    "services/planning/.python-version": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "services/planning/Dockerfile": "985ac32f8b74aac563a773f43d267fb8ad2593b6809c9fdaed6f7061c1ee07d3",
+    "services/planning/README.md": "f3d4f02480c5139c1c7533228e9a7bc51dcce4a6fa16dbbc4011f9b0f059a772",
+    "services/planning/migrations/001_messaging.sql": "03a4abcc96db1ae6fbb1400371c83ca6045f4efe595f84b17a7517a99166ff5d",
+    "services/planning/migrations/002_planning.sql": "982b6696bf8d1eadee3e4d0e88e25230023f5750827f160f2cb96d7de54527c8",
+    "services/planning/pyproject.toml": "45a00a84b57e2abcbe743b533351e6d061c994f5fcf22b767a9a5513c0a9a4fe",
+    "services/planning/src/planning/__init__.py": "d33acb57dfc2000f2c59d7e6d3fda69dc1785f8f63c053aff460cfad69b9b8a0",
+    "services/planning/src/planning/application/__init__.py": "1f5ae340d751c791e5b1bea85bdeaa0fa9cbb7a2900d7f3473f42e0c2f48047f",
+    "services/planning/src/planning/application/events.py": "15f28dc2af66beede0c07105e2e6c1433b972479c8a00a381e583c20c7660b25",
+    "services/planning/src/planning/application/foundation.py": "f3774527b6898bf92837c1607552c20f3791981e3f5fc518abf4090ed1e2dc3c",
+    "services/planning/src/planning/application/migration_plans.py": "2566ba58d0cbcfd6e076e492c7d04d6bcc8b3bfe5c4082afe310a4d562077328",
+    "services/planning/src/planning/application/planning.py": "34fbbed53568a1f16eea80925dd7393462ba87ee46e82ecfba04c2d829c52ad0",
+    "services/planning/src/planning/application/ports.py": "a909d87b4ee07aaa2c56f3b7cb48918c9fad2d417bca38c85f23a08308a71046",
+    "services/planning/src/planning/bootstrap/__init__.py": "82a5df3924fa02353da3bd5efeb4f9e2f3474cf3768ee1a74962f79757c10fc0",
+    "services/planning/src/planning/bootstrap/facts.py": "05707f58e8d5d309780156dbbf0a9c6f075dc57a12eaba6c91011bff1894a7ce",
+    "services/planning/src/planning/bootstrap/health.py": "50b864a7f7d1d5c100fa58d0ffe4fb31ecf7bae8169f0c9be94dab705f503b2b",
+    "services/planning/src/planning/bootstrap/server.py": "e1c54fce9fb722211961e796b58b1e209c6b723820543be900898c0b31d7e5b7",
+    "services/planning/src/planning/domain/__init__.py": "91db66bba038dc98e701dccee41f63de04a4a26f385305a02eb077b0abcbdf00",
+    "services/planning/src/planning/domain/assessment.py": "99e1e66cbdee5cf22d90215f3a4c6f7960dec10709c087c9ef214efaecaee25e",
+    "services/planning/src/planning/domain/compilation.py": "2aa306f76c7f53e74fb2687333a42f30987f62e72f9850a4c916472742a91573",
+    "services/planning/src/planning/domain/expansion.py": "2a2dc66c5485c039bf03ff8100b0881154daac52eb57985887f9e7c09ad21a1e",
+    "services/planning/src/planning/domain/migration.py": "df2285724ebde8a03b1037673a36242a90fd0d8e802e579d563a7e2117b386cc",
+    "services/planning/src/planning/domain/migration_plan.py": "a8aaadca06998ddc9a31cd49316b7551af743a5222840df7cc59bab100f87913",
+    "services/planning/src/planning/domain/model.py": "26e57f9e6670fa716fa632dffa53e22fd8cdfe79beb8dc0fce21fa00baff9fe5",
+    "services/planning/src/planning/infrastructure/__init__.py": "ec32a7399e0c702770c6372d86b55a54ec146fe993eaff22ce17546839b06eaa",
+    "services/planning/src/planning/infrastructure/facts/__init__.py": "34fc30525c4d10e71980b1caca7718eaa24cc110be1d38294c9569086eca9dcc",
+    "services/planning/src/planning/infrastructure/facts/broker.py": "db76b8bbec2639d7ca2eb4b15c4510d141ee48e1a218a5546077b25344b6c61e",
+    "services/planning/src/planning/infrastructure/facts/catalogue.json": "712093647c39b4411341ce2a6f15eb0d6328245c374861e20fd7ea25bdac7e33",
+    "services/planning/src/planning/infrastructure/facts/inventory.json": "fe0543252657e2329f09a856fff2f1127f56b714b30e352f984df1943e9c48c6",
+    "services/planning/src/planning/infrastructure/foundation.py": "3da357be9b1c77dd92682e2e9d5946a3b484062bfc0cae4fad3b44521b5ea97f",
+    "services/planning/src/planning/infrastructure/inputs/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "services/planning/src/planning/infrastructure/inputs/catalogue-input-v1.json": "77ab18d6c2576f1d90fe330dd7b7e1ff4581232b1e64ebed57e9e4b159d13066",
+    "services/planning/src/planning/infrastructure/inputs/inventory-input-v1.json": "5e250e2c72aa34633943750c4307112b47856ed1a354a7d6ee96a01261ab2ea6",
+    "services/planning/src/planning/infrastructure/inputs/migration-input-v1.json": "827d4d9e55ef0287131b046fa865e6defb7f779cc17f30cd5e57a683bd915dfb",
+    "services/planning/src/planning/infrastructure/inputs/qualification-v1.json": "2cd213cb12dd9256d277711df8e7a27df654ea1859bbbf9821c64c438ecb139b",
+    "services/planning/src/planning/infrastructure/messaging/__init__.py": "e94fcb4b78633a340d692e4361bea16d4c07fa4a82e98850004ed045d9d0a774",
+    "services/planning/src/planning/infrastructure/messaging/codec.py": "55fa04a529881ce78204f3a033ff58643dcb0517e3f85b5de4fc95625b365d98",
+    "services/planning/src/planning/infrastructure/messaging/consumer.py": "f5a2ae11610e4b08df88a1358dc29be6a297a03176ebe5fba558631d2c829fc4",
+    "services/planning/src/planning/infrastructure/messaging/foundation-event.json": "933b1e3d02678ba7bd5ebb19aeffd6d08c42124ba3d1706bc1e0b039f5e1052f",
+    "services/planning/src/planning/infrastructure/messaging/generated.py": "bb9c3c45b406a889c2d6ef9398351aef895c85355ebaa7770cd4446c5da5bc0c",
+    "services/planning/src/planning/infrastructure/messaging/inbox.py": "f5c763f3b02323c3d0c0f51e4e8828bf6928dd072e46e0afc623dcfd0a5ee58b",
+    "services/planning/src/planning/infrastructure/migration.py": "5e6997213160db5c583e44500b025fc30defc9544afddb56b2dd9b9ef96df6fc",
+    "services/planning/src/planning/infrastructure/migration_recipes.py": "e67ea5846e7fd0911f9c7781c36b23dcc88a947d6e7911c2c0b16a9c9e0b429f",
+    "services/planning/src/planning/infrastructure/owners.py": "af0dcc14b43e397dfd5b3a70ad8d38c77d0bb07e875fe8479997dbbd91d335ff",
+    "services/planning/src/planning/infrastructure/store.py": "3d71776946c6c251d9116340ad3bc0c0bfe70f1a7f6338776fac73c5c515e116",
+    "services/planning/src/planning/infrastructure/telemetry.py": "c696d8aa49355e07825de2525c77ed3f0878ef4a7bfb32be4537e40e415b77d3",
+    "services/planning/src/planning/interfaces/__init__.py": "d29a95e5c802f25989fdeabb4de10092c480413fff97e55e632d41daaa1fe2a8",
+    "services/planning/src/planning/interfaces/health.py": "5f0cfd6e9aea930e7135b1c58d52d22c18463556cfa1532f3c95b80ae37e9a22",
+    "services/planning/src/planning/interfaces/http.py": "63f752c5df7eb3a2ff9aced3010b27a76fb05a83b32a16e4027a99100e2cb8e0",
+    "services/planning/src/planning/interfaces/migration.py": "298d61e699c1b76c9f3e60d2dbf98437bb0d660aa9dceb8028f18d832697aef6",
+    "services/planning/src/planning/interfaces/planning.py": "08ef2881404aa598c4bb0bdc723cc1e02291f80628c032e80daafa8ab44d078b",
+    "services/planning/src/planning/interfaces/telemetry.py": "8944542d2f446c4e86c517ba252f4c0807fc2fbc4a13bba057e598c2d3bb3532",
+    "services/planning/tests/conftest.py": "aa0114aac6bd58f71086f6cb2af1ee81adb9a7f8acf2f8b9ddd97e8e337eb72d",
+    "services/planning/tests/fixtures/permit-desk-v1.json": "ad774c7fe91989c89642991ed35b746015a34007a78c8dac5dc91a6d7d8c57c4",
+    "services/planning/tests/planning_fixture.py": "589becf2b7bca1191202e70baf10fd7ba82da1cd592df87623cd4f879afddd1f",
+    "services/planning/tests/test_expansion.py": "b0042565bf950cf1b015c8ec4006e6519bb077866e77480b82cf88547adbcef5",
+    "services/planning/tests/test_foundation.py": "ac9a60da08f4023801cb521e4713c89bd73e5cb72ce158480bd4eb3865744493",
+    "services/planning/tests/test_health.py": "eff6c57b1f76f4cb5c52c58d5d4c9c1ca497516f5ac8c50606ae61840987d854",
+    "services/planning/tests/test_messaging.py": "07775e96d93fe80c75aced4ff7f8011d121d1e3197bbcb2e6bc0bc25a99c33a1",
+    "services/planning/tests/test_migration_plans.py": "0a4d567c4005bf8d19c974547bf6d7f3b4f2d65d2c29c3e857a7c657e157d0fa",
+    "services/planning/tests/test_migration_profiles.py": "e3bdef6de5f18584200ec628a6f617680e4e38d776e0230afe32305ba02287a9",
+    "services/planning/tests/test_planning.py": "3206af877c3876dcfe23e67a5b64b0abca73941f0c0445b970a9856d61718fe0",
+    "services/planning/tests/test_planning_http.py": "e9b69f215598af5b6a694976883e9f0386ca0bf727a652abb00e687bad3837fe",
+    "services/planning/tests/test_planning_store.py": "c6802f1b2a93be8f607dea1b79f7831e63275195c1789308d00900759a78693d",
+    "services/planning/tests/test_telemetry.py": "a588fc0d832e5d3ef310d5bff7a95ad23081cd37c7fd5bf3e3cc4461d9d01b19",
+    "services/planning/uv.lock": "4f38c90978cfc231e6ce6f5fb53fc4f080704447fc4e15bb6da6c79fea494bdd",
+    "services/planning/verification/bootstrap-20261004/01-python.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/01-python.stdout.log": "4c3569f5da09975434dd9fd9a91fadbc4367a91d8f3c3fab59e9241ab9ee4bd8",
+    "services/planning/verification/bootstrap-20261004/02-uv.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/02-uv.stdout.log": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6",
+    "services/planning/verification/bootstrap-20261004/03-lock-check.stderr.log": "6ca67a1a90baee31d9ab30e35e418bcdf35c1589eadfb921660330df2fa9af0f",
+    "services/planning/verification/bootstrap-20261004/03-lock-check.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/04-clean-frozen-install.stderr.log": "cfdcd5eb75c8a9a6a8217db230c83ffff0546be7730ee9faf32eef5e9e6e08a4",
+    "services/planning/verification/bootstrap-20261004/04-clean-frozen-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/05-ruff.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/05-ruff.stdout.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "services/planning/verification/bootstrap-20261004/06-format.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/06-format.stdout.log": "cfe5c6461b42a90595a492aed11f2c8e6eb98b7c4caf2cc9f47e3333185e3f33",
+    "services/planning/verification/bootstrap-20261004/07-mypy.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/07-mypy.stdout.log": "ab35ee42183d4d6d3ba483825ab037d18a5a15622d03be01d82220b1564851ff",
+    "services/planning/verification/bootstrap-20261004/08-tests.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/08-tests.stdout.log": "7fca7a8d71c9c2029ca566d01d2e9026fb3d599af3b46d7ed5cab69ea30e0d09",
+    "services/planning/verification/bootstrap-20261004/09-wheel-build.stderr.log": "febce958f99d98beffee85161555e8dcddf354bffb35a9d6a7ebf31d8dd6f37b",
+    "services/planning/verification/bootstrap-20261004/09-wheel-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/10-empty-runtime.stderr.log": "d5b8566a9884dd0a40f14a2ca9132330653397f784c8a47e89b4223a47a49437",
+    "services/planning/verification/bootstrap-20261004/10-empty-runtime.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/11-wheel-install.stderr.log": "a353d53b9b223827de5434806f0875e0869278e9731aaf554f90860233b9e943",
+    "services/planning/verification/bootstrap-20261004/11-wheel-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/12-runtime-inventory.stderr.log": "d99f88e13c588b5bea74a9f42f44ebcbb9eb22ec097d6ff98ea9086d667ac398",
+    "services/planning/verification/bootstrap-20261004/12-runtime-inventory.stdout.log": "b9c8472260372c419c19dc9e9a0d1c3299a30668d456e5962fa854b537869aa7",
+    "services/planning/verification/bootstrap-20261004/13-isolated-import.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/13-isolated-import.stdout.log": "6fc76518bbb17ef8b290e9be079690ea1cd1a0129e7ff733478a34bc46c9c8f7",
+    "services/planning/verification/bootstrap-20261004/14-isolated-liveness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/14-isolated-liveness.stdout.log": "0194c2ae2c86ecb197887d5a0e57ae8478187c32adba4a29101173209dcd58c4",
+    "services/planning/verification/bootstrap-20261004/15-isolated-readiness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/15-isolated-readiness.stdout.log": "0305cf3d68f514472ccb22fdd27d41072a29dbbb6527cbbfb1e56c9685c0bbb8",
+    "services/planning/verification/bootstrap-20261004/16-isolated-invalid-input.stderr.log": "163ecd4ed03b3b25349edae7663b51d04784faffe04668ed99fcb7623561ef4c",
+    "services/planning/verification/bootstrap-20261004/16-isolated-invalid-input.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/17-installed-entrypoint.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "services/planning/verification/bootstrap-20261004/17-installed-entrypoint.stdout.log": "0194c2ae2c86ecb197887d5a0e57ae8478187c32adba4a29101173209dcd58c4",
+    "services/planning/verification/bootstrap-20261004/report.json": "8d2901fadedfd4b2bf9a3090ae5c4d0a0c5621a7af2591924b66d00f95e16450",
+    "services/planning/verification/bootstrap-20261004/wheel-envelope.json": "d4bb37d40dd9f86a9f6517b99cbfc11ce45b7a087bbda0f18f4c84a0f2035474",
+    "workers/lifecycle/.dockerignore": "fe73f11478a4bff4efd3ba35718d1102b36eaca32a5b55cf3267b2a6eadbe91a",
+    "workers/lifecycle/.gitignore": "c95d538d814abdee4b85b0190ecdff09a9cf312e47e64374c78f984994ab34b6",
+    "workers/lifecycle/.python-version": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "workers/lifecycle/Dockerfile": "d3dcb82f324dbf44519aa089d9e759d7a4445a1345bca0c813ec107d425bc7ab",
+    "workers/lifecycle/README.md": "1f7588d0eb50f301e255bc844ceb95736b3a6251574b2673f74636ba4c80a647",
+    "workers/lifecycle/migrations/001_simulation.sql": "40a1513e8fbfc4346cd7593b61b6aba872ae6cafbe8f89fc9d94317a9b04cbdc",
+    "workers/lifecycle/migrations/native/001_attempts.sql": "29d301316fe6deef12022b32daffdebf8c9c0167b1a9797c1792c75d1fa581b5",
+    "workers/lifecycle/migrations/native/002_migration.sql": "657e948bc9dff88a8d0abb233b842a5d8701ee20f5d3a9895a0e81a3a4b6257d",
+    "workers/lifecycle/migrations/native/003_conversion.sql": "0c674e083b2a2f7dd0ee23b630ca1b6a7b02d28925f2c1e3cda1a55735a1c5a2",
+    "workers/lifecycle/pyproject.toml": "605a36c39ade623624e89015bcef2e9e1aff1a525ef8c24f2ab89d47de5cd029",
+    "workers/lifecycle/src/lifecycle_worker/__init__.py": "3b4010b8d05a3a439446a408740b15251146c27372a571087ea99d5f296ccf90",
+    "workers/lifecycle/src/lifecycle_worker/application/__init__.py": "c3458e9262794ff9d611d04319aa622e0aede6e5408ed1d8277aa905a839a04d",
+    "workers/lifecycle/src/lifecycle_worker/application/api_plan.py": "30a9f00a388a5f5d9c1502c99dc2b01d7e599f502851c7da3d4db41cc2a42277",
+    "workers/lifecycle/src/lifecycle_worker/application/migration_runtime.py": "457efc79ed9fc0d066f6b46c9fae2ab5ccbac6e7f373dfb8a4d429b7c4d0dbb6",
+    "workers/lifecycle/src/lifecycle_worker/application/native.py": "528575768d6de0f9a87db38d324e9c37e11ddb86aab8b6845249c5c911f1ffe1",
+    "workers/lifecycle/src/lifecycle_worker/application/native_authority.py": "b67047a6a536d52e8a361d7cf5e5b0fd7aa8ebf2724fd37a6b7a8d8f6db2e26f",
+    "workers/lifecycle/src/lifecycle_worker/application/native_effect.py": "72924a52ba05d38166a96457fd8667f6a7c50ef400b6f3a1298021918e99d84d",
+    "workers/lifecycle/src/lifecycle_worker/application/platform_plan.py": "c8b09f15e66b99f4059c63d8251ee352874d9ef399b56b7772489c7fd1ecf639",
+    "workers/lifecycle/src/lifecycle_worker/application/simulation.py": "b7630e01b76e7fc722030cfe47243db5db06d921f65c39f72e404bf698f216e3",
+    "workers/lifecycle/src/lifecycle_worker/bootstrap/__init__.py": "8010e6643d45e15dca091684e6b4b8de191cbb88e3b8bd1e3f57255e3f6f40e2",
+    "workers/lifecycle/src/lifecycle_worker/bootstrap/health.py": "6596ef06eb795b66bcc439341caafc694759fbd70e53c7a69a77341e0de8780a",
+    "workers/lifecycle/src/lifecycle_worker/bootstrap/migration_accounts.py": "48e6a6368e0df3e5b05b527c25d8f012237dd3c74375a38d4ddfc3d2bc3c663b",
+    "workers/lifecycle/src/lifecycle_worker/bootstrap/native.py": "6db724bb866ac96f4f95c810a8d1469847a204d0a3e0b6e5f0a3b297cc46dcc8",
+    "workers/lifecycle/src/lifecycle_worker/bootstrap/native_inspect.py": "ea8c1e7d79e04d7b408f0e510bdb1cc967e5359491df1d8ce532fb3377133771",
+    "workers/lifecycle/src/lifecycle_worker/bootstrap/simulation.py": "c8d9a57acfef2c21440208c86be02f4c77eca75133b8e92883702671ba6395b3",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/__init__.py": "40a7f5d84888e4bf5391a9d037d7cd713df6bbb8e5bee4404c1c1a3851657646",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/extension_trust.py": "de6d8b05beba355941b12f2f82ba27c04d88a3fb5577a26adfe7c3d62cfce0c7",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/image_conversion.py": "4f1e982662ada508fc7b72a9c19e1a075c46bc062a668b055f23754a89ce22c1",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_accounts.py": "a696337477bad53fe9f36d89afbcb5e7e93be1432fa91528bcb06789f9ecdc01",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_archive.py": "6055164d0d845e7828310937e14988a3a8e3a38f031d1f70d85d88527e47e98f",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_bootstrap.py": "d11f92c07f36dd972f18223d583ae82e5915cd6a48be13d9162465f0b42cc4c1",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_budget.py": "1053aee0f8e8ca9ad25ac5b09dcf2ee030d34e2b9160f466460911527e9fd727",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_conversion.py": "7b40d2ed98f2d5ee97d1e156d0c53040d5220fa2b74e837101faf91b332141b7",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_import.py": "2111ef43ca6d37d440f97cbb7b335474c53c10ea254c8dc0ba5799cdf4e3e74e",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_protocol.py": "9277708a5d2cf54ed79a8f822b7f642b930da1234c8f583a0e682ea610f25552",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/native_authority.py": "22cc6addf3803d6ba6ff5457eac1d1060db48f8142c99eedc7303a5813de022e",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/native_copy.py": "e816d240b3236d23aa4059790ffe69a49c65be29587bf910035309137b9fae57",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/native_files.py": "1ab0ab947937b66d1503405c3cdac8a699694df57ef1b0d9a938c7f719896145",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/native_http.py": "eb2c7becf57c172d746b622aa0989b45a372709d6648b8558341c638a2001504",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/native_journal.py": "11eff38c988a35319bb6d0a7ff3c1842cf633db59cbd59cc9d435b461d4903ef",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/native_runtime.py": "d2d4f5fc0d4aa677e500720f76a18c9c4c990fd6d4f3e46d456329535b4ff9fe",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/openstack_api.py": "15c67ad56b222abf5b20478db3930ccc41322f720b35322caf7089e716f88142",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/openstack_readback.py": "3111111b4dcb802420e256584542c2ef53377d352ff920e48c827f091fcd6f06",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/platform_api.py": "b2ab11c88f993a723bcf4573c4d5dfedcae77da76211a0dfc30c8e9706acb5d6",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/runtime.py": "002f62baec203f341cae4b6e16e05cad06f2749a8904719361faff653902af09",
+    "workers/lifecycle/src/lifecycle_worker/infrastructure/vmware_capture.py": "80dcfba062939524366b62fcc70a2e347f53e1155b0117d00702157ce749b802",
+    "workers/lifecycle/src/lifecycle_worker/interfaces/__init__.py": "daea91f1463c254186d8ee783019199308090814320a0de8e59b05fa11cb67b9",
+    "workers/lifecycle/src/lifecycle_worker/interfaces/health.py": "778c57a85f0e87e8335e9438c84f114333bd830ad44e3b00e6968723500dc6c7",
+    "workers/lifecycle/src/lifecycle_worker/interfaces/native.py": "1ec6ce812208b77c353c87cf8dc3502f8c86abab91775c29e193fb4f93ba6f8c",
+    "workers/lifecycle/src/lifecycle_worker/interfaces/simulation.py": "f92fa648476399d513387bc2207a501053a6c4c09cd5d21b182336cef1ea82ca",
+    "workers/lifecycle/tests/fixtures/native-stage-grant-v1.json": "7c6e7f7cbfc8f6ec11b1d14b18ad0ba45a639f7194dcdfdf576f28d1009bbf7b",
+    "workers/lifecycle/tests/test_health.py": "92fb1e442ccd163324965cce072460a2970dd181a0f3d50ef5455660b7d912f6",
+    "workers/lifecycle/tests/test_image_conversion.py": "f4e0e4163bb65f11e2015e0ca4aeb81112acceebd169bd349159cf82db7ecfd0",
+    "workers/lifecycle/tests/test_migration_accounts.py": "04101be81b7b6f6b4f6731b6a78c52e1daed50ca1b229556f06dec6376a873b6",
+    "workers/lifecycle/tests/test_migration_archive.py": "5a9a909b02267e4585c384301fbb0bf761e27ad60d445eba190df8f61c5eea9a",
+    "workers/lifecycle/tests/test_migration_bootstrap.py": "5aaaec15e31cc565dfc19e52f94a4e85d2df5173307e85c569072178787c6398",
+    "workers/lifecycle/tests/test_migration_budget.py": "73e4e31396cee286223df903d32c582a05d64d9f70b3254e26432ca2eb37c5d6",
+    "workers/lifecycle/tests/test_migration_conversion.py": "582a271fa238d1a8db3caa19d7dbf74cbbcd3c4336be2391d3ef39dd80247a65",
+    "workers/lifecycle/tests/test_migration_import.py": "8049e48e3c1b153cf36f68a24e3c1daf0077739deea2b2ed195b87a3ff519996",
+    "workers/lifecycle/tests/test_migration_runtime.py": "f0d53c1305bbed9532a711559efc37eb97821bc0ebdd08331c4281c9fb2d8de6",
+    "workers/lifecycle/tests/test_native.py": "89088b683120f2cc492c5ae71279421825113c91e4e7bf2f5e9ffb35d2ff79a5",
+    "workers/lifecycle/tests/test_native_copy.py": "c37051c96234eab97400171296d7c1b4cc10d28abad36a97207c72fd6dfde71d",
+    "workers/lifecycle/tests/test_native_effect.py": "bf815b02499fdb743f4f1663ccda78f5fb40f9370737506c925a304ca8ecbb3c",
+    "workers/lifecycle/tests/test_native_http.py": "82f36241e8eb61439aef682477548ff8d24dd85e61e67e6f281864cc07444cd4",
+    "workers/lifecycle/tests/test_native_journal.py": "49effe79bc8b57beb1f5442e6dcf43da1ab533ec59f18dcecfa74318108d246c",
+    "workers/lifecycle/tests/test_native_writes.py": "3582d2c201cd09c5648fe2af3e3440820ffcdf9e9f541f8a53e974cfa948cebc",
+    "workers/lifecycle/tests/test_platform_expansion.py": "9eb9999f1aaa6fe2b58d6e2051039aff772f45a1c7cab8aefc8c8bfe0dabe962",
+    "workers/lifecycle/tests/test_platform_http.py": "356cf6e973266c48de34f3b7a2e4e10912d4810e262042d1daf3cda95f078d32",
+    "workers/lifecycle/tests/test_vmware_capture.py": "a74033ffbde716c89fb6530d5327058b3748662826816c407e31f508aee9fe7e",
+    "workers/lifecycle/uv.lock": "fc2d22d221f6be7c6863ceadbf6882c9db9d9871709e5d448cee828a90991666",
+    "workers/lifecycle/verification/bootstrap-20261004/01-python.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/01-python.stdout.log": "4c3569f5da09975434dd9fd9a91fadbc4367a91d8f3c3fab59e9241ab9ee4bd8",
+    "workers/lifecycle/verification/bootstrap-20261004/02-uv.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/02-uv.stdout.log": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6",
+    "workers/lifecycle/verification/bootstrap-20261004/03-lock-check.stderr.log": "6ca67a1a90baee31d9ab30e35e418bcdf35c1589eadfb921660330df2fa9af0f",
+    "workers/lifecycle/verification/bootstrap-20261004/03-lock-check.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/04-clean-frozen-install.stderr.log": "aa9eb7c2bb384c20a00c7c042880dab67ad63fd90614dc5a3255a476c1cfe6cc",
+    "workers/lifecycle/verification/bootstrap-20261004/04-clean-frozen-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/05-ruff.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/05-ruff.stdout.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "workers/lifecycle/verification/bootstrap-20261004/06-format.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/06-format.stdout.log": "cfe5c6461b42a90595a492aed11f2c8e6eb98b7c4caf2cc9f47e3333185e3f33",
+    "workers/lifecycle/verification/bootstrap-20261004/07-mypy.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/07-mypy.stdout.log": "ab35ee42183d4d6d3ba483825ab037d18a5a15622d03be01d82220b1564851ff",
+    "workers/lifecycle/verification/bootstrap-20261004/08-tests.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/08-tests.stdout.log": "92d8af1d4cd890b8147bfcda5f64a3265980d0e60fb26b1e499ccd1a71ebe59f",
+    "workers/lifecycle/verification/bootstrap-20261004/09-wheel-build.stderr.log": "8578d5860e5ed2650d33bd8d8daea0b47af1787f5ec1eaed3ff57b0225390fb5",
+    "workers/lifecycle/verification/bootstrap-20261004/09-wheel-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/10-empty-runtime.stderr.log": "564d20ebcd998dc58e2685ad360324baddf2c9f977c6ec05a847e5f2dbcddc4b",
+    "workers/lifecycle/verification/bootstrap-20261004/10-empty-runtime.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/11-wheel-install.stderr.log": "dd6d69025fc9c922746d13fb2a356c4c882864e494fbe360b7109e02eaac93f6",
+    "workers/lifecycle/verification/bootstrap-20261004/11-wheel-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/12-runtime-inventory.stderr.log": "6cb17f687031e2ddeda653fab3d53fd48afb8445bd6456b75aef3c5268024e8d",
+    "workers/lifecycle/verification/bootstrap-20261004/12-runtime-inventory.stdout.log": "3bb4d4ab0de12c7c083dd4e5c7485cbab861e15661daf106d4a573f5e06cfcc9",
+    "workers/lifecycle/verification/bootstrap-20261004/13-isolated-import.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/13-isolated-import.stdout.log": "5844ad53c1ae99e2e23a84439635189a89000e8eb98188c8afa212d8e0f57e18",
+    "workers/lifecycle/verification/bootstrap-20261004/14-isolated-liveness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/14-isolated-liveness.stdout.log": "59a4b0a1dd0bde6b27c6b7b8302f6d369c48ce7d5b2524931c14071d87040865",
+    "workers/lifecycle/verification/bootstrap-20261004/15-isolated-readiness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/15-isolated-readiness.stdout.log": "84da603c1b85b2079b527b283f82b2a185ec53e4d13f201b394a171e98fd5b43",
+    "workers/lifecycle/verification/bootstrap-20261004/16-isolated-invalid-input.stderr.log": "ebc00588ffb1941e91dd7cecbcfb2609b3b903fc2512899b79a646f24ac80301",
+    "workers/lifecycle/verification/bootstrap-20261004/16-isolated-invalid-input.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/17-installed-entrypoint.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/17-installed-entrypoint.stdout.log": "59a4b0a1dd0bde6b27c6b7b8302f6d369c48ce7d5b2524931c14071d87040865",
+    "workers/lifecycle/verification/bootstrap-20261004/18-isolated-siblings-absent.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workers/lifecycle/verification/bootstrap-20261004/18-isolated-siblings-absent.stdout.log": "ffcdd655164fcf3c3e9cd21534a61d8e11f40918cccf235da7fd5dfad7f16353",
+    "workers/lifecycle/verification/bootstrap-20261004/report.json": "356d355a38f1ed8cd1af9099e05e00ce4d4738eb72406e408397a6a72f072a5b",
+    "workers/lifecycle/verification/bootstrap-20261004/wheel-envelope.json": "3f3fafeb690472b99907f962b102649793cd57dc581b7aafb289a41bc56efe36"
+  },
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "result": "FAILED",
+  "limitations": [
+    "Local software and synthetic TLS checks only; this is not a passing full P09 campaign.",
+    "PostgreSQL-dependent tests are skipped because the local binary is unavailable and UID switching is blocked.",
+    "Hosted PostgreSQL checks have not run: automatic approval review blocked public branch publication.",
+    "Actual selected tranche, native effects, account mapping, custody and independent receiving remain required.",
+    "No native support, gate approval, operational acceptance, P08 or P09 completion is established."
+  ],
+  "commands": [
+    {
+      "directory": "services/planning",
+      "argv": [
+        "uv",
+        "sync",
+        "--locked",
+        "--group",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": "planning-sync.log",
+      "sha256": "70333f2a51362c4a0f9999da57b2e7958e47d8a72bb85f1dfa9061aa76c85b13"
+    },
+    {
+      "directory": "services/planning",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "log": "planning-lint.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "directory": "services/planning",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "log": "planning-format.log",
+      "sha256": "1e8100ce5112b41053a89fae8931d735807139a983d212a9a9d2a8fab1194b67"
+    },
+    {
+      "directory": "services/planning",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "log": "planning-types.log",
+      "sha256": "918734ea957dd4753b8d4ca0aba97793773f2fcb1fa479a6e2953922f26612f8"
+    },
+    {
+      "directory": "services/planning",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-q",
+        "--junitxml=/workspace/scratch/86d322ce5558/multi-tenant/verification/p09/local/planning.xml"
+      ],
+      "exit_code": 0,
+      "log": "planning-tests.log",
+      "sha256": "128ffb476d162ad5f7ed9a933053c272b7db5a29d85e541ab266de94ffef0a01"
+    },
+    {
+      "directory": "services/planning",
+      "argv": [
+        "uv",
+        "build",
+        "--no-build-isolation",
+        "--wheel"
+      ],
+      "exit_code": 0,
+      "log": "planning-wheel.log",
+      "sha256": "2324c0bbf9f4bcb9a4eab3c09d44edf58d33ad77d9acacdefac2d427b612251d"
+    },
+    {
+      "directory": "services/lifecycle",
+      "argv": [
+        "uv",
+        "sync",
+        "--locked",
+        "--group",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": "lifecycle-sync.log",
+      "sha256": "b404c99b07236247254dd77a4f29e6d5f693983f657f0abcda71a14ed3768383"
+    },
+    {
+      "directory": "services/lifecycle",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "log": "lifecycle-lint.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "directory": "services/lifecycle",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "log": "lifecycle-format.log",
+      "sha256": "ea2969fd741733e33c490fb6696583f5d6e29e16cae5e536952236a31cf615b1"
+    },
+    {
+      "directory": "services/lifecycle",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "log": "lifecycle-types.log",
+      "sha256": "34c29026a4985e207be3fa0ca6bcbdd59f07078ca6ce6db8c3b8438bf135169c"
+    },
+    {
+      "directory": "services/lifecycle",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-q",
+        "--junitxml=/workspace/scratch/86d322ce5558/multi-tenant/verification/p09/local/lifecycle.xml"
+      ],
+      "exit_code": 0,
+      "log": "lifecycle-tests.log",
+      "sha256": "414cab190d6508ab74f0ca28b7927add94ca7928ce012f8715f49b8af9ce7f11"
+    },
+    {
+      "directory": "services/lifecycle",
+      "argv": [
+        "uv",
+        "build",
+        "--no-build-isolation",
+        "--wheel"
+      ],
+      "exit_code": 0,
+      "log": "lifecycle-wheel.log",
+      "sha256": "d4400ad302012293560fdc482bcbd410b15edbeea94d4fcb9c01e605ac6612bc"
+    },
+    {
+      "directory": "workers/lifecycle",
+      "argv": [
+        "uv",
+        "sync",
+        "--locked",
+        "--group",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": "worker-sync.log",
+      "sha256": "461de5b8a2fd6a2fe984b83c8784058b050671a24bfcc4022a45cc6aad4a923a"
+    },
+    {
+      "directory": "workers/lifecycle",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "log": "worker-lint.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "directory": "workers/lifecycle",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "log": "worker-format.log",
+      "sha256": "c3c36fcff1e28b14cae0ee73be45b9f119bbadb20f7d5eb8ab829feeabf5769d"
+    },
+    {
+      "directory": "workers/lifecycle",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "log": "worker-types.log",
+      "sha256": "8797c60315242ee16057cb107ea1ec62e2678d358c86bc2be797e23d87e87578"
+    },
+    {
+      "directory": "workers/lifecycle",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-q",
+        "--junitxml=/workspace/scratch/86d322ce5558/multi-tenant/verification/p09/local/worker.xml"
+      ],
+      "exit_code": 0,
+      "log": "worker-tests.log",
+      "sha256": "5829ebb2152f8a079deacd57f36944c495edd1e6494296c7f7d7319a4a631bf7"
+    },
+    {
+      "directory": "workers/lifecycle",
+      "argv": [
+        "uv",
+        "build",
+        "--no-build-isolation",
+        "--wheel"
+      ],
+      "exit_code": 0,
+      "log": "worker-wheel.log",
+      "sha256": "369fe18108bc9a1a111222d84495cf8b4343a721a26c05c468daee44def1bf00"
+    },
+    {
+      "directory": "services/planning",
+      "argv": [
+        "uv",
+        "run",
+        "--frozen",
+        "python",
+        "/workspace/scratch/86d322ce5558/multi-tenant/scripts/p09/check_contract.py"
+      ],
+      "exit_code": 0,
+      "log": "schema.log",
+      "sha256": "b22fc05e3a36452719128f30191dd74357d3fdc8c7c21d7262815e67c148dda1"
+    },
+    {
+      "directory": ".",
+      "argv": [
+        "python",
+        "scripts/validate_architecture.py"
+      ],
+      "exit_code": 1,
+      "log": "architecture.log",
+      "sha256": "ca85ed77de2298988076e0d504eb6a2d5a2b9a8d4faece2727a3272c019ff05a"
+    }
+  ],
+  "suites": [
+    {
+      "name": "planning",
+      "tests": 308,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 5,
+      "passed": 303,
+      "junit": "planning.xml",
+      "sha256": "5574f336e27365ff0702fdbd70659dcb28e20bf11d595e5027b6b300223fb4ed",
+      "skipped_cases": [
+        {
+          "case": "tests.test_migration_plans.test_complete_plan_options_persistence_retry_and_wire_schema",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_planning_store.test_atomic_retry_race_and_restart",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_planning_store.test_immutable_history_and_tenant_isolation",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_planning_store.test_plan_persistence_invalidation_duplicate_and_conflict",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_planning_store.test_expiry_and_unavailable_inputs_preserve_plan",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        }
+      ]
+    },
+    {
+      "name": "lifecycle",
+      "tests": 360,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 59,
+      "passed": 301,
+      "junit": "lifecycle.xml",
+      "sha256": "37f0d49a40777bf42550da6e544eb1d7282a3eba8df1efc03adb61db7fac7efe",
+      "skipped_cases": [
+        {
+          "case": "tests.test_campaign.test_measured_outage_cannot_exceed_approved_application_objective",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_campaign.test_campaign_admission_and_idempotency_are_atomic",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_campaign.test_campaign_cannot_change_approved_plan_or_reserve_on_failure",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_campaign.test_cancel_keeps_active_allocations_and_stops_queued_starts",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_campaign.test_pause_revokes_a_prepared_campaign_grant",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_campaign.test_fair_dispatch_reaches_ready_members_behind_waiting_members",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_campaign.test_pool_pause_applies_to_prepared_work_and_release_requires_independent_cleanup",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_campaign_http.test_create_read_list_and_pause_require_current_scoped_actor",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_expansion.test_import_never_grants_write_authority_and_transfer_is_separate",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_expansion.test_field_collision_crosses_tenants_and_detach_never_deletes_vm",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_expansion.test_import_drift_and_wrong_tenant_are_denied",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_expansion.test_shared_endpoint_unknown_budget_and_stop_boundary",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_expansion.test_dag_pause_stop_and_revocation",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_expansion.test_concurrent_dispatchers_share_correlated_impact_budget",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_expansion.test_blackout_full_duration_and_failed_dependency_prevent_dispatch",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_expansion.test_restart_after_lost_submission_does_not_resubmit",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_expansion_http.test_adoption_api_scopes_every_action_and_denies_forged_owner_proof",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_expansion_http.test_wave_api_uses_owned_plans_and_cannot_claim_or_release_budget",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_migration.test_cutover_complete_and_write_marker_append_only",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_migration.test_lost_activation_response_forbids_rollback_and_stale_worker",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_migration.test_prewrite_rollback_requires_no_divergence_and_recovery_replaces_authority",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_migration.test_partial_fencing_never_admits_target_writes",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_migration.test_distinct_vm_members_share_an_application_but_cannot_share_source_or_custody",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_migration.test_legacy_application_hold_is_retained_when_recovery_takes_over",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_admission_dispatch_is_atomic_and_same_key_does_not_requeue",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_lost_dispatch_reply_keeps_same_identity_and_confirms_remote_memo",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_dispatch_does_not_adopt_foreign_workflow[job_id-ed8ca7d1-8f66-46d2-944b-763b3d588886]",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_dispatch_does_not_adopt_foreign_workflow[tenant_id-ec72a695-5d28-476e-b3b7-6f98e940e36c]",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_dispatch_does_not_adopt_foreign_workflow[plan_sha256-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff]",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_dispatch_does_not_adopt_foreign_workflow[version-True]",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_stopped_admission_never_enters_temporal",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_checkpoint_never_reissues_prepared_or_held_grant",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_worker_return_cannot_establish_readiness_or_redeem_grant",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_activity_rejects_cross_job_and_revoked_authority_before_transport",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_dispatch.test_checkpoint_next_stage_requires_independent_completion",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_whole_journey_and_separately_authorized_retirement",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_concurrent_admission_and_grant_redemption_are_once",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_stale_command_cross_tenant_and_cross_worker_denied",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_unknown_outcome_retains_hold_until_complete_quiescent_readback",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_stop_is_terminal_for_writes_even_after_successful_readback",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_epoch_rotation_or_restored_old_database_never_reopens_authority",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_configuration_and_readiness_rechecked_at_effect_boundary",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_no_late_launch_or_step_skipping_and_heartbeat_can_exceed_minute",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_separate_retirement_plan_and_retention_evidence_cannot_be_omitted",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_runtime_cannot_rewrite_authority_or_certainty[DELETE FROM app.native_jobs]",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_runtime_cannot_rewrite_authority_or_certainty[DELETE FROM app.native_events]",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_runtime_cannot_rewrite_authority_or_certainty[DELETE FROM app.native_operations]",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_runtime_cannot_rewrite_authority_or_certainty[DELETE FROM app.native_redemptions]",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_runtime_cannot_rewrite_authority_or_certainty[UPDATE app.native_observations SET digest='changed']",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_runtime_cannot_rewrite_authority_or_certainty[UPDATE app.native_control SET quarantined=false]",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_runtime_cannot_rewrite_authority_or_certainty[TRUNCATE app.native_resource_holds]",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_native_http_identity_is_independent_of_body",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_long_running_grant_remains_bound_and_rechecks_current_authority",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_native_workflow.test_previous_stage_observation_cannot_clear_later_unknown_hold",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_reservations.test_competing_plans_cannot_infer_double_allocation",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_reservations.test_lost_acceptance_reply_reconciles_without_repeat",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_reservations.test_partial_owners_keep_known_receipts_for_compensation",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_reservations.test_expiry_never_releases_live_and_retry_is_idempotent",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        },
+        {
+          "case": "tests.test_reservations.test_runtime_cannot_erase_journal_or_read_owner_store",
+          "reason": "P05_POSTGRES_BIN is required for real PostgreSQL qualification"
+        }
+      ]
+    },
+    {
+      "name": "worker",
+      "tests": 292,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 15,
+      "passed": 277,
+      "junit": "worker.xml",
+      "sha256": "eba4bd6d0db9d94630e35ab44676d033ff5b19b7a3257a43ef4a8b33435ce8fb",
+      "skipped_cases": [
+        {
+          "case": "tests.test_native_journal.test_concurrent_duplicate_deliveries_claim_once",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_cross_tenant_ownership_digest_and_changed_attempt_denied",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_runtime_cannot_erase_uncertainty[DELETE FROM native.custody_holds]",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_runtime_cannot_erase_uncertainty[DELETE FROM native.events]",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_runtime_cannot_erase_uncertainty[UPDATE native.attempts SET fingerprint=repeat('a',64)]",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_runtime_cannot_erase_uncertainty[TRUNCATE native.custody_holds]",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_runtime_cannot_erase_uncertainty[ALTER TABLE native.attempts DROP COLUMN fingerprint]",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_unknown_effect_event_and_hold_survive_reconnect",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_accepted_ids_and_transfer_hashes_survive_new_journal_instance",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_duplicate_native_receipts_never_guess_resource_identity",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_migration_stage_custody_and_monotonic_recovery_generation",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_capture_receipt_resolution_cannot_cross_job_or_approved_plan",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_partial_artifact_is_not_a_conversion_or_import_source",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_completed_artifact_cannot_gain_unbound_disks[wrong_digest]",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        },
+        {
+          "case": "tests.test_native_journal.test_completed_artifact_cannot_gain_unbound_disks[late_disk]",
+          "reason": "P07_POSTGRES_BIN is required for real journal qualification"
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "tests": 960,
+    "passed": 881,
+    "skipped": 79,
+    "failures": 0,
+    "errors": 0
+  }
+}

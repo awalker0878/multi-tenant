@@ -1,0 +1,15 @@
+{
+  "observed_at": "2026-10-05T05:51:18.537Z",
+  "repository": "awalker0878/multi-tenant",
+  "branch": {
+    "name": "greenfield/enterprise-microservices-plan",
+    "commit": {
+      "sha": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/commits/48a998c8b4517f5d27933973d9d4b04677b48e49"
+    },
+    "protected": false
+  },
+  "rulesets": [],
+  "source": "GitHub connector GET branches/rulesets",
+  "scope": "Read-only settings observation; no admission activation"
+}

@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "record_id": "P01-OPERATING-INPUTS",
+  "status": "HELD",
+  "scope": "Concrete receiving inputs for P01/G01; development evidence is not operating acceptance",
+  "inputs": [
+    {
+      "id": "OP01",
+      "title": "Runtime, dependencies and network",
+      "accountable_role": "SRE/platform owners",
+      "carried_fields": [
+        "IP02.component_environment_bom",
+        "IP02.deployment_network_constraints"
+      ],
+      "required_input": "Exact target runtime/dependency BOM and support/update owners; allowed registry/advisory/PKI traffic, mirrors and disconnection/freshness limits.",
+      "status": "UNKNOWN",
+      "value": null,
+      "owner_identity": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewed_by": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "OP02",
+      "title": "Registry and artifact trust",
+      "accountable_role": "Platform/security owners",
+      "carried_fields": [
+        "IP02.registry_mirror_verification",
+        "IP02.identity_key_evidence_custody"
+      ],
+      "required_input": "Source/target registries and immutable-copy path; approved signer identity/custody, independently delivered trust root, revocation/time policy and authorized promotion owner.",
+      "status": "UNKNOWN",
+      "value": null,
+      "owner_identity": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewed_by": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "OP03",
+      "title": "Secrets, PKI and evidence custody",
+      "accountable_role": "Security/IAM/records owners",
+      "carried_fields": [
+        "IP02.identity_key_evidence_custody",
+        "IP06.trust_restore_model"
+      ],
+      "required_input": "Actual secret/PKI/evidence services and owners; scoped references, bootstrap, rotation, revocation, retention and recoverable key availability.",
+      "status": "UNKNOWN",
+      "value": null,
+      "owner_identity": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewed_by": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "OP04",
+      "title": "Repository admission activation",
+      "accountable_role": "Repository administrator and review owners",
+      "carried_fields": [
+        "IP01.criterion_reviewers",
+        "IP07.reviewer_implementer_conflicts"
+      ],
+      "required_input": "Verified numeric GitHub IDs and logins for context/platform/architecture/security/SRE roles; independent reporting identity; default-branch hook installation and observed protection settings.",
+      "status": "UNKNOWN",
+      "value": null,
+      "owner_identity": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewed_by": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "OP05",
+      "title": "Alert routing and response",
+      "accountable_role": "SRE/service owners",
+      "carried_fields": [
+        "IP06.evidence_alert_recipients",
+        "IP06.measurement_conditions"
+      ],
+      "required_input": "Actual receiving route reference, response owner/rota, delivery and acknowledgement evidence, escalation and outage/freshness measurement conditions.",
+      "status": "UNKNOWN",
+      "value": null,
+      "owner_identity": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewed_by": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "OP06",
+      "title": "Recovery and retained inventory",
+      "accountable_role": "Application/SRE/security/records owners",
+      "carried_fields": [
+        "IP01.retained_records_inventory",
+        "IP06.trust_restore_model",
+        "IP06.control_plane_targets"
+      ],
+      "required_input": "Complete persisted/configuration/evidence inventory with retention/deletion authority, key recovery dependencies and attributable restore/rollback acceptance; target objectives remain owned decisions.",
+      "status": "UNKNOWN",
+      "value": null,
+      "owner_identity": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewed_by": null,
+        "reviewed_at": null
+      }
+    },
+    {
+      "id": "OP07",
+      "title": "Support and accessibility baseline",
+      "accountable_role": "Engineering/SRE owners",
+      "carried_fields": [
+        "IP02.support_update_ownership",
+        "IP02.browser_assistive_matrix",
+        "IP06.support_access"
+      ],
+      "required_input": "Accountable patch/support access owners, selected managed browsers and assistive matrix with receiving checks.",
+      "status": "UNKNOWN",
+      "value": null,
+      "owner_identity": null,
+      "evidence": [],
+      "review": {
+        "disposition": "NOT_REVIEWED",
+        "reviewed_by": null,
+        "reviewed_at": null
+      }
+    }
+  ]
+}

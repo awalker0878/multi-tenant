@@ -1,0 +1,56 @@
+name: P02 Governance events
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: ['services/governance/**', 'contracts/schemas/events/governance-*.json', 'contracts/schemas/events/identity-*.json', 'contracts/asyncapi/governance.yaml', 'contracts/asyncapi/identity.yaml', 'contracts/schemas/events/support-*.json', 'contracts/asyncapi/support.yaml', 'scripts/p02/**', '.github/workflows/p02-governance-events.yml']
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  governance-events:
+    name: Governance PostgreSQL and confirmed TLS event delivery
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d
+        env:
+          POSTGRES_PASSWORD: synthetic-p02-disposable-postgres
+          POSTGRES_DB: p02_identity_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, mbstring, openssl, pdo, pdo_pgsql, pdo_sqlite, sockets, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+      - name: Install Governance from its independent lock
+        run: |
+          mkdir -p services/governance/bootstrap/cache services/governance/storage/framework/{cache,sessions,views} services/governance/storage/logs
+          touch services/governance/.env
+          composer install --working-dir=services/governance --no-scripts --no-interaction --prefer-dist --no-progress
+      - name: Exercise PostgreSQL concurrency, expiry and real TLS broker delivery
+        env:
+          P02_TEST_POSTGRES: '1'
+          P02_TEST_PASSWORD: synthetic-p02-disposable-postgres
+        run: python3 scripts/p02/verify_events.py --output "$RUNNER_TEMP/p02-governance-events"
+      - name: Retain exact source and redacted observations
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p02-governance-events-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p02-governance-events/
+          if-no-files-found: error
+          retention-days: 14

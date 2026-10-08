@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "run_id": 37247300526,
+  "source_revision": "c9c202786437601c0f000bdf29d7e1e401e773ee",
+  "component": "inventory-workers",
+  "artifact": {
+    "id": 11319402904,
+    "name": "p01-image-inventory-workers-c9c202786437601c0f000bdf29d7e1e401e773ee",
+    "size_in_bytes": 12431,
+    "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11319402904",
+    "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11319402904/zip",
+    "expired": false,
+    "created_at": "2026-10-05T00:23:26Z",
+    "expires_at": "2026-10-19T00:23:25Z",
+    "updated_at": "2026-10-05T00:23:26Z",
+    "digest": "sha256:64ec62dd4b26c804d4d9787feb84a7f3f364ea2b0f1cb1d6cf4f3ec50bed452f",
+    "workflow_run": {
+      "id": 37247300526,
+      "repository_id": 1374801496,
+      "head_repository_id": 1374801496,
+      "head_branch": "greenfield/enterprise-microservices-plan",
+      "head_sha": "c9c202786437601c0f000bdf29d7e1e401e773ee"
+    }
+  },
+  "archive_sha256": "64ec62dd4b26c804d4d9787feb84a7f3f364ea2b0f1cb1d6cf4f3ec50bed452f",
+  "archive_bytes": 12431,
+  "archive_checksum_verified": true,
+  "archive_size_verified": true,
+  "report_sha256": "37cd91d8ab6a5956c98f6f48f3c806ea2184b24fb5c0a4c6ed018a79897d483a",
+  "result": "PASSED",
+  "failure": null,
+  "source_checks": {
+    ".github/workflows/p01-images.yml": {
+      "sha256": "0776d380e416d599d5fc49ac93c032eec7bd8d5afea91aec91f3a092d6d6b29a",
+      "git_blob_sha": "ea20ce6a580d896b3a82802f9dd919af1f353a1e"
+    },
+    "deploy/build/components.json": {
+      "sha256": "7b50205d5f714836368ab7e67f696678218d156b6608370a86956d525ca54901",
+      "git_blob_sha": "3ac150c4964c68b2a3d332f57e8172f57f2cf189"
+    },
+    "deploy/build/inputs.lock.json": {
+      "sha256": "2423a82d62c4f556f93ce675fad865e8b96c987bc1edd2955895b99bd813dc4c",
+      "git_blob_sha": "71e76d8bb189414572a6f18a96ce51a84d1b88bc"
+    },
+    "scripts/p01/candidates.json": {
+      "sha256": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+      "git_blob_sha": "afa963d567cef41c678d47732bc692470855b48c"
+    },
+    "scripts/p01/check_jobs.py": {
+      "sha256": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+      "git_blob_sha": "67494c7fbee17097e2ee656b8fc4baff6034323c"
+    },
+    "scripts/p01/python_lock.py": {
+      "sha256": "05b4074482edb8899c95da980b4886975a9ce36adb19c2894bd4e42b40d76769",
+      "git_blob_sha": "3c4c5cf63af395b12015764e3cac8cbfb2549f4e"
+    },
+    "scripts/p01/run_images.py": {
+      "sha256": "7898d827e081ee477ff99ad154bd289d571350a4483aa5b74d64e8bdbde72c8b",
+      "git_blob_sha": "86b8e47487cbdb7ff1cac83d1a7d6885e843f597"
+    },
+    "scripts/p01/select_components.py": {
+      "sha256": "37575f2fb29659ae7d72d477c9b09f1d981571386ef20ccd0ce4d039b5cd79d7",
+      "git_blob_sha": "ad1a608ea86fd1c5dd66b16e1d4c75af8cb3ade8"
+    },
+    "workers/inventory/.dockerignore": {
+      "sha256": "59e9a97d2a5cf9b6df4160b1c1b558f281a7c6335efb3fe00e446442b5ee407b",
+      "git_blob_sha": "1136d4f7741b5f591074f437f3056fcbc0f31234"
+    },
+    "workers/inventory/.python-version": {
+      "sha256": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+      "git_blob_sha": "f36fa5fd8017a085e301126c8c3fc30f1a2550b9"
+    },
+    "workers/inventory/Dockerfile": {
+      "sha256": "6931256a87dff3cdab530bd093e825857eabdec1852c610fb2728c763cdfed88",
+      "git_blob_sha": "a30b09f360fcb918e5769b45fac8665d48a2176c"
+    },
+    "workers/inventory/README.md": {
+      "sha256": "90d2971b1e11641a1c5ce18a37e737f1aca39636312183825ac526f5024a7ae5",
+      "git_blob_sha": "0019506ad09ee295288b70e3d35777d4ab482feb"
+    },
+    "workers/inventory/pyproject.toml": {
+      "sha256": "de8eb115eec0541a9cb2b60b6cad9c4bdcc9b8896742d66d13ca343d70da23fa",
+      "git_blob_sha": "d02f7218df645936ce17a9d56d218bd884b1a942"
+    },
+    "workers/inventory/src/inventory_worker/__init__.py": {
+      "sha256": "6e853d964278e02193a4dcba0223e8b0cf54f1be8cb35814f521ddf3e09f4756",
+      "git_blob_sha": "4437e371c257fddb911fe5fbb7e865dbb560f199"
+    },
+    "workers/inventory/src/inventory_worker/bootstrap/__init__.py": {
+      "sha256": "637c638429b138e5bb55497bb6b3741398f01268d099c2b295fdccb670e5385d",
+      "git_blob_sha": "200f487a902231f969d4c30a93291eab5656bc10"
+    },
+    "workers/inventory/src/inventory_worker/bootstrap/health.py": {
+      "sha256": "2bae4c6e2013c2924fc85761d0b531bc3ce05cd9427249cc428d7a75dfb8e694",
+      "git_blob_sha": "07a26830a7a824b32a33cd3ecd798fa0c94597d7"
+    },
+    "workers/inventory/src/inventory_worker/interfaces/__init__.py": {
+      "sha256": "2137fe4ce5fde3321fb026bf7801201b1de41d361d86d6c13509d83b2a9233d5",
+      "git_blob_sha": "ce3156dde5121a3fecd18b0b220f3c0f71f3731f"
+    },
+    "workers/inventory/src/inventory_worker/interfaces/health.py": {
+      "sha256": "1fe7a7aaaeea8c9512232d3a8bb393742aa771423c52d10b841081099fd1b192",
+      "git_blob_sha": "9c97936f72132754edc20469d5d12ab13bbc62f8"
+    },
+    "workers/inventory/uv.lock": {
+      "sha256": "f2a0b4cc9553b6af8091d724e506d524d3dcc9f334f24bccd6f68decab408860",
+      "git_blob_sha": "c23fd3d2221135545d8d8284014cdb27655ff6eb"
+    }
+  },
+  "source_bindings_verified_against_commit": 19,
+  "command_log_hashes_verified": 20,
+  "artifact_hashes_verified": 0,
+  "retained_file_sha256": {
+    "01-source-revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-source-revision.stdout.log": "9b66f98ceee698e43fd681494759b440f5de52ad7546f4d1576a81634ea21785",
+    "02-source-clean.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "02-source-clean.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-docker-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-docker-version.stdout.log": "58d5180149fd3334dbb3ff73de521946336e4052a1b769cb475f72486c934b1b",
+    "04-buildx-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-buildx-version.stdout.log": "d6a1fdd95fd9b2615b359b42e82829b1cad6bb22202cff355e55be8242e8c395",
+    "05-build.stderr.log": "b127648b48d557f2b8fcb1b8a66d42ad89da4e483fa897dbaed09b7e6a892589",
+    "05-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-image-inspect.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-image-inspect.stdout.log": "41b56ff59da507c92a1e05c4841a5c86e340fdf36662dfaae3e8c5ddf8cfaf9e",
+    "07-liveness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "07-liveness.stdout.log": "992ee5e474f58dc02d49cb822c5c585a064f8a76412cd97cd15d4f72f73774d8",
+    "08-readiness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-readiness.stdout.log": "0c6406d31fa0a3f7f33b4b0f0cc289f1c346cb6854dcc163eaaef220b9fb1665",
+    "09-rejected-override.stderr.log": "cf63856c43187cc175382ce1a1876db067afd3976cf6cf06fccd1a52be663561",
+    "09-rejected-override.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "10-runtime-isolation.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "10-runtime-isolation.stdout.log": "57473b8922d529646b1e90e677cdd073e578945050e95e5bec1cf892ac317f4f",
+    "report.json": "37cd91d8ab6a5956c98f6f48f3c806ea2184b24fb5c0a4c6ed018a79897d483a"
+  },
+  "image": {
+    "id": "sha256:a81a8f88a74e3ab1fd897d2dee00b8f3dab2e8be8120b405aaf224ba7ec2a26f",
+    "tag": "p01-inventory-workers:c9c202786437601c0f000bdf29d7e1e401e773ee",
+    "size": 124377077,
+    "platform": "linux/amd64",
+    "identity_kind": "local_image_configuration_digest"
+  }
+}

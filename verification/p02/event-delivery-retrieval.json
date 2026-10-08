@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "source_sha": "4afcee1d504b8dfb0725d3306f8c2c55eb1f6dce",
+  "retrieved_at": "2026-10-05T18:59:47.982352+00:00",
+  "observer": "Codex via GitHub connector; exact ZIP, retained-byte and source comparison",
+  "result": "PASS",
+  "runs": [
+    {
+      "run_id": 37358890871,
+      "kind": "events",
+      "report_path": "verification/p02/events/run-37358890871/report.json",
+      "report_sha256": "dfb91f09514bd5ba27bcaff03434d12c6279728addd63570b8ab7415a0f9e244",
+      "archive_sha256": "0823310e0e011c569c49d950886f50cfa5f505d55a26ca6a84f5265ebd8a9b47",
+      "result": "PASS",
+      "checks": 4,
+      "matched_source_bindings": 132,
+      "matched_artifact_hashes": 10
+    },
+    {
+      "run_id": 37358891052,
+      "kind": "identity",
+      "report_path": "verification/p02/identity/run-37358891052/report.json",
+      "report_sha256": "4a329751d99cd0cb0996843b5d6d11de0bd70ac7e1b33fa4aaa3bd934948e820",
+      "archive_sha256": "35e4d691eed6b442f87ac43bcdf1d3695132adb8f5ad1869da5d9b8240229a5a",
+      "result": "PASS",
+      "checks": 46,
+      "matched_source_bindings": 236,
+      "matched_artifact_hashes": 6
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.98kB done
+#1 DONE 0.0s
+
+#2 [auth] library/python:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [internal] load metadata for ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3
+#3 DONE 0.4s
+
+#4 [internal] load metadata for docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#4 DONE 0.4s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 179B done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 59.68kB done
+#6 DONE 0.0s
+
+#7 [uv-tool 1/1] FROM ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3
+#7 resolve ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3 done
+#7 sha256:de5ce60260f893ece94ee7b7e9bdc7d0cd51b33e74aabef1358342e642ca71e7 1.30kB / 1.30kB done
+#7 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 0B / 23.52MB 0.1s
+#7 sha256:54723a59ba9fe2be41df3ad59d75d4738b62774f60a8e988163ed08002fa4215 0B / 98B 0.1s
+#7 sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3 669B / 669B done
+#7 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 20.97MB / 23.52MB 0.2s
+#7 sha256:54723a59ba9fe2be41df3ad59d75d4738b62774f60a8e988163ed08002fa4215 98B / 98B 0.1s done
+#7 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 23.52MB / 23.52MB 0.3s done
+#7 extracting sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba
+#7 extracting sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 0.3s done
+#7 extracting sha256:54723a59ba9fe2be41df3ad59d75d4738b62774f60a8e988163ed08002fa4215 done
+#7 DONE 0.8s
+
+#8 [build 1/6] FROM docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#8 resolve docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a done
+#8 sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a 1.75kB / 1.75kB done
+#8 sha256:febd0be41adb897a0ab8f1f1c693d8912669ea60c4940e076e9946b60e210ef0 5.68kB / 5.68kB done
+#8 sha256:1c5e03f304918f89aed0c098c8f4b6f163f7bf9d2702991696bf0132a2853e30 3.53MB / 3.53MB 0.1s done
+#8 extracting sha256:1c5e03f304918f89aed0c098c8f4b6f163f7bf9d2702991696bf0132a2853e30 0.2s done
+#8 sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8 13.67MB / 13.67MB 0.4s done
+#8 sha256:7c6fab1667eb7d9029684d783e4c127f11dd7ed5120829f875b799a0b9431558 249B / 249B 0.3s done
+#8 extracting sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8
+#8 extracting sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8 0.5s done
+#8 extracting sha256:7c6fab1667eb7d9029684d783e4c127f11dd7ed5120829f875b799a0b9431558
+#8 extracting sha256:7c6fab1667eb7d9029684d783e4c127f11dd7ed5120829f875b799a0b9431558 done
+#8 DONE 1.5s
+
+#9 [build 2/6] COPY --from=uv-tool /uv /usr/local/bin/uv
+#9 ...
+
+#10 [runtime 2/3] WORKDIR /app
+#10 DONE 0.3s
+
+#9 [build 2/6] COPY --from=uv-tool /uv /usr/local/bin/uv
+#9 DONE 0.4s
+
+#11 [build 3/6] WORKDIR /build
+#11 DONE 0.0s
+
+#12 [build 4/6] COPY .python-version pyproject.toml uv.lock README.md ./
+#12 DONE 0.0s
+
+#13 [build 5/6] COPY src/ ./src/
+#13 DONE 0.0s
+
+#14 [build 6/6] RUN uv sync --locked --only-group build --no-install-project --no-managed-python     && uv build --offline --no-build-isolation --wheel     && uv export --locked --no-default-groups --no-emit-project --no-annotate --no-header          --format requirements.txt --output-file /build/production-requirements.txt     && uv venv --no-managed-python --python /usr/local/bin/python /opt/venv     && uv pip sync --python /opt/venv/bin/python --require-hashes --only-binary :all: /build/production-requirements.txt     && uv pip install --python /opt/venv/bin/python --offline --no-index --no-deps dist/*.whl     && uv pip check --python /opt/venv/bin/python
+#14 0.300 Using CPython 3.12.14 interpreter at: /usr/local/bin/python3.12
+#14 0.300 Creating virtual environment at: .venv
+#14 0.303 Resolved 22 packages in 0.83ms
+#14 0.423 Prepared 3 packages in 119ms
+#14 0.491 Installed 3 packages in 67ms
+#14 0.491  + packaging==26.3
+#14 0.491  + setuptools==84.0.0
+#14 0.491  + wheel==0.48.0
+#14 0.622 Building wheel...
+#14 1.452 running bdist_wheel
+#14 1.458 running build
+#14 1.458 running build_py
+#14 1.459 creating build/lib/planning
+#14 1.459 copying src/planning/__init__.py -> build/lib/planning
+#14 1.459 creating build/lib/planning/application
+#14 1.459 copying src/planning/application/foundation.py -> build/lib/planning/application
+#14 1.460 copying src/planning/application/__init__.py -> build/lib/planning/application
+#14 1.462 creating build/lib/planning/bootstrap
+#14 1.462 copying src/planning/bootstrap/server.py -> build/lib/planning/bootstrap
+#14 1.462 copying src/planning/bootstrap/health.py -> build/lib/planning/bootstrap
+#14 1.462 copying src/planning/bootstrap/__init__.py -> build/lib/planning/bootstrap
+#14 1.462 creating build/lib/planning/infrastructure
+#14 1.462 copying src/planning/infrastructure/foundation.py -> build/lib/planning/infrastructure
+#14 1.462 copying src/planning/infrastructure/__init__.py -> build/lib/planning/infrastructure
+#14 1.462 creating build/lib/planning/interfaces
+#14 1.462 copying src/planning/interfaces/health.py -> build/lib/planning/interfaces
+#14 1.462 copying src/planning/interfaces/http.py -> build/lib/planning/interfaces
+#14 1.462 copying src/planning/interfaces/__init__.py -> build/lib/planning/interfaces
+#14 1.463 running egg_info
+#14 1.463 creating src/product_planning.egg-info
+#14 1.471 writing src/product_planning.egg-info/PKG-INFO
+#14 1.471 writing dependency_links to src/product_planning.egg-info/dependency_links.txt
+#14 1.472 writing entry points to src/product_planning.egg-info/entry_points.txt
+#14 1.480 writing requirements to src/product_planning.egg-info/requires.txt
+#14 1.480 writing top-level names to src/product_planning.egg-info/top_level.txt
+#14 1.481 writing manifest file 'src/product_planning.egg-info/SOURCES.txt'
+#14 1.482 reading manifest file 'src/product_planning.egg-info/SOURCES.txt'
+#14 1.483 writing manifest file 'src/product_planning.egg-info/SOURCES.txt'
+#14 1.491 warning: build_py: byte-compiling is disabled, skipping.
+#14 1.491 
+#14 1.493 installing to build/bdist.linux-x86_64/wheel
+#14 1.493 running install
+#14 1.497 running install_lib
+#14 1.498 creating build/bdist.linux-x86_64/wheel
+#14 1.499 creating build/bdist.linux-x86_64/wheel/planning
+#14 1.499 creating build/bdist.linux-x86_64/wheel/planning/application
+#14 1.499 copying build/lib/planning/application/foundation.py -> build/bdist.linux-x86_64/wheel/./planning/application
+#14 1.499 copying build/lib/planning/application/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/application
+#14 1.499 creating build/bdist.linux-x86_64/wheel/planning/bootstrap
+#14 1.499 copying build/lib/planning/bootstrap/server.py -> build/bdist.linux-x86_64/wheel/./planning/bootstrap
+#14 1.499 copying build/lib/planning/bootstrap/health.py -> build/bdist.linux-x86_64/wheel/./planning/bootstrap
+#14 1.501 warning: install_lib: byte-compiling is disabled, skipping.
+#14 1.501 
+#14 1.501 copying build/lib/planning/bootstrap/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/bootstrap
+#14 1.501 creating build/bdist.linux-x86_64/wheel/planning/infrastructure
+#14 1.501 copying build/lib/planning/infrastructure/foundation.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure
+#14 1.501 copying build/lib/planning/infrastructure/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure
+#14 1.501 creating build/bdist.linux-x86_64/wheel/planning/interfaces
+#14 1.501 copying build/lib/planning/interfaces/health.py -> build/bdist.linux-x86_64/wheel/./planning/interfaces
+#14 1.501 copying build/lib/planning/interfaces/http.py -> build/bdist.linux-x86_64/wheel/./planning/interfaces
+#14 1.501 copying build/lib/planning/interfaces/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/interfaces
+#14 1.501 copying build/lib/planning/__init__.py -> build/bdist.linux-x86_64/wheel/./planning
+#14 1.501 running install_egg_info
+#14 1.501 Copying src/product_planning.egg-info to build/bdist.linux-x86_64/wheel/./product_planning-0.1.0.dev0-py3.12.egg-info
+#14 1.504 running install_scripts
+#14 1.504 creating build/bdist.linux-x86_64/wheel/product_planning-0.1.0.dev0.dist-info/WHEEL
+#14 1.504 creating '/build/dist/.tmp-44tco1hd/product_planning-0.1.0.dev0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+#14 1.504 adding 'planning/__init__.py'
+#14 1.504 adding 'planning/application/__init__.py'
+#14 1.504 adding 'planning/application/foundation.py'
+#14 1.504 adding 'planning/bootstrap/__init__.py'
+#14 1.504 adding 'planning/bootstrap/health.py'
+#14 1.504 adding 'planning/bootstrap/server.py'
+#14 1.504 adding 'planning/infrastructure/__init__.py'
+#14 1.505 adding 'planning/infrastructure/foundation.py'
+#14 1.505 adding 'planning/interfaces/__init__.py'
+#14 1.505 adding 'planning/interfaces/health.py'
+#14 1.505 adding 'planning/interfaces/http.py'
+#14 1.505 adding 'product_planning-0.1.0.dev0.dist-info/METADATA'
+#14 1.507 adding 'product_planning-0.1.0.dev0.dist-info/WHEEL'
+#14 1.507 adding 'product_planning-0.1.0.dev0.dist-info/entry_points.txt'
+#14 1.507 adding 'product_planning-0.1.0.dev0.dist-info/top_level.txt'
+#14 1.507 adding 'product_planning-0.1.0.dev0.dist-info/RECORD'
+#14 1.507 removing build/bdist.linux-x86_64/wheel
+#14 1.536 Successfully built dist/product_planning-0.1.0.dev0-py3-none-any.whl
+#14 1.547 Resolved 22 packages in 0.70ms
+#14 1.547 click==8.5.0 \
+#14 1.547     --hash=sha256:255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360 \
+#14 1.547     --hash=sha256:ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34
+#14 1.547 h11==0.16.0 \
+#14 1.547     --hash=sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1 \
+#14 1.547     --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
+#14 1.547 psycopg==3.3.6 \
+#14 1.547     --hash=sha256:a1db9f7148b06a28606767efaca51fa6f9398c5c0a3810519be69d7000bdb631 \
+#14 1.547     --hash=sha256:c081f2250df751a943036e42db6df4571c66cd0aabe8291a7a506512b12007d2
+#14 1.547 psycopg-binary==3.3.6 ; implementation_name != 'pypy' \
+#14 1.547     --hash=sha256:1679a1cb93fbe5a6d1fd58d82cbddcc6fcb8c61446ba7cae6eb2a7b19bc585de \
+#14 1.547     --hash=sha256:289aadd6a00e151203c081f708348ec89f1e483c9b510ef4ac3981f847f01f79 \
+#14 1.547     --hash=sha256:366db6e97e66b37211475f20c4c1324a2dc0dd825e46d4e87f9d599304d276f9 \
+#14 1.547     --hash=sha256:37d40450659401600e6d043ff586c89a71a69f33cbb8bcdba6cdb2569beecdbe \
+#14 1.547     --hash=sha256:3f84dab25e0385692ee13274c68678377e0b1a70ab9d14e56264cbf61f60c62d \
+#14 1.547     --hash=sha256:612382ac3ed13651c7fa44b5fee9fbf7baaa2ddbc6f500391672682c5f1df9e0 \
+#14 1.547     --hash=sha256:a4ee3bdd5468a725f2a4d9aab8a74b6d0279f768c8b5d3aeb102c5307ff3d59c \
+#14 1.547     --hash=sha256:a5165300324efd5a772c48a88ab3a928513ab3979fca76553e62ee815f7b2b9c \
+#14 1.547     --hash=sha256:d636338c8f21b0df2f84657b00bc34f9313f826ef93f1155bc743607e4a0c5eb \
+#14 1.547     --hash=sha256:e23a66a763fbe83fcc210bc77c27e5a5ea380ebf091c06f34d8561b695e5a40f \
+#14 1.547     --hash=sha256:f21d057f3e5f5491067e5b292498073b73847d48799b099803fef100775fcc52
+#14 1.547 typing-extensions==4.16.0 \
+#14 1.547     --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8 \
+#14 1.547     --hash=sha256:dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5
+#14 1.547 tzdata==2026.5 ; sys_platform == 'win32' \
+#14 1.547     --hash=sha256:8cc73c0a0bfca7dbfa59235d60b2eff82231dee33f53d206db1acd9173cfc0a7 \
+#14 1.547     --hash=sha256:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac
+#14 1.547 uvicorn==0.53.0 \
+#14 1.547     --hash=sha256:a9356f0cb89b3b8621529c5d5eebd69bfe154f4c3f68b4cf2de47e45fa855c2e \
+#14 1.547     --hash=sha256:e8dca71ec86dce5f04e333f0d56cdedf942446e6643b9cea1af0d6d3a02cb03e
+#14 1.710 Using CPython 3.12.14 interpreter at: /usr/local/bin/python
+#14 1.710 Creating virtual environment at: /opt/venv
+#14 1.869 Using Python 3.12.14 environment at: /opt/venv
+#14 2.043 Resolved 6 packages in 172ms
+#14 2.089 Downloading psycopg-binary (5.0MiB)
+#14 2.255  Downloaded psycopg-binary
+#14 2.256 Prepared 6 packages in 213ms
+#14 2.540 Installed 6 packages in 284ms
+#14 2.541  + click==8.5.0
+#14 2.541  + h11==0.16.0
+#14 2.541  + psycopg==3.3.6
+#14 2.541  + psycopg-binary==3.3.6
+#14 2.541  + typing-extensions==4.16.0
+#14 2.541  + uvicorn==0.53.0
+#14 2.549 Using Python 3.12.14 environment at: /opt/venv
+#14 2.553 Resolved 1 package in 2ms
+#14 2.560 Prepared 1 package in 7ms
+#14 2.610 Installed 1 package in 49ms
+#14 2.610  + product-planning==0.1.0.dev0 (from file:///build/dist/product_planning-0.1.0.dev0-py3-none-any.whl)
+#14 2.616 Using Python 3.12.14 environment at: /opt/venv
+#14 2.617 Checked 7 packages in 0.35ms
+#14 2.618 All installed packages are compatible
+#14 DONE 2.7s
+
+#15 [runtime 3/3] COPY --from=build /opt/venv/ /opt/venv/
+#15 DONE 0.1s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 0.3s done
+#16 writing image sha256:7026bbb91cadc10e898e6d49c84cdf34a53a13710c05295ebdfdee4d804aee25
+#16 writing image sha256:7026bbb91cadc10e898e6d49c84cdf34a53a13710c05295ebdfdee4d804aee25 0.0s done
+#16 naming to docker.io/library/p01-planning:685215de15e40c1298b32c9f068db2f8ad5b2675 0.0s done
+#16 DONE 0.4s

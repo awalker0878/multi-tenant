@@ -1,0 +1,2 @@
+usage: planning-health [-h] {liveness,readiness}
+planning-health: error: unrecognized arguments: --force

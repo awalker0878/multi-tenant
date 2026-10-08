@@ -1,0 +1,8 @@
+{
+  "npmName": "@p00/private-synthetic-client",
+  "npmVersion": "0.0.0",
+  "supportsES6": true,
+  "typescriptThreePlus": true,
+  "hideGenerationTimestamp": true,
+  "disallowAdditionalPropertiesIfNotPresent": false
+}

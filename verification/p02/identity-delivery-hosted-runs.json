@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-05T20:11:25.210Z",
+  "observer": "Codex through GitHub connector; workflow status and engine jobs; raw campaigns have separate verified retrieval records",
+  "campaigns": [
+    {
+      "source_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+      "runs": [
+        {
+          "run_id": 37366983021,
+          "name": "P01 bootstrap images",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37366983021",
+          "head_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+          "updated_at": "2026-10-05T19:59:57Z"
+        },
+        {
+          "run_id": 37366983048,
+          "name": "P01 isolated Compose integration",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37366983048",
+          "head_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+          "updated_at": "2026-10-05T19:59:57Z"
+        },
+        {
+          "run_id": 37366983088,
+          "name": "P01 isolated Kubernetes integration",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37366983088",
+          "head_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+          "updated_at": "2026-10-05T19:59:57Z"
+        },
+        {
+          "run_id": 37366983079,
+          "name": "P01 foundation contracts",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37366983079",
+          "head_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+          "updated_at": "2026-10-05T19:59:57Z"
+        },
+        {
+          "run_id": 37366983093,
+          "name": "P02 identity",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37366983093",
+          "head_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+          "updated_at": "2026-10-05T19:59:57Z"
+        },
+        {
+          "run_id": 37366983173,
+          "name": "P01 policy controls",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37366983173",
+          "head_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+          "updated_at": "2026-10-05T19:59:57Z"
+        },
+        {
+          "run_id": 37366983143,
+          "name": "P01 transactional messaging",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37366983143",
+          "head_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+          "updated_at": "2026-10-05T19:59:57Z"
+        },
+        {
+          "run_id": 37366983045,
+          "name": "P02 Governance events",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37366983045",
+          "head_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+          "updated_at": "2026-10-05T20:06:02Z"
+        },
+        {
+          "run_id": 37366983209,
+          "name": "Context policy",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37366983209",
+          "head_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+          "updated_at": "2026-10-05T20:03:07Z"
+        },
+        {
+          "run_id": 37366983118,
+          "name": "P01 foundation packages",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37366983118",
+          "head_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+          "updated_at": "2026-10-05T20:03:07Z"
+        }
+      ]
+    },
+    {
+      "source_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+      "runs": [
+        {
+          "run_id": 37367430762,
+          "name": "P01 isolated Kubernetes integration",
+          "status": "pending",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37367430762",
+          "head_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+          "updated_at": "2026-10-05T20:04:11Z"
+        },
+        {
+          "run_id": 37367427132,
+          "name": "P02 identity",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37367427132",
+          "head_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+          "updated_at": "2026-10-05T20:04:08Z"
+        },
+        {
+          "run_id": 37367425497,
+          "name": "P01 isolated Compose integration",
+          "status": "pending",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37367425497",
+          "head_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+          "updated_at": "2026-10-05T20:04:08Z"
+        },
+        {
+          "run_id": 37367321433,
+          "name": "P01 bootstrap images",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37367321433",
+          "head_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+          "updated_at": "2026-10-05T20:06:06Z"
+        },
+        {
+          "run_id": 37367321636,
+          "name": "P01 foundation packages",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37367321636",
+          "head_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+          "updated_at": "2026-10-05T20:06:06Z"
+        },
+        {
+          "run_id": 37367321447,
+          "name": "Context policy",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37367321447",
+          "head_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+          "updated_at": "2026-10-05T20:06:07Z"
+        },
+        {
+          "run_id": 37367321499,
+          "name": "P02 Governance events",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37367321499",
+          "head_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+          "updated_at": "2026-10-05T20:03:06Z"
+        },
+        {
+          "run_id": 37367321450,
+          "name": "P01 foundation contracts",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37367321450",
+          "head_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+          "updated_at": "2026-10-05T20:03:06Z"
+        },
+        {
+          "run_id": 37367321420,
+          "name": "P01 policy controls",
+          "status": "queued",
+          "conclusion": null,
+          "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37367321420",
+          "head_sha": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+          "updated_at": "2026-10-05T20:03:06Z"
+        }
+      ]
+    }
+  ],
+  "browser_jobs": [
+    {
+      "id": 111955854690,
+      "run_id": 37367427132,
+      "name": "P02 identity, tenancy and approval (chromium)",
+      "status": "queued",
+      "conclusion": null
+    },
+    {
+      "id": 111955854845,
+      "run_id": 37367427132,
+      "name": "P02 identity, tenancy and approval (webkit)",
+      "status": "queued",
+      "conclusion": null
+    },
+    {
+      "id": 111955854953,
+      "run_id": 37367427132,
+      "name": "P02 identity, tenancy and approval (firefox)",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}

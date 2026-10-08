@@ -1,0 +1,1565 @@
+{
+  "schema_version": 1,
+  "result": "FAIL",
+  "component": "governance",
+  "scope": "P01 independently installed foundation candidates; no service dependency readiness or native qualification",
+  "recorded_at": "2026-10-06T12:57:38.806346+00:00",
+  "source_sha": "55b03c131b1439ee622a9e8afbfa5b547a191c95",
+  "source_ref": "refs/heads/greenfield/enterprise-microservices-plan",
+  "run_id": "37466956477",
+  "run_attempt": "1",
+  "commands": [
+    {
+      "name": "php-version",
+      "command": [
+        "php",
+        "-r",
+        "echo json_encode([\"version\"=>PHP_VERSION,\"extensions\"=>get_loaded_extensions()],JSON_THROW_ON_ERROR);"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:38.879067+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "01-php-version.stdout.log",
+      "stderr": "01-php-version.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:38.943379+00:00",
+      "duration_seconds": 0.064,
+      "stdout_sha256": "78c7007ae057d38c850ca704a277e6191e0dc7f0599549c22e2614ef55030b72",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "composer-version",
+      "command": [
+        "composer",
+        "--version",
+        "--no-ansi"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:38.944514+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "02-composer-version.stdout.log",
+      "stderr": "02-composer-version.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:39.760713+00:00",
+      "duration_seconds": 0.816,
+      "stdout_sha256": "6dca12c153909313c4e7537ed657ec2f5a9f303611d5d516a9b0d4d0e3f2f472",
+      "stderr_sha256": "4acf068af6281ef9fbbc5dbd2d747263c3675e7cf932189d53b274050e7d37a4",
+      "passed": true
+    },
+    {
+      "name": "locked-install",
+      "command": [
+        "composer",
+        "install",
+        "--no-interaction",
+        "--prefer-dist",
+        "--no-scripts",
+        "--no-progress"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:39.761975+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "03-locked-install.stdout.log",
+      "stderr": "03-locked-install.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:45.703899+00:00",
+      "duration_seconds": 5.942,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ff2244d45e03df002c032e51a24268f91064ed38b669ca37ffa536242c836009",
+      "passed": true
+    },
+    {
+      "name": "composer-validate",
+      "command": [
+        "composer",
+        "validate",
+        "--strict",
+        "--no-check-all",
+        "--no-interaction"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:45.814297+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "04-composer-validate.stdout.log",
+      "stderr": "04-composer-validate.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:46.176939+00:00",
+      "duration_seconds": 0.314,
+      "stdout_sha256": "43add299dc97ecbd90ec2dc456ef5a0bd824bb9abdae2a3d7cdb520e21f8e86d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "platform-requirements",
+      "command": [
+        "composer",
+        "check-platform-reqs",
+        "--no-interaction"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:46.275926+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "05-platform-requirements.stdout.log",
+      "stderr": "05-platform-requirements.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:46.491538+00:00",
+      "duration_seconds": 0.214,
+      "stdout_sha256": "b3519b200eebcd5760d7c10da742306098cb3f8c47075782da2ff5312b022c60",
+      "stderr_sha256": "0fbede05e037d5229f008b1901345217d825139d02c2a1b60590c0bd7c61cdca",
+      "passed": true
+    },
+    {
+      "name": "installed-packages-initial",
+      "command": [
+        "php",
+        "-r",
+        "require \"vendor/autoload.php\"; $p=[]; foreach (Composer\\InstalledVersions::getInstalledPackages() as $name) {$p[$name]=[\"version\"=>Composer\\InstalledVersions::getPrettyVersion($name),\"reference\"=>Composer\\InstalledVersions::getReference($name)];}ksort($p); echo json_encode($p,JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:46.560156+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "06-installed-packages-initial.stdout.log",
+      "stderr": "06-installed-packages-initial.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:46.624819+00:00",
+      "duration_seconds": 0.064,
+      "stdout_sha256": "6700a229e80d15c296bd3d478fddc3513f74eb84ff97c6fcbb3f0e4de2e04c19",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "clean-locked-install",
+      "command": [
+        "composer",
+        "install",
+        "--no-interaction",
+        "--prefer-dist",
+        "--no-scripts",
+        "--no-progress"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:46.917551+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "07-clean-locked-install.stdout.log",
+      "stderr": "07-clean-locked-install.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:52.044460+00:00",
+      "duration_seconds": 5.126,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "dc5f50aa696e5b079ab7c1a2d6088f6d1c449aba7b7a61746eb1ac4a1c170e09",
+      "passed": true
+    },
+    {
+      "name": "installed-packages-replay",
+      "command": [
+        "php",
+        "-r",
+        "require \"vendor/autoload.php\"; $p=[]; foreach (Composer\\InstalledVersions::getInstalledPackages() as $name) {$p[$name]=[\"version\"=>Composer\\InstalledVersions::getPrettyVersion($name),\"reference\"=>Composer\\InstalledVersions::getReference($name)];}ksort($p); echo json_encode($p,JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:52.048504+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "08-installed-packages-replay.stdout.log",
+      "stderr": "08-installed-packages-replay.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:52.112798+00:00",
+      "duration_seconds": 0.064,
+      "stdout_sha256": "6700a229e80d15c296bd3d478fddc3513f74eb84ff97c6fcbb3f0e4de2e04c19",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "pint",
+      "command": [
+        "composer",
+        "run",
+        "test:format"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:52.114159+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "09-pint.stdout.log",
+      "stderr": "09-pint.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:54.482382+00:00",
+      "duration_seconds": 2.368,
+      "stdout_sha256": "c9beda7d220885864db3fcd52ad0b3c2800661a62ff87e7ca348ee1ccd085d00",
+      "stderr_sha256": "9271b2fe7eb35336d59a4bb008f074d3e37f99bf90b8baf598ef6627ec0891f6",
+      "passed": true
+    },
+    {
+      "name": "larastan",
+      "command": [
+        "composer",
+        "run",
+        "test:types"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:54.483539+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "10-larastan.stdout.log",
+      "stderr": "10-larastan.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:58.058230+00:00",
+      "duration_seconds": 3.574,
+      "stdout_sha256": "9dd3eeb023e498eff4ab6e14af3d76d6e6c7672da330c9e3edf35753590df0d7",
+      "stderr_sha256": "4ed9f0665b650b18cf127ae4d7a9cb779b3f39d08aaa4b607b2c5e7c8f9f89b9",
+      "passed": true
+    },
+    {
+      "name": "deptrac",
+      "command": [
+        "composer",
+        "run",
+        "test:architecture"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:58.059412+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "11-deptrac.stdout.log",
+      "stderr": "11-deptrac.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:57:58.775422+00:00",
+      "duration_seconds": 0.715,
+      "stdout_sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+      "stderr_sha256": "f02a3cd32c697352d4cb22e29e3d800d5aa009cae9c2c74eb261dbd6c223e8ba",
+      "passed": true
+    },
+    {
+      "name": "pest",
+      "command": [
+        "composer",
+        "run",
+        "test"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:57:58.776612+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "12-pest.stdout.log",
+      "stderr": "12-pest.stderr.log",
+      "exit_code": 2,
+      "finished_at": "2026-10-06T12:58:12.922617+00:00",
+      "duration_seconds": 14.145,
+      "stdout_sha256": "f8d1bec9c88f589f729196d01a542f03a322e8bb16b3285955132d2d8ba6747e",
+      "stderr_sha256": "a542a79af2c294a37719333cb761edffe8ccd4eb7b0be243a3dbefcc02231a05",
+      "passed": false
+    },
+    {
+      "name": "quality-canaries",
+      "command": [
+        "composer",
+        "run",
+        "test:canaries"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:58:12.923797+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "13-quality-canaries.stdout.log",
+      "stderr": "13-quality-canaries.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:58:18.399424+00:00",
+      "duration_seconds": 5.475,
+      "stdout_sha256": "82c506929a17b12815e6e5cffc07538293bc0aeec1443c97148fce1f2999119b",
+      "stderr_sha256": "86c3ee76dc56e026ee9f6a2bfaef2727dd14d0c3f2aeceb450eaec8f0d0d42b0",
+      "passed": true
+    },
+    {
+      "name": "config-cache",
+      "command": [
+        "php",
+        "artisan",
+        "config:cache"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:58:18.400653+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "14-config-cache.stdout.log",
+      "stderr": "14-config-cache.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:58:18.515444+00:00",
+      "duration_seconds": 0.114,
+      "stdout_sha256": "2ee7f0aba1d533d27bcb1fe295b80c698ffbdbd42142042771720681424407c9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "route-cache",
+      "command": [
+        "php",
+        "artisan",
+        "route:cache"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-06T12:58:18.516675+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "15-route-cache.stdout.log",
+      "stderr": "15-route-cache.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-06T12:58:18.631281+00:00",
+      "duration_seconds": 0.114,
+      "stdout_sha256": "952523a762a8362973a179b58c0e20d376bff6f706fc4381c0f89300400448ce",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "component-path-inside-repository",
+      "passed": true
+    },
+    {
+      "name": "component-source-present",
+      "passed": true
+    },
+    {
+      "name": "component-has-no-symlink-input",
+      "passed": true
+    },
+    {
+      "name": "replay-requires-committed-lock",
+      "passed": true
+    },
+    {
+      "name": "exact-php-version",
+      "passed": true
+    },
+    {
+      "name": "exact-composer-version",
+      "passed": true
+    },
+    {
+      "name": "replay-lock-unchanged",
+      "passed": true
+    },
+    {
+      "name": "clean-install-lock-unchanged",
+      "passed": true
+    },
+    {
+      "name": "clean-install-package-versions-references-match",
+      "passed": true
+    },
+    {
+      "name": "http-/health/live-status",
+      "passed": true
+    },
+    {
+      "name": "http-/health/live-body",
+      "passed": true
+    },
+    {
+      "name": "http-/health/live-no-cache",
+      "passed": true
+    },
+    {
+      "name": "http-/health/ready-status",
+      "passed": true
+    },
+    {
+      "name": "http-/health/ready-body",
+      "passed": true
+    },
+    {
+      "name": "http-/health/ready-no-cache",
+      "passed": true
+    },
+    {
+      "name": "unready-retry-after",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "services/governance/.dockerignore": "bf2ad8135b53a1e9a686a09c17c219f0ea06caa48f5b88c9c0003be2a5821106",
+    "services/governance/.env.example": "7bf7eb9d2b53653e1df29d4b6f7b8e3fd4411f4648b7c8ca04514f78ed9bfb83",
+    "services/governance/.gitignore": "8b26495180f3143fc90b845284bc42f9153e42e17afd30567cadf938096f6f26",
+    "services/governance/Dockerfile": "88ceeb2344510e9d09d487e40d8e9031f6466f4df89bae618812f986b63a7d0e",
+    "services/governance/README.md": "8680dbd135550280157549696ede51d63f1368b902d3c504cf966fffed29f083",
+    "services/governance/app/Application/Approvals/Actions/ExpireApprovals.php": "68fdeaebdb366adc429d053a3ae0b50e1a05f9b8f01a204c0efc382ef71f119b",
+    "services/governance/app/Application/Approvals/Actions/InspectApproval.php": "d6772a8b3a202976a9b64758d77b757633335eb4075675ae3c28df2bd74c7e6c",
+    "services/governance/app/Application/Approvals/Actions/ManageApproval.php": "8ec2fe33cb0affefac9466de70395afa3f2ca5d1268cd16a823fc2781afd0283",
+    "services/governance/app/Application/Approvals/Contracts/ImmutablePlanSource.php": "490ca568e3b36c531420c3ec9f3fc6e393092b24d52ef0a126216683ae64c940",
+    "services/governance/app/Application/Foundation/Actions/InspectDependencies.php": "019459639caec1e3d3fb397026215fe77777a3dd77c18efc41c5a1ca406ff74b",
+    "services/governance/app/Application/Foundation/Contracts/DependencyProbe.php": "b79f3e6ed6c6e08677d3c0b61f90fb382c98e96d26e807b3d119fd81a0990c66",
+    "services/governance/app/Application/Foundation/Contracts/HealthCredential.php": "7fdeb5b78e2eb9f676ab955a1f1451fd27eb2f861b2670657e3438a6babb8a93",
+    "services/governance/app/Application/Foundation/Contracts/SignalBuffer.php": "4a78c3f8413add9220d28b71112cfbc738863bed440b9a7545f72010050ac14b",
+    "services/governance/app/Application/Foundation/Data/DependencyStatus.php": "5b19fe2dee35b14359e8a4d4438185a4c77d51f25a82dc6aeb80f5a14ce465f3",
+    "services/governance/app/Application/Identity/Actions/ActivateOidcConnection.php": "c313ff3c4e838719772969428cf7b03eb96262e2b833ed52071a247fc6bed389",
+    "services/governance/app/Application/Identity/Actions/BeginOidcLogin.php": "e983c0a8dec414bdbf571651fc85ed92eec59be56e4dc5c1b57a5c25938e9908",
+    "services/governance/app/Application/Identity/Actions/BootstrapAdministrator.php": "b98e5d82435ebec23b2a2808b3d5ae172e07d5098712c3ab2afd619006703bba",
+    "services/governance/app/Application/Identity/Actions/ChangeLocalPassword.php": "f79d80cfcc074bff444d0c9f548003bf4415836f51c0341ea2d0a4001c3bede6",
+    "services/governance/app/Application/Identity/Actions/CheckIdentityAdmission.php": "307deea8306004b687f0462f5ba3f8f3330263e6fa47f01e791d9ff2212a100e",
+    "services/governance/app/Application/Identity/Actions/CompleteOidcLogin.php": "ef0ab648dffbea37cdf2ebc7da36cbbcee1369227204183d2a5574c0fa8420dc",
+    "services/governance/app/Application/Identity/Actions/InspectActorDelegation.php": "d92e27f8f3edfd629a86e337123825314ce10939bda3a1d8c87a6ffba29393a3",
+    "services/governance/app/Application/Identity/Actions/IssueActorDelegation.php": "fc93572d63c55b655f28594f3f46d793a6bb56da8d40b4bd164465429efc91a0",
+    "services/governance/app/Application/Identity/Actions/IssueFederatedSession.php": "3b4cbab2da0af215045f6ccbd500f872800e9c3274868d2d13e67f29e292a46d",
+    "services/governance/app/Application/Identity/Actions/IssueLocalSession.php": "04f17137c624600b58c92ccdcc71ae5cb6c80fa13be8a3fc6a5768e782caf3cf",
+    "services/governance/app/Application/Identity/Actions/LoginLocalAdministrator.php": "1246efbaeb8b5dcb8d72cf949134063803e19ed282fc94a463beb03e07c7d6d4",
+    "services/governance/app/Application/Identity/Actions/LogoutIdentitySession.php": "a4f1d297db331c51d67805c8be6deee6bcc243de857e376f0c67ff99658082eb",
+    "services/governance/app/Application/Identity/Actions/ResolveIdentitySession.php": "a60c1cef28fc91e72c660f714c744f2890ca6b6c4bae68fe5b76df3e87d6507c",
+    "services/governance/app/Application/Identity/Actions/ResolveLocalSession.php": "6e023f150dc0665a3db830cc045e324c22bb065e9fd3304607385e6dacdf94d1",
+    "services/governance/app/Application/Identity/Actions/RevokeActorDelegation.php": "a228137fe0b8eecc89dd5eb23d8f3058daa063bda1e78bf59c77b138f9bcd391",
+    "services/governance/app/Application/Identity/Actions/SaveOidcConnection.php": "f1969b41ebe8f09dc4e9bfc1995fc33b0c7ca54857878f5123bc72dac5a57f5b",
+    "services/governance/app/Application/Identity/Contracts/AdmissionCustody.php": "32ddc6441820386f5294b1e01bf5c99c9d70bfeaeaf12abe1a0df9feca81299d",
+    "services/governance/app/Application/Identity/Contracts/ConsoleCredential.php": "1c8ef557d78d6b51584231ad351a2cfefee7bac0603c983ab42bf02d3cd26580",
+    "services/governance/app/Application/Identity/Contracts/DeploymentTerminal.php": "82d6e85566b2fac17c3270e0df88f8453e84c4e183f46b4a59830f1c00f3d235",
+    "services/governance/app/Application/Identity/Contracts/OidcHttpTransport.php": "357c46b68a5b7db983023847c133010e251473e7f5929a8e3c1e8c5ccf5cbe08",
+    "services/governance/app/Application/Identity/Contracts/OidcProvider.php": "0b97d4d29b81e6ff279c61456632ef5602e828cac26031b18a8c9f2015125a86",
+    "services/governance/app/Application/Identity/Contracts/ServiceCredentials.php": "477cd7792eeab3d4053b1d0f6cc8bbe78bbe60fb603c651236f910cfa0830574",
+    "services/governance/app/Application/Identity/Data/FederatedIdentity.php": "037863bfd6f5ad9d47f97f42fcc1de7fbb48406495a8816c6922c9ed354aaa75",
+    "services/governance/app/Application/Identity/Data/LocalIdentity.php": "ca009384d91410ffb5e5712316cb86b5fbb5b5f2ac04367f74de70682b156c93",
+    "services/governance/app/Application/Identity/Data/SessionCredentials.php": "9afed17110c3b494b9890b3ff594838434eb77e6bc99b578081ce5c2ba4f5d3c",
+    "services/governance/app/Application/Messaging/Actions/PublishGovernanceEvent.php": "b6a5ec8a7ce954c900ebf01efadad700b2c46dbedae464ca6185d14cc5bce02b",
+    "services/governance/app/Application/Messaging/Actions/PublishIdentityEvent.php": "970222a9869e790b0cbcfe957fdbd9cdbe93dc1eb2f17a845b8e2a4bb0ce903f",
+    "services/governance/app/Application/Messaging/Actions/PublishOutboxEvent.php": "c046a03875669bbfc5be95d8565a82c94a3ebddcce44a4d0342520154553a506",
+    "services/governance/app/Application/Messaging/Actions/PublishSupportEvent.php": "c4bd7bdbb70ea112726bc277ac9acfe9e64b0bd640e7021eb197ef738bbc935b",
+    "services/governance/app/Application/Messaging/Contracts/ConfirmedPublisher.php": "9ed511a3aed383aad198e7b118a2935cf81acb74d091372dbfbd9b9c8346a411",
+    "services/governance/app/Application/Messaging/Contracts/EventEncoder.php": "868dc790482aa8848cd39b290023ebeff78f6622520f6f5b781f09313717d9c8",
+    "services/governance/app/Application/Recovery/Actions/ApplyIdentityRecovery.php": "b7c7e5b5ee87fdd3c093d1a48e9e62604056f09ab261528867399492d3f95e8e",
+    "services/governance/app/Application/Recovery/Actions/ConfirmIdentityResumption.php": "0df2d94e96fb08dbdd41c257aaba4d5eee9622eb3f6fabd1cd619bd0b53d3cf1",
+    "services/governance/app/Application/Recovery/Actions/PrepareIdentityRecovery.php": "b7f9d6e2f0c5303028583d61399bc34be4fac7cf7f192d038ef1086235840f3b",
+    "services/governance/app/Application/Recovery/Actions/PrepareIdentityResumption.php": "67cd3a4e827a67df3ab2c490d255337ece9eac49039dbe0044082186ecb8a20a",
+    "services/governance/app/Application/Recovery/Contracts/RecoveryCustody.php": "1602e0656c69b4d80f56fdba73754217cc950adf25b8bb987f7741ea3a706d5c",
+    "services/governance/app/Application/Recovery/Contracts/RecoveryDatabase.php": "8eddbe301c228e66f6490d2538e0d6c1ea24b5a6689eea189e3c13796486027c",
+    "services/governance/app/Application/Recovery/RecoveryPlan.php": "0cab6e8e8d32e9e8cefb2276c33eb5c4bfac56425d6017eb15414e30948ba02b",
+    "services/governance/app/Application/Recovery/RecoveryResumption.php": "ee74ac86cc545bee1e23b21c0df5daec97ff52363260c4032ee9a2ec2ba9347d",
+    "services/governance/app/Application/Recovery/RecoveryState.php": "736a38cafd57ab68ec8393d3887086402f0db9a0166ebb9b4d4b8d383c39e9e7",
+    "services/governance/app/Application/Support/Actions/DecideSupportAccess.php": "392d7660f9bc018a57716c049fee20e9fd390a388bff10f8561829d4169beee8",
+    "services/governance/app/Application/Support/Actions/ExpireSupportAccess.php": "466444f71bd1a7e9376699be8e94759629374051daaffb289ca7f6aceb9f0efc",
+    "services/governance/app/Application/Support/Actions/ManageSupportSecurity.php": "e79af3035357488007d66f7ddfc8bee4ed6f6534a9d1c7ed289da1704987fa17",
+    "services/governance/app/Application/Support/Actions/ReadSupportAccess.php": "69a6f4b524543747615a9a2b4ed4eae64af35ca635bf4273abd39ff9a4903ed5",
+    "services/governance/app/Application/Support/Actions/RequestSupportAccess.php": "4fd3c0d2796def2b700507dca26534cde9d5bed50c209ffc57b5b94b8790180e",
+    "services/governance/app/Application/Support/Actions/SupportAuthority.php": "69243a98dc97a7853c18bedcdd01950157a85d2b40e5140aef2b1b6080b9a87d",
+    "services/governance/app/Application/Support/Actions/SupportTransaction.php": "d3aed3a8450bffc5096294530dba3eb62c8dee4234179983b7f5f6bc06194ab4",
+    "services/governance/app/Application/Support/Actions/SupportValidity.php": "5f63dc0cbba6e750c54cb1f6bf7722662525b69267d0e1b06790d63afa139935",
+    "services/governance/app/Application/Support/Actions/UseSupportAccess.php": "dcda5566d76c843d6abda37de06236641ed0589d608efda2215cea26d4b47224",
+    "services/governance/app/Application/Support/Contracts/SupportTrust.php": "412fed4114312c4331d9c3eb13d53d4b9c73fae33385ac2c7363c1da4ba7174b",
+    "services/governance/app/Application/Tenancy/Actions/AuthorizeTenant.php": "1886775d81070b2c3cbf91a372129d75843b617d23ba3d3e54778dfd1e75685d",
+    "services/governance/app/Application/Tenancy/Actions/EvaluateTenantPermission.php": "a4c33a241a8a6f5e7c5894fad4a942751479d1ae3056e5f337f81b14367b91af",
+    "services/governance/app/Application/Tenancy/Actions/ExecuteGovernanceCommand.php": "f4b006ded214427cfd18df8a33692a3318ed4dd43588c1de2979a63e43655b99",
+    "services/governance/app/Application/Tenancy/Actions/ManageTenant.php": "c961012f408d7964b8295c9daf95b2a8cfa260333cf2f1b3846fc5815ce3258a",
+    "services/governance/app/Application/Tenancy/Actions/ReadDirectory.php": "35480e1d8114c3ba0726de7b5140f54c1f5f19071d5777436dccc24f38be970b",
+    "services/governance/app/Application/Tenancy/Actions/ReadTenant.php": "10d94fac39677e69498ff31a78eb7faf7433dc8261ba0ce422cfdac51813f863",
+    "services/governance/app/Console/Commands/BootstrapIdentity.php": "e24d7f721e0c5d0adf8a3cca6bcca99760076cf9e270d81983cf2ab8b39c82bb",
+    "services/governance/app/Console/Commands/ExpireGovernanceApprovals.php": "279af91753e06683abf3d25b9924595344c4542a4a6d57a67f403419779c1e8c",
+    "services/governance/app/Console/Commands/ExpireSupportAccess.php": "da1e2d1778bbd0f7a17e52aca87b50dad71c0e41e1c12e9629dcaf7f78e2d6a8",
+    "services/governance/app/Console/Commands/PublishGovernanceOutbox.php": "8cc56e45bedc34f680f898b2fdb2be18e6bc2e5f8d7c0751714a2310fa929494",
+    "services/governance/app/Console/Commands/PublishIdentityOutbox.php": "88848a6c40b98952966380c22401e485c15a02e56bfda4c6d7ce5d1f663e1552",
+    "services/governance/app/Console/Commands/PublishSupportOutbox.php": "2c822d4ac2a93785809d368cb603f6d90e25315277457e5efc83933ce7e695ea",
+    "services/governance/app/Console/Commands/RecoverIdentity.php": "4c34d1264b434b649efcb1b8c6d3a306df2a2c4ac14ac8f3f6f74d7e3abdc35d",
+    "services/governance/app/Domain/Approvals/ApprovalExpiry.php": "e932a213fdb2b3cf826a44b2feaf7cda8fd42d7b37dbfe8341ea2e56057b4e9b",
+    "services/governance/app/Domain/Approvals/BoundPlan.php": "0a6bc458903491db2ccd1b77c4249755da0c4103e05d98c12c60b32e40a308b6",
+    "services/governance/app/Domain/Identity/AdmissionState.php": "4bed7ac982aedd034ce664adbc442ae7d1264690c1616e16c0eb847f81c85088",
+    "services/governance/app/Domain/Identity/BootstrapAdministrator.php": "bb49b64b17155236493708c81e255b1614671b965af6b487b3a474324f1c4ff7",
+    "services/governance/app/Domain/Identity/DelegationPolicy.php": "a308f3867b71493f3d49ac2ffdbdd78991ed91c8ee955e16b6e703e2cd66be16",
+    "services/governance/app/Domain/Identity/IdentityDenied.php": "6ad9db5694fb917eb4e9bafb458a97f040043ef84fdd0cca9054b062ae10d1d7",
+    "services/governance/app/Domain/Identity/IdentityLedger.php": "84e84c41ee05fcc44fd42621f9bd5aea6d7e53314897ab1d9b2ef9baf63ac10d",
+    "services/governance/app/Domain/Identity/OidcConnection.php": "822188362a7e7a035ff8cd87507a3127af1ad0fd63ed1b6edbbdebe02c16b8e0",
+    "services/governance/app/Domain/Identity/OidcUrl.php": "4ed0647729c55abd303586dd0092ac2221c6cdc508fdc1a4403c5bc999525f3a",
+    "services/governance/app/Domain/Messaging/InvalidEvent.php": "4b7642d11171b95f96773afc8ac4727eee930e349948468fce8ebdf16fc6211e",
+    "services/governance/app/Domain/Messaging/Outbox.php": "b2a4cf33a276ee011881ec640e5ebe51e29bffdfab574cd58ed4352aff035362",
+    "services/governance/app/Domain/Recovery/RecoveryContext.php": "f16f31e4dc6b7268099b93cebac1ebac646a27a52fa520eef2a20371ac5b2606",
+    "services/governance/app/Domain/Recovery/RecoveryDenied.php": "dd6105eee57f0484b2344ec6408bcb6732548ba4fa20a47dec3977a06432a1f1",
+    "services/governance/app/Domain/Recovery/RecoveryJson.php": "23d0145531964bb247fad35b33b01fea5f8bc46c117553272227d7ee7dd4a994",
+    "services/governance/app/Domain/Support/SupportExpiry.php": "08de5274e4d2ed7cc145cfaaf81f5e56c22550ba32586464228899d360dff1cb",
+    "services/governance/app/Domain/Support/SupportLedger.php": "df6c96f77ad0fbc3c6c7965701c06f1643e6bab5c0a1c4f0ab9a326e1a42b720",
+    "services/governance/app/Domain/Support/SupportPolicy.php": "e842aa18526c16849bd4104b86648a72883b0a9627589aeab49cb27ffbbceb4c",
+    "services/governance/app/Domain/Support/SupportTrustState.php": "4b7dbc963518509260f15ac37ae5e250182115058e92b797737c1a546e44cdcf",
+    "services/governance/app/Domain/Tenancy/GovernanceLedger.php": "56c68ca349b089087bf67f7f140c0e80c5ba9c64e2224c6845678e393f57763e",
+    "services/governance/app/Domain/Tenancy/PermissionMatrix.php": "45db761a81ef69db4e25369ca0cb7bd172ff015cdf4b41513c91ed47686e814d",
+    "services/governance/app/Http/Controllers/ApprovalController.php": "d9a64a2610f4644d0d18e7bc73fe266cff21735f1bb6faf9f68def9d6d4c53b4",
+    "services/governance/app/Http/Controllers/CatalogueOwnerController.php": "ae804234a53ba2f5c395d3da195345689acedddf87ce31932435dae6eec13aee",
+    "services/governance/app/Http/Controllers/DelegationController.php": "ac9d04013b0434e2022dc80e8482d26b139fecdf4ab9ecaa5a15395d5a66c169",
+    "services/governance/app/Http/Controllers/DependencyHealthController.php": "aab6062bb49e07df600613609f43d492b80f62622ab43608d3e3c92b4337ffeb",
+    "services/governance/app/Http/Controllers/DirectoryController.php": "0e34dc7600023d4d2aa58dab1896d4ae11bc26798219321debfe98847372689c",
+    "services/governance/app/Http/Controllers/HealthController.php": "8a211030f5dbc505518d02584ffc104a36ba534e73422a4ba811e3aaecdd6fab",
+    "services/governance/app/Http/Controllers/InventoryCollectionController.php": "b12b8f7f47c8aaccf93b29e47176a6674aa95b00863791d5b75cf5257bab0349",
+    "services/governance/app/Http/Controllers/LocalIdentityController.php": "c87eba6d10d78296d4e2377ca160b973e01ce49fbff05909a60312635562ba7d",
+    "services/governance/app/Http/Controllers/OidcController.php": "f3f9f224aca941dac5a08b14ed2076724e06ca8e496ad54f4e41bbcb76240439",
+    "services/governance/app/Http/Controllers/PlanningInputController.php": "817dbfbc813019a93cf5799cf247e1ff37bd4ba15890dab2a847d8a15ae2b591",
+    "services/governance/app/Http/Controllers/SupportAccessController.php": "84b3243b82b055a3b49f5de91ed571a4ba2963852af465dfad0262877129b71b",
+    "services/governance/app/Http/Controllers/TenantController.php": "e7974d0c6fe9f3b99cab3605086f7f38c09a3eab3ec56deb5c4b72d00c75c14e",
+    "services/governance/app/Http/Middleware/AuthenticateConsole.php": "def11037f9748eae1401edb64a2a50999af0dc5a406dacf41a5cd9292c879d93",
+    "services/governance/app/Http/Middleware/AuthenticateService.php": "b4d434a5fb70b85e3290c588bbfae0e5954c4604fed732a860045e602c7aeab2",
+    "services/governance/app/Http/Middleware/RequestTelemetry.php": "7f35c16beca5f4544471be419a6f6e686b6615eccdffb85ef43a85ce1e62a57b",
+    "services/governance/app/Http/Middleware/RequireIdentitySetup.php": "09d454506a334cf11388a20919ef02cdd4d4ca3682e11d51d460c638ca01a36d",
+    "services/governance/app/Infrastructure/Approvals/PlanningPlanSource.php": "f2bca5b41030903f06090e1c9aacd732929a275c9c09600a3bdea5ffc93db32e",
+    "services/governance/app/Infrastructure/Foundation/BoundedSignalBuffer.php": "ef39f2f0e618d55bba19a94ed246e9149ee3b494d949ea26a91e18e05b8137f3",
+    "services/governance/app/Infrastructure/Foundation/MountedHealthCredential.php": "3c0a622df2f954de62f6f2864a56157394bc1d4a63788a992fabc4df7b765d86",
+    "services/governance/app/Infrastructure/Foundation/MountedSecret.php": "2e395919fe9c8d42c78e4b28bdb04a5a38d69c7a0d4fa6e6715beabb42b61162",
+    "services/governance/app/Infrastructure/Foundation/PostgresDependencyProbe.php": "e8b8cf3577392336d86cc253d9843b9403c4f1e6493f8b22466ab57ed19b21d7",
+    "services/governance/app/Infrastructure/Identity/ExternalOidcProvider.php": "312672762904cbe30d0179c91fc40fa1ebfdc2bbd427bb90d2670865e7d92eba",
+    "services/governance/app/Infrastructure/Identity/InteractiveDeploymentTerminal.php": "67f4585d56f2c565df1451f46edad0609422ec952729371ac791cdc952cb2ce4",
+    "services/governance/app/Infrastructure/Identity/MountedAdmissionCustody.php": "8e59ea72953ef083a919c62d26f688d056699f5a1406103e894d3b53739b0202",
+    "services/governance/app/Infrastructure/Identity/MountedConsoleCredential.php": "b926abd703c778a3cc799406a39452d04e4421ede335e75ee1b164eeaae53019",
+    "services/governance/app/Infrastructure/Identity/MountedServiceCredentials.php": "ad33b23d620ad8234b2949c9be12547229fb24ad90ebb75c874f12b4de18e0a0",
+    "services/governance/app/Infrastructure/Identity/OidcHttpClient.php": "2a9ffe27c18eede31f8a0b9f9f67c4e57b0b0d8ba5dcd82a46df3e36eb086306",
+    "services/governance/app/Infrastructure/Messaging/GovernanceEventEncoder.php": "2174bcf6f1eac5222b3eb640e91bd4dfb3048629ab0bd10460923380c1b29a91",
+    "services/governance/app/Infrastructure/Messaging/IdentityEventEncoder.php": "c263b8d04918ae939b0b563fd7fc7def8162dda2a6b5130ea5c424c119600411",
+    "services/governance/app/Infrastructure/Messaging/RabbitPublisher.php": "b7cec3a27e6b67233724a2892226d7978773c6fc088391142351ee5c906ccc78",
+    "services/governance/app/Infrastructure/Messaging/SupportEventEncoder.php": "d3b020c4f675e2e16ff498f20a4551f6a1c95a642cb2237836c863223db0dac8",
+    "services/governance/app/Infrastructure/Recovery/MountedRecoveryCustody.php": "7cfe87e388b2885697bf830086475de2068246ea67bb2874da3c3647c4bc0333",
+    "services/governance/app/Infrastructure/Recovery/PostgresRecoveryDatabase.php": "ed4723e9a3922a8cbf07d7be4891b75f563a869a10eb877602b691444aa3b3e7",
+    "services/governance/app/Infrastructure/Support/OnlineSupportTrust.php": "32bacd39bd47d1fa8f6d665f757cf50c16a02e7e2305e0be635e155e426dc3e8",
+    "services/governance/app/Providers/AppServiceProvider.php": "55e7189ba5453d9bebfe1376c7c3daaf47db92bb1663aef6c083bd28d2a8a09f",
+    "services/governance/artisan": "83c95e93ffda62b12bdfd605f5626762ee239fd61cf46ff56fd244dc828f609a",
+    "services/governance/bootstrap/app.php": "3c87fb69452362ba029509abb226992bfbe4e03dd81abe2d4ac773b2b5fc8875",
+    "services/governance/bootstrap/cache/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "services/governance/bootstrap/providers.php": "a3848357a2e0cc535c8b200081cfe9d437821db79c01a58227e782e378e9f656",
+    "services/governance/composer.json": "5bdd6973d2c4eaf76627bf896eb0b8bedfaf01b013287f8a91ea732e5ac9fb2e",
+    "services/governance/composer.lock": "79d17bbd18f9194833ab6853523a6a69c6bdc8e6b4980930382db804993425da",
+    "services/governance/config/app.php": "a12bb0798aa79d8ea181a83ef37559c65fe8f78ef9275f2226a575f192392c6a",
+    "services/governance/config/cache.php": "dd4ecb492fc5e827722c53ad92a0b8d1bed4efebf52bb5576a34941f97d80e10",
+    "services/governance/config/database.php": "d5da2e6c1d133cb44557969b54a9149bfc67aa5e68619730aeecf3ffb9da4df1",
+    "services/governance/config/foundation.php": "0fc9a39a95f0a5cf307fc3cdcf7af0a728cb313ef9b82ab6ef5600de9b6efb6d",
+    "services/governance/config/governance.php": "61c548eba7e6d1d6d1acd7ea760a3714c18be20beb405a4808b540be5641e505",
+    "services/governance/config/hashing.php": "09aa3216775d5fe8d6e525240c66e3fd0a667b7210cda2cab447dcd82df89dff",
+    "services/governance/config/identity.php": "7cdde8c021446e07092426ca8c1357da685a4b5e0cee28f32a7129f33a3d4960",
+    "services/governance/config/logging.php": "29eabe013cf03a79de0f56893816a7ec97b561536009f634607b957e0fd099f4",
+    "services/governance/config/messaging.php": "9ab9e44a32211fc74f9206dcd04130ebbd646679270542c852b9fd2a92bb1e30",
+    "services/governance/config/telemetry.php": "a8e3ca78ee997ac95a3fa02cb0f48868b547ce24862363ba58b0e132eaacf2fb",
+    "services/governance/database/migrations/001_identity.sql": "407dd5025f21b2a36bdacf55d8abbf475efdcd689d77678f8bc10d1b8f91662f",
+    "services/governance/database/migrations/002_federation.sql": "5a7f9ea11881175f3066771c6fea103bf6061c57176c3aa4141b21a669adf146",
+    "services/governance/database/migrations/003_tenancy.sql": "8d263028d7b98664c688761b1246abc913d56847e8b19ad1bab41574bb3b3b58",
+    "services/governance/database/migrations/004_approvals.sql": "2fe76e8272a588623ec3cc1eb26b52036df73f39c016e087f2c2f90f6880a40a",
+    "services/governance/database/migrations/005_event_delivery.sql": "f92d79d6edb59db4b291692cbbb4b525f14f627c8fcf07012937cc0f4ccdcabe",
+    "services/governance/database/migrations/006_actor_delegation.sql": "c8e54364d8091de26cbac0478c6437d64a8b4669b87bd18c74ae9ca2bc43a3bd",
+    "services/governance/database/migrations/007_identity_event_delivery.sql": "847932dd8f096fec0b7fed6535355c4e14b888d025d5d554ca2baf80c66af1df",
+    "services/governance/database/migrations/008_directory_indexes.sql": "7f60980d448fffd884e3e39e68abb1897943bafcfd4945f803dea62bc4e598ff",
+    "services/governance/database/migrations/009_identity_admission.sql": "f3dbfd6c763a5e829970e6db5720a099b2d7bfba82af67a44c93ce62b387e543",
+    "services/governance/database/migrations/010_support_access.sql": "2cfc2ecae63cf0693bb924da814bbd29c62634fddff4c66cd96ae92fdbe912f8",
+    "services/governance/database/migrations/011_identity_recovery.sql": "93069720d6f34d8e2db13c8d47d2b1fba4fa5a116dce46e92d479e27fdf25e58",
+    "services/governance/database/migrations/012_inventory_delegation.sql": "c2876111bffb26d157102c2a50b330d3e3a4cce24d1faee2444cc02bf280093d",
+    "services/governance/deptrac.yaml": "1f9ddf03628d9751a10d7523d1c28125dea5e7cbc53e1ec1fcc265e7ba690d09",
+    "services/governance/phpstan.neon": "040531182713abfa15e3063d5806473131d805007ef888e0fd54c2e09f05fd84",
+    "services/governance/phpunit.xml": "1197e1d1b02d4ce7d9fb269e3b2b53542a8d2714ba1304a2ca16533e68c899fa",
+    "services/governance/pint.json": "e54acf88cddb03d9f17392c062c70b8bdf5c8426391adecaed4c3105a21d4bdb",
+    "services/governance/public/index.php": "59caa93d7583ba8fbb335d7bf0c31f3c382a7cda6c6c6915fd844af840c09c13",
+    "services/governance/resources/contracts/governance-change-v1.json": "470cb3b3472e19cfe919f67bdf5c7e23cc5442533eaf15fbef3c03c621ab9afa",
+    "services/governance/resources/contracts/governance-support-v1.json": "c779f3fbad7685824aa0be8e3a90da4f3150565d95fbb48e834c964c265b5714",
+    "services/governance/resources/contracts/identity-change-v1.json": "3e29ad64056f83e5738f09adb241bd9b4faeb00450101d27dba9b25d123946f4",
+    "services/governance/resources/contracts/support-change-v1.json": "64bc40fdc3992941a8bcb3011bdf2a879b4c232358ebad8d72d4ff2a085184b6",
+    "services/governance/routes/api.php": "d37f53c02f5bfd9eafb633644145f560ebfd75c2958f3009659726227e318c03",
+    "services/governance/storage/framework/cache/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "services/governance/storage/framework/phpstan/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "services/governance/storage/framework/views/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "services/governance/storage/logs/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "services/governance/tests/Architecture/FoundationTest.php": "7ee5fd8d8f6b2d4c9bfb1f7c2e30426dd4dcf7c98b5e25c0a0abcba6835cb371",
+    "services/governance/tests/Architecture/verify_quality_canaries.php": "d239abcc4aca5b10b405a946a6f62c20a6b9cf99c4ac12fc54d98032bd1ef01e",
+    "services/governance/tests/Feature/ActorDelegationTest.php": "a719c5f1233ce49e06a013e5a1c3241972357992a43352ed399a0b599be219ad",
+    "services/governance/tests/Feature/ApprovalTest.php": "5816216c7b2fd1d02984ac2b4342524bce185155424612b1aef4bebd357497d5",
+    "services/governance/tests/Feature/CatalogueOwnersTest.php": "bb94a22d298b9df5c82a513924d62a2a75ccdd91a96f1cfada19b93c15474dbd",
+    "services/governance/tests/Feature/DependencyHealthTest.php": "a682e4b88e4c14af02a2a9e0452987ae5c75d443e2e5c12601fd1df92d4002e6",
+    "services/governance/tests/Feature/DirectoryTest.php": "af1b9fecb15dfcf419446bdce7b84af279d29b55e6a9e5608125ebd164ebb1d3",
+    "services/governance/tests/Feature/GovernanceBrokerTest.php": "8b8f5bbb9d336408c2f852d3255c1bd44090fa86ec9ed91055d45ed96931c071",
+    "services/governance/tests/Feature/GovernanceOutboxTest.php": "4f5d3569838beea33ecccb6d84934db1c8b923ebf53c4633e17292a8139b82f2",
+    "services/governance/tests/Feature/HealthTest.php": "8da83ce5f36f536252766452adebb3bb5d11613cec9911f9db532b85253f08f3",
+    "services/governance/tests/Feature/IdentityAdmissionTest.php": "a7430398940dff16a4024494e83532a07055e1843dbed2348d4bf7711df07434",
+    "services/governance/tests/Feature/IdentityBrokerTest.php": "10c7c4a64c7d75d5b6eea2b7ffacbb4fe9f8f8dcd2cca81a89783b1febdd2ab9",
+    "services/governance/tests/Feature/IdentityOutboxTest.php": "e1e8b8d7985aad3dacefd4e2219ae1fc5239a22c80f5b3499af3f70ceacc1df6",
+    "services/governance/tests/Feature/IdentityRecoveryTest.php": "79f4902207ebd0f33f950f7e47ed064bd04db08d2edb0649ba57f8e928a332bb",
+    "services/governance/tests/Feature/InventoryAdmissionTest.php": "5e89ba781db9b70b2af5d9d41744a490f1101507ec6d996130578a8994b43d18",
+    "services/governance/tests/Feature/LocalIdentityTest.php": "7884524766faafccc090f200c7e9f7c7d00e7ea82fb4a895ac0c6e4f0769851c",
+    "services/governance/tests/Feature/OidcIdentityTest.php": "d0bcc48a5a2d4911d7e8219ea0149b1a21bef217d4962cca3346ccd27aaa6713",
+    "services/governance/tests/Feature/PlanningInputsTest.php": "7b84138b77a40ceb926385385bdc67382c2c28e27a382bb5cacb28164eaa8146",
+    "services/governance/tests/Feature/SupportAccessTest.php": "81adea7182c17b541a0c6108866e13453abafe411058b53b32052344cf03874b",
+    "services/governance/tests/Feature/SupportBrokerTest.php": "4399ea87dec8d9c3f99358699582bce809cb5159df35370b5b43ccf6a5fdc15f",
+    "services/governance/tests/Feature/SupportConcurrencyTest.php": "5474e74f9cedfb329ed6c470a5b56085fff0aefd386af22e44567eec1de8fc12",
+    "services/governance/tests/Feature/SupportContractTest.php": "56059a03e87b4e63e921cf2903970a8a843184889af054b5f298cf617f75318f",
+    "services/governance/tests/Feature/SupportOutboxTest.php": "fc53ae48714655835e1af14821edd35c092418a23c9b87c140bf80a33a017a30",
+    "services/governance/tests/Feature/SupportTrustTest.php": "44d81e8bf617395a38ae4115fa7eae825f1cc2652ad8f18396b3ca5a5b183e22",
+    "services/governance/tests/Feature/TelemetryTest.php": "ddf9bf45f2f563f1c5bab2494df1132a82aa557d57c87ac075e0d240b665de51",
+    "services/governance/tests/Feature/TenancyTest.php": "098a3accd5cbe063710d98891db74cd4136e72fe42123c304efc4dd4e7c278b6",
+    "services/governance/tests/Pest.php": "9701fd74b1fab4c6364d6a2877a141ac4e1ba3c3e769ace5e078b6dff868d863",
+    "services/governance/tests/Support/IdentityFixture.php": "167de7ef9f22657246a8ff09696d51963b9cb06e4af297c70f581a826732fba6",
+    "services/governance/tests/Support/RecoveryFixture.php": "eb5ebb3bf544d0ac2d79257c79644221e95d425f89e248a45b9a90c2a6ff53b5",
+    "services/governance/tests/Support/SupportFixture.php": "ea8ce2d8bf3e5fc7f28c2e305d056e0e7a1b0a41ec959481a924d4c318ebebb8",
+    "services/governance/tests/Support/SyntheticOidcTransport.php": "ad27387a9d2f3490b4fa3025daaa1738d46fe01cf37154f19a08185f36290d2b",
+    "services/governance/tests/Support/SyntheticPlanSource.php": "3817af9ca18e6de46ca391a2f654eaf7d91c986854af197585cc773be4d41fdd",
+    "services/governance/tests/TestCase.php": "9bf01af61ef8aafb5ae927f5bd42a7c74a1993e4fbcaea3c58c630c90f6e4dd9",
+    "scripts/p01/README.md": "c43804617f0f238bb226742ffefecf8f3f2c2131aa688b6ae4e0bfbf989c1812",
+    "scripts/p01/admission/check_pr.py": "fccf26880698beaf5869521f0461d7cfacc32296e3890792eb106162ae4cb20f",
+    "scripts/p01/admission/check_sources.py": "1b46352ff62eba4034bfd6b2cbdffa8813f73d336ad52ecf86b36cab5e86598a",
+    "scripts/p01/admission/exclusions.py": "fd9b27990a3efeaa99efdf5f9a23300f7c118c42b594558a5934b28c271905d6",
+    "scripts/p01/admission/operating_inputs.py": "f4a38a27f9bfdda3aecdbd303fa3b770504b3861547f8c863c8ade38f6ad3d71",
+    "scripts/p01/admission/policy.py": "25658e8505bbfa3916c16a0eaa6819847e7df08157724e61017a1c0e7bd56a3b",
+    "scripts/p01/admission/probe_pr.py": "240478eaa98075393956a77a0950aab8f71ce94869f761b53651f4cf9ea0284f",
+    "scripts/p01/admission/test_check_sources.py": "5d70a18179e5667b267b0d6c328326f7fcc43dfe4759de5d7d9cec42e75e8af4",
+    "scripts/p01/admission/test_exclusions.py": "3f1641b9d54c6cf927d4041c03c5c79700a8ad2b1a881dff996e6559e068e462",
+    "scripts/p01/admission/test_operating_inputs.py": "73ec0043b02a3de18bcbd37d26ca014d53eda90e981f46132905ad8ce2e11b70",
+    "scripts/p01/admission/test_policy.py": "5a31b724c4d4a785778e364341204eeac4fca8350b938cc7588877e9b79dba5a",
+    "scripts/p01/alert_delivery.py": "0994c34c5072d39a5eb2c2c209f6f00668dab01be81b76313273b8a996b82405",
+    "scripts/p01/alpine_inputs.py": "92953d65a0332638263fa9dbad6ba65a913e3f902b2c1d7fcee813ebb13138b0",
+    "scripts/p01/artifacts/bundle.py": "1213a73198af682611e68773052801c2bdd45aab24a87284c36ca3f5a1a7ee2c",
+    "scripts/p01/artifacts/campaign.py": "166c18f6a822cb56674f418217740a8aeb22b74f96312d9cbde4db125e947129",
+    "scripts/p01/artifacts/observe_remediation.py": "49a90d29962831dcf7e8318bcf06d83d09564e6daea1ef3f4d572ced8a5de712",
+    "scripts/p01/artifacts/release_set.py": "dc009f7a65282d1b6740b1f902026ac6a6c75cafa7618e0aa2551f500f067bf1",
+    "scripts/p01/artifacts/repository_scan.py": "13eed3db230a99756d435acbc61e58c318e6eb13ccd02c346988d27b084dc212",
+    "scripts/p01/artifacts/resolve_alpine.py": "09e4cd917e1bf039453760305bae2c787e58fb2e7fda33f2e7d7ead1af6558e6",
+    "scripts/p01/artifacts/test_bundle.py": "6346ba2b00b8b4c5a1a35eee55ec3f3e2f294d40fedfc7e472e456a9cb551162",
+    "scripts/p01/artifacts/test_campaign.py": "62c26deaec6ab35a88d64e0c95eaadd5064fdad525202d3b8db9994224b03a56",
+    "scripts/p01/artifacts/test_release_set.py": "70931a0098ed4d040dd2d274a6a288205067f4da5f3dd0d3cabb67acbcb404f6",
+    "scripts/p01/artifacts/tools.py": "829c6cb1a9b769e79b0f69b2ed3e8c41e689206d3bc6cb042dc747b51dda339c",
+    "scripts/p01/candidates.json": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+    "scripts/p01/check_jobs.py": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+    "scripts/p01/console_shared_state.php": "09f147e8a5c6722302440a4ec3aef1fba471b7854b19d8c5a0d89e1335f7ae9c",
+    "scripts/p01/contracts/compatibility.py": "ea1176fbf8bff363fb4f1cef82fe674d62ab9155e1c21802287533ceee38fdde",
+    "scripts/p01/contracts/config-php.json": "12cb6d61d4661117692300d84fbc4c117ee5f252f06306813375523a9cadcf40",
+    "scripts/p01/contracts/config-python.json": "57fccb73fe13bb0c2c17b88db04c0892345a54f2845be6194e2721406caedf99",
+    "scripts/p01/contracts/config-typescript-fetch.json": "dfbc7aed787a9a529de03db50c9e7915dafe6fec71e0573457c8f7c78adb40cb",
+    "scripts/p01/contracts/package-lock.json": "b45c3b6ade5daf81de9b086060f6a631638e52d46a2083f34ab4e75094e76742",
+    "scripts/p01/contracts/package.json": "fbdb858ce3725ffc47879326382a88052d0304e26d492c706f9dce870fb43ae1",
+    "scripts/p01/contracts/pyproject.toml": "eff306f45a1d4d4dc1ecf21f36eba2daf20be160b938a87928af4e8e6655f315",
+    "scripts/p01/contracts/run.py": "b7b647933bdb5518e4bf9e2dd54330868f29cf5b5ec234e7beec25835b56df0a",
+    "scripts/p01/contracts/test_compatibility.py": "bf5b7e1a0437a564cf1fada63a81aed9abdd235cf3e8094bfd6d4588ec78f71d",
+    "scripts/p01/contracts/uv.lock": "6afd3e92a837772ab2edf0a61abb912d4e5d0917e2ebae03f0bbcbf21fe7951c",
+    "scripts/p01/kubernetes_runtime.py": "2a896b580f5a0785281620d1e16d5d156b8d2572ed463191864cefeacc52d0c5",
+    "scripts/p01/local_runtime.py": "8e4b276f804dfdd5a6dbcb4af3c31c58e56f04affbfd858391e0c4425241df4d",
+    "scripts/p01/messaging/consumer.py": "e6745fbeaf529b6e631ecaecb1fd200a326e50e35abd1f99d75eeb833c69c30a",
+    "scripts/p01/messaging/generate.py": "248b9d8e1ae6e9dd7bdc0d260b27146dafdd7185ef66070440550b0030f5b704",
+    "scripts/p01/messaging/producer.php": "c43a863653e8fc90af26cadb3736b220a3b6e84b8d702d3de2e9f8e95ccaa313",
+    "scripts/p01/messaging/runtime.py": "47b7cf5ae90daade091ae3ab5ef52b6d3f863750a04dd09c8113fb0f941b3dfd",
+    "scripts/p01/permit_desk/Dockerfile": "d4c5ee38d43c97dc7eaa993aa045b1c3fe7774cb17ce4d83575dc61dbd2cdb80",
+    "scripts/p01/permit_desk/app.py": "fcd4165742fffce4c2f12a91ce7e30c35f91896553b60f8ab878b6efbf621cb6",
+    "scripts/p01/permit_desk/bundle.py": "ddb9eb23cbb5526435e070b2efbcb786f0e704f049b5e0d52ef59f36f6886524",
+    "scripts/p01/permit_desk/requirements.txt": "c287ec994d02e304dfa3e8a83bf7813faa2f6cf624edb02cab247d8752fd9955",
+    "scripts/p01/permit_desk/state.py": "c1002207716bef5d7cb46805b1e4712fc8eb6c9dbc76619499d685f17aae1311",
+    "scripts/p01/php_image_probe.php": "b145f43daf40e678275c54bcadb17a32aa18db6d529042dd29bbac849ccee032",
+    "scripts/p01/python_lock.py": "05b4074482edb8899c95da980b4886975a9ce36adb19c2894bd4e42b40d76769",
+    "scripts/p01/record_check_source.py": "e1441efa3477ed0db9e845547aa81e7a75b2227ce0b946ed1bcab4d0ebe3bd7b",
+    "scripts/p01/resolve_dependencies.py": "5bf284a7bff395bd29a344dfc311c4e2b97ad814da58f373c4a0703dc16e9210",
+    "scripts/p01/resource_observation.py": "271a4192d1246ebd6befebc67c5c99f2033a9d3bdd99586b42cae8f26291568b",
+    "scripts/p01/run_images.py": "b8ef7e7a62d080a7e08e1e15806efab37fe2bd55c0742d6a60a35e4cd72a0187",
+    "scripts/p01/run_kubernetes.py": "9e97677f54194ce9fbcdc282df9b7c3adfd1764b64416ea6107263e92eb8f14d",
+    "scripts/p01/run_local.py": "7b204f022119609ecbe4aa3b02701d0b693014f4544d72838f5a5423145576e1",
+    "scripts/p01/run_messaging.py": "390279417c8f8a8ea0a8fcea1cf33802f72d471d0b64428c717c31bef2498a8b",
+    "scripts/p01/run_permit_desk.py": "875c65d49a45dce549d678cdeae5d3dbf586ef529387d6d00912f8e0a6e40d7b",
+    "scripts/p01/run_policy_controls.py": "8755b293fe919cccd8dcf54deee64eff2de388992ec275ac38d0ea71ab20d27a",
+    "scripts/p01/run_quality.py": "a1ba38d3e97028f9ddfe0c361690cbf13c892201077e2d1b0af05fe1a04b48cd",
+    "scripts/p01/run_stateful.py": "21d040012d8ce9360ec3e2df9e451ca80f7bb1fe4d8d71939da3ffd28d1706ae",
+    "scripts/p01/select_components.py": "9806b65f0faf745fe5f43451953b9d3432cd7baa106649ab0f65128cbf54f3ab",
+    "scripts/p01/stateful/Dockerfile": "c94f8ad1e12642cab4cb75e4342513d23117d9ab48d7d89001383dead91ab7c0",
+    "scripts/p01/stateful/Minio.Dockerfile": "e678385f2be94be3d9a07d0a7031be6669a9e709dc644382b8be4281583295d4",
+    "scripts/p01/stateful/probe.py": "be12ef04c62356b427f2bbc10440b79a134778031cc0bcb8b54c1676a25e4998",
+    "scripts/p01/stateful/requirements.in": "337f840ef121d68a09c39a7e0f3cb6249e90a6a16716b7b56927b247f184f33a",
+    "scripts/p01/stateful/requirements.txt": "8502a23321ac4444a5033774030d7ae3ccd1e4de21412c59bc2a1e316b90cdad",
+    "scripts/p01/stateful/resolve.py": "df470b2534427e43dd1b351e55cf4d48765aa7abfb2d9a9d53649259d22f4ffb",
+    "scripts/p01/stateful/runtime.py": "def6b44b6deba5cf6b429877587f76f81cce49759fcc62dcc102b2f29f90b2a6",
+    "scripts/p01/stateful/workflow.py": "3ff476ff222706766a5b6dcb5b5a62d7fe58724fd5317335ac054e71c9e3491d",
+    "scripts/p01/telemetry.py": "ff515376e284541f47d388cd33800798ef0eab3b7c8dbb889df0bb5f62bfba69",
+    "scripts/p01/telemetry_campaign.py": "888220985a6b3d2e93ee1064d6b65d2b76c5494172f8ff52c4e74b6a4abe2988",
+    "scripts/p01/test_alert_delivery.py": "fd9187d058e14533237a55085b784223e88b325493a5a295a4f2ef41702aa414",
+    "scripts/p01/test_alpine_inputs.py": "b65bb27c4bfec9067ec1a3e9b81a3b6972a3c2d8f6924aa22d216113fcc285b7",
+    "scripts/p01/test_jobs.py": "b103af1562f26ceb28e13e36fa13a09fb131333bc8cf4144e071d05b7c23bbf5",
+    "scripts/p01/test_kubernetes_campaign.py": "07c16af7ae660f365ce19b66bcb5697457a9ae0b8e0cb899d8fc20c787fbf267",
+    "scripts/p01/test_kubernetes_runtime.py": "19d19f8548bec14c3fdecb589e14d6cfd3c5c884082f87fba45f4ebfd12512ef",
+    "scripts/p01/test_local_campaign.py": "18d60c06c69792b9e0255e82dcd62654fc93bce6c6e44d74a38a9c67ea7cb03c",
+    "scripts/p01/test_local_runtime.py": "ef7b21f9821e19f5233ab6f163f33f851df9539fb830947be0854c1576d96972",
+    "scripts/p01/test_permit_desk.py": "13a522274de07e953e4490491b821644fc3719902d6182d9c225530ffc7b3d92",
+    "scripts/p01/test_python_lock.py": "aa0243b4687a89a677f57bfa161a5956150de379364ea39be29f17f340602971",
+    "scripts/p01/test_recorder.py": "afc5002982dfb8d1d71a71974fdf5a2d3471854c6cfccc91f31f06b0d3bbe56f",
+    "scripts/p01/test_resource_observation.py": "a7eeea2c945e93efeb0b8ac0430853f2f64f49a6ac653494ad465aa8a8673d2c",
+    "scripts/p01/test_retained.py": "12e1248f65212da103e2c92bbc98f58cdd45be0af103d7874077782eddafd07f",
+    "scripts/p01/test_selection.py": "d6122c2ac881b206f4871e3f77dda8e5f0194f3f1b790864154cd6bf20367ab6",
+    "scripts/p01/test_stateful.py": "b60a35e81d054d91b6132b1252d095151c89ab5c26c3e2b0ae6e3a85b0fbf61c",
+    "scripts/p01/test_telemetry.py": "46905d01b1df4585c22f64a18d3026e6a33c74c0132f8485f83c300fe7254389",
+    "scripts/p01/verify_retained.py": "872344688ead3abc56eff37d825f147576eb57e156eff397e8e825cd426fcbbf",
+    ".github/workflows/p01-foundations.yml": "4360982a4243ac60a6e133dbf2a32646270f52cc9e656553da2e430c191bd9a7"
+  },
+  "input_lock_sha256": "79d17bbd18f9194833ab6853523a6a69c6bdc8e6b4980930382db804993425da",
+  "dependency_mode": "replay",
+  "resolved_lock_sha256": "79d17bbd18f9194833ab6853523a6a69c6bdc8e6b4980930382db804993425da",
+  "installed_packages": {
+    "brianium/paratest": {
+      "version": "v7.20.0",
+      "reference": "81c80677c9ec0ed4ef16b246167f11dec81a6e3d"
+    },
+    "brick/math": {
+      "version": "1.0.0",
+      "reference": "2effe05d2177c451b86c6a073196a4034c02f211"
+    },
+    "carbonphp/carbon-doctrine-types": {
+      "version": "3.2.1",
+      "reference": "5fa5eacafd9ef47c8c6ab9143fc901ba0194d3dc"
+    },
+    "composer/pcre": {
+      "version": "3.4.0",
+      "reference": "d5a341b3fb61f3001970940afb1d332968a183ed"
+    },
+    "composer/xdebug-handler": {
+      "version": "3.0.5",
+      "reference": "6c1925561632e83d60a44492e0b344cf48ab85ef"
+    },
+    "cordoval/hamcrest-php": {
+      "version": null,
+      "reference": null
+    },
+    "davedevelopment/hamcrest-php": {
+      "version": null,
+      "reference": null
+    },
+    "deptrac/deptrac": {
+      "version": "4.7.2",
+      "reference": "060c7edca50331129c866e6c5d5687edfea03c5f"
+    },
+    "dflydev/dot-access-data": {
+      "version": "v3.0.3",
+      "reference": "a23a2bf4f31d3518f3ecb38660c95715dfead60f"
+    },
+    "doctrine/deprecations": {
+      "version": "1.1.6",
+      "reference": "d4fe3e6fd9bb9e72557a19674f44d8ac7db4c6ca"
+    },
+    "doctrine/inflector": {
+      "version": "2.1.0",
+      "reference": "6d6c96277ea252fc1304627204c3d5e6e15faa3b"
+    },
+    "doctrine/lexer": {
+      "version": "3.0.3",
+      "reference": "71d305eaa6480d3d3460c7d053d1da7749fa9cca"
+    },
+    "dragonmantank/cron-expression": {
+      "version": "v3.6.0",
+      "reference": "d61a8a9604ec1f8c3d150d09db6ce98b32675013"
+    },
+    "egulias/email-validator": {
+      "version": "4.0.4",
+      "reference": "d42c8731f0624ad6bdc8d3e5e9a4524f68801cfa"
+    },
+    "fidry/cpu-core-counter": {
+      "version": "1.4.1",
+      "reference": "d384a7d0d6e67aa497327260ca95023e92dc2032"
+    },
+    "filp/whoops": {
+      "version": "2.18.6",
+      "reference": "7d0a2cde892089bb09372f4366e9b960eb3001a9"
+    },
+    "firebase/php-jwt": {
+      "version": "v7.2.1",
+      "reference": "0501f5729b9e2448516674aff07c7d1727869b8e"
+    },
+    "fruitcake/php-cors": {
+      "version": "v1.4.0",
+      "reference": "38aaa6c3fd4c157ffe2a4d10aa8b9b16ba8de379"
+    },
+    "graham-campbell/result-type": {
+      "version": "v1.2.0",
+      "reference": "adccca3324eece92ca35463648c12b9e6293c05b"
+    },
+    "guzzlehttp/guzzle": {
+      "version": "8.2.0",
+      "reference": "93939470950a9b11e2e84204166ef5e048c55fe4"
+    },
+    "guzzlehttp/promises": {
+      "version": "3.0.2",
+      "reference": "42118e66a53c492effaf92bc357e931985d5c6f9"
+    },
+    "guzzlehttp/psr7": {
+      "version": "3.1.0",
+      "reference": "a3059ba1a84c9139c4ae03cf0f45bea276c97c74"
+    },
+    "guzzlehttp/uri-template": {
+      "version": "v2.0.1",
+      "reference": "7a466ad606491eb6528c717482f7cca77f1851f3"
+    },
+    "hamcrest/hamcrest-php": {
+      "version": "v3.0.0",
+      "reference": "b61cd040da1a4925bc90a51c074f5297e7c0fa52"
+    },
+    "iamcal/sql-parser": {
+      "version": "v0.7",
+      "reference": "610392f38de49a44dab08dc1659960a29874c4b8"
+    },
+    "illuminate/auth": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/broadcasting": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/bus": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/cache": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/collections": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/concurrency": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/conditionable": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/config": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/console": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/container": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/contracts": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/cookie": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/database": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/encryption": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/events": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/filesystem": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/hashing": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/http": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/image": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/json-schema": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/log": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/macroable": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/mail": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/notifications": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/pagination": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/pipeline": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/process": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/queue": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/redis": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/reflection": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/routing": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/session": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/support": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/testing": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/translation": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/validation": {
+      "version": null,
+      "reference": null
+    },
+    "illuminate/view": {
+      "version": null,
+      "reference": null
+    },
+    "jean85/pretty-package-versions": {
+      "version": "2.1.1",
+      "reference": "4d7aa5dab42e2a76d99559706022885de0e18e1a"
+    },
+    "jetbrains/phpstorm-stubs": {
+      "version": "v2026.2",
+      "reference": "709e512210784a7c0a677b3a89d35def844a59b9"
+    },
+    "kodova/hamcrest-php": {
+      "version": null,
+      "reference": null
+    },
+    "larastan/larastan": {
+      "version": "v3.12.2",
+      "reference": "c328727e6103c1147d1c64cc96b3aedfda26bc20"
+    },
+    "laravel/framework": {
+      "version": "v13.34.0",
+      "reference": "c829b4982d29344cbcf1d7ad78eb5d2bb8ae66c4"
+    },
+    "laravel/pint": {
+      "version": "v1.32.1",
+      "reference": "006bd7825eb01daf92959d060b89cd9514fe4253"
+    },
+    "laravel/prompts": {
+      "version": "v0.3.24",
+      "reference": "5d3cdef29e93ca3b62b1871359db3078cd99908b"
+    },
+    "laravel/serializable-closure": {
+      "version": "v2.1.0",
+      "reference": "2d5869a838bbcf37e0d8b0568fc41914e81374b5"
+    },
+    "league/commonmark": {
+      "version": "2.10.3",
+      "reference": "6efbd9c472b91db0a3350fcd601c8332c2382e1f"
+    },
+    "league/config": {
+      "version": "v1.2.0",
+      "reference": "754b3604fb2984c71f4af4a9cbe7b57f346ec1f3"
+    },
+    "league/flysystem": {
+      "version": "3.36.0",
+      "reference": "f7fb152932f30072d573510cbd4dd657d6475b25"
+    },
+    "league/flysystem-local": {
+      "version": "3.35.3",
+      "reference": "a099b24dce160f3b2239043d13d47c4a1a214ea4"
+    },
+    "league/mime-type-detection": {
+      "version": "1.17.0",
+      "reference": "f5f47eff7c48ed1003069a2ca67f316fb4021c76"
+    },
+    "league/uri": {
+      "version": "7.8.1",
+      "reference": "08cf38e3924d4f56238125547b5720496fac8fd4"
+    },
+    "league/uri-interfaces": {
+      "version": "7.8.1",
+      "reference": "85d5c77c5d6d3af6c54db4a78246364908f3c928"
+    },
+    "mockery/mockery": {
+      "version": "1.6.15",
+      "reference": "967a801bd188989a5669bd280f252d51c0fdc9ee"
+    },
+    "monolog/monolog": {
+      "version": "3.12.1",
+      "reference": "d7059e4c691d05ea1222b5124bed0f961be46e15"
+    },
+    "mtdowling/cron-expression": {
+      "version": null,
+      "reference": null
+    },
+    "myclabs/deep-copy": {
+      "version": "1.14.0",
+      "reference": "8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae"
+    },
+    "nesbot/carbon": {
+      "version": "3.14.2",
+      "reference": "94cfc34887f07ab5c0efa07914c8f527544e3224"
+    },
+    "nette/schema": {
+      "version": "v1.3.6",
+      "reference": "c54350438cd6914616f790a49cb424605f421562"
+    },
+    "nette/utils": {
+      "version": "v4.1.5",
+      "reference": "b043439dbdf954e6c28b5ea7e34b0100f83165e0"
+    },
+    "nikic/php-parser": {
+      "version": "v5.9.0",
+      "reference": "9e33da9553fe7786f0962b35f4e4ecf01be89def"
+    },
+    "nunomaduro/collision": {
+      "version": "v8.9.5",
+      "reference": "fb53eacd509a1d303858e2d20cfebf2d630254ec"
+    },
+    "nunomaduro/termwind": {
+      "version": "v2.4.0",
+      "reference": "712a31b768f5daea284c2169a7d227031001b9a8"
+    },
+    "opis/json-schema": {
+      "version": "2.6.0",
+      "reference": "8458763e0dd0b6baa310e04f1829fc73da4e8c8a"
+    },
+    "opis/string": {
+      "version": "2.1.0",
+      "reference": "3e4d2aaff518ac518530b89bb26ed40f4503635e"
+    },
+    "opis/uri": {
+      "version": "1.1.0",
+      "reference": "0f3ca49ab1a5e4a6681c286e0b2cc081b93a7d5a"
+    },
+    "paragonie/constant_time_encoding": {
+      "version": "v3.1.3",
+      "reference": "d5b01a39b3415c2cd581d3bd3a3575c1ebbd8e77"
+    },
+    "pestphp/pest": {
+      "version": "v4.7.8",
+      "reference": "5b2293f67adcf1b2320b33f521b94a692d18f360"
+    },
+    "pestphp/pest-plugin": {
+      "version": "v4.0.0",
+      "reference": "9d4b93d7f73d3f9c3189bb22c220fef271cdf568"
+    },
+    "pestphp/pest-plugin-arch": {
+      "version": "v4.0.2",
+      "reference": "3fb0d02a91b9da504b139dc7ab2a31efb7c3215c"
+    },
+    "pestphp/pest-plugin-laravel": {
+      "version": "v4.1.0",
+      "reference": "3057a36669ff11416cc0dc2b521b3aec58c488d0"
+    },
+    "pestphp/pest-plugin-mutate": {
+      "version": "v4.0.1",
+      "reference": "d9b32b60b2385e1688a68cc227594738ec26d96c"
+    },
+    "pestphp/pest-plugin-profanity": {
+      "version": "v4.2.1",
+      "reference": "343cfa6f3564b7e35df0ebb77b7fa97039f72b27"
+    },
+    "phar-io/manifest": {
+      "version": "2.0.4",
+      "reference": "54750ef60c58e43759730615a392c31c80e23176"
+    },
+    "phar-io/version": {
+      "version": "3.2.1",
+      "reference": "4f7fd7836c6f332bb2933569e566a0d6c4cbed74"
+    },
+    "php-amqplib/php-amqplib": {
+      "version": "v3.7.5",
+      "reference": "96da6d97b5a2da782be3234631ef64ac2c912298"
+    },
+    "phpdocumentor/graphviz": {
+      "version": "2.1.0",
+      "reference": "115999dc7f31f2392645aa825a94a6b165e1cedf"
+    },
+    "phpdocumentor/reflection-common": {
+      "version": "2.2.1",
+      "reference": "ee15a5a2022c8383906b225055e9496a6a5e6e3b"
+    },
+    "phpdocumentor/reflection-docblock": {
+      "version": "6.0.3",
+      "reference": "7bae67520aa9f5ecc506d646810bd40d9da54582"
+    },
+    "phpdocumentor/type-resolver": {
+      "version": "2.1.0",
+      "reference": "dbe2133bb23e2e33a6834f4ed417f24a1b167769"
+    },
+    "phpoption/phpoption": {
+      "version": "1.10.0",
+      "reference": "67b192b6a42ec03944b972d6e633ddec78ad2c6d"
+    },
+    "phpseclib/phpseclib": {
+      "version": "4.0.1",
+      "reference": "bb7b959c8159957edae6f5084ebbac765d310e16"
+    },
+    "phpstan/phpdoc-parser": {
+      "version": "2.3.6",
+      "reference": "1427af4647235b4a73b13940b1f1258d3584f36e"
+    },
+    "phpstan/phpstan": {
+      "version": "2.2.16",
+      "reference": "46a6d9060e5a7763adfcc21ebcb8b504ebdbcb92"
+    },
+    "phpunit/php-code-coverage": {
+      "version": "12.5.8",
+      "reference": "7440368d94738d54f2c1de24dbd3871793bbb0dd"
+    },
+    "phpunit/php-file-iterator": {
+      "version": "6.0.2",
+      "reference": "a248d1640ab059b075f53a2ef0f9856e864e06b5"
+    },
+    "phpunit/php-invoker": {
+      "version": "6.0.0",
+      "reference": "12b54e689b07a25a9b41e57736dfab6ec9ae5406"
+    },
+    "phpunit/php-text-template": {
+      "version": "5.0.1",
+      "reference": "babab73b7ef9fae406f2eb3ee11323a61caa63d5"
+    },
+    "phpunit/php-timer": {
+      "version": "8.0.0",
+      "reference": "f258ce36aa457f3aa3339f9ed4c81fc66dc8c2cc"
+    },
+    "phpunit/phpunit": {
+      "version": "12.5.33",
+      "reference": "b98e028a26c5c5ba7e4a54be96ccf35f2914d184"
+    },
+    "product/governance": {
+      "version": "1.0.0+no-version-set",
+      "reference": null
+    },
+    "psr/clock": {
+      "version": "1.0.0",
+      "reference": "e41a24703d4560fd0acb709162f73b8adfc3aa0d"
+    },
+    "psr/clock-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/container": {
+      "version": "2.0.2",
+      "reference": "c71ecc56dfe541dbd90c5360474fbc405f8d5963"
+    },
+    "psr/container-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/event-dispatcher": {
+      "version": "1.0.0",
+      "reference": "dbefd12671e8a14ec7f180cab83036ed26714bb0"
+    },
+    "psr/event-dispatcher-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/http-client": {
+      "version": "1.0.3",
+      "reference": "bb5906edc1c324c9a05aa0873d40117941e5fa90"
+    },
+    "psr/http-client-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/http-factory": {
+      "version": "1.1.0",
+      "reference": "2b4765fddfe3b508ac62f829e852b1501d3f6e8a"
+    },
+    "psr/http-factory-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/http-message": {
+      "version": "2.0",
+      "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71"
+    },
+    "psr/http-message-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/log": {
+      "version": "3.0.2",
+      "reference": "f16e1d5863e37f8d8c2a01719f5b34baa2b714d3"
+    },
+    "psr/log-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "psr/simple-cache": {
+      "version": "3.0.0",
+      "reference": "764e0b3939f5ca87cb904f570ef9be2d78a07865"
+    },
+    "psr/simple-cache-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "ramsey/collection": {
+      "version": "2.1.1",
+      "reference": "344572933ad0181accbf4ba763e85a0306a8c5e2"
+    },
+    "ramsey/uuid": {
+      "version": "4.9.4",
+      "reference": "75d73f48d02797c2c285a7e9f348fadc0102ffe2"
+    },
+    "rhumsaa/uuid": {
+      "version": null,
+      "reference": null
+    },
+    "sebastian/cli-parser": {
+      "version": "4.2.1",
+      "reference": "7d05781b13f7dec9043a629a21d086ed74582a15"
+    },
+    "sebastian/comparator": {
+      "version": "7.1.8",
+      "reference": "7c65c1e79836812819705b473a90c12399542485"
+    },
+    "sebastian/complexity": {
+      "version": "5.0.0",
+      "reference": "bad4316aba5303d0221f43f8cee37eb58d384bbb"
+    },
+    "sebastian/diff": {
+      "version": "7.0.1",
+      "reference": "cd4cabe39f8a4e8ee6818ba99f10a05561ea4ad6"
+    },
+    "sebastian/environment": {
+      "version": "8.1.2",
+      "reference": "9d32c685773823b1983e256ae4ecd48a10d6e439"
+    },
+    "sebastian/exporter": {
+      "version": "7.0.3",
+      "reference": "c5e21b5de653ce0a769fb36f5cdfcb5e7a32cf23"
+    },
+    "sebastian/global-state": {
+      "version": "8.0.3",
+      "reference": "b164d3274d6537ab462591c5755f76a8f5b1aae9"
+    },
+    "sebastian/lines-of-code": {
+      "version": "4.0.1",
+      "reference": "d543b8ef219dcd8da262cbb958639a96bedba10e"
+    },
+    "sebastian/object-enumerator": {
+      "version": "7.0.0",
+      "reference": "1effe8e9b8e068e9ae228e542d5d11b5d16db894"
+    },
+    "sebastian/object-reflector": {
+      "version": "5.0.0",
+      "reference": "4bfa827c969c98be1e527abd576533293c634f6a"
+    },
+    "sebastian/recursion-context": {
+      "version": "7.0.1",
+      "reference": "0b01998a7d5b1f122911a66bebcb8d46f0c82d8c"
+    },
+    "sebastian/type": {
+      "version": "6.0.4",
+      "reference": "82ff822c2edc46724be9f7411d3163021f602773"
+    },
+    "sebastian/version": {
+      "version": "6.0.1",
+      "reference": "9e935a16187e14f39b0e79910dabd614972cdb26"
+    },
+    "spatie/once": {
+      "version": null,
+      "reference": null
+    },
+    "staabm/side-effects-detector": {
+      "version": "1.0.5",
+      "reference": "d8334211a140ce329c13726d4a715adbddd0a163"
+    },
+    "symfony/clock": {
+      "version": "v8.1.0",
+      "reference": "701ef4de9705d6c32292ebee5e8044094a09fbf6"
+    },
+    "symfony/config": {
+      "version": "v8.1.5",
+      "reference": "ec711a6c14ae287d9618fbd2c9de4e223a1a4b02"
+    },
+    "symfony/console": {
+      "version": "v8.1.8",
+      "reference": "4b81146e3ee248ea969186f85499b54fbc78db08"
+    },
+    "symfony/css-selector": {
+      "version": "v8.1.6",
+      "reference": "08e2905152a39cf3fd1745d83f8c483e258887d9"
+    },
+    "symfony/dependency-injection": {
+      "version": "v8.1.8",
+      "reference": "e375617d3f132059bd096f41951b527c2eb60cd0"
+    },
+    "symfony/deprecation-contracts": {
+      "version": "v3.7.1",
+      "reference": "f3202fa1b5097b0af062dc978b32ecf63404e31d"
+    },
+    "symfony/error-handler": {
+      "version": "v8.1.8",
+      "reference": "c146daceccd5d4f864c051b233c276641cec527b"
+    },
+    "symfony/event-dispatcher": {
+      "version": "v8.1.5",
+      "reference": "7458da64220376b2e0dc2d8451bf43382c1ad297"
+    },
+    "symfony/event-dispatcher-contracts": {
+      "version": "v3.7.1",
+      "reference": "c7de7a00ffb67842132da02ea92988a39ccd9f4e"
+    },
+    "symfony/event-dispatcher-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "symfony/filesystem": {
+      "version": "v8.1.6",
+      "reference": "7599ebb855fede59413ddb7f15198d67bfcae7ba"
+    },
+    "symfony/finder": {
+      "version": "v8.1.8",
+      "reference": "bd4fed193a3132c91c5c93595cbfc78988915822"
+    },
+    "symfony/http-foundation": {
+      "version": "v8.1.8",
+      "reference": "662f5257658d4f60deff1bc790e9f2c68cb391bf"
+    },
+    "symfony/http-kernel": {
+      "version": "v8.1.8",
+      "reference": "51c014e881d8b4ce61e56c0d4105f65b50df786a"
+    },
+    "symfony/mailer": {
+      "version": "v8.1.7",
+      "reference": "8783380ecdafa23d36fc90c5873fd44b635c6e10"
+    },
+    "symfony/mime": {
+      "version": "v8.1.7",
+      "reference": "773ac57f20e2795bdadb65b5b1b5f4850d498283"
+    },
+    "symfony/polyfill-ctype": {
+      "version": "v1.37.0",
+      "reference": "141046a8f9477948ff284fa65be2095baafb94f2"
+    },
+    "symfony/polyfill-deepclone": {
+      "version": "v1.43.0",
+      "reference": "8db92c5508a3f7f82d8688d32f0a4868a26e58ad"
+    },
+    "symfony/polyfill-intl-grapheme": {
+      "version": "v1.43.0",
+      "reference": "5cac8f4db97208823aa353f59a01faad2da52c75"
+    },
+    "symfony/polyfill-intl-idn": {
+      "version": "v1.43.0",
+      "reference": "533d68cf99c8f8ee2e8893c59ed59192e92cfd74"
+    },
+    "symfony/polyfill-intl-normalizer": {
+      "version": "v1.43.0",
+      "reference": "ebd57ccc7edb93d632e184efbe7693d2517bab3b"
+    },
+    "symfony/polyfill-mbstring": {
+      "version": "v1.43.0",
+      "reference": "4d5d331bf731e0aedbc6b2f5e61135b7b7996a72"
+    },
+    "symfony/polyfill-php80": {
+      "version": "v1.43.0",
+      "reference": "9c6a5d6b01ca51d486c813e9a9c0ed55f208bb74"
+    },
+    "symfony/polyfill-php82": {
+      "version": "v1.43.0",
+      "reference": "843bbe8b2a7934307b749751eede0f111f5d1cfc"
+    },
+    "symfony/polyfill-php84": {
+      "version": "v1.43.0",
+      "reference": "22c6548499cbe5c5bb072fc0c42312dff062a015"
+    },
+    "symfony/polyfill-php85": {
+      "version": "v1.43.0",
+      "reference": "86a42cbcc07adc331481a5ab310a4024bfc227f6"
+    },
+    "symfony/polyfill-php86": {
+      "version": "v1.43.0",
+      "reference": "8840df45b24f33a49dc419fa18dc0057231ae1d8"
+    },
+    "symfony/polyfill-uuid": {
+      "version": "v1.43.0",
+      "reference": "b23ff8245cc5c4479ea2be3d0132d2e6dd433993"
+    },
+    "symfony/process": {
+      "version": "v8.1.7",
+      "reference": "10823b09358e690df4ff943e24e8492bb1019fc3"
+    },
+    "symfony/routing": {
+      "version": "v8.1.8",
+      "reference": "e46d741c56485441f37104a3e7eace4e17ed91f9"
+    },
+    "symfony/service-contracts": {
+      "version": "v3.7.3",
+      "reference": "15e6a07ec2a2c75ceb1b21dd98105ee8456d2257"
+    },
+    "symfony/service-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "symfony/string": {
+      "version": "v8.1.7",
+      "reference": "d950140b5f56f31901e5b7a0c04ffc3a3deb943c"
+    },
+    "symfony/translation": {
+      "version": "v8.1.5",
+      "reference": "d9e1caba0d6b6f9a26710af8a2f88d37f001215a"
+    },
+    "symfony/translation-contracts": {
+      "version": "v3.7.1",
+      "reference": "ccb206b98faccc511ebae8e5fad50f2dc0b30621"
+    },
+    "symfony/translation-implementation": {
+      "version": null,
+      "reference": null
+    },
+    "symfony/uid": {
+      "version": "v8.1.8",
+      "reference": "f412a0b5edd75eb3104a93bd0d11fd2ea3da34e4"
+    },
+    "symfony/var-dumper": {
+      "version": "v8.1.7",
+      "reference": "741a8c4c948b0bb9bd3653daacd3644c73c40ea5"
+    },
+    "symfony/var-exporter": {
+      "version": "v8.1.6",
+      "reference": "802362f41128c430fd6685491e1fb72127fae78a"
+    },
+    "symfony/yaml": {
+      "version": "v8.1.8",
+      "reference": "030e96eed0303223bfca3af9109e9e64830b6ec3"
+    },
+    "ta-tikoma/phpunit-architecture-test": {
+      "version": "0.8.7",
+      "reference": "1248f3f506ca9641d4f68cebcd538fa489754db8"
+    },
+    "theseer/tokenizer": {
+      "version": "2.0.1",
+      "reference": "7989e43bf381af0eac72e4f0ca5bcbfa81658be4"
+    },
+    "tijsverkoyen/css-to-inline-styles": {
+      "version": "v2.4.0",
+      "reference": "f0292ccf0ec75843d65027214426b6b163b48b41"
+    },
+    "videlalvaro/php-amqplib": {
+      "version": null,
+      "reference": null
+    },
+    "vlucas/phpdotenv": {
+      "version": "v5.7.0",
+      "reference": "301c07936b16d88628b126b01d082ba153cf4c40"
+    },
+    "voku/portable-ascii": {
+      "version": "2.1.1",
+      "reference": "8e1051fe39379367aecf014f41744ce7539a856f"
+    },
+    "webmozart/assert": {
+      "version": "2.4.1",
+      "reference": "2ccb7c2e821038c03a3e6e1700c570c158c55f70"
+    }
+  },
+  "http_server": {
+    "command": [
+      "php",
+      "artisan",
+      "serve",
+      "--host=127.0.0.1",
+      "--port=8031",
+      "--no-reload"
+    ],
+    "started_at": "2026-10-06T12:58:18.632378+00:00",
+    "log": "http-server.log",
+    "bound_address": "127.0.0.1:8031",
+    "exit_code_after_stop": -15,
+    "stopped_at": "2026-10-06T12:58:19.027942+00:00",
+    "cleanup_passed": true,
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "http_responses": [
+    {
+      "route": "/health/live",
+      "status": 200,
+      "headers": {
+        "Host": "127.0.0.1:8031",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.5.11",
+        "Cache-Control": "no-store, private",
+        "Date": "Tue, 06 Oct 2026 12:58:18 GMT",
+        "Content-Type": "application/json",
+        "X-Trace-Id": "a7c29618ab20bc096eee5d9c268d4edf",
+        "X-Span-Id": "0b1a28db1d6ebae8",
+        "X-Telemetry-State": "disabled"
+      },
+      "body": "{\"service\":\"governance\",\"status\":\"alive\",\"scope\":\"process\"}",
+      "body_sha256": "1a12fc5642f739b13f6085c713194862a30d4d1959d72823bd616b8b10c16d43"
+    },
+    {
+      "route": "/health/ready",
+      "status": 503,
+      "headers": {
+        "Host": "127.0.0.1:8031",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.5.11",
+        "Cache-Control": "no-store, private",
+        "Retry-After": "10",
+        "Date": "Tue, 06 Oct 2026 12:58:19 GMT",
+        "Content-Type": "application/json",
+        "X-Trace-Id": "06be95f38cc87b484b082594bf8dd686",
+        "X-Span-Id": "5e4fee4676d50869",
+        "X-Telemetry-State": "disabled"
+      },
+      "body": "{\"service\":\"governance\",\"status\":\"not_ready\",\"scope\":\"service\",\"reason\":\"foundation_only\"}",
+      "body_sha256": "b0e7876ce14c6135c7fdefb8d0bab01f4a2307e4de0eb421a6d1f32c9f36f684"
+    }
+  ],
+  "failure": "RuntimeError: pest: exit 2 (expected 0); see retained logs",
+  "artifact_sha256": {
+    "01-php-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-php-version.stdout.log": "78c7007ae057d38c850ca704a277e6191e0dc7f0599549c22e2614ef55030b72",
+    "02-composer-version.stderr.log": "4acf068af6281ef9fbbc5dbd2d747263c3675e7cf932189d53b274050e7d37a4",
+    "02-composer-version.stdout.log": "6dca12c153909313c4e7537ed657ec2f5a9f303611d5d516a9b0d4d0e3f2f472",
+    "03-locked-install.stderr.log": "ff2244d45e03df002c032e51a24268f91064ed38b669ca37ffa536242c836009",
+    "03-locked-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-composer-validate.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-composer-validate.stdout.log": "43add299dc97ecbd90ec2dc456ef5a0bd824bb9abdae2a3d7cdb520e21f8e86d",
+    "05-platform-requirements.stderr.log": "0fbede05e037d5229f008b1901345217d825139d02c2a1b60590c0bd7c61cdca",
+    "05-platform-requirements.stdout.log": "b3519b200eebcd5760d7c10da742306098cb3f8c47075782da2ff5312b022c60",
+    "06-installed-packages-initial.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-installed-packages-initial.stdout.log": "6700a229e80d15c296bd3d478fddc3513f74eb84ff97c6fcbb3f0e4de2e04c19",
+    "07-clean-locked-install.stderr.log": "dc5f50aa696e5b079ab7c1a2d6088f6d1c449aba7b7a61746eb1ac4a1c170e09",
+    "07-clean-locked-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-installed-packages-replay.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-installed-packages-replay.stdout.log": "6700a229e80d15c296bd3d478fddc3513f74eb84ff97c6fcbb3f0e4de2e04c19",
+    "09-pint.stderr.log": "9271b2fe7eb35336d59a4bb008f074d3e37f99bf90b8baf598ef6627ec0891f6",
+    "09-pint.stdout.log": "c9beda7d220885864db3fcd52ad0b3c2800661a62ff87e7ca348ee1ccd085d00",
+    "10-larastan.stderr.log": "4ed9f0665b650b18cf127ae4d7a9cb779b3f39d08aaa4b607b2c5e7c8f9f89b9",
+    "10-larastan.stdout.log": "9dd3eeb023e498eff4ab6e14af3d76d6e6c7672da330c9e3edf35753590df0d7",
+    "11-deptrac.stderr.log": "f02a3cd32c697352d4cb22e29e3d800d5aa009cae9c2c74eb261dbd6c223e8ba",
+    "11-deptrac.stdout.log": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+    "12-pest.stderr.log": "a542a79af2c294a37719333cb761edffe8ccd4eb7b0be243a3dbefcc02231a05",
+    "12-pest.stdout.log": "f8d1bec9c88f589f729196d01a542f03a322e8bb16b3285955132d2d8ba6747e",
+    "13-quality-canaries.stderr.log": "86c3ee76dc56e026ee9f6a2bfaef2727dd14d0c3f2aeceb450eaec8f0d0d42b0",
+    "13-quality-canaries.stdout.log": "82c506929a17b12815e6e5cffc07538293bc0aeec1443c97148fce1f2999119b",
+    "14-config-cache.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "14-config-cache.stdout.log": "2ee7f0aba1d533d27bcb1fe295b80c698ffbdbd42142042771720681424407c9",
+    "15-route-cache.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "15-route-cache.stdout.log": "952523a762a8362973a179b58c0e20d376bff6f706fc4381c0f89300400448ce",
+    "application-logs/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "composer.json": "5bdd6973d2c4eaf76627bf896eb0b8bedfaf01b013287f8a91ea732e5ac9fb2e",
+    "composer.lock": "79d17bbd18f9194833ab6853523a6a69c6bdc8e6b4980930382db804993425da",
+    "http-server.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "completed_at": "2026-10-06T12:58:19.031875+00:00"
+}

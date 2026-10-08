@@ -1,0 +1,1 @@
+{"stage": "broker-outage", "result": "PASS", "checks": [{"name": "broker-outage-is-visible", "passed": true, "observation": {"error_type": "gaierror", "code": null}}], "state": {}}

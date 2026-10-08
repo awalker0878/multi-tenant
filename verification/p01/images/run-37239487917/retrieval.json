@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "run_id": 37239487917,
+  "source_revision": "d0a7cefb23352ffc112638178bb225d20bf12368",
+  "workflow_conclusion": "success",
+  "components": [
+    {
+      "component": "console",
+      "report_sha256": "0ecbfe0d51812ca8ec475682c194f2dcef35aca23672c3949752b8fef3002896",
+      "retrieval_sha256": "77cf5cb5fdb2af8a0e9d6c1ed2025d64d5ce32e9b9b51ac5a7048948336f101b",
+      "result": "PASSED",
+      "image": {
+        "id": "sha256:501a19c0798e79f2c3105249975a4021eea064d3772ed2bcad15c4ebccc54727",
+        "tag": "p01-console:d0a7cefb23352ffc112638178bb225d20bf12368",
+        "size": 552637408,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      }
+    }
+  ],
+  "log_hashes_verified": 18,
+  "source_bindings_verified": 40,
+  "result": "VERIFIED",
+  "scope": "Isolated image and HTTP kernel checks only; no browser hydration, listening FastCGI deployment, registry publication or native qualification."
+}

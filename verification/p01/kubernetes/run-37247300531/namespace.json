@@ -1,0 +1,10 @@
+{
+  "apiVersion": "v1",
+  "kind": "Namespace",
+  "metadata": {
+    "labels": {
+      "app.kubernetes.io/part-of": "p01-foundation"
+    },
+    "name": "p01-c9c202786437-601e9835"
+  }
+}

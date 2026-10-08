@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "source_revision": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+  "run_id": 37378369526,
+  "artifact_id": 11373121192,
+  "archive_sha256": "456469956a3ad14bd950a039b6bfa482fc8db66a489e46e841bdbf40ccb23dce",
+  "retrieved_at": "2026-10-05T21:54:40.725321+00:00",
+  "campaign_result": "PASS",
+  "matched_source_bindings": 302,
+  "verified_artifact_bindings": 10,
+  "retained_file_sha256": {
+    "notification-broker-ready.log": "334459dc7c11f121513f698791bde3abf223e2f550d91d7b5a46e69111b2cbf6",
+    "report.json": "5c030819309f624a1ed89a35718ef4e143ccf80b91f35d284e3a66036f3cf61f",
+    "postgres-features.log": "f28003805984848e616100afebff2a855f84ad2cb2df8a310087034c1ed3f4f0",
+    "noninteractive-denial.log": "350a8d53e709600769f9a42f98d128cb95e74590e18ff67a444bd8ce7a7ce5ce",
+    "approval-history-producer.log": "9a917c487d9952d97109cd446a8c255f501205543312f2112c8847bdf064c181",
+    "governance-http.log": "ad08d80df4695b48fe5a8a4a7f8790f4d067e96637c7ea0b13143b1c3c9a58e3",
+    "console-notification-features.log": "4d7d170e364dfa7bf9d8bd5691dce89df58deb08178d30d4dc1f0f6e68dd61d3",
+    "browser.log": "8a8489828ae5c9b245eb78b365f99a5bca0e96e5692beeeb5b780fe5fbee13eb",
+    "notification-broker-start.log": "b05c6ec7b2bb513e0e41d9b74a76ca91fe65e4d0de545f96a2108c96fed12943",
+    "campaign.zip": "456469956a3ad14bd950a039b6bfa482fc8db66a489e46e841bdbf40ccb23dce",
+    "console-http.log": "214c38fca99e890ae326cae712e4a146469471cc1c2e3322136f25cd911eb393",
+    "browser.json": "6c086ee40f6b3b300a10769ec6f8a29da09ea4c730220ffa01f73eba0d489a1a"
+  },
+  "scope": "webkit installation-consumer/recovery campaign; original archive, logs and source identities independently verified"
+}

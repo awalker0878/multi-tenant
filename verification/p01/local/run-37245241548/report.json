@@ -1,0 +1,1100 @@
+{
+  "schema_version": 1,
+  "scope": "Synthetic P01 Compose foundation; no product readiness or native effects",
+  "source_revision": "685215de15e40c1298b32c9f068db2f8ad5b2675",
+  "result": "FAIL",
+  "commands": [
+    {
+      "name": "source-revision",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.001,
+      "stdout": {
+        "path": "001-source-revision.stdout.log",
+        "bytes": 41,
+        "sha256": "3ee95fc509f09b2f14b5399cd57c2d0583706dbb15eab385b7a3a297399c7e18"
+      },
+      "stderr": {
+        "path": "001-source-revision.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "source-clean",
+      "argv": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all",
+        "--",
+        "scripts/p01",
+        "deploy",
+        "services",
+        "apps/console"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.043,
+      "stdout": {
+        "path": "002-source-clean.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "002-source-clean.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "application-image-identity",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .Os}} {{json .Architecture}} {{json .Config.Labels}}",
+        "sha256:db6b023e15faf43f7e02b6ed531fcda731e9e5f746fa9714bcccf1fb1c82290d"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.012,
+      "stdout": {
+        "path": "003-application-image-identity.stdout.log",
+        "bytes": 204,
+        "sha256": "267eaf9822299843e2a3eee4d08a00628beb0b720bd86b54f7be3082243cbe9c"
+      },
+      "stderr": {
+        "path": "003-application-image-identity.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "application-image-identity",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .Os}} {{json .Architecture}} {{json .Config.Labels}}",
+        "sha256:cad1a677a8d4e095067c452b923af3e4c0c9254d49b259ed74d3fca1b0f44c9c"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.011,
+      "stdout": {
+        "path": "004-application-image-identity.stdout.log",
+        "bytes": 207,
+        "sha256": "132a5f55a62bfab3c5583a953aecf16ba6770001625a7d356953ce23b646b737"
+      },
+      "stderr": {
+        "path": "004-application-image-identity.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "application-image-identity",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .Os}} {{json .Architecture}} {{json .Config.Labels}}",
+        "sha256:ad489f75640da40693c8e81801964f6d18897b4121b7e6e6dd93575858c4c4c6"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.011,
+      "stdout": {
+        "path": "005-application-image-identity.stdout.log",
+        "bytes": 206,
+        "sha256": "a66403432d45fcd8c6aebf58cf579e5b166cb497371fe016ccfe4f8028c9c573"
+      },
+      "stderr": {
+        "path": "005-application-image-identity.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "application-image-identity",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .Os}} {{json .Architecture}} {{json .Config.Labels}}",
+        "sha256:ea49d80de8fed812b0f3d07e21a0d786350e3a8543009ae2c313a875565142aa"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.01,
+      "stdout": {
+        "path": "006-application-image-identity.stdout.log",
+        "bytes": 206,
+        "sha256": "35bfdebe7b7e78e84dc246a70a9811773b6193e329f213ad1c96fbb76d8c90fe"
+      },
+      "stderr": {
+        "path": "006-application-image-identity.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "application-image-identity",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .Os}} {{json .Architecture}} {{json .Config.Labels}}",
+        "sha256:7026bbb91cadc10e898e6d49c84cdf34a53a13710c05295ebdfdee4d804aee25"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.009,
+      "stdout": {
+        "path": "007-application-image-identity.stdout.log",
+        "bytes": 347,
+        "sha256": "89290f7d2288697bae0441c7fdb6160cc63e72be5d023e3b1e766863781c7ca1"
+      },
+      "stderr": {
+        "path": "007-application-image-identity.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "application-image-identity",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .Os}} {{json .Architecture}} {{json .Config.Labels}}",
+        "sha256:569391a619b3fc318625e6d3027129f008b58b0a77b54b6ed810481396b470fa"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.009,
+      "stdout": {
+        "path": "008-application-image-identity.stdout.log",
+        "bytes": 349,
+        "sha256": "5d3bc5955796e8e4e23ef1b6eb24f2a63eacf9c91bbfd43380bdbc7b6625e4ab"
+      },
+      "stderr": {
+        "path": "008-application-image-identity.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "application-image-identity",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .Os}} {{json .Architecture}} {{json .Config.Labels}}",
+        "sha256:b47d799b02dd01b04c5a6a8ffd417f8b3f72a2269bf2e8dc1082aa79adf4f449"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.009,
+      "stdout": {
+        "path": "009-application-image-identity.stdout.log",
+        "bytes": 349,
+        "sha256": "2f26739dd1cb7c4c26ce882b75c44bbcc8b1e836951a2831867612d67eed63cc"
+      },
+      "stderr": {
+        "path": "009-application-image-identity.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "compose-validation",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "config",
+        "--quiet"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.268,
+      "stdout": {
+        "path": "010-compose-validation.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "010-compose-validation.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "empty-project",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "ps",
+        "-aq"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.077,
+      "stdout": {
+        "path": "011-empty-project.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "011-empty-project.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "pull-postgres",
+      "argv": [
+        "docker",
+        "pull",
+        "--platform",
+        "linux/amd64",
+        "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 5.425,
+      "stdout": {
+        "path": "012-pull-postgres.stdout.log",
+        "bytes": 2140,
+        "sha256": "12fefc489d218ae6189b066865aa676606bd2b08100b47f978d149c82753b2bf"
+      },
+      "stderr": {
+        "path": "012-pull-postgres.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "pull-nginx",
+      "argv": [
+        "docker",
+        "pull",
+        "--platform",
+        "linux/amd64",
+        "docker.io/library/nginx@sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 2.906,
+      "stdout": {
+        "path": "013-pull-nginx.stdout.log",
+        "bytes": 1336,
+        "sha256": "bbdc3c51a5fd99dbd958a28f5175bbc7637cb94f6163208e2e34d87b6b336606"
+      },
+      "stderr": {
+        "path": "013-pull-nginx.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "create-public-extraction",
+      "argv": [
+        "docker",
+        "create",
+        "--name",
+        "p01-685215de15e4-b84eee94-extract-console",
+        "sha256:db6b023e15faf43f7e02b6ed531fcda731e9e5f746fa9714bcccf1fb1c82290d"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.02,
+      "stdout": {
+        "path": "014-create-public-extraction.stdout.log",
+        "bytes": 65,
+        "sha256": "9fb14b5241a9a42e3628cc02d43dff1624666c3c7c40f333b378a43b8cc10754"
+      },
+      "stderr": {
+        "path": "014-create-public-extraction.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "extract-public-root",
+      "argv": [
+        "docker",
+        "cp",
+        "p01-685215de15e4-b84eee94-extract-console:/app/public/.",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/public/console"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.014,
+      "stdout": {
+        "path": "015-extract-public-root.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "015-extract-public-root.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "remove-public-extraction",
+      "argv": [
+        "docker",
+        "rm",
+        "p01-685215de15e4-b84eee94-extract-console"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.017,
+      "stdout": {
+        "path": "016-remove-public-extraction.stdout.log",
+        "bytes": 42,
+        "sha256": "c12ab49433fd67944107a137de669c40e74cd0349769e88557f87d1191e9909c"
+      },
+      "stderr": {
+        "path": "016-remove-public-extraction.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "create-public-extraction",
+      "argv": [
+        "docker",
+        "create",
+        "--name",
+        "p01-685215de15e4-b84eee94-extract-governance",
+        "sha256:cad1a677a8d4e095067c452b923af3e4c0c9254d49b259ed74d3fca1b0f44c9c"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.019,
+      "stdout": {
+        "path": "017-create-public-extraction.stdout.log",
+        "bytes": 65,
+        "sha256": "b9afb28b8cf5cdf036223dc8b7e7ffa9e69b83c91e5849ca53f3323bc37bf206"
+      },
+      "stderr": {
+        "path": "017-create-public-extraction.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "extract-public-root",
+      "argv": [
+        "docker",
+        "cp",
+        "p01-685215de15e4-b84eee94-extract-governance:/app/public/.",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/public/governance"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.013,
+      "stdout": {
+        "path": "018-extract-public-root.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "018-extract-public-root.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "remove-public-extraction",
+      "argv": [
+        "docker",
+        "rm",
+        "p01-685215de15e4-b84eee94-extract-governance"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.014,
+      "stdout": {
+        "path": "019-remove-public-extraction.stdout.log",
+        "bytes": 45,
+        "sha256": "c0a48fe5d0602c313c22420fb73443190ce1d0871ccded4766d0e0af58788be7"
+      },
+      "stderr": {
+        "path": "019-remove-public-extraction.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "create-public-extraction",
+      "argv": [
+        "docker",
+        "create",
+        "--name",
+        "p01-685215de15e4-b84eee94-extract-catalogue",
+        "sha256:ad489f75640da40693c8e81801964f6d18897b4121b7e6e6dd93575858c4c4c6"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.017,
+      "stdout": {
+        "path": "020-create-public-extraction.stdout.log",
+        "bytes": 65,
+        "sha256": "3f728bacb82b1011063b18d9634094fcf3932ae98d462947e190f850664fc2eb"
+      },
+      "stderr": {
+        "path": "020-create-public-extraction.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "extract-public-root",
+      "argv": [
+        "docker",
+        "cp",
+        "p01-685215de15e4-b84eee94-extract-catalogue:/app/public/.",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/public/catalogue"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.012,
+      "stdout": {
+        "path": "021-extract-public-root.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "021-extract-public-root.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "remove-public-extraction",
+      "argv": [
+        "docker",
+        "rm",
+        "p01-685215de15e4-b84eee94-extract-catalogue"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.02,
+      "stdout": {
+        "path": "022-remove-public-extraction.stdout.log",
+        "bytes": 44,
+        "sha256": "944cd0ab33ab1c61f1dae70cb451c60bc5d8858008e9b0dce4ff549ee3265423"
+      },
+      "stderr": {
+        "path": "022-remove-public-extraction.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "create-public-extraction",
+      "argv": [
+        "docker",
+        "create",
+        "--name",
+        "p01-685215de15e4-b84eee94-extract-assurance",
+        "sha256:ea49d80de8fed812b0f3d07e21a0d786350e3a8543009ae2c313a875565142aa"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.018,
+      "stdout": {
+        "path": "023-create-public-extraction.stdout.log",
+        "bytes": 65,
+        "sha256": "941b661e1bd0237cb3c68d9a7686e2b3ecc9eedb04b760f066e3749eeda14db1"
+      },
+      "stderr": {
+        "path": "023-create-public-extraction.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "extract-public-root",
+      "argv": [
+        "docker",
+        "cp",
+        "p01-685215de15e4-b84eee94-extract-assurance:/app/public/.",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/public/assurance"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.012,
+      "stdout": {
+        "path": "024-extract-public-root.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "024-extract-public-root.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "remove-public-extraction",
+      "argv": [
+        "docker",
+        "rm",
+        "p01-685215de15e4-b84eee94-extract-assurance"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.014,
+      "stdout": {
+        "path": "025-remove-public-extraction.stdout.log",
+        "bytes": 44,
+        "sha256": "ad0cdd41e930b2d18280a1b1a132e7f1f76f97c3f0c7f3759ddd4a20dbbbd06d"
+      },
+      "stderr": {
+        "path": "025-remove-public-extraction.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "install-database",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "up",
+        "-d",
+        "--wait",
+        "--wait-timeout",
+        "120",
+        "postgres"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 4.851,
+      "stdout": {
+        "path": "026-install-database.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "026-install-database.stderr.log",
+        "bytes": 1264,
+        "sha256": "1e37bab4a8e413eb9ffe3eec8e9d6c28ad74c628930eb169e58c7eeabbea6ffb"
+      }
+    },
+    {
+      "name": "console-migrator-sql",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "exec",
+        "-T",
+        "postgres",
+        "sh",
+        "-ec",
+        "export PGPASSWORD=\"$(cat /run/secrets/console-migrator-password)\"; exec psql -X -qAt -v ON_ERROR_STOP=1 \"host=postgres port=5432 dbname=console user=console_migrator sslmode=verify-full sslrootcert=/run/secrets/ca.crt connect_timeout=2\""
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.149,
+      "stdout": {
+        "path": "027-console-migrator-sql.stdout.log",
+        "bytes": 27,
+        "sha256": "1e00544ea199f98431e17276a1bebcc7fe67d35df560892b5d55b6e69c461fdd"
+      },
+      "stderr": {
+        "path": "027-console-migrator-sql.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "governance-migrator-sql",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "exec",
+        "-T",
+        "postgres",
+        "sh",
+        "-ec",
+        "export PGPASSWORD=\"$(cat /run/secrets/governance-migrator-password)\"; exec psql -X -qAt -v ON_ERROR_STOP=1 \"host=postgres port=5432 dbname=governance user=governance_migrator sslmode=verify-full sslrootcert=/run/secrets/ca.crt connect_timeout=2\""
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.145,
+      "stdout": {
+        "path": "028-governance-migrator-sql.stdout.log",
+        "bytes": 33,
+        "sha256": "b9d06af2d927b20d6a207fd3eef9fbf43219090029f6f3ef1f74f82301d1f5a8"
+      },
+      "stderr": {
+        "path": "028-governance-migrator-sql.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "catalogue-migrator-sql",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "exec",
+        "-T",
+        "postgres",
+        "sh",
+        "-ec",
+        "export PGPASSWORD=\"$(cat /run/secrets/catalogue-migrator-password)\"; exec psql -X -qAt -v ON_ERROR_STOP=1 \"host=postgres port=5432 dbname=catalogue user=catalogue_migrator sslmode=verify-full sslrootcert=/run/secrets/ca.crt connect_timeout=2\""
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.14,
+      "stdout": {
+        "path": "029-catalogue-migrator-sql.stdout.log",
+        "bytes": 31,
+        "sha256": "87ce0d721d5ed396fee51a7c65d13a73acc118a3b6fe489b8294f766a1cf7d21"
+      },
+      "stderr": {
+        "path": "029-catalogue-migrator-sql.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "assurance-migrator-sql",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "exec",
+        "-T",
+        "postgres",
+        "sh",
+        "-ec",
+        "export PGPASSWORD=\"$(cat /run/secrets/assurance-migrator-password)\"; exec psql -X -qAt -v ON_ERROR_STOP=1 \"host=postgres port=5432 dbname=assurance user=assurance_migrator sslmode=verify-full sslrootcert=/run/secrets/ca.crt connect_timeout=2\""
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.142,
+      "stdout": {
+        "path": "030-assurance-migrator-sql.stdout.log",
+        "bytes": 31,
+        "sha256": "3602aabb32ebbd1c11c94582b0e0851a5e7b1adb6a420b419d28318a51c0bcc3"
+      },
+      "stderr": {
+        "path": "030-assurance-migrator-sql.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "planning-migrator-sql",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "exec",
+        "-T",
+        "postgres",
+        "sh",
+        "-ec",
+        "export PGPASSWORD=\"$(cat /run/secrets/planning-migrator-password)\"; exec psql -X -qAt -v ON_ERROR_STOP=1 \"host=postgres port=5432 dbname=planning user=planning_migrator sslmode=verify-full sslrootcert=/run/secrets/ca.crt connect_timeout=2\""
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.141,
+      "stdout": {
+        "path": "031-planning-migrator-sql.stdout.log",
+        "bytes": 29,
+        "sha256": "11ed6ab12f0f1dcbb705d26b0db818ad1d5c0e02855da775ca4ee7d77ff06fbe"
+      },
+      "stderr": {
+        "path": "031-planning-migrator-sql.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "inventory-migrator-sql",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "exec",
+        "-T",
+        "postgres",
+        "sh",
+        "-ec",
+        "export PGPASSWORD=\"$(cat /run/secrets/inventory-migrator-password)\"; exec psql -X -qAt -v ON_ERROR_STOP=1 \"host=postgres port=5432 dbname=inventory user=inventory_migrator sslmode=verify-full sslrootcert=/run/secrets/ca.crt connect_timeout=2\""
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.156,
+      "stdout": {
+        "path": "032-inventory-migrator-sql.stdout.log",
+        "bytes": 31,
+        "sha256": "06013b19ae8ad0da98a54cd478ebade768719ceecdc9429e7dfd38d5d932bb75"
+      },
+      "stderr": {
+        "path": "032-inventory-migrator-sql.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "lifecycle-migrator-sql",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "exec",
+        "-T",
+        "postgres",
+        "sh",
+        "-ec",
+        "export PGPASSWORD=\"$(cat /run/secrets/lifecycle-migrator-password)\"; exec psql -X -qAt -v ON_ERROR_STOP=1 \"host=postgres port=5432 dbname=lifecycle user=lifecycle_migrator sslmode=verify-full sslrootcert=/run/secrets/ca.crt connect_timeout=2\""
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.149,
+      "stdout": {
+        "path": "033-lifecycle-migrator-sql.stdout.log",
+        "bytes": 31,
+        "sha256": "d2aba599567e80d70229659e54c25daa38f31711877fabcf2ec59731010456a1"
+      },
+      "stderr": {
+        "path": "033-lifecycle-migrator-sql.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "install-applications",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "up",
+        "-d"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 1.238,
+      "stdout": {
+        "path": "034-install-applications.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "034-install-applications.stderr.log",
+        "bytes": 4300,
+        "sha256": "0a2dd39b7545256cf8386413bef6d4596eae447546f5736275e4637e8ae30ff8"
+      }
+    },
+    {
+      "name": "proxy-port",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "port",
+        "console-proxy",
+        "8443"
+      ],
+      "exit_code": 1,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 0.164,
+      "stdout": {
+        "path": "035-proxy-port.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "035-proxy-port.stderr.log",
+        "bytes": 75,
+        "sha256": "394bddf8d9549ca3cde7e90833c5e42fc23be47022893943484c5f961f960606"
+      }
+    },
+    {
+      "name": "container-logs",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "logs",
+        "--no-color"
+      ],
+      "exit_code": 0,
+      "expected_exit": null,
+      "timed_out": false,
+      "seconds": 0.172,
+      "stdout": {
+        "path": "036-container-logs.stdout.log",
+        "bytes": 6772,
+        "sha256": "c68d92bffa9c3d3a2740fa92f2ea589e8fdd1decd7c4aab8494f13011d8f8456"
+      },
+      "stderr": {
+        "path": "036-container-logs.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "remove-isolated-project",
+      "argv": [
+        "docker",
+        "compose",
+        "-f",
+        "/tmp/p01-private-parent-k1ya6qhg/runtime/compose.json",
+        "down",
+        "--volumes",
+        "--remove-orphans"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "timed_out": false,
+      "seconds": 1.799,
+      "stdout": {
+        "path": "037-remove-isolated-project.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "037-remove-isolated-project.stderr.log",
+        "bytes": 5389,
+        "sha256": "6be27f05ce0f9135855d29cbc37530a860ef7839f4989f4b7f792cbedccf997a"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "exact-source-revision",
+      "passed": true,
+      "observation": null
+    },
+    {
+      "name": "no-modified-or-untracked-inputs",
+      "passed": true,
+      "observation": null
+    },
+    {
+      "name": "owned-image-source-and-platform",
+      "passed": true,
+      "observation": {
+        "service": "console",
+        "image_id": "sha256:db6b023e15faf43f7e02b6ed531fcda731e9e5f746fa9714bcccf1fb1c82290d",
+        "labels": {
+          "io.product.component": "console",
+          "org.opencontainers.image.revision": "685215de15e40c1298b32c9f068db2f8ad5b2675"
+        }
+      }
+    },
+    {
+      "name": "owned-image-source-and-platform",
+      "passed": true,
+      "observation": {
+        "service": "governance",
+        "image_id": "sha256:cad1a677a8d4e095067c452b923af3e4c0c9254d49b259ed74d3fca1b0f44c9c",
+        "labels": {
+          "io.product.component": "governance",
+          "org.opencontainers.image.revision": "685215de15e40c1298b32c9f068db2f8ad5b2675"
+        }
+      }
+    },
+    {
+      "name": "owned-image-source-and-platform",
+      "passed": true,
+      "observation": {
+        "service": "catalogue",
+        "image_id": "sha256:ad489f75640da40693c8e81801964f6d18897b4121b7e6e6dd93575858c4c4c6",
+        "labels": {
+          "io.product.component": "catalogue",
+          "org.opencontainers.image.revision": "685215de15e40c1298b32c9f068db2f8ad5b2675"
+        }
+      }
+    },
+    {
+      "name": "owned-image-source-and-platform",
+      "passed": true,
+      "observation": {
+        "service": "assurance",
+        "image_id": "sha256:ea49d80de8fed812b0f3d07e21a0d786350e3a8543009ae2c313a875565142aa",
+        "labels": {
+          "io.product.component": "assurance",
+          "org.opencontainers.image.revision": "685215de15e40c1298b32c9f068db2f8ad5b2675"
+        }
+      }
+    },
+    {
+      "name": "owned-image-source-and-platform",
+      "passed": true,
+      "observation": {
+        "service": "planning",
+        "image_id": "sha256:7026bbb91cadc10e898e6d49c84cdf34a53a13710c05295ebdfdee4d804aee25",
+        "labels": {
+          "io.product.component": "planning",
+          "org.opencontainers.image.revision": "685215de15e40c1298b32c9f068db2f8ad5b2675",
+          "org.opencontainers.image.source": "https://github.com/awalker0878/multi-tenant",
+          "org.opencontainers.image.title": "product-planning bootstrap"
+        }
+      }
+    },
+    {
+      "name": "owned-image-source-and-platform",
+      "passed": true,
+      "observation": {
+        "service": "inventory",
+        "image_id": "sha256:569391a619b3fc318625e6d3027129f008b58b0a77b54b6ed810481396b470fa",
+        "labels": {
+          "io.product.component": "inventory",
+          "org.opencontainers.image.revision": "685215de15e40c1298b32c9f068db2f8ad5b2675",
+          "org.opencontainers.image.source": "https://github.com/awalker0878/multi-tenant",
+          "org.opencontainers.image.title": "product-inventory bootstrap"
+        }
+      }
+    },
+    {
+      "name": "owned-image-source-and-platform",
+      "passed": true,
+      "observation": {
+        "service": "lifecycle",
+        "image_id": "sha256:b47d799b02dd01b04c5a6a8ffd417f8b3f72a2269bf2e8dc1082aa79adf4f449",
+        "labels": {
+          "io.product.component": "lifecycle",
+          "org.opencontainers.image.revision": "685215de15e40c1298b32c9f068db2f8ad5b2675",
+          "org.opencontainers.image.source": "https://github.com/awalker0878/multi-tenant",
+          "org.opencontainers.image.title": "product-lifecycle bootstrap"
+        }
+      }
+    },
+    {
+      "name": "backend-ports-not-published",
+      "passed": true,
+      "observation": null
+    },
+    {
+      "name": "runtime-has-no-migrator-secret",
+      "passed": true,
+      "observation": null
+    },
+    {
+      "name": "empty-project",
+      "passed": true,
+      "observation": null
+    }
+  ],
+  "installation_source_sha256": {
+    "scripts/p01/README.md": "c43804617f0f238bb226742ffefecf8f3f2c2131aa688b6ae4e0bfbf989c1812",
+    "scripts/p01/candidates.json": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+    "scripts/p01/check_jobs.py": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+    "scripts/p01/local_runtime.py": "86b3029b42d91f647453d4535e76cca55ce9d799826f7b102473035a3685060f",
+    "scripts/p01/php_image_probe.php": "f4ac97d5b8638258e6d595869d7324cc624d3c5958199e9f969d6f77badbaf74",
+    "scripts/p01/python_lock.py": "05b4074482edb8899c95da980b4886975a9ce36adb19c2894bd4e42b40d76769",
+    "scripts/p01/resolve_dependencies.py": "5bf284a7bff395bd29a344dfc311c4e2b97ad814da58f373c4a0703dc16e9210",
+    "scripts/p01/run_images.py": "7898d827e081ee477ff99ad154bd289d571350a4483aa5b74d64e8bdbde72c8b",
+    "scripts/p01/run_local.py": "e7569816ae9662c5091b4251adcec41cb8f54b57a1381a8ff0c13cd5c7c4abe5",
+    "scripts/p01/run_quality.py": "134733b7907e0484eda4971bd7af7d8d16383966b257de7b6570d8813c85b496",
+    "scripts/p01/select_components.py": "37575f2fb29659ae7d72d477c9b09f1d981571386ef20ccd0ce4d039b5cd79d7",
+    "scripts/p01/test_jobs.py": "b103af1562f26ceb28e13e36fa13a09fb131333bc8cf4144e071d05b7c23bbf5",
+    "scripts/p01/test_local_campaign.py": "18d60c06c69792b9e0255e82dcd62654fc93bce6c6e44d74a38a9c67ea7cb03c",
+    "scripts/p01/test_local_runtime.py": "24a7bed777b0ac072143416a4a6459c29bec33a15e24c39df9f4548ef79d6833",
+    "scripts/p01/test_python_lock.py": "0e64837b214d31eaa2fa8004e3c5a49230f039742f15a1b2d6875a1b983d173b",
+    "scripts/p01/test_recorder.py": "afc5002982dfb8d1d71a71974fdf5a2d3471854c6cfccc91f31f06b0d3bbe56f",
+    "scripts/p01/test_selection.py": "d6122c2ac881b206f4871e3f77dda8e5f0194f3f1b790864154cd6bf20367ab6",
+    "deploy/build/README.md": "e5f2d821443ecaa7c6c563037cfc241eb19946baa879dc3b9e5263d9cae143a1",
+    "deploy/build/components.json": "7b50205d5f714836368ab7e67f696678218d156b6608370a86956d525ca54901",
+    "deploy/build/inputs.lock.json": "2423a82d62c4f556f93ce675fad865e8b96c987bc1edd2955895b99bd813dc4c",
+    "deploy/dependencies/README.md": "201673a0c83e43874d42fe762942141ab8cf3c0e27ace50a29fea0b07f2dadbf",
+    "deploy/dependencies/candidates.json": "4cb80b04ad8f033dde108f5760f1d24d4320b7893fcb483d4110ef7a8020d2e8",
+    "deploy/dependencies/inputs.lock.json": "70cdaa02b3a89144b17042eb4e3c65cadf83e6ba85d27bb15c45396cd868d93c",
+    "deploy/dependencies/postgres/entrypoint.sh": "dc9c2d5998079e6c6dce76aa63c9c7b894125b4075cfc913167329bb35118030",
+    "deploy/dependencies/postgres/initialize.sh": "503db4abd2ddf2da421d1f4e8e73342edb954708d17b452d35d42734b368fcb6",
+    "deploy/dependencies/postgres/migrate.sql": "b72f25b260bea54eab56d21fd281b2bda6d4c0ea99b0d3f26ded9da21c82b6a6",
+    "deploy/local/README.md": "5f10c359c65363cfa79276fc54b63045b127c6455e93a7b015fa1f74a2bf6945"
+  },
+  "application_images": {
+    "console": "sha256:db6b023e15faf43f7e02b6ed531fcda731e9e5f746fa9714bcccf1fb1c82290d",
+    "governance": "sha256:cad1a677a8d4e095067c452b923af3e4c0c9254d49b259ed74d3fca1b0f44c9c",
+    "catalogue": "sha256:ad489f75640da40693c8e81801964f6d18897b4121b7e6e6dd93575858c4c4c6",
+    "assurance": "sha256:ea49d80de8fed812b0f3d07e21a0d786350e3a8543009ae2c313a875565142aa",
+    "planning": "sha256:7026bbb91cadc10e898e6d49c84cdf34a53a13710c05295ebdfdee4d804aee25",
+    "inventory": "sha256:569391a619b3fc318625e6d3027129f008b58b0a77b54b6ed810481396b470fa",
+    "lifecycle": "sha256:b47d799b02dd01b04c5a6a8ffd417f8b3f72a2269bf2e8dc1082aa79adf4f449"
+  },
+  "configuration_sha256": "093f1f8aaa65eb55c59cc65215418717752351ae5a1dd5cd176b89def2ff9ede",
+  "project": "p01-685215de15e4-b84eee94",
+  "error": "proxy-port exited 1; inspect retained logs",
+  "cleanup_complete": true
+}

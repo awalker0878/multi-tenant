@@ -1,0 +1,5 @@
+ database  | migration_identity | schema_version 
+-----------+--------------------+----------------
+ lifecycle | lifecycle_migrator |              1
+(1 row)
+

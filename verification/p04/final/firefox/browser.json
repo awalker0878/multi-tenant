@@ -1,0 +1,164 @@
+{
+  "config": {
+    "argv": [
+      "/opt/hostedtoolcache/node/24.19.0/x64/bin/node",
+      "/home/runner/work/multi-tenant/multi-tenant/apps/console/node_modules/.bin/playwright",
+      "test",
+      "--config=tests/browser-p04/playwright.config.ts"
+    ],
+    "configFile": "/home/runner/work/multi-tenant/multi-tenant/apps/console/tests/browser-p04/playwright.config.ts",
+    "rootDir": "/home/runner/work/multi-tenant/multi-tenant/apps/console/tests/browser-p04",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 180000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/awalker0878/multi-tenant/commit/6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+        "commitHash": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+        "buildHref": "https://github.com/awalker0878/multi-tenant/actions/runs/37439404279"
+      },
+      "gitCommit": {
+        "shortHash": "6b21490",
+        "hash": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+        "subject": "test(inventory): preserve independent live browser sessions",
+        "body": "test(inventory): preserve independent live browser sessions",
+        "author": {
+          "name": "awalker0878",
+          "email": "52688461+awalker0878@users.noreply.github.com",
+          "time": 1791276931000
+        },
+        "committer": {
+          "name": "awalker0878",
+          "email": "52688461+awalker0878@users.noreply.github.com",
+          "time": 1791276931000
+        },
+        "branch": "greenfield/enterprise-microservices-plan"
+      },
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/multi-tenant/multi-tenant/apps/console/test-results/p04-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/awalker0878/multi-tenant/commit/6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+            "commitHash": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+            "buildHref": "https://github.com/awalker0878/multi-tenant/actions/runs/37439404279"
+          },
+          "gitCommit": {
+            "shortHash": "6b21490",
+            "hash": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+            "subject": "test(inventory): preserve independent live browser sessions",
+            "body": "test(inventory): preserve independent live browser sessions",
+            "author": {
+              "name": "awalker0878",
+              "email": "52688461+awalker0878@users.noreply.github.com",
+              "time": 1791276931000
+            },
+            "committer": {
+              "name": "awalker0878",
+              "email": "52688461+awalker0878@users.noreply.github.com",
+              "time": 1791276931000
+            },
+            "branch": "greenfield/enterprise-microservices-plan"
+          },
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/home/runner/work/multi-tenant/multi-tenant/apps/console/tests/browser-p04",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 150000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../../test-results/p04-browser.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "inventory.spec.ts",
+      "file": "inventory.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "browses scoped observations, preserves uncertain enrollment and clears revoked access",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 150000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 20965,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-06T08:57:39.502Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "491382254a121adeeb47-667f02ae4855048dc9b9",
+          "file": "inventory.spec.ts",
+          "line": 4,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-06T08:57:39.094Z",
+    "duration": 22249.574,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

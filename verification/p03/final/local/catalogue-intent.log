@@ -1,0 +1,30 @@
+
+   PASS  Tests\Feature\IntentDocumentTest
+  ✓ it preserves complete multi-domain intent and unsupported mandatory… 0.08s  
+  ✓ it rejects structural, native-credential and placement ambiguity wi… 0.01s  
+  ✓ it rejects structural, native-credential and placement ambiguity wi… 0.01s  
+  ✓ it rejects structural, native-credential and placement ambiguity wi… 0.01s  
+  ✓ it rejects structural, native-credential and placement ambiguity with ('empty')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('missing')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('huge')
+  ✓ it rejects structural, native-credential and placement ambiguity wi… 0.01s  
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('cycle', 'dependency_cycle')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('self', 'dangling_or_self_dependency')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('dangling', 'dangling_or_self_dependency')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('duplicate', 'duplicate_identity')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('nic', 'nic_domain_mismatch')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('order', 'device_order_gap')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('boot', 'one_boot_disk_required')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('dataset', 'dangling_dataset')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('interface', 'controlled_interface_required')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('port', 'protocol_port_mismatch')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('service', 'dangling_service_workload')
+  ✓ it permits bidirectional communication while checking startup and shutdown graphs independently
+  ✓ it rejects integer values that a browser would silently round with…  0.01s  
+  ✓ it rejects integer values that a browser would silently round with…  0.01s  
+  ✓ it preserves typed requirement values at the interoperable integer boundary
+  ✓ it rejects an overflowing JSON integer before it can become rounded immutable intent
+
+  Tests:    24 passed (40 assertions)
+  Duration: 0.25s
+

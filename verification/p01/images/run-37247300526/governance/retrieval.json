@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "run_id": 37247300526,
+  "source_revision": "c9c202786437601c0f000bdf29d7e1e401e773ee",
+  "component": "governance",
+  "artifact": {
+    "id": 11319422963,
+    "name": "p01-image-governance-c9c202786437601c0f000bdf29d7e1e401e773ee",
+    "size_in_bytes": 27224,
+    "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11319422963",
+    "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11319422963/zip",
+    "expired": false,
+    "created_at": "2026-10-05T00:23:44Z",
+    "expires_at": "2026-10-19T00:23:43Z",
+    "updated_at": "2026-10-05T00:23:44Z",
+    "digest": "sha256:0e949ce1e92c139b0305d463ac15e7d5d5274d02d897432b39f66bca327386e4",
+    "workflow_run": {
+      "id": 37247300526,
+      "repository_id": 1374801496,
+      "head_repository_id": 1374801496,
+      "head_branch": "greenfield/enterprise-microservices-plan",
+      "head_sha": "c9c202786437601c0f000bdf29d7e1e401e773ee"
+    }
+  },
+  "archive_sha256": "0e949ce1e92c139b0305d463ac15e7d5d5274d02d897432b39f66bca327386e4",
+  "archive_bytes": 27224,
+  "archive_checksum_verified": true,
+  "archive_size_verified": true,
+  "report_sha256": "908d1be3bed14857fa77333a8760f6affc221d6fd3290bfbcd798e374aac19e0",
+  "result": "PASSED",
+  "failure": null,
+  "source_checks": {
+    ".github/workflows/p01-images.yml": {
+      "sha256": "0776d380e416d599d5fc49ac93c032eec7bd8d5afea91aec91f3a092d6d6b29a",
+      "git_blob_sha": "ea20ce6a580d896b3a82802f9dd919af1f353a1e"
+    },
+    "deploy/build/components.json": {
+      "sha256": "7b50205d5f714836368ab7e67f696678218d156b6608370a86956d525ca54901",
+      "git_blob_sha": "3ac150c4964c68b2a3d332f57e8172f57f2cf189"
+    },
+    "deploy/build/inputs.lock.json": {
+      "sha256": "2423a82d62c4f556f93ce675fad865e8b96c987bc1edd2955895b99bd813dc4c",
+      "git_blob_sha": "71e76d8bb189414572a6f18a96ce51a84d1b88bc"
+    },
+    "scripts/p01/candidates.json": {
+      "sha256": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+      "git_blob_sha": "afa963d567cef41c678d47732bc692470855b48c"
+    },
+    "scripts/p01/check_jobs.py": {
+      "sha256": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+      "git_blob_sha": "67494c7fbee17097e2ee656b8fc4baff6034323c"
+    },
+    "scripts/p01/php_image_probe.php": {
+      "sha256": "f4ac97d5b8638258e6d595869d7324cc624d3c5958199e9f969d6f77badbaf74",
+      "git_blob_sha": "968e38f291368ef278d5de2a92e30653b1258ed0"
+    },
+    "scripts/p01/python_lock.py": {
+      "sha256": "05b4074482edb8899c95da980b4886975a9ce36adb19c2894bd4e42b40d76769",
+      "git_blob_sha": "3c4c5cf63af395b12015764e3cac8cbfb2549f4e"
+    },
+    "scripts/p01/run_images.py": {
+      "sha256": "7898d827e081ee477ff99ad154bd289d571350a4483aa5b74d64e8bdbde72c8b",
+      "git_blob_sha": "86b8e47487cbdb7ff1cac83d1a7d6885e843f597"
+    },
+    "scripts/p01/select_components.py": {
+      "sha256": "37575f2fb29659ae7d72d477c9b09f1d981571386ef20ccd0ce4d039b5cd79d7",
+      "git_blob_sha": "ad1a608ea86fd1c5dd66b16e1d4c75af8cb3ade8"
+    },
+    "services/governance/.dockerignore": {
+      "sha256": "6e52bb0ef70b55a5bb4a4eaf553c36d3a8dc0d14fcff285823b864f56b4209b9",
+      "git_blob_sha": "1cb30eb5a24083cc010f6fb52be799e83710481a"
+    },
+    "services/governance/Dockerfile": {
+      "sha256": "a179c1d5c961c904be67ab4ab2cccca6999230feed834a0a76754a0e9bf6d9c3",
+      "git_blob_sha": "6f8559d0fe64c74da16df54a1d92898fb992c388"
+    },
+    "services/governance/app/Application/Foundation/Actions/InspectDependencies.php": {
+      "sha256": "019459639caec1e3d3fb397026215fe77777a3dd77c18efc41c5a1ca406ff74b",
+      "git_blob_sha": "243774854b14e2984156d6c6781ff04c2bc487a2"
+    },
+    "services/governance/app/Application/Foundation/Contracts/DependencyProbe.php": {
+      "sha256": "b79f3e6ed6c6e08677d3c0b61f90fb382c98e96d26e807b3d119fd81a0990c66",
+      "git_blob_sha": "103ccc23f01816c0e547e9f8b93334be26a96385"
+    },
+    "services/governance/app/Application/Foundation/Contracts/HealthCredential.php": {
+      "sha256": "7fdeb5b78e2eb9f676ab955a1f1451fd27eb2f861b2670657e3438a6babb8a93",
+      "git_blob_sha": "1d7a41314ac8946efa9e4991647b23f7ce7fbc71"
+    },
+    "services/governance/app/Application/Foundation/Data/DependencyStatus.php": {
+      "sha256": "5b19fe2dee35b14359e8a4d4438185a4c77d51f25a82dc6aeb80f5a14ce465f3",
+      "git_blob_sha": "af97aa59377e930e15111e7717afded554a2297d"
+    },
+    "services/governance/app/Http/Controllers/DependencyHealthController.php": {
+      "sha256": "aab6062bb49e07df600613609f43d492b80f62622ab43608d3e3c92b4337ffeb",
+      "git_blob_sha": "5a4435372da7d162544283555f84464eb2d8c8f5"
+    },
+    "services/governance/app/Http/Controllers/HealthController.php": {
+      "sha256": "8a211030f5dbc505518d02584ffc104a36ba534e73422a4ba811e3aaecdd6fab",
+      "git_blob_sha": "b8cdef3073308b1cc826861ddf994b4b9d4feefd"
+    },
+    "services/governance/app/Infrastructure/Foundation/MountedHealthCredential.php": {
+      "sha256": "3c0a622df2f954de62f6f2864a56157394bc1d4a63788a992fabc4df7b765d86",
+      "git_blob_sha": "3c5913c372e8adffd6294741924fe9c813cb4a3a"
+    },
+    "services/governance/app/Infrastructure/Foundation/MountedSecret.php": {
+      "sha256": "2e395919fe9c8d42c78e4b28bdb04a5a38d69c7a0d4fa6e6715beabb42b61162",
+      "git_blob_sha": "57be0996f9e98fda74f27fadb15ea7b8b7bd000f"
+    },
+    "services/governance/app/Infrastructure/Foundation/PostgresDependencyProbe.php": {
+      "sha256": "e8b8cf3577392336d86cc253d9843b9403c4f1e6493f8b22466ab57ed19b21d7",
+      "git_blob_sha": "97caf8c5083b5bb59c61b368314c56221714de08"
+    },
+    "services/governance/app/Providers/AppServiceProvider.php": {
+      "sha256": "3237015f10000feb4451aef22bb92ff008f056d1571e41c09437dc30b6321ac9",
+      "git_blob_sha": "c87ee04e0e99154454e30e447f9081edd7fb5b4a"
+    },
+    "services/governance/artisan": {
+      "sha256": "83c95e93ffda62b12bdfd605f5626762ee239fd61cf46ff56fd244dc828f609a",
+      "git_blob_sha": "015ca1dea3513877be66918b6f2417dd43427f91"
+    },
+    "services/governance/bootstrap/app.php": {
+      "sha256": "3cd38ee3305ab579386857096686e0dd5ce653f19916735f4cd6951090043d8b",
+      "git_blob_sha": "55d0763c7ddd835191c050683d354e5f25d3dade"
+    },
+    "services/governance/bootstrap/providers.php": {
+      "sha256": "a3848357a2e0cc535c8b200081cfe9d437821db79c01a58227e782e378e9f656",
+      "git_blob_sha": "888aae0aeb8ff40a499090d43cc69cb855546ea2"
+    },
+    "services/governance/build/snapshot.sh": {
+      "sha256": "f2bada6d41cc464634d2893db0b0121e130a6728d49d3660d551307e2178bebf",
+      "git_blob_sha": "eddd2c53b948442bbe19acd4922e1df971426e50"
+    },
+    "services/governance/composer.json": {
+      "sha256": "7aa749021d4aabedee1afd4c4e19da0a2cae89c80ae56543709c6a03e0a03a75",
+      "git_blob_sha": "77d4fa77573a16ecbf3a26ca721621e86e299f5c"
+    },
+    "services/governance/composer.lock": {
+      "sha256": "e5ddd1d1218174f0be042650de80d9b4df67ce3c73749e761384890ff340a988",
+      "git_blob_sha": "1718ea69173d5b8854dd7f55a9c08685261015e6"
+    },
+    "services/governance/config/app.php": {
+      "sha256": "a12bb0798aa79d8ea181a83ef37559c65fe8f78ef9275f2226a575f192392c6a",
+      "git_blob_sha": "fa05f587691b145964dcda5ba1a38514a53af095"
+    },
+    "services/governance/config/cache.php": {
+      "sha256": "dd4ecb492fc5e827722c53ad92a0b8d1bed4efebf52bb5576a34941f97d80e10",
+      "git_blob_sha": "e10e7d8b083ad37836c9fd032aed1e51189ebf6d"
+    },
+    "services/governance/config/database.php": {
+      "sha256": "d5da2e6c1d133cb44557969b54a9149bfc67aa5e68619730aeecf3ffb9da4df1",
+      "git_blob_sha": "3416356fa71c38ae62e092d5a20670389af138d1"
+    },
+    "services/governance/config/foundation.php": {
+      "sha256": "0fc9a39a95f0a5cf307fc3cdcf7af0a728cb313ef9b82ab6ef5600de9b6efb6d",
+      "git_blob_sha": "1a8d2747d31f0fd09df32456fd69870e9675afc8"
+    },
+    "services/governance/config/logging.php": {
+      "sha256": "29eabe013cf03a79de0f56893816a7ec97b561536009f634607b957e0fd099f4",
+      "git_blob_sha": "c4c3b93dad438656563ebfba924de4ea37050740"
+    },
+    "services/governance/public/index.php": {
+      "sha256": "59caa93d7583ba8fbb335d7bf0c31f3c382a7cda6c6c6915fd844af840c09c13",
+      "git_blob_sha": "1c3f915a2c355b63f4cb4386ba5b375841b01b4f"
+    },
+    "services/governance/routes/api.php": {
+      "sha256": "522eea762a2c04f8719f3fcc70520bdaa9720bd3ac89b022a06907116bf5b4fa",
+      "git_blob_sha": "e5353ec76befd4565f5fadbf74a682592c1535e9"
+    }
+  },
+  "source_bindings_verified_against_commit": 34,
+  "command_log_hashes_verified": 18,
+  "artifact_hashes_verified": 0,
+  "retained_file_sha256": {
+    "01-source-revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-source-revision.stdout.log": "9b66f98ceee698e43fd681494759b440f5de52ad7546f4d1576a81634ea21785",
+    "02-source-clean.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "02-source-clean.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-docker-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-docker-version.stdout.log": "58d5180149fd3334dbb3ff73de521946336e4052a1b769cb475f72486c934b1b",
+    "04-buildx-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-buildx-version.stdout.log": "d6a1fdd95fd9b2615b359b42e82829b1cad6bb22202cff355e55be8242e8c395",
+    "05-build.stderr.log": "7306ce182b52e408b684b7f65bfc64094c2e4e80b123f0ff2ccf937f30f32091",
+    "05-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-image-inspect.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-image-inspect.stdout.log": "917649326c27b219b112443c372b534a59916e2771febaf953de48bac281951e",
+    "07-fpm-configuration.stderr.log": "d73f5ef492f882633978c20c94074127b4da3caa309de8a96fa91ab80b7e81bf",
+    "07-fpm-configuration.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-kernel-and-runtime-isolation.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-kernel-and-runtime-isolation.stdout.log": "4c5a98c68730409ab33525d820362808c26eb8866a96c1d0e08ed256ab067432",
+    "09-operating-system-packages.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "09-operating-system-packages.stdout.log": "7d83189b255a416d862950256643609d593a87950b425fbe0538a68fbb51e684",
+    "report.json": "908d1be3bed14857fa77333a8760f6affc221d6fd3290bfbcd798e374aac19e0"
+  },
+  "image": {
+    "id": "sha256:4ea73e5e469e75dd33838958555de469f1b4a50b32937a33532135d7058a731d",
+    "tag": "p01-governance:c9c202786437601c0f000bdf29d7e1e401e773ee",
+    "size": 552206470,
+    "platform": "linux/amd64",
+    "identity_kind": "local_image_configuration_digest"
+  }
+}

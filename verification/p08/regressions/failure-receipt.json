@@ -1,0 +1,17 @@
+{
+  "artifact_id": "11469053471",
+  "archive": "p06-live-firefox-37592344371-1.zip",
+  "archive_sha256": "b180bd3d12a769bcf62fa5f65f2a79c52438786572b2aefaaf3696401b801d37",
+  "run_id": "37592344371",
+  "source_revision": "712ea5d8b2e8d12ec1095c36730a5a5d87722e77",
+  "result": "FAIL",
+  "original_error": "p06-real-temporal-namespace failed: ",
+  "original_exit_code": -11,
+  "command_logs_verified": 41,
+  "source_bindings_verified": 1078,
+  "source_binding_mismatches": [],
+  "requalification_run_id": "37592736181",
+  "requalification_source_revision": "a72d0e88b3626b6912cf189c46ce45cf2fc4878c",
+  "requalification_conclusion": "success",
+  "scope_note": "Original namespace-bootstrap process crashed before P06 Temporal journey. Root cause not established; unchanged P06 scripts passed in all three browsers on the final source run. This is not a corrected native or P08 guest journey."
+}

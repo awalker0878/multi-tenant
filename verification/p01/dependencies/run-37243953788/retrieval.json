@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "run_id": 37243953788,
+  "source_revision": "4f483fe96244984c4a6dacf68035c9db5a7f48ef",
+  "artifact_id": 11318790564,
+  "archive_bytes": 3331,
+  "archive_sha256": "c2c5e2383dfc99a48e33ce505fa03050bd516ee9e16da3d8539db9945e0d5905",
+  "files": {
+    "inputs.lock.json": "3397a46b6a0994a4725bd7e31b29095cb8fd75417c0a8f977f24f445ce3b0a92",
+    "nginx-index.json": "b972f831f200b19ef0767938224f9711e74cd783718738cd7405d5cabf75c442",
+    "nginx-manifest.json": "3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae"
+  },
+  "result": "VERIFIED",
+  "scope": "Registry manifest observation only; no installation or operating support qualification"
+}

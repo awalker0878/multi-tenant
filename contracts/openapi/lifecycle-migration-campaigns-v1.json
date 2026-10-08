@@ -1,0 +1,1871 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Lifecycle migration campaigns",
+    "version": "1.0.0",
+    "description": "Immutable schedules with current owner admission; observation publishers have separately mounted grants."
+  },
+  "paths": {
+    "/v1/tenants/{tenant}/migration-campaigns": {
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listMigrationCampaigns",
+        "security": [
+          {
+            "workload": [],
+            "actorDelegation": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "site_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "environment",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "resource_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scoped result; no native authority is conferred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Held, denied or unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createMigrationCampaign",
+        "security": [
+          {
+            "workload": [],
+            "actorDelegation": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Scoped result; no native authority is conferred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignReceipt"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Held, denied or unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/migration-campaigns/{campaign}": {
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "campaign",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getMigrationCampaign",
+        "security": [
+          {
+            "workload": [],
+            "actorDelegation": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Scoped result; no native authority is conferred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Campaign"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Held, denied or unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/migration-campaigns/{campaign}/commands": {
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "campaign",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "commandMigrationCampaign",
+        "security": [
+          {
+            "workload": [],
+            "actorDelegation": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Scoped result; no native authority is conferred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignReceipt"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Held, denied or unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommandRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/tenants/{tenant}/migration-observations/performance": {
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "publishMigrationPerformance",
+        "security": [
+          {
+            "workload": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Scoped result; no native authority is conferred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationReceipt"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Held, denied or unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerformanceObservation"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/tenants/{tenant}/migration-observations/capacity": {
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "publishMigrationCapacity",
+        "security": [
+          {
+            "workload": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Scoped result; no native authority is conferred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationReceipt"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Held, denied or unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapacityObservation"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/tenants/{tenant}/migration-observations/release": {
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "publishMigrationRelease",
+        "security": [
+          {
+            "workload": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "Scoped result; no native authority is conferred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationReceipt"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Held, denied or unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReleaseObservation"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "workload": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "actorDelegation": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Actor-Delegation"
+      }
+    },
+    "schemas": {
+      "Scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environment": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "resource_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "site_id",
+          "environment",
+          "resource_id"
+        ]
+      },
+      "Settings": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "windows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "start": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1152921504606846976
+                },
+                "end": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1152921504606846976
+                }
+              },
+              "required": [
+                "start",
+                "end"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 128
+          },
+          "cutover_windows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "start": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1152921504606846976
+                },
+                "end": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1152921504606846976
+                }
+              },
+              "required": [
+                "start",
+                "end"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 128
+          },
+          "blackouts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "start": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1152921504606846976
+                },
+                "end": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1152921504606846976
+                }
+              },
+              "required": [
+                "start",
+                "end"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 128
+          },
+          "stagger_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 86400
+          },
+          "max_active": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "phase_limits": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "capture": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "transfer": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "conversion": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "import": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "validation": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "cutover": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              }
+            },
+            "required": [
+              "capture",
+              "transfer",
+              "conversion",
+              "import",
+              "validation",
+              "cutover"
+            ]
+          },
+          "failure_limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          }
+        },
+        "required": [
+          "name",
+          "timezone",
+          "windows",
+          "cutover_windows",
+          "blackouts",
+          "stagger_seconds",
+          "max_active",
+          "phase_limits",
+          "failure_limit"
+        ]
+      },
+      "MemberRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1152921504606846976
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "approval_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          },
+          "outage_group": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "not_before": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1152921504606846976
+          },
+          "deadline": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1152921504606846976
+          }
+        },
+        "required": [
+          "id",
+          "plan_id",
+          "plan_revision",
+          "plan_digest",
+          "approval_id",
+          "depends_on",
+          "outage_group",
+          "priority",
+          "not_before",
+          "deadline"
+        ]
+      },
+      "MemberSpecification": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1152921504606846976
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "approval_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          },
+          "outage_group": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "not_before": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1152921504606846976
+          },
+          "deadline": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1152921504606846976
+          },
+          "route_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "sizes": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "capture": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1152921504606846976
+              },
+              "transfer": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1152921504606846976
+              },
+              "conversion": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1152921504606846976
+              },
+              "import": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1152921504606846976
+              },
+              "validation": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1152921504606846976
+              },
+              "cutover": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1152921504606846976
+              }
+            },
+            "required": [
+              "capture",
+              "transfer",
+              "conversion",
+              "import",
+              "validation",
+              "cutover"
+            ]
+          },
+          "demands": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 64,
+            "patternProperties": {
+              "^[a-z][a-z0-9_-]{0,39}:[a-f0-9]{64}$": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1152921504606846976
+              }
+            },
+            "additionalProperties": false
+          },
+          "mode": {
+            "enum": [
+              "rehearsal",
+              "cutover"
+            ]
+          },
+          "method": {
+            "enum": [
+              "APPLICATION_REBUILD_RESTORE",
+              "VM_SNAPSHOT_BASELINE_APP_DELTA",
+              "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+              "VM_COLD_EXPORT",
+              "EXTERNAL_BLOCK_REPLICATION"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "plan_id",
+          "plan_revision",
+          "plan_digest",
+          "approval_id",
+          "depends_on",
+          "outage_group",
+          "priority",
+          "not_before",
+          "deadline",
+          "route_sha256",
+          "sizes",
+          "demands",
+          "mode",
+          "method"
+        ]
+      },
+      "CreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "site_id",
+              "environment",
+              "resource_id"
+            ]
+          },
+          "settings": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "timezone": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "windows": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1152921504606846976
+                    },
+                    "end": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1152921504606846976
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 128
+              },
+              "cutover_windows": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1152921504606846976
+                    },
+                    "end": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1152921504606846976
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 128
+              },
+              "blackouts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1152921504606846976
+                    },
+                    "end": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1152921504606846976
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 128
+              },
+              "stagger_seconds": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 86400
+              },
+              "max_active": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "phase_limits": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "capture": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "transfer": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "conversion": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "import": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "validation": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "cutover": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  }
+                },
+                "required": [
+                  "capture",
+                  "transfer",
+                  "conversion",
+                  "import",
+                  "validation",
+                  "cutover"
+                ]
+              },
+              "failure_limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              }
+            },
+            "required": [
+              "name",
+              "timezone",
+              "windows",
+              "cutover_windows",
+              "blackouts",
+              "stagger_seconds",
+              "max_active",
+              "phase_limits",
+              "failure_limit"
+            ]
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberRequest"
+            },
+            "minItems": 1,
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "scope",
+          "settings",
+          "members"
+        ]
+      },
+      "CommandRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "schedule",
+              "pause",
+              "cancel"
+            ]
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1152921504606846976
+          }
+        },
+        "required": [
+          "action",
+          "expected_revision"
+        ]
+      },
+      "CampaignReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "site_id",
+              "environment",
+              "resource_id"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1152921504606846976
+          },
+          "state": {
+            "enum": [
+              "draft",
+              "scheduled",
+              "paused",
+              "cancelled",
+              "complete"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "scope",
+          "revision",
+          "state"
+        ]
+      },
+      "Campaign": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "site_id",
+              "environment",
+              "resource_id"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1152921504606846976
+          },
+          "state": {
+            "enum": [
+              "draft",
+              "scheduled",
+              "paused",
+              "cancelled",
+              "complete"
+            ]
+          },
+          "settings": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "timezone": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "windows": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1152921504606846976
+                    },
+                    "end": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1152921504606846976
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 128
+              },
+              "cutover_windows": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1152921504606846976
+                    },
+                    "end": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1152921504606846976
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 128
+              },
+              "blackouts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1152921504606846976
+                    },
+                    "end": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1152921504606846976
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 128
+              },
+              "stagger_seconds": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 86400
+              },
+              "max_active": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "phase_limits": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "capture": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "transfer": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "conversion": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "import": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "validation": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "cutover": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  }
+                },
+                "required": [
+                  "capture",
+                  "transfer",
+                  "conversion",
+                  "import",
+                  "validation",
+                  "cutover"
+                ]
+              },
+              "failure_limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              }
+            },
+            "required": [
+              "name",
+              "timezone",
+              "windows",
+              "cutover_windows",
+              "blackouts",
+              "stagger_seconds",
+              "max_active",
+              "phase_limits",
+              "failure_limit"
+            ]
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "state": {
+                  "enum": [
+                    "queued",
+                    "admitted",
+                    "complete",
+                    "held",
+                    "cancelled"
+                  ]
+                },
+                "reason": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 120
+                },
+                "job_id": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "specification": {
+                  "$ref": "#/components/schemas/MemberSpecification"
+                },
+                "estimate": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "phases": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "capture": {
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 1152921504606846976
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "transfer": {
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 1152921504606846976
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "conversion": {
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 1152921504606846976
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "import": {
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 1152921504606846976
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "validation": {
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 1152921504606846976
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "cutover": {
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 1152921504606846976
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "capture",
+                        "transfer",
+                        "conversion",
+                        "import",
+                        "validation",
+                        "cutover"
+                      ]
+                    },
+                    "total_seconds": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 1152921504606846976
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "outage_seconds": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 1152921504606846976
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "holds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      "minItems": 0,
+                      "maxItems": 6
+                    },
+                    "margin_percent": {
+                      "const": 25
+                    },
+                    "phase_limits": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "capture": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 1000
+                        },
+                        "transfer": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 1000
+                        },
+                        "conversion": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 1000
+                        },
+                        "import": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 1000
+                        },
+                        "validation": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 1000
+                        },
+                        "cutover": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 1000
+                        }
+                      },
+                      "required": [
+                        "capture",
+                        "transfer",
+                        "conversion",
+                        "import",
+                        "validation",
+                        "cutover"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "phases",
+                    "total_seconds",
+                    "outage_seconds",
+                    "holds",
+                    "margin_percent",
+                    "phase_limits"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "state",
+                "reason",
+                "job_id",
+                "specification",
+                "estimate"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 1000
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "scope",
+          "revision",
+          "state",
+          "settings",
+          "members",
+          "native_write_authorized"
+        ]
+      },
+      "CampaignList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "site_id",
+              "environment",
+              "resource_id"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "state": {
+                  "enum": [
+                    "draft",
+                    "scheduled",
+                    "paused",
+                    "cancelled",
+                    "complete"
+                  ]
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1152921504606846976
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "created_at": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1152921504606846976
+                }
+              },
+              "required": [
+                "id",
+                "state",
+                "revision",
+                "name",
+                "created_at"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 100
+          },
+          "limit_reached": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "scope",
+          "items",
+          "limit_reached"
+        ]
+      },
+      "PerformanceObservation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "route_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "phase": {
+            "enum": [
+              "capture",
+              "transfer",
+              "conversion",
+              "import",
+              "validation",
+              "cutover"
+            ]
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1152921504606846976
+          },
+          "elapsed_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 604800000
+          },
+          "concurrency": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1152921504606846976
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1152921504606846976
+          },
+          "evidence_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "production_impact_ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "route_sha256",
+          "phase",
+          "bytes",
+          "elapsed_ms",
+          "concurrency",
+          "observed_at",
+          "expires_at",
+          "evidence_sha256",
+          "production_impact_ok"
+        ]
+      },
+      "CapacityObservation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pool_key": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,39}:[a-f0-9]{64}$"
+          },
+          "capacity": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1152921504606846976
+          },
+          "paused": {
+            "type": "boolean"
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1152921504606846976
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1152921504606846976
+          },
+          "evidence_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "pool_key",
+          "capacity",
+          "paused",
+          "observed_at",
+          "expires_at",
+          "evidence_sha256"
+        ]
+      },
+      "ReleaseObservation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "member_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "pool_key": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,39}:[a-f0-9]{64}$"
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1152921504606846976
+          },
+          "evidence_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "unused": {
+            "const": true
+          },
+          "provider_requests_quiescent": {
+            "const": true
+          }
+        },
+        "required": [
+          "member_id",
+          "pool_key",
+          "observed_at",
+          "evidence_sha256",
+          "unused",
+          "provider_requests_quiescent"
+        ]
+      },
+      "ObservationReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accepted": {
+            "const": true
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        },
+        "required": [
+          "accepted",
+          "native_write_authorized"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "string",
+            "pattern": "^[a-z_]{1,120}$"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    }
+  }
+}

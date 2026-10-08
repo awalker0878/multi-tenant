@@ -1,0 +1,146 @@
+{
+  "verified_at": "2026-10-06T23:38:05.980Z",
+  "result": "PASS",
+  "scope": "Associated preparation and regression workflows only; each run retains its own exact source. No native OpenStack qualification or P07 completion.",
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "runs": [
+    {
+      "run_id": 37544177842,
+      "name": "P07 native readiness preparation",
+      "source_revision": "249a77e9fda5c0a3e25918ce3efdb52f4ab415de",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37544177842",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:01:54Z"
+    },
+    {
+      "run_id": 37545874970,
+      "name": "P06 execution",
+      "source_revision": "c2c29067f0ecdb7d0df0c92687507b66415219e5",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37545874970",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:23:32Z"
+    },
+    {
+      "run_id": 37545566656,
+      "name": "P04 inventory",
+      "source_revision": "cf3992c3c33b95a060a2ef34677d054b51d9a8c0",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37545566656",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:18:34Z"
+    },
+    {
+      "run_id": 37545566705,
+      "name": "P05 planning",
+      "source_revision": "cf3992c3c33b95a060a2ef34677d054b51d9a8c0",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37545566705",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:18:21Z"
+    },
+    {
+      "run_id": 37546672620,
+      "name": "Context policy",
+      "source_revision": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37546672620",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:27:54Z"
+    },
+    {
+      "run_id": 37546672554,
+      "name": "P01 isolated Kubernetes integration",
+      "source_revision": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37546672554",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:37:37Z"
+    },
+    {
+      "run_id": 37546672564,
+      "name": "P01 policy controls",
+      "source_revision": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37546672564",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:27:55Z"
+    },
+    {
+      "run_id": 37546672521,
+      "name": "P01 foundation contracts",
+      "source_revision": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37546672521",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:28:13Z"
+    },
+    {
+      "run_id": 37546672552,
+      "name": "P01 Permit Desk application recovery",
+      "source_revision": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37546672552",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:28:28Z"
+    },
+    {
+      "run_id": 37546672559,
+      "name": "P01 bootstrap images",
+      "source_revision": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37546672559",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:29:07Z"
+    },
+    {
+      "run_id": 37546672569,
+      "name": "P01 foundation packages",
+      "source_revision": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37546672569",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:29:34Z"
+    },
+    {
+      "run_id": 37546672547,
+      "name": "P01 isolated Compose integration",
+      "source_revision": "b0f5516409dd4047c3c25eb0ba0861f76d321c11",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37546672547",
+      "run_attempt": 1,
+      "updated_at": "2026-10-06T23:30:53Z"
+    }
+  ],
+  "retained_failures": [
+    {
+      "run_id": 37544177753,
+      "source_revision": "249a77e9fda5c0a3e25918ce3efdb52f4ab415de",
+      "reason": "Temporal fixture PostgreSQL startup race"
+    },
+    {
+      "run_id": 37545566682,
+      "source_revision": "cf3992c3c33b95a060a2ef34677d054b51d9a8c0",
+      "reason": "Console shared-state probe empty stdout"
+    },
+    {
+      "run_id": 37544824899,
+      "source_revision": "414225d9d89ac11ac6ef995b4c7179b59240cda4",
+      "reason": "Review-packet link published before target document"
+    }
+  ]
+}

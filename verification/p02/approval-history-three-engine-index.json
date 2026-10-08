@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "result": "PASS",
+  "source_revision": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+  "run_id": 37378369526,
+  "verified_at": "2026-10-05T21:59:43.698271+00:00",
+  "engines": [
+    {
+      "engine": "chromium",
+      "report": "verification/p02/identity/run-37378369526/chromium/report.json",
+      "report_sha256": "c86e9b2328e9d5abf915e63aaea9128b6a2308147c0ab63f1ed526ea62fd14ce",
+      "retrieval": "verification/p02/identity/run-37378369526/chromium/retrieval.json",
+      "retrieval_sha256": "8fd47f14b3f9368f262d3bbaad052674f54d87d3c7b49382f698f0c2ae5915b9",
+      "archive_sha256": "18cd1ba73e6418303f36c75e671521bc6ea18a996c6f814e77e446bd6efc8174",
+      "checks": 100,
+      "source_bindings": 302,
+      "artifact_bindings": 10,
+      "browser_stats": {
+        "startTime": "2026-10-05T21:51:06.223Z",
+        "duration": 48534.041999999994,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "observed_at": "2026-10-05T21:50:18.210906+00:00",
+      "completed_at": "2026-10-05T21:52:04.559540+00:00",
+      "notification_delivery": {
+        "cycles": 29,
+        "counts": {
+          "published": 19,
+          "recorded": 19,
+          "duplicate": 0,
+          "quarantined": 0,
+          "retry": 0
+        },
+        "error": null
+      }
+    },
+    {
+      "engine": "firefox",
+      "report": "verification/p02/identity/run-37378369526/firefox/report.json",
+      "report_sha256": "572e7614fe957e5c59a9ca3e54d7f8ab1b225b07fc04156cf0d2691a6564c508",
+      "retrieval": "verification/p02/identity/run-37378369526/firefox/retrieval.json",
+      "retrieval_sha256": "eec459a29bf3109f5e7ff4f9f5829c243322744b233c67982312fab2efa6cd54",
+      "archive_sha256": "4750411ec9a77c306fcfb5395ebc1a7b03ad530772ca208a2be0af304e5a970f",
+      "checks": 100,
+      "source_bindings": 302,
+      "artifact_bindings": 10,
+      "browser_stats": {
+        "startTime": "2026-10-05T21:50:48.271Z",
+        "duration": 49905.491,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "observed_at": "2026-10-05T21:50:03.616588+00:00",
+      "completed_at": "2026-10-05T21:51:48.106244+00:00",
+      "notification_delivery": {
+        "cycles": 31,
+        "counts": {
+          "published": 21,
+          "recorded": 21,
+          "duplicate": 0,
+          "quarantined": 0,
+          "retry": 0
+        },
+        "error": null
+      }
+    },
+    {
+      "engine": "webkit",
+      "report": "verification/p02/identity/run-37378369526/webkit/report.json",
+      "report_sha256": "5c030819309f624a1ed89a35718ef4e143ccf80b91f35d284e3a66036f3cf61f",
+      "retrieval": "verification/p02/identity/run-37378369526/webkit/retrieval.json",
+      "retrieval_sha256": "bb63a2388073ee1a99a915c8cb8b84279512328ed43008fd9648fb4b9dc3fe9c",
+      "archive_sha256": "456469956a3ad14bd950a039b6bfa482fc8db66a489e46e841bdbf40ccb23dce",
+      "checks": 100,
+      "source_bindings": 302,
+      "artifact_bindings": 10,
+      "browser_stats": {
+        "startTime": "2026-10-05T21:50:54.316Z",
+        "duration": 64465.961,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "observed_at": "2026-10-05T21:50:18.462453+00:00",
+      "completed_at": "2026-10-05T21:52:05.418157+00:00",
+      "notification_delivery": {
+        "cycles": 45,
+        "counts": {
+          "published": 20,
+          "recorded": 20,
+          "duplicate": 0,
+          "quarantined": 0,
+          "retry": 0
+        },
+        "error": null
+      }
+    }
+  ],
+  "limitations": "Three independent disposable integration jobs; no supported managed-browser/assistive-technology matrix, operated identity custody, native effect, promotion or independent gate decision. Each original report retains its own limits."
+}

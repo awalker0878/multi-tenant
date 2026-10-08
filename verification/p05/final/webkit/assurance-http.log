@@ -1,0 +1,52 @@
+[7552] [Tue Oct  6 13:54:21 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8036) started
+[7553] [Tue Oct  6 13:54:21 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8036) started
+[7554] [Tue Oct  6 13:54:21 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8036) started
+[7551] [Tue Oct  6 13:54:21 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8036) started
+[7555] [Tue Oct  6 13:54:21 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8036) started
+[7554] [Tue Oct  6 13:54:21 2026] 127.0.0.1:57288 Accepted
+[Tue Oct 6 13:54:21 2026] 127.0.0.1:57288 [GET] URI: /health/live
+[7554] [Tue Oct  6 13:54:21 2026] 127.0.0.1:57288 Closing
+[7987] [Tue Oct  6 13:54:29 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8036) started
+[7988] [Tue Oct  6 13:54:29 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8036) started
+[7989] [Tue Oct  6 13:54:29 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8036) started
+[7986] [Tue Oct  6 13:54:29 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8036) started
+[7990] [Tue Oct  6 13:54:29 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8036) started
+[7989] [Tue Oct  6 13:54:29 2026] 127.0.0.1:55934 Accepted
+[Tue Oct 6 13:54:29 2026] 127.0.0.1:55934 [GET] URI: /health/live
+[7989] [Tue Oct  6 13:54:29 2026] 127.0.0.1:55934 Closing
+[7989] [Tue Oct  6 13:54:30 2026] 127.0.0.1:55942 Accepted
+[Tue Oct 6 13:54:30 2026] 127.0.0.1:55942 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7989] [Tue Oct  6 13:54:30 2026] 127.0.0.1:55942 Closing
+[7986] [Tue Oct  6 13:54:31 2026] 127.0.0.1:55948 Accepted
+[Tue Oct 6 13:54:31 2026] 127.0.0.1:55948 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7988] [Tue Oct  6 13:54:31 2026] 127.0.0.1:55958 Accepted
+[Tue Oct 6 13:54:31 2026] 127.0.0.1:55958 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7986] [Tue Oct  6 13:54:31 2026] 127.0.0.1:55948 Closing
+[7988] [Tue Oct  6 13:54:31 2026] 127.0.0.1:55958 Closing
+[7988] [Tue Oct  6 13:54:31 2026] 127.0.0.1:55970 Accepted
+[Tue Oct 6 13:54:31 2026] 127.0.0.1:55970 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7986] [Tue Oct  6 13:54:31 2026] 127.0.0.1:55982 Accepted
+[Tue Oct 6 13:54:31 2026] 127.0.0.1:55982 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7988] [Tue Oct  6 13:54:31 2026] 127.0.0.1:55970 Closing
+[7986] [Tue Oct  6 13:54:31 2026] 127.0.0.1:55982 Closing
+[7988] [Tue Oct  6 13:54:31 2026] 127.0.0.1:55992 Accepted
+[Tue Oct 6 13:54:31 2026] 127.0.0.1:55992 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7988] [Tue Oct  6 13:54:31 2026] 127.0.0.1:55992 Closing
+[7989] [Tue Oct  6 13:54:32 2026] 127.0.0.1:56008 Accepted
+[Tue Oct 6 13:54:32 2026] 127.0.0.1:56008 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7989] [Tue Oct  6 13:54:32 2026] 127.0.0.1:56008 Closing
+[7989] [Tue Oct  6 13:54:32 2026] 127.0.0.1:56022 Accepted
+[Tue Oct 6 13:54:32 2026] 127.0.0.1:56022 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7989] [Tue Oct  6 13:54:32 2026] 127.0.0.1:56022 Closing
+[7989] [Tue Oct  6 13:54:40 2026] 127.0.0.1:42058 Accepted
+[Tue Oct 6 13:54:40 2026] 127.0.0.1:42058 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7989] [Tue Oct  6 13:54:40 2026] 127.0.0.1:42058 Closing
+[7987] [Tue Oct  6 13:54:41 2026] 127.0.0.1:42072 Accepted
+[Tue Oct 6 13:54:41 2026] 127.0.0.1:42072 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7987] [Tue Oct  6 13:54:41 2026] 127.0.0.1:42072 Closing
+[7986] [Tue Oct  6 13:54:41 2026] 127.0.0.1:42084 Accepted
+[Tue Oct 6 13:54:41 2026] 127.0.0.1:42084 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7986] [Tue Oct  6 13:54:41 2026] 127.0.0.1:42084 Closing
+[7986] [Tue Oct  6 13:54:56 2026] 127.0.0.1:39156 Accepted
+[Tue Oct 6 13:54:56 2026] 127.0.0.1:39156 [POST] URI: /v1/tenants/780718b7-35cb-4d3b-aa4d-bf962ee0ae93/planning-qualification
+[7986] [Tue Oct  6 13:54:56 2026] 127.0.0.1:39156 Closing

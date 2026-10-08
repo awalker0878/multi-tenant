@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "run_id": 37260680627,
+  "source_revision": "72188a2dcf973ceee09eed05dfb79a6c53122ae2",
+  "workflow": {
+    "id": 37260680627,
+    "name": "P01 foundation contracts",
+    "head_sha": "72188a2dcf973ceee09eed05dfb79a6c53122ae2",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "created_at": "2026-10-05T03:45:12Z",
+    "updated_at": "2026-10-05T03:45:53Z",
+    "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37260680627"
+  },
+  "archives": [
+    {
+      "artifact_id": 11324133008,
+      "archive_bytes": 15965,
+      "archive_sha256": "0e5ed6f3930db7031b96b8173a1d8fa91ecf014b3950c9803d26d286cf584d39"
+    }
+  ],
+  "retrieved_at": "2026-10-05T03:51:53.138289+00:00",
+  "result": "VERIFIED",
+  "reported_result": "PASS",
+  "reported_cleanup_complete": null,
+  "reports": [
+    {
+      "path": "report.json",
+      "sha256": "3c744f514134f5142d433a9dd84438086f3c4ed22c2a8ee1ffe123c886fe1a11",
+      "result": "PASS",
+      "commands": 24,
+      "command_log_hashes_verified": 24
+    }
+  ],
+  "command_count": 24,
+  "command_log_hashes_verified": 24,
+  "unique_source_bindings_verified": 18,
+  "source_verification_sha256": "30503e2322d752a22d446f619e4885b778f8a826e204a687b2c18239c8da1cb9",
+  "retained_file_sha256": {
+    "compatibility-negative-cases.log": "33060fd73862c5e1af97335504d5b45211fce6d229657f556d8deceeadc52ce4",
+    "generate-first-php.log": "0f8a5ca20824489771c4b472fb42bc34357d581e74a254d01d6d9d00d1d84e07",
+    "generate-first-python.log": "88445f5152a61358a4f67b8cf99dd1074d8cb7f27a9a530338274556fd680358",
+    "generate-first-typescript-fetch.log": "290cbaeeb533e0f8d3c6fe03e0955cff54dfaa1449a3d0bb2ca35d9a2e627ffd",
+    "generate-second-php.log": "49a2ff3243a236f776c871dac4a08ed17455194e08611ff3fc53235dd4ebae3f",
+    "generate-second-python.log": "77b6cfc8cc932b68c5a17a67236236da042fd443e0e5c24d4bc91cc198d302c6",
+    "generate-second-typescript-fetch.log": "38a3a5649e6f97dad095946d2e35f416580a8113494374734c1cdbccfb0288b0",
+    "generated-sha256.json": "1d0c71b5e409e15fcb6a25af3467a05182f30f840a7743a17b0524e8401f3e8b",
+    "generator-version.log": "51587aac6244156fa9045620237e41443cdde69c47a5a3c3d10f8a1450878be2",
+    "openapi-validation.log": "623a54b0746017d467101f1f77df7b5bdd964dae818465fd963cfe56941fc3bb",
+    "php-lint-0.log": "10f4a239cc9543ecd9e26be59b130734fb59736bd5c6933b653c0c229947e43c",
+    "php-lint-1.log": "55b049fb17a7a77b92d792bd8e87d2cd5afb1469b6040cf6a493c3321c1dae3a",
+    "php-lint-10.log": "3544c81d521a3ca67da71ae42c9a18a633149a743683a4d584b1ad9910952444",
+    "php-lint-11.log": "2d5c753fd53b522414c79107f97f68841f39a7dcb62695a9fd40788812e14080",
+    "php-lint-12.log": "7d6f7cf01d67d9ea789c9afe51715371ddc170a77e7916b432720228abf2272a",
+    "php-lint-2.log": "ed160dc855bb6a34c83d06154c5a3e863d613e3939877d2d630f7cdfa44ae32a",
+    "php-lint-3.log": "a6be46b4bb4f6a39f7297d67bbd92c4c10979cab2fd9b60f18eb59579c1c6379",
+    "php-lint-4.log": "76b21617400bee55261927c6f227c15c141534a3e02615cee42f9add811fa13c",
+    "php-lint-5.log": "3e0c026683649f2b5d438976a1fdef2527b2d448f1d28b2b4c9396359c371bc5",
+    "php-lint-6.log": "c2d605caafc5ecf1f5aca2e6ba4901c287fb9a3ddc76064728f6e15e94477084",
+    "php-lint-7.log": "16b747ba02b5c9334675dc46f90684cabd2f8d0631625fdd92611d3866ea77b7",
+    "php-lint-8.log": "0fba050304594ac360463e78f2559b16822a056b21f1d6d8af10ed696b987c87",
+    "php-lint-9.log": "1bb6e1dae1965f1a71b109528746ffd6144f17e2767edbda0f1f05ef0296d6ff",
+    "php-wire-and-models.log": "44e2abe77530050d83d8a649cfd2a97358e39bdca48eacd70a3042bfd541b50a",
+    "provider-response-examination.json": "0720e74f6178fce184b6b262353710347c443bbc9459cb503a874c1ea628fa7a",
+    "report.json": "3c744f514134f5142d433a9dd84438086f3c4ed22c2a8ee1ffe123c886fe1a11",
+    "source-verification.json": "30503e2322d752a22d446f619e4885b778f8a826e204a687b2c18239c8da1cb9",
+    "typescript-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "limitations": [
+    "Connector archive/source retrieval verifies retained identities, not release signing, independent role approval or operational acceptance."
+  ]
+}

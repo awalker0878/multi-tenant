@@ -1,0 +1,10 @@
+{
+  "result": "VERIFIED",
+  "observed_at": "2026-10-05T21:59:43.698271+00:00",
+  "source_revision": "ec4c773992f0d82a0338180b6b5c09f12aa12685",
+  "report_sha256": "1b935645f9d6cf410477b80a08f44462ef7a602e0382fed69b425f50648dae6b",
+  "verified_streams": 24,
+  "matched_source_bindings": 294,
+  "supersedes_for_evidence_use": "fa83b4f5cdc9ce6debde07ec74211efa9e5732431379f29a8f100a9623e5f7a9",
+  "limits": "Engineering consistency check; no independent receiving review."
+}

@@ -1,0 +1,52 @@
+name: P00 rebuild restore fixture
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths:
+      - spikes/compatibility/restore/**
+      - .github/workflows/p00-restore-feasibility.yml
+  workflow_dispatch:
+    inputs:
+      fixture_mode:
+        description: Replay captured PostgreSQL image input, or resolve an explicit candidate update
+        type: choice
+        options: [replay, resolve]
+        default: replay
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p00-restore-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  restore-feasibility:
+    name: Exercise disposable database and attachment rebuild restore
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out isolated fixture
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5, resolved 2026-10-04
+        with:
+          persist-credentials: false
+
+      - name: Run real dependency fixture and retain observations
+        env:
+          # Ordinary pushes replay the measured input; explicit resolve records a candidate update.
+          P00_FIXTURE_MODE: ${{ inputs.fixture_mode || 'replay' }}
+        run: >-
+          python3 spikes/compatibility/restore/run.py
+          --workspace "$GITHUB_WORKSPACE"
+          --output "$RUNNER_TEMP/p00-restore"
+          --mode "$P00_FIXTURE_MODE"
+
+      - name: Retain fixture evidence without production credentials
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, resolved 2026-10-04
+        with:
+          name: p00-restore-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p00-restore/evidence/
+          if-no-files-found: error
+          retention-days: 14

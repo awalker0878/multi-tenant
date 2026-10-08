@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "scope": "P01 independently owned Python and Laravel foundation images; no operating qualification",
+  "components": [
+    {
+      "id": "planning",
+      "context": "services/planning",
+      "dockerfile": "Dockerfile",
+      "target": "runtime",
+      "module": "planning",
+      "distribution": "product-planning",
+      "version": "0.1.0.dev0",
+      "entrypoint": "/opt/venv/bin/planning-health",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "README.md",
+        "src"
+      ],
+      "probe_base": {
+        "service": "planning",
+        "scope": "process_bootstrap",
+        "native_operations_enabled": false
+      },
+      "readiness_reason": "service_dependencies_not_implemented",
+      "language": "python",
+      "runtime_mode": "asgi",
+      "runtime_requirements": [
+        "psycopg[binary]==3.3.6",
+        "uvicorn==0.53.0",
+        "jsonschema==4.26.0",
+        "pika==1.4.4"
+      ],
+      "runtime_entrypoint": "/opt/venv/bin/planning-serve"
+    },
+    {
+      "id": "inventory",
+      "context": "services/inventory",
+      "dockerfile": "Dockerfile",
+      "target": "runtime",
+      "module": "inventory",
+      "distribution": "product-inventory",
+      "version": "0.1.0.dev0",
+      "entrypoint": "/opt/venv/bin/inventory-health",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "README.md",
+        "src"
+      ],
+      "probe_base": {
+        "service": "inventory",
+        "scope": "process_bootstrap",
+        "native_operations_enabled": false
+      },
+      "readiness_reason": "service_dependencies_not_implemented",
+      "language": "python",
+      "runtime_mode": "asgi",
+      "runtime_requirements": [
+        "psycopg[binary]==3.3.6",
+        "uvicorn==0.53.0",
+        "pika==1.4.4"
+      ],
+      "runtime_entrypoint": "/opt/venv/bin/inventory-serve"
+    },
+    {
+      "id": "lifecycle",
+      "context": "services/lifecycle",
+      "dockerfile": "Dockerfile",
+      "target": "runtime",
+      "module": "lifecycle",
+      "distribution": "product-lifecycle",
+      "version": "0.1.0.dev0",
+      "entrypoint": "/opt/venv/bin/lifecycle-health",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "README.md",
+        "src"
+      ],
+      "probe_base": {
+        "service": "lifecycle",
+        "scope": "process_bootstrap",
+        "native_operations_enabled": false
+      },
+      "readiness_reason": "service_dependencies_not_implemented",
+      "language": "python",
+      "runtime_mode": "asgi",
+      "runtime_requirements": [
+        "psycopg[binary]==3.3.6",
+        "uvicorn==0.53.0",
+        "temporalio==1.34.0"
+      ],
+      "runtime_entrypoint": "/opt/venv/bin/lifecycle-serve",
+      "additional_scripts": {
+        "lifecycle-native": "lifecycle.bootstrap.native_server:main"
+      }
+    },
+    {
+      "id": "inventory-workers",
+      "context": "workers/inventory",
+      "dockerfile": "Dockerfile",
+      "target": "runtime",
+      "module": "inventory_worker",
+      "distribution": "product-inventory-worker",
+      "version": "0.1.0.dev0",
+      "entrypoint": "/opt/venv/bin/inventory-worker-health",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "README.md",
+        "src"
+      ],
+      "probe_base": {
+        "service": "inventory",
+        "scope": "process_bootstrap",
+        "native_operations_enabled": false,
+        "component": "inventory-workers",
+        "component_kind": "worker_bootstrap",
+        "task_consumption_enabled": false
+      },
+      "readiness_reason": "worker_dependencies_not_implemented",
+      "language": "python",
+      "runtime_mode": "cli",
+      "runtime_requirements": [],
+      "additional_scripts": {
+        "inventory-worker-collect": "inventory_worker.bootstrap.collect:main"
+      }
+    },
+    {
+      "id": "lifecycle-workers",
+      "context": "workers/lifecycle",
+      "dockerfile": "Dockerfile",
+      "target": "runtime",
+      "module": "lifecycle_worker",
+      "distribution": "product-lifecycle-worker",
+      "version": "0.1.0.dev0",
+      "entrypoint": "/opt/venv/bin/lifecycle-worker-health",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "README.md",
+        "src"
+      ],
+      "probe_base": {
+        "service": "lifecycle",
+        "scope": "process_bootstrap",
+        "native_operations_enabled": false,
+        "component": "lifecycle-workers",
+        "component_kind": "worker_bootstrap",
+        "task_consumption_enabled": false
+      },
+      "readiness_reason": "worker_dependencies_not_implemented",
+      "language": "python",
+      "runtime_mode": "cli",
+      "runtime_requirements": [
+        "cryptography==50.0.2",
+        "psycopg[binary]==3.3.6",
+        "uvicorn==0.53.0"
+      ],
+      "additional_scripts": {
+        "lifecycle-simulator": "lifecycle_worker.bootstrap.simulation:main",
+        "lifecycle-native-inspect": "lifecycle_worker.bootstrap.native_inspect:main",
+        "lifecycle-worker-native": "lifecycle_worker.bootstrap.native:main",
+        "lifecycle-migration-accounts": "lifecycle_worker.bootstrap.migration_accounts:main"
+      }
+    },
+    {
+      "id": "governance",
+      "language": "php",
+      "context": "services/governance",
+      "dockerfile": "Dockerfile",
+      "target": "php-runtime",
+      "distribution": "product/governance",
+      "entrypoint": "/usr/local/bin/service-entrypoint",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        "composer.json",
+        "composer.lock",
+        "artisan",
+        "app",
+        "bootstrap/app.php",
+        "bootstrap/providers.php",
+        "config",
+        "public/index.php",
+        "routes",
+        "database/migrations",
+        "build/apk.lock.json",
+        "build/download-apks.php"
+      ]
+    },
+    {
+      "id": "catalogue",
+      "language": "php",
+      "context": "services/catalogue",
+      "dockerfile": "Dockerfile",
+      "target": "php-runtime",
+      "distribution": "product/catalogue",
+      "entrypoint": "/usr/local/bin/service-entrypoint",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        "composer.json",
+        "composer.lock",
+        "artisan",
+        "app",
+        "bootstrap/app.php",
+        "bootstrap/providers.php",
+        "config",
+        "public/index.php",
+        "routes",
+        "resources",
+        "build/apk.lock.json",
+        "build/download-apks.php"
+      ]
+    },
+    {
+      "id": "assurance",
+      "language": "php",
+      "context": "services/assurance",
+      "dockerfile": "Dockerfile",
+      "target": "php-runtime",
+      "distribution": "product/assurance",
+      "entrypoint": "/usr/local/bin/service-entrypoint",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        "composer.json",
+        "composer.lock",
+        "artisan",
+        "app",
+        "bootstrap/app.php",
+        "bootstrap/providers.php",
+        "config",
+        "public/index.php",
+        "routes",
+        "build/apk.lock.json",
+        "build/download-apks.php"
+      ]
+    },
+    {
+      "id": "console",
+      "language": "php",
+      "context": "apps/console",
+      "dockerfile": "Dockerfile",
+      "target": "php-runtime",
+      "distribution": "product/console",
+      "entrypoint": "/usr/local/bin/service-entrypoint",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        "composer.json",
+        "composer.lock",
+        "artisan",
+        "app",
+        "bootstrap/app.php",
+        "bootstrap/providers.php",
+        "config",
+        "public/index.php",
+        "routes",
+        "resources",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json",
+        "vite.config.ts",
+        "build/apk.lock.json",
+        "build/download-apks.php"
+      ]
+    }
+  ]
+}

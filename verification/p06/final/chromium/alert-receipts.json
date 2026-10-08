@@ -1,0 +1,47 @@
+[
+  {
+    "event": {
+      "id": "b66b66c8-8e6e-4dc9-bfb2-808d0eb253d1",
+      "job_id": "5179405c-0bee-42ab-bb36-50fea0348144",
+      "reason": "operator_stop",
+      "simulation": true
+    },
+    "receipt_id": "06f6e1cd-9990-58d2-8d1c-d68b74910efa"
+  },
+  {
+    "event": {
+      "id": "ea5c0c3b-ac7c-48cc-98d0-765f929de5dd",
+      "job_id": "30cb5860-aa0d-49f6-990f-7cf900c8d1bd",
+      "reason": "confirmed_failed",
+      "simulation": true
+    },
+    "receipt_id": "0adb6c08-5bb9-5e23-b1de-49e2eda053ca"
+  },
+  {
+    "event": {
+      "id": "1e5c8301-33b8-49de-8bd5-82a6696b4d86",
+      "job_id": "552759ee-b2de-4fda-ab62-5067d0ae3686",
+      "reason": "evidence_pending",
+      "simulation": true
+    },
+    "receipt_id": "25476a3d-83d7-53d0-a746-9cc6d523965d"
+  },
+  {
+    "event": {
+      "id": "f314c69d-404f-4250-8bd5-ffebc787e5b1",
+      "job_id": "30cb5860-aa0d-49f6-990f-7cf900c8d1bd",
+      "reason": "evidence_pending",
+      "simulation": true
+    },
+    "receipt_id": "b2dd29cc-52f5-5560-9ef0-c30f33ea631c"
+  },
+  {
+    "event": {
+      "id": "0773ea3d-a170-46e8-8958-56f44a3a453e",
+      "job_id": "fb99ed71-91d5-4bdd-94c4-62ff7687de57",
+      "reason": "evidence_pending",
+      "simulation": true
+    },
+    "receipt_id": "b6315065-b6bd-55ac-925c-e310df2ddb9e"
+  }
+]

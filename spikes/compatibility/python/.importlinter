@@ -1,0 +1,37 @@
+[importlinter]
+root_packages =
+    probe_inventory
+    probe_planning
+include_external_packages = True
+
+[importlinter:contract:layers]
+name = Owned Python layer direction
+type = layers
+containers =
+    probe_inventory
+    probe_planning
+layers =
+    bootstrap
+    infrastructure | interfaces
+    application
+    domain
+exhaustive = True
+
+[importlinter:contract:services]
+name = Independent service sources
+type = independence
+modules =
+    probe_inventory
+    probe_planning
+
+[importlinter:contract:core]
+name = No transport libraries in core
+type = forbidden
+source_modules =
+    probe_inventory.domain
+    probe_inventory.application
+    probe_planning.domain
+    probe_planning.application
+forbidden_modules =
+    httpx
+    pydantic

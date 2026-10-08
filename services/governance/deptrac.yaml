@@ -1,0 +1,53 @@
+deptrac:
+  paths:
+    - app
+  analyser:
+    types: [class, use]
+  layers:
+    - name: Domain
+      collectors:
+        - {type: classLike, value: '^App\\Domain\\.*'}
+    - name: Application
+      collectors:
+        - {type: classLike, value: '^App\\Application\\.*'}
+    - name: Infrastructure
+      collectors:
+        - {type: classLike, value: '^App\\Infrastructure\\.*'}
+    - name: Delivery
+      collectors:
+        - {type: classLike, value: '^App\\(Http|Console|Jobs|Listeners|Policies)\\.*'}
+    - name: Composition
+      collectors:
+        - {type: classLike, value: '^App\\Providers\\.*'}
+    - name: PublishedContracts
+      collectors:
+        - {type: classLike, value: '^Product\\Contracts\\.*'}
+    - name: ForeignPrivate
+      collectors:
+        - {type: classLike, value: '^Product\\(Contexts|Services)\\.*'}
+    - name: Framework
+      collectors:
+        - type: classLike
+          value: '^(?!Illuminate\\(Http|Routing|Console|Foundation\\Http)\\|Illuminate\\Support\\Facades\\(Http|Request|Response|Route|Redirect|URL)$|Symfony\\Component\\(HttpFoundation|HttpKernel|Routing|HttpClient|Console)\\|Psr\\Http\\)(Illuminate|Carbon|Symfony|Psr)\\.*'
+    - name: Transport
+      collectors:
+        - type: classLike
+          value: '^(Inertia\\|Illuminate\\(Http|Routing|Console|Foundation\\Http)\\|Illuminate\\Support\\Facades\\(Http|Request|Response|Route|Redirect|URL)$|Symfony\\Component\\(HttpFoundation|HttpKernel|Routing|HttpClient|Console)\\|Psr\\Http\\).*'
+    - name: MessagingVendors
+      collectors:
+        - {type: classLike, value: '^(Opis|PhpAmqpLib)\\.*'}
+    - name: Jwt
+      collectors:
+        - {type: classLike, value: '^Firebase\\JWT\\.*'}
+  ruleset:
+    Domain: [Framework]
+    Application: [Domain, Framework]
+    Infrastructure: [Domain, Application, Framework, Transport, PublishedContracts, Jwt, MessagingVendors]
+    Delivery: [Domain, Application, Framework, Transport]
+    Composition: [Domain, Application, Infrastructure, Delivery, Framework, Transport, PublishedContracts]
+    PublishedContracts: []
+    ForeignPrivate: []
+    Framework: []
+    Transport: []
+    Jwt: []
+    MessagingVendors: []

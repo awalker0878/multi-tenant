@@ -1,0 +1,42 @@
+{
+  "applications": {
+    "assurance": {
+      "kind_reference": "p01.local/assurance:sha256-47f62073d8fff008f43b6d713a616ee8efa5f0bdddf99b3ca97c896f0fbd470e",
+      "local_image_id": "sha256:47f62073d8fff008f43b6d713a616ee8efa5f0bdddf99b3ca97c896f0fbd470e"
+    },
+    "catalogue": {
+      "kind_reference": "p01.local/catalogue:sha256-1a11a2c869c52da11909f77775e8d8d56b1f10620b0fdfecc4a4de5ac9b56e6f",
+      "local_image_id": "sha256:1a11a2c869c52da11909f77775e8d8d56b1f10620b0fdfecc4a4de5ac9b56e6f"
+    },
+    "console": {
+      "kind_reference": "p01.local/console:sha256-2b82fb49d8a0e87505b454bbbffd1f4b5f50dcd2134465fb63b5f61f7982f0ff",
+      "local_image_id": "sha256:2b82fb49d8a0e87505b454bbbffd1f4b5f50dcd2134465fb63b5f61f7982f0ff"
+    },
+    "governance": {
+      "kind_reference": "p01.local/governance:sha256-545af7312ddf66cf15e2596d2929d2ec3f63cb92cc93aa351f9a54ca03083664",
+      "local_image_id": "sha256:545af7312ddf66cf15e2596d2929d2ec3f63cb92cc93aa351f9a54ca03083664"
+    },
+    "inventory": {
+      "kind_reference": "p01.local/inventory:sha256-613db98d7ddfcc22a4a40feb0b37c94e1696a9389d02c9a2fd7a080d378c8956",
+      "local_image_id": "sha256:613db98d7ddfcc22a4a40feb0b37c94e1696a9389d02c9a2fd7a080d378c8956"
+    },
+    "lifecycle": {
+      "kind_reference": "p01.local/lifecycle:sha256-3d5dbcea69620381feadaad6f476eef6f16b81fcf8f742040ed751b577fe0b7f",
+      "local_image_id": "sha256:3d5dbcea69620381feadaad6f476eef6f16b81fcf8f742040ed751b577fe0b7f"
+    },
+    "planning": {
+      "kind_reference": "p01.local/planning:sha256-96b801cb9c0bdb1723a109ca7fb0dff57328a590165abfde109fcb68d83a21ed",
+      "local_image_id": "sha256:96b801cb9c0bdb1723a109ca7fb0dff57328a590165abfde109fcb68d83a21ed"
+    }
+  },
+  "dependencies": {
+    "nginx": {
+      "kind_reference": "p01.local/nginx:manifest-sha256-3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+      "source_reference": "docker.io/library/nginx@sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae"
+    },
+    "postgres": {
+      "kind_reference": "p01.local/postgres:manifest-sha256-9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+      "source_reference": "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d"
+    }
+  }
+}

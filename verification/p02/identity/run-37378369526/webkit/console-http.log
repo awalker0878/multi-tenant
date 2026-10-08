@@ -1,0 +1,412 @@
+[Mon Oct  5 21:50:53 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8031) started
+[Mon Oct  5 21:50:53 2026] 127.0.0.1:39568 Accepted
+[Mon Oct 5 21:50:53 2026] 127.0.0.1:39568 [GET] URI: /health/live
+[Mon Oct  5 21:50:53 2026] 127.0.0.1:39568 Closing
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46904 Accepted
+[Mon Oct 5 21:51:09 2026] 127.0.0.1:46904 [GET] URI: /setup
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46904 Closing
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46914 Accepted
+[Mon Oct 5 21:51:09 2026] 127.0.0.1:46914 [GET] URI: /login
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46914 Closing
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46930 Accepted
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46930 [200]: GET /build/assets/app-e60AENEA.css
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46940 Accepted
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46940 [200]: GET /build/assets/app-fOk3S7Mg.js
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46930 Closing
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46940 Closing
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46952 Accepted
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46952 [200]: GET /build/assets/Login-BJc8snnL.js
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46962 Accepted
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46962 [200]: GET /build/assets/IdentityLayout-BJr7JN_d.js
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46952 Closing
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46962 Closing
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46968 Accepted
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46968 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:09 2026] 127.0.0.1:46968 Closing
+[Mon Oct  5 21:51:11 2026] 127.0.0.1:46974 Accepted
+[Mon Oct 5 21:51:11 2026] 127.0.0.1:46974 [POST] URI: /login
+[Mon Oct  5 21:51:11 2026] 127.0.0.1:46974 Closing
+[Mon Oct  5 21:51:11 2026] 127.0.0.1:46986 Accepted
+[Mon Oct 5 21:51:11 2026] 127.0.0.1:46986 [GET] URI: /password
+[Mon Oct  5 21:51:11 2026] 127.0.0.1:46986 Closing
+[Mon Oct  5 21:51:11 2026] 127.0.0.1:46996 Accepted
+[Mon Oct  5 21:51:11 2026] 127.0.0.1:46996 [200]: GET /build/assets/Password-D6aEpbUw.js
+[Mon Oct  5 21:51:11 2026] 127.0.0.1:46996 Closing
+[Mon Oct  5 21:51:12 2026] 127.0.0.1:47002 Accepted
+[Mon Oct 5 21:51:12 2026] 127.0.0.1:47002 [GET] URI: /setup
+[Mon Oct  5 21:51:12 2026] 127.0.0.1:47002 Closing
+[Mon Oct  5 21:51:12 2026] 127.0.0.1:47014 Accepted
+[Mon Oct 5 21:51:12 2026] 127.0.0.1:47014 [GET] URI: /password
+[Mon Oct  5 21:51:12 2026] 127.0.0.1:47014 Closing
+[Mon Oct  5 21:51:12 2026] 127.0.0.1:47030 Accepted
+[Mon Oct  5 21:51:12 2026] 127.0.0.1:47030 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:12 2026] 127.0.0.1:47030 Closing
+[Mon Oct  5 21:51:12 2026] 127.0.0.1:47040 Accepted
+[Mon Oct 5 21:51:12 2026] 127.0.0.1:47040 [POST] URI: /password
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47040 Closing
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47052 Accepted
+[Mon Oct 5 21:51:13 2026] 127.0.0.1:47052 [GET] URI: /setup
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47052 Closing
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47060 Accepted
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47060 [200]: GET /build/assets/Setup-xotpjjgH.js
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47060 Closing
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47072 Accepted
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47072 [200]: GET /build/assets/ChangeNotice-DL5ZkRbH.js
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47072 Closing
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47074 Accepted
+[Mon Oct 5 21:51:13 2026] 127.0.0.1:47074 [GET] URI: /setup
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47074 Closing
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47090 Accepted
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47090 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:13 2026] 127.0.0.1:47090 Closing
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47094 Accepted
+[Mon Oct 5 21:51:14 2026] 127.0.0.1:47094 [POST] URI: /logout
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47094 Closing
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47108 Accepted
+[Mon Oct 5 21:51:14 2026] 127.0.0.1:47108 [GET] URI: /login
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47108 Closing
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47116 Accepted
+[Mon Oct 5 21:51:14 2026] 127.0.0.1:47116 [POST] URI: /login
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47116 Closing
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47128 Accepted
+[Mon Oct 5 21:51:14 2026] 127.0.0.1:47128 [GET] URI: /login
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47128 Closing
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47138 Accepted
+[Mon Oct 5 21:51:14 2026] 127.0.0.1:47138 [POST] URI: /login
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47138 Closing
+[Mon Oct  5 21:51:14 2026] 127.0.0.1:47146 Accepted
+[Mon Oct 5 21:51:14 2026] 127.0.0.1:47146 [GET] URI: /setup
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47146 Closing
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47158 Accepted
+[Mon Oct 5 21:51:15 2026] 127.0.0.1:47158 [GET] URI: /login
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47158 Closing
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47172 Accepted
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47172 [200]: GET /build/assets/app-e60AENEA.css
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47176 Accepted
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47176 [200]: GET /build/assets/app-fOk3S7Mg.js
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47172 Closing
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47176 Closing
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47184 Accepted
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47184 [200]: GET /build/assets/Login-BJc8snnL.js
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47190 Accepted
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47190 [200]: GET /build/assets/IdentityLayout-BJr7JN_d.js
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47184 Closing
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47190 Closing
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47194 Accepted
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47194 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47194 Closing
+[Mon Oct  5 21:51:15 2026] 127.0.0.1:47202 Accepted
+[Mon Oct 5 21:51:15 2026] 127.0.0.1:47202 [POST] URI: /login
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47202 Closing
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47208 Accepted
+[Mon Oct 5 21:51:16 2026] 127.0.0.1:47208 [GET] URI: /setup
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47208 Closing
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47900 Accepted
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47900 [200]: GET /build/assets/Setup-xotpjjgH.js
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47912 Accepted
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47900 Closing
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47912 [200]: GET /build/assets/ChangeNotice-DL5ZkRbH.js
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47912 Closing
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47922 Accepted
+[Mon Oct 5 21:51:16 2026] 127.0.0.1:47922 [PUT] URI: /setup
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47922 Closing
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47928 Accepted
+[Mon Oct 5 21:51:16 2026] 127.0.0.1:47928 [GET] URI: /setup
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47928 Closing
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47944 Accepted
+[Mon Oct 5 21:51:16 2026] 127.0.0.1:47944 [POST] URI: /setup/test
+[Mon Oct  5 21:51:16 2026] 127.0.0.1:47944 Closing
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:47960 Accepted
+[Mon Oct 5 21:51:17 2026] 127.0.0.1:47960 [GET] URI: /identity/callback
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:47960 Closing
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:47964 Accepted
+[Mon Oct 5 21:51:17 2026] 127.0.0.1:47964 [GET] URI: /setup
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:47964 Closing
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:47980 Accepted
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:47980 [200]: GET /build/assets/app-e60AENEA.css
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:47990 Accepted
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:47980 Closing
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:47990 [200]: GET /build/assets/app-fOk3S7Mg.js
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:47990 Closing
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48004 Accepted
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48004 [200]: GET /build/assets/Setup-xotpjjgH.js
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48004 Closing
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48016 Accepted
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48016 [200]: GET /build/assets/IdentityLayout-BJr7JN_d.js
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48016 Closing
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48030 Accepted
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48030 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48030 Closing
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48042 Accepted
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48042 [200]: GET /build/assets/ChangeNotice-DL5ZkRbH.js
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48042 Closing
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48046 Accepted
+[Mon Oct 5 21:51:17 2026] 127.0.0.1:48046 [POST] URI: /setup/test
+[Mon Oct  5 21:51:17 2026] 127.0.0.1:48046 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48052 Accepted
+[Mon Oct 5 21:51:18 2026] 127.0.0.1:48052 [GET] URI: /identity/callback
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48052 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48054 Accepted
+[Mon Oct 5 21:51:18 2026] 127.0.0.1:48054 [GET] URI: /setup
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48054 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48062 Accepted
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48062 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48062 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48064 Accepted
+[Mon Oct 5 21:51:18 2026] 127.0.0.1:48064 [POST] URI: /setup/activate
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48064 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48074 Accepted
+[Mon Oct 5 21:51:18 2026] 127.0.0.1:48074 [GET] URI: /setup
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48074 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48076 Accepted
+[Mon Oct 5 21:51:18 2026] 127.0.0.1:48076 [GET] URI: /setup
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48076 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48080 Accepted
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48080 [200]: GET /build/assets/app-e60AENEA.css
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48080 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48084 Accepted
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48084 [200]: GET /build/assets/app-fOk3S7Mg.js
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48084 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48094 Accepted
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48094 [200]: GET /build/assets/Setup-xotpjjgH.js
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48094 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48098 Accepted
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48098 [200]: GET /build/assets/IdentityLayout-BJr7JN_d.js
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48098 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48104 Accepted
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48110 Accepted
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48104 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48110 [200]: GET /build/assets/ChangeNotice-DL5ZkRbH.js
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48104 Closing
+[Mon Oct  5 21:51:18 2026] 127.0.0.1:48110 Closing
+[Mon Oct  5 21:51:19 2026] 127.0.0.1:48120 Accepted
+[Mon Oct 5 21:51:19 2026] 127.0.0.1:48120 [PUT] URI: /setup
+[Mon Oct  5 21:51:19 2026] 127.0.0.1:48120 Closing
+[Mon Oct  5 21:51:19 2026] 127.0.0.1:48132 Accepted
+[Mon Oct 5 21:51:19 2026] 127.0.0.1:48132 [GET] URI: /setup
+[Mon Oct  5 21:51:19 2026] 127.0.0.1:48132 Closing
+[Mon Oct  5 21:51:33 2026] 127.0.0.1:59040 Accepted
+[Mon Oct 5 21:51:33 2026] 127.0.0.1:59040 [GET] URI: /setup/notification-status
+[Mon Oct  5 21:51:33 2026] 127.0.0.1:59040 Closing
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59044 Accepted
+[Mon Oct 5 21:51:34 2026] 127.0.0.1:59044 [GET] URI: /setup
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59044 Closing
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59060 Accepted
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59060 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59060 Closing
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59062 Accepted
+[Mon Oct 5 21:51:34 2026] 127.0.0.1:59062 [GET] URI: /account
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59062 Closing
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59070 Accepted
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59070 [200]: GET /build/assets/Account-T_VKLaSI.js
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59070 Closing
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59080 Accepted
+[Mon Oct 5 21:51:34 2026] 127.0.0.1:59080 [POST] URI: /tenants
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59080 Closing
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59092 Accepted
+[Mon Oct 5 21:51:34 2026] 127.0.0.1:59092 [GET] URI: /account
+[Mon Oct  5 21:51:34 2026] 127.0.0.1:59092 Closing
+[Mon Oct  5 21:51:35 2026] 127.0.0.1:59106 Accepted
+[Mon Oct 5 21:51:35 2026] 127.0.0.1:59106 [POST] URI: /tenants
+[Mon Oct  5 21:51:35 2026] 127.0.0.1:59106 Closing
+[Mon Oct  5 21:51:35 2026] 127.0.0.1:59114 Accepted
+[Mon Oct 5 21:51:35 2026] 127.0.0.1:59114 [GET] URI: /account
+[Mon Oct  5 21:51:35 2026] 127.0.0.1:59114 Closing
+[Mon Oct  5 21:51:35 2026] 127.0.0.1:59120 Accepted
+[Mon Oct 5 21:51:35 2026] 127.0.0.1:59120 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:35 2026] 127.0.0.1:59120 Closing
+[Mon Oct  5 21:51:35 2026] 127.0.0.1:59134 Accepted
+[Mon Oct  5 21:51:35 2026] 127.0.0.1:59134 [200]: GET /build/assets/Tenant-oZOmY_L8.js
+[Mon Oct  5 21:51:35 2026] 127.0.0.1:59134 Closing
+[Mon Oct  5 21:51:36 2026] 127.0.0.1:59146 Accepted
+[Mon Oct 5 21:51:36 2026] 127.0.0.1:59146 [POST] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4/memberships
+[Mon Oct  5 21:51:36 2026] 127.0.0.1:59146 Closing
+[Mon Oct  5 21:51:36 2026] 127.0.0.1:59420 Accepted
+[Mon Oct 5 21:51:36 2026] 127.0.0.1:59420 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:36 2026] 127.0.0.1:59420 Closing
+[Mon Oct  5 21:51:36 2026] 127.0.0.1:59424 Accepted
+[Mon Oct 5 21:51:36 2026] 127.0.0.1:59424 [POST] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4/quota
+[Mon Oct  5 21:51:36 2026] 127.0.0.1:59424 Closing
+[Mon Oct  5 21:51:36 2026] 127.0.0.1:59428 Accepted
+[Mon Oct 5 21:51:36 2026] 127.0.0.1:59428 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:37 2026] 127.0.0.1:59428 Closing
+[Mon Oct  5 21:51:37 2026] 127.0.0.1:59442 Accepted
+[Mon Oct 5 21:51:37 2026] 127.0.0.1:59442 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:37 2026] 127.0.0.1:59442 Closing
+[Mon Oct  5 21:51:37 2026] 127.0.0.1:59456 Accepted
+[Mon Oct  5 21:51:37 2026] 127.0.0.1:59456 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:37 2026] 127.0.0.1:59456 Closing
+[Mon Oct  5 21:51:37 2026] 127.0.0.1:59466 Accepted
+[Mon Oct 5 21:51:37 2026] 127.0.0.1:59466 [GET] URI: /account
+[Mon Oct  5 21:51:37 2026] 127.0.0.1:59466 Closing
+[Mon Oct  5 21:51:37 2026] 127.0.0.1:59470 Accepted
+[Mon Oct 5 21:51:37 2026] 127.0.0.1:59470 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:38 2026] 127.0.0.1:59470 Closing
+[Mon Oct  5 21:51:38 2026] 127.0.0.1:59480 Accepted
+[Mon Oct 5 21:51:38 2026] 127.0.0.1:59480 [GET] URI: /tenants/97d8c158-232e-46e7-b4e2-e46d98d75f8f
+[Mon Oct  5 21:51:38 2026] 127.0.0.1:59480 Closing
+[Mon Oct  5 21:51:38 2026] 127.0.0.1:59490 Accepted
+[Mon Oct 5 21:51:38 2026] 127.0.0.1:59490 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:38 2026] 127.0.0.1:59490 Closing
+[Mon Oct  5 21:51:38 2026] 127.0.0.1:59494 Accepted
+[Mon Oct  5 21:51:38 2026] 127.0.0.1:59494 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:38 2026] 127.0.0.1:59494 Closing
+[Mon Oct  5 21:51:38 2026] 127.0.0.1:59508 Accepted
+[Mon Oct 5 21:51:38 2026] 127.0.0.1:59508 [GET] URI: /tenants/97d8c158-232e-46e7-b4e2-e46d98d75f8f
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59508 Closing
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59520 Accepted
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59520 [200]: GET /build/assets/app-e60AENEA.css
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59520 Closing
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59526 Accepted
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59526 [200]: GET /build/assets/app-fOk3S7Mg.js
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59526 Closing
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59530 Accepted
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59530 [200]: GET /build/assets/Tenant-oZOmY_L8.js
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59538 Accepted
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59538 [200]: GET /build/assets/IdentityLayout-BJr7JN_d.js
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59530 Closing
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59538 Closing
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59542 Accepted
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59542 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59542 Closing
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59552 Accepted
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59552 [200]: GET /build/assets/ChangeNotice-DL5ZkRbH.js
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59552 Closing
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59558 Accepted
+[Mon Oct 5 21:51:39 2026] 127.0.0.1:59558 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59558 Closing
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59560 Accepted
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59560 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59560 Closing
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59568 Accepted
+[Mon Oct 5 21:51:39 2026] 127.0.0.1:59568 [POST] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4/quota
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59568 Closing
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59570 Accepted
+[Mon Oct 5 21:51:39 2026] 127.0.0.1:59570 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:39 2026] 127.0.0.1:59570 Closing
+[Mon Oct  5 21:51:53 2026] 127.0.0.1:37810 Accepted
+[Mon Oct 5 21:51:53 2026] 127.0.0.1:37810 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4/notification-status
+[Mon Oct  5 21:51:53 2026] 127.0.0.1:37810 Closing
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37816 Accepted
+[Mon Oct 5 21:51:54 2026] 127.0.0.1:37816 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37816 Closing
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37824 Accepted
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37824 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37824 Closing
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37834 Accepted
+[Mon Oct 5 21:51:54 2026] 127.0.0.1:37834 [GET] URI: /tenants/97d8c158-232e-46e7-b4e2-e46d98d75f8f
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37834 Closing
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37848 Accepted
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37848 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37848 Closing
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37864 Accepted
+[Mon Oct 5 21:51:54 2026] 127.0.0.1:37864 [GET] URI: /login
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37864 Closing
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37876 Accepted
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37876 [200]: GET /build/assets/app-e60AENEA.css
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37892 Accepted
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37892 [200]: GET /build/assets/app-fOk3S7Mg.js
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37876 Closing
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37892 Closing
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37904 Accepted
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37904 [200]: GET /build/assets/Login-BJc8snnL.js
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37908 Accepted
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37908 [200]: GET /build/assets/IdentityLayout-BJr7JN_d.js
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37904 Closing
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37908 Closing
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37918 Accepted
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37918 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:54 2026] 127.0.0.1:37918 Closing
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37930 Accepted
+[Mon Oct 5 21:51:55 2026] 127.0.0.1:37930 [POST] URI: /identity/sign-in
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37930 Closing
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37934 Accepted
+[Mon Oct 5 21:51:55 2026] 127.0.0.1:37934 [GET] URI: /identity/callback
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37934 Closing
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37940 Accepted
+[Mon Oct 5 21:51:55 2026] 127.0.0.1:37940 [GET] URI: /account
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37940 Closing
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37952 Accepted
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37952 [200]: GET /build/assets/Account-T_VKLaSI.js
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37952 Closing
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37964 Accepted
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37964 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37964 Closing
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37974 Accepted
+[Mon Oct 5 21:51:55 2026] 127.0.0.1:37974 [GET] URI: /tenants/97d8c158-232e-46e7-b4e2-e46d98d75f8f
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37974 Closing
+[Mon Oct  5 21:51:55 2026] 127.0.0.1:37988 Accepted
+[Mon Oct 5 21:51:55 2026] 127.0.0.1:37988 [GET] URI: /account
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:37988 Closing
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:38004 Accepted
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:38004 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:38004 Closing
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:38008 Accepted
+[Mon Oct 5 21:51:56 2026] 127.0.0.1:38008 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:38008 Closing
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43796 Accepted
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43796 [200]: GET /build/assets/Tenant-oZOmY_L8.js
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43796 Closing
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43812 Accepted
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43812 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43812 Closing
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43822 Accepted
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43822 [200]: GET /build/assets/ChangeNotice-DL5ZkRbH.js
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43822 Closing
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43834 Accepted
+[Mon Oct 5 21:51:56 2026] 127.0.0.1:43834 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4/notification-status
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43834 Closing
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43840 Accepted
+[Mon Oct 5 21:51:56 2026] 127.0.0.1:43840 [POST] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4/memberships
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43840 Closing
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43850 Accepted
+[Mon Oct 5 21:51:56 2026] 127.0.0.1:43850 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43850 Closing
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43866 Accepted
+[Mon Oct 5 21:51:56 2026] 127.0.0.1:43866 [GET] URI: /setup/notification-status
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43866 Closing
+[Mon Oct  5 21:51:56 2026] 127.0.0.1:43874 Accepted
+[Mon Oct 5 21:51:56 2026] 127.0.0.1:43874 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4/notification-status
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43874 Closing
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43876 Accepted
+[Mon Oct 5 21:51:57 2026] 127.0.0.1:43876 [GET] URI: /tenants/926a9101-f1c3-4b5e-8ee5-6f0ae45b98b4
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43876 Closing
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43890 Accepted
+[Mon Oct 5 21:51:57 2026] 127.0.0.1:43890 [GET] URI: /account
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43890 Closing
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43906 Accepted
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43906 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43906 Closing
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43918 Accepted
+[Mon Oct 5 21:51:57 2026] 127.0.0.1:43918 [POST] URI: /logout
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43918 Closing
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43926 Accepted
+[Mon Oct 5 21:51:57 2026] 127.0.0.1:43926 [GET] URI: /login
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43926 Closing
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43942 Accepted
+[Mon Oct 5 21:51:57 2026] 127.0.0.1:43942 [GET] URI: /login
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43942 Closing
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43958 Accepted
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43960 Accepted
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43958 [200]: GET /build/assets/Login-BJc8snnL.js
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43960 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43958 Closing
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43960 Closing
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43964 Accepted
+[Mon Oct 5 21:51:57 2026] 127.0.0.1:43964 [POST] URI: /login
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43964 Closing
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43966 Accepted
+[Mon Oct 5 21:51:57 2026] 127.0.0.1:43966 [GET] URI: /login
+[Mon Oct  5 21:51:57 2026] 127.0.0.1:43966 Closing
+[Mon Oct  5 21:51:58 2026] 127.0.0.1:43974 Accepted
+[Mon Oct 5 21:51:58 2026] 127.0.0.1:43974 [POST] URI: /identity/sign-in
+[Mon Oct  5 21:51:58 2026] 127.0.0.1:43974 Closing
+[Mon Oct  5 21:51:58 2026] 127.0.0.1:43984 Accepted
+[Mon Oct 5 21:51:58 2026] 127.0.0.1:43984 [GET] URI: /identity/callback
+[Mon Oct  5 21:51:58 2026] 127.0.0.1:43984 Closing
+[Mon Oct  5 21:51:58 2026] 127.0.0.1:43990 Accepted
+[Mon Oct 5 21:51:58 2026] 127.0.0.1:43990 [GET] URI: /setup
+[Mon Oct  5 21:51:58 2026] 127.0.0.1:43990 Closing
+[Mon Oct  5 21:51:58 2026] 127.0.0.1:43992 Accepted
+[Mon Oct  5 21:51:58 2026] 127.0.0.1:43992 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[Mon Oct  5 21:51:58 2026] 127.0.0.1:43992 Closing

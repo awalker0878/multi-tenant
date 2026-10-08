@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "run_id": 37247300526,
+  "source_revision": "c9c202786437601c0f000bdf29d7e1e401e773ee",
+  "component": "catalogue",
+  "artifact": {
+    "id": 11319028914,
+    "name": "p01-image-catalogue-c9c202786437601c0f000bdf29d7e1e401e773ee",
+    "size_in_bytes": 27192,
+    "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11319028914",
+    "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11319028914/zip",
+    "expired": false,
+    "created_at": "2026-10-05T00:23:45Z",
+    "expires_at": "2026-10-19T00:23:45Z",
+    "updated_at": "2026-10-05T00:23:45Z",
+    "digest": "sha256:f23c02e7c34f6bc33ae1187f9d8cce9fbb8e0261a71750d2556d34b15074ab4d",
+    "workflow_run": {
+      "id": 37247300526,
+      "repository_id": 1374801496,
+      "head_repository_id": 1374801496,
+      "head_branch": "greenfield/enterprise-microservices-plan",
+      "head_sha": "c9c202786437601c0f000bdf29d7e1e401e773ee"
+    }
+  },
+  "archive_sha256": "f23c02e7c34f6bc33ae1187f9d8cce9fbb8e0261a71750d2556d34b15074ab4d",
+  "archive_bytes": 27192,
+  "archive_checksum_verified": true,
+  "archive_size_verified": true,
+  "report_sha256": "1fdb339e106eabfd505939539c9d14318d952f09133310e56954f06e562054f6",
+  "result": "PASSED",
+  "failure": null,
+  "source_checks": {
+    ".github/workflows/p01-images.yml": {
+      "sha256": "0776d380e416d599d5fc49ac93c032eec7bd8d5afea91aec91f3a092d6d6b29a",
+      "git_blob_sha": "ea20ce6a580d896b3a82802f9dd919af1f353a1e"
+    },
+    "deploy/build/components.json": {
+      "sha256": "7b50205d5f714836368ab7e67f696678218d156b6608370a86956d525ca54901",
+      "git_blob_sha": "3ac150c4964c68b2a3d332f57e8172f57f2cf189"
+    },
+    "deploy/build/inputs.lock.json": {
+      "sha256": "2423a82d62c4f556f93ce675fad865e8b96c987bc1edd2955895b99bd813dc4c",
+      "git_blob_sha": "71e76d8bb189414572a6f18a96ce51a84d1b88bc"
+    },
+    "scripts/p01/candidates.json": {
+      "sha256": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+      "git_blob_sha": "afa963d567cef41c678d47732bc692470855b48c"
+    },
+    "scripts/p01/check_jobs.py": {
+      "sha256": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+      "git_blob_sha": "67494c7fbee17097e2ee656b8fc4baff6034323c"
+    },
+    "scripts/p01/php_image_probe.php": {
+      "sha256": "f4ac97d5b8638258e6d595869d7324cc624d3c5958199e9f969d6f77badbaf74",
+      "git_blob_sha": "968e38f291368ef278d5de2a92e30653b1258ed0"
+    },
+    "scripts/p01/python_lock.py": {
+      "sha256": "05b4074482edb8899c95da980b4886975a9ce36adb19c2894bd4e42b40d76769",
+      "git_blob_sha": "3c4c5cf63af395b12015764e3cac8cbfb2549f4e"
+    },
+    "scripts/p01/run_images.py": {
+      "sha256": "7898d827e081ee477ff99ad154bd289d571350a4483aa5b74d64e8bdbde72c8b",
+      "git_blob_sha": "86b8e47487cbdb7ff1cac83d1a7d6885e843f597"
+    },
+    "scripts/p01/select_components.py": {
+      "sha256": "37575f2fb29659ae7d72d477c9b09f1d981571386ef20ccd0ce4d039b5cd79d7",
+      "git_blob_sha": "ad1a608ea86fd1c5dd66b16e1d4c75af8cb3ade8"
+    },
+    "services/catalogue/.dockerignore": {
+      "sha256": "6e52bb0ef70b55a5bb4a4eaf553c36d3a8dc0d14fcff285823b864f56b4209b9",
+      "git_blob_sha": "1cb30eb5a24083cc010f6fb52be799e83710481a"
+    },
+    "services/catalogue/Dockerfile": {
+      "sha256": "b0ceaf04874fed073928d4471fe9247cbdf33906ad11a860657d9379f06b035d",
+      "git_blob_sha": "535ba8b134184a93fe9d1d68ea9f19f9a92ad897"
+    },
+    "services/catalogue/app/Application/Foundation/Actions/InspectDependencies.php": {
+      "sha256": "019459639caec1e3d3fb397026215fe77777a3dd77c18efc41c5a1ca406ff74b",
+      "git_blob_sha": "243774854b14e2984156d6c6781ff04c2bc487a2"
+    },
+    "services/catalogue/app/Application/Foundation/Contracts/DependencyProbe.php": {
+      "sha256": "b79f3e6ed6c6e08677d3c0b61f90fb382c98e96d26e807b3d119fd81a0990c66",
+      "git_blob_sha": "103ccc23f01816c0e547e9f8b93334be26a96385"
+    },
+    "services/catalogue/app/Application/Foundation/Contracts/HealthCredential.php": {
+      "sha256": "7fdeb5b78e2eb9f676ab955a1f1451fd27eb2f861b2670657e3438a6babb8a93",
+      "git_blob_sha": "1d7a41314ac8946efa9e4991647b23f7ce7fbc71"
+    },
+    "services/catalogue/app/Application/Foundation/Data/DependencyStatus.php": {
+      "sha256": "5b19fe2dee35b14359e8a4d4438185a4c77d51f25a82dc6aeb80f5a14ce465f3",
+      "git_blob_sha": "af97aa59377e930e15111e7717afded554a2297d"
+    },
+    "services/catalogue/app/Http/Controllers/DependencyHealthController.php": {
+      "sha256": "0c868730f63e5c736bd6fe21cea00ca544fc754fd0645684ef9999c8cc5315ea",
+      "git_blob_sha": "31722bed25d1225aa5e0a559d4480353fe1e1b3c"
+    },
+    "services/catalogue/app/Http/Controllers/HealthController.php": {
+      "sha256": "4432dbeeed66158e8619def7510ba3446facca3662b8f56b1460b38f50f97127",
+      "git_blob_sha": "10d666793849ecdae659f93b24454d3129ccf025"
+    },
+    "services/catalogue/app/Infrastructure/Foundation/MountedHealthCredential.php": {
+      "sha256": "3c0a622df2f954de62f6f2864a56157394bc1d4a63788a992fabc4df7b765d86",
+      "git_blob_sha": "3c5913c372e8adffd6294741924fe9c813cb4a3a"
+    },
+    "services/catalogue/app/Infrastructure/Foundation/MountedSecret.php": {
+      "sha256": "2e395919fe9c8d42c78e4b28bdb04a5a38d69c7a0d4fa6e6715beabb42b61162",
+      "git_blob_sha": "57be0996f9e98fda74f27fadb15ea7b8b7bd000f"
+    },
+    "services/catalogue/app/Infrastructure/Foundation/PostgresDependencyProbe.php": {
+      "sha256": "e8b8cf3577392336d86cc253d9843b9403c4f1e6493f8b22466ab57ed19b21d7",
+      "git_blob_sha": "97caf8c5083b5bb59c61b368314c56221714de08"
+    },
+    "services/catalogue/app/Providers/AppServiceProvider.php": {
+      "sha256": "3237015f10000feb4451aef22bb92ff008f056d1571e41c09437dc30b6321ac9",
+      "git_blob_sha": "c87ee04e0e99154454e30e447f9081edd7fb5b4a"
+    },
+    "services/catalogue/artisan": {
+      "sha256": "83c95e93ffda62b12bdfd605f5626762ee239fd61cf46ff56fd244dc828f609a",
+      "git_blob_sha": "015ca1dea3513877be66918b6f2417dd43427f91"
+    },
+    "services/catalogue/bootstrap/app.php": {
+      "sha256": "3cd38ee3305ab579386857096686e0dd5ce653f19916735f4cd6951090043d8b",
+      "git_blob_sha": "55d0763c7ddd835191c050683d354e5f25d3dade"
+    },
+    "services/catalogue/bootstrap/providers.php": {
+      "sha256": "a3848357a2e0cc535c8b200081cfe9d437821db79c01a58227e782e378e9f656",
+      "git_blob_sha": "888aae0aeb8ff40a499090d43cc69cb855546ea2"
+    },
+    "services/catalogue/build/snapshot.sh": {
+      "sha256": "f2bada6d41cc464634d2893db0b0121e130a6728d49d3660d551307e2178bebf",
+      "git_blob_sha": "eddd2c53b948442bbe19acd4922e1df971426e50"
+    },
+    "services/catalogue/composer.json": {
+      "sha256": "8c90f58db508b3102fc58bc4e8efa07d828a5df0b8b40baa00acbaf2de620957",
+      "git_blob_sha": "5963059b3eb3f3bb8f49a2bd981d3d8473d6b7a9"
+    },
+    "services/catalogue/composer.lock": {
+      "sha256": "398e228c419850ce2061c606ca5f48211a57c3785d9d97e5763f8461c2be992a",
+      "git_blob_sha": "df4ba1b42f8f781eb3a6614b986e72f129e002ba"
+    },
+    "services/catalogue/config/app.php": {
+      "sha256": "bd3bf9e4bf9a74088e8c41321c4908c8ed0f9d68e6ab18f40258f45a96aa4a72",
+      "git_blob_sha": "0767f76af643f82c5a0731f7608a9989d0a85e33"
+    },
+    "services/catalogue/config/cache.php": {
+      "sha256": "1c3c04e2490a66807909f437d772f5610200c8b3afb3c4db6a0a0bf2993b70cb",
+      "git_blob_sha": "cd84d37ca855bc1424966b63862f16da3f7bd273"
+    },
+    "services/catalogue/config/database.php": {
+      "sha256": "d5da2e6c1d133cb44557969b54a9149bfc67aa5e68619730aeecf3ffb9da4df1",
+      "git_blob_sha": "3416356fa71c38ae62e092d5a20670389af138d1"
+    },
+    "services/catalogue/config/foundation.php": {
+      "sha256": "0fc9a39a95f0a5cf307fc3cdcf7af0a728cb313ef9b82ab6ef5600de9b6efb6d",
+      "git_blob_sha": "1a8d2747d31f0fd09df32456fd69870e9675afc8"
+    },
+    "services/catalogue/config/logging.php": {
+      "sha256": "29eabe013cf03a79de0f56893816a7ec97b561536009f634607b957e0fd099f4",
+      "git_blob_sha": "c4c3b93dad438656563ebfba924de4ea37050740"
+    },
+    "services/catalogue/public/index.php": {
+      "sha256": "59caa93d7583ba8fbb335d7bf0c31f3c382a7cda6c6c6915fd844af840c09c13",
+      "git_blob_sha": "1c3f915a2c355b63f4cb4386ba5b375841b01b4f"
+    },
+    "services/catalogue/routes/api.php": {
+      "sha256": "522eea762a2c04f8719f3fcc70520bdaa9720bd3ac89b022a06907116bf5b4fa",
+      "git_blob_sha": "e5353ec76befd4565f5fadbf74a682592c1535e9"
+    }
+  },
+  "source_bindings_verified_against_commit": 34,
+  "command_log_hashes_verified": 18,
+  "artifact_hashes_verified": 0,
+  "retained_file_sha256": {
+    "01-source-revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-source-revision.stdout.log": "9b66f98ceee698e43fd681494759b440f5de52ad7546f4d1576a81634ea21785",
+    "02-source-clean.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "02-source-clean.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-docker-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-docker-version.stdout.log": "58d5180149fd3334dbb3ff73de521946336e4052a1b769cb475f72486c934b1b",
+    "04-buildx-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-buildx-version.stdout.log": "d6a1fdd95fd9b2615b359b42e82829b1cad6bb22202cff355e55be8242e8c395",
+    "05-build.stderr.log": "2a3b7d17c0b628ef288aa537d684569902946edbd8b3cb8b0acb31e494a728a1",
+    "05-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-image-inspect.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-image-inspect.stdout.log": "9bfa9120c5067e8dd06783fce4bd97ad8bc25125ecda038f5c74f2ffc2bd8dcd",
+    "07-fpm-configuration.stderr.log": "8f63940b25cd0d62fa2b6d9accd04927f0dd359a7f77f99be2cc8f34903cae23",
+    "07-fpm-configuration.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-kernel-and-runtime-isolation.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-kernel-and-runtime-isolation.stdout.log": "37d2b3eaa8249440b55e051e542c8f70b759457c44aaa84de2355b6a246abd7c",
+    "09-operating-system-packages.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "09-operating-system-packages.stdout.log": "7d83189b255a416d862950256643609d593a87950b425fbe0538a68fbb51e684",
+    "report.json": "1fdb339e106eabfd505939539c9d14318d952f09133310e56954f06e562054f6"
+  },
+  "image": {
+    "id": "sha256:69ac940d40bd36a8e9b965423d75cafd75568cd57028faf737c1259d2e921a90",
+    "tag": "p01-catalogue:c9c202786437601c0f000bdf29d7e1e401e773ee",
+    "size": 552206461,
+    "platform": "linux/amd64",
+    "identity_kind": "local_image_configuration_digest"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "dependencies": {
+    "catalogue": [], "planning": ["catalogue"], "inventory": [], "lifecycle": [],
+    "governance": [], "assurance": [], "console": ["governance"],
+    "inventory-workers": ["inventory"], "lifecycle-workers": ["lifecycle"]
+  },
+  "contracts": {
+    "contracts/schemas/events/catalogue-foundation-recorded-v1.json": ["catalogue", "planning"],
+    "contracts/asyncapi/catalogue.yaml": ["catalogue", "planning"],
+    "contracts/openapi/foundation-health-v1.json": ["console", "governance", "catalogue", "inventory", "planning", "lifecycle", "assurance"],
+    "contracts/openapi/governance-local-identity-v1.json": ["governance", "console"],
+    "contracts/schemas/events/governance-change-v1.json": ["governance", "console"],
+    "contracts/asyncapi/governance.yaml": ["governance", "console"]
+  },
+  "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied."
+}

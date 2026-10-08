@@ -1,0 +1,15 @@
+{
+  "synthetic_only": true,
+  "responses": {
+    "/": {"versions": [{"id": "v2.1", "min_version": "2.1", "version": "2.104", "status": "CURRENT"}, {"id": "v3.0", "min_version": "3.0", "version": "3.71", "status": "CURRENT"}]},
+    "/v2.1/flavors/detail": {"flavors": [{"id": "small", "name": "Small fixture", "vcpus": 2, "ram": 4096, "disk": 20}]},
+    "/v2.1/os-availability-zone": {"availabilityZoneInfo": [{"zoneName": "zone-a", "zoneState": {"available": true}}]},
+    "/v2.0/extensions": {"extensions": [{"alias": "port-security", "name": "Port security"}, {"alias": "provider", "name": "Provider networks"}]},
+    "/v2.0/subnets": {"subnets": [{"id": "subnet-a", "name": "Application subnet", "project_id": "project-a", "network_id": "net-1", "cidr": "192.0.2.0/24", "ip_version": 4, "enable_dhcp": true}]},
+    "/v2.0/ports": {"ports": [{"id": "port-a", "project_id": "project-a", "network_id": "net-1", "security_groups": ["sg-a"], "port_security_enabled": true}]},
+    "/v2.0/routers": {"routers": [{"id": "router-a", "project_id": "project-a", "admin_state_up": true}]},
+    "/v2.0/security-groups": {"security_groups": [{"id": "sg-a", "project_id": "project-a", "stateful": true, "security_group_rules": [{"direction": "ingress", "protocol": "tcp", "port_range_min": 443, "port_range_max": 443}]}]},
+    "/v2.0/trunks": {"trunks": []},
+    "/v3/project-a/types": {"volume_types": [{"id": "type-a", "name": "Encrypted fixture type", "is_public": true, "extra_specs": {"volume_backend_name": "fixture-rbd", "private_auth": "must-never-copy"}}]}
+  }
+}

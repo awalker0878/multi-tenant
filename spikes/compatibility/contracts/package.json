@@ -1,0 +1,9 @@
+{
+  "name": "p00-contract-tooling",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@11.9.0",
+  "engines": { "node": "24.x", "npm": "11.x" },
+  "devDependencies": { "typescript": "6.0.3", "@types/node": "24.19.1" }
+}

@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "source_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+  "retrieved_at": "2026-10-05T14:36:54.107Z",
+  "observer": "Codex via GitHub connector",
+  "scope": "Affected development regression workflows; not receiving gate acceptance or promotion authorization",
+  "runs": [
+    {
+      "run_id": 37324649359,
+      "run_attempt": 1,
+      "name": "P01 transactional messaging",
+      "head_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324649359"
+    },
+    {
+      "run_id": 37324649355,
+      "run_attempt": 1,
+      "name": "P01 isolated Compose integration",
+      "head_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324649355"
+    },
+    {
+      "run_id": 37324649608,
+      "run_attempt": 1,
+      "name": "P01 isolated stateful dependencies",
+      "head_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324649608"
+    },
+    {
+      "run_id": 37324649390,
+      "run_attempt": 1,
+      "name": "P01 isolated Kubernetes integration",
+      "head_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324649390"
+    },
+    {
+      "run_id": 37324649515,
+      "run_attempt": 1,
+      "name": "Context policy",
+      "head_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324649515"
+    },
+    {
+      "run_id": 37324649376,
+      "run_attempt": 1,
+      "name": "P01 policy controls",
+      "head_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324649376"
+    },
+    {
+      "run_id": 37324649609,
+      "run_attempt": 1,
+      "name": "P01 Permit Desk application recovery",
+      "head_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324649609"
+    },
+    {
+      "run_id": 37324649394,
+      "run_attempt": 1,
+      "name": "P01 foundation contracts",
+      "head_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324649394"
+    },
+    {
+      "run_id": 37324649662,
+      "run_attempt": 1,
+      "name": "P01 foundation packages",
+      "head_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324649662"
+    },
+    {
+      "run_id": 37324649500,
+      "run_attempt": 1,
+      "name": "P01 bootstrap images",
+      "head_sha": "ebec6eeb9589ba2b184ba64ac57c69f43bee44c6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37324649500"
+    }
+  ],
+  "jobs": [
+    {
+      "job_id": 111812159337,
+      "run_id": 37324649662,
+      "name": "Select affected independent packages",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812254224,
+      "run_id": 37324649662,
+      "name": "Laravel console",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812254303,
+      "run_id": 37324649662,
+      "name": "Laravel governance",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812254309,
+      "run_id": 37324649662,
+      "name": "Python lifecycle",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812254383,
+      "run_id": 37324649662,
+      "name": "Python inventory",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812254465,
+      "run_id": 37324649662,
+      "name": "Python inventory-workers",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812254509,
+      "run_id": 37324649662,
+      "name": "Laravel catalogue",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812254529,
+      "run_id": 37324649662,
+      "name": "Python lifecycle-workers",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812254623,
+      "run_id": 37324649662,
+      "name": "Python planning",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812254816,
+      "run_id": 37324649662,
+      "name": "Laravel assurance",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812831421,
+      "run_id": 37324649662,
+      "name": "Foundation checks",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812154551,
+      "run_id": 37324649500,
+      "name": "Select affected independent images",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812252649,
+      "run_id": 37324649500,
+      "name": "inventory isolated image",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812252702,
+      "run_id": 37324649500,
+      "name": "planning isolated image",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812252729,
+      "run_id": 37324649500,
+      "name": "assurance isolated image",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812252745,
+      "run_id": 37324649500,
+      "name": "governance isolated image",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812252766,
+      "run_id": 37324649500,
+      "name": "lifecycle-workers isolated image",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812252768,
+      "run_id": 37324649500,
+      "name": "console isolated image",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812252784,
+      "run_id": 37324649500,
+      "name": "lifecycle isolated image",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812252853,
+      "run_id": 37324649500,
+      "name": "catalogue isolated image",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812253364,
+      "run_id": 37324649500,
+      "name": "inventory-workers isolated image",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "job_id": 111812813670,
+      "run_id": 37324649500,
+      "name": "Foundation images",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+# P08 — Native migration implementation
+
+P08.01–P08.05 implement R17/R21–R24/R31/R33 through Inventory discovery,
+Lifecycle's durable native coordinator and isolated Lifecycle workers. The accepted
+[native migration design](p08-native-migration.md) remains authoritative.
+
+## Source readiness and capture
+
+The read-only `VmwareWorkloadDiscovery` consumes an enrolled VM allowlist and a
+commissioned VI JSON endpoint. It observes immutable identity, versions, compute,
+firmware, Tools, all disks/backing chains/controllers, NIC/network fingerprints,
+snapshot tree and clone capabilities. A second configuration read detects drift.
+Application datasets, dependencies, consistency and objectives remain explicit
+owner inputs. Missing native facts produce holds; metadata does not establish
+qualification. The actual commissioned source tuple remains required.
+
+Inventory now persists immutable source/target profiles only after a complete
+leased generation. Each of the eight source reads and seven target reads requires
+current worker, lease, enrollment and Governance authority plus its collection
+budget. A source VM must have appeared in that generation's scoped server listing;
+the explicit VI JSON release and enrolled host/trust remain fixed. Revocation,
+expired leases, replayed read permits and incomplete profile reads deny publication.
+
+The Console migration review displays original API facts separately from owner-only
+application references and reasoned interpretations. It requires an explicit method,
+every disk's dataset coverage, consistency/mount/check references and owner objectives.
+Inventory stores append-only revisions and confirmations with exact digests,
+idempotency and optimistic concurrency. A changed generation, expired profile,
+revoked enrollment or changed authority invalidates current confirmation.
+
+Planning's authenticated migration-preparation route re-reads that exact confirmed
+Inventory revision and derives native identity/profile bindings, capacities and
+all datasets. Callers supply only target disk keys and supported formats. Lifecycle
+admission compares the full current owner receipt with the immutable plan, including
+review digest, owner-input digest, method, objectives, capacities and every disk/
+dataset mapping. Preparation is not a persisted or approved complete MigrationPlan;
+composition with commissioned stage intents, independent qualification and approval
+remains required. Inventory v1.2 and Planning migration v1 carry that preparation;
+previously published canonical contracts retain their original bytes.
+
+The subsequent [runtime/commissioning increment](p08-runtime-commissioning.md)
+adds Planning migration v1.1 recipe options and immutable complete proposals,
+bulk Console plan creation with unchanged-command retry, the native worker process
+and protected stage/observer registry, and six-account read-only commissioning.
+Distinct source VMs can share an application while duplicate-source and shared-custody
+admission remains held. The [native control increment](p08-native-control.md) now
+supplies the separate Lifecycle process/dispatcher, live Planning/Governance/Inventory
+clients and immutable execution-plan resolver. Provider custody/fencing and selected
+owner protocols still require commissioning; simulation approvals grant no native authority.
+
+The [runtime qualification](../../verification/p08/runtime/README.md), registered
+as EV-P08-007, retains 893 component tests without skips, all three browser journeys
+and all 23 Console quality commands at `7860616`. Console records 195 tests and
+922 assertions, with seven separate broker-campaign skips. The protected worker,
+proposal creation and VM custody checks use real PostgreSQL/TLS and synthetic native
+owners. Planning migration v1.2 adds explicit commissioning-hold responses while
+preserving published v1.1 bytes. Neither this evidence nor a proposal supplies the
+missing native approval, selected application protocols or actual Q07/G08 outcomes.
+
+`VmwareCapture` submits one disk-only S0 snapshot and one exact-S0 clone through
+native task APIs. It requires a stopped source, matching configuration, snapshot
+support and host clone capability. All NICs and removable media are removed in
+`CloneSpec` before creation, and the powered-off distinct clone's disk/controller
+mapping is read back. No source NIC is changed and this adapter never powers on
+production. RDM, independent/shared/encrypted disk and special-device profiles
+are held for separately qualified handling. Task receipts survive uncertainty;
+a task ID is observed rather than resubmitted after a lost outcome.
+
+## Retained archive, conversion and native image import
+
+`MigrationArchive` resolves the isolated clone from the same tenant/job/approved
+capture intent in the worker's append-only journal. It transfers every disk into
+private retained custody with byte/rate/deadline limits and verifies the native
+manifest. It calls `OvfManager.CreateDescriptor` using the downloaded filenames and
+sizes, rejects descriptor findings, external entities and incomplete/unsafe file
+or disk references, and retains the descriptor before completing the NFC lease.
+A failure keeps the partial archive and original lease identity; no new lease or
+range resumption is attempted automatically.
+
+`MigrationConversion` resolves only a completed archive. `CopyConverter` runs a
+pinned QEMU artifact inside a pinned bubblewrap sandbox with a read-only rootfs
+mount, isolated network/namespaces, no inherited credentials, read-only source and
+one new output directory. Only explicitly selected RAW/QCOW2 conversion of
+self-contained streamOptimized/monolithicSparse VMDK is admitted. The worker checks
+virtual sizes, output metadata, QCOW2 consistency and guest-visible sector equality,
+then hashes the original and converted files. It has no salvage, repair, in-place
+conversion or method fallback. The current tests exercise a synthetic engine and
+command contracts; they do **not** qualify the actual QEMU/bubblewrap runtime.
+
+`MigrationImport` resolves the same job's completed conversion receipt, verifies
+all disks before creating any image, and uses the explicitly selected Glance-direct
+route. Image UUIDs, format, firmware and disk bus are fixed in the immutable intent.
+The existing native OpenStack creation adapter can consume those image identities
+for Cinder/Nova. Target guest readiness, quarantine readback, activation and native
+acceptance remain independent requirements. The TLS campaign uses synthetic image
+bytes; it does not boot a guest or qualify an installed image backend.
+
+Artifact handoffs are references to prior immutable stage-intent digests. The
+worker resolves native clone/operation identities from its journal under the same
+job, tenant, source plan, epoch, scope and custody generation. Unknown, duplicate,
+partial or cross-job receipts hold the next stage. Completion binds the aggregate
+all-disk digest; additional disk events after completion are rejected. No payload crosses the control
+API, Console or event bus. Explicit version 2 archive/conversion/import intents
+allow movement budgets up to one day, bounded by current profile/plan/credential
+expiry; version 1 retains its ten-minute limit. Interrupted transfers still need
+separately implemented and qualified reconciliation. A longer timeout is not resumption.
+
+The [native control evidence](../../verification/p08/control/README.md) records 951 passing component tests
+without skips, all 30 real compiler-to-resolver combinations and three passing
+migration browser journeys at `f765eb9`. Separate unchanged Governance source passes
+219 PostgreSQL tests and 160 campaign checks. The original architecture failure and
+its passing correction remain retained. These results do not supply native acceptance.
+
+## Migration control and recovery
+
+Version 2 admission binds source/target profile identities, every disk/dataset,
+exact method, conversion/guest/delta/recovery artifacts, independent approval,
+owner objectives and rehearsal/recovery references. All five design methods have
+explicit ordered contracts; admission still requires the commissioned owners'
+current qualified-method and complete-dataset evidence. A method contract is not
+an implemented or qualified application-specific adapter.
+
+Rehearsal has no business-write stage. Cutover requires independent all-writer
+fencing, final synchronization, source shutdown, target integrity, guest/services,
+backup restore, security paths and current change authority. Guest-dependent
+final delta precedes shutdown. Cold migration requires continued source shutdown
+and fencing during movement. No failed method selects another method.
+
+The append-only `native_migration_writes` row commits with activation grant
+redemption, before the first possible target write. An uncertain activation
+response therefore requires post-write recovery. A new recovery plan needs a
+separate approval, newer custody generation and the same method/datasets/native
+identities. Admission atomically stops the prior workflow. Provider-side stale
+request exclusion and independent drain remain mandatory owner observations.
+Pre-write source return requires target fencing and no divergence. Post-write
+forward/reverse recovery requires retention of accepted target changes. Cleanup
+has separate authority and cannot retire the source.
+
+Worker custody generations are append-only and bind tenant/site/project/resource/
+ownership scope. Multiple separately authorized stages share an admitted job;
+a new job requires a newer independently authorized generation. Older generations
+and cross-scope attempts are denied. Lifecycle remains the stage-order authority;
+worker journal possession does not authorize an effect.
+
+## Current qualification boundary
+
+The [retained index](../../verification/p08/qualification-index.json) verifies
+original source-bound archives, reports and command logs. At source
+`a72d0e88b3626b6912cf189c46ce45cf2fc4878c`, the hosted campaign passes all 20
+static/type/build/schema/test commands: 295 Lifecycle, 204 worker and 59
+Inventory-worker tests, with no skips or failures. It verifies 262 source bindings.
+The [check matrix](../../verification/p08/check-matrix.md) separates real
+PostgreSQL/TLS/subprocess checks from synthetic native and current-owner peers.
+The earlier strict-type failure remains FAILED in the original evidence, with
+its correction and rerun recorded separately.
+
+Real PostgreSQL checks run in the established hosted campaign because this local
+container cannot create the required unprivileged database account. Missing-engine
+local skips are not passing. The converter launcher sets limits in a fresh isolated
+interpreter instead of a multithreaded-fork hook. Actual subprocess bounds and
+cancellation are tested; a QEMU/bubblewrap rootfs and guest remain unqualified.
+
+The [completion packet](p08-completion-review.md) and
+[custody runbook](../operations/runbooks/native-migration.md) give the concrete
+remaining obligations and recovery procedure. The newer profile/review integration
+is qualified separately in the [profile evidence](../../verification/p08/profiles/qualification-index.json).
+The newer worker/proposal increment above supplies protected composition and
+immutable complete proposals. Native control now resolves those proposals against
+current approval and Inventory owners and rechecks revoked Planning recipes. Remaining
+implementation includes independently administered provider custody/fencing, concrete
+guest/service/delta/traffic/recovery protocols, physical observation producers and
+interrupted-transfer continuation. The composed native journey still requires actual
+commissioning and Q07 qualification. Source and target
+profile components distinguish observed facts from further capability evidence;
+only genuinely API-unavailable values should become manual administrator inputs. Installed tuples, scoped identities, independent owner protocols,
+application dataset/objective definitions and native fencing are not supplied.
+P08 and G08 remain incomplete; software checks cannot supply those inputs or actual
+Q07/G08 receiving decisions.
+
+## Native references
+
+Reviewed 2026-10-07 against Broadcom's VI JSON contracts:
+[CloneVM_Task](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VirtualMachine/moId/CloneVM_Task/post/),
+[CreateSnapshotEx_Task](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VirtualMachine/moId/CreateSnapshotEx_Task/post/), and
+[CreateDescriptor](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/OvfManager/moId/CreateDescriptor/post/).
+These are documentation references, not installed-release qualification.
+
+The converter options were checked against the [QEMU image utility documentation](https://www.qemu.org/docs/master/tools/qemu-img.html)
+and [bubblewrap command reference](https://github.com/containers/bubblewrap/blob/main/bwrap.xml).
+These references do not select or qualify an installed runtime.
+
+## API source fleet and bulk selection
+
+Inventory v1.3 exposes API-discovered VMware machines independently of detailed-profile
+availability. The Console's Migrate to OpenStack page supports source API refresh,
+paged browsing, text/readiness filters, grouping by source/guest/power/readiness,
+individual/group selection and observed resource totals. Inventory persists named
+application/environment groups with exact OpenStack target profiles and immutable
+member identity bindings. Each VM retains an independent review/confirmation.
+
+Bulk preparation revalidates saved group membership and per-VM profiles and uses the
+existing authenticated Planning preparation endpoint. It reports each VM separately;
+a held member never becomes an implicitly accepted migration. Group updates use
+optimistic revision checks and exact-command retries. The UI pauses on access loss,
+stale group or unavailable owners. No bulk operation submits native migration effects.
+The subsequent complete-proposal increment is described above; native execution
+and Q07/G08 obligations remain open.
+
+The [fleet qualification](../../verification/p08/fleet/README.md) retains 785 passing
+component tests without skips, both browser journeys and the independent Console
+package at `74ab8e4`. Original failures and their corrections remain separately
+recorded. These checks use real PostgreSQL and Chromium with synthetic native and
+owner peers; they do not establish a completed native migration.
+
+Current bounds are 50 VMs per saved group, 100 groups and 50 target profiles per site;
+the source list is paginated in 50-row pages. Existing native collector scope, API list,
+profile allowlist, freshness and request-budget bounds remain enforced. The vCenter
+REST collector currently holds lists over 100 entries and detailed collection requires
+the enrolled VM allowlist (up to 32 per connection); the fleet projection does not
+silently truncate or expand those scopes. The native list reference is
+[Broadcom Vcenter VM list](https://developer.broadcom.com/xapis/vsphere-automation-api/latest/api/vcenter/vm/get/).
+This documentation reference supplies no installed-platform qualification.

@@ -1,0 +1,15 @@
+{
+  "run_id": 37252715903,
+  "source_revision": "7c4dc24fdc46e146275a9b6f6552c7cf44f022f1",
+  "artifact_id": 11322081276,
+  "archive_sha256": "9eac5f093706f79d39135c162a65a4247e2849540a28d3f998f055dab8a77da6",
+  "archive_bytes": 71570,
+  "archive_checksum_verified": true,
+  "reported_result": "FAIL",
+  "reported_cleanup_complete": true,
+  "report_sha256": "950d57ab9396667b98b0018681337905b14c9ed19cefa89a2888669fbdb04f50",
+  "command_log_hashes_verified": 78,
+  "immutable_source_bindings_verified": 48,
+  "failure_scope": "Broker probes, namespace bootstrap and initial namespace/port denials passed. Expired JWT was rejected during SDK negotiation rather than the intended namespace probe. Visibility logs identified missing convert_ts EXECUTE privilege. No complete workflow or S3 recovery pass.",
+  "reviewer": "Codex \u2014 raw commands, denial diagnostics, archive and immutable source integrity examination"
+}

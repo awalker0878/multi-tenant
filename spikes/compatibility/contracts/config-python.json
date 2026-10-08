@@ -1,0 +1,8 @@
+{
+  "packageName": "p00_private_client",
+  "projectName": "p00-private-synthetic-client",
+  "library": "httpx",
+  "hideGenerationTimestamp": true,
+  "disallowAdditionalPropertiesIfNotPresent": false,
+  "generateSourceCodeOnly": true
+}

@@ -1,0 +1,19 @@
+test_accepts_signed_bound_fixture (__main__.BundleTests.test_accepts_signed_bound_fixture) ... ok
+test_altered_layer_sbom_and_missing_scan_rejected (__main__.BundleTests.test_altered_layer_sbom_and_missing_scan_rejected) ... ok
+test_altered_manifest_rejected (__main__.BundleTests.test_altered_manifest_rejected) ... ok
+test_build_once_transfer_keeps_every_byte (__main__.BundleTests.test_build_once_transfer_keeps_every_byte) ... ok
+test_bundle_cannot_supply_own_anchor (__main__.BundleTests.test_bundle_cannot_supply_own_anchor) ... ok
+test_even_signed_missing_and_stale_scans_rejected (__main__.BundleTests.test_even_signed_missing_and_stale_scans_rejected) ... ok
+test_even_signed_security_findings_block (__main__.BundleTests.test_even_signed_security_findings_block) ... ok
+test_no_operated_scope_upgrade (__main__.BundleTests.test_no_operated_scope_upgrade) ... ok
+test_signed_empty_scan_and_unbound_database_are_denied (__main__.BundleTests.test_signed_empty_scan_and_unbound_database_are_denied) ... ok
+test_signed_empty_source_sbom_is_denied (__main__.BundleTests.test_signed_empty_source_sbom_is_denied) ... ok
+test_unexpected_file_and_symlink_rejected (__main__.BundleTests.test_unexpected_file_and_symlink_rejected) ... ok
+test_unsigned_rejected (__main__.BundleTests.test_unsigned_rejected) ... ok
+test_wrong_or_revoked_key_rejected (__main__.BundleTests.test_wrong_or_revoked_key_rejected) ... ok
+test_wrong_source_and_digest_rejected (__main__.BundleTests.test_wrong_source_and_digest_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 2.067s
+
+OK

@@ -1,0 +1,340 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from php.Dockerfile
+#1 transferring dockerfile: 2.99kB done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${COMPOSER_BASE} results in empty or invalid base image name (line 4)
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${NODE_BASE} results in empty or invalid base image name (line 5)
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${PHP_BASE} results in empty or invalid base image name (line 12)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/php@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d
+#4 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 255B done
+#5 DONE 0.0s
+
+#6 [php-base 1/4] FROM docker.io/library/php@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3
+#6 DONE 0.0s
+
+#7 [composer-tool 1/1] FROM docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 74.85kB done
+#8 DONE 0.0s
+
+#9 [frontend 1/4] FROM docker.io/library/node@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174
+#9 DONE 0.0s
+
+#10 [php-base 2/4] COPY images/snapshot.sh /tmp/p00-snapshot.sh
+#10 CACHED
+
+#11 [php-base 3/4] RUN sh /tmp/p00-snapshot.sh     && apt-get update     && apt-get install -y --no-install-recommends libpq-dev     && docker-php-ext-install -j2 pdo_pgsql     && apt-mark manual libpq5     && apt-get purge -y --auto-remove libpq-dev autoconf 		dpkg-dev 		file 		g++ 		gcc 		libc-dev 		make 		pkg-config 		re2c     && rm -rf /var/lib/apt/lists/* /tmp/p00-snapshot.sh     && cp "/usr/local/etc/php/php.ini-production" "/usr/local/etc/php/php.ini"
+#11 CACHED
+
+#12 [php-base 4/4] WORKDIR /app
+#12 CACHED
+
+#13 [dependencies 1/4] COPY --from=composer-tool /usr/bin/composer /usr/local/bin/composer
+#13 CACHED
+
+#14 [frontend 2/4] WORKDIR /frontend
+#14 DONE 0.0s
+
+#15 [frontend 3/4] COPY frontend/ ./
+#15 DONE 0.0s
+
+#16 [frontend 4/4] RUN node -e 'if (process.version !== "v24.19.0") throw new Error(process.version)' && npm --version     && npm ci --ignore-scripts --no-audit --no-fund     && npm run typecheck && npm run build
+#16 0.204 11.17.0
+#16 2.558 
+#16 2.558 added 77 packages in 2s
+#16 2.560 npm notice
+#16 2.560 npm notice New major version of npm available! 11.17.0 -> 12.2.0
+#16 2.560 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+#16 2.560 npm notice To update run: npm install -g npm@12.2.0
+#16 2.560 npm notice
+#16 2.788 
+#16 2.788 > p00-frontend-compatibility@0.0.0 typecheck
+#16 2.788 > vue-tsc --noEmit
+#16 2.788 
+#16 ...
+
+#17 [dependencies 2/4] RUN apt-get update && apt-get install -y --no-install-recommends unzip     && rm -rf /var/lib/apt/lists/*
+#17 0.232 Get:1 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm InRelease [151 kB]
+#17 0.267 Get:2 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm-updates InRelease [55.4 kB]
+#17 0.280 Get:3 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security InRelease [34.8 kB]
+#17 0.344 Get:4 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm/main amd64 Packages [8790 kB]
+#17 0.488 Get:5 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm-updates/main amd64 Packages [6924 B]
+#17 0.502 Get:6 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 Packages [346 kB]
+#17 1.181 Fetched 9384 kB in 1s (8931 kB/s)
+#17 1.181 Reading package lists...
+#17 1.591 Reading package lists...
+#17 1.998 Building dependency tree...
+#17 2.118 Reading state information...
+#17 2.203 Suggested packages:
+#17 2.203   zip
+#17 2.225 The following NEW packages will be installed:
+#17 2.225   unzip
+#17 2.301 0 upgraded, 1 newly installed, 0 to remove and 2 not upgraded.
+#17 2.301 Need to get 167 kB of archives.
+#17 2.301 After this operation, 389 kB of additional disk space will be used.
+#17 2.301 Get:1 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 unzip amd64 6.0-28+deb12u1 [167 kB]
+#17 2.389 debconf: delaying package configuration, since apt-utils is not installed
+#17 2.409 Fetched 167 kB in 0s (1765 kB/s)
+#17 2.419 Selecting previously unselected package unzip.
+#17 2.419 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 8687 files and directories currently installed.)
+#17 2.427 Preparing to unpack .../unzip_6.0-28+deb12u1_amd64.deb ...
+#17 2.428 Unpacking unzip (6.0-28+deb12u1) ...
+#17 2.450 Setting up unzip (6.0-28+deb12u1) ...
+#17 DONE 3.9s
+
+#18 [dependencies 3/4] COPY php/ ./
+#18 DONE 0.0s
+
+#19 [dependencies 4/4] RUN composer install --no-dev --no-plugins --no-scripts --no-interaction --prefer-dist --no-progress --classmap-authoritative     && composer check-platform-reqs --no-dev
+#19 0.213 Installing dependencies from lock file
+#19 0.219 Verifying lock file contents can be installed on current platform.
+#19 0.384 Package operations: 74 installs, 0 updates, 0 removals
+#19 0.388   - Downloading doctrine/lexer (3.0.3)
+#19 0.388   - Downloading symfony/polyfill-mbstring (v1.43.0)
+#19 0.389   - Downloading symfony/polyfill-intl-normalizer (v1.43.0)
+#19 0.389   - Downloading symfony/polyfill-intl-grapheme (v1.43.0)
+#19 0.390   - Downloading symfony/polyfill-ctype (v1.37.0)
+#19 0.391   - Downloading symfony/string (v8.1.7)
+#19 0.391   - Downloading symfony/deprecation-contracts (v3.7.1)
+#19 0.392   - Downloading psr/container (2.0.2)
+#19 0.392   - Downloading symfony/service-contracts (v3.7.3)
+#19 0.393   - Downloading symfony/polyfill-php85 (v1.43.0)
+#19 0.393   - Downloading symfony/console (v8.1.8)
+#19 0.394   - Downloading voku/portable-ascii (2.1.1)
+#19 0.394   - Downloading symfony/polyfill-php80 (v1.43.0)
+#19 0.395   - Downloading phpoption/phpoption (1.10.0)
+#19 0.395   - Downloading graham-campbell/result-type (v1.2.0)
+#19 0.396   - Downloading vlucas/phpdotenv (v5.7.0)
+#19 0.396   - Downloading symfony/css-selector (v8.1.6)
+#19 0.397   - Downloading tijsverkoyen/css-to-inline-styles (v2.4.0)
+#19 0.397   - Downloading symfony/var-dumper (v8.1.7)
+#19 0.397   - Downloading symfony/polyfill-uuid (v1.43.0)
+#19 0.397   - Downloading symfony/uid (v8.1.8)
+#19 0.397   - Downloading symfony/routing (v8.1.8)
+#19 0.398   - Downloading symfony/process (v8.1.7)
+#19 0.398   - Downloading symfony/polyfill-php86 (v1.43.0)
+#19 0.398   - Downloading symfony/polyfill-php84 (v1.43.0)
+#19 0.398   - Downloading symfony/polyfill-intl-idn (v1.43.0)
+#19 0.399   - Downloading symfony/mime (v8.1.7)
+#19 0.399   - Downloading psr/event-dispatcher (1.0.0)
+#19 0.399   - Downloading symfony/event-dispatcher-contracts (v3.7.1)
+#19 0.400   - Downloading symfony/event-dispatcher (v8.1.5)
+#19 0.400   - Downloading psr/log (3.0.2)
+#19 0.401   - Downloading egulias/email-validator (4.0.4)
+#19 0.401   - Downloading symfony/mailer (v8.1.7)
+#19 0.401   - Downloading symfony/http-foundation (v8.1.8)
+#19 0.402   - Downloading symfony/error-handler (v8.1.8)
+#19 0.402   - Downloading symfony/http-kernel (v8.1.8)
+#19 0.402   - Downloading symfony/finder (v8.1.8)
+#19 0.403   - Downloading ramsey/collection (2.1.1)
+#19 0.403   - Downloading brick/math (1.0.0)
+#19 0.403   - Downloading ramsey/uuid (4.9.4)
+#19 0.404   - Downloading psr/simple-cache (3.0.0)
+#19 0.404   - Downloading psr/http-message (2.0)
+#19 0.405   - Downloading nunomaduro/termwind (v2.4.0)
+#19 0.405   - Downloading symfony/translation-contracts (v3.7.1)
+#19 0.405   - Downloading symfony/translation (v8.1.5)
+#19 0.406   - Downloading psr/clock (1.0.0)
+#19 0.406   - Downloading symfony/clock (v8.1.0)
+#19 0.407   - Downloading carbonphp/carbon-doctrine-types (3.2.1)
+#19 0.407   - Downloading nesbot/carbon (3.14.2)
+#19 0.407   - Downloading monolog/monolog (3.12.1)
+#19 0.407   - Downloading psr/http-factory (1.1.0)
+#19 0.408   - Downloading league/uri-interfaces (7.8.1)
+#19 0.408   - Downloading league/uri (7.8.1)
+#19 0.408   - Downloading league/mime-type-detection (1.17.0)
+#19 0.408   - Downloading league/flysystem-local (3.35.3)
+#19 0.408   - Downloading league/flysystem (3.36.0)
+#19 0.409   - Downloading nette/utils (v4.1.5)
+#19 0.409   - Downloading nette/schema (v1.3.6)
+#19 0.409   - Downloading dflydev/dot-access-data (v3.0.3)
+#19 0.409   - Downloading league/config (v1.2.0)
+#19 0.410   - Downloading league/commonmark (2.10.3)
+#19 0.410   - Downloading laravel/serializable-closure (v2.1.0)
+#19 0.410   - Downloading laravel/prompts (v0.3.24)
+#19 0.410   - Downloading guzzlehttp/uri-template (v2.0.1)
+#19 0.411   - Downloading symfony/polyfill-php82 (v1.43.0)
+#19 0.411   - Downloading guzzlehttp/psr7 (3.1.0)
+#19 0.411   - Downloading guzzlehttp/promises (3.0.2)
+#19 0.411   - Downloading psr/http-client (1.0.3)
+#19 0.411   - Downloading guzzlehttp/guzzle (8.2.0)
+#19 0.412   - Downloading fruitcake/php-cors (v1.4.0)
+#19 0.412   - Downloading dragonmantank/cron-expression (v3.6.0)
+#19 0.413   - Downloading doctrine/inflector (2.1.0)
+#19 0.413   - Downloading laravel/framework (v13.34.0)
+#19 0.413   - Downloading inertiajs/inertia-laravel (v3.5.1)
+#19 1.566   - Installing doctrine/lexer (3.0.3): Extracting archive
+#19 1.568   - Installing symfony/polyfill-mbstring (v1.43.0): Extracting archive
+#19 1.569   - Installing symfony/polyfill-intl-normalizer (v1.43.0): Extracting archive
+#19 1.571   - Installing symfony/polyfill-intl-grapheme (v1.43.0): Extracting archive
+#19 1.572   - Installing symfony/polyfill-ctype (v1.37.0): Extracting archive
+#19 1.575   - Installing symfony/string (v8.1.7): Extracting archive
+#19 1.576   - Installing symfony/deprecation-contracts (v3.7.1): Extracting archive
+#19 1.577   - Installing psr/container (2.0.2): Extracting archive
+#19 1.578   - Installing symfony/service-contracts (v3.7.3): Extracting archive
+#19 1.579   - Installing symfony/polyfill-php85 (v1.43.0): Extracting archive
+#19 1.580   - Installing symfony/console (v8.1.8): Extracting archive
+#19 1.581   - Installing voku/portable-ascii (2.1.1): Extracting archive
+#19 1.582   - Installing symfony/polyfill-php80 (v1.43.0): Extracting archive
+#19 1.583   - Installing phpoption/phpoption (1.10.0): Extracting archive
+#19 1.583   - Installing graham-campbell/result-type (v1.2.0): Extracting archive
+#19 1.584   - Installing vlucas/phpdotenv (v5.7.0): Extracting archive
+#19 1.584   - Installing symfony/css-selector (v8.1.6): Extracting archive
+#19 1.584   - Installing tijsverkoyen/css-to-inline-styles (v2.4.0): Extracting archive
+#19 1.584   - Installing symfony/var-dumper (v8.1.7): Extracting archive
+#19 1.584   - Installing symfony/polyfill-uuid (v1.43.0): Extracting archive
+#19 1.585   - Installing symfony/uid (v8.1.8): Extracting archive
+#19 1.585   - Installing symfony/routing (v8.1.8): Extracting archive
+#19 1.585   - Installing symfony/process (v8.1.7): Extracting archive
+#19 1.585   - Installing symfony/polyfill-php86 (v1.43.0): Extracting archive
+#19 1.585   - Installing symfony/polyfill-php84 (v1.43.0): Extracting archive
+#19 1.586   - Installing symfony/polyfill-intl-idn (v1.43.0): Extracting archive
+#19 1.586   - Installing symfony/mime (v8.1.7): Extracting archive
+#19 1.586   - Installing psr/event-dispatcher (1.0.0): Extracting archive
+#19 1.586   - Installing symfony/event-dispatcher-contracts (v3.7.1): Extracting archive
+#19 1.586   - Installing symfony/event-dispatcher (v8.1.5): Extracting archive
+#19 1.587   - Installing psr/log (3.0.2): Extracting archive
+#19 1.587   - Installing egulias/email-validator (4.0.4): Extracting archive
+#19 1.587   - Installing symfony/mailer (v8.1.7): Extracting archive
+#19 1.587   - Installing symfony/http-foundation (v8.1.8): Extracting archive
+#19 1.587   - Installing symfony/error-handler (v8.1.8): Extracting archive
+#19 1.588   - Installing symfony/http-kernel (v8.1.8): Extracting archive
+#19 1.588   - Installing symfony/finder (v8.1.8): Extracting archive
+#19 1.588   - Installing ramsey/collection (2.1.1): Extracting archive
+#19 1.588   - Installing brick/math (1.0.0): Extracting archive
+#19 1.588   - Installing ramsey/uuid (4.9.4): Extracting archive
+#19 1.588   - Installing psr/simple-cache (3.0.0): Extracting archive
+#19 1.589   - Installing psr/http-message (2.0): Extracting archive
+#19 1.589   - Installing nunomaduro/termwind (v2.4.0): Extracting archive
+#19 1.589   - Installing symfony/translation-contracts (v3.7.1): Extracting archive
+#19 1.589   - Installing symfony/translation (v8.1.5): Extracting archive
+#19 1.589   - Installing psr/clock (1.0.0): Extracting archive
+#19 1.589   - Installing symfony/clock (v8.1.0): Extracting archive
+#19 1.590   - Installing carbonphp/carbon-doctrine-types (3.2.1): Extracting archive
+#19 1.590   - Installing nesbot/carbon (3.14.2): Extracting archive
+#19 1.590   - Installing monolog/monolog (3.12.1): Extracting archive
+#19 1.590   - Installing psr/http-factory (1.1.0): Extracting archive
+#19 1.591   - Installing league/uri-interfaces (7.8.1): Extracting archive
+#19 1.591   - Installing league/uri (7.8.1): Extracting archive
+#19 1.591   - Installing league/mime-type-detection (1.17.0): Extracting archive
+#19 1.591   - Installing league/flysystem-local (3.35.3): Extracting archive
+#19 1.591   - Installing league/flysystem (3.36.0): Extracting archive
+#19 1.591   - Installing nette/utils (v4.1.5): Extracting archive
+#19 1.592   - Installing nette/schema (v1.3.6): Extracting archive
+#19 1.592   - Installing dflydev/dot-access-data (v3.0.3): Extracting archive
+#19 1.592   - Installing league/config (v1.2.0): Extracting archive
+#19 1.592   - Installing league/commonmark (2.10.3): Extracting archive
+#19 1.592   - Installing laravel/serializable-closure (v2.1.0): Extracting archive
+#19 1.592   - Installing laravel/prompts (v0.3.24): Extracting archive
+#19 1.593   - Installing guzzlehttp/uri-template (v2.0.1): Extracting archive
+#19 1.593   - Installing symfony/polyfill-php82 (v1.43.0): Extracting archive
+#19 1.593   - Installing guzzlehttp/psr7 (3.1.0): Extracting archive
+#19 1.593   - Installing guzzlehttp/promises (3.0.2): Extracting archive
+#19 1.593   - Installing psr/http-client (1.0.3): Extracting archive
+#19 1.593   - Installing guzzlehttp/guzzle (8.2.0): Extracting archive
+#19 1.594   - Installing fruitcake/php-cors (v1.4.0): Extracting archive
+#19 1.594   - Installing dragonmantank/cron-expression (v3.6.0): Extracting archive
+#19 1.594   - Installing doctrine/inflector (2.1.0): Extracting archive
+#19 1.594   - Installing laravel/framework (v13.34.0): Extracting archive
+#19 1.594   - Installing inertiajs/inertia-laravel (v3.5.1): Extracting archive
+#19 2.376 Generating optimized autoload files
+#19 2.885 54 packages you are using are looking for funding.
+#19 2.885 Use the `composer fund` command to find out more!
+#19 2.991 Checking non-dev platform requirements for packages in the vendor dir
+#19 2.996 composer-runtime-api 2.2.2      success                                       
+#19 2.996 ext-ctype            *          success provided by symfony/polyfill-ctype    
+#19 2.996 ext-dom              20031129   success                                       
+#19 2.996 ext-fileinfo         8.5.11     success                                       
+#19 2.996 ext-filter           8.5.11     success                                       
+#19 2.996 ext-hash             8.5.11     success                                       
+#19 2.996 ext-iconv            8.5.11     success                                       
+#19 2.996 ext-json             8.5.11     success                                       
+#19 2.996 ext-libxml           8.5.11     success                                       
+#19 2.996 ext-mbstring         *          success provided by symfony/polyfill-mbstring 
+#19 2.996 ext-openssl          8.5.11     success                                       
+#19 2.996 ext-pcre             8.5.11     success                                       
+#19 2.996 ext-pdo              8.5.11     success                                       
+#19 2.996 ext-pdo_sqlite       8.5.11     success                                       
+#19 2.996 ext-session          8.5.11     success                                       
+#19 2.996 ext-tokenizer        8.5.11     success                                       
+#19 2.996 php                  8.5.11     success                                       
+#19 DONE 3.4s
+
+#16 [frontend 4/4] RUN node -e 'if (process.version !== "v24.19.0") throw new Error(process.version)' && npm --version     && npm ci --ignore-scripts --no-audit --no-fund     && npm run typecheck && npm run build
+#16 6.922 
+#16 6.922 > p00-frontend-compatibility@0.0.0 build
+#16 6.922 > vite build
+#16 6.922 
+#16 7.238 vite v8.3.2 building client environment for production...
+#16 7.249 transforming...
+#16 7.385 ✓ 563 modules transformed.
+#16 7.406 rendering chunks...
+#16 7.445 computing gzip size...
+#16 7.447 public/build/manifest.json                       0.52 kB │ gzip:  0.22 kB
+#16 7.447 public/build/assets/app-BoZQBhN6.css             6.08 kB │ gzip:  2.03 kB
+#16 7.447 public/build/assets/Compatibility-D_yVkEXg.js    1.35 kB │ gzip:  0.77 kB
+#16 7.447 public/build/assets/app-CP-jyg2t.js            172.12 kB │ gzip: 58.81 kB
+#16 7.447 
+#16 7.448 ✓ built in 208ms
+#16 DONE 7.6s
+
+#20 [php-runtime  1/11] COPY --from=dependencies /app/vendor ./vendor
+#20 DONE 0.8s
+
+#21 [php-runtime  2/11] COPY php/app/ ./app/
+#21 DONE 0.0s
+
+#22 [php-runtime  3/11] COPY php/bootstrap/ ./bootstrap/
+#22 DONE 0.0s
+
+#23 [php-runtime  4/11] COPY php/config/ ./config/
+#23 DONE 0.0s
+
+#24 [php-runtime  5/11] COPY php/public/ ./public/
+#24 DONE 0.0s
+
+#25 [php-runtime  6/11] COPY php/resources/ ./resources/
+#25 DONE 0.0s
+
+#26 [php-runtime  7/11] COPY php/routes/ ./routes/
+#26 DONE 0.0s
+
+#27 [php-runtime  8/11] COPY frontend/resources/js/Pages/ /frontend/resources/js/Pages/
+#27 DONE 0.0s
+
+#28 [php-runtime  9/11] COPY php/artisan php/composer.json php/composer.lock ./
+#28 DONE 0.0s
+
+#29 [php-runtime 10/11] COPY --from=frontend /frontend/public/build/ ./public/build/
+#29 DONE 0.0s
+
+#30 [php-runtime 11/11] RUN printf '# Disposable fixture: runtime configuration must be injected.\n' > .env     && mkdir -p bootstrap/cache storage/framework/cache storage/framework/sessions storage/framework/views storage/logs     && chown -R 10001:10001 bootstrap/cache storage     && printf '[global]\npid = /tmp/php-fpm.pid\n[www]\nlisten = 9000\n' > /usr/local/etc/php-fpm.d/zz-p00.conf
+#30 DONE 0.1s
+
+#31 exporting to image
+#31 exporting layers
+#31 exporting layers 1.7s done
+#31 writing image sha256:5dc973dd013e582ebd4b284cb6d460d341dbf17c4e104e052828222c38b82af5 done
+#31 naming to docker.io/library/p00-99b8f96d3217:php-runtime done
+#31 DONE 1.7s
+
+#32 resolving provenance for metadata file
+#32 DONE 0.0s
+
+ [33m3 warnings found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG ${COMPOSER_BASE} results in empty or invalid base image name (line 4)
+ - InvalidDefaultArgInFrom: Default value for ARG ${NODE_BASE} results in empty or invalid base image name (line 5)
+ - InvalidDefaultArgInFrom: Default value for ARG ${PHP_BASE} results in empty or invalid base image name (line 12)

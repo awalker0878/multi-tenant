@@ -1,0 +1,25 @@
+name: P01 dependency input observation
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: [deploy/dependencies/candidates.json, scripts/p01/resolve_dependencies.py, .github/workflows/p01-dependency-inputs.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Resolve selected platform manifests
+        run: python3 scripts/p01/resolve_dependencies.py --output "$RUNNER_TEMP/p01-dependency-inputs"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p01-dependency-inputs-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-dependency-inputs/
+          if-no-files-found: error
+          retention-days: 14

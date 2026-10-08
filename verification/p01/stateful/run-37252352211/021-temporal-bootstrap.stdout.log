@@ -1,0 +1,1 @@
+{"stage": "temporal-bootstrap", "result": "FAIL", "checks": [], "error_type": "TypeError", "error": "WorkflowService.register_namespace() got an unexpected keyword argument 'rpc_timeout'"}

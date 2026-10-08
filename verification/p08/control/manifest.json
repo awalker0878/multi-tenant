@@ -1,0 +1,20 @@
+[
+  {
+    "archive": "archives/p08-control-components.zip",
+    "archive_sha256": "f9beaa8541f9a7cedbf09ff29a8acc88d9f1bc602063f403bb8a25f52c8045ed",
+    "kind": "components",
+    "run_id": "37684992865",
+    "artifact_id": "11511020701",
+    "source_revision": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992865"
+  },
+  {
+    "archive": "archives/p08-control-browser.zip",
+    "archive_sha256": "c24d5b271500d03971984e9efd9578d91536653f1fbc4bfb4b3f0489f616c3db",
+    "kind": "browser",
+    "run_id": "37684992865",
+    "artifact_id": "11510454876",
+    "source_revision": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992865"
+  }
+]

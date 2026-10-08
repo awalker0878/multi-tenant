@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "run_id": 37272419641,
+  "source_revision": "5de3333a1343fe4a5a1e27450787a0993908083a",
+  "artifacts": [
+    {
+      "id": 11328589280,
+      "name": "p01-remediation-5de3333a1343fe4a5a1e27450787a0993908083a",
+      "size_in_bytes": 38222,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11328589280",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11328589280/zip",
+      "expired": false,
+      "created_at": "2026-10-05T06:27:09Z",
+      "expires_at": "2026-10-19T06:27:09Z",
+      "updated_at": "2026-10-05T06:27:09Z",
+      "digest": "sha256:6fb2be979af5ab7c63568a3518a37e7113b9afae4231b686c8fb5cb68193b7a3",
+      "workflow_run": {
+        "id": 37272419641,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "5de3333a1343fe4a5a1e27450787a0993908083a"
+      }
+    }
+  ],
+  "source_verification_sha256": "92b8f144deca5dc00fa7203504c6833a2091e8d9ba0e1e0464ecc4867eb7583c",
+  "retained_file_sha256": {
+    "alpine-packages.lock.json": "14155c25ff67dd47b7b4168ce9c0caf8c32cfe5ed4b0b65f796ac4c6904a7259",
+    "apk-build-offline-install.log": "aaeeab6c4c53b611ef663b624ebfb15019b78c795f5a7b2eaf91235e3bd91224",
+    "apk-build.log": "b31b4c26c397325cb87adabbbd2aa856f6ac45fa3b43bb7acad69f8a96b7adde",
+    "apk-composer-offline-install.log": "499fad1524b301ef89ac5f82165b1e71fa111ac682ee91d39a7cd0db67a30e67",
+    "apk-composer.log": "dfebb3efa051cc149398bd114a2bcdb69c89dced5a4b05c70474321852dbdc9f",
+    "apk-runtime-offline-install.log": "b521738198a3d1c9d9c1ca13bc493b35a6deecfd5aa8a3af25d1e7b1ca9a4e6c",
+    "apk-runtime.log": "589e569f33a6a581e535dd577c607fe6f3b0ea4bc0c8437f1ae9c9e639389b67",
+    "php-alpine-index.json": "fa01fb1645cd0fc566a5f146b099adace33b906571f972f71f2182a7c12d1cd7",
+    "php-alpine-manifest.json": "aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005",
+    "php-trixie-index.json": "584e584083bada479f0ee733a3025722a68e366eb721e618d1b6a252e4ff45c5",
+    "php-trixie-manifest.json": "1c1a9137ab0a01339ffffa27256ab7fafe270a1429688aa9b51a221443f157fc",
+    "python-alpine-index.json": "4c47124a8391cb7a9f571164147d154777cf012a4ece5f86097130d7a4478111",
+    "python-alpine-manifest.json": "9b8dad7f66b5c7751df6cb7a64a07812e86bed85d0116efe82b3a11209f1440d",
+    "python-trixie-index.json": "f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+    "python-trixie-manifest.json": "44ff437bba879d4941b710a369a8f19266aea34b29002807f0c487fabc9eec9b",
+    "report.json": "cd3c92d18a2797026cf530da16a2763f52d22dc4c93c0fca9e52bd3c370761e3",
+    "source-verification.json": "92b8f144deca5dc00fa7203504c6833a2091e8d9ba0e1e0464ecc4867eb7583c"
+  },
+  "limitations": [
+    "Downloaded ZIP digest verified against Actions artifact metadata. Extracted bytes retained; original archive and downloaded APK files not retained.",
+    "Base-image scans are observations only; full-image and runtime admission require separate campaigns."
+  ]
+}

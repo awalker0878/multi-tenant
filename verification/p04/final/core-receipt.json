@@ -1,0 +1,8 @@
+{
+  "run_id": 37439404279,
+  "artifact_id": 11399794610,
+  "archive_sha256": "4144d82a17d3b57b4e41cf423167b0eed1706ac783c155df9b701a80ac41493d",
+  "source_revision": "6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9",
+  "report_sha256": "eaccce423b4646794b4c0ae2fdf42ec4b7612f598107109d921b0d0813a29d8a",
+  "report": "core/report.json"
+}

@@ -1,0 +1,274 @@
+{
+  "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+  "result": "PASS_AUTOMATED_P03_SCOPE",
+  "observed_at": "2026-10-06T02:45:48.814541+00:00",
+  "observer": "GitHub Actions executed real dependency/browser campaigns; Codex independently matched retained archives, report/log hashes, JUnit results and source bytes. Local Console checks executed by Codex.",
+  "reports": [
+    {
+      "label": "core",
+      "path": "verification/p03/final/core/report.json",
+      "sha256": "a4e8e2bd37ae10a28a54553cf0739c6d965f10164f53f6a9b98e39defa3e8d97",
+      "result": "PASS",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "source_files_verified": 327,
+      "command_logs_verified": 16,
+      "observed_at": "2026-10-06T02:39:12.512384+00:00",
+      "retrieval": {
+        "run_id": 37405120516,
+        "artifact_id": 11387495399,
+        "artifact_archive_sha256": "3c6c4da5b7d7846c8dab1189fcdc330a3d3ced8726b0dd93dc3d5b4f69214566",
+        "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+        "retrieved_at": "2026-10-06T02:42:19.621784+00:00",
+        "result": "PASS",
+        "verified_source_files": 327,
+        "report_sha256": "a4e8e2bd37ae10a28a54553cf0739c6d965f10164f53f6a9b98e39defa3e8d97",
+        "method": "GitHub connector artifact download; archive, retained command logs and source bytes independently matched."
+      },
+      "tests": 89
+    },
+    {
+      "label": "chromium",
+      "path": "verification/p03/final/chromium/report.json",
+      "sha256": "40ff11eb8f5bb61aa1e9d90bc90d5964c541dd73eea42dfd889aa00303674ecf",
+      "result": "PASS",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "source_files_verified": 475,
+      "command_logs_verified": 13,
+      "observed_at": "2026-10-06T02:39:39.953678+00:00",
+      "retrieval": {
+        "run_id": 37405120516,
+        "artifact_id": 11387060740,
+        "artifact_archive_sha256": "8c8d5d2b6104768a30492cec160a2afe5939b640bed0ac018d3a6f6582626a32",
+        "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+        "retrieved_at": "2026-10-06T02:42:22.455249+00:00",
+        "result": "PASS",
+        "verified_source_files": 475,
+        "report_sha256": "40ff11eb8f5bb61aa1e9d90bc90d5964c541dd73eea42dfd889aa00303674ecf",
+        "method": "GitHub connector artifact download; archive, retained command logs and source bytes independently matched."
+      },
+      "checks": 38,
+      "browser_stats": {
+        "startTime": "2026-10-06T02:40:00.481Z",
+        "duration": 12413.845,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "scale": {
+        "large_tenant_applications": 10001,
+        "small_tenant_applications": 1001,
+        "page_size": 50,
+        "page_bytes": 6812,
+        "page_query_execution_ms": 0.081,
+        "scope": "Synthetic metadata skew; query count is separately asserted in the PostgreSQL feature campaign."
+      },
+      "broker_delivery": {
+        "observed_messages": 11,
+        "unique_events": 10,
+        "duplicate_event_ids": 1,
+        "resource_sequences": [
+          [
+            1,
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1,
+            2,
+            3,
+            4
+          ],
+          [
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "label": "firefox",
+      "path": "verification/p03/final/firefox/report.json",
+      "sha256": "1ed183ee30a141001168b19698d874eb4fb420fd4150a64dd93cd87c63865b37",
+      "result": "PASS",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "source_files_verified": 475,
+      "command_logs_verified": 13,
+      "observed_at": "2026-10-06T02:39:48.639018+00:00",
+      "retrieval": {
+        "run_id": 37405120516,
+        "artifact_id": 11387475569,
+        "artifact_archive_sha256": "d788b00c3c7bb040bb28d81f2ef277e7050848b9d948e0e296b6bafbbe0cd96f",
+        "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+        "retrieved_at": "2026-10-06T02:42:21.095290+00:00",
+        "result": "PASS",
+        "verified_source_files": 475,
+        "report_sha256": "1ed183ee30a141001168b19698d874eb4fb420fd4150a64dd93cd87c63865b37",
+        "method": "GitHub connector artifact download; archive, retained command logs and source bytes independently matched."
+      },
+      "checks": 38,
+      "browser_stats": {
+        "startTime": "2026-10-06T02:40:11.481Z",
+        "duration": 16199.54,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "scale": {
+        "large_tenant_applications": 10001,
+        "small_tenant_applications": 1001,
+        "page_size": 50,
+        "page_bytes": 6813,
+        "page_query_execution_ms": 0.17,
+        "scope": "Synthetic metadata skew; query count is separately asserted in the PostgreSQL feature campaign."
+      },
+      "broker_delivery": {
+        "observed_messages": 11,
+        "unique_events": 10,
+        "duplicate_event_ids": 1,
+        "resource_sequences": [
+          [
+            1,
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1,
+            2,
+            3,
+            4
+          ],
+          [
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "label": "webkit",
+      "path": "verification/p03/final/webkit/report.json",
+      "sha256": "2144efc62f5a5259e3f2656a2c6a00be3c4988ee0deb86b6764c5e739bbfd489",
+      "result": "PASS",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "source_files_verified": 475,
+      "command_logs_verified": 13,
+      "observed_at": "2026-10-06T02:40:10.916556+00:00",
+      "retrieval": {
+        "run_id": 37405120516,
+        "artifact_id": 11386529685,
+        "artifact_archive_sha256": "9a04e2cf403d622c788a347f7654c4c0fb264fcb57cefa86c20be96bfcf60504",
+        "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+        "retrieved_at": "2026-10-06T02:42:23.813834+00:00",
+        "result": "PASS",
+        "verified_source_files": 475,
+        "report_sha256": "2144efc62f5a5259e3f2656a2c6a00be3c4988ee0deb86b6764c5e739bbfd489",
+        "method": "GitHub connector artifact download; archive, retained command logs and source bytes independently matched."
+      },
+      "checks": 38,
+      "browser_stats": {
+        "startTime": "2026-10-06T02:40:34.851Z",
+        "duration": 26194.606,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "scale": {
+        "large_tenant_applications": 10001,
+        "small_tenant_applications": 1001,
+        "page_size": 50,
+        "page_bytes": 6817,
+        "page_query_execution_ms": 0.188,
+        "scope": "Synthetic metadata skew; query count is separately asserted in the PostgreSQL feature campaign."
+      },
+      "broker_delivery": {
+        "observed_messages": 11,
+        "unique_events": 10,
+        "duplicate_event_ids": 1,
+        "resource_sequences": [
+          [
+            1,
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1
+          ],
+          [
+            1,
+            2,
+            3,
+            4
+          ],
+          [
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "label": "local",
+      "path": "verification/p03/final/local/report.json",
+      "sha256": "d68d3fcf3dddea0624b98ac0326a03b1bbb49b47446a481dd9ad5604a91dfd6a",
+      "result": "PASS",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "source_files_verified": 269,
+      "command_logs_verified": 9,
+      "observed_at": "2026-10-06T02:44:00.063632+00:00"
+    }
+  ],
+  "unique_verified_source_files": 475,
+  "contract_and_fixture_sha256": {
+    "contracts/openapi/catalogue-v1.0.1.json": "656e124e9fceca6aad21bbb5676cdcb88f8c5d0e089e5ade3ffa7245023d2679",
+    "contracts/openapi/governance-catalogue-owners-v1.json": "44673c782d4879e4e4f7b765d0559ca744ed40523d6a16720b034007d99b1969",
+    "contracts/schemas/catalogue/intent-v1.json": "83aaeb8a35299c9954e21f6a57755e4b1a9ed33004331c2921748647024ae658",
+    "contracts/schemas/events/catalogue-intent-v1.json": "712093647c39b4411341ce2a6f15eb0d6328245c374861e20fd7ea25bdac7e33",
+    "contracts/fixtures/catalogue/permit-desk-v1.json": "7332017cc1103ba4c3dfac278d6cb6454a9460b4f4673377ad6e8f43767c0f83"
+  },
+  "regression_receipt": {
+    "path": "verification/p03/final/regression-status.json",
+    "sha256": "34ee19dfa44f1c69bbc5613609852b467cb5a6382791ca2153e0d6524bff04c3"
+  },
+  "limitations": [
+    "Synthetic authorities in core feature tests; separate live campaign uses actual Governance current authority with synthetic principal-bootstrap OIDC transport.",
+    "Verified TLS PostgreSQL and RabbitMQ; application TLS peers use disposable loopback proxies and browser uses HTTP loopback. No operated ingress qualification.",
+    "Real broker observer is not the P05 Planning product consumer.",
+    "Metadata skew and measured query bounds do not establish production capacity, memory or SLO acceptance.",
+    "Local Console suite has seven explicitly PostgreSQL-gated skips; hosted P02 and P03 results have their separately recorded scopes.",
+    "Automated keyboard/reflow checks do not provide representative-user, screen-reader or independent G03 approval.",
+    "Final-source Kubernetes remains queued in the separate foundation workflow; this index makes no current-source Kubernetes pass claim."
+  ],
+  "gate_decision": "NOT_REVIEWED",
+  "valid_until": null,
+  "invalidated_at": null
+}

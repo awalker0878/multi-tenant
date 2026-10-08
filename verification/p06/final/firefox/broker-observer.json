@@ -1,0 +1,176 @@
+[
+  {
+    "body": {
+      "aggregate_id": "43861829-36c7-4326-94e3-787a646ba115",
+      "data": {
+        "digest": "f8519b17f1913c716cb0c8344d7452652e70622f7d86d6e821ed874394da530d",
+        "id": "43861829-36c7-4326-94e3-787a646ba115",
+        "kind": "assessment",
+        "native_write_authorized": false
+      },
+      "event_id": "0938826c-afa1-4b22-b9a0-cc3fab008a11",
+      "event_type": "planning.assessment.created",
+      "occurred_at": 1791313951,
+      "sequence": 1,
+      "specversion": "1.0",
+      "tenant_id": "1d722aca-02eb-4742-8508-54bed61af385"
+    },
+    "message_id": "0938826c-afa1-4b22-b9a0-cc3fab008a11",
+    "user_id": "planning",
+    "routing_key": "planning.facts.v1"
+  },
+  {
+    "body": {
+      "aggregate_id": "43861829-36c7-4326-94e3-787a646ba115",
+      "data": {
+        "digest": "f8519b17f1913c716cb0c8344d7452652e70622f7d86d6e821ed874394da530d",
+        "id": "43861829-36c7-4326-94e3-787a646ba115",
+        "kind": "assessment",
+        "native_write_authorized": false
+      },
+      "event_id": "0938826c-afa1-4b22-b9a0-cc3fab008a11",
+      "event_type": "planning.assessment.created",
+      "occurred_at": 1791313951,
+      "sequence": 1,
+      "specversion": "1.0",
+      "tenant_id": "1d722aca-02eb-4742-8508-54bed61af385"
+    },
+    "message_id": "0938826c-afa1-4b22-b9a0-cc3fab008a11",
+    "user_id": "planning",
+    "routing_key": "planning.facts.v1"
+  },
+  {
+    "body": {
+      "aggregate_id": "01d15cce-3760-4145-8a4d-f46b34956037",
+      "data": {
+        "digest": "44d3dd6129df6a343f8f8606f9d03bc7b6e06d4961747661f57c0b14a974c418",
+        "id": "01d15cce-3760-4145-8a4d-f46b34956037",
+        "kind": "assessment",
+        "native_write_authorized": false
+      },
+      "event_id": "350ac8e9-bd6d-4f45-a612-7d3931241811",
+      "event_type": "planning.assessment.created",
+      "occurred_at": 1791313952,
+      "sequence": 2,
+      "specversion": "1.0",
+      "tenant_id": "1d722aca-02eb-4742-8508-54bed61af385"
+    },
+    "message_id": "350ac8e9-bd6d-4f45-a612-7d3931241811",
+    "user_id": "planning",
+    "routing_key": "planning.facts.v1"
+  },
+  {
+    "body": {
+      "aggregate_id": "23a17abc-908d-4d0c-8df7-c33ffc7f877e",
+      "data": {
+        "binding": {
+          "action": "application.provision",
+          "canonicalization": "p05-json-v1",
+          "content_digest": "52443d139f76af8a141277cb2be0e0a3a70a379d6b2c430f79838c9accefd8cc",
+          "digest": "429a7f6cb08a6993ab06db66bb5708c47c03884110e197985fa91331bc41fe09",
+          "environment": "b31b0b15-d7d2-4d37-a0b6-257b54ff2890",
+          "executor_ids": [
+            "7e95a1c9-adb1-46ff-bebf-4d9beb1b88f5"
+          ],
+          "lane": "operational",
+          "plan_id": "23a17abc-908d-4d0c-8df7-c33ffc7f877e",
+          "requested_by": "5926ba90-2d5b-4b77-ae86-c21185cfb5a9",
+          "resource_id": "22a70e99-d914-43ac-b7a6-809c07937a61",
+          "revision": 1,
+          "site_id": "2d17aca0-9a05-45dd-8959-96892ef214e7",
+          "tenant_id": "1d722aca-02eb-4742-8508-54bed61af385",
+          "valid_until": 1791314853
+        },
+        "digest": "476dce11fbd09b2a26c74e71fa8b30f988fbe7261094d62d17bd14a1ff0d8f65",
+        "id": "23a17abc-908d-4d0c-8df7-c33ffc7f877e",
+        "kind": "plan",
+        "native_write_authorized": false
+      },
+      "event_id": "582df0e6-2d49-4fec-9a3c-544353ad6a6c",
+      "event_type": "planning.plan.created",
+      "occurred_at": 1791313953,
+      "sequence": 3,
+      "specversion": "1.0",
+      "tenant_id": "1d722aca-02eb-4742-8508-54bed61af385"
+    },
+    "message_id": "582df0e6-2d49-4fec-9a3c-544353ad6a6c",
+    "user_id": "planning",
+    "routing_key": "planning.facts.v1"
+  },
+  {
+    "body": {
+      "aggregate_id": "7509d8e4-406f-4209-bb48-40c49464e46c",
+      "data": {
+        "binding": {
+          "action": "application.provision",
+          "canonicalization": "p05-json-v1",
+          "content_digest": "52443d139f76af8a141277cb2be0e0a3a70a379d6b2c430f79838c9accefd8cc",
+          "digest": "a3913e6d000c6ebea02e01363167c6bc70f6ab6372b959ebe13857f458758635",
+          "environment": "b31b0b15-d7d2-4d37-a0b6-257b54ff2890",
+          "executor_ids": [
+            "7e95a1c9-adb1-46ff-bebf-4d9beb1b88f5"
+          ],
+          "lane": "operational",
+          "plan_id": "7509d8e4-406f-4209-bb48-40c49464e46c",
+          "requested_by": "5926ba90-2d5b-4b77-ae86-c21185cfb5a9",
+          "resource_id": "22a70e99-d914-43ac-b7a6-809c07937a61",
+          "revision": 1,
+          "site_id": "2d17aca0-9a05-45dd-8959-96892ef214e7",
+          "tenant_id": "1d722aca-02eb-4742-8508-54bed61af385",
+          "valid_until": 1791314853
+        },
+        "digest": "b2e6c0ffd7e2fd70966474e0c085eb0bfd4bf3d8bf95070b373b0e89cc891b37",
+        "id": "7509d8e4-406f-4209-bb48-40c49464e46c",
+        "kind": "plan",
+        "native_write_authorized": false
+      },
+      "event_id": "c2ceeb40-cc9a-41ea-b838-de1ddd8ae105",
+      "event_type": "planning.plan.created",
+      "occurred_at": 1791313953,
+      "sequence": 4,
+      "specversion": "1.0",
+      "tenant_id": "1d722aca-02eb-4742-8508-54bed61af385"
+    },
+    "message_id": "c2ceeb40-cc9a-41ea-b838-de1ddd8ae105",
+    "user_id": "planning",
+    "routing_key": "planning.facts.v1"
+  },
+  {
+    "body": {
+      "aggregate_id": "7d200128-e651-48e9-844d-fdd66b821ca7",
+      "data": {
+        "binding": {
+          "action": "application.provision",
+          "canonicalization": "p05-json-v1",
+          "content_digest": "2bf373b16f6b22fbdb4682a69ec2fb3f23f49ed3a28c52ec7a46b68bda6b0fe3",
+          "digest": "5f90add3d4e31ac1e32436dfb4f1738d7377cef57c66ccc337010cfadb27d2e2",
+          "environment": "b31b0b15-d7d2-4d37-a0b6-257b54ff2890",
+          "executor_ids": [
+            "7e95a1c9-adb1-46ff-bebf-4d9beb1b88f5"
+          ],
+          "lane": "operational",
+          "plan_id": "7d200128-e651-48e9-844d-fdd66b821ca7",
+          "requested_by": "5926ba90-2d5b-4b77-ae86-c21185cfb5a9",
+          "resource_id": "22a70e99-d914-43ac-b7a6-809c07937a61",
+          "revision": 1,
+          "site_id": "2d17aca0-9a05-45dd-8959-96892ef214e7",
+          "tenant_id": "1d722aca-02eb-4742-8508-54bed61af385",
+          "valid_until": 1791314859
+        },
+        "digest": "fb6fce887202204b817fac053663cc48e50d32e3643b1701d979206db0ac33c0",
+        "id": "7d200128-e651-48e9-844d-fdd66b821ca7",
+        "kind": "plan",
+        "native_write_authorized": false
+      },
+      "event_id": "8c101c1c-fec8-4bbb-b5b3-f85f7aff7049",
+      "event_type": "planning.plan.created",
+      "occurred_at": 1791313959,
+      "sequence": 5,
+      "specversion": "1.0",
+      "tenant_id": "1d722aca-02eb-4742-8508-54bed61af385"
+    },
+    "message_id": "8c101c1c-fec8-4bbb-b5b3-f85f7aff7049",
+    "user_id": "planning",
+    "routing_key": "planning.facts.v1"
+  }
+]

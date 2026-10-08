@@ -1,0 +1,220 @@
+{
+  "qualification_source": "3a9c136639426087d060845184048f52850fcfc7",
+  "observed_at": "2026-10-06T19:42:23.347686+00:00",
+  "result": "PASS",
+  "runs": [
+    {
+      "name": "P01 foundation contracts",
+      "run_id": 37516991224,
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991224",
+      "updated_at": "2026-10-06T19:11:33Z",
+      "impact_review": "Final runtime source; affected package/image selection and the stated workflow scope only."
+    },
+    {
+      "name": "P01 foundation packages",
+      "run_id": 37516991238,
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991238",
+      "updated_at": "2026-10-06T19:18:12Z",
+      "impact_review": "Final runtime source; affected package/image selection and the stated workflow scope only."
+    },
+    {
+      "name": "P01 bootstrap images",
+      "run_id": 37516991322,
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991322",
+      "updated_at": "2026-10-06T19:12:52Z",
+      "impact_review": "Final runtime source; affected package/image selection and the stated workflow scope only."
+    },
+    {
+      "name": "P05 planning",
+      "run_id": 37516991327,
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991327",
+      "updated_at": "2026-10-06T19:14:03Z",
+      "impact_review": "Final runtime source; affected package/image selection and the stated workflow scope only."
+    },
+    {
+      "name": "P01 isolated Compose integration",
+      "run_id": 37516991300,
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991300",
+      "updated_at": "2026-10-06T19:14:19Z",
+      "impact_review": "Final runtime source; affected package/image selection and the stated workflow scope only."
+    },
+    {
+      "name": "P06 execution",
+      "run_id": 37516991249,
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991249",
+      "updated_at": "2026-10-06T19:15:18Z",
+      "impact_review": "Final runtime source; affected package/image selection and the stated workflow scope only."
+    },
+    {
+      "name": "P01 isolated Kubernetes integration",
+      "run_id": 37516991256,
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991256",
+      "updated_at": "2026-10-06T19:40:32Z",
+      "impact_review": "Final runtime source; affected package/image selection and the stated workflow scope only."
+    },
+    {
+      "name": "P01 policy controls",
+      "run_id": 37516991302,
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991302",
+      "updated_at": "2026-10-06T19:11:08Z",
+      "impact_review": "Final runtime source; affected package/image selection and the stated workflow scope only."
+    },
+    {
+      "name": "Context policy",
+      "run_id": 37516991325,
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37516991325",
+      "updated_at": "2026-10-06T19:11:12Z",
+      "impact_review": "Final runtime source; affected package/image selection and the stated workflow scope only."
+    },
+    {
+      "name": "P02 identity",
+      "run_id": 37513710542,
+      "source_revision": "4481f3d9b32a91b0fdb95babe00f3931cd2f45d9",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37513710542",
+      "updated_at": "2026-10-06T18:49:36Z",
+      "impact_review": "Listed owning source, consumer and campaign inputs are byte-identical to the final source. Unrelated P06 Lifecycle/custody additions have their own full final-source qualification.",
+      "identical_input_paths": [
+        "services/governance",
+        "apps/console",
+        "scripts/p02",
+        ".github/workflows/p02-identity.yml"
+      ]
+    },
+    {
+      "name": "P02 Governance events",
+      "run_id": 37512933394,
+      "source_revision": "b8a3be597aad8caec4178e34658ebc3b41ced26f",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37512933394",
+      "updated_at": "2026-10-06T18:40:27Z",
+      "impact_review": "Listed owning source, consumer and campaign inputs are byte-identical to the final source. Unrelated P06 Lifecycle/custody additions have their own full final-source qualification.",
+      "identical_input_paths": [
+        "services/governance",
+        "scripts/p02",
+        "contracts/asyncapi/governance.yaml",
+        ".github/workflows/p02-governance-events.yml"
+      ]
+    },
+    {
+      "name": "P01 Permit Desk application recovery",
+      "run_id": 37512933296,
+      "source_revision": "b8a3be597aad8caec4178e34658ebc3b41ced26f",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37512933296",
+      "updated_at": "2026-10-06T18:40:27Z",
+      "impact_review": "Listed owning source, consumer and campaign inputs are byte-identical to the final source. Unrelated P06 Lifecycle/custody additions have their own full final-source qualification.",
+      "identical_input_paths": [
+        "services/governance",
+        "scripts/p02",
+        ".github/workflows/p01-permit-desk-recovery.yml"
+      ]
+    },
+    {
+      "name": "P01 transactional messaging",
+      "run_id": 37512933519,
+      "source_revision": "b8a3be597aad8caec4178e34658ebc3b41ced26f",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37512933519",
+      "updated_at": "2026-10-06T18:42:53Z",
+      "impact_review": "Listed owning source, consumer and campaign inputs are byte-identical to the final source. Unrelated P06 Lifecycle/custody additions have their own full final-source qualification.",
+      "identical_input_paths": [
+        "services/catalogue",
+        "scripts/p01/messaging",
+        "scripts/p01/run_messaging.py",
+        "contracts/asyncapi/catalogue.yaml",
+        "contracts/schemas/events",
+        ".github/workflows/p01-messaging.yml"
+      ]
+    },
+    {
+      "name": "P03 catalogue",
+      "run_id": 37513710645,
+      "source_revision": "4481f3d9b32a91b0fdb95babe00f3931cd2f45d9",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37513710645",
+      "updated_at": "2026-10-06T18:47:34Z",
+      "impact_review": "Listed owning source, consumer and campaign inputs are byte-identical to the final source. Unrelated P06 Lifecycle/custody additions have their own full final-source qualification.",
+      "identical_input_paths": [
+        "services/catalogue",
+        "services/governance",
+        "apps/console",
+        "scripts/p03",
+        "contracts/openapi/catalogue-v1.json",
+        ".github/workflows/p03-catalogue.yml"
+      ]
+    },
+    {
+      "name": "P04 inventory",
+      "run_id": 37513710639,
+      "source_revision": "4481f3d9b32a91b0fdb95babe00f3931cd2f45d9",
+      "run_attempt": 2,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37513710639",
+      "updated_at": "2026-10-06T19:31:40Z",
+      "impact_review": "Listed owning source, consumer and campaign inputs are byte-identical to the final source. Unrelated P06 Lifecycle/custody additions have their own full final-source qualification.",
+      "identical_input_paths": [
+        "services/inventory",
+        "workers/inventory",
+        "services/governance",
+        "services/catalogue",
+        "apps/console",
+        "scripts/p04",
+        "contracts/openapi/inventory-v1.json",
+        ".github/workflows/p04-inventory.yml"
+      ]
+    }
+  ],
+  "limitations": [
+    "These are workflow conclusions and bounded source-impact comparisons, not native or operating acceptance.",
+    "Inventory run attempt 1 broker-startup failure and an earlier Kubernetes empty shared-state witness remain retained. Passing reruns do not relabel failed attempts.",
+    "Final P06 original archives and fully checked source/log hashes are in qualification-index.json; this receipt records associated regression completion."
+  ]
+}

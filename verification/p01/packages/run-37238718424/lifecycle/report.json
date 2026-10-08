@@ -1,0 +1,568 @@
+{
+  "schema_version": 1,
+  "result": "PASS",
+  "component": "lifecycle",
+  "scope": "P01 independently installed foundation candidates; no service dependency readiness or native qualification",
+  "recorded_at": "2026-10-04T22:06:28.996455+00:00",
+  "source_sha": "af1bf00ad84831a84817975e2ffc124190e3bdcc",
+  "source_ref": "refs/heads/greenfield/enterprise-microservices-plan",
+  "run_id": "37238718424",
+  "run_attempt": "1",
+  "commands": [
+    {
+      "name": "python-version",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.14/x64/bin/python",
+        "-c",
+        "import sys; print(sys.version.split()[0])"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:29.004542+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "01-python-version.stdout.log",
+      "stderr": "01-python-version.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:29.020393+00:00",
+      "duration_seconds": 0.016,
+      "stdout_sha256": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:29.021199+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "02-uv-version.stdout.log",
+      "stderr": "02-uv-version.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:29.028998+00:00",
+      "duration_seconds": 0.008,
+      "stdout_sha256": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "lock-check",
+      "command": [
+        "uv",
+        "lock",
+        "--check",
+        "--no-managed-python"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:29.029656+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "03-lock-check.stdout.log",
+      "stderr": "03-lock-check.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:29.093666+00:00",
+      "duration_seconds": 0.064,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "0a67722074961f4e04e4e82ae6389fb9ca871cf9967bf2c5f96e3af03806db2a",
+      "passed": true
+    },
+    {
+      "name": "clean-locked-install",
+      "command": [
+        "uv",
+        "sync",
+        "--locked",
+        "--group",
+        "build",
+        "--no-managed-python",
+        "--no-editable"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:29.094290+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "04-clean-locked-install.stdout.log",
+      "stderr": "04-clean-locked-install.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:30.059845+00:00",
+      "duration_seconds": 0.965,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "9b162bf1251c5a61680a741b757b67c38b218035d05db0ed132335919e1f96e7",
+      "passed": true
+    },
+    {
+      "name": "installed-quality-inventory",
+      "command": [
+        "uv",
+        "pip",
+        "list",
+        "--python",
+        "/home/runner/work/_temp/p01-quality/component/.venv/bin/python",
+        "--format",
+        "json"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:30.060550+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "05-installed-quality-inventory.stdout.log",
+      "stderr": "05-installed-quality-inventory.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:30.124717+00:00",
+      "duration_seconds": 0.064,
+      "stdout_sha256": "0539661cd1bdd3f2cdde7c5b08bd96849d117ecd1f7f7044d61546c6a29f90b1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:30.125377+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "06-ruff.stdout.log",
+      "stderr": "06-ruff.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:30.141541+00:00",
+      "duration_seconds": 0.016,
+      "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:30.142278+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "07-format.stdout.log",
+      "stderr": "07-format.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:30.158389+00:00",
+      "duration_seconds": 0.016,
+      "stdout_sha256": "ef7d13d02214e98ca902b05257cdbe6a8e84f3b4714508efdc19766460b54209",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "mypy"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:30.158997+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "08-mypy.stdout.log",
+      "stderr": "08-mypy.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:31.275934+00:00",
+      "duration_seconds": 1.117,
+      "stdout_sha256": "ab35ee42183d4d6d3ba483825ab037d18a5a15622d03be01d82220b1564851ff",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "tests",
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "pytest",
+        "-q"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:31.276681+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "09-tests.stdout.log",
+      "stderr": "09-tests.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:31.892193+00:00",
+      "duration_seconds": 0.615,
+      "stdout_sha256": "e173149ae4a7d07bf2a0a59558af27878c827af0bd7e82bda6c485ccd7a63e9f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "wheel-build",
+      "command": [
+        "uv",
+        "build",
+        "--no-build-isolation",
+        "--wheel"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:31.893005+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "10-wheel-build.stdout.log",
+      "stderr": "10-wheel-build.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:32.257945+00:00",
+      "duration_seconds": 0.365,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4552c741179218f2286f5f9f42780f252fc67c33b912da3fadbdd8c177b46da0",
+      "passed": true
+    },
+    {
+      "name": "empty-runtime",
+      "command": [
+        "uv",
+        "venv",
+        "--no-managed-python",
+        "--python",
+        "3.12.14",
+        "/home/runner/work/_temp/p01-quality/runtime"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:32.261225+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "11-empty-runtime.stdout.log",
+      "stderr": "11-empty-runtime.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:32.269180+00:00",
+      "duration_seconds": 0.008,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "88b6bafc565e7b9c8f4bfc2231a1fef35f6dbbcd4c7077c154d9c29d2ec301d4",
+      "passed": true
+    },
+    {
+      "name": "isolated-wheel-install",
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--python",
+        "/home/runner/work/_temp/p01-quality/runtime/bin/python",
+        "--no-index",
+        "--no-deps",
+        "/home/runner/work/_temp/p01-quality/component/dist/product_lifecycle-0.1.0.dev0-py3-none-any.whl"
+      ],
+      "cwd": "component",
+      "started_at": "2026-10-04T22:06:32.269806+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "12-isolated-wheel-install.stdout.log",
+      "stderr": "12-isolated-wheel-install.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:32.334351+00:00",
+      "duration_seconds": 0.064,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "2ca0def40afdd0a10ceb817c378d2c830752de23c3e6431b1c40c94bcc36414c",
+      "passed": true
+    },
+    {
+      "name": "runtime-inventory",
+      "command": [
+        "uv",
+        "pip",
+        "list",
+        "--python",
+        "/home/runner/work/_temp/p01-quality/runtime/bin/python",
+        "--format",
+        "json"
+      ],
+      "cwd": "runtime",
+      "started_at": "2026-10-04T22:06:32.335199+00:00",
+      "timeout_seconds": 300,
+      "expected_exit_code": 0,
+      "stdout": "13-runtime-inventory.stdout.log",
+      "stderr": "13-runtime-inventory.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:32.343684+00:00",
+      "duration_seconds": 0.008,
+      "stdout_sha256": "d29a30c896f9a410ea2715d8690d37da893062c55138fc5de24d62a167614a32",
+      "stderr_sha256": "78ec6a56cf4cd8f0eb0a6502996a948aa8c0f175f7dbeebae140cdadabde0cbf",
+      "passed": true
+    },
+    {
+      "name": "isolated-import",
+      "command": [
+        "/home/runner/work/_temp/p01-quality/runtime/bin/python",
+        "-I",
+        "-c",
+        "import lifecycle; print(lifecycle.__file__)"
+      ],
+      "cwd": "runtime",
+      "started_at": "2026-10-04T22:06:32.345104+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "14-isolated-import.stdout.log",
+      "stderr": "14-isolated-import.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:32.361158+00:00",
+      "duration_seconds": 0.016,
+      "stdout_sha256": "c6b3feaccb44362637e9ff1eba694269441245bb871d70e1b9280f78c6063b5a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "isolated-liveness",
+      "command": [
+        "/home/runner/work/_temp/p01-quality/runtime/bin/python",
+        "-I",
+        "-m",
+        "lifecycle.bootstrap.health",
+        "liveness"
+      ],
+      "cwd": "runtime",
+      "started_at": "2026-10-04T22:06:32.362315+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "15-isolated-liveness.stdout.log",
+      "stderr": "15-isolated-liveness.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:32.394476+00:00",
+      "duration_seconds": 0.032,
+      "stdout_sha256": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "isolated-readiness",
+      "command": [
+        "/home/runner/work/_temp/p01-quality/runtime/bin/python",
+        "-I",
+        "-m",
+        "lifecycle.bootstrap.health",
+        "readiness"
+      ],
+      "cwd": "runtime",
+      "started_at": "2026-10-04T22:06:32.397451+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 1,
+      "stdout": "16-isolated-readiness.stdout.log",
+      "stderr": "16-isolated-readiness.stderr.log",
+      "exit_code": 1,
+      "finished_at": "2026-10-04T22:06:32.429561+00:00",
+      "duration_seconds": 0.032,
+      "stdout_sha256": "0a577cc36a0f23fc6200b5f008f18c398b3c4701b67beffd59088e451db93402",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "isolated-invalid-input",
+      "command": [
+        "/home/runner/work/_temp/p01-quality/runtime/bin/python",
+        "-I",
+        "-m",
+        "lifecycle.bootstrap.health",
+        "readiness",
+        "--force"
+      ],
+      "cwd": "runtime",
+      "started_at": "2026-10-04T22:06:32.430642+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 2,
+      "stdout": "17-isolated-invalid-input.stdout.log",
+      "stderr": "17-isolated-invalid-input.stderr.log",
+      "exit_code": 2,
+      "finished_at": "2026-10-04T22:06:32.462840+00:00",
+      "duration_seconds": 0.032,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "db2ce41829f676bbf3c305ee5c139ef7bfb24f38fe6c5742815bb5835efbb736",
+      "passed": true
+    },
+    {
+      "name": "installed-entrypoint",
+      "command": [
+        "/home/runner/work/_temp/p01-quality/runtime/bin/lifecycle-health",
+        "liveness"
+      ],
+      "cwd": "runtime",
+      "started_at": "2026-10-04T22:06:32.464208+00:00",
+      "timeout_seconds": 20,
+      "expected_exit_code": 0,
+      "stdout": "18-installed-entrypoint.stdout.log",
+      "stderr": "18-installed-entrypoint.stderr.log",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T22:06:32.496694+00:00",
+      "duration_seconds": 0.032,
+      "stdout_sha256": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "component-path-inside-repository",
+      "passed": true
+    },
+    {
+      "name": "component-source-present",
+      "passed": true
+    },
+    {
+      "name": "component-has-no-symlink-input",
+      "passed": true
+    },
+    {
+      "name": "committed-uv-lock-present",
+      "passed": true
+    },
+    {
+      "name": "exact-python-version",
+      "passed": true
+    },
+    {
+      "name": "exact-uv-version",
+      "passed": true
+    },
+    {
+      "name": "one-owned-wheel",
+      "passed": true
+    },
+    {
+      "name": "one-wheel-metadata",
+      "passed": true
+    },
+    {
+      "name": "wheel-contains-only-private-module-and-metadata",
+      "passed": true
+    },
+    {
+      "name": "no-runtime-dependencies",
+      "passed": true
+    },
+    {
+      "name": "only-one-runtime-distribution",
+      "passed": true
+    },
+    {
+      "name": "import-resolves-inside-installed-runtime",
+      "passed": true
+    },
+    {
+      "name": "liveness-bounded-to-process",
+      "passed": true
+    },
+    {
+      "name": "readiness-rejects-unimplemented-dependencies",
+      "passed": true
+    },
+    {
+      "name": "invalid-input-produces-no-success-document",
+      "passed": true
+    },
+    {
+      "name": "installed-command-agrees-with-module",
+      "passed": true
+    },
+    {
+      "name": "lock-unchanged",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "services/lifecycle/.dockerignore": "59e9a97d2a5cf9b6df4160b1c1b558f281a7c6335efb3fe00e446442b5ee407b",
+    "services/lifecycle/.gitignore": "c95d538d814abdee4b85b0190ecdff09a9cf312e47e64374c78f984994ab34b6",
+    "services/lifecycle/.python-version": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "services/lifecycle/Dockerfile": "ff63e3a22cf1f66ae44bd008a5fcb9e54f7c8c9ae2bec802f5ad05655be4b753",
+    "services/lifecycle/README.md": "84f42f846f3aaad6bbc60d8da58c65dd19e2191d7aac2e174bb02b1c87056da8",
+    "services/lifecycle/pyproject.toml": "0690036faba2fcb939f9ddad72da3b2e0157fad44bc65fb6a87d8baa4274e034",
+    "services/lifecycle/src/lifecycle/__init__.py": "6ef74fd0e8a102879b2b7dfea8ad56a3d8a35c5fb67561e5774aa8b986db2263",
+    "services/lifecycle/src/lifecycle/bootstrap/__init__.py": "ef6adabd1f5e063e8fc84022c413520bedb752a95eedc2181ea1fcaadbe5ec84",
+    "services/lifecycle/src/lifecycle/bootstrap/health.py": "c9d0d3a850c41373c168d85edbf35b5472d5aaedf24c5659134c7b1c6f968e67",
+    "services/lifecycle/src/lifecycle/interfaces/__init__.py": "36c59f445f3f701ece7b2016379abbbfabfd269ac5f6e2dac30860791a7d6a42",
+    "services/lifecycle/src/lifecycle/interfaces/health.py": "2ff7d45481e2926fd48f825546d55b05b6fa5034a8afc1082fe8960ef426766c",
+    "services/lifecycle/tests/test_health.py": "30fe8c535732cd4a452ce1f41e07af257475f1e570aa717c7cfe95e79b018e98",
+    "services/lifecycle/uv.lock": "fb93d6bfcf1f601f44572575d48c682132c2d7ef7e4a2152a00502f33b6ec2d4",
+    "scripts/p01/README.md": "7a6e158aabd3e7e8c18b921a491e197867999ddb056392f1fe869b96d44504e9",
+    "scripts/p01/candidates.json": "fc69e024a236030dd6f903dd3c2c8e7b0076c870739e110bc19f24c49b018153",
+    "scripts/p01/check_jobs.py": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+    "scripts/p01/run_images.py": "91bb18aa7cccb54c77cd14b4ffa15290cfb391e11865c77f2268ce2cedc75684",
+    "scripts/p01/run_quality.py": "d0123d3fe1df426281c2b8588404eb6366309135be04d2585d430f1927000db4",
+    "scripts/p01/select_components.py": "2a0f592465ad91409e221fb5e978a908fed2c1407edf53650b6ba5e800b20d5b",
+    "scripts/p01/test_jobs.py": "b103af1562f26ceb28e13e36fa13a09fb131333bc8cf4144e071d05b7c23bbf5",
+    "scripts/p01/test_recorder.py": "afc5002982dfb8d1d71a71974fdf5a2d3471854c6cfccc91f31f06b0d3bbe56f",
+    "scripts/p01/test_selection.py": "9d565729dfa41711d0ed12799ae23d2f63e0b6e83129d3476fb9bd9f84a70631",
+    ".github/workflows/p01-foundations.yml": "dad72497e6d9f777ad0b52c4283f6694b1096690477d012eb47da6b692a35bd8"
+  },
+  "input_lock_sha256": "fb93d6bfcf1f601f44572575d48c682132c2d7ef7e4a2152a00502f33b6ec2d4",
+  "wheel_members": [
+    "lifecycle/__init__.py",
+    "lifecycle/bootstrap/__init__.py",
+    "lifecycle/bootstrap/health.py",
+    "lifecycle/interfaces/__init__.py",
+    "lifecycle/interfaces/health.py",
+    "product_lifecycle-0.1.0.dev0.dist-info/METADATA",
+    "product_lifecycle-0.1.0.dev0.dist-info/WHEEL",
+    "product_lifecycle-0.1.0.dev0.dist-info/entry_points.txt",
+    "product_lifecycle-0.1.0.dev0.dist-info/top_level.txt",
+    "product_lifecycle-0.1.0.dev0.dist-info/RECORD"
+  ],
+  "wheel_sha256": "a1771b8e3592756c82c7c5ed632d0864a95441b7d67663895d2f5d93a622f3e4",
+  "artifact_sha256": {
+    "01-python-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-python-version.stdout.log": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "02-uv-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "02-uv-version.stdout.log": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6",
+    "03-lock-check.stderr.log": "0a67722074961f4e04e4e82ae6389fb9ca871cf9967bf2c5f96e3af03806db2a",
+    "03-lock-check.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-clean-locked-install.stderr.log": "9b162bf1251c5a61680a741b757b67c38b218035d05db0ed132335919e1f96e7",
+    "04-clean-locked-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "05-installed-quality-inventory.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "05-installed-quality-inventory.stdout.log": "0539661cd1bdd3f2cdde7c5b08bd96849d117ecd1f7f7044d61546c6a29f90b1",
+    "06-ruff.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-ruff.stdout.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "07-format.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "07-format.stdout.log": "ef7d13d02214e98ca902b05257cdbe6a8e84f3b4714508efdc19766460b54209",
+    "08-mypy.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-mypy.stdout.log": "ab35ee42183d4d6d3ba483825ab037d18a5a15622d03be01d82220b1564851ff",
+    "09-tests.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "09-tests.stdout.log": "e173149ae4a7d07bf2a0a59558af27878c827af0bd7e82bda6c485ccd7a63e9f",
+    "10-wheel-build.stderr.log": "4552c741179218f2286f5f9f42780f252fc67c33b912da3fadbdd8c177b46da0",
+    "10-wheel-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "11-empty-runtime.stderr.log": "88b6bafc565e7b9c8f4bfc2231a1fef35f6dbbcd4c7077c154d9c29d2ec301d4",
+    "11-empty-runtime.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "12-isolated-wheel-install.stderr.log": "2ca0def40afdd0a10ceb817c378d2c830752de23c3e6431b1c40c94bcc36414c",
+    "12-isolated-wheel-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "13-runtime-inventory.stderr.log": "78ec6a56cf4cd8f0eb0a6502996a948aa8c0f175f7dbeebae140cdadabde0cbf",
+    "13-runtime-inventory.stdout.log": "d29a30c896f9a410ea2715d8690d37da893062c55138fc5de24d62a167614a32",
+    "14-isolated-import.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "14-isolated-import.stdout.log": "c6b3feaccb44362637e9ff1eba694269441245bb871d70e1b9280f78c6063b5a",
+    "15-isolated-liveness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "15-isolated-liveness.stdout.log": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+    "16-isolated-readiness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "16-isolated-readiness.stdout.log": "0a577cc36a0f23fc6200b5f008f18c398b3c4701b67beffd59088e451db93402",
+    "17-isolated-invalid-input.stderr.log": "db2ce41829f676bbf3c305ee5c139ef7bfb24f38fe6c5742815bb5835efbb736",
+    "17-isolated-invalid-input.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "18-installed-entrypoint.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "18-installed-entrypoint.stdout.log": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+    "pyproject.toml": "0690036faba2fcb939f9ddad72da3b2e0157fad44bc65fb6a87d8baa4274e034",
+    "uv.lock": "fb93d6bfcf1f601f44572575d48c682132c2d7ef7e4a2152a00502f33b6ec2d4",
+    "wheel-envelope.json": "d132940dc0faa25393948686e5c08fe41c074927c1d1577f1f6213621a91daaa"
+  },
+  "completed_at": "2026-10-04T22:06:32.501468+00:00"
+}

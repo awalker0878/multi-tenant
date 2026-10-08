@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools==84.0.0", "wheel==0.48.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "product-lifecycle-worker"
+version = "0.1.0.dev0"
+description = "Lifecycle worker; isolated simulation and bounded native adapter components"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "cryptography==50.0.2",
+    "psycopg[binary]==3.3.6",
+    "uvicorn==0.53.0",
+]
+
+[project.scripts]
+lifecycle-worker-health = "lifecycle_worker.bootstrap.health:main"
+lifecycle-simulator = "lifecycle_worker.bootstrap.simulation:main"
+lifecycle-native-inspect = "lifecycle_worker.bootstrap.native_inspect:main"
+lifecycle-worker-native = "lifecycle_worker.bootstrap.native:main"
+lifecycle-migration-accounts = "lifecycle_worker.bootstrap.migration_accounts:main"
+
+[dependency-groups]
+dev = ["mypy==2.4.0", "pytest==9.1.1", "ruff==0.16.10"]
+build = ["setuptools==84.0.0", "wheel==0.48.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["lifecycle_worker", "lifecycle_worker.*"]
+namespaces = false
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-config --strict-markers"

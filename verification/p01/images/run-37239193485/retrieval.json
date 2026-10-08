@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "run_id": 37239193485,
+  "source_revision": "4142571874a53b351a9c6023313185fe718d0dac",
+  "workflow_conclusion": "failure",
+  "components": [
+    {
+      "component": "planning",
+      "result": "PASSED",
+      "report_sha256": "5f74cabc0b91eeba9cc48cb74b67ef0b7cb0d0dcd9b1de8c52d9caa257942218",
+      "retrieval_sha256": "5cbac6414f838e181ea2eeb20ba88ad0bca1121f0dea9007026035376819aa4c",
+      "archive_sha256": "b204dbb35a955c11097af3cec68f84f3edeebdbe11f791e03480ca42b64a8412",
+      "artifact_id": 11317170076,
+      "image": {
+        "id": "sha256:a456d7115a1d68da8a6656fad28fdc9add82d32147fc74ff59429f12c2cf125f",
+        "tag": "p01-planning:4142571874a53b351a9c6023313185fe718d0dac",
+        "size": 124376376,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      },
+      "commands": 10
+    },
+    {
+      "component": "catalogue",
+      "result": "PASSED",
+      "report_sha256": "cc512c07bddd883e746dae835440b1a88a7711a5db27a4d9de628714d883553e",
+      "retrieval_sha256": "89e3ec8fe5e4c398824f958bbc64180eaa4cff4e90fce7c24cca8c0cf2a8bcbc",
+      "archive_sha256": "6746e4014f85cbfb58dd3ca1acfde4e6e05357d2ac0391edb71f73ebd5d82a3c",
+      "artifact_id": 11316960110,
+      "image": {
+        "id": "sha256:8096d07465a167aa32aab451c19a6b020f79acf3a85eb9f2301cd8addfb11e81",
+        "tag": "p01-catalogue:4142571874a53b351a9c6023313185fe718d0dac",
+        "size": 552195220,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      },
+      "commands": 9
+    },
+    {
+      "component": "lifecycle",
+      "result": "PASSED",
+      "report_sha256": "13f9946d0425bb56212f3ed4d6d7a09e7cecd40aedba33e8724a70e7fcbba967",
+      "retrieval_sha256": "14bd7ff548fccbc54d1c8a39b477eab3b42c2f68928836ad2910715b3d3395d2",
+      "archive_sha256": "ca97e75799b3b84f9e392f0c71a8cb071cd7414b8e120a1f6865f611978bb907",
+      "artifact_id": 11316900331,
+      "image": {
+        "id": "sha256:4b4106ac253716787900100c6154f60c7b03c0e2573fea4c1218bfe9ea5da6ec",
+        "tag": "p01-lifecycle:4142571874a53b351a9c6023313185fe718d0dac",
+        "size": 124376463,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      },
+      "commands": 10
+    },
+    {
+      "component": "assurance",
+      "result": "PASSED",
+      "report_sha256": "5e42d3caa1ff864002e3e2ef01ef3c0895a6b5a70a4dd9279304d8abcf09c2b7",
+      "retrieval_sha256": "721826f2ccfb7866d08c4104f4b144e814792bf2a4bf2a60f4b08bc0fd67026a",
+      "archive_sha256": "7d21d309770804f7cdc0f147bb4de94b42a2f46b7043c15f73b64f5b4200f5e9",
+      "artifact_id": 11316870333,
+      "image": {
+        "id": "sha256:cfcd2aab161aac95198b902db3acb9a63ee587362cb43742715f981c819067a3",
+        "tag": "p01-assurance:4142571874a53b351a9c6023313185fe718d0dac",
+        "size": 552195220,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      },
+      "commands": 9
+    },
+    {
+      "component": "governance",
+      "result": "PASSED",
+      "report_sha256": "ac69a07084af1a2baea92c52ef8ca9af3b2c6ddd0d0df60267a939cd4fc25e11",
+      "retrieval_sha256": "554ab0fdac0c25caa98a66fe102b972090a83d875432dd350ce72a7f514667b7",
+      "archive_sha256": "170e2a99c2f7bb0dae1212e3f25fbe22d938eb8383bf160feea36ea05ec71037",
+      "artifact_id": 11316810688,
+      "image": {
+        "id": "sha256:dfc3d97b2d2badbe264454422a4e5b136e6f7f89a606f8bac27112452b39a79c",
+        "tag": "p01-governance:4142571874a53b351a9c6023313185fe718d0dac",
+        "size": 552195228,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      },
+      "commands": 9
+    },
+    {
+      "component": "console",
+      "result": "FAILED",
+      "report_sha256": "f3f4e0a0e57c4f9a8afe0dd225dd6214e224e0927be7def14c2bf732f47633a0",
+      "retrieval_sha256": "be5d9b050865e39cb5fba851af3a9c14a197e4b78c2c06e9e045faf434eb1733",
+      "archive_sha256": "58ec131650e851721d2a0f4c38c49e38783888a4ac5dc1f25284acade3b6defb",
+      "artifact_id": 11316598824,
+      "image": {
+        "id": "sha256:a09d8847afa32289a0d8d75221fbdd3927720d370598238f59444e005a58162d",
+        "tag": "p01-console:4142571874a53b351a9c6023313185fe718d0dac",
+        "size": 552636085,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      },
+      "commands": 8
+    },
+    {
+      "component": "lifecycle-workers",
+      "result": "PASSED",
+      "report_sha256": "608696dcf9e58fa385c8bf6b821abb84530f4f51e87bd533d3862ee9be3ba882",
+      "retrieval_sha256": "78f7091bc3d551941423ff8f0966ec54cd8f0d01c6cd306a5a5cfbb7e35872ee",
+      "archive_sha256": "5dd4533a715040e2d67c91761171bd8f3c0801b7af73326ac77e948a33fec455",
+      "artifact_id": 11316523978,
+      "image": {
+        "id": "sha256:202dbdc34af94722b986e04dfa7c4254beec74fe5f87c423915854f03d6b401c",
+        "tag": "p01-lifecycle-workers:4142571874a53b351a9c6023313185fe718d0dac",
+        "size": 124377119,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      },
+      "commands": 10
+    },
+    {
+      "component": "inventory",
+      "result": "PASSED",
+      "report_sha256": "d6222722ce0b31592aef0bfbd1f8db24d0948ce7dbc225f8a7a82a71ca51634f",
+      "retrieval_sha256": "d681a17cc9f915e87264e16ec3a2b6410dd58b59514cb404579fbe423bea9cbc",
+      "archive_sha256": "d1323abdf6204161c9c47d4296ed96fb20d9df10e34b8c72e05635049ce90f55",
+      "artifact_id": 11316058713,
+      "image": {
+        "id": "sha256:8b9aa8d9a05ff50c72c4ad81c053e5b0686ffe1e96d24f5e944604e01a1843f0",
+        "tag": "p01-inventory:4142571874a53b351a9c6023313185fe718d0dac",
+        "size": 124376442,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      },
+      "commands": 10
+    },
+    {
+      "component": "inventory-workers",
+      "result": "PASSED",
+      "report_sha256": "0ec1834d16691ecb6c377471050dfcac8d21e12cec4d97f685fcde600ed07f31",
+      "retrieval_sha256": "3441f3f4ea3ebd85d1c589e3114e93d3f199ee34f78a10635ad738372bc144d5",
+      "archive_sha256": "375e685deebb87814e00cd735ed674e4881bbf93b9db03ef74e48a78ed94d604",
+      "artifact_id": 11315959185,
+      "image": {
+        "id": "sha256:da6eaba2509c08defe4a11e5e56a95a005d80a24e8634690ae02d9b9d7e7024b",
+        "tag": "p01-inventory-workers:4142571874a53b351a9c6023313185fe718d0dac",
+        "size": 124377077,
+        "platform": "linux/amd64",
+        "identity_kind": "local_image_configuration_digest"
+      },
+      "commands": 10
+    }
+  ],
+  "commands": 85,
+  "log_hashes_verified": 170,
+  "passed_components": 8,
+  "failed_components": [
+    "console"
+  ],
+  "result": "VERIFIED_WITH_RETAINED_FAILURE",
+  "corrective_run_id": 37239487917,
+  "scope": "Nine image builds; eight runtime checks passed. Console runtime failure retained unchanged; corrected result is a separate source-bound run."
+}

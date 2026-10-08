@@ -1,0 +1,71 @@
+name: P01 foundation contracts
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    name: Foundation contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24.19.0'
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, fileinfo, mbstring, openssl, pdo, pdo_pgsql, sockets, tokenizer
+          coverage: none
+          tools: composer:2.10.3
+      - name: Replay locks, freeze published versions and generate clients twice
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          EVENT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          export PATH="$JAVA_HOME/bin:$GITHUB_WORKSPACE/scripts/p01/contracts/.venv/bin:$PATH"
+          uv sync --project scripts/p01/contracts --frozen
+          npm ci --ignore-scripts --no-audit --no-fund --prefix scripts/p01/contracts
+          composer install --working-dir=services/catalogue --no-dev --no-plugins --no-scripts --no-interaction --no-progress
+          if [ "$EVENT_NAME" = pull_request ]; then
+            CONTRACT_BASE=$(git merge-base "$EVENT_BASE" "$EVENT_HEAD")
+          elif [ -n "$EVENT_BASE" ] && [ "$EVENT_BASE" != 0000000000000000000000000000000000000000 ]; then
+            CONTRACT_BASE="$EVENT_BASE"
+          else
+            CONTRACT_BASE=$(git rev-parse HEAD^)
+          fi
+          python scripts/p01/contracts/run.py --base "$CONTRACT_BASE" --output "$RUNNER_TEMP/p01-http-contracts"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p01-http-contracts-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-http-contracts/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Record the exact successfully tested checkout
+        run: python3 scripts/p01/record_check_source.py --name "Foundation contracts"
+      - name: Retain exact check source
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: check-source-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p01-check-source/report.json
+          if-no-files-found: error
+          retention-days: 14

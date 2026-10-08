@@ -1,0 +1,1092 @@
+{
+  "schema_version": 1,
+  "evidence_level": "E2",
+  "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+  "scope": "Native API component, PostgreSQL, Temporal and dependent browser qualification.",
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "production_native_dispatch_enabled": false,
+  "campaigns": [
+    {
+      "archive": "archives/p07-native-dispatch-37576102685-1.zip",
+      "archive_sha256": "79699b2426cdba7aeeda6a3ca4c635ee3ec3619d33c8901e46e2a10b5e3940cf",
+      "artifact_id": "11462947706",
+      "run_id": "37576102685",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102685",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T05:24:12.687219+00:00",
+      "source_bindings_verified": 206,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 11,
+      "artifact_hashes_verified": 19,
+      "nonzero_commands": [],
+      "test_suites": {
+        "temporal.xml": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-native-dispatch-37576102685-1/report.json",
+      "observed_checks": 43,
+      "replayed_histories": 6
+    },
+    {
+      "archive": "archives/p07-native-adapters-37576102685-1.zip",
+      "archive_sha256": "287a6e4e8a8f9812136b39a656d754b37bc2083811757f504b584f21573e633e",
+      "artifact_id": "11462837879",
+      "run_id": "37576102685",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102685",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T05:24:05.699809+00:00",
+      "source_bindings_verified": 120,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 14,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [],
+      "test_suites": {
+        "lifecycle.xml": {
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "native.xml": {
+          "tests": 139,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-native-adapters-37576102685-1/report.json"
+    },
+    {
+      "archive": "archives/p07-preparation-37576102685-1.zip",
+      "archive_sha256": "ed718b6e42a66b6f3695e46bdf04ee9862a1a92163b26c678fe4c2f643092a11",
+      "artifact_id": "11462089269",
+      "run_id": "37576102685",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102685",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T05:24:05.471187+00:00",
+      "source_bindings_verified": 66,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 6,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "python",
+            "-m",
+            "lifecycle.bootstrap.commissioning",
+            "--input",
+            "/home/runner/work/multi-tenant/multi-tenant/release/p07-native-inputs.json",
+            "--require-complete"
+          ],
+          "exit_code": 2,
+          "expected_exit_codes": [
+            0,
+            2
+          ],
+          "passed": true,
+          "log": "05.log",
+          "sha256": "0f9cad549cb1392a374b590b543695f392ee35467f037a4da9e79b08ac7b1625"
+        }
+      ],
+      "test_suites": {
+        "preparation.xml": {
+          "tests": 93,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-preparation-37576102685-1/report.json"
+    },
+    {
+      "archive": "archives/p05-live-chromium-37575647489-1.zip",
+      "archive_sha256": "a971582e1c9375d2023a0e9567e81a636a961beba862ac44f59c4d944f579378",
+      "artifact_id": "11463036428",
+      "run_id": "37575647489",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37575647489",
+      "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+      "result": "FAIL",
+      "observed_at": "2026-10-07T05:19:42.306220+00:00",
+      "source_bindings_verified": 1074,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 21,
+      "artifact_hashes_verified": 28,
+      "nonzero_commands": [],
+      "test_suites": {},
+      "report": "reports/p05-live-chromium-37575647489-1/report.json",
+      "observed_checks": 48,
+      "original_error": "planning_plans_expected_201_got_422:{\"error\": \"native_operation_scope_changed\"}"
+    },
+    {
+      "archive": "archives/p05-live-webkit-37575647489-1.zip",
+      "archive_sha256": "b63fc5adacaa8d790db911719c6428c5cc6d5349e9d2d5dde9622fe48c0c3206",
+      "artifact_id": "11462502720",
+      "run_id": "37575647489",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37575647489",
+      "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+      "result": "FAIL",
+      "observed_at": "2026-10-07T05:19:51.535532+00:00",
+      "source_bindings_verified": 1074,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 21,
+      "artifact_hashes_verified": 28,
+      "nonzero_commands": [],
+      "test_suites": {},
+      "report": "reports/p05-live-webkit-37575647489-1/report.json",
+      "observed_checks": 48,
+      "original_error": "planning_plans_expected_201_got_422:{\"error\": \"native_operation_scope_changed\"}"
+    },
+    {
+      "archive": "archives/p05-live-firefox-37575647489-1.zip",
+      "archive_sha256": "75a663ab334109b84ce1b9e3cacfb514b9634001285d26b4822dd0bbca43d8ad",
+      "artifact_id": "11462421514",
+      "run_id": "37575647489",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37575647489",
+      "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+      "result": "FAIL",
+      "observed_at": "2026-10-07T05:19:38.191891+00:00",
+      "source_bindings_verified": 1074,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 21,
+      "artifact_hashes_verified": 28,
+      "nonzero_commands": [],
+      "test_suites": {},
+      "report": "reports/p05-live-firefox-37575647489-1/report.json",
+      "observed_checks": 48,
+      "original_error": "planning_plans_expected_201_got_422:{\"error\": \"native_operation_scope_changed\"}"
+    },
+    {
+      "archive": "archives/p06-live-webkit-37575647527-1.zip",
+      "archive_sha256": "9a816619f850a17d90ff26e37f4524170856fd7f9d5f201cdde6288d882fb3fd",
+      "artifact_id": "11462911201",
+      "run_id": "37575647527",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37575647527",
+      "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+      "result": "FAIL",
+      "observed_at": "2026-10-07T05:20:11.176491+00:00",
+      "source_bindings_verified": 1073,
+      "source_binding_mismatches": [
+        {
+          "path": "services/lifecycle/src/product_lifecycle.egg-info/PKG-INFO",
+          "reported_sha256": "31bbc27ecbffc4b818f43c197b318de95dc4dab2107f99a3c93e21548658c049",
+          "git_sha256": "fd2b027233d642a5302355fc30ecc367f8d1059cf7d33ef5ff675e00d36b78af"
+        }
+      ],
+      "command_logs_verified": 21,
+      "artifact_hashes_verified": 28,
+      "nonzero_commands": [],
+      "test_suites": {},
+      "report": "reports/p06-live-webkit-37575647527-1/report.json",
+      "observed_checks": 48,
+      "original_error": "planning_plans_expected_201_got_422:{\"error\": \"native_operation_scope_changed\"}"
+    },
+    {
+      "archive": "archives/p06-live-chromium-37575647527-1.zip",
+      "archive_sha256": "eb63c6a3507736afe5eb86331c0e5b4942417da7d76ae65956e1d80c5bd2c701",
+      "artifact_id": "11462068748",
+      "run_id": "37575647527",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37575647527",
+      "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+      "result": "FAIL",
+      "observed_at": "2026-10-07T05:20:02.726231+00:00",
+      "source_bindings_verified": 1073,
+      "source_binding_mismatches": [
+        {
+          "path": "services/lifecycle/src/product_lifecycle.egg-info/PKG-INFO",
+          "reported_sha256": "31bbc27ecbffc4b818f43c197b318de95dc4dab2107f99a3c93e21548658c049",
+          "git_sha256": "fd2b027233d642a5302355fc30ecc367f8d1059cf7d33ef5ff675e00d36b78af"
+        }
+      ],
+      "command_logs_verified": 21,
+      "artifact_hashes_verified": 28,
+      "nonzero_commands": [],
+      "test_suites": {},
+      "report": "reports/p06-live-chromium-37575647527-1/report.json",
+      "observed_checks": 48,
+      "original_error": "planning_plans_expected_201_got_422:{\"error\": \"native_operation_scope_changed\"}"
+    },
+    {
+      "archive": "archives/p06-live-firefox-37575647527-1.zip",
+      "archive_sha256": "0e0c455617665e3e820d2916bd1b0f7388d95fb3b5f5a28577e77f402a27b1ed",
+      "artifact_id": "11462058717",
+      "run_id": "37575647527",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37575647527",
+      "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+      "result": "FAIL",
+      "observed_at": "2026-10-07T05:20:09.059827+00:00",
+      "source_bindings_verified": 1073,
+      "source_binding_mismatches": [
+        {
+          "path": "services/lifecycle/src/product_lifecycle.egg-info/PKG-INFO",
+          "reported_sha256": "31bbc27ecbffc4b818f43c197b318de95dc4dab2107f99a3c93e21548658c049",
+          "git_sha256": "fd2b027233d642a5302355fc30ecc367f8d1059cf7d33ef5ff675e00d36b78af"
+        }
+      ],
+      "command_logs_verified": 21,
+      "artifact_hashes_verified": 28,
+      "nonzero_commands": [],
+      "test_suites": {},
+      "report": "reports/p06-live-firefox-37575647527-1/report.json",
+      "observed_checks": 48,
+      "original_error": "planning_plans_expected_201_got_422:{\"error\": \"native_operation_scope_changed\"}"
+    },
+    {
+      "archive": "archives/p07-native-dispatch-37575647479-1.zip",
+      "archive_sha256": "624e657c457a480ecc1149b4045a7e0ea4cfcf0efb18c0135d4c07d1fe164823",
+      "artifact_id": "11462976859",
+      "run_id": "37575647479",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37575647479",
+      "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T05:20:15.435953+00:00",
+      "source_bindings_verified": 206,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 11,
+      "artifact_hashes_verified": 19,
+      "nonzero_commands": [],
+      "test_suites": {
+        "temporal.xml": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-native-dispatch-37575647479-1/report.json",
+      "observed_checks": 43,
+      "replayed_histories": 6
+    },
+    {
+      "archive": "archives/p07-preparation-37575647479-1.zip",
+      "archive_sha256": "9cff8e75c07415c3708d8a81c5fd9bb6df90f4be2e937d6d34e09a839138d0d8",
+      "artifact_id": "11462421464",
+      "run_id": "37575647479",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37575647479",
+      "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T05:19:21.766626+00:00",
+      "source_bindings_verified": 66,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 6,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "python",
+            "-m",
+            "lifecycle.bootstrap.commissioning",
+            "--input",
+            "/home/runner/work/multi-tenant/multi-tenant/release/p07-native-inputs.json",
+            "--require-complete"
+          ],
+          "exit_code": 2,
+          "expected_exit_codes": [
+            0,
+            2
+          ],
+          "passed": true,
+          "log": "05.log",
+          "sha256": "acaba70e2773b361d6a13670a002591d9365ba90c86d4fd33abade2d04d24bd1"
+        }
+      ],
+      "test_suites": {
+        "preparation.xml": {
+          "tests": 93,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-preparation-37575647479-1/report.json"
+    },
+    {
+      "archive": "archives/p07-native-adapters-37575647479-1.zip",
+      "archive_sha256": "2c746ac51d74b8248bdde2116897e8fa2a5e57114821fab56ee538aa9bd9d9fd",
+      "artifact_id": "11462388036",
+      "run_id": "37575647479",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37575647479",
+      "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T05:20:12.270657+00:00",
+      "source_bindings_verified": 120,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 14,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [],
+      "test_suites": {
+        "lifecycle.xml": {
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "native.xml": {
+          "tests": 137,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-native-adapters-37575647479-1/report.json"
+    },
+    {
+      "archive": "archives/native-contract-failure.zip",
+      "archive_sha256": "0287cf5de8ca8f9e3e3cdd24ac304e2e454272772fc16f049365679455e8ded6",
+      "artifact_id": "11463140659",
+      "run_id": "37575647515",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37575647515",
+      "source_revision": "eaf060b5bf2154d4d57c3445e3f1d8b5de901c9f",
+      "result": "FAIL",
+      "observed_at": null,
+      "source_bindings_verified": 66,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 2,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [],
+      "test_suites": {},
+      "report": "reports/native-contract-failure/report.json",
+      "original_error": "Published contract removed or changed: contracts/fixtures/catalogue/permit-desk-v1.json, contracts/fixtures/lifecycle/native-stage-grant-v1.json, contracts/fixtures/planning/synthetic-inputs-v1.json, contracts/fixtures/planning/synthetic-plan-v1.1.json, contracts/fixtures/planning/synthetic-plan-v1.json, contracts/openapi/lifecycle-native-boundary-v1.json, contracts/openapi/planning-v1.json, contracts/openapi/worker-native-effect-v1.json, contracts/schemas/planning/content-v1.json"
+    },
+    {
+      "archive": "archives/p05-live-chromium-37576102662-1.zip",
+      "archive_sha256": "7e8ebf19625c041ac5e62df06477b3eefaffd670df1332bb7fa9bb0204d3cfee",
+      "artifact_id": "11462683453",
+      "run_id": "37576102662",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102662",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:25:35.038430+00:00",
+      "source_bindings_verified": 1074,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 32,
+      "artifact_hashes_verified": 42,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p05-live-chromium-37576102662-1/report.json",
+      "observed_checks": 73
+    },
+    {
+      "archive": "archives/p05-live-firefox-37576102662-1.zip",
+      "archive_sha256": "e6e5b2616381e58e694a3c36dfdf9dd8442dae4a78c9edbd7367c4936f67bfa1",
+      "artifact_id": "11462532248",
+      "run_id": "37576102662",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102662",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:25:12.663170+00:00",
+      "source_bindings_verified": 1074,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 32,
+      "artifact_hashes_verified": 42,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p05-live-firefox-37576102662-1/report.json",
+      "observed_checks": 73
+    },
+    {
+      "archive": "archives/p05-core-37576102662-1.zip",
+      "archive_sha256": "9099d0b9949a9fa384e4008c8042a42a0a8f342cb4fa86fc089d06f9b39ef155",
+      "artifact_id": "11462382137",
+      "run_id": "37576102662",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102662",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASSED",
+      "observed_at": null,
+      "source_bindings_verified": 915,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 11,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [],
+      "test_suites": {
+        "services-lifecycle.xml": {
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "services-planning.xml": {
+          "tests": 110,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p05-core-37576102662-1/report.json"
+    },
+    {
+      "archive": "archives/p05-live-webkit-37576102662-1.zip",
+      "archive_sha256": "8a07bcefc19ee867f6683a2262b4b4a53824c2ee329e4f262a74a6854d0d4cbc",
+      "artifact_id": "11462298948",
+      "run_id": "37576102662",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102662",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:25:33.981182+00:00",
+      "source_bindings_verified": 1074,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 32,
+      "artifact_hashes_verified": 42,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p05-live-webkit-37576102662-1/report.json",
+      "observed_checks": 73
+    },
+    {
+      "archive": "archives/p06-live-chromium-37576102674-1.zip",
+      "archive_sha256": "90883ea7ce4ed58b37efdfd1eaef5772e3f42c30ab0620e6a672957e62d5eb5f",
+      "artifact_id": "11463107176",
+      "run_id": "37576102674",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102674",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:25:24.956083+00:00",
+      "source_bindings_verified": 1073,
+      "source_binding_mismatches": [
+        {
+          "path": "services/lifecycle/src/product_lifecycle.egg-info/PKG-INFO",
+          "reported_sha256": "31bbc27ecbffc4b818f43c197b318de95dc4dab2107f99a3c93e21548658c049",
+          "git_sha256": "fd2b027233d642a5302355fc30ecc367f8d1059cf7d33ef5ff675e00d36b78af"
+        }
+      ],
+      "command_logs_verified": 63,
+      "artifact_hashes_verified": 83,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-before-acceptance",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-after-target-write",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-lost-temporal-start-response",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-restored-worker-denied",
+          "exit_code": 1,
+          "sha256": "d90e4a55f8f4b5e919ff035890a0c7e6fda4a59cefff39ba2299b10a247cd416"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p06-live-chromium-37576102674-1/report.json",
+      "observed_checks": 148
+    },
+    {
+      "archive": "archives/p06-live-firefox-37576102674-1.zip",
+      "archive_sha256": "a1a4421f883d1be32aa4aba7b27cad7ab830ffe9ab597549c28781d1c77132be",
+      "artifact_id": "11463067523",
+      "run_id": "37576102674",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102674",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:25:20.459521+00:00",
+      "source_bindings_verified": 1073,
+      "source_binding_mismatches": [
+        {
+          "path": "services/lifecycle/src/product_lifecycle.egg-info/PKG-INFO",
+          "reported_sha256": "31bbc27ecbffc4b818f43c197b318de95dc4dab2107f99a3c93e21548658c049",
+          "git_sha256": "fd2b027233d642a5302355fc30ecc367f8d1059cf7d33ef5ff675e00d36b78af"
+        }
+      ],
+      "command_logs_verified": 63,
+      "artifact_hashes_verified": 83,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-before-acceptance",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-after-target-write",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-lost-temporal-start-response",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-restored-worker-denied",
+          "exit_code": 1,
+          "sha256": "d90e4a55f8f4b5e919ff035890a0c7e6fda4a59cefff39ba2299b10a247cd416"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p06-live-firefox-37576102674-1/report.json",
+      "observed_checks": 148
+    },
+    {
+      "archive": "archives/p06-live-webkit-37576102674-1.zip",
+      "archive_sha256": "770444556dd0835d5493059ffb12a612cb50b630dfb3797dc83eb6b6b03728f0",
+      "artifact_id": "11463047642",
+      "run_id": "37576102674",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102674",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:25:29.870381+00:00",
+      "source_bindings_verified": 1073,
+      "source_binding_mismatches": [
+        {
+          "path": "services/lifecycle/src/product_lifecycle.egg-info/PKG-INFO",
+          "reported_sha256": "31bbc27ecbffc4b818f43c197b318de95dc4dab2107f99a3c93e21548658c049",
+          "git_sha256": "fd2b027233d642a5302355fc30ecc367f8d1059cf7d33ef5ff675e00d36b78af"
+        }
+      ],
+      "command_logs_verified": 63,
+      "artifact_hashes_verified": 83,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-before-acceptance",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-after-target-write",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-lost-temporal-start-response",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-restored-worker-denied",
+          "exit_code": 1,
+          "sha256": "d90e4a55f8f4b5e919ff035890a0c7e6fda4a59cefff39ba2299b10a247cd416"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p06-live-webkit-37576102674-1/report.json",
+      "observed_checks": 148
+    },
+    {
+      "archive": "archives/p06-core-37576102674-1.zip",
+      "archive_sha256": "519e0306ccec363579ed79965955bc65c0268e5b859f9d4945bd93a1b32de32c",
+      "artifact_id": "11462029682",
+      "run_id": "37576102674",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37576102674",
+      "source_revision": "06a329d083901885e6471300cc455cb6c317b8dc",
+      "result": "PASSED",
+      "observed_at": null,
+      "source_bindings_verified": 199,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 12,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [],
+      "test_suites": {
+        "execution.xml": {
+          "tests": 49,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "services-lifecycle.xml": {
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "workers-lifecycle.xml": {
+          "tests": 139,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 10
+        }
+      },
+      "report": "reports/p06-core-37576102674-1/report.json"
+    },
+    {
+      "archive": "archives/p07-native-adapters-37577020405-1.zip",
+      "archive_sha256": "c0223ef379510de46bc40345456f8d30cc598398f15d0ada7fcdb2c6a976fb25",
+      "artifact_id": "11463123372",
+      "run_id": "37577020405",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020405",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T05:35:09.587229+00:00",
+      "source_bindings_verified": 114,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 14,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [],
+      "test_suites": {
+        "lifecycle.xml": {
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "native.xml": {
+          "tests": 139,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-native-adapters-37577020405-1/report.json"
+    },
+    {
+      "archive": "archives/p07-native-dispatch-37577020405-1.zip",
+      "archive_sha256": "b0b34698ba3bc21b631ef382be4109403c2e9ccf833ea896656ce0acde0469ca",
+      "artifact_id": "11462818062",
+      "run_id": "37577020405",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020405",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T05:35:07.003482+00:00",
+      "source_bindings_verified": 200,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 11,
+      "artifact_hashes_verified": 19,
+      "nonzero_commands": [],
+      "test_suites": {
+        "temporal.xml": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-native-dispatch-37577020405-1/report.json",
+      "observed_checks": 43,
+      "replayed_histories": 6
+    },
+    {
+      "archive": "archives/p07-preparation-37577020405-1.zip",
+      "archive_sha256": "ac274eab5b29f67c191162b425d72c50a2d7ca73f744b2d85e7adffb99ab5ac9",
+      "artifact_id": "11462563179",
+      "run_id": "37577020405",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020405",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T05:35:12.790273+00:00",
+      "source_bindings_verified": 60,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 6,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "python",
+            "-m",
+            "lifecycle.bootstrap.commissioning",
+            "--input",
+            "/home/runner/work/multi-tenant/multi-tenant/release/p07-native-inputs.json",
+            "--require-complete"
+          ],
+          "exit_code": 2,
+          "expected_exit_codes": [
+            0,
+            2
+          ],
+          "passed": true,
+          "log": "05.log",
+          "sha256": "20d92911c2d3434efcb6b0b81b13e52d4a4edd7a68945af92bea0ab42dff75bf"
+        }
+      ],
+      "test_suites": {
+        "preparation.xml": {
+          "tests": 93,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-preparation-37577020405-1/report.json"
+    },
+    {
+      "archive": "archives/p05-core-37577020396-1.zip",
+      "archive_sha256": "2ba2269c67fcf4ed0934ed19bcf91bcd88c83bcd37d2f78eaf478535ab4fcbc0",
+      "artifact_id": "11462558331",
+      "run_id": "37577020396",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020396",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASSED",
+      "observed_at": null,
+      "source_bindings_verified": 897,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 11,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [],
+      "test_suites": {
+        "services-lifecycle.xml": {
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "services-planning.xml": {
+          "tests": 110,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p05-core-37577020396-1/report.json"
+    },
+    {
+      "archive": "archives/p06-core-37577020428-1.zip",
+      "archive_sha256": "5660dfba140ea411f99028429130df0da08626c1eaccb4aee6d9f4801765d27e",
+      "artifact_id": "11463360714",
+      "run_id": "37577020428",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020428",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASSED",
+      "observed_at": null,
+      "source_bindings_verified": 193,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 12,
+      "artifact_hashes_verified": 0,
+      "nonzero_commands": [],
+      "test_suites": {
+        "execution.xml": {
+          "tests": 49,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "services-lifecycle.xml": {
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "workers-lifecycle.xml": {
+          "tests": 139,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 10
+        }
+      },
+      "report": "reports/p06-core-37577020428-1/report.json"
+    },
+    {
+      "archive": "archives/p05-live-firefox-37577020396-1.zip",
+      "archive_sha256": "dfccfe1c4cde7340927b50d274c4595e58dbf3af01d5f529fc563603c6d89a4c",
+      "artifact_id": "11463410548",
+      "run_id": "37577020396",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020396",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:36:38.953784+00:00",
+      "source_bindings_verified": 1056,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 32,
+      "artifact_hashes_verified": 42,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p05-live-firefox-37577020396-1/report.json",
+      "observed_checks": 73
+    },
+    {
+      "archive": "archives/p05-live-webkit-37577020396-1.zip",
+      "archive_sha256": "ae211f67b9a0542b53dff961f59f0e88236083799276793b51694fcffe6a70d2",
+      "artifact_id": "11463198329",
+      "run_id": "37577020396",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020396",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:36:59.353586+00:00",
+      "source_bindings_verified": 1056,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 32,
+      "artifact_hashes_verified": 42,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p05-live-webkit-37577020396-1/report.json",
+      "observed_checks": 73
+    },
+    {
+      "archive": "archives/p05-live-chromium-37577020396-1.zip",
+      "archive_sha256": "da2ba98670f2e707e4fb302f5220627e4ca6718d26f42e63cf75ba0d45997707",
+      "artifact_id": "11462979329",
+      "run_id": "37577020396",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020396",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:36:14.561427+00:00",
+      "source_bindings_verified": 1056,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 32,
+      "artifact_hashes_verified": 42,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p05-live-chromium-37577020396-1/report.json",
+      "observed_checks": 73
+    },
+    {
+      "archive": "archives/p06-live-firefox-37577020428-1.zip",
+      "archive_sha256": "238866f7e567a939ad0ea29887bb0cb7fcdbbd1c2d04a7551ea2d666120cd6ca",
+      "artifact_id": "11462658545",
+      "run_id": "37577020428",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020428",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:36:21.461353+00:00",
+      "source_bindings_verified": 1056,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 63,
+      "artifact_hashes_verified": 83,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-before-acceptance",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-after-target-write",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-lost-temporal-start-response",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-restored-worker-denied",
+          "exit_code": 1,
+          "sha256": "d90e4a55f8f4b5e919ff035890a0c7e6fda4a59cefff39ba2299b10a247cd416"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p06-live-firefox-37577020428-1/report.json",
+      "observed_checks": 148
+    },
+    {
+      "archive": "archives/p06-live-chromium-37577020428-1.zip",
+      "archive_sha256": "4005f1fd18cd2b054458120cad8c2e9bee72ace81c4f18957204c7b04fcb3919",
+      "artifact_id": "11462558609",
+      "run_id": "37577020428",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020428",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:36:14.349614+00:00",
+      "source_bindings_verified": 1056,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 63,
+      "artifact_hashes_verified": 83,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-before-acceptance",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-after-target-write",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-lost-temporal-start-response",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-restored-worker-denied",
+          "exit_code": 1,
+          "sha256": "d90e4a55f8f4b5e919ff035890a0c7e6fda4a59cefff39ba2299b10a247cd416"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p06-live-chromium-37577020428-1/report.json",
+      "observed_checks": 148
+    },
+    {
+      "archive": "archives/p06-live-webkit-37577020428-1.zip",
+      "archive_sha256": "123eb47afeffb62accafc5ba2ce1d4b4767327294292aafc0d1d02a45a397bec",
+      "artifact_id": "11462358873",
+      "run_id": "37577020428",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37577020428",
+      "source_revision": "4ee67fdd704f6b6c401237137e3d8e2940ba3d1a",
+      "result": "PASS",
+      "observed_at": "2026-10-07T05:36:44.174268+00:00",
+      "source_bindings_verified": 1056,
+      "source_binding_mismatches": [],
+      "command_logs_verified": 63,
+      "artifact_hashes_verified": 83,
+      "nonzero_commands": [
+        {
+          "name": "planning-broker-unavailable",
+          "exit_code": 1,
+          "sha256": "008598166f08ef58571d8c4fabc2143317efc1e1ea6ddcf0fe091f641e51e68e"
+        },
+        {
+          "name": "planning-confirmed-before-receipt-loss",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-before-acceptance",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-crash-after-target-write",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-lost-temporal-start-response",
+          "exit_code": 75,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "p06-restored-worker-denied",
+          "exit_code": 1,
+          "sha256": "d90e4a55f8f4b5e919ff035890a0c7e6fda4a59cefff39ba2299b10a247cd416"
+        }
+      ],
+      "test_suites": {},
+      "report": "reports/p06-live-webkit-37577020428-1/report.json",
+      "observed_checks": 148
+    }
+  ],
+  "limitations": [
+    "TLS peers use synthetic OpenStack/vSphere responses; no installed native platform is exercised.",
+    "Actual PostgreSQL and Temporal exercise durable journals and dispatch with synthetic current owners and stage effects.",
+    "The copy component covers parts of P08 M3/M4/M6, not snapshot/clone, OVF, conversion, guest transformation or delta cutover.",
+    "Current-owner/caller-trust composition, native fencing and selected guest/service/traffic/retirement integrations remain unfinished.",
+    "No Q05/Q06 native campaign, G07 receiving, operating acceptance or P07 completion is established."
+  ]
+}

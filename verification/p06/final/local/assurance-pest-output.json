@@ -1,0 +1,8 @@
+{
+  "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+  "command": "PATH=/workspace/scratch/e0ba18164d29/bin:$PATH vendor/bin/pest --compact",
+  "component": "services/assurance",
+  "exit_code": 0,
+  "output": "\n  \u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\u001b[90;1m.\u001b[39;22m\n\n  \u001b[90mTests:\u001b[39m    \u001b[32;1m40 passed\u001b[39;22m\u001b[90m (188 assertions)\u001b[39m\n  \u001b[90mDuration:\u001b[39m \u001b[39m2.51s\u001b[39m\n\n",
+  "scope": "40 local unit tests; independent hosted campaign supplies actual evidence custody integration."
+}

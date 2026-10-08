@@ -1,0 +1,62 @@
+name: Context policy
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: context-policy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  architecture-and-docs:
+    name: Architecture registry and documentation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5, resolved 2026-10-04
+        with:
+          persist-credentials: false
+      - name: Set up documentation Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6, resolved 2026-10-04
+        with:
+          python-version: '3.12'
+      - name: Install pinned documentation dependency
+        run: python -m pip install --disable-pip-version-check -r requirements-docs.txt
+      - name: Check context registry and supported source boundaries
+        run: python scripts/validate_architecture.py
+      - name: Prove valid and forbidden architecture fixtures
+        run: python -m unittest discover -s tests/documentation -p 'test_*.py' -v
+      - name: Validate declared P00 inputs without requiring external readiness
+        run: python scripts/validate_p00_inputs.py
+      - name: Validate carried P01 operating inputs without inventing acceptance
+        run: python scripts/p01/admission/operating_inputs.py
+      - name: Check retained evidence without changing its original bytes
+        run: |
+          python scripts/p01/test_retained.py -q
+          python scripts/p01/verify_retained.py
+      - name: Reconcile the complete P01 candidate evidence set
+        run: >-
+          python scripts/p01/artifacts/release_set.py
+          --run-path verification/p01/artifact-trust/run-37278732015
+          --check release/p01-candidate-set.json
+      - name: Check generated delivery views
+        run: python scripts/render_delivery_views.py --check
+      - name: Check documentation and delivery references
+        run: python scripts/validate_docs.py
+      - name: Record the exact successfully tested checkout
+        run: python3 scripts/p01/record_check_source.py --name "Architecture registry and documentation"
+      - name: Retain exact check source
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: check-source-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p01-check-source/report.json
+          if-no-files-found: error
+          retention-days: 14

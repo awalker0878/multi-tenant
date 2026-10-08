@@ -1,0 +1,158 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.53kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3
+#2 ...
+
+#3 [auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#4 ...
+
+#2 [internal] load metadata for ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3
+#2 DONE 0.6s
+
+#4 [internal] load metadata for docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#4 DONE 0.6s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 179B done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 41.22kB done
+#6 DONE 0.0s
+
+#7 [uv-tool 1/1] FROM ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3
+#7 resolve ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3 done
+#7 sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3 669B / 669B done
+#7 sha256:de5ce60260f893ece94ee7b7e9bdc7d0cd51b33e74aabef1358342e642ca71e7 1.30kB / 1.30kB done
+#7 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 0B / 23.52MB 0.1s
+#7 sha256:54723a59ba9fe2be41df3ad59d75d4738b62774f60a8e988163ed08002fa4215 0B / 98B 0.1s
+#7 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 9.44MB / 23.52MB 0.3s
+#7 sha256:54723a59ba9fe2be41df3ad59d75d4738b62774f60a8e988163ed08002fa4215 98B / 98B 0.2s done
+#7 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 12.58MB / 23.52MB 0.4s
+#7 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 20.97MB / 23.52MB 0.5s
+#7 sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 23.52MB / 23.52MB 0.6s done
+#7 extracting sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba
+#7 extracting sha256:c899545868f84f908ee09e6d932033fc14acdf3a2a8b2d6cdacf573c85450bba 0.3s done
+#7 extracting sha256:54723a59ba9fe2be41df3ad59d75d4738b62774f60a8e988163ed08002fa4215 done
+#7 DONE 1.6s
+
+#8 [build 1/6] FROM docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+#8 resolve docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a done
+#8 sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a 1.75kB / 1.75kB done
+#8 sha256:febd0be41adb897a0ab8f1f1c693d8912669ea60c4940e076e9946b60e210ef0 5.68kB / 5.68kB done
+#8 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 28.24MB / 28.24MB 0.2s done
+#8 extracting sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 1.3s
+#8 sha256:1c5e03f304918f89aed0c098c8f4b6f163f7bf9d2702991696bf0132a2853e30 3.53MB / 3.53MB 0.2s done
+#8 sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8 13.67MB / 13.67MB 0.3s done
+#8 sha256:7c6fab1667eb7d9029684d783e4c127f11dd7ed5120829f875b799a0b9431558 249B / 249B 0.3s done
+#8 extracting sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 1.6s done
+#8 extracting sha256:1c5e03f304918f89aed0c098c8f4b6f163f7bf9d2702991696bf0132a2853e30
+#8 extracting sha256:1c5e03f304918f89aed0c098c8f4b6f163f7bf9d2702991696bf0132a2853e30 0.3s done
+#8 extracting sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8
+#8 extracting sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8 0.5s done
+#8 extracting sha256:7c6fab1667eb7d9029684d783e4c127f11dd7ed5120829f875b799a0b9431558 done
+#8 DONE 4.4s
+
+#9 [runtime 2/3] WORKDIR /app
+#9 DONE 0.0s
+
+#10 [build 2/6] COPY --from=uv-tool /uv /usr/local/bin/uv
+#10 DONE 0.1s
+
+#11 [build 3/6] WORKDIR /build
+#11 DONE 0.0s
+
+#12 [build 4/6] COPY .python-version pyproject.toml uv.lock README.md ./
+#12 DONE 0.0s
+
+#13 [build 5/6] COPY src/ ./src/
+#13 DONE 0.0s
+
+#14 [build 6/6] RUN uv sync --locked --only-group build --no-install-project --no-managed-python     && uv build --offline --no-build-isolation --wheel     && uv venv --no-managed-python --python /usr/local/bin/python /opt/venv     && uv pip install --python /opt/venv/bin/python --offline --no-index --no-deps dist/*.whl
+#14 0.302 Using CPython 3.12.14 interpreter at: /usr/local/bin/python3.12
+#14 0.302 Creating virtual environment at: .venv
+#14 0.305 Resolved 16 packages in 0.75ms
+#14 0.410 Prepared 3 packages in 105ms
+#14 0.469 Installed 3 packages in 58ms
+#14 0.469  + packaging==26.3
+#14 0.469  + setuptools==84.0.0
+#14 0.469  + wheel==0.48.0
+#14 0.633 Building wheel...
+#14 1.390 running bdist_wheel
+#14 1.397 running build
+#14 1.398 running build_py
+#14 1.400 creating build/lib/inventory_worker
+#14 1.400 copying src/inventory_worker/__init__.py -> build/lib/inventory_worker
+#14 1.400 creating build/lib/inventory_worker/bootstrap
+#14 1.401 copying src/inventory_worker/bootstrap/health.py -> build/lib/inventory_worker/bootstrap
+#14 1.401 copying src/inventory_worker/bootstrap/__init__.py -> build/lib/inventory_worker/bootstrap
+#14 1.401 creating build/lib/inventory_worker/interfaces
+#14 1.402 copying src/inventory_worker/interfaces/health.py -> build/lib/inventory_worker/interfaces
+#14 1.402 copying src/inventory_worker/interfaces/__init__.py -> build/lib/inventory_worker/interfaces
+#14 1.402 running egg_info
+#14 1.404 creating src/product_inventory_worker.egg-info
+#14 1.405 writing src/product_inventory_worker.egg-info/PKG-INFO
+#14 1.406 writing dependency_links to src/product_inventory_worker.egg-info/dependency_links.txt
+#14 1.406 writing entry points to src/product_inventory_worker.egg-info/entry_points.txt
+#14 1.407 writing top-level names to src/product_inventory_worker.egg-info/top_level.txt
+#14 1.407 writing manifest file 'src/product_inventory_worker.egg-info/SOURCES.txt'
+#14 1.410 reading manifest file 'src/product_inventory_worker.egg-info/SOURCES.txt'
+#14 1.411 writing manifest file 'src/product_inventory_worker.egg-info/SOURCES.txt'
+#14 1.411 warning: build_py: byte-compiling is disabled, skipping.
+#14 1.411 
+#14 1.414 installing to build/bdist.linux-x86_64/wheel
+#14 1.414 running install
+#14 1.421 running install_lib
+#14 1.422 creating build/bdist.linux-x86_64/wheel
+#14 1.423 creating build/bdist.linux-x86_64/wheel/inventory_worker
+#14 1.423 creating build/bdist.linux-x86_64/wheel/inventory_worker/bootstrap
+#14 1.424 copying build/lib/inventory_worker/bootstrap/health.py -> build/bdist.linux-x86_64/wheel/./inventory_worker/bootstrap
+#14 1.424 copying build/lib/inventory_worker/bootstrap/__init__.py -> build/bdist.linux-x86_64/wheel/./inventory_worker/bootstrap
+#14 1.424 creating build/bdist.linux-x86_64/wheel/inventory_worker/interfaces
+#14 1.424 copying build/lib/inventory_worker/interfaces/health.py -> build/bdist.linux-x86_64/wheel/./inventory_worker/interfaces
+#14 1.425 copying build/lib/inventory_worker/interfaces/__init__.py -> build/bdist.linux-x86_64/wheel/./inventory_worker/interfaces
+#14 1.425 copying build/lib/inventory_worker/__init__.py -> build/bdist.linux-x86_64/wheel/./inventory_worker
+#14 1.425 warning: install_lib: byte-compiling is disabled, skipping.
+#14 1.425 
+#14 1.425 running install_egg_info
+#14 1.427 Copying src/product_inventory_worker.egg-info to build/bdist.linux-x86_64/wheel/./product_inventory_worker-0.1.0.dev0-py3.12.egg-info
+#14 1.428 running install_scripts
+#14 1.429 creating build/bdist.linux-x86_64/wheel/product_inventory_worker-0.1.0.dev0.dist-info/WHEEL
+#14 1.430 creating '/build/dist/.tmp-1jndt20e/product_inventory_worker-0.1.0.dev0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+#14 1.430 adding 'inventory_worker/__init__.py'
+#14 1.431 adding 'inventory_worker/bootstrap/__init__.py'
+#14 1.431 adding 'inventory_worker/bootstrap/health.py'
+#14 1.431 adding 'inventory_worker/interfaces/__init__.py'
+#14 1.431 adding 'inventory_worker/interfaces/health.py'
+#14 1.432 adding 'product_inventory_worker-0.1.0.dev0.dist-info/METADATA'
+#14 1.432 adding 'product_inventory_worker-0.1.0.dev0.dist-info/WHEEL'
+#14 1.432 adding 'product_inventory_worker-0.1.0.dev0.dist-info/entry_points.txt'
+#14 1.433 adding 'product_inventory_worker-0.1.0.dev0.dist-info/top_level.txt'
+#14 1.433 adding 'product_inventory_worker-0.1.0.dev0.dist-info/RECORD'
+#14 1.433 removing build/bdist.linux-x86_64/wheel
+#14 1.457 Successfully built dist/product_inventory_worker-0.1.0.dev0-py3-none-any.whl
+#14 1.616 Using CPython 3.12.14 interpreter at: /usr/local/bin/python
+#14 1.616 Creating virtual environment at: /opt/venv
+#14 1.775 Using Python 3.12.14 environment at: /opt/venv
+#14 1.777 Resolved 1 package in 1ms
+#14 1.780 Prepared 1 package in 3ms
+#14 1.784 Installed 1 package in 3ms
+#14 1.784  + product-inventory-worker==0.1.0.dev0 (from file:///build/dist/product_inventory_worker-0.1.0.dev0-py3-none-any.whl)
+#14 DONE 1.8s
+
+#15 [runtime 3/3] COPY --from=build /opt/venv/ /opt/venv/
+#15 DONE 0.0s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 0.4s done
+#16 writing image sha256:a81a8f88a74e3ab1fd897d2dee00b8f3dab2e8be8120b405aaf224ba7ec2a26f done
+#16 naming to docker.io/library/p01-inventory-workers:c9c202786437601c0f000bdf29d7e1e401e773ee done
+#16 DONE 0.4s

@@ -1,0 +1,1 @@
+../../../../../../../../tmp/p00-contracts-9xywifs0/first/probe-typescript-negative.ts(2,68): error TS2322: Type '"executing"' is not assignable to type 'SamplePhaseEnum'.

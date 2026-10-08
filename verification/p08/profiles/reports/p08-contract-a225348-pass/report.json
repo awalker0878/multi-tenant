@@ -1,0 +1,422 @@
+{
+  "result": "PASS",
+  "source_revision": "a225348115010b4f92cb49c4dd9f2021a63731a7",
+  "commands": [
+    {
+      "name": "generator-version",
+      "exit_code": 0,
+      "log": "generator-version.log",
+      "sha256": "51587aac6244156fa9045620237e41443cdde69c47a5a3c3d10f8a1450878be2"
+    },
+    {
+      "name": "compatibility-negative-cases",
+      "exit_code": 0,
+      "log": "compatibility-negative-cases.log",
+      "sha256": "33060fd73862c5e1af97335504d5b45211fce6d229657f556d8deceeadc52ce4"
+    },
+    {
+      "name": "openapi-validation",
+      "exit_code": 0,
+      "log": "openapi-validation.log",
+      "sha256": "623a54b0746017d467101f1f77df7b5bdd964dae818465fd963cfe56941fc3bb"
+    },
+    {
+      "name": "generate-first-php",
+      "exit_code": 0,
+      "log": "generate-first-php.log",
+      "sha256": "7d6331cc64e3c846f1aabcfe60c5f6af434267cde395834aed81df60720c8fef"
+    },
+    {
+      "name": "generate-first-python",
+      "exit_code": 0,
+      "log": "generate-first-python.log",
+      "sha256": "35b1bb1acd447644d09c10d279f1c6696a3935b1ce6e2685bb7a09d11fe78668"
+    },
+    {
+      "name": "generate-first-typescript-fetch",
+      "exit_code": 0,
+      "log": "generate-first-typescript-fetch.log",
+      "sha256": "d6264d9098c25e3109cd7a955b5ece001dd0319d2d5d02edd1aa2c776feda747"
+    },
+    {
+      "name": "generate-second-php",
+      "exit_code": 0,
+      "log": "generate-second-php.log",
+      "sha256": "d8f849e829ba4745426d7d12f5190676c6e79b43f57daa29c02dd37a9e86ae42"
+    },
+    {
+      "name": "generate-second-python",
+      "exit_code": 0,
+      "log": "generate-second-python.log",
+      "sha256": "c7a02748ca3e3c6bb5d965c2da31242c2766a68aa0044d4abf2960cdbe867a6e"
+    },
+    {
+      "name": "generate-second-typescript-fetch",
+      "exit_code": 0,
+      "log": "generate-second-typescript-fetch.log",
+      "sha256": "26184e9b572e0095fcaad0fa9ca4e5c59430da3d642da1b5e51d9f2f61dcb6a2"
+    },
+    {
+      "name": "php-lint-0",
+      "exit_code": 0,
+      "log": "php-lint-0.log",
+      "sha256": "67b102ac16fc91a493b6cf36dcabdd1a8923f781d9de8062de61fdf2bf3b17a2"
+    },
+    {
+      "name": "php-lint-1",
+      "exit_code": 0,
+      "log": "php-lint-1.log",
+      "sha256": "9588c3e7ce8bb6260667722fe4b18e325c82a682dc818812c6d0f05b884056ce"
+    },
+    {
+      "name": "php-lint-2",
+      "exit_code": 0,
+      "log": "php-lint-2.log",
+      "sha256": "d87d7868bdaef2834aa3ca4bd21a0da25fb996e01de5301a7069554eddd54f7d"
+    },
+    {
+      "name": "php-lint-3",
+      "exit_code": 0,
+      "log": "php-lint-3.log",
+      "sha256": "252a43c042421852e9e4c7d65d65229154ba5531d162e7c18e475e763a3e89d4"
+    },
+    {
+      "name": "php-lint-4",
+      "exit_code": 0,
+      "log": "php-lint-4.log",
+      "sha256": "7fe8ee7d070a133b350d28acd2ced68c9354d0289b580658f356c36d742131ba"
+    },
+    {
+      "name": "php-lint-5",
+      "exit_code": 0,
+      "log": "php-lint-5.log",
+      "sha256": "25d46e6a087367e436707391e49e125b2e97121826467ef723a5f86306f71d65"
+    },
+    {
+      "name": "php-lint-6",
+      "exit_code": 0,
+      "log": "php-lint-6.log",
+      "sha256": "35269199b80f95036c329da685f52adb1f5f135e7c4addbd555c8741c0f4475f"
+    },
+    {
+      "name": "php-lint-7",
+      "exit_code": 0,
+      "log": "php-lint-7.log",
+      "sha256": "745a2d52ac8a8a636aee7c06e24072e3c8231f8693dbe3235f634f84863e3d79"
+    },
+    {
+      "name": "php-lint-8",
+      "exit_code": 0,
+      "log": "php-lint-8.log",
+      "sha256": "8b7c92e68b8b0232533c5aa898fc47326da922efa92a48f1c7f96d85b2144743"
+    },
+    {
+      "name": "php-lint-9",
+      "exit_code": 0,
+      "log": "php-lint-9.log",
+      "sha256": "755ef630b5b65972b432a51017ef09ea283f98afa93a408c603fbe05fb446169"
+    },
+    {
+      "name": "php-lint-10",
+      "exit_code": 0,
+      "log": "php-lint-10.log",
+      "sha256": "04aa43ca1f3d4c14a1b22c25c571c40bb53e31c0a507db1a6ed21473a83c0d44"
+    },
+    {
+      "name": "php-lint-11",
+      "exit_code": 0,
+      "log": "php-lint-11.log",
+      "sha256": "feba7cdf6e730713d1aff29d0b10418104cfa9d0d58b7d421e2b162feb2f9849"
+    },
+    {
+      "name": "php-lint-12",
+      "exit_code": 0,
+      "log": "php-lint-12.log",
+      "sha256": "50bed109e7c8788c26436f9baf6123bf876259300b64b43c1df8d807c14ca965"
+    },
+    {
+      "name": "php-wire-and-models",
+      "exit_code": 0,
+      "log": "php-wire-and-models.log",
+      "sha256": "44e2abe77530050d83d8a649cfd2a97358e39bdca48eacd70a3042bfd541b50a"
+    },
+    {
+      "name": "typescript-compile",
+      "exit_code": 0,
+      "log": "typescript-compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "fixtures": [
+    {
+      "id": "ProcessLive-valid",
+      "valid": true
+    },
+    {
+      "id": "ProcessLive-invalid-status",
+      "valid": false
+    },
+    {
+      "id": "ProcessLive-invalid-service",
+      "valid": false
+    },
+    {
+      "id": "ProcessLive-invalid-scope",
+      "valid": false
+    },
+    {
+      "id": "ProcessLive-invalid-extra",
+      "valid": false
+    },
+    {
+      "id": "ServiceNotReady-valid",
+      "valid": true
+    },
+    {
+      "id": "ServiceNotReady-invalid-status",
+      "valid": false
+    },
+    {
+      "id": "ServiceNotReady-invalid-service",
+      "valid": false
+    },
+    {
+      "id": "ServiceNotReady-invalid-scope",
+      "valid": false
+    },
+    {
+      "id": "ServiceNotReady-invalid-extra",
+      "valid": false
+    },
+    {
+      "id": "DependenciesReady-valid",
+      "valid": true
+    },
+    {
+      "id": "DependenciesReady-invalid-status",
+      "valid": false
+    },
+    {
+      "id": "DependenciesReady-invalid-service",
+      "valid": false
+    },
+    {
+      "id": "DependenciesReady-invalid-scope",
+      "valid": false
+    },
+    {
+      "id": "DependenciesReady-invalid-extra",
+      "valid": false
+    },
+    {
+      "id": "DependenciesReady-native-denied",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnauthorized-valid",
+      "valid": true
+    },
+    {
+      "id": "DependenciesUnauthorized-invalid-status",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnauthorized-invalid-service",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnauthorized-invalid-scope",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnauthorized-invalid-extra",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnauthorized-native-denied",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnavailable-valid",
+      "valid": true
+    },
+    {
+      "id": "DependenciesUnavailable-invalid-status",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnavailable-invalid-service",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnavailable-invalid-scope",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnavailable-invalid-extra",
+      "valid": false
+    },
+    {
+      "id": "DependenciesUnavailable-native-denied",
+      "valid": false
+    }
+  ],
+  "limits": [
+    "Foundation diagnostic contract only; business API conventions remain separate.",
+    "Generated clients are disposable private conformance outputs, not authorization or complete validators.",
+    "Exact-byte existing-version freeze is conservative compatibility feedback, not protected admission.",
+    "No current live provider or business API is exercised by this generation job."
+  ],
+  "input_sha256": {
+    "contracts/asyncapi/catalogue-intent.yaml": "4dd406dd996e9fb6923059fdb2069d149b475e1c23d41dffce41c676a088e9dd",
+    "contracts/asyncapi/catalogue.yaml": "d11eab6a06d27b202011223a6b366b1ad8419a2af15eb8d764581bef794043ee",
+    "contracts/asyncapi/governance.yaml": "0e1d37ee9444b9bfff47fd5549a4af595f831dc40ebdd438634803db3b4fdc92",
+    "contracts/asyncapi/identity.yaml": "f11805164c9abd57a6195b700cd71d4afb08a14a239f58a6735d695b54cd7e8f",
+    "contracts/asyncapi/support.yaml": "936929ecb1687dc916c004daa936dad08f10498a736d8bca0331776202ad7202",
+    "contracts/fixtures/catalogue/permit-desk-v1.json": "ad774c7fe91989c89642991ed35b746015a34007a78c8dac5dc91a6d7d8c57c4",
+    "contracts/fixtures/inventory/configuration-v1.1.json": "9190b60d4167afbd4721d5e2c0fbde1c1c0b29a9e18f63fdf69f26d20a339817",
+    "contracts/fixtures/inventory/migration-profile-v1.json": "f8dbd40c3cef94011573dc89ffea07f4d1589c5eaa117eb2e83cf23c21dc6e00",
+    "contracts/fixtures/lifecycle/migration-stage-grant-v2.json": "c8c4c6792e1f67ab89fdbb8be8c12a3a6c45825d18c889fc84393ba46a72e4c5",
+    "contracts/fixtures/lifecycle/native-stage-grant-v1.json": "7c6e7f7cbfc8f6ec11b1d14b18ad0ba45a639f7194dcdfdf576f28d1009bbf7b",
+    "contracts/fixtures/planning/synthetic-inputs-v1.json": "789fa7012755730a7375b19d3cc6fdc0a3d0ba135bee12f3aeb95fa8e161376f",
+    "contracts/fixtures/planning/synthetic-plan-v1.1.json": "df71e419c03c282c11b5b351f607f9596e3eec3b027e62bec5d03886f741b20c",
+    "contracts/fixtures/planning/synthetic-plan-v1.json": "df71e419c03c282c11b5b351f607f9596e3eec3b027e62bec5d03886f741b20c",
+    "contracts/openapi/assurance-evidence-v1.json": "35a2aa1c10483ebe85753954b82125eddd8ba589463191adc80238c6e2812bc7",
+    "contracts/openapi/catalogue-v1.0.1.json": "656e124e9fceca6aad21bbb5676cdcb88f8c5d0e089e5ade3ffa7245023d2679",
+    "contracts/openapi/catalogue-v1.json": "82d6660aaf38411c3ecfc1ed38429ccea890fd454d1436a23bafb998a18f1195",
+    "contracts/openapi/foundation-health-v1.json": "0ae446a089acaa24d549d11b860efa750d8758b67c70d9d82a056ebcd012977c",
+    "contracts/openapi/governance-approvals-v1.json": "942f8b0a7a0fb56d4f44607d2aeb61673778d4c3f1c54457063cb78fde3bb689",
+    "contracts/openapi/governance-catalogue-owners-v1.json": "44673c782d4879e4e4f7b765d0559ca744ed40523d6a16720b034007d99b1969",
+    "contracts/openapi/governance-delegation-v1.1.json": "3ee10400c054ffed7048dcdf24966b5e7dd6bd8e9587f8bda9a413599d2451d7",
+    "contracts/openapi/governance-delegation-v1.json": "2e466b0d873439b3938d005295e33dc3551052bf0e2d2d66d788cd4466a5b94d",
+    "contracts/openapi/governance-directory-v1.json": "63ae9d01cf3d31ba008c9736d3573c100e301a572bffe9c0a86eae4b263be155",
+    "contracts/openapi/governance-federation-v1.json": "233a03ad6c3d38ac99a4978f24ae28e46eb3fde632586d0766772c7b3c99eb2d",
+    "contracts/openapi/governance-inventory-collection-v1.json": "cf4e7f9cbdfc9e02843230a6b06999c92a37054fddfad238196463e7f15c87f0",
+    "contracts/openapi/governance-local-identity-v1.json": "79f17eb90e3c0fd335d7be95f4fd71666adf017d8c31254872ef64c1dfc7ad0e",
+    "contracts/openapi/governance-support-v1.json": "c779f3fbad7685824aa0be8e3a90da4f3150565d95fbb48e834c964c265b5714",
+    "contracts/openapi/governance-tenancy-v1.json": "39ba6e2e78f1575f84f765910ad48a07a8e73d606cb30d8d51788e8d07125d1d",
+    "contracts/openapi/inventory-v1.1.json": "935fbe249aff663361454c90284b2f8a019b87d19261170527d4eb3a052908e8",
+    "contracts/openapi/inventory-v1.2.json": "504bb97f9a50c54df3193ac223e281ade0eae5135705be2aa65ffe6690e00e98",
+    "contracts/openapi/inventory-v1.json": "97181d57ab05a4547af0695292896f11561a7d273c53d562a0deb2f5eaee9ded",
+    "contracts/openapi/lifecycle-migration-boundary-v2.json": "0b25dfd91c3722b484237b8a4fc5e05e20c77eb6fb962a1c86f9309b84a96e31",
+    "contracts/openapi/lifecycle-native-boundary-v1.json": "d73e9b1fef21eb334e7b10ea380f319ff6bc6d179291a11920f2f66167d7fe78",
+    "contracts/openapi/lifecycle-v1.json": "bdbd28bc7ccaf4e48c6d4ee68391e0bb22fefbc7c50f6999f0c0c11479a42935",
+    "contracts/openapi/planning-immutable-plan-v1.1.json": "c1acd0ef313580977f31c07fe39b87fd18e31385dfe7f318a536f53047e4a0e2",
+    "contracts/openapi/planning-immutable-plan-v1.json": "68db8d73386ab4817dbe8810f6b2364aab7ffa8a96b5987371a4ac97dbd24b48",
+    "contracts/openapi/planning-inputs-v1.json": "00841695f09780aa1dd78943ac98b8585255e42b0814341b40640aad65ac9ad1",
+    "contracts/openapi/planning-migration-v1.json": "473795fed19bbfb6bf85268046064e5b4920107ff357406cef0863d1f1b612a2",
+    "contracts/openapi/planning-v1.json": "cba61af64a5f4df2df1a88389de8c3758ba21e814e59038f03823089993a3071",
+    "contracts/openapi/worker-migration-effect-v2.json": "dcc1adf08a2e9cba552201d0086fb226fcb9bba75aeaa035f3cdba7e03c2df0f",
+    "contracts/openapi/worker-native-effect-v1.json": "4d200757f74a69a744749f3d6d93e08be946c07fd4ee572aa04c65e5bc40367f",
+    "contracts/schemas/catalogue/intent-v1.json": "83aaeb8a35299c9954e21f6a57755e4b1a9ed33004331c2921748647024ae658",
+    "contracts/schemas/events/catalogue-foundation-recorded-v1.json": "933b1e3d02678ba7bd5ebb19aeffd6d08c42124ba3d1706bc1e0b039f5e1052f",
+    "contracts/schemas/events/catalogue-intent-v1.json": "712093647c39b4411341ce2a6f15eb0d6328245c374861e20fd7ea25bdac7e33",
+    "contracts/schemas/events/governance-change-v1.json": "470cb3b3472e19cfe919f67bdf5c7e23cc5442533eaf15fbef3c03c621ab9afa",
+    "contracts/schemas/events/identity-change-v1.json": "3e29ad64056f83e5738f09adb241bd9b4faeb00450101d27dba9b25d123946f4",
+    "contracts/schemas/events/support-change-v1.json": "64bc40fdc3992941a8bcb3011bdf2a879b4c232358ebad8d72d4ff2a085184b6",
+    "contracts/schemas/inventory/collection-page-v1.1.json": "660ccab28680797faec0844d9e40063f7f67472db9bdc7ca37046dad4c3a1115",
+    "contracts/schemas/inventory/collection-page-v1.2.json": "b6018d89b2440bfb2b58abf50643def62981f40061b289f963cb3af3edf91ce3",
+    "contracts/schemas/inventory/collection-page-v1.json": "6b310d623a2288397f96690367d5160734fa14334e473b117f77dfbdf823a526",
+    "contracts/schemas/inventory/fact-v1.1.json": "fe0543252657e2329f09a856fff2f1127f56b714b30e352f984df1943e9c48c6",
+    "contracts/schemas/inventory/fact-v1.json": "2ddc754b0b6c0c3df42c3919233ad3201a9bbbf3a5589b80bac115301e1033a9",
+    "contracts/schemas/planning/admission-record-v1.json": "b70982bf839b1d3d85b6e94cfa0ccf7d63fc1c7cb7b933549282d75e02b24ebe",
+    "contracts/schemas/planning/catalogue-input-v1.json": "77ab18d6c2576f1d90fe330dd7b7e1ff4581232b1e64ebed57e9e4b159d13066",
+    "contracts/schemas/planning/content-v1.json": "0714eb786f87afd3db25ed9ef70c9d58205b7a33d1f395024d549b47f7d0dbfb",
+    "contracts/schemas/planning/fact-v1.json": "19fcddc81440c29e046dd268c7a3fe13a1eeb5f3a5c23b8d4a8647b7580526eb",
+    "contracts/schemas/planning/inventory-input-v1.json": "5e250e2c72aa34633943750c4307112b47856ed1a354a7d6ee96a01261ab2ea6",
+    "contracts/schemas/planning/migration-input-v1.json": "827d4d9e55ef0287131b046fa865e6defb7f779cc17f30cd5e57a683bd915dfb",
+    "contracts/schemas/planning/qualification-v1.json": "2cd213cb12dd9256d277711df8e7a27df654ea1859bbbf9821c64c438ecb139b",
+    "contracts/schemas/planning/reservation-receipt-v1.json": "5db097d03af6fb461a9eef8c736781e6883dcc6882fb34c166d056b4a3f7ac10",
+    "scripts/p01/contracts/compatibility.py": "ea1176fbf8bff363fb4f1cef82fe674d62ab9155e1c21802287533ceee38fdde",
+    "scripts/p01/contracts/config-php.json": "12cb6d61d4661117692300d84fbc4c117ee5f252f06306813375523a9cadcf40",
+    "scripts/p01/contracts/config-python.json": "57fccb73fe13bb0c2c17b88db04c0892345a54f2845be6194e2721406caedf99",
+    "scripts/p01/contracts/config-typescript-fetch.json": "dfbc7aed787a9a529de03db50c9e7915dafe6fec71e0573457c8f7c78adb40cb",
+    "scripts/p01/contracts/package-lock.json": "b45c3b6ade5daf81de9b086060f6a631638e52d46a2083f34ab4e75094e76742",
+    "scripts/p01/contracts/package.json": "fbdb858ce3725ffc47879326382a88052d0304e26d492c706f9dce870fb43ae1",
+    "scripts/p01/contracts/pyproject.toml": "eff306f45a1d4d4dc1ecf21f36eba2daf20be160b938a87928af4e8e6655f315",
+    "scripts/p01/contracts/run.py": "b7b647933bdb5518e4bf9e2dd54330868f29cf5b5ec234e7beec25835b56df0a",
+    "scripts/p01/contracts/test_compatibility.py": "bf5b7e1a0437a564cf1fada63a81aed9abdd235cf3e8094bfd6d4588ec78f71d",
+    "scripts/p01/contracts/uv.lock": "6afd3e92a837772ab2edf0a61abb912d4e5d0917e2ebae03f0bbcbf21fe7951c",
+    "tests/contracts/conformance.py": "46e34326d298ab1da9bd2961106a32eb4393ec8a03c77c58e784c9da1cb592be",
+    "tests/contracts/fixtures.json": "4a934da040afe647284e9d8ab0fa9100709993dda29502133f3d3e4763a7ae3d",
+    "tests/contracts/health-fixtures.json": "2fd012b13404e0fe0451df8705dc7982850f86b79179f8407104a70180be190b",
+    "tests/contracts/health.php": "bc0eea420c79fba9b5ce907dac8d854b1c438ff1acf434e4aaa9dfe93a721d47",
+    "tests/contracts/php.php": "c4559cd63304d3f7e9116c66b8db72506a0db4966649068b7f835394ebffab48"
+  },
+  "tools": {
+    "openapi-generator-cli": "7.25.0",
+    "openapi-spec-validator": "0.9.0",
+    "pydantic": "2.13.5"
+  },
+  "generator_version": "7.25.0",
+  "compatibility": {
+    "base_revision": "b975c8f60f2d45a4b6635caca7b7f6c33785b89d",
+    "policy": "immutable-existing-contract-artifacts",
+    "baseline_sha256": {
+      "contracts/asyncapi/catalogue-intent.yaml": "4dd406dd996e9fb6923059fdb2069d149b475e1c23d41dffce41c676a088e9dd",
+      "contracts/asyncapi/catalogue.yaml": "d11eab6a06d27b202011223a6b366b1ad8419a2af15eb8d764581bef794043ee",
+      "contracts/asyncapi/governance.yaml": "0e1d37ee9444b9bfff47fd5549a4af595f831dc40ebdd438634803db3b4fdc92",
+      "contracts/asyncapi/identity.yaml": "f11805164c9abd57a6195b700cd71d4afb08a14a239f58a6735d695b54cd7e8f",
+      "contracts/asyncapi/support.yaml": "936929ecb1687dc916c004daa936dad08f10498a736d8bca0331776202ad7202",
+      "contracts/fixtures/catalogue/permit-desk-v1.json": "ad774c7fe91989c89642991ed35b746015a34007a78c8dac5dc91a6d7d8c57c4",
+      "contracts/fixtures/inventory/configuration-v1.1.json": "9190b60d4167afbd4721d5e2c0fbde1c1c0b29a9e18f63fdf69f26d20a339817",
+      "contracts/fixtures/inventory/migration-profile-v1.json": "f8dbd40c3cef94011573dc89ffea07f4d1589c5eaa117eb2e83cf23c21dc6e00",
+      "contracts/fixtures/lifecycle/migration-stage-grant-v2.json": "c8c4c6792e1f67ab89fdbb8be8c12a3a6c45825d18c889fc84393ba46a72e4c5",
+      "contracts/fixtures/lifecycle/native-stage-grant-v1.json": "7c6e7f7cbfc8f6ec11b1d14b18ad0ba45a639f7194dcdfdf576f28d1009bbf7b",
+      "contracts/fixtures/planning/synthetic-inputs-v1.json": "789fa7012755730a7375b19d3cc6fdc0a3d0ba135bee12f3aeb95fa8e161376f",
+      "contracts/fixtures/planning/synthetic-plan-v1.1.json": "df71e419c03c282c11b5b351f607f9596e3eec3b027e62bec5d03886f741b20c",
+      "contracts/fixtures/planning/synthetic-plan-v1.json": "df71e419c03c282c11b5b351f607f9596e3eec3b027e62bec5d03886f741b20c",
+      "contracts/openapi/assurance-evidence-v1.json": "35a2aa1c10483ebe85753954b82125eddd8ba589463191adc80238c6e2812bc7",
+      "contracts/openapi/catalogue-v1.0.1.json": "656e124e9fceca6aad21bbb5676cdcb88f8c5d0e089e5ade3ffa7245023d2679",
+      "contracts/openapi/catalogue-v1.json": "82d6660aaf38411c3ecfc1ed38429ccea890fd454d1436a23bafb998a18f1195",
+      "contracts/openapi/foundation-health-v1.json": "0ae446a089acaa24d549d11b860efa750d8758b67c70d9d82a056ebcd012977c",
+      "contracts/openapi/governance-approvals-v1.json": "942f8b0a7a0fb56d4f44607d2aeb61673778d4c3f1c54457063cb78fde3bb689",
+      "contracts/openapi/governance-catalogue-owners-v1.json": "44673c782d4879e4e4f7b765d0559ca744ed40523d6a16720b034007d99b1969",
+      "contracts/openapi/governance-delegation-v1.1.json": "3ee10400c054ffed7048dcdf24966b5e7dd6bd8e9587f8bda9a413599d2451d7",
+      "contracts/openapi/governance-delegation-v1.json": "2e466b0d873439b3938d005295e33dc3551052bf0e2d2d66d788cd4466a5b94d",
+      "contracts/openapi/governance-directory-v1.json": "63ae9d01cf3d31ba008c9736d3573c100e301a572bffe9c0a86eae4b263be155",
+      "contracts/openapi/governance-federation-v1.json": "233a03ad6c3d38ac99a4978f24ae28e46eb3fde632586d0766772c7b3c99eb2d",
+      "contracts/openapi/governance-inventory-collection-v1.json": "cf4e7f9cbdfc9e02843230a6b06999c92a37054fddfad238196463e7f15c87f0",
+      "contracts/openapi/governance-local-identity-v1.json": "79f17eb90e3c0fd335d7be95f4fd71666adf017d8c31254872ef64c1dfc7ad0e",
+      "contracts/openapi/governance-support-v1.json": "c779f3fbad7685824aa0be8e3a90da4f3150565d95fbb48e834c964c265b5714",
+      "contracts/openapi/governance-tenancy-v1.json": "39ba6e2e78f1575f84f765910ad48a07a8e73d606cb30d8d51788e8d07125d1d",
+      "contracts/openapi/inventory-v1.1.json": "935fbe249aff663361454c90284b2f8a019b87d19261170527d4eb3a052908e8",
+      "contracts/openapi/inventory-v1.2.json": "504bb97f9a50c54df3193ac223e281ade0eae5135705be2aa65ffe6690e00e98",
+      "contracts/openapi/inventory-v1.json": "97181d57ab05a4547af0695292896f11561a7d273c53d562a0deb2f5eaee9ded",
+      "contracts/openapi/lifecycle-migration-boundary-v2.json": "0b25dfd91c3722b484237b8a4fc5e05e20c77eb6fb962a1c86f9309b84a96e31",
+      "contracts/openapi/lifecycle-native-boundary-v1.json": "d73e9b1fef21eb334e7b10ea380f319ff6bc6d179291a11920f2f66167d7fe78",
+      "contracts/openapi/lifecycle-v1.json": "bdbd28bc7ccaf4e48c6d4ee68391e0bb22fefbc7c50f6999f0c0c11479a42935",
+      "contracts/openapi/planning-immutable-plan-v1.1.json": "c1acd0ef313580977f31c07fe39b87fd18e31385dfe7f318a536f53047e4a0e2",
+      "contracts/openapi/planning-immutable-plan-v1.json": "68db8d73386ab4817dbe8810f6b2364aab7ffa8a96b5987371a4ac97dbd24b48",
+      "contracts/openapi/planning-inputs-v1.json": "00841695f09780aa1dd78943ac98b8585255e42b0814341b40640aad65ac9ad1",
+      "contracts/openapi/planning-v1.json": "cba61af64a5f4df2df1a88389de8c3758ba21e814e59038f03823089993a3071",
+      "contracts/openapi/worker-migration-effect-v2.json": "dcc1adf08a2e9cba552201d0086fb226fcb9bba75aeaa035f3cdba7e03c2df0f",
+      "contracts/openapi/worker-native-effect-v1.json": "4d200757f74a69a744749f3d6d93e08be946c07fd4ee572aa04c65e5bc40367f",
+      "contracts/schemas/catalogue/intent-v1.json": "83aaeb8a35299c9954e21f6a57755e4b1a9ed33004331c2921748647024ae658",
+      "contracts/schemas/events/catalogue-foundation-recorded-v1.json": "933b1e3d02678ba7bd5ebb19aeffd6d08c42124ba3d1706bc1e0b039f5e1052f",
+      "contracts/schemas/events/catalogue-intent-v1.json": "712093647c39b4411341ce2a6f15eb0d6328245c374861e20fd7ea25bdac7e33",
+      "contracts/schemas/events/governance-change-v1.json": "470cb3b3472e19cfe919f67bdf5c7e23cc5442533eaf15fbef3c03c621ab9afa",
+      "contracts/schemas/events/identity-change-v1.json": "3e29ad64056f83e5738f09adb241bd9b4faeb00450101d27dba9b25d123946f4",
+      "contracts/schemas/events/support-change-v1.json": "64bc40fdc3992941a8bcb3011bdf2a879b4c232358ebad8d72d4ff2a085184b6",
+      "contracts/schemas/inventory/collection-page-v1.1.json": "660ccab28680797faec0844d9e40063f7f67472db9bdc7ca37046dad4c3a1115",
+      "contracts/schemas/inventory/collection-page-v1.2.json": "b6018d89b2440bfb2b58abf50643def62981f40061b289f963cb3af3edf91ce3",
+      "contracts/schemas/inventory/collection-page-v1.json": "6b310d623a2288397f96690367d5160734fa14334e473b117f77dfbdf823a526",
+      "contracts/schemas/inventory/fact-v1.1.json": "fe0543252657e2329f09a856fff2f1127f56b714b30e352f984df1943e9c48c6",
+      "contracts/schemas/inventory/fact-v1.json": "2ddc754b0b6c0c3df42c3919233ad3201a9bbbf3a5589b80bac115301e1033a9",
+      "contracts/schemas/planning/admission-record-v1.json": "b70982bf839b1d3d85b6e94cfa0ccf7d63fc1c7cb7b933549282d75e02b24ebe",
+      "contracts/schemas/planning/catalogue-input-v1.json": "77ab18d6c2576f1d90fe330dd7b7e1ff4581232b1e64ebed57e9e4b159d13066",
+      "contracts/schemas/planning/content-v1.json": "0714eb786f87afd3db25ed9ef70c9d58205b7a33d1f395024d549b47f7d0dbfb",
+      "contracts/schemas/planning/fact-v1.json": "19fcddc81440c29e046dd268c7a3fe13a1eeb5f3a5c23b8d4a8647b7580526eb",
+      "contracts/schemas/planning/inventory-input-v1.json": "5e250e2c72aa34633943750c4307112b47856ed1a354a7d6ee96a01261ab2ea6",
+      "contracts/schemas/planning/migration-input-v1.json": "827d4d9e55ef0287131b046fa865e6defb7f779cc17f30cd5e57a683bd915dfb",
+      "contracts/schemas/planning/qualification-v1.json": "2cd213cb12dd9256d277711df8e7a27df654ea1859bbbf9821c64c438ecb139b",
+      "contracts/schemas/planning/reservation-receipt-v1.json": "5db097d03af6fb461a9eef8c736781e6883dcc6882fb34c166d056b4a3f7ac10"
+    },
+    "added": [
+      "contracts/openapi/planning-migration-v1.json"
+    ],
+    "conflicts": []
+  },
+  "deterministic_generation": true,
+  "cross_language": "PASS"
+}

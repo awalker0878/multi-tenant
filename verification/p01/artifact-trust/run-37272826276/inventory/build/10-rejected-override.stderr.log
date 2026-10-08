@@ -1,0 +1,2 @@
+usage: inventory-health [-h] {liveness,readiness}
+inventory-health: error: unrecognized arguments: --force

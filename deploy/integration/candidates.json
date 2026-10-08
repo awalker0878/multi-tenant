@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "scope": "Synthetic isolated kind integration inputs; measured campaign results are recorded separately and do not establish operating qualification",
+  "platform": "linux/amd64",
+  "kind": {
+    "version": "v0.33.0",
+    "binary": "https://github.com/kubernetes-sigs/kind/releases/download/v0.33.0/kind-linux-amd64",
+    "sha256": "aee6151561422756b764a4ae28e7f44cda5af5a9eead3cc9985112b1de8d8e0d",
+    "source": "https://github.com/kubernetes-sigs/kind/releases/tag/v0.33.0",
+    "checksum_source": "https://api.github.com/repos/kubernetes-sigs/kind/releases/assets/531396433"
+  },
+  "helm": {
+    "version": "v3.22.0",
+    "binary": "https://get.helm.sh/helm-v3.22.0-linux-amd64.tar.gz",
+    "sha256": "1e4ab49e429626cf6c6958d914248b78c9730803c2751b87627e171dc800e7bb",
+    "source": "https://github.com/helm/helm/releases/tag/v3.22.0",
+    "checksum_source": "https://get.helm.sh/helm-v3.22.0-linux-amd64.tar.gz.sha256sum",
+    "archive_member": "linux-amd64/helm"
+  },
+  "node": {
+    "version": "v1.36.4",
+    "reference": "kindest/node:v1.36.4@sha256:099e049362a1526b2db71494e1947aae99bd16290d7c895f2b7ea312e3cbfaed",
+    "provenance": "Published node digest in the kind v0.33.0 release; registry resolution and installed inventory must still be recorded"
+  },
+  "cilium": {
+    "version": "1.20.2",
+    "chart": "oci://quay.io/cilium/charts/cilium",
+    "chart_sha256": "b2afd87b7f75f875f92a14559f14f59b7babbb479d968e3fd625a20bf30ec20e",
+    "chart_oci_digest": "sha256:a7c12d330dd96bfcda3bf057b24be8f36566c34868265f930f776dff6f42d838",
+    "chart_observation": {
+      "source_revision": "84a8a2a0a88930e6e3dd3da715f6bdedc7646fec",
+      "workflow_run": "https://github.com/awalker0878/multi-tenant/actions/runs/37245679773",
+      "artifact_id": 11319331001,
+      "evidence": "verification/p01/kubernetes/run-37245679773/cilium-observed-lock.json",
+      "evidence_revision": "2a024a7848bcc575213c0b98f3fa6b391e4b6300",
+      "scope": "First-observed chart identities retained from a campaign that installed Cilium but failed a later application health-contract assertion; not a passing integration campaign"
+    },
+    "source": "https://docs.cilium.io/en/stable/installation/kind/",
+    "compatibility_source": "https://docs.cilium.io/en/stable/network/kubernetes/compatibility/",
+    "documented_kubernetes_minors": [
+      "1.33",
+      "1.34",
+      "1.35",
+      "1.36"
+    ],
+    "remaining": "Replay both measured chart identities, require immutable rendered images, and record installed CNI identities and measured denial behavior in a completed campaign"
+  },
+  "verified_sources_at": "2026-10-04"
+}

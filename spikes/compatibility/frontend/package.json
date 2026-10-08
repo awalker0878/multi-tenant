@@ -1,0 +1,33 @@
+{
+  "name": "p00-frontend-compatibility",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@11.9.0",
+  "engines": {
+    "node": "24.x",
+    "npm": "11.x"
+  },
+  "scripts": {
+    "typecheck": "vue-tsc --noEmit",
+    "build": "vite build",
+    "browser:install": "playwright install --with-deps --only-shell chromium",
+    "browser:test": "playwright test"
+  },
+  "dependencies": {
+    "@inertiajs/vue3": "3.8.0",
+    "vue": "3.5.43"
+  },
+  "devDependencies": {
+    "@inertiajs/vite": "3.8.0",
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "^24.0.0",
+    "@vitejs/plugin-vue": "6.0.9",
+    "laravel-vite-plugin": "3.2.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "vite": "8.3.2",
+    "vue-tsc": "3.3.12"
+  }
+}

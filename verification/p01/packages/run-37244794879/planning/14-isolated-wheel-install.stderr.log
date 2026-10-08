@@ -1,0 +1,5 @@
+Using Python 3.12.14 environment at: /home/runner/work/_temp/p01-quality/runtime
+Resolved 1 package in 0.82ms
+Prepared 1 package in 5ms
+Installed 1 package in 1ms
+ + product-planning==0.1.0.dev0 (from file:///home/runner/work/_temp/p01-quality/component/dist/product_planning-0.1.0.dev0-py3-none-any.whl)

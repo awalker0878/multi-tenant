@@ -1,0 +1,51 @@
+# Engineering coverage and delivery mapping
+
+Owner: Engineering and quality leads. Reviewed: 2026-10-04. Scope: the planned seven applications, shared contracts, frontend and worker interfaces.
+
+This map identifies what reviewers must inspect and which existing packages deliver it. The initial audit found strong product ownership, native-effect safety and phased qualification coverage, but insufficient framework-specific engineering rules. The linked standards close those documentation gaps. Implementation, automated enforcement and observed results remain governed by the [delivery register](../implementation/delivery-register.yaml); no row is a passing result.
+
+## Control map
+
+Each ENG identifier is a stable engineering topic, not a replacement R-series product requirement or gate criterion. The named packages own implementation; the existing gates own acceptance. Proof below is the additional detail needed when evaluating those criteria. All references apply only to relevant services or features, with reviewed reasons for any non-applicability.
+
+| Control | Required coverage and canonical guidance | Delivery packages | Gate criteria | Required proof |
+| --- | --- | --- | --- | --- |
+| ENG01 | Runtime, extension, framework and browser compatibility; [developer workflow](developer-workflow.md), [frontend](frontend.md) | P00.03, P01.01 | G00.03, G01.01 | Clean resolution/build against exact PHP/Node/Python, browser and package inputs; reviewed support windows |
+| ENG02 | Service ownership, pragmatic Laravel capability layers, language-specific source roots and dependency direction; [context structure](../architecture/context-code-structure.md), [conventions](laravel-conventions.md), [code controls](code-control.md) | P00.02, P01.01 | G00.02, G01.01 | Registry/source agreement, service-private Eloquent models, allowed framework/Action fixtures, forbidden upward/cross-service imports, isolated builds and complete language-aware analysis |
+| ENG03 | PSR-4, pinned formatter, typing and static analysis; [workflow](developer-workflow.md), [testing](testing-and-ci.md) | P01.01, P01.04 | G01.01, G01.04 | Case-correct autoload, formatter and static/type analysis checks on fresh first-party code |
+| ENG04 | Validation, field authorization and explicit response resources; [security](security-and-tenancy.md), [conventions](laravel-conventions.md) | P01.03, P02.03, P03.01 | G01.03, G02.01, G03.02 | Invalid/nested/extra-field and mass-assignment cases; no unauthorized relationship or field disclosure |
+| ENG05 | Federated authentication, resource policies and current delegated authority; [security](security-and-tenancy.md) | P02.01, P02.03, P02.04 | G02.01, G02.02, G02.03 | Wrong issuer/audience, expired/revoked scope, direct API and separation-of-duties denials |
+| ENG06 | Tenant isolation in database, queues, cache, files, search and long-lived context; [security](security-and-tenancy.md), [data](data-and-messaging.md) | P01.05, P02.02, P02.03 | G01.05, G02.01 | Two-tenant negative matrix, alternating jobs/requests, raw query and object access checks |
+| ENG07 | Session/CSRF, trusted host/proxy, TLS and browser headers; [security](security-and-tenancy.md), [frontend](frontend.md) | P01.02, P02.01, P02.05 | G01.02, G02.01, G02.04 | Deployed HTTP/browser checks with real middleware, session rotation/logout and hostile-origin requests |
+| ENG08 | SSRF, outbound clients, hostile imports/uploads and command arguments; [security](security-and-tenancy.md) | P01.03, P04.01, P04.04 | G01.03, G04.02 | Endpoint/redirect/address rejection, bounded input handling and denied credential exfiltration paths |
+| ENG09 | Eloquent queries, pagination, N+1 detection and tenant indexes; [data](data-and-messaging.md) | P03.01, P03.05, P10.01 | G03.02, G03.04, G10.01 | Representative row/tenant volume, query counts/plans, bounded response size and latency |
+| ENG10 | Local atomicity, idempotency, revision concurrency and durable outbox/inbox; [data](data-and-messaging.md) | P01.03, P03.03 | G01.03, G03.03 | Real PostgreSQL races, rollback and crash-after-commit cases, broker outage and duplicate delivery |
+| ENG11 | Queue retry/timeout policy, dead letters, scheduled overlap and Temporal boundary; [data](data-and-messaging.md) | P01.03, P01.06, P06.02, P06.05 | G01.03, G01.06, G06.03 | Driver-specific timeout tests, poison-message handling, restart and unknown-outcome reconciliation |
+| ENG12 | Cache scope, invalidation, authorization freshness and stampede control; [data](data-and-messaging.md) | P02.02, P02.03, P10.01 | G02.01, G02.03, G10.01 | Permission/tenant change, cache loss and concurrent-miss tests; no stale authority admission |
+| ENG13 | Expand/contract schema changes, backfill, migrator identity and rollback limits; [data](data-and-messaging.md), [upgrade](../operations/runbooks/upgrade.md) | P01.05, P10.02 | G01.05, G10.02 | Concurrent old/new readers and workers, migration exclusion, lock behavior and interrupted backfill recovery |
+| ENG14 | Safe Inertia props/history, server validation and tenant-switch cleanup; [frontend](frontend.md) | P02.05, P03.04 | G02.01, G02.04, G03.04 | Props/history inspection, stale response rejection, error flow and tenant/logout isolation |
+| ENG15 | Typed UI boundaries, component ownership and asset/browser compatibility; [frontend](frontend.md) | P00.03, P01.01, P02.05 | G00.03, G01.01, G02.04 | Separate Vue/TypeScript checks, production assets and representative managed-browser journeys |
+| ENG16 | Accessibility, safe rich content and clear held/conflict states; [frontend](frontend.md) | P02.05, P03.04, P06.06, P11.02 | G02.04, G03.04, G06.01, G11.02 | Automated plus keyboard/screen-reader task checks and user review of destructive/held operations |
+| ENG17 | Unit/feature/contract/integration/browser/fault test boundaries; [testing](testing-and-ci.md) | P01.04, P03.05, P06.05 | G01.04, G03.02, G06.03 | Test inventory tied to risk; real-dependency evidence where framework fakes cannot prove behavior |
+| ENG18 | Monorepo code ownership, protected review, trusted check policy and dependency impact; [code controls](code-control.md), [workflow](developer-workflow.md), [testing](testing-and-ci.md) | P01.01, P01.04, P10.06 | G01.01, G01.04, G10.04 | Base/head impact includes all consumers; unknown/missing scans and failed role/check requirements cannot admit a change; policy drift and expired exceptions block release |
+| ENG19 | Locked dependencies, vulnerability/license review, SBOM and signed provenance; [workflow](developer-workflow.md), [release process](../releases/release-process.md) | P00.03, P01.04, P10.06 | G00.03, G01.04, G10.04 | Audited dependency change, manifest/signature verification and rejected tampered artifact |
+| ENG20 | Environment configuration, public document root, process roles and health; [deployment](../operations/deployment-model.md), [install](../operations/runbooks/install.md) | P01.02, P01.06, P10.05 | G01.02, G01.06, G10.03 | Runtime-only secrets/config, boot/readiness distinctions, dependency outage and restricted installation |
+| ENG21 | Worker draining, compatible jobs, key rotation and coordinated recovery; [upgrade](../operations/runbooks/upgrade.md), [data](data-and-messaging.md) | P01.06, P10.02 | G01.06, G10.02 | Old/new artifact and encrypted-data compatibility, supervised restart and safe restore of in-flight work |
+| ENG22 | Correlation, redaction, query/queue telemetry and performance budgets; [observability](../operations/observability.md), [testing](testing-and-ci.md) | P01.06, P10.01, P10.04 | G01.06, G10.01, G10.04 | Received alerts, safe logs, measured request/job/query budgets and bounded metric cardinality |
+| ENG23 | Versioned security verification and supply-chain control applicability; [security](security-and-tenancy.md), [workflow](developer-workflow.md) | P00.05, P10.03 | G00.05, G10.03 | Threat-driven ASVS applicability and independent security finding closure for actual release scope |
+| ENG24 | API/event evolution, error semantics and retry budgets; [contracts](../contracts/README.md), [conventions](laravel-conventions.md) | P01.03, P05.06, P10.02 | G01.03, G05.02, G10.02 | Old/new producer-consumer checks, PHP/Python vectors, safe error mapping and bounded retries |
+
+## Apply coverage at the right phase
+
+P00 confirms the compatible stack, owners, security applicability and operating targets. P01 establishes structural checks, reproducible builds, contract/messaging primitives and baseline deployment proof. P02/P03 apply the conventions to real tenant and application behavior. P04–P09 extend them to every added API, adapter and operator task. P10 qualifies the complete release at representative scale; P11 verifies pilot usability and operating handover. Security and test automation therefore begin before feature growth, not at P10.
+
+Service owners identify applicable controls in each package's implementation review. Quality checks the required proof against the criterion, not merely whether a linked file exists. The framework examples and configuration commands in these documents are not a substitute for tests on selected locked versions.
+
+## Remaining implementation decisions
+
+- P00.03/ADR-003 resolves exact dependency/image versions, extensions, compatible analysis/test tools and update support windows.
+- P00.05/ADR-017 and the security review ratify numeric performance limits and security-control applicability for the intended hosting boundary.
+- The registry validator and fixture workflow are present; their output states the source forms actually analyzed. P01 adds comprehensive PHP/Python/frontend architecture enforcement, generated contracts, real owner identities and verified repository review/check protection alongside runnable applications.
+- Per-service query budgets, input limits, queue retry/retention limits and migration lock budgets require measured representative fixtures and reviewed configuration.
+
+Add a control when a new material risk is uncovered; preserve existing IDs and attach it to real packages and gates. Update package `doc_refs` for canonical engineering inputs. Keep completion, findings and evidence in their established records rather than adding a second progress tracker here.

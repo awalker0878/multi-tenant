@@ -1,0 +1,635 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.93kB done
+#1 DONE 0.0s
+
+#2 [auth] library/composer:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [auth] library/php:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d
+#4 ...
+
+#5 [internal] load metadata for docker.io/library/php@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3
+#5 DONE 0.5s
+
+#4 [internal] load metadata for docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d
+#4 DONE 0.5s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 459B done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 389.77kB 0.0s done
+#7 DONE 0.0s
+
+#8 [composer-tool 1/1] FROM docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d
+#8 resolve docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d done
+#8 sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d 3.61kB / 3.61kB done
+#8 sha256:87ef1f7078ab07ff3822199a1572016cd47bc5dc5cd9aae9e6f2d9b2884a50f9 12.14kB / 12.14kB done
+#8 sha256:108ad594590ceb72747aa8d762dc9fb9d1f6377ac3e991684c4ee9c46d38e2fa 0B / 215B 0.6s
+#8 sha256:c74954296e3dcddf622cc98260e98c4dcf93fa3a75aa35323873dd266bd4bd1e 0B / 3.49MB 0.6s
+#8 sha256:406faa0b22ce98d8b28e44c625e146357adf030ab36c13a5bcdc3d4d05696978 0B / 931B 0.6s
+#8 sha256:108ad594590ceb72747aa8d762dc9fb9d1f6377ac3e991684c4ee9c46d38e2fa 215B / 215B 0.6s done
+#8 sha256:c74954296e3dcddf622cc98260e98c4dcf93fa3a75aa35323873dd266bd4bd1e 3.49MB / 3.49MB 0.7s done
+#8 sha256:406faa0b22ce98d8b28e44c625e146357adf030ab36c13a5bcdc3d4d05696978 931B / 931B 0.6s done
+#8 extracting sha256:c74954296e3dcddf622cc98260e98c4dcf93fa3a75aa35323873dd266bd4bd1e 0.1s
+#8 sha256:0bfa53ef058425d39dda0dc330b0afa6aef24ed3cac2b9cb8461ee73d98e1667 490B / 490B 0.7s done
+#8 sha256:6361c0c16a9abd0a1ac1a96c836fd6273a651e1a15d291e2811f1e36904c0f96 0B / 22.83MB 0.7s
+#8 sha256:88c97ededfa581ed39cd2fad6551d825b2f6527397e92c2eafa80648778438b6 0B / 14.49MB 0.7s
+#8 sha256:b7fa1c822b375082f66aed3706a736de5ac75f201b684d75f728d3f8218d94be 0B / 2.45kB 0.7s
+#8 extracting sha256:c74954296e3dcddf622cc98260e98c4dcf93fa3a75aa35323873dd266bd4bd1e 0.1s done
+#8 sha256:88c97ededfa581ed39cd2fad6551d825b2f6527397e92c2eafa80648778438b6 9.44MB / 14.49MB 0.8s
+#8 sha256:b7fa1c822b375082f66aed3706a736de5ac75f201b684d75f728d3f8218d94be 2.45kB / 2.45kB 0.7s done
+#8 sha256:52bc90a67a58631429510dce4678820c6c9f4f7401f893e131eab5e61d6e4ba1 22.43kB / 22.43kB 0.8s done
+#8 sha256:6361c0c16a9abd0a1ac1a96c836fd6273a651e1a15d291e2811f1e36904c0f96 22.83MB / 22.83MB 0.9s done
+#8 sha256:88c97ededfa581ed39cd2fad6551d825b2f6527397e92c2eafa80648778438b6 14.49MB / 14.49MB 0.8s done
+#8 sha256:b643345218f3d9927c0c0a2c77e668efb8875590c035958d065feb6c5ae2b1b1 31.96MB / 31.96MB 1.0s
+#8 sha256:8806a571cc741e14b8f9231f56c52579b3d524dfddf2ba831dfc13dbdafcb292 253B / 253B 0.9s done
+#8 sha256:6f7b1962d76481345b26e2686cfd94cb8f3d3d9d4b9bd5473b4c8e9a7929cd76 1.08MB / 1.08MB 0.9s done
+#8 sha256:1755349a9517f4193071aca80c53be43652721fbd4ca9b15bb18c4fb1fed3a96 93B / 93B 1.0s
+#8 sha256:92421a00585b560d1bf778295d236587186c4650824389f597ff4f21925040f8 419B / 419B 1.0s
+#8 sha256:b643345218f3d9927c0c0a2c77e668efb8875590c035958d065feb6c5ae2b1b1 31.96MB / 31.96MB 1.1s done
+#8 sha256:1755349a9517f4193071aca80c53be43652721fbd4ca9b15bb18c4fb1fed3a96 93B / 93B 1.1s done
+#8 sha256:92421a00585b560d1bf778295d236587186c4650824389f597ff4f21925040f8 419B / 419B 1.1s done
+#8 extracting sha256:406faa0b22ce98d8b28e44c625e146357adf030ab36c13a5bcdc3d4d05696978
+#8 extracting sha256:406faa0b22ce98d8b28e44c625e146357adf030ab36c13a5bcdc3d4d05696978 done
+#8 extracting sha256:108ad594590ceb72747aa8d762dc9fb9d1f6377ac3e991684c4ee9c46d38e2fa done
+#8 extracting sha256:88c97ededfa581ed39cd2fad6551d825b2f6527397e92c2eafa80648778438b6 0.1s done
+#8 extracting sha256:0bfa53ef058425d39dda0dc330b0afa6aef24ed3cac2b9cb8461ee73d98e1667
+#8 extracting sha256:0bfa53ef058425d39dda0dc330b0afa6aef24ed3cac2b9cb8461ee73d98e1667 done
+#8 extracting sha256:6361c0c16a9abd0a1ac1a96c836fd6273a651e1a15d291e2811f1e36904c0f96 0.1s
+#8 extracting sha256:6361c0c16a9abd0a1ac1a96c836fd6273a651e1a15d291e2811f1e36904c0f96 0.7s done
+#8 extracting sha256:b7fa1c822b375082f66aed3706a736de5ac75f201b684d75f728d3f8218d94be done
+#8 extracting sha256:52bc90a67a58631429510dce4678820c6c9f4f7401f893e131eab5e61d6e4ba1
+#8 extracting sha256:52bc90a67a58631429510dce4678820c6c9f4f7401f893e131eab5e61d6e4ba1 done
+#8 extracting sha256:b643345218f3d9927c0c0a2c77e668efb8875590c035958d065feb6c5ae2b1b1 0.1s
+#8 extracting sha256:b643345218f3d9927c0c0a2c77e668efb8875590c035958d065feb6c5ae2b1b1 1.3s done
+#8 extracting sha256:8806a571cc741e14b8f9231f56c52579b3d524dfddf2ba831dfc13dbdafcb292 done
+#8 extracting sha256:6f7b1962d76481345b26e2686cfd94cb8f3d3d9d4b9bd5473b4c8e9a7929cd76 0.0s done
+#8 extracting sha256:92421a00585b560d1bf778295d236587186c4650824389f597ff4f21925040f8
+#8 extracting sha256:92421a00585b560d1bf778295d236587186c4650824389f597ff4f21925040f8 done
+#8 extracting sha256:1755349a9517f4193071aca80c53be43652721fbd4ca9b15bb18c4fb1fed3a96 done
+#8 DONE 6.7s
+
+#9 [php-base 1/4] FROM docker.io/library/php@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3
+#9 resolve docker.io/library/php@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3 done
+#9 sha256:611a3d8a1bdfe71c093d2e097ca10c84d1ef973b510de74a26f42f4e96ac513b 226B / 226B 0.1s done
+#9 sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3 3.07kB / 3.07kB done
+#9 sha256:1eec88f3ef7f7e2885c1608aebe4ae463bd19a8971d582b550bc1b0588aad252 11.08kB / 11.08kB done
+#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 28.24MB / 28.24MB 0.3s done
+#9 sha256:9b021f8315053203c86b5df5d6c858e1f6b78fbed3b1aa4fa8ecf305e6b17aa8 104.35MB / 104.35MB 0.5s done
+#9 sha256:38a8a315d5f676b86a9011bbd6b4fd95f6f13bb788bac154a2c9361c03e15449 223B / 223B 0.2s done
+#9 sha256:f5978ed912fac564381c3caecc6c9e0915471966ac27e016766772baa208a17f 14.58MB / 14.58MB 0.4s done
+#9 extracting sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 1.4s done
+#9 sha256:6a39461bdf6264f562e4b7163b5eb5c867f60aad7a81412f9dc120b2b7ee9959 31.22MB / 31.22MB 0.5s done
+#9 sha256:fc607023dd7a22cfd8625cd51b9efb1899f5e6551ee52d8a10af27129249337c 489B / 489B 0.4s done
+#9 sha256:04a6f7b50c77dea275d2ea3895aa94c2d489d626890ff788b183a883f63acad5 2.45kB / 2.45kB 0.5s done
+#9 sha256:f720b01afadbdffc9e12fcb5a717c78281416e65776be1eee2697ad825f0d3df 246B / 246B 0.5s done
+#9 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 0.5s done
+#9 sha256:d7b35ae1920d31c874a9b60f5323460f721ef6492144ea861348699feb4f1c52 9.27kB / 9.27kB 0.6s done
+#9 extracting sha256:611a3d8a1bdfe71c093d2e097ca10c84d1ef973b510de74a26f42f4e96ac513b done
+#9 extracting sha256:9b021f8315053203c86b5df5d6c858e1f6b78fbed3b1aa4fa8ecf305e6b17aa8 3.0s
+#9 extracting sha256:9b021f8315053203c86b5df5d6c858e1f6b78fbed3b1aa4fa8ecf305e6b17aa8 3.3s done
+#9 extracting sha256:38a8a315d5f676b86a9011bbd6b4fd95f6f13bb788bac154a2c9361c03e15449
+#9 extracting sha256:38a8a315d5f676b86a9011bbd6b4fd95f6f13bb788bac154a2c9361c03e15449 done
+#9 extracting sha256:f5978ed912fac564381c3caecc6c9e0915471966ac27e016766772baa208a17f 0.1s done
+#9 extracting sha256:fc607023dd7a22cfd8625cd51b9efb1899f5e6551ee52d8a10af27129249337c done
+#9 extracting sha256:6a39461bdf6264f562e4b7163b5eb5c867f60aad7a81412f9dc120b2b7ee9959 0.1s
+#9 extracting sha256:6a39461bdf6264f562e4b7163b5eb5c867f60aad7a81412f9dc120b2b7ee9959 0.6s done
+#9 extracting sha256:04a6f7b50c77dea275d2ea3895aa94c2d489d626890ff788b183a883f63acad5
+#9 extracting sha256:04a6f7b50c77dea275d2ea3895aa94c2d489d626890ff788b183a883f63acad5 done
+#9 extracting sha256:f720b01afadbdffc9e12fcb5a717c78281416e65776be1eee2697ad825f0d3df done
+#9 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+#9 extracting sha256:d7b35ae1920d31c874a9b60f5323460f721ef6492144ea861348699feb4f1c52 done
+#9 DONE 8.0s
+
+#10 [php-base 2/4] COPY build/snapshot.sh /tmp/service-snapshot.sh
+#10 DONE 0.0s
+
+#11 [php-base 3/4] RUN sh /tmp/service-snapshot.sh     && apt-get update     && apt-get install -y --no-install-recommends libpq-dev     && docker-php-ext-install -j2 pdo_pgsql     && apt-mark manual libpq5     && apt-get purge -y --auto-remove libpq-dev autoconf 		dpkg-dev 		file 		g++ 		gcc 		libc-dev 		make 		pkg-config 		re2c     && rm -rf /var/lib/apt/lists/* /tmp/service-snapshot.sh     && cp "/usr/local/etc/php/php.ini-production" "/usr/local/etc/php/php.ini"
+#11 0.308 Get:1 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm InRelease [151 kB]
+#11 0.354 Get:2 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm-updates InRelease [55.4 kB]
+#11 0.374 Get:3 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security InRelease [34.8 kB]
+#11 0.464 Get:4 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm/main amd64 Packages [8790 kB]
+#11 0.632 Get:5 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm-updates/main amd64 Packages [6924 B]
+#11 0.649 Get:6 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 Packages [346 kB]
+#11 1.461 Fetched 9384 kB in 1s (7188 kB/s)
+#11 1.461 Reading package lists...
+#11 1.945 Reading package lists...
+#11 2.429 Building dependency tree...
+#11 2.574 Reading state information...
+#11 2.683 The following additional packages will be installed:
+#11 2.684   libpq5 libssl-dev libssl3 openssl
+#11 2.684 Suggested packages:
+#11 2.684   postgresql-doc-15 libssl-doc
+#11 2.704 The following NEW packages will be installed:
+#11 2.705   libpq-dev libpq5 libssl-dev
+#11 2.706 The following packages will be upgraded:
+#11 2.706   libssl3 openssl
+#11 2.830 2 upgraded, 3 newly installed, 0 to remove and 2 not upgraded.
+#11 2.830 Need to get 6290 kB of archives.
+#11 2.830 After this operation, 14.0 MB of additional disk space will be used.
+#11 2.830 Get:1 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 libssl3 amd64 3.0.22-1~deb12u1 [2039 kB]
+#11 2.927 Get:2 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 libpq5 amd64 15.19-0+deb12u1 [203 kB]
+#11 2.930 Get:3 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 libssl-dev amd64 3.0.22-1~deb12u1 [2450 kB]
+#11 2.955 Get:4 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 libpq-dev amd64 15.19-0+deb12u1 [156 kB]
+#11 2.956 Get:5 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 openssl amd64 3.0.22-1~deb12u1 [1442 kB]
+#11 3.057 debconf: delaying package configuration, since apt-utils is not installed
+#11 3.077 Fetched 6290 kB in 0s (24.6 MB/s)
+#11 3.090 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 13263 files and directories currently installed.)
+#11 3.100 Preparing to unpack .../libssl3_3.0.22-1~deb12u1_amd64.deb ...
+#11 3.102 Unpacking libssl3:amd64 (3.0.22-1~deb12u1) over (3.0.20-1~deb12u2) ...
+#11 3.227 Selecting previously unselected package libpq5:amd64.
+#11 3.229 Preparing to unpack .../libpq5_15.19-0+deb12u1_amd64.deb ...
+#11 3.230 Unpacking libpq5:amd64 (15.19-0+deb12u1) ...
+#11 3.256 Selecting previously unselected package libssl-dev:amd64.
+#11 3.258 Preparing to unpack .../libssl-dev_3.0.22-1~deb12u1_amd64.deb ...
+#11 3.258 Unpacking libssl-dev:amd64 (3.0.22-1~deb12u1) ...
+#11 3.410 Selecting previously unselected package libpq-dev.
+#11 3.412 Preparing to unpack .../libpq-dev_15.19-0+deb12u1_amd64.deb ...
+#11 3.412 Unpacking libpq-dev (15.19-0+deb12u1) ...
+#11 3.438 Preparing to unpack .../openssl_3.0.22-1~deb12u1_amd64.deb ...
+#11 3.440 Unpacking openssl (3.0.22-1~deb12u1) over (3.0.20-1~deb12u2) ...
+#11 3.545 Setting up libssl3:amd64 (3.0.22-1~deb12u1) ...
+#11 3.547 Setting up libpq5:amd64 (15.19-0+deb12u1) ...
+#11 3.548 Setting up libssl-dev:amd64 (3.0.22-1~deb12u1) ...
+#11 3.550 Setting up openssl (3.0.22-1~deb12u1) ...
+#11 3.553 Setting up libpq-dev (15.19-0+deb12u1) ...
+#11 3.555 Processing triggers for libc-bin (2.36-9+deb12u14) ...
+#11 5.699 Configuring for:
+#11 5.699 PHP Version:             8.5
+#11 5.699 PHP Api Version:         20250925
+#11 5.699 Zend Module Api No:      20250925
+#11 5.699 Zend Extension Api No:   420250925
+#11 6.284 checking for grep that handles long lines and -e... /usr/bin/grep
+#11 6.286 checking for egrep... /usr/bin/grep -E
+#11 6.288 checking for a sed that does not truncate output... /usr/bin/sed
+#11 6.318 checking build system type... x86_64-pc-linux-gnu
+#11 6.322 checking host system type... x86_64-pc-linux-gnu
+#11 6.323 checking target system type... x86_64-pc-linux-gnu
+#11 6.348 shtool:echo:Warning: unable to determine terminal sequence for bold mode
+#11 6.383 shtool:echo:Warning: unable to determine terminal sequence for bold mode
+#11 6.393 checking for gawk... no
+#11 6.394 checking for nawk... nawk
+#11 6.394 checking if nawk is broken... no
+#11 6.397 checking for pkg-config... /usr/bin/pkg-config
+#11 6.397 checking pkg-config is at least version 0.9.0... yes
+#11 6.399 checking for cc... cc
+#11 6.425 checking whether the C compiler works... yes
+#11 6.461 checking for C compiler default output file name... a.out
+#11 6.462 checking for suffix of executables... 
+#11 6.498 checking whether we are cross compiling... no
+#11 6.539 checking for suffix of object files... o
+#11 6.559 checking whether the compiler supports GNU C... yes
+#11 6.578 checking whether cc accepts -g... yes
+#11 6.597 checking for cc option to enable C11 features... none needed
+#11 6.642 checking how to run the C preprocessor... cc -E
+#11 6.691 checking for icc... no
+#11 6.701 checking for suncc... no
+#11 6.710 checking for system library directory... lib
+#11 6.710 checking if compiler supports -Wl,-rpath,... yes
+#11 6.763 checking for PHP prefix... /usr/local
+#11 6.763 checking for PHP includes... -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib
+#11 6.763 checking for PHP extension directory... /usr/local/lib/php/extensions/no-debug-non-zts-20250925
+#11 6.763 checking for PHP installed headers prefix... /usr/local/include/php
+#11 6.764 checking if debugging is enabled... no
+#11 6.779 checking if PHP is built with thread safety (ZTS)... no
+#11 6.797 
+#11 6.797 Configuring extension
+#11 6.797 checking for PostgreSQL support for PDO... yes, shared
+#11 6.797 checking for libpq >= 10.0... yes
+#11 6.812 checking for PQencryptPasswordConn in -lpq... yes
+#11 6.885 checking for PQresultMemorySize in -lpq... yes
+#11 6.957 checking for PQclosePrepared in -lpq... no
+#11 7.001 checking for PQclosePortal in -lpq... no
+#11 7.043 checking for PDO includes... /usr/local/include/php/ext
+#11 7.050 
+#11 7.050 Configuring libtool
+#11 7.050 checking for a sed that does not truncate output... /usr/bin/sed
+#11 7.053 checking for ld used by cc... /usr/bin/ld
+#11 7.058 checking if the linker (/usr/bin/ld) is GNU ld... yes
+#11 7.060 checking for /usr/bin/ld option to reload object files... -r
+#11 7.061 checking for BSD-compatible nm... /usr/bin/nm -B
+#11 7.063 checking whether ln -s works... yes
+#11 7.063 checking how to recognize dependent libraries... pass_all
+#11 7.077 checking for stdio.h... yes
+#11 7.094 checking for stdlib.h... yes
+#11 7.115 checking for string.h... yes
+#11 7.139 checking for inttypes.h... yes
+#11 7.163 checking for stdint.h... yes
+#11 7.186 checking for strings.h... yes
+#11 7.209 checking for sys/stat.h... yes
+#11 7.232 checking for sys/types.h... yes
+#11 7.256 checking for unistd.h... yes
+#11 7.281 checking for dlfcn.h... yes
+#11 7.307 checking the maximum length of command line arguments... 3145728
+#11 7.312 checking command to parse /usr/bin/nm -B output from cc object... ok
+#11 7.374 checking for objdir... .libs
+#11 7.377 checking for ar... ar
+#11 7.378 checking for ranlib... ranlib
+#11 7.378 checking for strip... strip
+#11 7.428 checking if cc supports -fno-rtti -fno-exceptions... no
+#11 7.447 checking for cc option to produce PIC... -fPIC
+#11 7.448 checking if cc PIC flag -fPIC works... yes
+#11 7.466 checking if cc static flag -static works... yes
+#11 7.536 checking if cc supports -c -o file.o... yes
+#11 7.562 checking whether the cc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+#11 7.575 checking whether -lc should be explicitly linked in... no
+#11 7.599 checking dynamic linker characteristics... GNU/Linux ld.so
+#11 7.614 checking how to hardcode library paths into programs... immediate
+#11 7.614 checking whether stripping libraries is possible... yes
+#11 7.616 checking if libtool supports shared libraries... yes
+#11 7.616 checking whether to build shared libraries... yes
+#11 7.617 checking whether to build static libraries... no
+#11 7.753 
+#11 7.753 creating libtool
+#11 7.770 appending configuration tag "CXX" to libtool
+#11 7.776 
+#11 7.776 Generating files
+#11 7.796 configure: creating build directories
+#11 7.813 configure: creating Makefile
+#11 7.817 configure: patching config.h.in
+#11 7.820 configure: creating ./config.status
+#11 7.868 config.status: creating config.h
+#11 7.902 /bin/bash /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=compile cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE    -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pdo_pgsql.c -o pdo_pgsql.lo  -MMD -MF pdo_pgsql.dep -MT pdo_pgsql.lo
+#11 7.902 /bin/bash /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=compile cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE    -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_driver.c -o pgsql_driver.lo  -MMD -MF pgsql_driver.dep -MT pgsql_driver.lo
+#11 7.997 mkdir .libs
+#11 7.999  cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_driver.c -MMD -MF pgsql_driver.dep -MT pgsql_driver.lo  -fPIC -DPIC -o .libs/pgsql_driver.o
+#11 7.999  cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pdo_pgsql.c -MMD -MF pdo_pgsql.dep -MT pdo_pgsql.lo  -fPIC -DPIC -o .libs/pdo_pgsql.o
+#11 8.230 /bin/bash /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=compile cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE    -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_statement.c -o pgsql_statement.lo  -MMD -MF pgsql_statement.dep -MT pgsql_statement.lo
+#11 8.324  cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_statement.c -MMD -MF pgsql_statement.dep -MT pgsql_statement.lo  -fPIC -DPIC -o .libs/pgsql_statement.o
+#11 8.529 /bin/bash /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=compile cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE    -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_sql_parser.c -o pgsql_sql_parser.lo  -MMD -MF pgsql_sql_parser.dep -MT pgsql_sql_parser.lo
+#11 8.621  cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_sql_parser.c -MMD -MF pgsql_sql_parser.dep -MT pgsql_sql_parser.lo  -fPIC -DPIC -o .libs/pgsql_sql_parser.o
+#11 8.774 /bin/bash /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=link cc -shared -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE  -Wl,-O1 -pie  -o pdo_pgsql.la -export-dynamic -avoid-version -prefer-pic -module -rpath /usr/src/php/ext/pdo_pgsql/modules  pdo_pgsql.lo pgsql_driver.lo pgsql_statement.lo pgsql_sql_parser.lo -lpq
+#11 8.871 cc -shared  .libs/pdo_pgsql.o .libs/pgsql_driver.o .libs/pgsql_statement.o .libs/pgsql_sql_parser.o  -lpq  -Wl,-O1 -Wl,-soname -Wl,pdo_pgsql.so -o .libs/pdo_pgsql.so
+#11 8.892 creating pdo_pgsql.la
+#11 8.899 (cd .libs && rm -f pdo_pgsql.la && ln -s ../pdo_pgsql.la pdo_pgsql.la)
+#11 8.901 /bin/bash /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=install cp ./pdo_pgsql.la /usr/src/php/ext/pdo_pgsql/modules
+#11 8.928 cp ./.libs/pdo_pgsql.so /usr/src/php/ext/pdo_pgsql/modules/pdo_pgsql.so
+#11 8.931 cp ./.libs/pdo_pgsql.lai /usr/src/php/ext/pdo_pgsql/modules/pdo_pgsql.la
+#11 8.949 PATH="$PATH:/sbin" ldconfig -n /usr/src/php/ext/pdo_pgsql/modules
+#11 8.951 ----------------------------------------------------------------------
+#11 8.951 Libraries have been installed in:
+#11 8.951    /usr/src/php/ext/pdo_pgsql/modules
+#11 8.951 
+#11 8.951 If you ever happen to want to link against installed libraries
+#11 8.951 in a given directory, LIBDIR, you must either use libtool, and
+#11 8.951 specify the full pathname of the library, or use the `-LLIBDIR'
+#11 8.951 flag during linking and do at least one of the following:
+#11 8.951    - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+#11 8.951      during execution
+#11 8.951    - add LIBDIR to the `LD_RUN_PATH' environment variable
+#11 8.951      during linking
+#11 8.952    - use the `-Wl,--rpath -Wl,LIBDIR' linker flag
+#11 8.952    - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+#11 8.952 
+#11 8.952 See any operating system documentation about shared libraries for
+#11 8.952 more information, such as the ld(1) and ld.so(8) manual pages.
+#11 8.953 ----------------------------------------------------------------------
+#11 8.955 
+#11 8.956 Build complete.
+#11 8.957 Don't forget to run 'make test'.
+#11 8.958 
+#11 8.978 + strip --strip-all modules/pdo_pgsql.so
+#11 9.002 Installing shared extensions:     /usr/local/lib/php/extensions/no-debug-non-zts-20250925/
+#11 9.082 find . -name \*.gcno -o -name \*.gcda | xargs rm -f
+#11 9.086 find . -name \*.lo -o -name \*.o -o -name \*.dep | xargs rm -f
+#11 9.090 find . -name \*.la -o -name \*.a | xargs rm -f
+#11 9.093 find . -name \*.so | xargs rm -f
+#11 9.098 find . -name .libs -a -type d|xargs rm -rf
+#11 9.102 rm -f libphp.la        modules/* libs/*
+#11 9.104 rm -f ext/opcache/jit/ir/gen_ir_fold_hash
+#11 9.105 rm -f ext/opcache/jit/ir/minilua
+#11 9.107 rm -f ext/opcache/jit/ir/ir_fold_hash.h
+#11 9.109 rm -f ext/opcache/jit/ir/ir_emit_x86.h
+#11 9.110 rm -f ext/opcache/jit/ir/ir_emit_aarch64.h
+#11 10.68 libpq5 set to manually installed.
+#11 10.68 Reading package lists...
+#11 11.14 Building dependency tree...
+#11 11.26 Reading state information...
+#11 11.39 The following packages will be REMOVED:
+#11 11.39   autoconf* binutils* binutils-common* binutils-x86-64-linux-gnu* bzip2* cpp*
+#11 11.39   cpp-12* dpkg-dev* file* g++* g++-12* gcc* gcc-12* libasan8* libatomic1*
+#11 11.39   libbinutils* libcc1-0* libctf-nobfd0* libctf0* libdpkg-perl* libgcc-12-dev*
+#11 11.39   libgdbm-compat4* libgdbm6* libgomp1* libgprofng0* libisl23* libitm1*
+#11 11.39   libjansson4* liblsan0* libmagic-mgc* libmagic1* libmpc3* libmpfr6*
+#11 11.39   libperl5.36* libpkgconf3* libpq-dev* libquadmath0* libssl-dev*
+#11 11.39   libstdc++-12-dev* libtsan2* libubsan1* m4* make* patch* perl*
+#11 11.39   perl-modules-5.36* pkg-config* pkgconf* pkgconf-bin* re2c*
+#11 11.53 0 upgraded, 0 newly installed, 50 to remove and 2 not upgraded.
+#11 11.53 After this operation, 320 MB disk space will be freed.
+#11 11.53 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 13458 files and directories currently installed.)
+#11 11.54 Removing autoconf (2.71-3) ...
+#11 11.56 Removing g++ (4:12.2.0-3) ...
+#11 11.57 Removing gcc (4:12.2.0-3) ...
+#11 11.58 Removing dpkg-dev (1.21.23) ...
+#11 11.59 Removing bzip2 (1.0.8-5+b1) ...
+#11 11.60 Removing cpp (4:12.2.0-3) ...
+#11 11.61 Removing file (1:5.44-3) ...
+#11 11.62 Removing g++-12 (12.2.0-14+deb12u1) ...
+#11 11.63 Removing libstdc++-12-dev:amd64 (12.2.0-14+deb12u1) ...
+#11 11.71 Removing libdpkg-perl (1.21.23) ...
+#11 11.73 Removing perl (5.36.0-7+deb12u3) ...
+#11 11.75 Removing libperl5.36:amd64 (5.36.0-7+deb12u3) ...
+#11 11.83 Removing libgdbm-compat4:amd64 (1.23-3) ...
+#11 11.84 Removing libgdbm6:amd64 (1.23-3) ...
+#11 11.85 Removing libmagic1:amd64 (1:5.44-3) ...
+#11 11.86 Removing libmagic-mgc (1:5.44-3) ...
+#11 11.87 Removing pkg-config:amd64 (1.8.1-1) ...
+#11 11.87 Removing pkgconf:amd64 (1.8.1-1) ...
+#11 11.88 Removing pkgconf-bin (1.8.1-1) ...
+#11 11.89 Removing libpkgconf3:amd64 (1.8.1-1) ...
+#11 11.90 Removing libpq-dev (15.19-0+deb12u1) ...
+#11 11.91 Removing libssl-dev:amd64 (3.0.22-1~deb12u1) ...
+#11 11.93 Removing m4 (1.4.19-3) ...
+#11 11.94 Removing make (4.3-4.1) ...
+#11 11.95 Removing patch (2.7.6-7) ...
+#11 11.96 Removing perl-modules-5.36 (5.36.0-7+deb12u3) ...
+#11 12.14 Removing re2c (3.0-2) ...
+#11 12.15 Removing gcc-12 (12.2.0-14+deb12u1) ...
+#11 12.16 Removing binutils (2.40-2) ...
+#11 12.17 Removing binutils-x86-64-linux-gnu (2.40-2) ...
+#11 12.19 Removing libgprofng0:amd64 (2.40-2) ...
+#11 12.20 Removing libctf0:amd64 (2.40-2) ...
+#11 12.21 Removing libbinutils:amd64 (2.40-2) ...
+#11 12.21 Removing binutils-common:amd64 (2.40-2) ...
+#11 12.22 Removing cpp-12 (12.2.0-14+deb12u1) ...
+#11 12.25 Removing libgcc-12-dev:amd64 (12.2.0-14+deb12u1) ...
+#11 12.27 Removing libasan8:amd64 (12.2.0-14+deb12u1) ...
+#11 12.27 Removing libatomic1:amd64 (12.2.0-14+deb12u1) ...
+#11 12.28 Removing libcc1-0:amd64 (12.2.0-14+deb12u1) ...
+#11 12.29 Removing libctf-nobfd0:amd64 (2.40-2) ...
+#11 12.29 Removing libgomp1:amd64 (12.2.0-14+deb12u1) ...
+#11 12.30 Removing libisl23:amd64 (0.25-1.1) ...
+#11 12.31 Removing libitm1:amd64 (12.2.0-14+deb12u1) ...
+#11 12.31 Removing libjansson4:amd64 (2.14-2) ...
+#11 12.32 Removing liblsan0:amd64 (12.2.0-14+deb12u1) ...
+#11 12.33 Removing libmpc3:amd64 (1.3.1-1) ...
+#11 12.33 Removing libmpfr6:amd64 (4.2.0-1) ...
+#11 12.34 Removing libquadmath0:amd64 (12.2.0-14+deb12u1) ...
+#11 12.35 Removing libtsan2:amd64 (12.2.0-14+deb12u1) ...
+#11 12.35 Removing libubsan1:amd64 (12.2.0-14+deb12u1) ...
+#11 12.37 Processing triggers for libc-bin (2.36-9+deb12u14) ...
+#11 12.39 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 8698 files and directories currently installed.)
+#11 12.40 Purging configuration files for binutils-common:amd64 (2.40-2) ...
+#11 12.41 Purging configuration files for libmagic1:amd64 (1:5.44-3) ...
+#11 12.41 Purging configuration files for dpkg-dev (1.21.23) ...
+#11 12.42 Purging configuration files for pkgconf:amd64 (1.8.1-1) ...
+#11 12.42 Purging configuration files for perl (5.36.0-7+deb12u3) ...
+#11 12.43 Purging configuration files for pkg-config:amd64 (1.8.1-1) ...
+#11 12.44 Purging configuration files for autoconf (2.71-3) ...
+#11 DONE 12.5s
+
+#12 [php-base 4/4] WORKDIR /app
+#12 DONE 0.0s
+
+#13 [dependencies 1/4] COPY --from=composer-tool /usr/bin/composer /usr/local/bin/composer
+#13 DONE 0.0s
+
+#14 [dependencies 2/4] RUN apt-get update && apt-get install -y --no-install-recommends unzip     && rm -rf /var/lib/apt/lists/*
+#14 0.238 Get:1 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm InRelease [151 kB]
+#14 0.277 Get:2 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm-updates InRelease [55.4 kB]
+#14 0.294 Get:3 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security InRelease [34.8 kB]
+#14 0.352 Get:4 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm/main amd64 Packages [8790 kB]
+#14 0.502 Get:5 https://snapshot.debian.org/archive/debian/20261004T000000Z bookworm-updates/main amd64 Packages [6924 B]
+#14 0.516 Get:6 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 Packages [346 kB]
+#14 1.318 Fetched 9384 kB in 1s (7957 kB/s)
+#14 1.318 Reading package lists...
+#14 1.799 Reading package lists...
+#14 2.265 Building dependency tree...
+#14 2.375 Reading state information...
+#14 2.475 Suggested packages:
+#14 2.475   zip
+#14 2.492 The following NEW packages will be installed:
+#14 2.492   unzip
+#14 2.592 0 upgraded, 1 newly installed, 0 to remove and 2 not upgraded.
+#14 2.592 Need to get 167 kB of archives.
+#14 2.592 After this operation, 389 kB of additional disk space will be used.
+#14 2.592 Get:1 https://snapshot.debian.org/archive/debian-security/20261004T000000Z bookworm-security/main amd64 unzip amd64 6.0-28+deb12u1 [167 kB]
+#14 2.709 debconf: delaying package configuration, since apt-utils is not installed
+#14 2.729 Fetched 167 kB in 0s (1310 kB/s)
+#14 2.740 Selecting previously unselected package unzip.
+#14 2.740 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 8687 files and directories currently installed.)
+#14 2.749 Preparing to unpack .../unzip_6.0-28+deb12u1_amd64.deb ...
+#14 2.750 Unpacking unzip (6.0-28+deb12u1) ...
+#14 2.775 Setting up unzip (6.0-28+deb12u1) ...
+#14 DONE 2.8s
+
+#15 [dependencies 3/4] COPY . ./
+#15 DONE 0.0s
+
+#16 [dependencies 4/4] RUN composer --version     && composer validate --strict --no-check-all     && composer install --no-dev --no-plugins --no-scripts --no-interaction         --prefer-dist --no-progress --classmap-authoritative     && composer check-platform-reqs --no-dev     && mkdir -p resources bootstrap/cache
+#16 0.208 Composer version 2.10.3 2026-08-27 13:34:23
+#16 0.208 PHP version 8.5.11 (/usr/local/bin/php)
+#16 0.208 Run the "diagnose" command to get more detailed diagnostics output.
+#16 0.333 ./composer.json is valid
+#16 0.437 Installing dependencies from lock file
+#16 0.440 Verifying lock file contents can be installed on current platform.
+#16 0.713 Package operations: 73 installs, 0 updates, 0 removals
+#16 0.717   - Downloading doctrine/lexer (3.0.3)
+#16 0.717   - Downloading voku/portable-ascii (2.1.1)
+#16 0.718   - Downloading symfony/polyfill-php80 (v1.43.0)
+#16 0.718   - Downloading symfony/polyfill-mbstring (v1.43.0)
+#16 0.719   - Downloading symfony/polyfill-ctype (v1.37.0)
+#16 0.719   - Downloading phpoption/phpoption (1.10.0)
+#16 0.719   - Downloading graham-campbell/result-type (v1.2.0)
+#16 0.720   - Downloading vlucas/phpdotenv (v5.7.0)
+#16 0.720   - Downloading symfony/css-selector (v8.1.6)
+#16 0.721   - Downloading tijsverkoyen/css-to-inline-styles (v2.4.0)
+#16 0.721   - Downloading symfony/var-dumper (v8.1.7)
+#16 0.721   - Downloading symfony/polyfill-uuid (v1.43.0)
+#16 0.722   - Downloading symfony/uid (v8.1.8)
+#16 0.722   - Downloading symfony/deprecation-contracts (v3.7.1)
+#16 0.722   - Downloading symfony/routing (v8.1.8)
+#16 0.722   - Downloading symfony/process (v8.1.7)
+#16 0.723   - Downloading symfony/polyfill-php86 (v1.43.0)
+#16 0.723   - Downloading symfony/polyfill-php85 (v1.43.0)
+#16 0.723   - Downloading symfony/polyfill-php84 (v1.43.0)
+#16 0.723   - Downloading symfony/polyfill-intl-normalizer (v1.43.0)
+#16 0.723   - Downloading symfony/polyfill-intl-idn (v1.43.0)
+#16 0.723   - Downloading symfony/mime (v8.1.7)
+#16 0.723   - Downloading psr/container (2.0.2)
+#16 0.723   - Downloading symfony/service-contracts (v3.7.3)
+#16 0.724   - Downloading psr/event-dispatcher (1.0.0)
+#16 0.724   - Downloading symfony/event-dispatcher-contracts (v3.7.1)
+#16 0.724   - Downloading symfony/event-dispatcher (v8.1.5)
+#16 0.724   - Downloading psr/log (3.0.2)
+#16 0.725   - Downloading egulias/email-validator (4.0.4)
+#16 0.725   - Downloading symfony/mailer (v8.1.7)
+#16 0.725   - Downloading symfony/http-foundation (v8.1.8)
+#16 0.725   - Downloading symfony/error-handler (v8.1.8)
+#16 0.726   - Downloading symfony/http-kernel (v8.1.8)
+#16 0.726   - Downloading symfony/finder (v8.1.8)
+#16 0.726   - Downloading symfony/polyfill-intl-grapheme (v1.43.0)
+#16 0.726   - Downloading symfony/string (v8.1.7)
+#16 0.726   - Downloading symfony/console (v8.1.8)
+#16 0.727   - Downloading ramsey/collection (2.1.1)
+#16 0.727   - Downloading brick/math (1.0.0)
+#16 0.727   - Downloading ramsey/uuid (4.9.4)
+#16 0.727   - Downloading psr/simple-cache (3.0.0)
+#16 0.728   - Downloading psr/http-message (2.0)
+#16 0.728   - Downloading nunomaduro/termwind (v2.4.0)
+#16 0.728   - Downloading symfony/translation-contracts (v3.7.1)
+#16 0.729   - Downloading symfony/translation (v8.1.5)
+#16 0.729   - Downloading psr/clock (1.0.0)
+#16 0.729   - Downloading symfony/clock (v8.1.0)
+#16 0.729   - Downloading carbonphp/carbon-doctrine-types (3.2.1)
+#16 0.729   - Downloading nesbot/carbon (3.14.2)
+#16 0.730   - Downloading monolog/monolog (3.12.1)
+#16 0.730   - Downloading psr/http-factory (1.1.0)
+#16 0.730   - Downloading league/uri-interfaces (7.8.1)
+#16 0.730   - Downloading league/uri (7.8.1)
+#16 0.731   - Downloading league/mime-type-detection (1.17.0)
+#16 0.731   - Downloading league/flysystem-local (3.35.3)
+#16 0.731   - Downloading league/flysystem (3.36.0)
+#16 0.731   - Downloading nette/utils (v4.1.5)
+#16 0.731   - Downloading nette/schema (v1.3.6)
+#16 0.732   - Downloading dflydev/dot-access-data (v3.0.3)
+#16 0.732   - Downloading league/config (v1.2.0)
+#16 0.732   - Downloading league/commonmark (2.10.3)
+#16 0.733   - Downloading laravel/serializable-closure (v2.1.0)
+#16 0.733   - Downloading laravel/prompts (v0.3.24)
+#16 0.733   - Downloading guzzlehttp/uri-template (v2.0.1)
+#16 0.733   - Downloading symfony/polyfill-php82 (v1.43.0)
+#16 0.733   - Downloading guzzlehttp/psr7 (3.1.0)
+#16 0.734   - Downloading guzzlehttp/promises (3.0.2)
+#16 0.734   - Downloading psr/http-client (1.0.3)
+#16 0.734   - Downloading guzzlehttp/guzzle (8.2.0)
+#16 0.734   - Downloading fruitcake/php-cors (v1.4.0)
+#16 0.735   - Downloading dragonmantank/cron-expression (v3.6.0)
+#16 0.735   - Downloading doctrine/inflector (2.1.0)
+#16 0.735   - Downloading laravel/framework (v13.34.0)
+#16 1.990   - Installing doctrine/lexer (3.0.3): Extracting archive
+#16 1.992   - Installing voku/portable-ascii (2.1.1): Extracting archive
+#16 1.993   - Installing symfony/polyfill-php80 (v1.43.0): Extracting archive
+#16 1.994   - Installing symfony/polyfill-mbstring (v1.43.0): Extracting archive
+#16 1.994   - Installing symfony/polyfill-ctype (v1.37.0): Extracting archive
+#16 1.996   - Installing phpoption/phpoption (1.10.0): Extracting archive
+#16 1.999   - Installing graham-campbell/result-type (v1.2.0): Extracting archive
+#16 2.000   - Installing vlucas/phpdotenv (v5.7.0): Extracting archive
+#16 2.001   - Installing symfony/css-selector (v8.1.6): Extracting archive
+#16 2.002   - Installing tijsverkoyen/css-to-inline-styles (v2.4.0): Extracting archive
+#16 2.003   - Installing symfony/var-dumper (v8.1.7): Extracting archive
+#16 2.004   - Installing symfony/polyfill-uuid (v1.43.0): Extracting archive
+#16 2.005   - Installing symfony/uid (v8.1.8): Extracting archive
+#16 2.005   - Installing symfony/deprecation-contracts (v3.7.1): Extracting archive
+#16 2.006   - Installing symfony/routing (v8.1.8): Extracting archive
+#16 2.007   - Installing symfony/process (v8.1.7): Extracting archive
+#16 2.007   - Installing symfony/polyfill-php86 (v1.43.0): Extracting archive
+#16 2.008   - Installing symfony/polyfill-php85 (v1.43.0): Extracting archive
+#16 2.008   - Installing symfony/polyfill-php84 (v1.43.0): Extracting archive
+#16 2.009   - Installing symfony/polyfill-intl-normalizer (v1.43.0): Extracting archive
+#16 2.010   - Installing symfony/polyfill-intl-idn (v1.43.0): Extracting archive
+#16 2.010   - Installing symfony/mime (v8.1.7): Extracting archive
+#16 2.011   - Installing psr/container (2.0.2): Extracting archive
+#16 2.012   - Installing symfony/service-contracts (v3.7.3): Extracting archive
+#16 2.012   - Installing psr/event-dispatcher (1.0.0): Extracting archive
+#16 2.013   - Installing symfony/event-dispatcher-contracts (v3.7.1): Extracting archive
+#16 2.013   - Installing symfony/event-dispatcher (v8.1.5): Extracting archive
+#16 2.014   - Installing psr/log (3.0.2): Extracting archive
+#16 2.014   - Installing egulias/email-validator (4.0.4): Extracting archive
+#16 2.014   - Installing symfony/mailer (v8.1.7): Extracting archive
+#16 2.015   - Installing symfony/http-foundation (v8.1.8): Extracting archive
+#16 2.015   - Installing symfony/error-handler (v8.1.8): Extracting archive
+#16 2.015   - Installing symfony/http-kernel (v8.1.8): Extracting archive
+#16 2.016   - Installing symfony/finder (v8.1.8): Extracting archive
+#16 2.016   - Installing symfony/polyfill-intl-grapheme (v1.43.0): Extracting archive
+#16 2.016   - Installing symfony/string (v8.1.7): Extracting archive
+#16 2.017   - Installing symfony/console (v8.1.8): Extracting archive
+#16 2.017   - Installing ramsey/collection (2.1.1): Extracting archive
+#16 2.017   - Installing brick/math (1.0.0): Extracting archive
+#16 2.018   - Installing ramsey/uuid (4.9.4): Extracting archive
+#16 2.018   - Installing psr/simple-cache (3.0.0): Extracting archive
+#16 2.018   - Installing psr/http-message (2.0): Extracting archive
+#16 2.019   - Installing nunomaduro/termwind (v2.4.0): Extracting archive
+#16 2.019   - Installing symfony/translation-contracts (v3.7.1): Extracting archive
+#16 2.019   - Installing symfony/translation (v8.1.5): Extracting archive
+#16 2.019   - Installing psr/clock (1.0.0): Extracting archive
+#16 2.020   - Installing symfony/clock (v8.1.0): Extracting archive
+#16 2.020   - Installing carbonphp/carbon-doctrine-types (3.2.1): Extracting archive
+#16 2.020   - Installing nesbot/carbon (3.14.2): Extracting archive
+#16 2.021   - Installing monolog/monolog (3.12.1): Extracting archive
+#16 2.021   - Installing psr/http-factory (1.1.0): Extracting archive
+#16 2.021   - Installing league/uri-interfaces (7.8.1): Extracting archive
+#16 2.022   - Installing league/uri (7.8.1): Extracting archive
+#16 2.022   - Installing league/mime-type-detection (1.17.0): Extracting archive
+#16 2.022   - Installing league/flysystem-local (3.35.3): Extracting archive
+#16 2.023   - Installing league/flysystem (3.36.0): Extracting archive
+#16 2.023   - Installing nette/utils (v4.1.5): Extracting archive
+#16 2.023   - Installing nette/schema (v1.3.6): Extracting archive
+#16 2.024   - Installing dflydev/dot-access-data (v3.0.3): Extracting archive
+#16 2.024   - Installing league/config (v1.2.0): Extracting archive
+#16 2.024   - Installing league/commonmark (2.10.3): Extracting archive
+#16 2.024   - Installing laravel/serializable-closure (v2.1.0): Extracting archive
+#16 2.025   - Installing laravel/prompts (v0.3.24): Extracting archive
+#16 2.025   - Installing guzzlehttp/uri-template (v2.0.1): Extracting archive
+#16 2.025   - Installing symfony/polyfill-php82 (v1.43.0): Extracting archive
+#16 2.026   - Installing guzzlehttp/psr7 (3.1.0): Extracting archive
+#16 2.026   - Installing guzzlehttp/promises (3.0.2): Extracting archive
+#16 2.026   - Installing psr/http-client (1.0.3): Extracting archive
+#16 2.027   - Installing guzzlehttp/guzzle (8.2.0): Extracting archive
+#16 2.027   - Installing fruitcake/php-cors (v1.4.0): Extracting archive
+#16 2.027   - Installing dragonmantank/cron-expression (v3.6.0): Extracting archive
+#16 2.028   - Installing doctrine/inflector (2.1.0): Extracting archive
+#16 2.028   - Installing laravel/framework (v13.34.0): Extracting archive
+#16 2.977 Generating optimized autoload files
+#16 3.615 54 packages you are using are looking for funding.
+#16 3.615 Use the `composer fund` command to find out more!
+#16 3.748 Checking non-dev platform requirements for packages in the vendor dir
+#16 3.757 composer-runtime-api 2.2.2      success                                       
+#16 3.757 ext-ctype            *          success provided by symfony/polyfill-ctype    
+#16 3.757 ext-dom              20031129   success                                       
+#16 3.757 ext-fileinfo         8.5.11     success                                       
+#16 3.757 ext-filter           8.5.11     success                                       
+#16 3.757 ext-hash             8.5.11     success                                       
+#16 3.757 ext-iconv            8.5.11     success                                       
+#16 3.757 ext-json             8.5.11     success                                       
+#16 3.757 ext-libxml           8.5.11     success                                       
+#16 3.757 ext-mbstring         *          success provided by symfony/polyfill-mbstring 
+#16 3.757 ext-openssl          8.5.11     success                                       
+#16 3.757 ext-pcre             8.5.11     success                                       
+#16 3.757 ext-pdo              8.5.11     success                                       
+#16 3.757 ext-pdo_pgsql        8.5.11     success                                       
+#16 3.757 ext-session          8.5.11     success                                       
+#16 3.757 ext-tokenizer        8.5.11     success                                       
+#16 3.757 php                  8.5.11     success                                       
+#16 DONE 3.9s
+
+#17 [php-runtime 1/9] COPY --from=dependencies /app/vendor/ ./vendor/
+#17 DONE 0.8s
+
+#18 [php-runtime 2/9] COPY --from=dependencies /app/app/ ./app/
+#18 DONE 0.0s
+
+#19 [php-runtime 3/9] COPY --from=dependencies /app/bootstrap/ ./bootstrap/
+#19 DONE 0.0s
+
+#20 [php-runtime 4/9] COPY --from=dependencies /app/config/ ./config/
+#20 DONE 0.0s
+
+#21 [php-runtime 5/9] COPY --from=dependencies /app/public/ ./public/
+#21 DONE 0.0s
+
+#22 [php-runtime 6/9] COPY --from=dependencies /app/routes/ ./routes/
+#22 DONE 0.0s
+
+#23 [php-runtime 7/9] COPY --from=dependencies /app/artisan /app/composer.json /app/composer.lock ./
+#23 DONE 0.0s
+
+#24 [php-runtime 8/9] COPY --from=dependencies /app/resources/ ./resources/
+#24 DONE 0.0s
+
+#25 [php-runtime 9/9] RUN mkdir -p bootstrap/cache storage/framework/cache storage/framework/sessions storage/framework/views storage/logs     && chown -R 10001:10001 bootstrap/cache storage     && printf '[global]\npid = /tmp/php-fpm.pid\n[www]\nlisten = 9000\nclear_env = no\n' > /usr/local/etc/php-fpm.d/zz-service.conf     && printf '%s\n' '#!/bin/sh' 'set -eu'         'mkdir -p /app/bootstrap/cache /app/storage/framework/cache /app/storage/framework/sessions /app/storage/framework/views /app/storage/logs'         'exec docker-php-entrypoint "$@"' > /usr/local/bin/service-entrypoint     && chmod 0755 /usr/local/bin/service-entrypoint
+#25 DONE 0.1s
+
+#26 exporting to image
+#26 exporting layers
+#26 exporting layers 2.4s done
+#26 writing image sha256:69ac940d40bd36a8e9b965423d75cafd75568cd57028faf737c1259d2e921a90 done
+#26 naming to docker.io/library/p01-catalogue:c9c202786437601c0f000bdf29d7e1e401e773ee done
+#26 DONE 2.4s

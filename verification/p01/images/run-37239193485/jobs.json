@@ -1,0 +1,90 @@
+[
+  {
+    "id": 111544276671,
+    "name": "Select affected independent images",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-10-04T22:13:32Z",
+    "completed_at": "2026-10-04T22:13:42Z"
+  },
+  {
+    "id": 111544314043,
+    "name": "inventory isolated image",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-10-04T22:13:45Z",
+    "completed_at": "2026-10-04T22:14:02Z"
+  },
+  {
+    "id": 111544314075,
+    "name": "governance isolated image",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-10-04T22:13:45Z",
+    "completed_at": "2026-10-04T22:14:20Z"
+  },
+  {
+    "id": 111544314094,
+    "name": "console isolated image",
+    "status": "completed",
+    "conclusion": "failure",
+    "started_at": "2026-10-04T22:13:45Z",
+    "completed_at": "2026-10-04T22:14:24Z"
+  },
+  {
+    "id": 111544314096,
+    "name": "planning isolated image",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-10-04T22:13:45Z",
+    "completed_at": "2026-10-04T22:14:03Z"
+  },
+  {
+    "id": 111544314102,
+    "name": "lifecycle-workers isolated image",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-10-04T22:13:45Z",
+    "completed_at": "2026-10-04T22:13:58Z"
+  },
+  {
+    "id": 111544314111,
+    "name": "assurance isolated image",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-10-04T22:13:44Z",
+    "completed_at": "2026-10-04T22:14:17Z"
+  },
+  {
+    "id": 111544314129,
+    "name": "lifecycle isolated image",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-10-04T22:13:45Z",
+    "completed_at": "2026-10-04T22:13:58Z"
+  },
+  {
+    "id": 111544314138,
+    "name": "inventory-workers isolated image",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-10-04T22:13:45Z",
+    "completed_at": "2026-10-04T22:14:03Z"
+  },
+  {
+    "id": 111544314390,
+    "name": "catalogue isolated image",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-10-04T22:13:45Z",
+    "completed_at": "2026-10-04T22:14:18Z"
+  },
+  {
+    "id": 111544444136,
+    "name": "Foundation images",
+    "status": "completed",
+    "conclusion": "failure",
+    "started_at": "2026-10-04T22:14:27Z",
+    "completed_at": "2026-10-04T22:14:31Z"
+  }
+]

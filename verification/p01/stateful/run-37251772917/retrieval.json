@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "run_id": 37251772917,
+  "source_revision": "6f49ce7fa77ca35b609c51d93618bd7abb258d2e",
+  "artifact_id": 11321650783,
+  "archive_sha256": "ccc3c62bbffe381f21ebbb417aee158862c1f30fda7a41d950698811c3a6476a",
+  "archive_bytes": 48604,
+  "archive_checksum_verified": true,
+  "reported_result": "FAIL",
+  "reported_cleanup_complete": true,
+  "report_sha256": "7f6a4b79c32ba0eac85474bfaafea52946f8d4ab54a4228148d5339fcbaee47a",
+  "command_log_hashes_verified": 40,
+  "immutable_source_bindings_verified": 48,
+  "failure_scope": "Images built; broker health check timed out before schema, authorization or recovery probes. TLS listener was present in broker logs. No installed-behavior pass claimed.",
+  "reviewer": "Codex \u2014 raw command, archive and immutable source integrity examination"
+}

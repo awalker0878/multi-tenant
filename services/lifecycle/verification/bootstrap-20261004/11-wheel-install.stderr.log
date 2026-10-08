@@ -1,0 +1,5 @@
+Using Python 3.12.14 environment at: /tmp/p01-lifecycle-g60tuxx5/runtime
+Resolved 1 package in 2ms
+Prepared 1 package in 7ms
+Installed 1 package in 3ms
+ + product-lifecycle==0.1.0.dev0 (from file:///tmp/p01-lifecycle-g60tuxx5/artifacts/product_lifecycle-0.1.0.dev0-py3-none-any.whl)

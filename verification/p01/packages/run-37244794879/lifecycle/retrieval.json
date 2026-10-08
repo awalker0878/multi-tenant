@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "run_id": 37244794879,
+  "source_revision": "c28c87e6c6804450fea9f6d6817a818eed37fc03",
+  "component": "lifecycle",
+  "artifact": {
+    "id": 11318583068,
+    "name": "p01-lifecycle-37244794879-1",
+    "size_in_bytes": 41271,
+    "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11318583068",
+    "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11318583068/zip",
+    "expired": false,
+    "created_at": "2026-10-04T23:44:09Z",
+    "expires_at": "2026-10-18T23:44:08Z",
+    "updated_at": "2026-10-04T23:44:09Z",
+    "digest": "sha256:a86ff5f5a8f00d36c504aa7909a7ff48b9a6e4b0357d6c9cd1843327f813b389",
+    "workflow_run": {
+      "id": 37244794879,
+      "repository_id": 1374801496,
+      "head_repository_id": 1374801496,
+      "head_branch": "greenfield/enterprise-microservices-plan",
+      "head_sha": "c28c87e6c6804450fea9f6d6817a818eed37fc03"
+    }
+  },
+  "archive_sha256": "a86ff5f5a8f00d36c504aa7909a7ff48b9a6e4b0357d6c9cd1843327f813b389",
+  "archive_bytes": 41271,
+  "archive_checksum_verified": true,
+  "archive_size_verified": true,
+  "report_sha256": "380a8ed3f4b7de2abab6be9679ad186e22f0339a1b29e6b65ef25aa2be1db0cb",
+  "result": "PASS",
+  "failure": null,
+  "source_checks": {
+    "services/lifecycle/.dockerignore": {
+      "sha256": "59e9a97d2a5cf9b6df4160b1c1b558f281a7c6335efb3fe00e446442b5ee407b",
+      "git_blob_sha": "1136d4f7741b5f591074f437f3056fcbc0f31234"
+    },
+    "services/lifecycle/.gitignore": {
+      "sha256": "c95d538d814abdee4b85b0190ecdff09a9cf312e47e64374c78f984994ab34b6",
+      "git_blob_sha": "8196a38558683fad4617d19116e05138f1048fb8"
+    },
+    "services/lifecycle/.python-version": {
+      "sha256": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+      "git_blob_sha": "f36fa5fd8017a085e301126c8c3fc30f1a2550b9"
+    },
+    "services/lifecycle/Dockerfile": {
+      "sha256": "389f60c3ff912d5c03b4d6fb3bd810abd8c2f87840b327903fe61daf42600fbc",
+      "git_blob_sha": "e28e4f014676edf16b69b45fb991232f96e0385a"
+    },
+    "services/lifecycle/README.md": {
+      "sha256": "18c60749b2a4558f1f1f608460fad4772ce9bc47d4d90b097dc8a61386760b56",
+      "git_blob_sha": "adf32706464bc4413332b27e5ee44402396f9be8"
+    },
+    "services/lifecycle/pyproject.toml": {
+      "sha256": "f2badbe54d9e3bf7b1d4f5da328acbf5a00ba1c803b97256df32312db772d835",
+      "git_blob_sha": "cc0d26b67795d996c84ff8a05ff66123440b26d8"
+    },
+    "services/lifecycle/src/lifecycle/__init__.py": {
+      "sha256": "6ef74fd0e8a102879b2b7dfea8ad56a3d8a35c5fb67561e5774aa8b986db2263",
+      "git_blob_sha": "8b82f5ca73d1725f64f23bf875fffb167fd2be2c"
+    },
+    "services/lifecycle/src/lifecycle/application/__init__.py": {
+      "sha256": "1f5ae340d751c791e5b1bea85bdeaa0fa9cbb7a2900d7f3473f42e0c2f48047f",
+      "git_blob_sha": "e9bb3fa89a70cdf3daf4e2289e204d348c25c671"
+    },
+    "services/lifecycle/src/lifecycle/application/foundation.py": {
+      "sha256": "f3774527b6898bf92837c1607552c20f3791981e3f5fc518abf4090ed1e2dc3c",
+      "git_blob_sha": "a844a1cee936ea3a5c3b5758da7ea2d94405fe74"
+    },
+    "services/lifecycle/src/lifecycle/bootstrap/__init__.py": {
+      "sha256": "ef6adabd1f5e063e8fc84022c413520bedb752a95eedc2181ea1fcaadbe5ec84",
+      "git_blob_sha": "59b13086269bdf68eac14929c14adb53ce982a63"
+    },
+    "services/lifecycle/src/lifecycle/bootstrap/health.py": {
+      "sha256": "c9d0d3a850c41373c168d85edbf35b5472d5aaedf24c5659134c7b1c6f968e67",
+      "git_blob_sha": "052213014f0cbde82e71c72423ce3a9e72707efb"
+    },
+    "services/lifecycle/src/lifecycle/bootstrap/server.py": {
+      "sha256": "096391fb5c01a7ea690afd76fed25a79fc8c28b89a6d6d8ac27d25bafb7d85bf",
+      "git_blob_sha": "8013830a01c69a629894a1173bf733433353ac18"
+    },
+    "services/lifecycle/src/lifecycle/infrastructure/__init__.py": {
+      "sha256": "ec32a7399e0c702770c6372d86b55a54ec146fe993eaff22ce17546839b06eaa",
+      "git_blob_sha": "d87cdb19705056ef6378d522601963f2d1bdd530"
+    },
+    "services/lifecycle/src/lifecycle/infrastructure/foundation.py": {
+      "sha256": "3da357be9b1c77dd92682e2e9d5946a3b484062bfc0cae4fad3b44521b5ea97f",
+      "git_blob_sha": "a04f9c81ab264f02d52016f092fce33c5e022622"
+    },
+    "services/lifecycle/src/lifecycle/interfaces/__init__.py": {
+      "sha256": "36c59f445f3f701ece7b2016379abbbfabfd269ac5f6e2dac30860791a7d6a42",
+      "git_blob_sha": "4d24ecb7c51fd148882bd5f0f479b4e9065028b7"
+    },
+    "services/lifecycle/src/lifecycle/interfaces/health.py": {
+      "sha256": "2ff7d45481e2926fd48f825546d55b05b6fa5034a8afc1082fe8960ef426766c",
+      "git_blob_sha": "6c3c6e2882b8affb7991f47384f88503610cb584"
+    },
+    "services/lifecycle/src/lifecycle/interfaces/http.py": {
+      "sha256": "2a1dddea8c58dead4324c32879627587ad3faf7eab6424a801072010b05ee937",
+      "git_blob_sha": "22fa35be7d0b3f3d527e0691bb6118aea48e98cf"
+    },
+    "services/lifecycle/tests/test_foundation.py": {
+      "sha256": "45a192c2864ca6c4e2705a72b07460be76ca5ec5682c321a8f6d6e4f9cc193bc",
+      "git_blob_sha": "7dde6c79725b279338c8d79984cd0787ef534848"
+    },
+    "services/lifecycle/tests/test_health.py": {
+      "sha256": "30fe8c535732cd4a452ce1f41e07af257475f1e570aa717c7cfe95e79b018e98",
+      "git_blob_sha": "b7fe8efb18bfdeb9e7812543f38bb62a1a70bf49"
+    },
+    "services/lifecycle/uv.lock": {
+      "sha256": "5cfc6998e2a3448bc957bb34a36cc9287b273dcd14c49920b3fe6846da4a8a49",
+      "git_blob_sha": "f449dbde96bd22a47185dbf99bfc17522537f62d"
+    },
+    "scripts/p01/README.md": {
+      "sha256": "c43804617f0f238bb226742ffefecf8f3f2c2131aa688b6ae4e0bfbf989c1812",
+      "git_blob_sha": "8568cd6366b24facc6f5ba628b7d1e4094829149"
+    },
+    "scripts/p01/candidates.json": {
+      "sha256": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+      "git_blob_sha": "afa963d567cef41c678d47732bc692470855b48c"
+    },
+    "scripts/p01/check_jobs.py": {
+      "sha256": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+      "git_blob_sha": "67494c7fbee17097e2ee656b8fc4baff6034323c"
+    },
+    "scripts/p01/local_runtime.py": {
+      "sha256": "86b3029b42d91f647453d4535e76cca55ce9d799826f7b102473035a3685060f",
+      "git_blob_sha": "4ed4f6529099c8dcc00472b313238ddb300c379a"
+    },
+    "scripts/p01/php_image_probe.php": {
+      "sha256": "f4ac97d5b8638258e6d595869d7324cc624d3c5958199e9f969d6f77badbaf74",
+      "git_blob_sha": "968e38f291368ef278d5de2a92e30653b1258ed0"
+    },
+    "scripts/p01/python_lock.py": {
+      "sha256": "05b4074482edb8899c95da980b4886975a9ce36adb19c2894bd4e42b40d76769",
+      "git_blob_sha": "3c4c5cf63af395b12015764e3cac8cbfb2549f4e"
+    },
+    "scripts/p01/resolve_dependencies.py": {
+      "sha256": "5bf284a7bff395bd29a344dfc311c4e2b97ad814da58f373c4a0703dc16e9210",
+      "git_blob_sha": "a678b8423df27a68295cb8189036514bff4ac935"
+    },
+    "scripts/p01/run_images.py": {
+      "sha256": "7898d827e081ee477ff99ad154bd289d571350a4483aa5b74d64e8bdbde72c8b",
+      "git_blob_sha": "86b8e47487cbdb7ff1cac83d1a7d6885e843f597"
+    },
+    "scripts/p01/run_local.py": {
+      "sha256": "e7569816ae9662c5091b4251adcec41cb8f54b57a1381a8ff0c13cd5c7c4abe5",
+      "git_blob_sha": "ddc26263a06b988f6d628ff0b3e4170e2eca9314"
+    },
+    "scripts/p01/run_quality.py": {
+      "sha256": "134733b7907e0484eda4971bd7af7d8d16383966b257de7b6570d8813c85b496",
+      "git_blob_sha": "4fc3971cd687931a8a0cedf1a23da5788e9914c3"
+    },
+    "scripts/p01/select_components.py": {
+      "sha256": "37575f2fb29659ae7d72d477c9b09f1d981571386ef20ccd0ce4d039b5cd79d7",
+      "git_blob_sha": "ad1a608ea86fd1c5dd66b16e1d4c75af8cb3ade8"
+    },
+    "scripts/p01/test_jobs.py": {
+      "sha256": "b103af1562f26ceb28e13e36fa13a09fb131333bc8cf4144e071d05b7c23bbf5",
+      "git_blob_sha": "39e6eda6731a45d62ac13ce98c72f3e2d4ee9cb0"
+    },
+    "scripts/p01/test_local_runtime.py": {
+      "sha256": "24a7bed777b0ac072143416a4a6459c29bec33a15e24c39df9f4548ef79d6833",
+      "git_blob_sha": "fc8fc028ffced10fdfcc566b99a4660a70b84b82"
+    },
+    "scripts/p01/test_python_lock.py": {
+      "sha256": "0e64837b214d31eaa2fa8004e3c5a49230f039742f15a1b2d6875a1b983d173b",
+      "git_blob_sha": "a2de3f67f3d27b1adf13c69610122a41f900a360"
+    },
+    "scripts/p01/test_recorder.py": {
+      "sha256": "afc5002982dfb8d1d71a71974fdf5a2d3471854c6cfccc91f31f06b0d3bbe56f",
+      "git_blob_sha": "e76c76d21d2808271ce2a67fc5feb6d23bd21bc9"
+    },
+    "scripts/p01/test_selection.py": {
+      "sha256": "d6122c2ac881b206f4871e3f77dda8e5f0194f3f1b790864154cd6bf20367ab6",
+      "git_blob_sha": "d25462046b36c9cdfd959b47374db6f104862987"
+    },
+    ".github/workflows/p01-foundations.yml": {
+      "sha256": "7843fd6cca1c4116fec105ad8f5e9101aa67014304b21a2a3bf2343af70e0b00",
+      "git_blob_sha": "6f0ddbf0a6e984bdfb4025716a21c550d5ecdc58"
+    }
+  },
+  "source_bindings_verified_against_commit": 37,
+  "command_log_hashes_verified": 42,
+  "artifact_hashes_verified": 47,
+  "retained_file_sha256": {
+    "01-python-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-python-version.stdout.log": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "02-uv-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "02-uv-version.stdout.log": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6",
+    "03-lock-check.stderr.log": "fe6004d2a798b03681a73f420a1dddc319fb3394235d66c53267ae40d139a2d1",
+    "03-lock-check.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-clean-locked-install.stderr.log": "94532be3f317cb74285642bb8611d0bd158c0729462798add03e57bf5abfdd73",
+    "04-clean-locked-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "05-installed-quality-inventory.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "05-installed-quality-inventory.stdout.log": "f46f3c3464a6f83b9459948a0db521ef6e15aa8b53a268c03f6e82c3d90d7eac",
+    "06-ruff.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-ruff.stdout.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "07-format.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "07-format.stdout.log": "04eb0d6e6734823dcd2b2b704729e976f683df7a8f334da7216520ef1cb319bf",
+    "08-mypy.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-mypy.stdout.log": "8f3f4c0ebcb835e848682f2c6610a1bf32c86a993bdb626d9ff36e3a49408398",
+    "09-tests.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "09-tests.stdout.log": "e941366cbfb574717e9ace861500fd6925a0f203e4406235c3a7c2c6b86d8268",
+    "10-wheel-build.stderr.log": "24df39447b2f4b09bf44848b2cf9390c2d41d3bb071d13a25371f4f6618eab01",
+    "10-wheel-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "11-empty-runtime.stderr.log": "88b6bafc565e7b9c8f4bfc2231a1fef35f6dbbcd4c7077c154d9c29d2ec301d4",
+    "11-empty-runtime.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "12-export-production-lock.stderr.log": "44eb74ff834d7429386af2b930b0f242bb7cd522a55e4fee8b92f273c67dffe1",
+    "12-export-production-lock.stdout.log": "75c1f9fbfa397b27372f7ca68098e64d5f47efce25109845191bee09be2aca25",
+    "13-isolated-production-install.stderr.log": "0d7b5d5112c88921760f05fd8febde621bda060df9ae451102a47b34415c9aec",
+    "13-isolated-production-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "14-isolated-wheel-install.stderr.log": "d8b81cd13e8cfe5150ee32f756314dae9a81ff9529366ce4a739eae9b5669163",
+    "14-isolated-wheel-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "15-runtime-dependency-check.stderr.log": "9cdfa4cb9e9778049ee9f5cc8d26f53bbd226d225144801a070daf791f6eb687",
+    "15-runtime-dependency-check.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "16-runtime-inventory.stderr.log": "78ec6a56cf4cd8f0eb0a6502996a948aa8c0f175f7dbeebae140cdadabde0cbf",
+    "16-runtime-inventory.stdout.log": "54a768705ffdcd4a95ef21ae1ae33976da90215dea5a591f4578d278e6167502",
+    "17-isolated-import.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "17-isolated-import.stdout.log": "c6b3feaccb44362637e9ff1eba694269441245bb871d70e1b9280f78c6063b5a",
+    "18-isolated-liveness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "18-isolated-liveness.stdout.log": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+    "19-isolated-readiness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "19-isolated-readiness.stdout.log": "0a577cc36a0f23fc6200b5f008f18c398b3c4701b67beffd59088e451db93402",
+    "20-isolated-invalid-input.stderr.log": "db2ce41829f676bbf3c305ee5c139ef7bfb24f38fe6c5742815bb5835efbb736",
+    "20-isolated-invalid-input.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "21-installed-entrypoint.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "21-installed-entrypoint.stdout.log": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+    "http-server.log": "7db474b94a4e41855c9254ad89825a5721c04e1f3c55b153755369f217db99e2",
+    "production-requirements.txt": "75c1f9fbfa397b27372f7ca68098e64d5f47efce25109845191bee09be2aca25",
+    "pyproject.toml": "f2badbe54d9e3bf7b1d4f5da328acbf5a00ba1c803b97256df32312db772d835",
+    "report.json": "380a8ed3f4b7de2abab6be9679ad186e22f0339a1b29e6b65ef25aa2be1db0cb",
+    "uv.lock": "5cfc6998e2a3448bc957bb34a36cc9287b273dcd14c49920b3fe6846da4a8a49",
+    "wheel-envelope.json": "9be9c13dc1bcb0b841b3477b373269bed3f4389c4609f2f48bdf85ef4d31aadb"
+  },
+  "http_log_hash_verified": true,
+  "binary_envelope_files_verified": 1,
+  "wheel_envelope_verified": true,
+  "run_attempt": "1",
+  "dependency_mode": null
+}

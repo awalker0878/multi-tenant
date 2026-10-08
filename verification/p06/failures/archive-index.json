@@ -1,0 +1,93 @@
+[
+  {
+    "run_id": 37512315239,
+    "artifact_id": 11434723696,
+    "source_revision": "efabb107207ebbc333d86c3ce66d1bca4f0efa01",
+    "archive": "archives/p06-compose-failure.zip",
+    "sha256": "2848b9d996f89d54cdc4ea4fe249031345c6a5ba6ce5cee4001237b4fa028a1c",
+    "report_present": true,
+    "observed_result": "FAIL",
+    "correction": "Image entrypoint differed from the declared health-first script."
+  },
+  {
+    "run_id": 37512315307,
+    "artifact_id": 11435593936,
+    "source_revision": "efabb107207ebbc333d86c3ce66d1bca4f0efa01",
+    "archive": "archives/p06-failure-11435593936.zip",
+    "sha256": "4136b3990c2673beac808aede79dd61db8c11071c0f395294a17fbc934b313d8",
+    "report_present": true,
+    "observed_result": "FAIL",
+    "correction": "Temporal schema image was not explicitly pulled under pull_policy=never."
+  },
+  {
+    "run_id": 37512933216,
+    "artifact_id": 11436475533,
+    "source_revision": "b8a3be597aad8caec4178e34658ebc3b41ced26f",
+    "archive": "archives/p06-live-startup-failure.zip",
+    "sha256": "08dd3bf105c1589e06271b349ff8173a0003a5cc1da45e10a4de344763705f48",
+    "report_present": false,
+    "observed_result": null,
+    "correction": "Temporal loopback reachability failed; late cleanup masked report generation."
+  },
+  {
+    "run_id": 37513710979,
+    "artifact_id": 11436001809,
+    "source_revision": "4481f3d9b32a91b0fdb95babe00f3931cd2f45d9",
+    "archive": "archives/p06-failure-11436001809.zip",
+    "sha256": "0aeef74095264e79e1df563ad6a10408b6da84fdc023f8fb268c4d11e8b27376",
+    "report_present": true,
+    "observed_result": "FAIL",
+    "correction": "Live fixture omitted runtime USAGE on the Lifecycle app schema."
+  },
+  {
+    "run_id": 37514549875,
+    "artifact_id": 11437416440,
+    "source_revision": "ffb6f387cea91827a57ba8240b5d9002fa65176c",
+    "archive": "archives/p06-failure-11437416440.zip",
+    "sha256": "480467bf0bf66b2816af87f03e9c0d4689717675ee233763a43c9363a77f56a6",
+    "report_present": true,
+    "observed_result": "FAIL",
+    "correction": "Reader membership fixture expected 201; owner returns 200."
+  },
+  {
+    "run_id": 37515335960,
+    "artifact_id": 11437187471,
+    "source_revision": "be35575658c3523d9c2edaffc95b4fb970d41494",
+    "archive": "archives/p06-revocation-failure.zip",
+    "sha256": "92ab6af46944ef6c0d52b8a17d1e4b91e568a75d71965c8d1d67ab4a26be6341",
+    "report_present": true,
+    "observed_result": "FAIL",
+    "correction": "Revoked tenant membership is masked as 404; campaign incorrectly expected 403."
+  },
+  {
+    "run_id": 37516350056,
+    "artifact_id": 11436694462,
+    "source_revision": "4fab88db2cc15002d083e5ebb597aaee3ec7cce4",
+    "archive": "archives/p06-control-core-failure.zip",
+    "sha256": "674105ce30756040a9573c92af63f0acf6b151a88c9569e59ec0e43b6352010e",
+    "report_present": true,
+    "observed_result": "FAILED",
+    "correction": "Connection-loss fixture supplied a duplicate connect_timeout keyword; use the owned database timeout."
+  },
+  {
+    "run_id": 37515335885,
+    "artifact_id": 11438211650,
+    "source_revision": "be35575658c3523d9c2edaffc95b4fb970d41494",
+    "archive": "archives/p06-kubernetes-empty-witness.zip",
+    "sha256": "cd3b4331d2c29962b3fdb47d3128acd089adc1e9c2e8e88fe161d2675080eab5",
+    "report_present": true,
+    "observed_result": "FAIL",
+    "correction": "Retain empty second-process witness as a failed observation; final-source deployment regression must independently pass."
+  },
+  {
+    "run_id": 37513710639,
+    "run_attempt": 1,
+    "artifact_id": 11437070523,
+    "source_revision": "4481f3d9b32a91b0fdb95babe00f3931cd2f45d9",
+    "archive": "archives/p06-inventory-broker-startup.zip",
+    "sha256": "1f8a14c077ddd6ea5f2b23657f74a926f95e2849136451f0a44c0b9a2d9b55d0",
+    "report_present": true,
+    "observed_result": "FAIL",
+    "correction": "Broker startup did not become ready; retry only the failed Chromium job on unchanged Inventory, Governance, Console and P04 campaign source. Preserve this original attempt."
+  }
+]

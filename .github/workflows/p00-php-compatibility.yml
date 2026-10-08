@@ -1,0 +1,74 @@
+name: P00 PHP compatibility
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths:
+      - spikes/compatibility/php/**
+      - spikes/compatibility/frontend/**
+      - spikes/compatibility/run-integration.py
+      - .github/workflows/p00-php-compatibility.yml
+  workflow_dispatch:
+    inputs:
+      dependency_mode:
+        description: Install the lock, or explicitly resolve a new experimental tuple
+        type: choice
+        options: [install, resolve]
+        default: install
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p00-php-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  php-compatibility:
+    name: Laravel HTTP, quality tools and Chromium integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      COMPOSER_NO_INTERACTION: '1'
+      COMPOSER_PROCESS_TIMEOUT: '300'
+    steps:
+      - name: Check out spike inputs
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5, resolved 2026-10-04
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP and Composer
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2, resolved 2026-10-04
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, filter, hash, mbstring, openssl, pcre, pdo, pdo_sqlite, session, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+        env:
+          fail-fast: 'true'
+
+      - name: Set up Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6, resolved 2026-10-04
+        with:
+          node-version: '24.19.0'
+
+      - name: Resolve, clean-install and execute the isolated probe
+        env:
+          COMPOSER_HOME: ${{ runner.temp }}/p00-composer-home
+          COMPOSER_CACHE_DIR: ${{ runner.temp }}/p00-composer-cache
+          # Dependency updates require an explicit dispatch; pushes replay the measured lock.
+          P00_DEPENDENCY_MODE: ${{ inputs.dependency_mode || 'install' }}
+        run: >-
+          python3 spikes/compatibility/run-integration.py
+          --workspace "$GITHUB_WORKSPACE"
+          --output "$RUNNER_TEMP/p00-integration"
+          --dependency-mode "$P00_DEPENDENCY_MODE"
+
+      - name: Retain locks, source bindings and actual command logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, resolved 2026-10-04
+        with:
+          name: p00-integration-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p00-integration/evidence/
+          if-no-files-found: error
+          retention-days: 14

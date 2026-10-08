@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:product:governance:change:1",
+  "title": "GovernanceChangeV1",
+  "description": "Immutable committed fact reference; never a grant or admission permit. Deduplicate by event_id and compare revision within tenant and resource family. Consumers retrieve protected data through current owner authorization.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "event_type": {
+      "enum": [
+        "governance.tenant.changed",
+        "governance.membership.changed",
+        "governance.grant.changed",
+        "governance.grant.revoked",
+        "governance.quota.changed",
+        "governance.approval.requested",
+        "governance.approval.approved",
+        "governance.approval.rejected",
+        "governance.approval.revoked",
+        "governance.approval.expired"
+      ]
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "tenant_id": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "actor_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "actor_kind": {
+      "enum": [
+        "federated",
+        "system"
+      ]
+    },
+    "resource_id": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "audit_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "authority_use": {
+      "const": "notification_only"
+    }
+  },
+  "required": [
+    "event_type",
+    "schema_version",
+    "event_id",
+    "tenant_id",
+    "actor_id",
+    "actor_kind",
+    "resource_id",
+    "revision",
+    "audit_sha256",
+    "occurred_at",
+    "authority_use"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "actor_kind": {
+            "const": "system"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "actor_id": {
+            "type": "null"
+          },
+          "event_type": {
+            "const": "governance.approval.expired"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "actor_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          }
+        }
+      }
+    }
+  ]
+}

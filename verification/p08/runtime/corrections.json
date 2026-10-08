@@ -1,0 +1,42 @@
+[
+  {
+    "kind": "image-entrypoint-failure",
+    "file": "image-first-failure.log",
+    "sha256": "03aac891fb95410c0a4d7ce25715582149f7af3d80e2fbee0ff907b89e8386ab",
+    "source_revision": "d7d350befb4aab531dd2dfa79a23996e5441c5ff",
+    "run_id": 37673681072,
+    "job_id": 112972417487
+  },
+  {
+    "kind": "frozen-contract-failure",
+    "file": "archives/p08-contract-version-first-failure.zip",
+    "sha256": "9ef700080f035c9edb24d519d2dfd35403cfd31d7c426ed0b09d6647b887dbcb",
+    "source_revision": "8494cba713c701de0610878622c327e5f11dc97e",
+    "run_id": 37674971112,
+    "job_id": 112976000836
+  },
+  {
+    "kind": "restored-contract-compatibility",
+    "file": "restored-contract-compatibility.json",
+    "sha256": "07fcae03cd05292df3ccd6f420833f5cfaf53c988eefe5e0caa508932784c025",
+    "source_revision": "7860616293cc0be7a1983ca7bc38529aed5e5b7f",
+    "run_id": null,
+    "job_id": null
+  },
+  {
+    "kind": "restoration-parent-comparison",
+    "file": "archives/p08-contract-restoration-comparison.zip",
+    "sha256": "27657c562fe35747854b2551a9ac5c679c034e6d6240eec012188790a6e09b64",
+    "source_revision": "7860616293cc0be7a1983ca7bc38529aed5e5b7f",
+    "run_id": 37675525121,
+    "job_id": 112977907123
+  },
+  {
+    "kind": "restored-contract-hosted-pass",
+    "file": "archives/p08-contract-restored-pass.zip",
+    "sha256": "988cb48c60e3a560e5ba272d4a570b6266c47cc65b1acb1b79fad0579ee45aa3",
+    "source_revision": "0a2d1cfeefba9df47dbfeb9a5fed05cf90f87bd8",
+    "run_id": 37676737472,
+    "job_id": 112982070662
+  }
+]

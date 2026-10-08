@@ -1,0 +1,10 @@
+INFO:     Started server process [8268]
+INFO:     Uvicorn running on http://127.0.0.1:8037 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Finished server process [8268]
+INFO:     Started server process [9961]
+INFO:     Uvicorn running on http://127.0.0.1:8037 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Finished server process [9961]
+INFO:     Started server process [14828]
+INFO:     Uvicorn running on http://127.0.0.1:8037 (Press CTRL+C to quit)

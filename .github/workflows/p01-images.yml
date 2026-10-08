@@ -1,0 +1,105 @@
+name: P01 bootstrap images
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p01-images-${{ github.workflow }}-${{ github.ref }}
+  queue: max
+  cancel-in-progress: false
+
+jobs:
+  selection:
+    name: Select affected independent images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      images: ${{ steps.select.outputs.images }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check selection and aggregate outcome rules
+        run: python3 -m unittest discover -s scripts/p01 -p 'test_*.py' -v
+      - name: Select images from changed paths and owner dependencies
+        id: select
+        run: python3 scripts/p01/select_components.py --workspace "$GITHUB_WORKSPACE"
+
+  images:
+    name: ${{ matrix.component }} isolated image
+    needs: selection
+    if: needs.selection.outputs.images != '[]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJSON(needs.selection.outputs.images) }}
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Build owned context and inspect foundation isolation
+        env:
+          P01_COMPONENT: ${{ matrix.component }}
+        run: >-
+          python3 scripts/p01/run_images.py
+          --component "$P01_COMPONENT"
+          --output "$RUNNER_TEMP/p01-image-$P01_COMPONENT"
+          --source-revision "$GITHUB_SHA"
+      - name: Scan and verify transfer of the same built image
+        env:
+          P01_COMPONENT: ${{ matrix.component }}
+        run: >-
+          python3 scripts/p01/artifacts/campaign.py
+          --build-report "$RUNNER_TEMP/p01-image-$P01_COMPONENT/report.json"
+          --output "$RUNNER_TEMP/p01-artifact-$P01_COMPONENT"
+      - name: Retain redacted artifact trust evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p01-artifact-${{ matrix.component }}-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-artifact-${{ matrix.component }}/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Retain source, input, image and execution evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: p01-image-${{ matrix.component }}-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-image-${{ matrix.component }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  image-outcome:
+    name: Foundation images
+    if: always()
+    needs: [selection, images]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Require every selected image result
+        env:
+          P01_NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 scripts/p01/check_jobs.py --workspace "$GITHUB_WORKSPACE" --family images
+      - name: Record the exact successfully tested checkout
+        run: python3 scripts/p01/record_check_source.py --name "Foundation images"
+      - name: Retain exact check source
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: check-source-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p01-check-source/report.json
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,24 @@
+name: P01 stateful dependency input observation
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: [deploy/dependencies/stateful/candidates.json, scripts/p01/stateful/resolve.py, scripts/p01/stateful/requirements.in, .github/workflows/p01-stateful-inputs.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - run: python3 scripts/p01/stateful/resolve.py --output "$RUNNER_TEMP/p01-stateful-inputs"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p01-stateful-inputs-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-stateful-inputs/
+          if-no-files-found: error
+          retention-days: 14

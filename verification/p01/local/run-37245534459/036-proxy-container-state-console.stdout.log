@@ -1,0 +1,1 @@
+{"Status":"running","Running":true,"Paused":false,"Restarting":false,"OOMKilled":false,"Dead":false,"Pid":12274,"ExitCode":0,"Error":"","StartedAt":"2026-10-04T23:57:35.059312776Z","FinishedAt":"0001-01-01T00:00:00Z"} {"80/tcp":null,"8443/tcp":[{"HostIp":"127.0.0.1","HostPort":"32773"}]} {"8443/tcp":[{"HostIp":"127.0.0.1","HostPort":"0"}]}

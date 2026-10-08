@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "evidence_level": "E2",
+  "campaigns": [
+    {
+      "archive": "archives/p08-control-components.zip",
+      "archive_sha256": "f9beaa8541f9a7cedbf09ff29a8acc88d9f1bc602063f403bb8a25f52c8045ed",
+      "kind": "components",
+      "run_id": "37684992865",
+      "artifact_id": "11511020701",
+      "source_revision": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992865",
+      "result": "PASSED",
+      "source_bindings_verified": 943,
+      "commands": 36,
+      "suites": [
+        {
+          "name": "inventory",
+          "tests": 112,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "planning",
+          "tests": 170,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "lifecycle",
+          "tests": 349,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "worker",
+          "tests": 258,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "inventory-worker",
+          "tests": 62,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "stats": null,
+      "console_tests": null,
+      "report": "reports/p08-control-components/report.json",
+      "report_sha256": "c826c8e000fbc9605213b3dfd56a155fdecbbe2386da534420041402686e2eb8"
+    },
+    {
+      "archive": "archives/p08-control-browser.zip",
+      "archive_sha256": "c24d5b271500d03971984e9efd9578d91536653f1fbc4bfb4b3f0489f616c3db",
+      "kind": "browser",
+      "run_id": "37684992865",
+      "artifact_id": "11510454876",
+      "source_revision": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684992865",
+      "result": "PASSED",
+      "source_bindings_verified": 231,
+      "commands": 5,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-07T20:51:47.177Z",
+        "duration": 41994.319,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "console_tests": null,
+      "report": "reports/p08-control-browser/report.json",
+      "report_sha256": "57b19ddfc7221d78e0aa77e00779add6aae656a959aa0e6c41be2d4416e671e4"
+    }
+  ],
+  "native_write_authorized": false,
+  "native_platforms_tested": [],
+  "limitations": [
+    "Real PostgreSQL, TLS and browsers; synthetic native platforms and custody/observation peers.",
+    "Governance evidence has a separate exact source; its service tree and native contract are unchanged at the final component source.",
+    "Provider custody/fencing, owner-specific guest/data/service/recovery implementations, interrupted-transfer reconciliation and physical measurements remain open.",
+    "No native Q05/Q06/Q07, G07/G08 receiving or operating acceptance."
+  ],
+  "governance": {
+    "archive": "archives/p08-control-governance.zip",
+    "archive_sha256": "c120098bc38335dbd9ae9c66acdd5becc66d4b0bdad5fe63ab0ef516d4d90cb0",
+    "source_revision": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+    "run_id": "37684327893",
+    "artifact_id": "11510915421",
+    "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37684327893",
+    "result": "PASS",
+    "checks": 160,
+    "source_bindings_verified": 474,
+    "artifacts_verified": 25,
+    "tests": 219,
+    "assertions": 5919,
+    "browser_stats": {
+      "startTime": "2026-10-07T20:48:56.085Z",
+      "duration": 44623.87,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "report": "reports/governance/report.json",
+    "report_sha256": "2673db648f5c4870ce00da1a5440531c14a27e7300eef9f0145afd5d44a6f237",
+    "unchanged_at_source": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd"
+  },
+  "correction": {
+    "original_source": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+    "original_run_id": "37684327980",
+    "original_job_id": "113008124629",
+    "original_conclusion": "failure",
+    "log": "context-policy-original-failure.log",
+    "log_sha256": "b53f00b79613aaf05e30089abbea69d053ceb52d56414b77927c9febd862ed90",
+    "cause": "Native owner infrastructure imported plan_requirements from the HTTP interface layer.",
+    "corrected_source": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+    "corrected_run_id": "37684992982",
+    "corrected_conclusion": "success",
+    "change": "Moved canonical immutable-plan validation to domain/campaign_plan.py and updated every caller. Architecture policy remains unchanged."
+  }
+}

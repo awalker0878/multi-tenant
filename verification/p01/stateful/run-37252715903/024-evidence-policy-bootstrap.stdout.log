@@ -1,0 +1,8 @@
+Added user `assurance` successfully.
+Added user `foreign` successfully.
+Created policy `assurance` successfully.
+Created policy `foreign` successfully.
+Attached Policies: [assurance]
+To User: assurance
+Attached Policies: [foreign]
+To User: foreign

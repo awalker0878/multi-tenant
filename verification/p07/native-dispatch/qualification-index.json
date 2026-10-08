@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "evidence_level": "E2",
+  "scope": "Native orchestration and internal saved-plan transport with synthetic native authority/tool/observations.",
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "production_native_dispatch_enabled": false,
+  "campaigns": [
+    {
+      "archive": "archives/p07-dispatch-initial-440ada2.zip",
+      "archive_sha256": "2435f24e26f0a6869d6ba890481868cefcc8d6a4fd063fe3a3ad2e83b757ce3c",
+      "run_id": "37569156612",
+      "artifact_id": "11459608181",
+      "source_revision": "440ada2a2d9c649c9c73d97cc0ce125cf6c54088",
+      "result": "FAILED",
+      "source_bindings_verified": 121,
+      "command_logs_verified": 11,
+      "artifact_hashes_verified": 13,
+      "test_suites": {
+        "temporal.xml": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-dispatch-initial-440ada2/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37569156612",
+      "observed_checks": 21,
+      "replayed_histories": 0
+    },
+    {
+      "archive": "archives/p07-dispatch-corrected-f3a5f79.zip",
+      "archive_sha256": "5aceb7d622da3f45c4d37b0686693646cdc570f229c2153654730338e48e9a8a",
+      "run_id": "37569680426",
+      "artifact_id": "11460341801",
+      "source_revision": "f3a5f798857f7e903688bf96d44fac16295f336c",
+      "result": "PASSED",
+      "source_bindings_verified": 121,
+      "command_logs_verified": 11,
+      "artifact_hashes_verified": 13,
+      "test_suites": {
+        "temporal.xml": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-dispatch-corrected-f3a5f79/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37569680426",
+      "observed_checks": 36,
+      "replayed_histories": 6
+    },
+    {
+      "archive": "archives/p07-effects-components-ad32c16.zip",
+      "archive_sha256": "299bf6b04a33436dbe3aa8ddcf0f48ccb71f66da8da8d5f375adad8d0d75d293",
+      "run_id": "37570806517",
+      "artifact_id": "11460458584",
+      "source_revision": "ad32c166da60e815c03ed3633b0a43ed7fbdb801",
+      "result": "PASSED",
+      "source_bindings_verified": 121,
+      "command_logs_verified": 18,
+      "artifact_hashes_verified": 0,
+      "test_suites": {
+        "lifecycle.xml": {
+          "tests": 288,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "native.xml": {
+          "tests": 157,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-effects-components-ad32c16/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37570806517"
+    },
+    {
+      "archive": "archives/p07-effects-dispatch-ad32c16.zip",
+      "archive_sha256": "65c1dbd1c1bf47d103b77377154f9db3b458b043bf8a4549b019a9845cd27c67",
+      "run_id": "37570806517",
+      "artifact_id": "11460398783",
+      "source_revision": "ad32c166da60e815c03ed3633b0a43ed7fbdb801",
+      "result": "PASSED",
+      "source_bindings_verified": 207,
+      "command_logs_verified": 11,
+      "artifact_hashes_verified": 13,
+      "test_suites": {
+        "temporal.xml": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-effects-dispatch-ad32c16/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37570806517",
+      "observed_checks": 43,
+      "replayed_histories": 6
+    },
+    {
+      "archive": "archives/p07-effects-isolated-worker-ad32c16.zip",
+      "archive_sha256": "4eff13f25ee513baf05a1f1c4c2ac1faa183e77c417130ff518e40ce49019589",
+      "run_id": "37570806542",
+      "artifact_id": "11460647381",
+      "source_revision": "ad32c166da60e815c03ed3633b0a43ed7fbdb801",
+      "result": "PASS",
+      "source_bindings_verified": 130,
+      "command_logs_verified": 42,
+      "artifact_hashes_verified": 46,
+      "test_suites": {},
+      "report": "reports/p07-effects-isolated-worker-ad32c16/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37570806542"
+    },
+    {
+      "archive": "archives/p07-components-final-9b01db7.zip",
+      "archive_sha256": "8fe022f4dd6532213f40cae9c7a4412d84b79dc0490628a9182f5c5be0e2ac3f",
+      "run_id": "37571135196",
+      "artifact_id": "11460960734",
+      "source_revision": "9b01db784ce4ceac012cc98592dd96997efc6168",
+      "result": "PASSED",
+      "source_bindings_verified": 121,
+      "command_logs_verified": 18,
+      "artifact_hashes_verified": 0,
+      "test_suites": {
+        "lifecycle.xml": {
+          "tests": 288,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "native.xml": {
+          "tests": 157,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-components-final-9b01db7/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37571135196"
+    },
+    {
+      "archive": "archives/p07-dispatch-final-9b01db7.zip",
+      "archive_sha256": "27ef84e1551f6bde3e7a105c9e51ce360c62a2619a05923af849c74b039192bb",
+      "run_id": "37571135196",
+      "artifact_id": "11460677673",
+      "source_revision": "9b01db784ce4ceac012cc98592dd96997efc6168",
+      "result": "PASSED",
+      "source_bindings_verified": 207,
+      "command_logs_verified": 11,
+      "artifact_hashes_verified": 19,
+      "test_suites": {
+        "temporal.xml": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "report": "reports/p07-dispatch-final-9b01db7/report.json",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37571135196",
+      "observed_checks": 43,
+      "replayed_histories": 6
+    }
+  ],
+  "limitations": [
+    "Actual Temporal, TLS and owner-separated PostgreSQL exercise orchestration and transport; native owners, saved-plan effects and provider observations in the orchestration fixture are synthetic.",
+    "The independent component campaign exercises actual bounded subprocess, artifact verification and provider-shaped readback; it does not run a native deployment.",
+    "Production composite owner and workload trust, provider request fencing and selected guest/service/traffic/retirement adapters remain unfinished.",
+    "No commissioned OpenStack environment, Q05/Q06 native campaign, receiving, P07 completion or supported native tuple is established."
+  ],
+  "source_revision": "9b01db784ce4ceac012cc98592dd96997efc6168",
+  "verified_at": "2026-10-07T04:24:34.584475+00:00",
+  "reviewer": "Codex source/artifact consistency review only; designated native and receiving reviews remain open.",
+  "offline_replay": "offline-replay.json",
+  "additional_tool_input_hashes": {
+    "scripts/p01/contracts/pyproject.toml": "eff306f45a1d4d4dc1ecf21f36eba2daf20be160b938a87928af4e8e6655f315",
+    "scripts/p01/contracts/uv.lock": "6afd3e92a837772ab2edf0a61abb912d4e5d0917e2ebae03f0bbcbf21fe7951c"
+  },
+  "isolated_package_source_comparison": {
+    "measured_source": "ad32c166da60e815c03ed3633b0a43ed7fbdb801",
+    "compared_source": "9b01db784ce4ceac012cc98592dd96997efc6168",
+    "unchanged_bindings": 130,
+    "result": "MATCHED"
+  }
+}

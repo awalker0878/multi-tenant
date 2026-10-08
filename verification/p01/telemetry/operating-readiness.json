@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-05T07:45:00.133441+00:00",
+  "source_revision": "36a14811b5afa23717566d5e8a08632e011f44a5",
+  "command": [
+    "python3",
+    "scripts/p01/admission/operating_inputs.py",
+    "--require-complete"
+  ],
+  "exit_code": 1,
+  "input_sha256": "c1043c37e4b223d8d4c779ab5f82aea5463c0abcbca32bdf26d587e6ca7f59ac",
+  "observation": {
+    "result": "HELD",
+    "missing_or_unreviewed": [
+      "OP01",
+      "OP02",
+      "OP03",
+      "OP04",
+      "OP05",
+      "OP06",
+      "OP07"
+    ],
+    "promotion_authorized": false,
+    "limitations": "Checks recorded identity and completeness only; does not fetch custody evidence or authenticate review."
+  }
+}

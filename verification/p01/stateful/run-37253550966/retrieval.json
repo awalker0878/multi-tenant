@@ -1,0 +1,19 @@
+{
+  "run_id": 37253550966,
+  "source_revision": "ad164ca10dd26134d3c889eef318201f77412a6a",
+  "artifact_id": 11322251357,
+  "archive_sha256": "be5f16e3fec3195ee3fc76d4c40838f7db0f91fe62bd88f31f06ddbf31074bc1",
+  "archive_bytes": 68062,
+  "archive_checksum_verified": true,
+  "reported_result": "FAIL",
+  "reported_cleanup_complete": false,
+  "report_sha256": "c0a0ea18c1114af4e9e64dadbaf00a2201820c48b5960def73e1638eba575dbe",
+  "command_log_hashes_verified": 73,
+  "withheld_log_paths": [
+    "025-evidence-policy-bootstrap.stderr.log"
+  ],
+  "withheld_logs_verified_as_placeholder": true,
+  "immutable_source_bindings_verified": 48,
+  "failure_scope": "The IAM bootstrap CLI failed and a generated credential was detected in its captured diagnostic. Artifact guard replaced that one stream with a withholding notice before upload. Original bytes intentionally unavailable and their original report hash cannot match the replacement. Container, volume and network removal checks passed, but overall cleanup/retention was correctly reported incomplete. No behavior pass.",
+  "reviewer": "Codex \u2014 archive, retained stream hashes, withholding marker and immutable source integrity examination"
+}

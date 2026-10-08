@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "source_sha": "1d45f11146913c7401732e9d6be0c8bd7677dfda",
+  "observer": "Codex via GitHub connector; archive digest, retained-byte and committed-source hashes compared",
+  "result": "PASS",
+  "run_id": 37366983045,
+  "artifact_id": 11369001682,
+  "report_path": "verification/p02/events/run-37366983045/report.json",
+  "report_sha256": "e3ef57bd0ba01fcbaabaee2b6e1aa6b82456a5fa1e9c5d291854b4c50e1c3c11",
+  "archive_sha256": "2f94f24655bfe9789093938d6f236b52e23bb1f8f9919d779260545c8d79e786",
+  "checks": 5,
+  "matched_source_bindings": 153,
+  "matched_artifact_hashes": 10
+}

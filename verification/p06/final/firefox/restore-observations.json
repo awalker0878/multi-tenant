@@ -1,0 +1,8 @@
+{
+  "backup_sha256": "e3b752150c4bb739ced781848efbd26cfa0720c10c3e23392629cfe2d98b9e16",
+  "restored_jobs": 4,
+  "independent_effect_count": 29,
+  "external_epoch_changed": true,
+  "read_only_hold": true,
+  "re_enable_decision": "DENIED: restored journal and current epoch require independent reconciliation and newly bound authority; no automatic release or old-epoch restoration"
+}

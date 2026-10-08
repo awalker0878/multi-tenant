@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "run_id": 37272257487,
+  "source_revision": "94a96313a256a7b4d0d29e4ccd1c9b3fdb23cc5a",
+  "artifact_id": 11328324995,
+  "artifact_digest": "sha256:22a2189275c6441684ad41531f1c5bf2481b24e18ce19024e77c648b369ad4c6",
+  "retained_file_sha256": {
+    "catalogue-build.zip": "22a2189275c6441684ad41531f1c5bf2481b24e18ce19024e77c648b369ad4c6"
+  },
+  "observation": "FAILED build: OpenSSL 3.5.9 libraries conflict with the base OpenSSL 3.5.8 executable. Subsequent resolution includes the matching executable and validates offline installation."
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "platform": "linux/amd64",
+  "candidate_sha256": "e20eeda5ed589b3dfc428f7103127eac986d68fa78f7ed15a8e8bd8b663a094f",
+  "resolved_at": "2026-10-04T20:27:07.043306+00:00",
+  "images": {
+    "php": {
+      "candidate": "docker.io/library/php:8.5.11-fpm-bookworm",
+      "index_digest": "sha256:53eab56a8f43f51a92119f6c29b3448af98eec288ff17f92829354a4b4c9ca05",
+      "digest": "sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3",
+      "reference": "docker.io/library/php@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3"
+    },
+    "python": {
+      "candidate": "docker.io/library/python:3.12.14-slim-bookworm",
+      "index_digest": "sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e",
+      "digest": "sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a",
+      "reference": "docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a"
+    },
+    "node": {
+      "candidate": "docker.io/library/node:24.19.0-bookworm-slim",
+      "index_digest": "sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df",
+      "digest": "sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+      "reference": "docker.io/library/node@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174"
+    },
+    "composer": {
+      "candidate": "docker.io/library/composer:2.10.3",
+      "index_digest": "sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac",
+      "digest": "sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d",
+      "reference": "docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d"
+    },
+    "uv": {
+      "candidate": "ghcr.io/astral-sh/uv:0.12.19",
+      "index_digest": "sha256:04d046b13e60d6bcec73cbc5e1cad25d680dea90c8573340950a0ac2d1aef424",
+      "digest": "sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3",
+      "reference": "ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3"
+    }
+  }
+}

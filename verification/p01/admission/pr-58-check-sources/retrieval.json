@@ -1,0 +1,273 @@
+{
+  "result": "VERIFIED",
+  "reports": [
+    {
+      "name": "Foundation checks",
+      "run": {
+        "id": 37265828765,
+        "run_attempt": 1,
+        "event": "pull_request",
+        "head_sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182",
+        "path": ".github/workflows/p01-foundations.yml",
+        "conclusion": "success",
+        "created_at": "2026-10-05T04:59:31Z",
+        "pull_requests": [
+          {
+            "url": "https://api.github.com/repos/awalker0878/multi-tenant/pulls/58",
+            "id": 4740258878,
+            "number": 58,
+            "head": {
+              "ref": "work/p01-admission-denial-20261005",
+              "sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182",
+              "repo": {
+                "id": 1374801496,
+                "url": "https://api.github.com/repos/awalker0878/multi-tenant",
+                "name": "multi-tenant"
+              }
+            },
+            "base": {
+              "ref": "greenfield/enterprise-microservices-plan",
+              "sha": "41bbcaec3be5ec0f2abdd534bab2041e46a74e90",
+              "repo": {
+                "id": 1374801496,
+                "url": "https://api.github.com/repos/awalker0878/multi-tenant",
+                "name": "multi-tenant"
+              }
+            }
+          }
+        ]
+      },
+      "job": {
+        "run_id": 37265828765,
+        "name": "Foundation checks",
+        "conclusion": "success"
+      },
+      "artifact": {
+        "id": 11326690732,
+        "name": "check-source-foundation-checks-37265828765-1",
+        "size_in_bytes": 494,
+        "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11326690732",
+        "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11326690732/zip",
+        "expired": false,
+        "created_at": "2026-10-05T05:01:23Z",
+        "expires_at": "2026-10-19T05:01:22Z",
+        "updated_at": "2026-10-05T05:01:23Z",
+        "digest": "sha256:180e6bd9e5c392f14485292e46995591a43da6aa22241f9ce19ba4269ce1d227",
+        "workflow_run": {
+          "id": 37265828765,
+          "repository_id": 1374801496,
+          "head_repository_id": 1374801496,
+          "head_branch": "work/p01-admission-denial-20261005",
+          "head_sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182"
+        }
+      },
+      "retained_report": "37265828765.json",
+      "retained_sha256": "2fe2627c7e91d98b05b7b2d1665986c71346ad3e713c4a5abd82c9c1364ed9ed",
+      "tested_merge": "d7e23f67ffe035185720536d1182a38560df8ada"
+    },
+    {
+      "name": "Foundation contracts",
+      "run": {
+        "id": 37265828778,
+        "run_attempt": 1,
+        "event": "pull_request",
+        "head_sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182",
+        "path": ".github/workflows/p01-contracts.yml",
+        "conclusion": "success",
+        "created_at": "2026-10-05T04:59:31Z",
+        "pull_requests": [
+          {
+            "url": "https://api.github.com/repos/awalker0878/multi-tenant/pulls/58",
+            "id": 4740258878,
+            "number": 58,
+            "head": {
+              "ref": "work/p01-admission-denial-20261005",
+              "sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182",
+              "repo": {
+                "id": 1374801496,
+                "url": "https://api.github.com/repos/awalker0878/multi-tenant",
+                "name": "multi-tenant"
+              }
+            },
+            "base": {
+              "ref": "greenfield/enterprise-microservices-plan",
+              "sha": "41bbcaec3be5ec0f2abdd534bab2041e46a74e90",
+              "repo": {
+                "id": 1374801496,
+                "url": "https://api.github.com/repos/awalker0878/multi-tenant",
+                "name": "multi-tenant"
+              }
+            }
+          }
+        ]
+      },
+      "job": {
+        "run_id": 37265828778,
+        "name": "Foundation contracts",
+        "conclusion": "success"
+      },
+      "artifact": {
+        "id": 11326641182,
+        "name": "check-source-contracts-37265828778-1",
+        "size_in_bytes": 492,
+        "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11326641182",
+        "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11326641182/zip",
+        "expired": false,
+        "created_at": "2026-10-05T05:00:08Z",
+        "expires_at": "2026-10-19T05:00:07Z",
+        "updated_at": "2026-10-05T05:00:08Z",
+        "digest": "sha256:13d5cc016b1b5ee0bb0dc90646523d9d257a3c3e51a0102e24138c6963e39427",
+        "workflow_run": {
+          "id": 37265828778,
+          "repository_id": 1374801496,
+          "head_repository_id": 1374801496,
+          "head_branch": "work/p01-admission-denial-20261005",
+          "head_sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182"
+        }
+      },
+      "retained_report": "37265828778.json",
+      "retained_sha256": "b311e046dce9282d092cc2f1cf2c71958c70d5c6a9d786f8456dcdf81b8f4d2e",
+      "tested_merge": "d7e23f67ffe035185720536d1182a38560df8ada"
+    },
+    {
+      "name": "Architecture registry and documentation",
+      "run": {
+        "id": 37265828759,
+        "run_attempt": 1,
+        "event": "pull_request",
+        "head_sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182",
+        "path": ".github/workflows/architecture-policy.yml",
+        "conclusion": "success",
+        "created_at": "2026-10-05T04:59:31Z",
+        "pull_requests": [
+          {
+            "url": "https://api.github.com/repos/awalker0878/multi-tenant/pulls/58",
+            "id": 4740258878,
+            "number": 58,
+            "head": {
+              "ref": "work/p01-admission-denial-20261005",
+              "sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182",
+              "repo": {
+                "id": 1374801496,
+                "url": "https://api.github.com/repos/awalker0878/multi-tenant",
+                "name": "multi-tenant"
+              }
+            },
+            "base": {
+              "ref": "greenfield/enterprise-microservices-plan",
+              "sha": "41bbcaec3be5ec0f2abdd534bab2041e46a74e90",
+              "repo": {
+                "id": 1374801496,
+                "url": "https://api.github.com/repos/awalker0878/multi-tenant",
+                "name": "multi-tenant"
+              }
+            }
+          }
+        ]
+      },
+      "job": {
+        "run_id": 37265828759,
+        "name": "Architecture registry and documentation",
+        "conclusion": "success"
+      },
+      "artifact": {
+        "id": 11325924043,
+        "name": "check-source-architecture-and-docs-37265828759-1",
+        "size_in_bytes": 515,
+        "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11325924043",
+        "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11325924043/zip",
+        "expired": false,
+        "created_at": "2026-10-05T04:59:46Z",
+        "expires_at": "2026-10-19T04:59:45Z",
+        "updated_at": "2026-10-05T04:59:46Z",
+        "digest": "sha256:6a0f9fa5b5d3999a30e326bef3f48042a0e8d578f42452b0ae3acbf0a9a7f0e9",
+        "workflow_run": {
+          "id": 37265828759,
+          "repository_id": 1374801496,
+          "head_repository_id": 1374801496,
+          "head_branch": "work/p01-admission-denial-20261005",
+          "head_sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182"
+        }
+      },
+      "retained_report": "37265828759.json",
+      "retained_sha256": "1068b05912fedad9a075aef153821249987b5453c1fa16733db906d6f9803084",
+      "tested_merge": "d7e23f67ffe035185720536d1182a38560df8ada"
+    },
+    {
+      "name": "Foundation policy controls",
+      "run": {
+        "id": 37265828730,
+        "run_attempt": 1,
+        "event": "pull_request",
+        "head_sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182",
+        "path": ".github/workflows/p01-policy-controls.yml",
+        "conclusion": "success",
+        "created_at": "2026-10-05T04:59:31Z",
+        "pull_requests": [
+          {
+            "url": "https://api.github.com/repos/awalker0878/multi-tenant/pulls/58",
+            "id": 4740258878,
+            "number": 58,
+            "head": {
+              "ref": "work/p01-admission-denial-20261005",
+              "sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182",
+              "repo": {
+                "id": 1374801496,
+                "url": "https://api.github.com/repos/awalker0878/multi-tenant",
+                "name": "multi-tenant"
+              }
+            },
+            "base": {
+              "ref": "greenfield/enterprise-microservices-plan",
+              "sha": "41bbcaec3be5ec0f2abdd534bab2041e46a74e90",
+              "repo": {
+                "id": 1374801496,
+                "url": "https://api.github.com/repos/awalker0878/multi-tenant",
+                "name": "multi-tenant"
+              }
+            }
+          }
+        ]
+      },
+      "job": {
+        "run_id": 37265828730,
+        "name": "Foundation policy controls",
+        "conclusion": "success"
+      },
+      "artifact": {
+        "id": 11326622170,
+        "name": "check-source-controls-37265828730-1",
+        "size_in_bytes": 498,
+        "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11326622170",
+        "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11326622170/zip",
+        "expired": false,
+        "created_at": "2026-10-05T04:59:41Z",
+        "expires_at": "2026-10-19T04:59:41Z",
+        "updated_at": "2026-10-05T04:59:41Z",
+        "digest": "sha256:14f9df712d4f8c8ef4f8541071f54d7f44004a143dae88ec06762c34cd179fdf",
+        "workflow_run": {
+          "id": 37265828730,
+          "repository_id": 1374801496,
+          "head_repository_id": 1374801496,
+          "head_branch": "work/p01-admission-denial-20261005",
+          "head_sha": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182"
+        }
+      },
+      "retained_report": "37265828730.json",
+      "retained_sha256": "c0aa2288559a7acbbfca00751fafe4f52cb8659eae16c624faae3d9631eadd8d",
+      "tested_merge": "d7e23f67ffe035185720536d1182a38560df8ada"
+    }
+  ],
+  "limitation": "Validates four successful jobs. Foundation images fails for real findings and provides no successful source artifact. No overall PR admission.",
+  "independently_observed_merge": {
+    "merge_sha": "d7e23f67ffe035185720536d1182a38560df8ada",
+    "parents": [
+      "41bbcaec3be5ec0f2abdd534bab2041e46a74e90",
+      "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182"
+    ],
+    "tree": "fa33277f89013aadf0e5ad4cd61069a52f249192",
+    "pr": 58,
+    "head": "2b7e1c4f717b1b8b7ed66834a7014c4893cd5182",
+    "base": "41bbcaec3be5ec0f2abdd534bab2041e46a74e90"
+  }
+}

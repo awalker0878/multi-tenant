@@ -1,0 +1,136 @@
+asyncapi: 3.0.0
+info:
+  title: Installation identity committed notifications
+  version: 1.0.0
+  description: Governance-owned installation facts; at-least-once and unordered delivery. Never current authority.
+channels:
+  bootstrap_created:
+    address: identity.bootstrap.created.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  login_denied:
+    address: identity.login.denied.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  login_succeeded:
+    address: identity.login.succeeded.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  password_denied:
+    address: identity.password.denied.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  password_changed:
+    address: identity.password.changed.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  oidc_settings_saved:
+    address: identity.oidc.settings_saved.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  oidc_administrator_verified:
+    address: identity.oidc.administrator_verified.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  oidc_activated:
+    address: identity.oidc.activated.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  federated_login:
+    address: identity.federated.login.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  session_revoked:
+    address: identity.session.revoked.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  delegation_issued:
+    address: identity.delegation.issued.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+  delegation_revoked:
+    address: identity.delegation.revoked.v1
+    description: Restricted governance.events topic exchange; installation-only consumer queue.
+    messages:
+      change:
+        $ref: '#/components/messages/Change'
+operations:
+  publish_bootstrap_created:
+    action: send
+    channel:
+      $ref: '#/channels/bootstrap_created'
+  publish_login_denied:
+    action: send
+    channel:
+      $ref: '#/channels/login_denied'
+  publish_login_succeeded:
+    action: send
+    channel:
+      $ref: '#/channels/login_succeeded'
+  publish_password_denied:
+    action: send
+    channel:
+      $ref: '#/channels/password_denied'
+  publish_password_changed:
+    action: send
+    channel:
+      $ref: '#/channels/password_changed'
+  publish_oidc_settings_saved:
+    action: send
+    channel:
+      $ref: '#/channels/oidc_settings_saved'
+  publish_oidc_administrator_verified:
+    action: send
+    channel:
+      $ref: '#/channels/oidc_administrator_verified'
+  publish_oidc_activated:
+    action: send
+    channel:
+      $ref: '#/channels/oidc_activated'
+  publish_federated_login:
+    action: send
+    channel:
+      $ref: '#/channels/federated_login'
+  publish_session_revoked:
+    action: send
+    channel:
+      $ref: '#/channels/session_revoked'
+  publish_delegation_issued:
+    action: send
+    channel:
+      $ref: '#/channels/delegation_issued'
+  publish_delegation_revoked:
+    action: send
+    channel:
+      $ref: '#/channels/delegation_revoked'
+components:
+  messages:
+    Change:
+      name: IdentityChangeV1
+      contentType: application/json
+      payload:
+        schemaFormat: application/schema+json;version=draft-2020-12
+        schema:
+          $ref: ../schemas/events/identity-change-v1.json

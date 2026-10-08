@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "evidence_level": "E2",
+  "campaigns": [
+    {
+      "archive": "archives/p08-fleet-components-first.zip",
+      "archive_sha256": "942b97ff5aa5de8b89b65cdf84abbf38ebacbbad4071f376e30a33b1da678eda",
+      "kind": "components",
+      "run_id": "37639180297",
+      "artifact_id": "11491063628",
+      "source_revision": "4d9984b02c7411faf677e67e7f3d3041aa5f2a18",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37639180297",
+      "result": "FAILED",
+      "source_bindings_verified": 682,
+      "commands": 6,
+      "suites": [
+        {
+          "name": "inventory",
+          "tests": 96,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "stats": null,
+      "report": "reports/p08-fleet-components-first/report.json",
+      "report_sha256": "2aaf809f9443c4799dda33817022890d11505690dd483f6d35dfb02ece97f064"
+    },
+    {
+      "archive": "archives/p08-fleet-browser-first.zip",
+      "archive_sha256": "e0d41918361f34f73f8a04c62e3c627e85ae3137bcaf7eb1654dbfcf2d261863",
+      "kind": "browser",
+      "run_id": "37639180297",
+      "artifact_id": "11491625850",
+      "source_revision": "4d9984b02c7411faf677e67e7f3d3041aa5f2a18",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37639180297",
+      "result": "FAILED",
+      "source_bindings_verified": 218,
+      "commands": 5,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-07T14:44:43.489Z",
+        "duration": 79972.874,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "report": "reports/p08-fleet-browser-first/report.json",
+      "report_sha256": "8d8162d3dbca09e6c31bd87a464b77484ff99108d61b9d9963dc39b0b30e09c6"
+    },
+    {
+      "archive": "archives/p08-fleet-browser-pass.zip",
+      "archive_sha256": "dcf2bc5d576eb207b0aeaa295cae92f6f4c887697587ace80106603868bc5118",
+      "kind": "browser",
+      "run_id": "37640141788",
+      "artifact_id": "11491861490",
+      "source_revision": "74ab8e41e2d1da90bb47f1b2794c9c7bf3778d66",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37640141788",
+      "result": "PASSED",
+      "source_bindings_verified": 218,
+      "commands": 5,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-07T14:51:30.840Z",
+        "duration": 35246.473,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "report": "reports/p08-fleet-browser-pass/report.json",
+      "report_sha256": "acc0fa1658501f28591bd4cce36c96adb84951088368c732d42d030f91955142"
+    },
+    {
+      "archive": "archives/p08-fleet-console-first.zip",
+      "archive_sha256": "fdb4972b4d9b091eee78876d63f7700df28653f1e2b9fb198e7b2e7e89355ce1",
+      "kind": "console",
+      "run_id": "37639180323",
+      "artifact_id": "11491144246",
+      "source_revision": "4d9984b02c7411faf677e67e7f3d3041aa5f2a18",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37639180323",
+      "result": "FAIL",
+      "source_bindings_verified": 295,
+      "commands": 23,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-07T14:47:58.459Z",
+        "duration": 2683.4100000000003,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "report": "reports/p08-fleet-console-first/report.json",
+      "report_sha256": "058ef3b5d43f4c696e1193a94febb529b8aae8fe986f6d4b2e00c253a2fa6724"
+    },
+    {
+      "archive": "archives/p08-fleet-components-pass.zip",
+      "archive_sha256": "097fa73d8e17186eec595b25650a703c23617c9350706ea5bad21582452cac6c",
+      "kind": "components",
+      "run_id": "37640141788",
+      "artifact_id": "11492875143",
+      "source_revision": "74ab8e41e2d1da90bb47f1b2794c9c7bf3778d66",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37640141788",
+      "result": "PASSED",
+      "source_bindings_verified": 682,
+      "commands": 35,
+      "suites": [
+        {
+          "name": "inventory",
+          "tests": 96,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "planning",
+          "tests": 119,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "lifecycle",
+          "tests": 304,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "worker",
+          "tests": 204,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "inventory-worker",
+          "tests": 62,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "stats": null,
+      "report": "reports/p08-fleet-components-pass/report.json",
+      "report_sha256": "5722949000107f99f71cf0f8e9154c59e722949b18cf00a4677e838aa0426ad8"
+    },
+    {
+      "archive": "archives/p08-fleet-console-pass.zip",
+      "archive_sha256": "859c7d95c991e4faa6aeafc4784459d96b7eddef226e8fbf73cd39aa58bc8c9e",
+      "kind": "console",
+      "run_id": "37640141936",
+      "artifact_id": "11492155901",
+      "source_revision": "74ab8e41e2d1da90bb47f1b2794c9c7bf3778d66",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37640141936",
+      "result": "PASS",
+      "source_bindings_verified": 295,
+      "commands": 23,
+      "suites": [],
+      "stats": {
+        "startTime": "2026-10-07T14:55:02.555Z",
+        "duration": 1397.335,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "report": "reports/p08-fleet-console-pass/report.json",
+      "report_sha256": "737144b01deb79d952ced0d37f9373158aca1df4cde690a4bd477a3c9ffa274a"
+    }
+  ],
+  "native_write_authorized": false,
+  "native_platforms_tested": [],
+  "limitations": [
+    "Real PostgreSQL/TLS and actual Vue/Inertia browser; synthetic native and owner peers.",
+    "Bulk preparation is not complete-plan composition or execution; native Q07/G08 remains unaccepted."
+  ]
+}

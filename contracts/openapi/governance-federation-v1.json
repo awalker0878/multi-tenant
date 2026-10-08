@@ -1,0 +1,397 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Governance federation",
+    "version": "1.0.0",
+    "description": "P02.01/P02.05 Console-to-Governance OIDC settings and tested activation. Provider data is governed application state."
+  },
+  "paths": {
+    "/identity/oidc": {
+      "get": {
+        "operationId": "get_identity_oidc",
+        "summary": "Read current draft settings; requires setup or federated installation administrator",
+        "security": [
+          {
+            "ConsoleWorkload": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Server-held user authority. Required for setup flows and their callbacks; absent for ordinary active-provider sign-in."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; all authority responses use Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload, session or federation proof"
+          },
+          "403": {
+            "description": "Current actor is not authorized"
+          },
+          "409": {
+            "description": "Revision or verification conflict"
+          },
+          "422": {
+            "description": "Invalid settings or unsupported provider"
+          },
+          "503": {
+            "description": "Provider or custody unavailable"
+          }
+        }
+      },
+      "put": {
+        "operationId": "put_identity_oidc",
+        "summary": "Save a new immutable settings revision; requires current administrator",
+        "security": [
+          {
+            "ConsoleWorkload": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Server-held user authority. Required for setup flows and their callbacks; absent for ordinary active-provider sign-in."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success; all authority responses use Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload, session or federation proof"
+          },
+          "403": {
+            "description": "Current actor is not authorized"
+          },
+          "409": {
+            "description": "Revision or verification conflict"
+          },
+          "422": {
+            "description": "Invalid settings or unsupported provider"
+          },
+          "503": {
+            "description": "Provider or custody unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "issuer": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "client_id": {
+                    "type": "string"
+                  },
+                  "client_secret": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "writeOnly": true
+                  },
+                  "redirect_uri": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "administrator_subject": {
+                    "type": "string"
+                  },
+                  "private_networks": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "revision",
+                  "issuer",
+                  "client_id",
+                  "redirect_uri",
+                  "administrator_subject",
+                  "private_networks"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/identity/oidc/flows": {
+      "post": {
+        "operationId": "post_identity_oidc_flows",
+        "summary": "Begin one-use setup verification or active-provider sign-in",
+        "security": [
+          {
+            "ConsoleWorkload": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Server-held user authority. Required for setup flows and their callbacks; absent for ordinary active-provider sign-in."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; all authority responses use Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload, session or federation proof"
+          },
+          "403": {
+            "description": "Current actor is not authorized"
+          },
+          "409": {
+            "description": "Revision or verification conflict"
+          },
+          "422": {
+            "description": "Invalid settings or unsupported provider"
+          },
+          "503": {
+            "description": "Provider or custody unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "purpose": {
+                    "type": "string",
+                    "enum": [
+                      "setup",
+                      "login"
+                    ]
+                  },
+                  "browser_binding": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "purpose",
+                  "browser_binding"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/identity/oidc/callback": {
+      "post": {
+        "operationId": "post_identity_oidc_callback",
+        "summary": "Consume browser-bound state, exchange code and verify identity",
+        "security": [
+          {
+            "ConsoleWorkload": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Server-held user authority. Required for setup flows and their callbacks; absent for ordinary active-provider sign-in."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; all authority responses use Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload, session or federation proof"
+          },
+          "403": {
+            "description": "Current actor is not authorized"
+          },
+          "409": {
+            "description": "Revision or verification conflict"
+          },
+          "422": {
+            "description": "Invalid settings or unsupported provider"
+          },
+          "503": {
+            "description": "Provider or custody unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "browser_binding": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "code": {
+                    "type": "string",
+                    "maxLength": 4096
+                  }
+                },
+                "required": [
+                  "state",
+                  "browser_binding",
+                  "code"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/identity/oidc/activation": {
+      "post": {
+        "operationId": "post_identity_oidc_activation",
+        "summary": "Activate the current verified revision and retire prior sessions",
+        "security": [
+          {
+            "ConsoleWorkload": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Console-Session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Server-held user authority. Required for setup flows and their callbacks; absent for ordinary active-provider sign-in."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; all authority responses use Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload, session or federation proof"
+          },
+          "403": {
+            "description": "Current actor is not authorized"
+          },
+          "409": {
+            "description": "Revision or verification conflict"
+          },
+          "422": {
+            "description": "Invalid settings or unsupported provider"
+          },
+          "503": {
+            "description": "Provider or custody unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "verification_token": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "verification_token"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ConsoleWorkload": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Independent mounted Console workload credential; never an OIDC token."
+      }
+    }
+  }
+}

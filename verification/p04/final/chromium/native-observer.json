@@ -1,0 +1,97 @@
+{
+  "synthetic_only": true,
+  "before_sha256": "74df47d7e1335a785bfd0efe741fb77ff9ac3434b6f5f8e1463bacf4a7096731",
+  "unchanged": true,
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/v2.1/servers/detail?limit=100",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.1/servers/detail?limit=100&marker=vm-1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.1/servers/detail?limit=100&marker=vm-2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.0/networks?limit=100&project_id=project-a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.0/networks?limit=100&marker=net-1&project_id=project-a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v3/project-a/volumes/detail?limit=100",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v3/project-a/volumes/detail?limit=100&marker=vol-1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.1/servers/detail?limit=100",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.1/servers/detail?limit=100&marker=vm-1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.1/servers/detail?limit=100&marker=vm-2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.0/networks?limit=100&project_id=project-a",
+      "status": 403
+    },
+    {
+      "method": "GET",
+      "path": "/v2.1/servers/detail?limit=100",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.1/servers/detail?limit=100&marker=vm-1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.1/servers/detail?limit=100&marker=vm-2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.0/networks?limit=100&project_id=project-a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v2.0/networks?limit=100&marker=net-1&project_id=project-a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v3/project-a/volumes/detail?limit=100",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/v3/project-a/volumes/detail?limit=100&marker=vol-1",
+      "status": 200
+    }
+  ]
+}

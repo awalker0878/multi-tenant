@@ -1,0 +1,1 @@
+{"component":"lifecycle-workers","component_kind":"worker_bootstrap","native_operations_enabled":false,"probe":"readiness","reason":"worker_dependencies_not_implemented","scope":"process_bootstrap","service":"lifecycle","status":"not_ready","task_consumption_enabled":false}

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "workflow": {
+    "id": 37250876554,
+    "name": "P01 stateful dependency input observation",
+    "head_sha": "a33270afad146b57c3abff4eaa931443650420a5",
+    "status": "completed",
+    "conclusion": "failure",
+    "run_attempt": 1,
+    "created_at": "2026-10-05T01:17:49Z",
+    "updated_at": "2026-10-05T01:18:05Z",
+    "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37250876554"
+  },
+  "artifact": {
+    "id": 11320708512,
+    "name": "p01-stateful-inputs-a33270afad146b57c3abff4eaa931443650420a5",
+    "size_in_bytes": 8727,
+    "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11320708512",
+    "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11320708512/zip",
+    "expired": false,
+    "created_at": "2026-10-05T01:18:03Z",
+    "expires_at": "2026-10-19T01:18:02Z",
+    "updated_at": "2026-10-05T01:18:03Z",
+    "digest": "sha256:81f3e2520c21ccf78d18680e22cfa6b3cf78e9b933941e04ee8de8bd3e17ce80",
+    "workflow_run": {
+      "id": 37250876554,
+      "repository_id": 1374801496,
+      "head_repository_id": 1374801496,
+      "head_branch": "greenfield/enterprise-microservices-plan",
+      "head_sha": "a33270afad146b57c3abff4eaa931443650420a5"
+    }
+  },
+  "source_revision": "a33270afad146b57c3abff4eaa931443650420a5",
+  "archive_sha256": "81f3e2520c21ccf78d18680e22cfa6b3cf78e9b933941e04ee8de8bd3e17ce80",
+  "archive_bytes": 8727,
+  "archive_checksum_verified": true,
+  "archive_size_verified": true,
+  "result": "VERIFIED",
+  "workflow_result": "failure",
+  "command_log_hashes_verified": 10,
+  "scope": "Dependency input observation only; no installed behavior claim",
+  "reviewer": "Codex \u2014 archive, manifest and command output integrity examination"
+}

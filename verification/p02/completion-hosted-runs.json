@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "source_revision": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+  "observed_at": "2026-10-05T22:00:41.333Z",
+  "observer": "GitHub Actions REST metadata retrieved through the GitHub connector",
+  "workflow_runs": [
+    {
+      "id": 37378369522,
+      "name": "Context policy",
+      "head_sha": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37378369522",
+      "created_at": "2026-10-05T21:48:51Z",
+      "updated_at": "2026-10-05T21:49:19Z",
+      "run_attempt": 1
+    },
+    {
+      "id": 37378369576,
+      "name": "P01 policy controls",
+      "head_sha": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37378369576",
+      "created_at": "2026-10-05T21:48:51Z",
+      "updated_at": "2026-10-05T21:49:17Z",
+      "run_attempt": 1
+    },
+    {
+      "id": 37378369775,
+      "name": "P02 Governance events",
+      "head_sha": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37378369775",
+      "created_at": "2026-10-05T21:48:51Z",
+      "updated_at": "2026-10-05T21:49:57Z",
+      "run_attempt": 1
+    },
+    {
+      "id": 37378369526,
+      "name": "P02 identity",
+      "head_sha": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37378369526",
+      "created_at": "2026-10-05T21:48:51Z",
+      "updated_at": "2026-10-05T21:52:10Z",
+      "run_attempt": 1
+    },
+    {
+      "id": 37378369506,
+      "name": "P01 foundation contracts",
+      "head_sha": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37378369506",
+      "created_at": "2026-10-05T21:48:51Z",
+      "updated_at": "2026-10-05T21:50:01Z",
+      "run_attempt": 1
+    },
+    {
+      "id": 37378369557,
+      "name": "P01 bootstrap images",
+      "head_sha": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37378369557",
+      "created_at": "2026-10-05T21:48:51Z",
+      "updated_at": "2026-10-05T21:50:19Z",
+      "run_attempt": 1
+    },
+    {
+      "id": 37378369685,
+      "name": "P01 foundation packages",
+      "head_sha": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37378369685",
+      "created_at": "2026-10-05T21:48:51Z",
+      "updated_at": "2026-10-05T21:51:11Z",
+      "run_attempt": 1
+    },
+    {
+      "id": 37378369534,
+      "name": "P01 isolated Compose integration",
+      "head_sha": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37378369534",
+      "created_at": "2026-10-05T21:48:51Z",
+      "updated_at": "2026-10-05T21:51:56Z",
+      "run_attempt": 1
+    },
+    {
+      "id": 37378369501,
+      "name": "P01 isolated Kubernetes integration",
+      "head_sha": "fe88107aac0aca028170fd5f39f06e0b0d30cb7f",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37378369501",
+      "created_at": "2026-10-05T21:48:51Z",
+      "updated_at": "2026-10-05T21:56:58Z",
+      "run_attempt": 1
+    }
+  ],
+  "limitations": "Metadata receipt only. Original P02 identity archives, per-file hashes and exact-source bindings are retained separately. Workflow success is not independent receiving or promotion approval."
+}

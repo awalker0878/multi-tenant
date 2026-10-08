@@ -1,0 +1,10 @@
+
+In Command line code line 8:
+                                                                              
+  Uncaught RuntimeException: Console HTML failed: 500 in Command line code:8  
+  Stack trace:                                                                
+  #0 Command line code(85): check()                                           
+  #1 {main}                                                                   
+    thrown                                                                    
+                                                                              
+

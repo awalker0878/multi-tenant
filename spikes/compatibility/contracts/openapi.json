@@ -1,0 +1,199 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "P00 synthetic contract",
+    "version": "0.0.0",
+    "description": "Isolated generator probe. Not a product API."
+  },
+  "servers": [
+    {
+      "url": "https://contract.invalid"
+    }
+  ],
+  "security": [
+    {
+      "ProbeBearer": []
+    }
+  ],
+  "paths": {
+    "/samples/{sample_id}": {
+      "get": {
+        "operationId": "getSample",
+        "tags": [
+          "Samples"
+        ],
+        "parameters": [
+          {
+            "name": "sample_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Synthetic response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sample"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Synthetic response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/samples": {
+      "post": {
+        "operationId": "createSample",
+        "tags": [
+          "Samples"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSample"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Synthetic response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sample"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Synthetic response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Sample": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "sample_id",
+          "schema_version",
+          "phase",
+          "revision"
+        ],
+        "properties": {
+          "sample_id": {
+            "type": "string",
+            "pattern": "^sample_[a-z0-9]+$"
+          },
+          "schema_version": {
+            "type": "integer",
+            "enum": [
+              1
+            ]
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "ready"
+            ]
+          },
+          "revision": {
+            "type": "string",
+            "pattern": "^[0-9]+$",
+            "description": "Decimal string retains values beyond JavaScript safe integer precision."
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          }
+        }
+      },
+      "CreateSample": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "type",
+          "status",
+          "code",
+          "retryable"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri"
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "sample_missing",
+              "sample_invalid"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ProbeBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

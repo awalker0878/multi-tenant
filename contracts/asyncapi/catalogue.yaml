@@ -1,0 +1,26 @@
+asyncapi: 3.0.0
+info:
+  title: Catalogue foundation facts
+  version: 1.0.0
+  description: P01 reference fact only. No intent write or native execution authority.
+channels:
+  foundationFacts:
+    address: catalogue.foundation.recorded.v1
+    description: Private catalogue.events direct exchange, Planning-owned planning.facts queue.
+    messages:
+      recorded:
+        $ref: '#/components/messages/Recorded'
+operations:
+  publishRecorded:
+    action: send
+    channel:
+      $ref: '#/channels/foundationFacts'
+components:
+  messages:
+    Recorded:
+      name: CatalogueFoundationRecordedV1
+      contentType: application/json
+      payload:
+        schemaFormat: application/schema+json;version=draft-2020-12
+        schema:
+          $ref: ../schemas/events/catalogue-foundation-recorded-v1.json

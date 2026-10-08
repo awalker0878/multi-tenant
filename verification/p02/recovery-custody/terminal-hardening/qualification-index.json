@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "result": "PASS",
+  "source_revision": "d5ccd142cca22e51448a1a86996bbd0a14cba2b5",
+  "observed_at": "2026-10-06T00:54:59.689839+00:00",
+  "scope": "Custody signing refuses non-terminal input and refuses Python getpass echo-protection fallback. Thirteen custody cases and the complete real PostgreSQL/TLS/three-browser recovery ceremony are reexecuted.",
+  "local": {
+    "path": "verification/p02/recovery-custody/terminal-hardening/local/report.json",
+    "sha256": "bff522e4b7816a6b3ec32e7f60261c7604eeda486f318b0252a231b9eb6cbab1"
+  },
+  "hosted_workflows": {
+    "path": "verification/p02/recovery-custody/terminal-hardening/hosted-final.json",
+    "sha256": "2e300995b25d5afe0a489b13d7cf553c14cb80dfe4a228416e356a7755a5e5aa"
+  },
+  "local_custody_cases": 13,
+  "engines": [
+    {
+      "engine": "chromium",
+      "run_id": 37395886614,
+      "report": {
+        "path": "verification/p02/recovery-custody/run-37395886614/chromium/report.json",
+        "sha256": "047beee1d0f54313324d158b6d1ebd2829f49e1e86d4f7ff6d8f6fdd801df18d"
+      },
+      "retrieval": {
+        "path": "verification/p02/recovery-custody/run-37395886614/chromium/retrieval.json",
+        "sha256": "a9bf47c68065647330d6a9ca3f452ce7cea0b2e8f1d7bd19bec9269b98c84d5b"
+      },
+      "archive_sha256": "5331a41e12a96da8990eb91da4512a932b2a4a5fa4f2351c877e758f51b4af88",
+      "checks": 156,
+      "source_bindings": 358,
+      "artifact_bindings": 25,
+      "custody_cases": 13,
+      "governance_cases": 205,
+      "governance_assertions": 5471,
+      "console_cases": 66,
+      "console_assertions": 248,
+      "browser_stats": {
+        "startTime": "2026-10-06T00:51:01.089Z",
+        "duration": 41162.889,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "independent_ceremony": "Real migration-owner PostgreSQL reconciliation, encrypted independent signing keys, separate custodian process, explicit release, fresh HTTPS OIDC admission and complete reconciled-schema restore"
+    },
+    {
+      "engine": "firefox",
+      "run_id": 37395886614,
+      "report": {
+        "path": "verification/p02/recovery-custody/run-37395886614/firefox/report.json",
+        "sha256": "72695673360f028cdd0c06240a6507a393b9ce3de9bedcd3e2e42bab0f243830"
+      },
+      "retrieval": {
+        "path": "verification/p02/recovery-custody/run-37395886614/firefox/retrieval.json",
+        "sha256": "4c34d8938a3a8114966d3f4ce927eac30549064b2d80ffa00703667777dc6c19"
+      },
+      "archive_sha256": "ae867fde222a2211f86fa52e11a873c2f02a156a39af4f07eac17a61424ac787",
+      "checks": 156,
+      "source_bindings": 358,
+      "artifact_bindings": 25,
+      "custody_cases": 13,
+      "governance_cases": 205,
+      "governance_assertions": 5471,
+      "console_cases": 66,
+      "console_assertions": 248,
+      "browser_stats": {
+        "startTime": "2026-10-06T00:51:45.491Z",
+        "duration": 47875.722,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "independent_ceremony": "Real migration-owner PostgreSQL reconciliation, encrypted independent signing keys, separate custodian process, explicit release, fresh HTTPS OIDC admission and complete reconciled-schema restore"
+    },
+    {
+      "engine": "webkit",
+      "run_id": 37395886614,
+      "report": {
+        "path": "verification/p02/recovery-custody/run-37395886614/webkit/report.json",
+        "sha256": "ba4ebfb46777830bf9ec73345fed9917f49893fec5ab98ee445db651cc417c29"
+      },
+      "retrieval": {
+        "path": "verification/p02/recovery-custody/run-37395886614/webkit/retrieval.json",
+        "sha256": "cdeb5c5cf803e191e2b2289e0b91ea2cf7a58964851e2c2cd6c1024303dc8b46"
+      },
+      "archive_sha256": "5246ec9b7711d9130395ea07472fa18fd505f127691086613aee262de4221097",
+      "checks": 156,
+      "source_bindings": 358,
+      "artifact_bindings": 25,
+      "custody_cases": 13,
+      "governance_cases": 205,
+      "governance_assertions": 5471,
+      "console_cases": 66,
+      "console_assertions": 248,
+      "browser_stats": {
+        "startTime": "2026-10-06T00:51:48.476Z",
+        "duration": 61364.386,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "independent_ceremony": "Real migration-owner PostgreSQL reconciliation, encrypted independent signing keys, separate custodian process, explicit release, fresh HTTPS OIDC admission and complete reconciled-schema restore"
+    }
+  ],
+  "unchanged_runtime_evidence": {
+    "source_revision": "7ec7a60623f60c84ba3356978f0ff51b03e9ca7e",
+    "qualification": {
+      "path": "verification/p02/recovery-custody/qualification-index.json",
+      "sha256": "bece3a6e176fcf31eda48b8bfe48cdc1780f104c90fed9d312f6c18084161a8d"
+    },
+    "hosted_regression": {
+      "path": "verification/p02/recovery-custody/hosted-final.json",
+      "sha256": "cf986328cd1f5df3e941192e28bcf1582afd182ea2c26a1f70851a7ea0a3e5a7"
+    },
+    "identical_git_trees": {
+      "services": "a242c8ce8a85c2bfaf312e604ed5e05bff594838",
+      "apps": "443e76a4d5e3a101222c1ac939b1f8073b749fa1",
+      "deploy": "3c113f82f9c0dc2a2e5f41ee4b79165428a84aa7",
+      "scripts/p01": "63d22c90dbd601f8468987584cde3ccf95c89948",
+      "scripts/p02": "49df1433eb954fc56aef7f49f384bb67ca8d38ab",
+      "contracts": "c27e85fa1285d4f606ed9e25d284e7a0d88b672d",
+      ".github": "4537c5567a57a5221f2cf198e4dc7799e58f8194"
+    },
+    "reason": "Only custody.py, its test file and documentation/evidence changed. Governance/Console applications, dependency/migration/runtime code, P01 integration, P02 observer, contracts and workflows are byte-identical. The completed nine-workflow runtime regression and 74-case TLS event campaign remain applicable to those unchanged components.",
+    "event_source_bindings_matching_current_revision": 217
+  },
+  "limits": [
+    "Synthetic custodians and separate disposable processes prove executable behavior, not actual production people or host/backup/mount/key-service independence.",
+    "No new production enrollment, key appointment, actual restore authorization, manual accessibility acceptance or independent receiving decision is inferred. Earlier original failures remain retained at their original sources."
+  ]
+}

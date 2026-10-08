@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "source_revision": "b13996d13db9b54736667a04be23c53f74269424",
+  "run_id": 37371858448,
+  "artifact_id": 11370152352,
+  "retrieved_at": "2026-10-05T20:54:36.355576+00:00",
+  "archive_sha256": "6fbe6d1abddbd80802eff973d6826bee2c1a896fcd95d703666691784b941bb1",
+  "verified_command_logs": 612,
+  "matched_unique_source_bindings": 451,
+  "checks": 249,
+  "retained_file_sha256": {
+    "report.json": "990d0011e5a45bf050e465e52c62160262f3704046a0d80affc698dc6b7e62c2",
+    "campaign.zip": "6fbe6d1abddbd80802eff973d6826bee2c1a896fcd95d703666691784b941bb1",
+    "source-verification.json": "f13935525e92aa51e50d723db0b26f1955b4a972543ca86a41b054bb65d581ee"
+  },
+  "scope": "Corrected sockets-enabled Console image and seven-service disposable Compose installation/runtime replay; original missing-extension failure remains retained.",
+  "limitations": [
+    "Single-host synthetic Compose observations; no broker HA, operated deployment or receiving acceptance.",
+    "Separate image-security admission, independent package replay, Kubernetes and browser-engine campaigns keep their own source identities and results."
+  ]
+}

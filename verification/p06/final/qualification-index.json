@@ -1,0 +1,203 @@
+{
+  "qualification_source": "3a9c136639426087d060845184048f52850fcfc7",
+  "verified_at": "2026-10-06T19:17:39.007198+00:00",
+  "result": "PASS",
+  "level": "E1/E2",
+  "native_platforms_tested": [],
+  "run_id": 37516991249,
+  "live": [
+    {
+      "run_id": 37516991249,
+      "run_attempt": 1,
+      "artifact_id": 11438191105,
+      "archive": "archives/p06-live-webkit-37516991249-1.zip",
+      "archive_sha256": "64ff879e6d22cd9e8576e6e4c3927018e3fa6793e7113006018eb566d40c2fb8",
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "report": "webkit/report.json",
+      "report_sha256": "2bad13eda1f3a7203ef959b59c008f4c344de8ca8176960eb89b2050929fa020",
+      "commands": 61,
+      "engine": "webkit",
+      "checks": 148,
+      "observed_at": "2026-10-06T19:12:22.735034+00:00",
+      "browsers": {
+        "browser.json": {
+          "startTime": "2026-10-06T19:12:47.044Z",
+          "duration": 39712.354999999996,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-browser.json": {
+          "startTime": "2026-10-06T19:14:12.391Z",
+          "duration": 16437.285,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-06T19:14:55.539Z",
+          "duration": 2778.698,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "accepted_effects": 29,
+      "replayed_histories": 4,
+      "restore_re_enable": "DENIED: restored journal and current epoch require independent reconciliation and newly bound authority; no automatic release or old-epoch restoration",
+      "alert_receipts": 5
+    },
+    {
+      "run_id": 37516991249,
+      "run_attempt": 1,
+      "artifact_id": 11438101199,
+      "archive": "archives/p06-live-firefox-37516991249-1.zip",
+      "archive_sha256": "377cbd6861a35bed429345c033b1faa5026651a9b83a2e7a79aa8844f1d25806",
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "report": "firefox/report.json",
+      "report_sha256": "2b75655e20c0e29ca4dfcc635cb702a803b7bf3be4bb519d4a783fde8172e8e6",
+      "commands": 61,
+      "engine": "firefox",
+      "checks": 148,
+      "observed_at": "2026-10-06T19:12:11.712436+00:00",
+      "browsers": {
+        "browser.json": {
+          "startTime": "2026-10-06T19:12:36.042Z",
+          "duration": 38224.826,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-browser.json": {
+          "startTime": "2026-10-06T19:14:00.263Z",
+          "duration": 18202.200999999997,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-06T19:14:45.540Z",
+          "duration": 4022.3379999999997,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "accepted_effects": 29,
+      "replayed_histories": 4,
+      "restore_re_enable": "DENIED: restored journal and current epoch require independent reconciliation and newly bound authority; no automatic release or old-epoch restoration",
+      "alert_receipts": 5
+    },
+    {
+      "run_id": 37516991249,
+      "run_attempt": 1,
+      "artifact_id": 11437606611,
+      "archive": "archives/p06-live-chromium-37516991249-1.zip",
+      "archive_sha256": "aa06030988ad0cce90249b0ef51a80137d8538f341e2a940beee08bcab4106e3",
+      "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+      "report": "chromium/report.json",
+      "report_sha256": "b1f47a196d59fffe25f183c7f46977e229497840e61f416e450d5877c2d82457",
+      "commands": 61,
+      "engine": "chromium",
+      "checks": 148,
+      "observed_at": "2026-10-06T19:12:13.161600+00:00",
+      "browsers": {
+        "browser.json": {
+          "startTime": "2026-10-06T19:12:37.322Z",
+          "duration": 36956.282,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-browser.json": {
+          "startTime": "2026-10-06T19:13:58.612Z",
+          "duration": 16049.130000000001,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "p06-evidence-browser.json": {
+          "startTime": "2026-10-06T19:14:41.156Z",
+          "duration": 2501.84,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "accepted_effects": 29,
+      "replayed_histories": 4,
+      "restore_re_enable": "DENIED: restored journal and current epoch require independent reconciliation and newly bound authority; no automatic release or old-epoch restoration",
+      "alert_receipts": 5
+    }
+  ],
+  "core": {
+    "run_id": 37516991249,
+    "run_attempt": 1,
+    "artifact_id": 11437108886,
+    "archive": "archives/p06-core-37516991249-1.zip",
+    "archive_sha256": "a9bad7ee46acf0a721615f746d4e24e233f102cd9c6ae93fc61fbfe454d51a33",
+    "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+    "report": "core/report.json",
+    "report_sha256": "1334099510747c66eb449ff8a8056b13010b06a0122fc3829d7950b49fe1fc68",
+    "commands": 12,
+    "suites": [
+      {
+        "suite": "execution.xml",
+        "tests": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "services-lifecycle.xml",
+        "tests": 79,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "workers-lifecycle.xml",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "unique_source_bindings_verified": 1014,
+  "reproduced_build_metadata": {
+    "report": "build-metadata/report.json",
+    "sha256": "c9311075d6266ad85f627dcabc6c1d4829c87cfe3c7e4d72543e4f5805b52839",
+    "bindings": 2,
+    "boundary": "Two generated wheel metadata outputs are independently reproduced from exact git source with the locked toolchain. Every other reported source hash matches the source commit directly."
+  },
+  "limitations": [
+    "E2 simulated effects with independently owned PostgreSQL observation; no native E3 or operational acceptance.",
+    "Synthetic OIDC bootstrap and controlled Inventory/qualification inputs do not appoint reviewers or qualify native support.",
+    "Restore safely denies re-enable; no automatic epoch rebind or native recovery adapter is implemented.",
+    "Automated browser checks do not replace designated G06 receiving, representative operator or selected assistive-technology observations."
+  ],
+  "assurance_quality": {
+    "run_id": 37516991238,
+    "artifact_id": 11437667133,
+    "source_revision": "3a9c136639426087d060845184048f52850fcfc7",
+    "archive": "archives/p01-assurance-37516991238-1.zip",
+    "archive_sha256": "864a6643704b0b991b3f38a049e29f0249a1d4044293e96d8c16a33260bfd218",
+    "report": "assurance-quality/report.json",
+    "report_sha256": "c79ead5a1470d561a60b764d71cf2c60135bfab03ad76128d588ebc901544cbe",
+    "commands": 15,
+    "tests": 40,
+    "assertions": 188,
+    "source_bindings_verified": 146,
+    "verification": "All source and original archive artifact/log hashes verified. Convenience extraction contains report and command logs; all original package members remain in the archive."
+  }
+}

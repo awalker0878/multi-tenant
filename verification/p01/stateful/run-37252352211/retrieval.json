@@ -1,0 +1,15 @@
+{
+  "run_id": 37252352211,
+  "source_revision": "c72737c81722b4373ea3591169d7db78609fa3d8",
+  "artifact_id": 11321406906,
+  "archive_sha256": "9ae411f3834a2f04274d2c988261d040f32e988f500a1069e98677e1309ccfe7",
+  "archive_bytes": 67144,
+  "archive_checksum_verified": true,
+  "reported_result": "FAIL",
+  "reported_cleanup_complete": true,
+  "report_sha256": "ee1ea39bb8361325d64fd19aac4b2c98c32f332c01be18a40d09fb6b47f6c8be",
+  "command_log_hashes_verified": 66,
+  "immutable_source_bindings_verified": 48,
+  "failure_scope": "Database isolation passed; Temporal probe rejected unsupported rpc_timeout argument and server rejected 1s dynamic configuration polling. No workflow or S3 recovery pass.",
+  "reviewer": "Codex \u2014 raw command and immutable source integrity examination"
+}

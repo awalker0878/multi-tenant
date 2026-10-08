@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-04T22:04:25.854877+00:00",
+  "executor": "Codex",
+  "workflow": {
+    "id": 37238148501,
+    "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37238148501",
+    "head_sha": "ba6acd71513c7d999cf51249d70d9c2be50967d9",
+    "name": "P01 bootstrap images",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-10-04T21:57:29Z",
+    "updated_at": "2026-10-04T21:58:22Z",
+    "run_attempt": 1
+  },
+  "job": {
+    "id": 111541299325,
+    "name": "lifecycle isolated image",
+    "conclusion": "success",
+    "status": "completed",
+    "started_at": "2026-10-04T21:57:32Z",
+    "completed_at": "2026-10-04T21:57:45Z",
+    "labels": [
+      "ubuntu-24.04"
+    ],
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "Check out exact source",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "Build owned context and inspect bootstrap isolation",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "Retain source, input, image and execution evidence",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "Post Check out exact source",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success",
+        "status": "completed"
+      }
+    ]
+  },
+  "artifact": {
+    "id": 11316188166,
+    "name": "p01-image-lifecycle-ba6acd71513c7d999cf51249d70d9c2be50967d9",
+    "archive_sha256": "1d2d2f087c711d8bef6f921e8c75b54dc1e7d0f3fa688bb7962114d49912f72d",
+    "github_digest": "sha256:1d2d2f087c711d8bef6f921e8c75b54dc1e7d0f3fa688bb7962114d49912f72d",
+    "bytes": 11624
+  },
+  "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9",
+  "source_tree": "ede2dcc88635c8e446644bcd1e08f893c3925cc4",
+  "verification": {
+    "archive_sha256_matches_github": true,
+    "archive_size_matches_github": true,
+    "safe_unique_regular_zip_members": true,
+    "raw_archive_members_retained_byte_exact": true,
+    "raw_file_count": 21,
+    "command_log_count": 20,
+    "all_command_log_sizes_and_hashes_match": true,
+    "source_binding_count": 15,
+    "source_hashes_match_exact_commit_git_blobs": true,
+    "measured_runner_input_validation_replayed": true,
+    "component_image_input_count": 11,
+    "reported_image_inputs_match_exact_commit_lock": true,
+    "image_configuration_and_revision_rechecked": true,
+    "source_revision_and_clean_status_rechecked": true,
+    "build_context_and_immutable_base_arguments_rechecked": true,
+    "liveness_and_unavailable_readiness_payloads_rechecked": true,
+    "unsupported_readiness_override_rejected": true,
+    "nonroot_readonly_capability_network_runtime_values_rechecked": true,
+    "installed_distribution_and_module_location_rechecked": true,
+    "all_expected_command_exits_rechecked": true
+  },
+  "source_files": {
+    ".github/workflows/p01-images.yml": {
+      "sha256": "b75afd870aaff52b5d425e6493bc1ddd20d79d3d9ca8742e67074376d2ccee5e",
+      "git_blob_sha": "17ae03879eb534f9e0f08091cb869ea12844f0d8",
+      "bytes": 1879,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "deploy/build/components.json": {
+      "sha256": "1222ad99e08d4eca24bedac4065ddcbf08057036c1c9923a850c374827334b62",
+      "git_blob_sha": "961cf9fc03257cb59d5ab9ef74e6bea675042135",
+      "bytes": 3868,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "deploy/build/inputs.lock.json": {
+      "sha256": "cdacc77240bb866f13166bdacef8fbaa5f273bd9340daab256f9669322d83061",
+      "git_blob_sha": "995fa109bed1175f55b8a3844acb45e4b00077c4",
+      "bytes": 1374,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "scripts/p01/run_images.py": {
+      "sha256": "91bb18aa7cccb54c77cd14b4ffa15290cfb391e11865c77f2268ce2cedc75684",
+      "git_blob_sha": "0905b035f4e9587afb3b1e49958f7aa7556c0698",
+      "bytes": 14025,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/.dockerignore": {
+      "sha256": "59e9a97d2a5cf9b6df4160b1c1b558f281a7c6335efb3fe00e446442b5ee407b",
+      "git_blob_sha": "1136d4f7741b5f591074f437f3056fcbc0f31234",
+      "bytes": 137,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/.python-version": {
+      "sha256": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+      "git_blob_sha": "f36fa5fd8017a085e301126c8c3fc30f1a2550b9",
+      "bytes": 8,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/Dockerfile": {
+      "sha256": "ff63e3a22cf1f66ae44bd008a5fcb9e54f7c8c9ae2bec802f5ad05655be4b753",
+      "git_blob_sha": "d905fbdabd4def9dcdcfd7b18069eaba4605709e",
+      "bytes": 1473,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/README.md": {
+      "sha256": "84f42f846f3aaad6bbc60d8da58c65dd19e2191d7aac2e174bb02b1c87056da8",
+      "git_blob_sha": "d28713bb82bcbd2418cf7bc163a5f056827727d8",
+      "bytes": 2775,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/pyproject.toml": {
+      "sha256": "0690036faba2fcb939f9ddad72da3b2e0157fad44bc65fb6a87d8baa4274e034",
+      "git_blob_sha": "be1f5238ef0ffe5179a25d6d161abac774f0203f",
+      "bytes": 912,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/src/lifecycle/__init__.py": {
+      "sha256": "6ef74fd0e8a102879b2b7dfea8ad56a3d8a35c5fb67561e5774aa8b986db2263",
+      "git_blob_sha": "8b82f5ca73d1725f64f23bf875fffb167fd2be2c",
+      "bytes": 83,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/src/lifecycle/bootstrap/__init__.py": {
+      "sha256": "ef6adabd1f5e063e8fc84022c413520bedb752a95eedc2181ea1fcaadbe5ec84",
+      "git_blob_sha": "59b13086269bdf68eac14929c14adb53ce982a63",
+      "bytes": 71,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/src/lifecycle/bootstrap/health.py": {
+      "sha256": "c9d0d3a850c41373c168d85edbf35b5472d5aaedf24c5659134c7b1c6f968e67",
+      "git_blob_sha": "052213014f0cbde82e71c72423ce3a9e72707efb",
+      "bytes": 820,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/src/lifecycle/interfaces/__init__.py": {
+      "sha256": "36c59f445f3f701ece7b2016379abbbfabfd269ac5f6e2dac30860791a7d6a42",
+      "git_blob_sha": "4d24ecb7c51fd148882bd5f0f479b4e9065028b7",
+      "bytes": 49,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/src/lifecycle/interfaces/health.py": {
+      "sha256": "2ff7d45481e2926fd48f825546d55b05b6fa5034a8afc1082fe8960ef426766c",
+      "git_blob_sha": "6c3c6e2882b8affb7991f47384f88503610cb584",
+      "bytes": 642,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    },
+    "services/lifecycle/uv.lock": {
+      "sha256": "fb93d6bfcf1f601f44572575d48c682132c2d7ef7e4a2152a00502f33b6ec2d4",
+      "git_blob_sha": "70a7b094113789c9d4108b7691572973b09844d6",
+      "bytes": 34667,
+      "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9"
+    }
+  },
+  "retained_raw_files": {
+    "01-source-revision.stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "01-source-revision.stdout.log": {
+      "sha256": "a23aaf073ed60011bf4f1b50ee437ab266a966ce5b040e2b69612ad57b3690c4",
+      "bytes": 41
+    },
+    "02-source-clean.stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "02-source-clean.stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "03-docker-version.stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "03-docker-version.stdout.log": {
+      "sha256": "58d5180149fd3334dbb3ff73de521946336e4052a1b769cb475f72486c934b1b",
+      "bytes": 769
+    },
+    "04-buildx-version.stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "04-buildx-version.stdout.log": {
+      "sha256": "d6a1fdd95fd9b2615b359b42e82829b1cad6bb22202cff355e55be8242e8c395",
+      "bytes": 74
+    },
+    "05-build.stderr.log": {
+      "sha256": "bffcd4adc9253e4dd67a1d47ab93fb24ea102207831233f226c1a04e4956541a",
+      "bytes": 8984
+    },
+    "05-build.stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "06-image-inspect.stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "06-image-inspect.stdout.log": {
+      "sha256": "aeb5a90892eaf41fa2dff5b8ee0774ce493e9b6e0ed81848d4343e7d742f6a9a",
+      "bytes": 3580
+    },
+    "07-liveness.stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "07-liveness.stdout.log": {
+      "sha256": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+      "bytes": 119
+    },
+    "08-readiness.stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "08-readiness.stdout.log": {
+      "sha256": "0a577cc36a0f23fc6200b5f008f18c398b3c4701b67beffd59088e451db93402",
+      "bytes": 175
+    },
+    "09-rejected-override.stderr.log": {
+      "sha256": "db2ce41829f676bbf3c305ee5c139ef7bfb24f38fe6c5742815bb5835efbb736",
+      "bytes": 107
+    },
+    "09-rejected-override.stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "10-runtime-isolation.stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "10-runtime-isolation.stdout.log": {
+      "sha256": "e2430967e20ccda9a341ccc562e6823587c1d229c6c9c146c471ee9e17c57720",
+      "bytes": 345
+    },
+    "report.json": {
+      "sha256": "8e2c1427c483ed9f6d55b143386b1ed8f7d0621be92e524d46d7ce23ff3bf13f",
+      "bytes": 15150
+    }
+  },
+  "limits": [
+    "Verification re-examines retained hosted-CI output and source; no Docker execution occurred in this retrieval environment.",
+    "Only five Python bootstrap images ran in this workflow; no Laravel image is represented.",
+    "One-shot liveness is not persistent service readiness or worker consumption.",
+    "Image identity is a runner-local configuration digest; no pushed registry digest, image archive, signature, SBOM or provenance attestation is retained.",
+    "No tenant/data isolation, integration topology, native platform, operating acceptance or whole-G01 result is established."
+  ]
+}

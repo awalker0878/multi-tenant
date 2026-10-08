@@ -1,0 +1,16 @@
+/.env
+/vendor/
+/.phpunit.cache/
+/.pest/
+/.phpunit.result.cache
+/.deptrac.cache
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/framework/phpstan/*
+!/storage/framework/phpstan/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore

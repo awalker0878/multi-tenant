@@ -1,0 +1,234 @@
+{
+  "config": {
+    "argv": [
+      "/opt/hostedtoolcache/node/24.19.0/x64/bin/node",
+      "/home/runner/work/multi-tenant/multi-tenant/apps/console/node_modules/.bin/playwright",
+      "test",
+      "--config=playwright.p02.config.ts"
+    ],
+    "configFile": "/home/runner/work/multi-tenant/multi-tenant/apps/console/playwright.p02.config.ts",
+    "rootDir": "/home/runner/work/multi-tenant/multi-tenant/apps/console/tests/browser-p02",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 150000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/awalker0878/multi-tenant/commit/7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+        "commitHash": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+        "buildHref": "https://github.com/awalker0878/multi-tenant/actions/runs/37367427132"
+      },
+      "gitCommit": {
+        "shortHash": "7b24476",
+        "hash": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+        "subject": "test(console): qualify P02 journeys independently across three browser engines",
+        "body": "test(console): qualify P02 journeys independently across three browser engines\n\nP02.05, R03, G02.01/G02.04: run fresh PostgreSQL/bootstrap/OIDC journeys in separate Chromium, Firefox and WebKit jobs. Label evidence with the actual engine and per-test version, assert the requested project ran, and retain results independently without fail-fast cancellation.\n\nLocal TypeScript validation and test discovery pass for all three engines. Hosted results remain pending; managed-browser support, actual history-cache restores and manual accessibility acceptance are separate receiving work.",
+        "author": {
+          "name": "awalker0878",
+          "email": "52688461+awalker0878@users.noreply.github.com",
+          "time": 1791230576000
+        },
+        "committer": {
+          "name": "awalker0878",
+          "email": "52688461+awalker0878@users.noreply.github.com",
+          "time": 1791230576000
+        },
+        "branch": "greenfield/enterprise-microservices-plan"
+      },
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/multi-tenant/multi-tenant/apps/console/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/awalker0878/multi-tenant/commit/7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+            "commitHash": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+            "buildHref": "https://github.com/awalker0878/multi-tenant/actions/runs/37367427132"
+          },
+          "gitCommit": {
+            "shortHash": "7b24476",
+            "hash": "7b24476c71a778dcf9a865b04c13aa35aa8b3992",
+            "subject": "test(console): qualify P02 journeys independently across three browser engines",
+            "body": "test(console): qualify P02 journeys independently across three browser engines\n\nP02.05, R03, G02.01/G02.04: run fresh PostgreSQL/bootstrap/OIDC journeys in separate Chromium, Firefox and WebKit jobs. Label evidence with the actual engine and per-test version, assert the requested project ran, and retain results independently without fail-fast cancellation.\n\nLocal TypeScript validation and test discovery pass for all three engines. Hosted results remain pending; managed-browser support, actual history-cache restores and manual accessibility acceptance are separate receiving work.",
+            "author": {
+              "name": "awalker0878",
+              "email": "52688461+awalker0878@users.noreply.github.com",
+              "time": 1791230576000
+            },
+            "committer": {
+              "name": "awalker0878",
+              "email": "52688461+awalker0878@users.noreply.github.com",
+              "time": 1791230576000
+            },
+            "branch": "greenfield/enterprise-microservices-plan"
+          },
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/home/runner/work/multi-tenant/multi-tenant/apps/console/tests/browser-p02",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/p02-browser.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "identity.spec.ts",
+      "file": "identity.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "deployment credential requires a change, survives reload and cannot be reused",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "browser-engine",
+                  "description": "firefox"
+                },
+                {
+                  "type": "browser-version",
+                  "description": "155.0"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3625,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T20:05:49.791Z",
+                  "annotations": [
+                    {
+                      "type": "browser-engine",
+                      "description": "firefox"
+                    },
+                    {
+                      "type": "browser-version",
+                      "description": "155.0"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bc384e94f5cb1e491b4d-d7b5f3ca71e4792ad15e",
+          "file": "identity.spec.ts",
+          "line": 11,
+          "column": 1
+        },
+        {
+          "title": "console configuration verifies HTTPS federation and enforces tenant revocation across browsers",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "browser-engine",
+                  "description": "firefox"
+                },
+                {
+                  "type": "browser-version",
+                  "description": "155.0"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6720,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T20:05:53.867Z",
+                  "annotations": [
+                    {
+                      "type": "browser-engine",
+                      "description": "firefox"
+                    },
+                    {
+                      "type": "browser-version",
+                      "description": "155.0"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bc384e94f5cb1e491b4d-bd21d1f309c5ea5118b8",
+          "file": "identity.spec.ts",
+          "line": 43,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-05T20:05:49.399Z",
+    "duration": 11498.713000000002,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

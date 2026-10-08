@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "scope": "Synthetic P01 installation candidates; no operated support or promotion claim",
+  "platform": "linux/amd64",
+  "images": {
+    "nginx": {
+      "candidate": "docker.io/library/nginx:1.30.5-trixie",
+      "purpose": "TLS public-root proxy for the private PHP FPM foundation applications",
+      "source": "https://hub.docker.com/_/nginx"
+    }
+  }
+}

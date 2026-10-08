@@ -1,0 +1,235 @@
+{
+  "source_revision": "b7411590868138ce2e240658ddbd2c167607a300",
+  "engineering_result": "PASSED_ENGINEERING_CHECKS",
+  "g10_status": "HELD",
+  "current_source_checks": [
+    {
+      "id": 37701090811,
+      "name": "P01 bootstrap images",
+      "status": "completed",
+      "conclusion": "success",
+      "updated_at": "2026-10-07T23:15:56Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37701090811"
+    },
+    {
+      "id": 37701090761,
+      "name": "P10 operating qualification engineering",
+      "status": "completed",
+      "conclusion": "success",
+      "updated_at": "2026-10-07T23:16:49Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37701090761"
+    },
+    {
+      "id": 37701090854,
+      "name": "P01 policy controls",
+      "status": "completed",
+      "conclusion": "success",
+      "updated_at": "2026-10-07T23:14:44Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37701090854"
+    },
+    {
+      "id": 37701090907,
+      "name": "Context policy",
+      "status": "completed",
+      "conclusion": "success",
+      "updated_at": "2026-10-07T23:14:37Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37701090907"
+    },
+    {
+      "id": 37701090893,
+      "name": "P01 foundation contracts",
+      "status": "completed",
+      "conclusion": "success",
+      "updated_at": "2026-10-07T23:15:50Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37701090893"
+    },
+    {
+      "id": 37701090828,
+      "name": "P01 foundation packages",
+      "status": "in_progress",
+      "conclusion": null,
+      "updated_at": "2026-10-07T23:18:31Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37701090828"
+    }
+  ],
+  "preceding_source": "eb8805ff74fa780b6ab0ba021322253c62a7d37f",
+  "preceding_source_checks": [
+    {
+      "id": 37700590993,
+      "name": "P01 bootstrap images",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:13:11Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700590993"
+    },
+    {
+      "id": 37700591126,
+      "name": "P08 native migration components",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:12:17Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591126"
+    },
+    {
+      "id": 37700591172,
+      "name": "P10 operating qualification engineering",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:12:01Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591172"
+    },
+    {
+      "id": 37700590970,
+      "name": "P09 platform expansion conformance",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:11:43Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700590970"
+    },
+    {
+      "id": 37700591129,
+      "name": "P07 native readiness preparation",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:11:53Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591129"
+    },
+    {
+      "id": 37700590978,
+      "name": "P01 isolated Kubernetes integration",
+      "status": "in_progress",
+      "conclusion": null,
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:12:22Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700590978"
+    },
+    {
+      "id": 37700591065,
+      "name": "P01 isolated Compose integration",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:12:34Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591065"
+    },
+    {
+      "id": 37700591124,
+      "name": "P05 planning",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:13:40Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591124"
+    },
+    {
+      "id": 37700591227,
+      "name": "P01 transactional messaging",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:13:41Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591227"
+    },
+    {
+      "id": 37700591164,
+      "name": "P06 execution",
+      "status": "in_progress",
+      "conclusion": null,
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:09:31Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591164"
+    },
+    {
+      "id": 37700591103,
+      "name": "P01 foundation contracts",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:10:10Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591103"
+    },
+    {
+      "id": 37700591125,
+      "name": "P01 policy controls",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:09:49Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591125"
+    },
+    {
+      "id": 37700590984,
+      "name": "P02 Governance events",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:10:35Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700590984"
+    },
+    {
+      "id": 37700591178,
+      "name": "Context policy",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:11:26Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591178"
+    },
+    {
+      "id": 37700591052,
+      "name": "P02 identity",
+      "status": "in_progress",
+      "conclusion": null,
+      "attempt": 2,
+      "updated_at": "2026-10-07T23:16:41Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591052"
+    },
+    {
+      "id": 37700591154,
+      "name": "P01 foundation packages",
+      "status": "completed",
+      "conclusion": "failure",
+      "attempt": 1,
+      "updated_at": "2026-10-07T23:18:13Z",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37700591154"
+    }
+  ],
+  "original_failures": [
+    {
+      "source": "f7001d3e75cffa13b28701f184c076a1bd1854af",
+      "reason": "Worker signature-verification dependency closure omitted from image/package preflight inventory",
+      "correction": "c023b0271552f9bb6beb2d4e0470f1c84bfe2b6a"
+    },
+    {
+      "source": "58807949bca43c46bbee77bd3fda382f983351a5",
+      "reason": "Worker image manifest dependency ordering differed from package manifest",
+      "correction": "eb8805ff74fa780b6ab0ba021322253c62a7d37f"
+    },
+    {
+      "source": "58807949bca43c46bbee77bd3fda382f983351a5",
+      "reason": "P02 database suite exceeded 120 seconds",
+      "correction": "eb8805ff74fa780b6ab0ba021322253c62a7d37f; targeted 300-second bound and retained timeout output"
+    },
+    {
+      "source": "eb8805ff74fa780b6ab0ba021322253c62a7d37f",
+      "job_id": 113062828009,
+      "reason": "WebKit disposable notification broker did not become ready",
+      "action": "Requested one targeted rerun; no product code modified or check relaxed"
+    },
+    {
+      "source": "eb8805ff74fa780b6ab0ba021322253c62a7d37f",
+      "job_id": 113062915621,
+      "reason": "Console Chromium installer timed out",
+      "action": "Requested one targeted rerun; no application check relaxed"
+    }
+  ],
+  "limitations": [
+    "This is an observed CI snapshot; pending/retried workflows must be read from their linked runs before claiming success.",
+    "Passing engineering checks do not establish native qualification, operating acceptance or release authorization."
+  ]
+}

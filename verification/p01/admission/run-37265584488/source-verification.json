@@ -1,0 +1,65 @@
+{
+  "method": "Report SHA-256 and independently computed Git blob SHA-1 match connector-retrieved immutable Git trees",
+  "revisions": [
+    {
+      "source_revision": "011465d805d9b23725df4b05b949e9dc8f4da827",
+      "bindings": [
+        {
+          "path": ".github/workflows/p01-admission-probe.yml",
+          "sha256": "377f5a31797a1c1a5eed5a02e4560c8ef4169927ede1573211fa1472b1c743af",
+          "git_blob_sha1": "b50ae5caf97aee5607c38d03d22b33f14187c26b"
+        },
+        {
+          "path": "release/admission-probe.json",
+          "sha256": "69adba8513cd00aa9e2ee0c739c0308346d3378d36ef6f374183a4277ac6bd1b",
+          "git_blob_sha1": "924b52129d2e86ad165f67326b09fe9d80c8d020"
+        },
+        {
+          "path": "release/exceptions.json",
+          "sha256": "b59f6163a351a046605ed305eed91466f1a15e58e5785b0808fb9149462669f2",
+          "git_blob_sha1": "6b74b57b5639c0143482e9fce3c8f4cb36157fcf"
+        },
+        {
+          "path": "release/review-policy.json",
+          "sha256": "6d53f74268d9751ebdfc0f921443911e0ba6ab1ee793518412d88c22451dcbad",
+          "git_blob_sha1": "739231f7fb23eaf485124f17eb984e3968dc50f2"
+        },
+        {
+          "path": "scripts/p01/admission/check_pr.py",
+          "sha256": "fccf26880698beaf5869521f0461d7cfacc32296e3890792eb106162ae4cb20f",
+          "git_blob_sha1": "dd1207c74f58c1ec6eb1b2c620d90dfb144d334a"
+        },
+        {
+          "path": "scripts/p01/admission/policy.py",
+          "sha256": "25658e8505bbfa3916c16a0eaa6819847e7df08157724e61017a1c0e7bd56a3b",
+          "git_blob_sha1": "531f60ea57a6451ea6b79ceaaad611100e621912"
+        },
+        {
+          "path": "scripts/p01/admission/probe_pr.py",
+          "sha256": "240478eaa98075393956a77a0950aab8f71ce94869f761b53651f4cf9ea0284f",
+          "git_blob_sha1": "24d78dac3087c5abf0cdffe01e8e4ed07ce9c095"
+        }
+      ]
+    },
+    {
+      "source_revision": "2e1be599cba89275c92396066f091779cd912539",
+      "bindings": [
+        {
+          "path": "release/review-policy.json",
+          "sha256": "51885d0efa6819cd6af8afc0f0c730c295e98a868122e6090a5d93ab60c45fa8",
+          "git_blob_sha1": "1bc2375fed1d08b181fe3592103ce7c596fbc691"
+        },
+        {
+          "path": "scripts/p01/admission/check_pr.py",
+          "sha256": "d3b9c0a73ea53e3eb147db519def2f7d56fd55ba97bed7fb25afec6ccf55e448",
+          "git_blob_sha1": "bd87c06f35754c0b7586906d943294d02b3991dd"
+        },
+        {
+          "path": "scripts/p01/admission/policy.py",
+          "sha256": "26922e63a45e80d3c06d59e1a8ec08eb2d67d552152f97b8bf8fc4bef54b89ce",
+          "git_blob_sha1": "2096ceb80b589e4feebcaae6775f78e571ad840d"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1824 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Inventory read-only commissioning and observations",
+    "version": "1.0.0",
+    "description": "P04 bounded observed facts. No write commissioning, reservation, adoption or native support claim."
+  },
+  "paths": {
+    "/v1/tenants/{tenant}/sites": {
+      "get": {
+        "operationId": "listSites",
+        "x-inventory-action": "inventory.read",
+        "x-response-schema": "SiteList",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/policies": {
+      "get": {
+        "operationId": "listPolicies",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "PolicyList",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints": {
+      "get": {
+        "operationId": "listEndpoints",
+        "x-inventory-action": "inventory.read",
+        "x-response-schema": "EndpointList",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndpointList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "enrollEndpoint",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "EndpointCommand",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndpointCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Enroll"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/health": {
+      "get": {
+        "operationId": "siteHealth",
+        "x-inventory-action": "inventory.read",
+        "x-response-schema": "Health",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/discoveries": {
+      "get": {
+        "operationId": "listDiscoveries",
+        "x-inventory-action": "inventory.read",
+        "x-response-schema": "DiscoveryList",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "requestDiscovery",
+        "x-inventory-action": "inventory.discover",
+        "x-response-schema": "DiscoveryCommand",
+        "x-status": 202,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/generations/{generation}/resources": {
+      "get": {
+        "operationId": "listResources",
+        "x-inventory-action": "inventory.read",
+        "x-response-schema": "ResourceList",
+        "x-status": 200,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "generation",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/renewals": {
+      "post": {
+        "operationId": "renewEndpoint",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "EndpointCommand",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]{0,8}\"$"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndpointCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/revocation": {
+      "post": {
+        "operationId": "revokeEndpoint",
+        "x-inventory-action": "inventory.admin",
+        "x-response-schema": "EndpointCommand",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]{0,8}\"$"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndpointCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empty"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/matches": {
+      "post": {
+        "operationId": "proposeMatch",
+        "x-inventory-action": "inventory.match",
+        "x-response-schema": "MatchCommand",
+        "x-status": 201,
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "site",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Authorized result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchCommand"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "No disclosed operational details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Match"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Workload": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "ActorDelegation": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Actor-Delegation"
+      }
+    },
+    "schemas": {
+      "Profile": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "platform",
+          "dimensions",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "platform": {
+            "enum": [
+              "openstack",
+              "vmware",
+              "ahv"
+            ]
+          },
+          "dimensions": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "installed_identity",
+              "compute_placement",
+              "storage_datasets",
+              "network_vpc",
+              "security_edge",
+              "guest_image",
+              "lifecycle_adoption",
+              "mobility",
+              "shared_services",
+              "resilience_operations",
+              "assurance_sovereignty"
+            ],
+            "properties": {
+              "installed_identity": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "compute_placement": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "storage_datasets": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "network_vpc": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "security_edge": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "guest_image": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "lifecycle_adoption": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "mobility": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "shared_services": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "resilience_operations": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "assurance_sovereignty": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "facts",
+                  "provenance"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "UNASSESSED"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "facts": {
+                    "type": "object"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              }
+            }
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        }
+      },
+      "Site": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "site_id"
+        ],
+        "properties": {
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "SiteList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Site"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Policy": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "policy_id",
+          "site_id",
+          "owner_id",
+          "platform",
+          "native_scope",
+          "epoch",
+          "profile",
+          "coverage_reference",
+          "policy_digest"
+        ],
+        "properties": {
+          "policy_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "owner_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "platform": {
+            "enum": [
+              "openstack",
+              "vmware",
+              "ahv"
+            ]
+          },
+          "native_scope": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "epoch": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/Profile"
+          },
+          "coverage_reference": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "policy_digest": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      },
+      "PolicyList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Policy"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Endpoint": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "endpoint_id",
+          "site_id",
+          "label",
+          "platform",
+          "native_scope",
+          "revision",
+          "generation_id",
+          "expires_at",
+          "state",
+          "reason",
+          "coverage_reference",
+          "profile",
+          "native_write_authorized",
+          "observed_capacity_reserved"
+        ],
+        "properties": {
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "platform": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "native_scope": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "generation_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "held",
+              "read_only_ready"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coverage_reference": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "profile": {
+            "$ref": "#/components/schemas/Profile"
+          },
+          "native_write_authorized": {
+            "const": false
+          },
+          "observed_capacity_reserved": {
+            "const": false
+          }
+        }
+      },
+      "EndpointList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Endpoint"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Discovery": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "reason",
+          "created_at",
+          "updated_at",
+          "page_count",
+          "failures"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "partial",
+              "complete"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "number"
+          },
+          "updated_at": {
+            "type": "number"
+          },
+          "page_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "failures": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "DiscoveryList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Discovery"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Observation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "native_id",
+          "incarnation",
+          "name",
+          "scope",
+          "facts"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "server",
+              "network",
+              "volume",
+              "datastore"
+            ]
+          },
+          "native_id": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "incarnation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "scope": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "facts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [],
+            "properties": {
+              "power": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "cpu": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "memory_mib": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "size_gib": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "status": {
+                "type": "string",
+                "maxLength": 255
+              }
+            }
+          }
+        }
+      },
+      "Resource": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resource_id",
+          "observation",
+          "collected_at",
+          "expires_at",
+          "holds",
+          "proposed_matches",
+          "ownership",
+          "reserved"
+        ],
+        "properties": {
+          "resource_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/Observation"
+          },
+          "collected_at": {
+            "type": "number"
+          },
+          "expires_at": {
+            "type": "number"
+          },
+          "holds": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            }
+          },
+          "proposed_matches": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ownership": {
+            "const": "observation_only"
+          },
+          "reserved": {
+            "const": false
+          }
+        }
+      },
+      "ResourceList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "next_cursor",
+          "generation_id",
+          "completion",
+          "reason",
+          "endpoint_id",
+          "policy_digest",
+          "consistency"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Resource"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "generation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "completion": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "policy_digest": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "consistency": {
+            "const": "bounded_observation_window"
+          }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "observed_at"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "count",
+                "last_activity"
+              ],
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "last_activity": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "observed_at": {
+            "type": "number"
+          }
+        }
+      },
+      "EndpointCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "endpoint_id",
+          "revision",
+          "state",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "endpoint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "state": {
+            "enum": [
+              "registered",
+              "revoked"
+            ]
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        }
+      },
+      "DiscoveryCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "discovery_id",
+          "status",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "discovery_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "const": "queued"
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        }
+      },
+      "MatchCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "match_id",
+          "state",
+          "ownership_granted"
+        ],
+        "properties": {
+          "match_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "const": "proposed_unverified"
+          },
+          "ownership_granted": {
+            "const": false
+          }
+        }
+      },
+      "Enroll": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "policy_id",
+          "label"
+        ],
+        "properties": {
+          "policy_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        }
+      },
+      "Empty": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {}
+      },
+      "Match": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resource_id",
+          "application_id",
+          "intent_revision",
+          "generation_id"
+        ],
+        "properties": {
+          "resource_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "application_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "intent_revision": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "generation_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "Workload": [],
+      "ActorDelegation": []
+    }
+  ]
+}

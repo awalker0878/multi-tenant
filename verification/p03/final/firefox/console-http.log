@@ -1,0 +1,170 @@
+[5600] [Tue Oct  6 02:39:53 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8031) started
+[5601] [Tue Oct  6 02:39:53 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8031) started
+[5602] [Tue Oct  6 02:39:53 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8031) started
+[5599] [Tue Oct  6 02:39:53 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8031) started
+[5603] [Tue Oct  6 02:39:53 2026] PHP 8.5.11 Development Server (http://127.0.0.1:8031) started
+[5602] [Tue Oct  6 02:39:53 2026] 127.0.0.1:45024 Accepted
+[Tue Oct 6 02:39:53 2026] 127.0.0.1:45024 [GET] URI: /health/live
+[5602] [Tue Oct  6 02:39:53 2026] 127.0.0.1:45024 Closing
+[5602] [Tue Oct  6 02:40:12 2026] 127.0.0.1:60236 Accepted
+[Tue Oct 6 02:40:12 2026] 127.0.0.1:60236 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/create
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60236 Closing
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60252 Accepted
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60266 Accepted
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60252 [200]: GET /build/assets/app-D19_Xxn_.css
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60266 [200]: GET /build/assets/app-BG1ZnUdn.js
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60252 Closing
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60266 Closing
+[5603] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60280 Accepted
+[5603] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60280 [200]: GET /build/assets/Editor-DpZyu0rJ.js
+[5600] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60286 Accepted
+[5603] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60280 Closing
+[5603] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60292 Accepted
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60308 Accepted
+[5601] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60310 Accepted
+[5603] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60292 [200]: GET /build/assets/_plugin-vue_export-helper-BDNMzG2s.js
+[5603] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60292 Closing
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60308 [200]: GET /build/assets/CatalogueLayout-nOgdaTW2.css
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60308 Closing
+[5600] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60286 [200]: GET /build/assets/CatalogueLayout-DcMSu0yv.js
+[5600] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60286 Closing
+[5601] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60310 [200]: GET /build/assets/defaults-PkqlGNrL.js
+[5601] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60310 Closing
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60322 Accepted
+[Tue Oct 6 02:40:13 2026] 127.0.0.1:60322 [GET] URI: /favicon.ico
+[5602] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60322 Closing
+[5601] [Tue Oct  6 02:40:13 2026] 127.0.0.1:60332 Accepted
+[Tue Oct 6 02:40:13 2026] 127.0.0.1:60332 [POST] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications
+[5601] [Tue Oct  6 02:40:14 2026] 127.0.0.1:60332 Closing
+[5599] [Tue Oct  6 02:40:14 2026] 127.0.0.1:60342 Accepted
+[Tue Oct 6 02:40:14 2026] 127.0.0.1:60342 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/create
+[5599] [Tue Oct  6 02:40:14 2026] 127.0.0.1:60342 Closing
+[5599] [Tue Oct  6 02:40:14 2026] 127.0.0.1:60358 Accepted
+[Tue Oct 6 02:40:14 2026] 127.0.0.1:60358 [POST] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications
+[5599] [Tue Oct  6 02:40:15 2026] 127.0.0.1:60358 Closing
+[5600] [Tue Oct  6 02:40:15 2026] 127.0.0.1:60362 Accepted
+[Tue Oct 6 02:40:15 2026] 127.0.0.1:60362 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449
+[5600] [Tue Oct  6 02:40:15 2026] 127.0.0.1:60362 Closing
+[5600] [Tue Oct  6 02:40:15 2026] 127.0.0.1:60376 Accepted
+[5600] [Tue Oct  6 02:40:15 2026] 127.0.0.1:60376 [200]: GET /build/assets/Application-29qujbDE.js
+[5600] [Tue Oct  6 02:40:15 2026] 127.0.0.1:60376 Closing
+[5599] [Tue Oct  6 02:40:15 2026] 127.0.0.1:60382 Accepted
+[Tue Oct 6 02:40:15 2026] 127.0.0.1:60382 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/edit
+[5599] [Tue Oct  6 02:40:16 2026] 127.0.0.1:60382 Closing
+[5599] [Tue Oct  6 02:40:16 2026] 127.0.0.1:60398 Accepted
+[Tue Oct 6 02:40:16 2026] 127.0.0.1:60398 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/edit
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60398 Closing
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60412 Accepted
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60412 [200]: GET /build/assets/app-D19_Xxn_.css
+[5601] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60420 Accepted
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60412 Closing
+[5601] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60420 [200]: GET /build/assets/app-BG1ZnUdn.js
+[5601] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60420 Closing
+[5602] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60422 Accepted
+[5602] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60422 [200]: GET /build/assets/Editor-DpZyu0rJ.js
+[5602] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60422 Closing
+[5602] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60430 Accepted
+[5602] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60430 [200]: GET /build/assets/CatalogueLayout-DcMSu0yv.js
+[5602] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60430 Closing
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60436 Accepted
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60436 [200]: GET /build/assets/_plugin-vue_export-helper-BDNMzG2s.js
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60436 Closing
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60448 Accepted
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60448 [200]: GET /build/assets/CatalogueLayout-nOgdaTW2.css
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60448 Closing
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60460 Accepted
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60460 [200]: GET /build/assets/defaults-PkqlGNrL.js
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60460 Closing
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60474 Accepted
+[Tue Oct 6 02:40:17 2026] 127.0.0.1:60474 [POST] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/revisions
+[5599] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60474 Closing
+[5600] [Tue Oct  6 02:40:17 2026] 127.0.0.1:60482 Accepted
+[Tue Oct 6 02:40:17 2026] 127.0.0.1:60482 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449
+[5600] [Tue Oct  6 02:40:18 2026] 127.0.0.1:60482 Closing
+[5600] [Tue Oct  6 02:40:18 2026] 127.0.0.1:60496 Accepted
+[Tue Oct 6 02:40:18 2026] 127.0.0.1:60496 [POST] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/revisions
+[5600] [Tue Oct  6 02:40:19 2026] 127.0.0.1:60496 Closing
+[5600] [Tue Oct  6 02:40:19 2026] 127.0.0.1:60500 Accepted
+[Tue Oct 6 02:40:19 2026] 127.0.0.1:60500 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/edit
+[5600] [Tue Oct  6 02:40:19 2026] 127.0.0.1:60500 Closing
+[5603] [Tue Oct  6 02:40:19 2026] 127.0.0.1:60504 Accepted
+[Tue Oct 6 02:40:19 2026] 127.0.0.1:60504 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/edit
+[5603] [Tue Oct  6 02:40:20 2026] 127.0.0.1:60504 Closing
+[5602] [Tue Oct  6 02:40:20 2026] 127.0.0.1:60508 Accepted
+[Tue Oct 6 02:40:20 2026] 127.0.0.1:60508 [POST] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/revisions
+[5602] [Tue Oct  6 02:40:20 2026] 127.0.0.1:60508 Closing
+[5600] [Tue Oct  6 02:40:20 2026] 127.0.0.1:60524 Accepted
+[Tue Oct 6 02:40:20 2026] 127.0.0.1:60524 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449
+[5600] [Tue Oct  6 02:40:21 2026] 127.0.0.1:60524 Closing
+[5600] [Tue Oct  6 02:40:21 2026] 127.0.0.1:60538 Accepted
+[5600] [Tue Oct  6 02:40:21 2026] 127.0.0.1:60538 [200]: GET /build/assets/Application-29qujbDE.js
+[5600] [Tue Oct  6 02:40:21 2026] 127.0.0.1:60538 Closing
+[5599] [Tue Oct  6 02:40:21 2026] 127.0.0.1:60542 Accepted
+[Tue Oct 6 02:40:21 2026] 127.0.0.1:60542 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449
+[5599] [Tue Oct  6 02:40:22 2026] 127.0.0.1:60542 Closing
+[5599] [Tue Oct  6 02:40:22 2026] 127.0.0.1:40196 Accepted
+[Tue Oct 6 02:40:22 2026] 127.0.0.1:40196 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/edit
+[5599] [Tue Oct  6 02:40:23 2026] 127.0.0.1:40196 Closing
+[5599] [Tue Oct  6 02:40:23 2026] 127.0.0.1:40200 Accepted
+[Tue Oct 6 02:40:23 2026] 127.0.0.1:40200 [POST] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/revisions
+[5599] [Tue Oct  6 02:40:23 2026] 127.0.0.1:40200 Closing
+[5599] [Tue Oct  6 02:40:23 2026] 127.0.0.1:40206 Accepted
+[Tue Oct 6 02:40:23 2026] 127.0.0.1:40206 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/edit
+[5599] [Tue Oct  6 02:40:24 2026] 127.0.0.1:40206 Closing
+[5603] [Tue Oct  6 02:40:24 2026] 127.0.0.1:40216 Accepted
+[Tue Oct 6 02:40:24 2026] 127.0.0.1:40216 [POST] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/revisions
+[5603] [Tue Oct  6 02:40:24 2026] 127.0.0.1:40216 Closing
+[5603] [Tue Oct  6 02:40:24 2026] 127.0.0.1:40224 Accepted
+[Tue Oct 6 02:40:24 2026] 127.0.0.1:40224 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449
+[5603] [Tue Oct  6 02:40:25 2026] 127.0.0.1:40224 Closing
+[5601] [Tue Oct  6 02:40:25 2026] 127.0.0.1:40228 Accepted
+[Tue Oct 6 02:40:25 2026] 127.0.0.1:40228 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449
+[5602] [Tue Oct  6 02:40:25 2026] 127.0.0.1:40240 Accepted
+[Tue Oct 6 02:40:25 2026] 127.0.0.1:40240 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/edit
+[5601] [Tue Oct  6 02:40:25 2026] 127.0.0.1:40228 Closing
+[5602] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40240 Closing
+[5599] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40250 Accepted
+[Tue Oct 6 02:40:26 2026] 127.0.0.1:40250 [POST] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/revisions
+[5599] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40250 Closing
+[5601] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40256 Accepted
+[Tue Oct 6 02:40:26 2026] 127.0.0.1:40256 [GET] URI: /account
+[5601] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40256 Closing
+[5601] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40258 Accepted
+[5601] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40270 Accepted
+[5601] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40258 [200]: GET /build/assets/Account-C9da5OiX.js
+[5601] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40270 [200]: GET /build/assets/IdentityLayout-DnhK2XQ1.js
+[5601] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40258 Closing
+[5601] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40270 Closing
+[5603] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40282 Accepted
+[5603] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40282 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[5603] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40282 Closing
+[5599] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40290 Accepted
+[Tue Oct 6 02:40:26 2026] 127.0.0.1:40290 [GET] URI: /tenants/979237ce-bb56-4db4-beb3-c766fc083e2b/applications/53acf7f5-9ef9-4c42-abbf-ccf49f1ea449/edit
+[5601] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40298 Accepted
+[Tue Oct 6 02:40:26 2026] 127.0.0.1:40298 [GET] URI: /tenants/1ab7f4a7-b808-4c9e-8180-49809309f9b8/applications
+[5601] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40298 Closing
+[5602] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40306 Accepted
+[Tue Oct 6 02:40:26 2026] 127.0.0.1:40306 [GET] URI: /account
+[5599] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40290 Closing
+[5600] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40318 Accepted
+[Tue Oct 6 02:40:26 2026] 127.0.0.1:40318 [GET] URI: /account
+[5602] [Tue Oct  6 02:40:26 2026] 127.0.0.1:40306 Closing
+[5600] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40318 Closing
+[5602] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40334 Accepted
+[5601] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40340 Accepted
+[5602] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40334 [200]: GET /build/assets/app-D19_Xxn_.css
+[5602] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40334 Closing
+[5601] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40340 [200]: GET /build/assets/app-BG1ZnUdn.js
+[5601] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40340 Closing
+[5599] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40344 Accepted
+[5599] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40344 [200]: GET /build/assets/Account-C9da5OiX.js
+[5599] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40344 Closing
+[5601] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40354 Accepted
+[5601] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40354 [200]: GET /build/assets/IdentityLayout-DnhK2XQ1.js
+[5601] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40354 Closing
+[5602] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40370 Accepted
+[5602] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40370 [200]: GET /build/assets/_plugin-vue_export-helper-BDNMzG2s.js
+[5602] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40370 Closing
+[5600] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40378 Accepted
+[5600] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40378 [200]: GET /build/assets/IdentityLayout-DWjcmymb.css
+[5600] [Tue Oct  6 02:40:27 2026] 127.0.0.1:40378 Closing

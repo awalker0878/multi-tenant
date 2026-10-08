@@ -1,0 +1,66 @@
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.utf8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are enabled.
+
+fixing permissions on existing directory /var/lib/postgresql/18/docker ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default "max_connections" ... 100
+selecting default "shared_buffers" ... 128MB
+selecting default time zone ... Etc/UTC
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+Success. You can now start the database server using:
+
+    pg_ctl -D /var/lib/postgresql/18/docker -l logfile start
+
+waiting for server to start....2026-10-05 00:02:44.126 UTC [69] LOG:  starting PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-10-05 00:02:44.126 UTC [69] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-10-05 00:02:44.130 UTC [75] LOG:  database system was shut down at 2026-10-05 00:02:44 UTC
+2026-10-05 00:02:44.133 UTC [69] LOG:  database system is ready to accept connections
+ done
+server started
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/10-private-identities.sh
+Bootstrapped private database and identities: console
+Bootstrapped private database and identities: governance
+Bootstrapped private database and identities: catalogue
+Bootstrapped private database and identities: inventory
+Bootstrapped private database and identities: planning
+Bootstrapped private database and identities: lifecycle
+Bootstrapped private database and identities: assurance
+
+waiting for server to shut down....2026-10-05 00:02:45.129 UTC [69] LOG:  received fast shutdown request
+2026-10-05 00:02:45.130 UTC [69] LOG:  aborting any active transactions
+2026-10-05 00:02:45.133 UTC [69] LOG:  background worker "logical replication launcher" (PID 78) exited with exit code 1
+2026-10-05 00:02:45.134 UTC [73] LOG:  shutting down
+2026-10-05 00:02:45.134 UTC [73] LOG:  checkpoint starting: shutdown immediate
+2026-10-05 00:02:45.317 UTC [73] LOG:  checkpoint complete: wrote 6608 buffers (40.3%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 2 recycled; write=0.171 s, sync=0.011 s, total=0.184 s; sync files=2106, longest=0.001 s, average=0.001 s; distance=30407 kB, estimate=30407 kB; lsn=0/350B310, redo lsn=0/350B310
+2026-10-05 00:02:45.338 UTC [69] LOG:  database system is shut down
+ done
+server stopped
+
+PostgreSQL init process complete; ready for start up.
+
+2026-10-05 00:02:45.454 UTC [1] LOG:  starting PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-10-05 00:02:45.455 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-10-05 00:02:45.455 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-10-05 00:02:45.455 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-10-05 00:02:45.461 UTC [132] LOG:  database system was shut down at 2026-10-05 00:02:45 UTC
+2026-10-05 00:02:45.465 UTC [1] LOG:  database system is ready to accept connections
+2026-10-05 00:02:47.778 UTC [139] ERROR:  relation "app.foundation_schema" does not exist at character 68
+2026-10-05 00:02:47.778 UTC [139] STATEMENT:  SELECT 1 AS probe, current_user AS identity, (SELECT count(*) FROM app.foundation_schema) AS schema_rows, (SELECT max(version) FROM app.foundation_schema) AS schema_version
+2026-10-05 00:02:48.255 UTC [144] ERROR:  relation "app.foundation_schema" does not exist at character 68
+2026-10-05 00:02:48.255 UTC [144] STATEMENT:  SELECT 1 AS probe, current_user AS identity, (SELECT count(*) FROM app.foundation_schema) AS schema_rows, (SELECT max(version) FROM app.foundation_schema) AS schema_version
+2026-10-05 00:02:48.529 UTC [145] ERROR:  relation "app.foundation_schema" does not exist at character 68
+2026-10-05 00:02:48.529 UTC [145] STATEMENT:  SELECT 1 AS probe, current_user AS identity, (SELECT count(*) FROM app.foundation_schema) AS schema_rows, (SELECT max(version) FROM app.foundation_schema) AS schema_version
+2026-10-05 00:02:48.546 UTC [146] ERROR:  relation "app.foundation_schema" does not exist at character 68
+2026-10-05 00:02:48.546 UTC [146] STATEMENT:  SELECT 1 AS probe, current_user AS identity, (SELECT count(*) FROM app.foundation_schema) AS schema_rows, (SELECT max(version) FROM app.foundation_schema) AS schema_version

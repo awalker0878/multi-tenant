@@ -1,0 +1,4482 @@
+{
+  "acceptance": "NOT_REVIEWED",
+  "boundaries": [
+    {
+      "at": "2026-10-04T20:56:59.806692+00:00",
+      "database": "source",
+      "fixture_writer_enabled": true,
+      "meaning": "Fixture PostgreSQL role gate only; admin bypass remains, no native fencing claim"
+    },
+    {
+      "at": "2026-10-04T20:57:00.041099+00:00",
+      "database": "source",
+      "fixture_writer_enabled": false,
+      "meaning": "Fixture PostgreSQL role gate only; admin bypass remains, no native fencing claim"
+    },
+    {
+      "at": "2026-10-04T20:57:02.534439+00:00",
+      "database": "source",
+      "fixture_writer_enabled": true,
+      "meaning": "Fixture PostgreSQL role gate only; admin bypass remains, no native fencing claim"
+    },
+    {
+      "at": "2026-10-04T20:57:02.892458+00:00",
+      "database": "source",
+      "fixture_writer_enabled": false,
+      "meaning": "Fixture PostgreSQL role gate only; admin bypass remains, no native fencing claim"
+    },
+    {
+      "at": "2026-10-04T20:57:04.450560+00:00",
+      "database": "target",
+      "fixture_writer_enabled": true,
+      "meaning": "Fixture PostgreSQL role gate only; admin bypass remains, no native fencing claim"
+    },
+    {
+      "at": "2026-10-04T20:57:04.572362+00:00",
+      "database": "target",
+      "known_target_write_accepted": true,
+      "marker": "known_target_write"
+    },
+    {
+      "at": "2026-10-04T20:57:04.691999+00:00",
+      "database": "target",
+      "fixture_writer_enabled": false,
+      "meaning": "Fixture PostgreSQL role gate only; admin bypass remains, no native fencing claim"
+    },
+    {
+      "at": "2026-10-04T20:57:06.427827+00:00",
+      "database": "recovery",
+      "fixture_writer_enabled": true,
+      "meaning": "Fixture PostgreSQL role gate only; admin bypass remains, no native fencing claim"
+    },
+    {
+      "at": "2026-10-04T20:57:06.925096+00:00",
+      "database": "recovery",
+      "fixture_writer_enabled": false,
+      "meaning": "Fixture PostgreSQL role gate only; admin bypass remains, no native fencing claim"
+    }
+  ],
+  "candidate": {
+    "database_encoding": "UTF8",
+    "database_locale": "C",
+    "expected_server_version_num": "180006",
+    "image": "docker.io/library/postgres:18.6-bookworm",
+    "platform": "linux/amd64",
+    "schema_version": 1,
+    "scope": "Disposable Permit Desk database and attachment experiment; no native route qualification",
+    "sources": [
+      "https://hub.docker.com/_/postgres",
+      "https://www.postgresql.org/docs/18/app-pgdump.html",
+      "https://www.postgresql.org/docs/18/app-pgrestore.html"
+    ]
+  },
+  "captures": [
+    {
+      "archive_sha256": "964c8fbe441b5c341bd37a1c388f3a7af7f74ab8d187502638b7935045fe19d5",
+      "bytes": 10804,
+      "database": "source",
+      "evidence_envelope": "initial-capture-bundle.json",
+      "manifest_sha256": "7a51765b8b350d4b1d78844b4f26a1017c43278151b625e1022a75d67c183f25",
+      "name": "initial-capture"
+    },
+    {
+      "archive_sha256": "292bc9b67ea79d9399cb3ba1120c5d16b60c78b83b3db7c7729f13d93e493521",
+      "bytes": 10982,
+      "database": "source",
+      "evidence_envelope": "final-capture-bundle.json",
+      "manifest_sha256": "0f99612cbb60d0d3215c6da393d37f250162062d594eef5541f2a08cea1f5e4c",
+      "name": "final-capture"
+    },
+    {
+      "archive_sha256": "556ac61a1f0183adc34d04a9425ff12694d52da0fac70b79629ce7f27f7fffdb",
+      "bytes": 11800,
+      "database": "target",
+      "evidence_envelope": "post-write-capture-bundle.json",
+      "manifest_sha256": "32df930b847af2d7af97c603fd8121754a303caadbf86bdf25dd682dd2137c5c",
+      "name": "post-write-capture"
+    }
+  ],
+  "checks": [
+    {
+      "actual": "LOCK_IMMUTABLE_REPOSITORY_REQUIRED",
+      "expected": "LOCK_IMMUTABLE_REPOSITORY_REQUIRED",
+      "name": "lock-reject-mutable-reference",
+      "result": "PASS"
+    },
+    {
+      "actual": "LOCK_CANDIDATE_MISMATCH",
+      "expected": "LOCK_CANDIDATE_MISMATCH",
+      "name": "lock-reject-changed-input",
+      "result": "PASS"
+    },
+    {
+      "actual": "LOCK_SELECTION_MISMATCH",
+      "expected": "LOCK_SELECTION_MISMATCH",
+      "name": "lock-reject-changed-platform",
+      "result": "PASS"
+    },
+    {
+      "actual": [
+        "linux",
+        "amd64"
+      ],
+      "expected": [
+        "linux",
+        "amd64"
+      ],
+      "name": "image-platform",
+      "result": "PASS"
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "name": "nonroot-postgres-uid",
+      "result": "PASS"
+    },
+    {
+      "actual": "180006",
+      "expected": "180006",
+      "name": "exact-postgres-version",
+      "result": "PASS"
+    },
+    {
+      "actual": "none",
+      "expected": "none",
+      "name": "network-none",
+      "result": "PASS"
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "name": "no-published-ports",
+      "result": "PASS"
+    },
+    {
+      "actual": "",
+      "expected": "",
+      "name": "postgres-no-tcp-listener",
+      "result": "PASS"
+    },
+    {
+      "actual": "5047444d50",
+      "expected": "5047444d50",
+      "name": "initial-capture-postgres-archive-header",
+      "result": "PASS"
+    },
+    {
+      "actual": {
+        "attachments": [
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "expected": {
+        "attachments": [
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "name": "initial-capture-stable-source-records",
+      "result": "PASS"
+    },
+    {
+      "actual": [
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "expected": [
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "name": "initial-capture-stable-source-attachment-set",
+      "result": "PASS"
+    },
+    {
+      "actual": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "expected": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "name": "initial-capture-stable-source-tenant_a_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "initial-capture-stable-source-tenant_a_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "initial-capture-stable-source-tenant_a_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "expected": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "name": "initial-capture-stable-source-tenant_a_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "initial-capture-stable-source-tenant_a_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "initial-capture-stable-source-tenant_a_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "expected": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "name": "initial-capture-stable-source-tenant_b_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "initial-capture-stable-source-tenant_b_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "initial-capture-stable-source-tenant_b_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "expected": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "name": "initial-capture-stable-source-tenant_b_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "initial-capture-stable-source-tenant_b_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "initial-capture-stable-source-tenant_b_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "0",
+      "expected": "0",
+      "name": "initial-capture-stable-source-no-orphans",
+      "result": "PASS"
+    },
+    {
+      "actual": "BUNDLE_ARTIFACT_DIGEST_MISMATCH:database.dump",
+      "expected": "BUNDLE_ARTIFACT_DIGEST_MISMATCH:database.dump",
+      "name": "corrupted-dump-exact-rejection",
+      "result": "PASS"
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "name": "corrupted-dump-before-database-create",
+      "result": "PASS"
+    },
+    {
+      "actual": "BUNDLE_ARTIFACT_SET_MISMATCH",
+      "expected": "BUNDLE_ARTIFACT_SET_MISMATCH",
+      "name": "missing-attachment-exact-rejection",
+      "result": "PASS"
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "name": "missing-attachment-before-database-create",
+      "result": "PASS"
+    },
+    {
+      "actual": "BUNDLE_ARTIFACT_SET_MISMATCH",
+      "expected": "BUNDLE_ARTIFACT_SET_MISMATCH",
+      "name": "unexpected-file-exact-rejection",
+      "result": "PASS"
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "name": "unexpected-file-before-database-create",
+      "result": "PASS"
+    },
+    {
+      "actual": "BUNDLE_MANIFEST_DIGEST_MISMATCH",
+      "expected": "BUNDLE_MANIFEST_DIGEST_MISMATCH",
+      "name": "modified-manifest-exact-rejection",
+      "result": "PASS"
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "name": "modified-manifest-before-database-create",
+      "result": "PASS"
+    },
+    {
+      "actual": {
+        "attachments": [
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "expected": {
+        "attachments": [
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "name": "initial-restore-verify-records",
+      "result": "PASS"
+    },
+    {
+      "actual": [
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "expected": [
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "name": "initial-restore-verify-attachment-set",
+      "result": "PASS"
+    },
+    {
+      "actual": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "expected": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "name": "initial-restore-verify-tenant_a_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "initial-restore-verify-tenant_a_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "initial-restore-verify-tenant_a_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "expected": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "name": "initial-restore-verify-tenant_a_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "initial-restore-verify-tenant_a_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "initial-restore-verify-tenant_a_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "expected": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "name": "initial-restore-verify-tenant_b_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "initial-restore-verify-tenant_b_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "initial-restore-verify-tenant_b_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "expected": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "name": "initial-restore-verify-tenant_b_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "initial-restore-verify-tenant_b_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "initial-restore-verify-tenant_b_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "0",
+      "expected": "0",
+      "name": "initial-restore-verify-no-orphans",
+      "result": "PASS"
+    },
+    {
+      "actual": {
+        "attachments": [
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "expected": {
+        "attachments": [
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "name": "after-negative-relationship-records",
+      "result": "PASS"
+    },
+    {
+      "actual": [
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "expected": [
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "name": "after-negative-relationship-attachment-set",
+      "result": "PASS"
+    },
+    {
+      "actual": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "expected": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "name": "after-negative-relationship-tenant_a_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "after-negative-relationship-tenant_a_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "after-negative-relationship-tenant_a_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "expected": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "name": "after-negative-relationship-tenant_a_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "after-negative-relationship-tenant_a_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "after-negative-relationship-tenant_a_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "expected": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "name": "after-negative-relationship-tenant_b_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "after-negative-relationship-tenant_b_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "after-negative-relationship-tenant_b_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "expected": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "name": "after-negative-relationship-tenant_b_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "after-negative-relationship-tenant_b_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "after-negative-relationship-tenant_b_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "0",
+      "expected": "0",
+      "name": "after-negative-relationship-no-orphans",
+      "result": "PASS"
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "name": "pre-return-target-never-enabled",
+      "result": "PASS"
+    },
+    {
+      "actual": "1",
+      "expected": "1",
+      "name": "source-return-write-observed",
+      "result": "PASS"
+    },
+    {
+      "actual": "5047444d50",
+      "expected": "5047444d50",
+      "name": "final-capture-postgres-archive-header",
+      "result": "PASS"
+    },
+    {
+      "actual": {
+        "attachments": [
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Accepted after pre-target-write return",
+            "marker": "source_return_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "expected": {
+        "attachments": [
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Accepted after pre-target-write return",
+            "marker": "source_return_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "name": "final-capture-stable-source-records",
+      "result": "PASS"
+    },
+    {
+      "actual": [
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "expected": [
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "name": "final-capture-stable-source-attachment-set",
+      "result": "PASS"
+    },
+    {
+      "actual": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "expected": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "name": "final-capture-stable-source-tenant_a_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "final-capture-stable-source-tenant_a_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "final-capture-stable-source-tenant_a_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "expected": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "name": "final-capture-stable-source-tenant_a_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "final-capture-stable-source-tenant_a_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "final-capture-stable-source-tenant_a_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "expected": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "name": "final-capture-stable-source-tenant_b_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "final-capture-stable-source-tenant_b_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "final-capture-stable-source-tenant_b_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "expected": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "name": "final-capture-stable-source-tenant_b_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "final-capture-stable-source-tenant_b_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "final-capture-stable-source-tenant_b_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "0",
+      "expected": "0",
+      "name": "final-capture-stable-source-no-orphans",
+      "result": "PASS"
+    },
+    {
+      "actual": {
+        "attachments": [
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Accepted after pre-target-write return",
+            "marker": "source_return_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "expected": {
+        "attachments": [
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Accepted after pre-target-write return",
+            "marker": "source_return_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "name": "final-restore-verify-records",
+      "result": "PASS"
+    },
+    {
+      "actual": [
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "expected": [
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "name": "final-restore-verify-attachment-set",
+      "result": "PASS"
+    },
+    {
+      "actual": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "expected": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "name": "final-restore-verify-tenant_a_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "final-restore-verify-tenant_a_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "final-restore-verify-tenant_a_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "expected": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "name": "final-restore-verify-tenant_a_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "final-restore-verify-tenant_a_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "final-restore-verify-tenant_a_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "expected": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "name": "final-restore-verify-tenant_b_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "final-restore-verify-tenant_b_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "final-restore-verify-tenant_b_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "expected": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "name": "final-restore-verify-tenant_b_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "final-restore-verify-tenant_b_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "final-restore-verify-tenant_b_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "0",
+      "expected": "0",
+      "name": "final-restore-verify-no-orphans",
+      "result": "PASS"
+    },
+    {
+      "actual": "0",
+      "expected": "0",
+      "name": "retained-source-lacks-target-write",
+      "result": "PASS"
+    },
+    {
+      "actual": "5047444d50",
+      "expected": "5047444d50",
+      "name": "post-write-capture-postgres-archive-header",
+      "result": "PASS"
+    },
+    {
+      "actual": {
+        "attachments": [
+          {
+            "attachment_id": "known_target_attachment",
+            "bytes": 68,
+            "file_mode": "0640",
+            "path": "tenant_a/known-target-write.txt",
+            "permit_id": "known_target_permit",
+            "sha256": "07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "known_target_permit",
+            "status": "approved",
+            "tenant_id": "tenant_a",
+            "title": "Known target write"
+          },
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Must survive clean-database recovery",
+            "marker": "known_target_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Accepted after pre-target-write return",
+            "marker": "source_return_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "expected": {
+        "attachments": [
+          {
+            "attachment_id": "known_target_attachment",
+            "bytes": 68,
+            "file_mode": "0640",
+            "path": "tenant_a/known-target-write.txt",
+            "permit_id": "known_target_permit",
+            "sha256": "07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "known_target_permit",
+            "status": "approved",
+            "tenant_id": "tenant_a",
+            "title": "Known target write"
+          },
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Must survive clean-database recovery",
+            "marker": "known_target_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Accepted after pre-target-write return",
+            "marker": "source_return_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "name": "post-write-capture-stable-source-records",
+      "result": "PASS"
+    },
+    {
+      "actual": [
+        "tenant_a/known-target-write.txt",
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "expected": [
+        "tenant_a/known-target-write.txt",
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "name": "post-write-capture-stable-source-attachment-set",
+      "result": "PASS"
+    },
+    {
+      "actual": "07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3",
+      "expected": "07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3",
+      "name": "post-write-capture-stable-source-known_target_attachment-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 68,
+      "expected": 68,
+      "name": "post-write-capture-stable-source-known_target_attachment-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "post-write-capture-stable-source-known_target_attachment-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "expected": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "name": "post-write-capture-stable-source-tenant_a_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "post-write-capture-stable-source-tenant_a_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "post-write-capture-stable-source-tenant_a_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "expected": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "name": "post-write-capture-stable-source-tenant_a_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "post-write-capture-stable-source-tenant_a_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "post-write-capture-stable-source-tenant_a_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "expected": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "name": "post-write-capture-stable-source-tenant_b_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "post-write-capture-stable-source-tenant_b_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "post-write-capture-stable-source-tenant_b_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "expected": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "name": "post-write-capture-stable-source-tenant_b_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "post-write-capture-stable-source-tenant_b_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "post-write-capture-stable-source-tenant_b_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "0",
+      "expected": "0",
+      "name": "post-write-capture-stable-source-no-orphans",
+      "result": "PASS"
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "name": "known-target-write-captured",
+      "result": "PASS"
+    },
+    {
+      "actual": {
+        "attachments": [
+          {
+            "attachment_id": "known_target_attachment",
+            "bytes": 68,
+            "file_mode": "0640",
+            "path": "tenant_a/known-target-write.txt",
+            "permit_id": "known_target_permit",
+            "sha256": "07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "known_target_permit",
+            "status": "approved",
+            "tenant_id": "tenant_a",
+            "title": "Known target write"
+          },
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Must survive clean-database recovery",
+            "marker": "known_target_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Accepted after pre-target-write return",
+            "marker": "source_return_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "expected": {
+        "attachments": [
+          {
+            "attachment_id": "known_target_attachment",
+            "bytes": 68,
+            "file_mode": "0640",
+            "path": "tenant_a/known-target-write.txt",
+            "permit_id": "known_target_permit",
+            "sha256": "07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_1.txt",
+            "permit_id": "tenant_a_permit_1",
+            "sha256": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_a_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_a/tenant_a_permit_2.txt",
+            "permit_id": "tenant_a_permit_2",
+            "sha256": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_1",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_1.txt",
+            "permit_id": "tenant_b_permit_1",
+            "sha256": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+            "tenant_id": "tenant_b"
+          },
+          {
+            "attachment_id": "tenant_b_attachment_2",
+            "bytes": 86,
+            "file_mode": "0640",
+            "path": "tenant_b/tenant_b_permit_2.txt",
+            "permit_id": "tenant_b_permit_2",
+            "sha256": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "permits": [
+          {
+            "permit_id": "known_target_permit",
+            "status": "approved",
+            "tenant_id": "tenant_a",
+            "title": "Known target write"
+          },
+          {
+            "permit_id": "tenant_a_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_a_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_a",
+            "title": "Synthetic permit 2"
+          },
+          {
+            "permit_id": "tenant_b_permit_1",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 1"
+          },
+          {
+            "permit_id": "tenant_b_permit_2",
+            "status": "submitted",
+            "tenant_id": "tenant_b",
+            "title": "Synthetic permit 2"
+          }
+        ],
+        "tenants": [
+          {
+            "name": "Synthetic A",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "name": "Synthetic B",
+            "tenant_id": "tenant_b"
+          }
+        ],
+        "write_markers": [
+          {
+            "description": "Must survive clean-database recovery",
+            "marker": "known_target_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Synthetic source capture boundary",
+            "marker": "last_source_write",
+            "tenant_id": "tenant_a"
+          },
+          {
+            "description": "Accepted after pre-target-write return",
+            "marker": "source_return_write",
+            "tenant_id": "tenant_a"
+          }
+        ]
+      },
+      "name": "post-write-recovery-verify-records",
+      "result": "PASS"
+    },
+    {
+      "actual": [
+        "tenant_a/known-target-write.txt",
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "expected": [
+        "tenant_a/known-target-write.txt",
+        "tenant_a/tenant_a_permit_1.txt",
+        "tenant_a/tenant_a_permit_2.txt",
+        "tenant_b/tenant_b_permit_1.txt",
+        "tenant_b/tenant_b_permit_2.txt"
+      ],
+      "name": "post-write-recovery-verify-attachment-set",
+      "result": "PASS"
+    },
+    {
+      "actual": "07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3",
+      "expected": "07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3",
+      "name": "post-write-recovery-verify-known_target_attachment-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 68,
+      "expected": 68,
+      "name": "post-write-recovery-verify-known_target_attachment-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "post-write-recovery-verify-known_target_attachment-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "expected": "37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767",
+      "name": "post-write-recovery-verify-tenant_a_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "post-write-recovery-verify-tenant_a_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "post-write-recovery-verify-tenant_a_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "expected": "651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb",
+      "name": "post-write-recovery-verify-tenant_a_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "post-write-recovery-verify-tenant_a_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "post-write-recovery-verify-tenant_a_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "expected": "94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e",
+      "name": "post-write-recovery-verify-tenant_b_attachment_1-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "post-write-recovery-verify-tenant_b_attachment_1-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "post-write-recovery-verify-tenant_b_attachment_1-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "expected": "e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a",
+      "name": "post-write-recovery-verify-tenant_b_attachment_2-digest",
+      "result": "PASS"
+    },
+    {
+      "actual": 86,
+      "expected": 86,
+      "name": "post-write-recovery-verify-tenant_b_attachment_2-bytes",
+      "result": "PASS"
+    },
+    {
+      "actual": "0640",
+      "expected": "0640",
+      "name": "post-write-recovery-verify-tenant_b_attachment_2-mode",
+      "result": "PASS"
+    },
+    {
+      "actual": "0",
+      "expected": "0",
+      "name": "post-write-recovery-verify-no-orphans",
+      "result": "PASS"
+    },
+    {
+      "actual": "1",
+      "expected": "1",
+      "name": "known-target-write-recovered",
+      "result": "PASS"
+    },
+    {
+      "actual": "1",
+      "expected": "1",
+      "name": "recovery-new-write-observed",
+      "result": "PASS"
+    },
+    {
+      "actual": "07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3",
+      "expected": "07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3",
+      "name": "recovery-known-attachment-preserved",
+      "result": "PASS"
+    }
+  ],
+  "cleanup": "CONTAINER_AND_DISPOSABLE_DATA_REMOVED",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "version"
+      ],
+      "duration_seconds": 0.115,
+      "exit_code": 0,
+      "label": "docker-version",
+      "log": "001-docker-version.log",
+      "log_sha256": "58d5180149fd3334dbb3ff73de521946336e4052a1b769cb475f72486c934b1b",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:48.138311+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "version"
+      ],
+      "duration_seconds": 0.265,
+      "exit_code": 0,
+      "label": "buildx-version",
+      "log": "002-buildx-version.log",
+      "log_sha256": "d6a1fdd95fd9b2615b359b42e82829b1cad6bb22202cff355e55be8242e8c395",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:48.253469+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "pull",
+        "--platform",
+        "linux/amd64",
+        "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d"
+      ],
+      "duration_seconds": 8.485,
+      "exit_code": 0,
+      "label": "pull-postgres",
+      "log": "003-pull-postgres.log",
+      "log_sha256": "c400ac7665b22a935ed0e92324429fabece319b4280051ee32afad7d34b291f3",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:48.520270+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d"
+      ],
+      "duration_seconds": 0.016,
+      "exit_code": 0,
+      "label": "image-inspect",
+      "log": "004-image-inspect.log",
+      "log_sha256": "7f1463ddd1758ffea514b727d7c2ab64f2449f58d63d61a6b870ffb801c1273d",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:57.006475+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--entrypoint",
+        "id",
+        "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+        "-u",
+        "postgres"
+      ],
+      "duration_seconds": 0.265,
+      "exit_code": 0,
+      "label": "postgres-uid",
+      "log": "005-postgres-uid.log",
+      "log_sha256": "94d59b76e5b10f74d285313f8c69cc4799f538481dbc05edb8dc62f7a59f6eab",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:57.023975+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--entrypoint",
+        "id",
+        "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+        "-g",
+        "postgres"
+      ],
+      "duration_seconds": 0.164,
+      "exit_code": 0,
+      "label": "postgres-gid",
+      "log": "006-postgres-gid.log",
+      "log_sha256": "94d59b76e5b10f74d285313f8c69cc4799f538481dbc05edb8dc62f7a59f6eab",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:57.290005+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "p00-restore-62f4e6c7f888",
+        "--network",
+        "none",
+        "--user",
+        "999:999",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--pids-limit",
+        "128",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--read-only",
+        "--tmpfs",
+        "/var/lib/postgresql:rw,nosuid,nodev,size=256m,uid=999,gid=999",
+        "--tmpfs",
+        "/var/run/postgresql:rw,nosuid,nodev,size=16m,uid=999,gid=999",
+        "--tmpfs",
+        "/tmp:rw,nosuid,nodev,size=64m,uid=999,gid=999",
+        "-e",
+        "POSTGRES_HOST_AUTH_METHOD=trust",
+        "-e",
+        "POSTGRES_INITDB_ARGS=--encoding=UTF8 --locale=C",
+        "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+        "postgres",
+        "-c",
+        "listen_addresses=",
+        "-c",
+        "max_connections=20"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "start-postgres",
+      "log": "007-start-postgres.log",
+      "log_sha256": "2596e08da4899eb8ad79e5642d851fbbb5642d73ebb005922599d459b98924be",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:57.456270+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "p00-restore-62f4e6c7f888",
+        "sh",
+        "-c",
+        "i=0; until [ \"$(cat /proc/1/comm)\" = postgres ] && pg_isready -U postgres -d postgres >/dev/null 2>&1; do i=$((i+1)); [ \"$i\" -lt 60 ] || exit 1; sleep 1; done"
+      ],
+      "duration_seconds": 1.117,
+      "exit_code": 0,
+      "label": "wait-postgres",
+      "log": "008-wait-postgres.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:57.571637+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "server-version-num",
+      "log": "009-server-version-num.log",
+      "log_sha256": "006d4a6d9f28eaba51e60a551ca1140858fc9b663dd9982a46f611e93f3e6eb9",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:58.690162+00:00",
+      "stdin": "SHOW server_version_num;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "p00-restore-62f4e6c7f888",
+        "sh",
+        "-c",
+        "id; postgres --version; psql --version; pg_dump --version; pg_restore --version; cat /etc/os-release"
+      ],
+      "duration_seconds": 0.165,
+      "exit_code": 0,
+      "label": "server-runtime",
+      "log": "010-server-runtime.log",
+      "log_sha256": "ab08c6c82767403ac445429e8ffcd7b625a1324596879ee1fa6f7b2b7810111b",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:58.806512+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "p00-restore-62f4e6c7f888",
+        "dpkg-query",
+        "-W",
+        "-f=${Package}\t${Version}\t${Architecture}\n"
+      ],
+      "duration_seconds": 0.064,
+      "exit_code": 0,
+      "label": "os-packages",
+      "log": "011-os-packages.log",
+      "log_sha256": "e21cb3bc8e6657f9f20026a4e4c9a37e5ae902ac607217829a374530516a2417",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:58.972426+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "inspect",
+        "p00-restore-62f4e6c7f888"
+      ],
+      "duration_seconds": 0.016,
+      "exit_code": 0,
+      "label": "container-inspect",
+      "log": "012-container-inspect.log",
+      "log_sha256": "27cd978ed4ef6c52fdc729919848619d64a5fa309ad278a838053b73d5d2e70c",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:59.037946+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "listen-addresses",
+      "log": "013-listen-addresses.log",
+      "log_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:59.057098+00:00",
+      "stdin": "SHOW listen_addresses;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "create-fixture-roles",
+      "log": "014-create-fixture-roles.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:59.174128+00:00",
+      "stdin": "CREATE ROLE source_writer NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;\nCREATE ROLE target_writer NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;\nCREATE ROLE recovery_writer NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.165,
+      "exit_code": 0,
+      "label": "create-source",
+      "log": "015-create-source.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:59.290418+00:00",
+      "stdin": "CREATE DATABASE source TEMPLATE template0 ENCODING 'UTF8' LC_COLLATE 'C' LC_CTYPE 'C';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "schema-source",
+      "log": "016-schema-source.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:59.457034+00:00",
+      "stdin": "CREATE TABLE tenants (tenant_id text PRIMARY KEY, name text NOT NULL);\nCREATE TABLE permits (\n    tenant_id text NOT NULL REFERENCES tenants(tenant_id),\n    permit_id text NOT NULL,\n    title text NOT NULL,\n    status text NOT NULL CHECK (status IN ('submitted', 'approved')),\n    PRIMARY KEY (tenant_id, permit_id)\n);\nCREATE TABLE attachments (\n    tenant_id text NOT NULL,\n    attachment_id text NOT NULL,\n    permit_id text NOT NULL,\n    path text NOT NULL UNIQUE,\n    sha256 text NOT NULL CHECK (length(sha256) = 64),\n    bytes integer NOT NULL CHECK (bytes >= 0),\n    file_mode text NOT NULL CHECK (file_mode = '0640'),\n    PRIMARY KEY (tenant_id, attachment_id),\n    FOREIGN KEY (tenant_id, permit_id) REFERENCES permits(tenant_id, permit_id)\n);\nCREATE TABLE write_markers (\n    marker text PRIMARY KEY,\n    tenant_id text NOT NULL REFERENCES tenants(tenant_id),\n    description text NOT NULL\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "seed-source",
+      "log": "017-seed-source.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:59.574049+00:00",
+      "stdin": "INSERT INTO tenants VALUES ('tenant_a', 'Synthetic A'), ('tenant_b', 'Synthetic B');\nINSERT INTO permits VALUES ('tenant_a', 'tenant_a_permit_1', 'Synthetic permit 1', 'submitted');\nINSERT INTO attachments VALUES ('tenant_a', 'tenant_a_attachment_1', 'tenant_a_permit_1', 'tenant_a/tenant_a_permit_1.txt', '37b63b815740740265cea480dfe1f8d6d4e46f557225c6a6fbedbbc17948f767', 86, '0640');\nINSERT INTO permits VALUES ('tenant_a', 'tenant_a_permit_2', 'Synthetic permit 2', 'submitted');\nINSERT INTO attachments VALUES ('tenant_a', 'tenant_a_attachment_2', 'tenant_a_permit_2', 'tenant_a/tenant_a_permit_2.txt', '651c1f23998bca83b756e96243500ae227dc15576b14350229385db9a85162fb', 86, '0640');\nINSERT INTO permits VALUES ('tenant_b', 'tenant_b_permit_1', 'Synthetic permit 1', 'submitted');\nINSERT INTO attachments VALUES ('tenant_b', 'tenant_b_attachment_1', 'tenant_b_permit_1', 'tenant_b/tenant_b_permit_1.txt', '94294b59e386673f1be5df53740122c1e4e9e7361f8c4e2f9fd502d853bfde5e', 86, '0640');\nINSERT INTO permits VALUES ('tenant_b', 'tenant_b_permit_2', 'Synthetic permit 2', 'submitted');\nINSERT INTO attachments VALUES ('tenant_b', 'tenant_b_attachment_2', 'tenant_b_permit_2', 'tenant_b/tenant_b_permit_2.txt', 'e37813e10a09f3f97c0bf46306ecd963f01373aa24a798718208aad627005d4a', 86, '0640');\nINSERT INTO write_markers VALUES ('last_source_write', 'tenant_a', 'Synthetic source capture boundary');\nGRANT USAGE ON SCHEMA public TO source_writer; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO source_writer;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "enable-source",
+      "log": "018-enable-source.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:59.690351+00:00",
+      "stdin": "ALTER ROLE source_writer LOGIN;\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "source_writer",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.115,
+      "exit_code": 0,
+      "label": "source-writer-read",
+      "log": "019-source-writer-read.log",
+      "log_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:59.807775+00:00",
+      "stdin": "SELECT count(*) FROM permits;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "quiesce-source",
+      "log": "020-quiesce-source.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:56:59.924754+00:00",
+      "stdin": "ALTER ROLE source_writer NOLOGIN;\nSELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE usename = 'source_writer' AND pid <> pg_backend_pid();\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "source_writer",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 2,
+      "expected_diagnostic": "role \"source_writer\" is not permitted to log in",
+      "label": "source-write-denied",
+      "log": "021-source-write-denied.log",
+      "log_sha256": "82d6de692f8d56b21f36d5ad9a47cc2c3023046ac8b24d1c624d14dbe8df620f",
+      "result": "EXPECTED_REJECTION",
+      "started_at": "2026-10-04T20:57:00.041949+00:00",
+      "stdin": "INSERT INTO write_markers VALUES ('forbidden', 'tenant_a', 'must not commit');\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "initial-capture-snapshot",
+      "log": "022-initial-capture-snapshot.log",
+      "log_sha256": "2d5781d6378079211184cf30f38a19ca166ff86112c28116479caa8d7efe1f3d",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:00.158544+00:00",
+      "stdin": "SELECT json_build_object(\n    'tenants', (SELECT json_agg(t ORDER BY tenant_id) FROM tenants t),\n    'permits', (SELECT json_agg(p ORDER BY tenant_id, permit_id) FROM permits p),\n    'attachments', (SELECT json_agg(a ORDER BY tenant_id, attachment_id) FROM attachments a),\n    'write_markers', (SELECT json_agg(w ORDER BY marker) FROM write_markers w)\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "p00-restore-62f4e6c7f888",
+        "pg_dump",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source",
+        "--format=custom",
+        "--no-owner",
+        "--no-acl"
+      ],
+      "duration_seconds": 0.165,
+      "exit_code": 0,
+      "label": "initial-capture-pg-dump",
+      "log": "023-initial-capture-pg-dump.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:00.275569+00:00",
+      "stdout_artifact": {
+        "base64_evidence": "023-initial-capture-pg-dump-stdout.base64.txt",
+        "bytes": 6858,
+        "complete": true,
+        "sha256": "964c8fbe441b5c341bd37a1c388f3a7af7f74ab8d187502638b7935045fe19d5"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "initial-capture-stable-source-snapshot",
+      "log": "024-initial-capture-stable-source-snapshot.log",
+      "log_sha256": "2d5781d6378079211184cf30f38a19ca166ff86112c28116479caa8d7efe1f3d",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:00.447936+00:00",
+      "stdin": "SELECT json_build_object(\n    'tenants', (SELECT json_agg(t ORDER BY tenant_id) FROM tenants t),\n    'permits', (SELECT json_agg(p ORDER BY tenant_id, permit_id) FROM permits p),\n    'attachments', (SELECT json_agg(a ORDER BY tenant_id, attachment_id) FROM attachments a),\n    'write_markers', (SELECT json_agg(w ORDER BY marker) FROM write_markers w)\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "initial-capture-stable-source-relationships",
+      "log": "025-initial-capture-stable-source-relationships.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:00.579441+00:00",
+      "stdin": "SELECT count(*) FROM attachments a LEFT JOIN permits p ON (a.tenant_id, a.permit_id) = (p.tenant_id, p.permit_id) WHERE p.permit_id IS NULL;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "corrupted-dump-no-target",
+      "log": "026-corrupted-dump-no-target.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:00.704632+00:00",
+      "stdin": "SELECT count(*) FROM pg_database WHERE datname = 'rejected';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "missing-attachment-no-target",
+      "log": "027-missing-attachment-no-target.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:00.826502+00:00",
+      "stdin": "SELECT count(*) FROM pg_database WHERE datname = 'rejected';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "unexpected-file-no-target",
+      "log": "028-unexpected-file-no-target.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:00.948201+00:00",
+      "stdin": "SELECT count(*) FROM pg_database WHERE datname = 'rejected';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "modified-manifest-no-target",
+      "log": "029-modified-manifest-no-target.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:01.070259+00:00",
+      "stdin": "SELECT count(*) FROM pg_database WHERE datname = 'rejected';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "initial-restore-check-absent",
+      "log": "030-initial-restore-check-absent.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:01.190816+00:00",
+      "stdin": "SELECT count(*) FROM pg_database WHERE datname = 'target';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "initial-restore-create",
+      "log": "031-initial-restore-create.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:01.307956+00:00",
+      "stdin": "CREATE DATABASE target TEMPLATE template0 ENCODING 'UTF8' LC_COLLATE 'C' LC_CTYPE 'C';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "pg_restore",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target",
+        "--exit-on-error",
+        "--single-transaction",
+        "--no-owner",
+        "--no-acl"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "initial-restore-pg-restore",
+      "log": "032-initial-restore-pg-restore.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:01.425028+00:00",
+      "stdin_file_bytes": 6858,
+      "stdin_file_sha256": "964c8fbe441b5c341bd37a1c388f3a7af7f74ab8d187502638b7935045fe19d5"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "initial-restore-writer-grants",
+      "log": "033-initial-restore-writer-grants.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:01.543104+00:00",
+      "stdin": "GRANT USAGE ON SCHEMA public TO target_writer; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO target_writer;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "initial-restore-verify-snapshot",
+      "log": "034-initial-restore-verify-snapshot.log",
+      "log_sha256": "2d5781d6378079211184cf30f38a19ca166ff86112c28116479caa8d7efe1f3d",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:01.660615+00:00",
+      "stdin": "SELECT json_build_object(\n    'tenants', (SELECT json_agg(t ORDER BY tenant_id) FROM tenants t),\n    'permits', (SELECT json_agg(p ORDER BY tenant_id, permit_id) FROM permits p),\n    'attachments', (SELECT json_agg(a ORDER BY tenant_id, attachment_id) FROM attachments a),\n    'write_markers', (SELECT json_agg(w ORDER BY marker) FROM write_markers w)\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "initial-restore-verify-relationships",
+      "log": "035-initial-restore-verify-relationships.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:01.799576+00:00",
+      "stdin": "SELECT count(*) FROM attachments a LEFT JOIN permits p ON (a.tenant_id, a.permit_id) = (p.tenant_id, p.permit_id) WHERE p.permit_id IS NULL;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "target_writer",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 2,
+      "expected_diagnostic": "role \"target_writer\" is not permitted to log in",
+      "label": "target-quarantine-write-denied",
+      "log": "036-target-quarantine-write-denied.log",
+      "log_sha256": "016bef8724f29d3a2bd0625fdfdb06e1bc577f5cd431a0f72ddb35ab3e93bf70",
+      "result": "EXPECTED_REJECTION",
+      "started_at": "2026-10-04T20:57:01.919374+00:00",
+      "stdin": "SELECT 1;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 3,
+      "expected_diagnostic": "violates foreign key constraint \"attachments_tenant_id_permit_id_fkey\"",
+      "label": "cross-tenant-relationship-denied",
+      "log": "037-cross-tenant-relationship-denied.log",
+      "log_sha256": "e3d61ca50f3d7e31926472ae211fad3afffa63974325893461226c8144447a57",
+      "result": "EXPECTED_REJECTION",
+      "started_at": "2026-10-04T20:57:02.037016+00:00",
+      "stdin": "INSERT INTO attachments VALUES ('tenant_b', 'foreign', 'tenant_a_permit_1', 'invalid', repeat('0',64), 0, '0640');\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "after-negative-relationship-snapshot",
+      "log": "038-after-negative-relationship-snapshot.log",
+      "log_sha256": "2d5781d6378079211184cf30f38a19ca166ff86112c28116479caa8d7efe1f3d",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:02.154823+00:00",
+      "stdin": "SELECT json_build_object(\n    'tenants', (SELECT json_agg(t ORDER BY tenant_id) FROM tenants t),\n    'permits', (SELECT json_agg(p ORDER BY tenant_id, permit_id) FROM permits p),\n    'attachments', (SELECT json_agg(a ORDER BY tenant_id, attachment_id) FROM attachments a),\n    'write_markers', (SELECT json_agg(w ORDER BY marker) FROM write_markers w)\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "after-negative-relationship-relationships",
+      "log": "039-after-negative-relationship-relationships.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:02.294917+00:00",
+      "stdin": "SELECT count(*) FROM attachments a LEFT JOIN permits p ON (a.tenant_id, a.permit_id) = (p.tenant_id, p.permit_id) WHERE p.permit_id IS NULL;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.115,
+      "exit_code": 0,
+      "label": "enable-source",
+      "log": "040-enable-source.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:02.416171+00:00",
+      "stdin": "ALTER ROLE source_writer LOGIN;\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "source_writer",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "pre-target-write-source-return",
+      "log": "041-pre-target-write-source-return.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:02.536145+00:00",
+      "stdin": "INSERT INTO write_markers VALUES ('source_return_write', 'tenant_a', 'Accepted after pre-target-write return');\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "source-return-readback",
+      "log": "042-source-return-readback.log",
+      "log_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:02.654159+00:00",
+      "stdin": "SELECT count(*) FROM write_markers WHERE marker='source_return_write';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "quiesce-source",
+      "log": "043-quiesce-source.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:02.774242+00:00",
+      "stdin": "ALTER ROLE source_writer NOLOGIN;\nSELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE usename = 'source_writer' AND pid <> pg_backend_pid();\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "final-capture-snapshot",
+      "log": "044-final-capture-snapshot.log",
+      "log_sha256": "752dac6e9f373aa34c80c58b0006d079a31de2384ca052e72dda51ac4b4b6ddb",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:02.894388+00:00",
+      "stdin": "SELECT json_build_object(\n    'tenants', (SELECT json_agg(t ORDER BY tenant_id) FROM tenants t),\n    'permits', (SELECT json_agg(p ORDER BY tenant_id, permit_id) FROM permits p),\n    'attachments', (SELECT json_agg(a ORDER BY tenant_id, attachment_id) FROM attachments a),\n    'write_markers', (SELECT json_agg(w ORDER BY marker) FROM write_markers w)\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "p00-restore-62f4e6c7f888",
+        "pg_dump",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source",
+        "--format=custom",
+        "--no-owner",
+        "--no-acl"
+      ],
+      "duration_seconds": 0.165,
+      "exit_code": 0,
+      "label": "final-capture-pg-dump",
+      "log": "045-final-capture-pg-dump.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:03.013113+00:00",
+      "stdout_artifact": {
+        "base64_evidence": "045-final-capture-pg-dump-stdout.base64.txt",
+        "bytes": 6891,
+        "complete": true,
+        "sha256": "292bc9b67ea79d9399cb3ba1120c5d16b60c78b83b3db7c7729f13d93e493521"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "final-capture-stable-source-snapshot",
+      "log": "046-final-capture-stable-source-snapshot.log",
+      "log_sha256": "752dac6e9f373aa34c80c58b0006d079a31de2384ca052e72dda51ac4b4b6ddb",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:03.188116+00:00",
+      "stdin": "SELECT json_build_object(\n    'tenants', (SELECT json_agg(t ORDER BY tenant_id) FROM tenants t),\n    'permits', (SELECT json_agg(p ORDER BY tenant_id, permit_id) FROM permits p),\n    'attachments', (SELECT json_agg(a ORDER BY tenant_id, attachment_id) FROM attachments a),\n    'write_markers', (SELECT json_agg(w ORDER BY marker) FROM write_markers w)\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "final-capture-stable-source-relationships",
+      "log": "047-final-capture-stable-source-relationships.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:03.335621+00:00",
+      "stdin": "SELECT count(*) FROM attachments a LEFT JOIN permits p ON (a.tenant_id, a.permit_id) = (p.tenant_id, p.permit_id) WHERE p.permit_id IS NULL;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "discard-quarantined-target",
+      "log": "048-discard-quarantined-target.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:03.459827+00:00",
+      "stdin": "DROP DATABASE target;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "final-restore-check-absent",
+      "log": "049-final-restore-check-absent.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:03.581480+00:00",
+      "stdin": "SELECT count(*) FROM pg_database WHERE datname = 'target';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "final-restore-create",
+      "log": "050-final-restore-create.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:03.700507+00:00",
+      "stdin": "CREATE DATABASE target TEMPLATE template0 ENCODING 'UTF8' LC_COLLATE 'C' LC_CTYPE 'C';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "pg_restore",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target",
+        "--exit-on-error",
+        "--single-transaction",
+        "--no-owner",
+        "--no-acl"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "final-restore-pg-restore",
+      "log": "051-final-restore-pg-restore.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:03.819449+00:00",
+      "stdin_file_bytes": 6891,
+      "stdin_file_sha256": "292bc9b67ea79d9399cb3ba1120c5d16b60c78b83b3db7c7729f13d93e493521"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "final-restore-writer-grants",
+      "log": "052-final-restore-writer-grants.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:03.939447+00:00",
+      "stdin": "GRANT USAGE ON SCHEMA public TO target_writer; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO target_writer;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "final-restore-verify-snapshot",
+      "log": "053-final-restore-verify-snapshot.log",
+      "log_sha256": "752dac6e9f373aa34c80c58b0006d079a31de2384ca052e72dda51ac4b4b6ddb",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:04.058710+00:00",
+      "stdin": "SELECT json_build_object(\n    'tenants', (SELECT json_agg(t ORDER BY tenant_id) FROM tenants t),\n    'permits', (SELECT json_agg(p ORDER BY tenant_id, permit_id) FROM permits p),\n    'attachments', (SELECT json_agg(a ORDER BY tenant_id, attachment_id) FROM attachments a),\n    'write_markers', (SELECT json_agg(w ORDER BY marker) FROM write_markers w)\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "final-restore-verify-relationships",
+      "log": "054-final-restore-verify-relationships.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:04.209318+00:00",
+      "stdin": "SELECT count(*) FROM attachments a LEFT JOIN permits p ON (a.tenant_id, a.permit_id) = (p.tenant_id, p.permit_id) WHERE p.permit_id IS NULL;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "enable-target",
+      "log": "055-enable-target.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:04.331095+00:00",
+      "stdin": "ALTER ROLE target_writer LOGIN;\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "target_writer",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "known-target-write",
+      "log": "056-known-target-write.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:04.453055+00:00",
+      "stdin": "BEGIN; INSERT INTO permits VALUES ('tenant_a', 'known_target_permit', 'Known target write', 'approved'); INSERT INTO attachments VALUES ('tenant_a', 'known_target_attachment', 'known_target_permit', 'tenant_a/known-target-write.txt', '07f2d02d7b41b15c048433a640080e556f79c6351c96ebb7f43b82ba06a341f3', 68, '0640'); INSERT INTO write_markers VALUES ('known_target_write', 'tenant_a', 'Must survive clean-database recovery'); COMMIT;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "quiesce-target",
+      "log": "057-quiesce-target.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:04.572387+00:00",
+      "stdin": "ALTER ROLE target_writer NOLOGIN;\nSELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE usename = 'target_writer' AND pid <> pg_backend_pid();\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "source_writer",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 2,
+      "expected_diagnostic": "role \"source_writer\" is not permitted to log in",
+      "label": "retained-source-still-denied",
+      "log": "058-retained-source-still-denied.log",
+      "log_sha256": "82d6de692f8d56b21f36d5ad9a47cc2c3023046ac8b24d1c624d14dbe8df620f",
+      "result": "EXPECTED_REJECTION",
+      "started_at": "2026-10-04T20:57:04.694403+00:00",
+      "stdin": "SELECT 1;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "source"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "retained-source-marker",
+      "log": "059-retained-source-marker.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:04.814204+00:00",
+      "stdin": "SELECT count(*) FROM write_markers WHERE marker='known_target_write';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "post-write-capture-snapshot",
+      "log": "060-post-write-capture-snapshot.log",
+      "log_sha256": "63cf837681bc17a3450b463a8ddd373d7765e5cc7860cd35980096a9c0508819",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:04.936762+00:00",
+      "stdin": "SELECT json_build_object(\n    'tenants', (SELECT json_agg(t ORDER BY tenant_id) FROM tenants t),\n    'permits', (SELECT json_agg(p ORDER BY tenant_id, permit_id) FROM permits p),\n    'attachments', (SELECT json_agg(a ORDER BY tenant_id, attachment_id) FROM attachments a),\n    'write_markers', (SELECT json_agg(w ORDER BY marker) FROM write_markers w)\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "p00-restore-62f4e6c7f888",
+        "pg_dump",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target",
+        "--format=custom",
+        "--no-owner",
+        "--no-acl"
+      ],
+      "duration_seconds": 0.165,
+      "exit_code": 0,
+      "label": "post-write-capture-pg-dump",
+      "log": "061-post-write-capture-pg-dump.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:05.056615+00:00",
+      "stdout_artifact": {
+        "base64_evidence": "061-post-write-capture-pg-dump-stdout.base64.txt",
+        "bytes": 7035,
+        "complete": true,
+        "sha256": "556ac61a1f0183adc34d04a9425ff12694d52da0fac70b79629ce7f27f7fffdb"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "post-write-capture-stable-source-snapshot",
+      "log": "062-post-write-capture-stable-source-snapshot.log",
+      "log_sha256": "63cf837681bc17a3450b463a8ddd373d7765e5cc7860cd35980096a9c0508819",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:05.234513+00:00",
+      "stdin": "SELECT json_build_object(\n    'tenants', (SELECT json_agg(t ORDER BY tenant_id) FROM tenants t),\n    'permits', (SELECT json_agg(p ORDER BY tenant_id, permit_id) FROM permits p),\n    'attachments', (SELECT json_agg(a ORDER BY tenant_id, attachment_id) FROM attachments a),\n    'write_markers', (SELECT json_agg(w ORDER BY marker) FROM write_markers w)\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "target"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "post-write-capture-stable-source-relationships",
+      "log": "063-post-write-capture-stable-source-relationships.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:05.398180+00:00",
+      "stdin": "SELECT count(*) FROM attachments a LEFT JOIN permits p ON (a.tenant_id, a.permit_id) = (p.tenant_id, p.permit_id) WHERE p.permit_id IS NULL;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "post-write-recovery-check-absent",
+      "log": "064-post-write-recovery-check-absent.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:05.530287+00:00",
+      "stdin": "SELECT count(*) FROM pg_database WHERE datname = 'recovery';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.115,
+      "exit_code": 0,
+      "label": "post-write-recovery-create",
+      "log": "065-post-write-recovery-create.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:05.650493+00:00",
+      "stdin": "CREATE DATABASE recovery TEMPLATE template0 ENCODING 'UTF8' LC_COLLATE 'C' LC_CTYPE 'C';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "pg_restore",
+        "--username",
+        "postgres",
+        "--dbname",
+        "recovery",
+        "--exit-on-error",
+        "--single-transaction",
+        "--no-owner",
+        "--no-acl"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "post-write-recovery-pg-restore",
+      "log": "066-post-write-recovery-pg-restore.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:05.771080+00:00",
+      "stdin_file_bytes": 7035,
+      "stdin_file_sha256": "556ac61a1f0183adc34d04a9425ff12694d52da0fac70b79629ce7f27f7fffdb"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "recovery"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "post-write-recovery-writer-grants",
+      "log": "067-post-write-recovery-writer-grants.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:05.893724+00:00",
+      "stdin": "GRANT USAGE ON SCHEMA public TO recovery_writer; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO recovery_writer;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "recovery"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "post-write-recovery-verify-snapshot",
+      "log": "068-post-write-recovery-verify-snapshot.log",
+      "log_sha256": "63cf837681bc17a3450b463a8ddd373d7765e5cc7860cd35980096a9c0508819",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:06.014218+00:00",
+      "stdin": "SELECT json_build_object(\n    'tenants', (SELECT json_agg(t ORDER BY tenant_id) FROM tenants t),\n    'permits', (SELECT json_agg(p ORDER BY tenant_id, permit_id) FROM permits p),\n    'attachments', (SELECT json_agg(a ORDER BY tenant_id, attachment_id) FROM attachments a),\n    'write_markers', (SELECT json_agg(w ORDER BY marker) FROM write_markers w)\n);\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "recovery"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "post-write-recovery-verify-relationships",
+      "log": "069-post-write-recovery-verify-relationships.log",
+      "log_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:06.183185+00:00",
+      "stdin": "SELECT count(*) FROM attachments a LEFT JOIN permits p ON (a.tenant_id, a.permit_id) = (p.tenant_id, p.permit_id) WHERE p.permit_id IS NULL;\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "enable-recovery",
+      "log": "070-enable-recovery.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:06.306808+00:00",
+      "stdin": "ALTER ROLE recovery_writer LOGIN;\n\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "recovery_writer",
+        "--dbname",
+        "recovery"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "recovered-known-write",
+      "log": "071-recovered-known-write.log",
+      "log_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:06.430933+00:00",
+      "stdin": "SELECT count(*) FROM write_markers WHERE marker='known_target_write';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "recovery_writer",
+        "--dbname",
+        "recovery"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "recovered-service-write",
+      "log": "072-recovered-service-write.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:06.555602+00:00",
+      "stdin": "INSERT INTO write_markers VALUES ('recovery_write', 'tenant_b', 'Accepted on recovered database');\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "recovery"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "recovery-new-write-readback",
+      "log": "073-recovery-new-write-readback.log",
+      "log_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:06.676544+00:00",
+      "stdin": "SELECT count(*) FROM write_markers WHERE marker='recovery_write';\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "-i",
+        "p00-restore-62f4e6c7f888",
+        "psql",
+        "-X",
+        "-qAt",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--username",
+        "postgres",
+        "--dbname",
+        "postgres"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "quiesce-recovery",
+      "log": "074-quiesce-recovery.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:06.804035+00:00",
+      "stdin": "ALTER ROLE recovery_writer NOLOGIN;\nSELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE usename = 'recovery_writer' AND pid <> pg_backend_pid();\n"
+    },
+    {
+      "command": [
+        "docker",
+        "logs",
+        "p00-restore-62f4e6c7f888"
+      ],
+      "duration_seconds": 0.032,
+      "exit_code": 0,
+      "label": "postgres-final-log",
+      "log": "075-postgres-final-log.log",
+      "log_sha256": "483bc43f8e082bcf52afdba753549e4fa43696d607e85abcfa42284834ff5acf",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:06.928304+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "-f",
+        "-v",
+        "p00-restore-62f4e6c7f888"
+      ],
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "label": "cleanup-postgres",
+      "log": "076-cleanup-postgres.log",
+      "log_sha256": "4dee0164eb137908323937c4261f67f8b732dd9e4e019fa407ebc4ad8406ae57",
+      "result": "PASS",
+      "started_at": "2026-10-04T20:57:06.967538+00:00"
+    }
+  ],
+  "container": {
+    "AppArmorProfile": "docker-default",
+    "Args": [
+      "postgres",
+      "-c",
+      "listen_addresses=",
+      "-c",
+      "max_connections=20"
+    ],
+    "Config": {
+      "AttachStderr": false,
+      "AttachStdin": false,
+      "AttachStdout": false,
+      "Cmd": [
+        "postgres",
+        "-c",
+        "listen_addresses=",
+        "-c",
+        "max_connections=20"
+      ],
+      "Domainname": "",
+      "Entrypoint": [
+        "docker-entrypoint.sh"
+      ],
+      "Env": [
+        "POSTGRES_HOST_AUTH_METHOD=trust",
+        "POSTGRES_INITDB_ARGS=--encoding=UTF8 --locale=C",
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/18/bin",
+        "GOSU_VERSION=1.19",
+        "LANG=en_US.utf8",
+        "PG_MAJOR=18",
+        "PG_VERSION=18.6-1.pgdg12+2",
+        "PGDATA=/var/lib/postgresql/18/docker"
+      ],
+      "ExposedPorts": {
+        "5432/tcp": {}
+      },
+      "Hostname": "9613075aa05e",
+      "Image": "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+      "Labels": {},
+      "OnBuild": null,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "StopSignal": "SIGINT",
+      "Tty": false,
+      "User": "999:999",
+      "Volumes": {
+        "/var/lib/postgresql": {}
+      },
+      "WorkingDir": ""
+    },
+    "Created": "2026-10-04T20:56:57.469582845Z",
+    "Driver": "overlay2",
+    "ExecIDs": null,
+    "GraphDriver": {
+      "Data": {
+        "ID": "9613075aa05e0f92a32cf29b90cdf304ef453928a974315842a33f3727763fe5",
+        "LowerDir": "/var/lib/docker/overlay2/92932a8ef84d35e46ec587b0855b47cc49c5f632d2d12fc77525dcb5f959c32e-init/diff:/var/lib/docker/overlay2/916ea708a731d4f12bc0930dda54043b58b804c4032ba52d3ed031ed36100893/diff:/var/lib/docker/overlay2/16154b0dc2ecdfba38942167a11af055b64b9b948c3b74e8a377dcfbb4562d4c/diff:/var/lib/docker/overlay2/aeccb025004049d7962f7b0a4b58f547c3a5e7159123a51151cace1c2635e2e2/diff:/var/lib/docker/overlay2/d2ba5b25997a12b2a61d376a6f6128e5e6533f8c985d8825fcbf7f99d147ae30/diff:/var/lib/docker/overlay2/7e9680297528f3ae0ce3e84b5262b1ccbc5421dc855b00c3f95a79cbfd89580e/diff:/var/lib/docker/overlay2/fe51d0556f4d6f106e7639aabba510af1ffb01f08189ebee26427177fd71a584/diff:/var/lib/docker/overlay2/f5619d105592bb582dd3fbbf34e03023a4532cf85538e038df737ec551d1a823/diff:/var/lib/docker/overlay2/f12975b445e07f5803972ca31b4a6a5ba5859e4eb8f8c0dfc14a9dc3214b4920/diff:/var/lib/docker/overlay2/8dc39f2643b86b6b1acc88b64f835eedd40cdc2f26043b1bdc2ba49044e08e00/diff:/var/lib/docker/overlay2/5fdfaa40c4939396c8e53ba6c26003714ff32d417890bfd3de44b50f903aba05/diff:/var/lib/docker/overlay2/29c441465e7a00f6ac74d77f86e85c3fb9c89610e74a811a8cd307a52f6a21c0/diff:/var/lib/docker/overlay2/3af2a8993a62e2d7515a2b99db20a3ecea51dc8a49ca22034e963d01cd3dee29/diff:/var/lib/docker/overlay2/ffa5562471875c3e1717e21842743b935ac2afc51ea56e3972253c1876c181be/diff",
+        "MergedDir": "/var/lib/docker/overlay2/92932a8ef84d35e46ec587b0855b47cc49c5f632d2d12fc77525dcb5f959c32e/merged",
+        "UpperDir": "/var/lib/docker/overlay2/92932a8ef84d35e46ec587b0855b47cc49c5f632d2d12fc77525dcb5f959c32e/diff",
+        "WorkDir": "/var/lib/docker/overlay2/92932a8ef84d35e46ec587b0855b47cc49c5f632d2d12fc77525dcb5f959c32e/work"
+      },
+      "Name": "overlay2"
+    },
+    "HostConfig": {
+      "AutoRemove": false,
+      "Binds": null,
+      "BlkioDeviceReadBps": [],
+      "BlkioDeviceReadIOps": [],
+      "BlkioDeviceWriteBps": [],
+      "BlkioDeviceWriteIOps": [],
+      "BlkioWeight": 0,
+      "BlkioWeightDevice": [],
+      "CapAdd": null,
+      "CapDrop": [
+        "ALL"
+      ],
+      "Cgroup": "",
+      "CgroupParent": "",
+      "CgroupnsMode": "private",
+      "ConsoleSize": [
+        0,
+        0
+      ],
+      "ContainerIDFile": "",
+      "CpuCount": 0,
+      "CpuPercent": 0,
+      "CpuPeriod": 0,
+      "CpuQuota": 0,
+      "CpuRealtimePeriod": 0,
+      "CpuRealtimeRuntime": 0,
+      "CpuShares": 0,
+      "CpusetCpus": "",
+      "CpusetMems": "",
+      "DeviceCgroupRules": null,
+      "DeviceRequests": null,
+      "Devices": [],
+      "Dns": [],
+      "DnsOptions": [],
+      "DnsSearch": [],
+      "ExtraHosts": null,
+      "GroupAdd": null,
+      "IOMaximumBandwidth": 0,
+      "IOMaximumIOps": 0,
+      "IpcMode": "private",
+      "Isolation": "",
+      "Links": null,
+      "LogConfig": {
+        "Config": {},
+        "Type": "json-file"
+      },
+      "MaskedPaths": [
+        "/proc/asound",
+        "/proc/acpi",
+        "/proc/interrupts",
+        "/proc/kcore",
+        "/proc/keys",
+        "/proc/latency_stats",
+        "/proc/timer_list",
+        "/proc/timer_stats",
+        "/proc/sched_debug",
+        "/proc/scsi",
+        "/sys/firmware",
+        "/sys/devices/virtual/powercap"
+      ],
+      "Memory": 805306368,
+      "MemoryReservation": 0,
+      "MemorySwap": 1610612736,
+      "MemorySwappiness": null,
+      "NanoCpus": 1000000000,
+      "NetworkMode": "none",
+      "OomKillDisable": null,
+      "OomScoreAdj": 0,
+      "PidMode": "",
+      "PidsLimit": 128,
+      "PortBindings": {},
+      "Privileged": false,
+      "PublishAllPorts": false,
+      "ReadonlyPaths": [
+        "/proc/bus",
+        "/proc/fs",
+        "/proc/irq",
+        "/proc/sys",
+        "/proc/sysrq-trigger"
+      ],
+      "ReadonlyRootfs": true,
+      "RestartPolicy": {
+        "MaximumRetryCount": 0,
+        "Name": "no"
+      },
+      "Runtime": "runc",
+      "SecurityOpt": [
+        "no-new-privileges:true"
+      ],
+      "ShmSize": 67108864,
+      "Tmpfs": {
+        "/tmp": "rw,nosuid,nodev,size=64m,uid=999,gid=999",
+        "/var/lib/postgresql": "rw,nosuid,nodev,size=256m,uid=999,gid=999",
+        "/var/run/postgresql": "rw,nosuid,nodev,size=16m,uid=999,gid=999"
+      },
+      "UTSMode": "",
+      "Ulimits": [],
+      "UsernsMode": "",
+      "VolumeDriver": "",
+      "VolumesFrom": null
+    },
+    "HostnamePath": "/var/lib/docker/containers/9613075aa05e0f92a32cf29b90cdf304ef453928a974315842a33f3727763fe5/hostname",
+    "HostsPath": "/var/lib/docker/containers/9613075aa05e0f92a32cf29b90cdf304ef453928a974315842a33f3727763fe5/hosts",
+    "Id": "9613075aa05e0f92a32cf29b90cdf304ef453928a974315842a33f3727763fe5",
+    "Image": "sha256:8d76d8de17e883d3995f76252e260bc6b7761e9c23edbf3356b0676d37c49ddb",
+    "LogPath": "/var/lib/docker/containers/9613075aa05e0f92a32cf29b90cdf304ef453928a974315842a33f3727763fe5/9613075aa05e0f92a32cf29b90cdf304ef453928a974315842a33f3727763fe5-json.log",
+    "MountLabel": "",
+    "Mounts": [],
+    "Name": "/p00-restore-62f4e6c7f888",
+    "NetworkSettings": {
+      "Bridge": "",
+      "EndpointID": "",
+      "Gateway": "",
+      "GlobalIPv6Address": "",
+      "GlobalIPv6PrefixLen": 0,
+      "HairpinMode": false,
+      "IPAddress": "",
+      "IPPrefixLen": 0,
+      "IPv6Gateway": "",
+      "LinkLocalIPv6Address": "",
+      "LinkLocalIPv6PrefixLen": 0,
+      "MacAddress": "",
+      "Networks": {
+        "none": {
+          "Aliases": null,
+          "DNSNames": null,
+          "DriverOpts": null,
+          "EndpointID": "745fc0322722d4eb033f4d76fcfbf6e533f9caae13b620e65c6c9c2b9eb8a69a",
+          "Gateway": "",
+          "GlobalIPv6Address": "",
+          "GlobalIPv6PrefixLen": 0,
+          "GwPriority": 0,
+          "IPAMConfig": null,
+          "IPAddress": "",
+          "IPPrefixLen": 0,
+          "IPv6Gateway": "",
+          "Links": null,
+          "MacAddress": "",
+          "NetworkID": "14979f5b58b2bf0ccc75179110f56d24ce3a4d4544fa3e4e70b6fad5320be1f9"
+        }
+      },
+      "Ports": {},
+      "SandboxID": "f374275e718b3ecccb44c328dbe8908c86ae2c2351bd10bb8fb46d6874df0ad0",
+      "SandboxKey": "/var/run/docker/netns/f374275e718b",
+      "SecondaryIPAddresses": null,
+      "SecondaryIPv6Addresses": null
+    },
+    "Path": "docker-entrypoint.sh",
+    "Platform": "linux",
+    "ProcessLabel": "",
+    "ResolvConfPath": "/var/lib/docker/containers/9613075aa05e0f92a32cf29b90cdf304ef453928a974315842a33f3727763fe5/resolv.conf",
+    "RestartCount": 0,
+    "State": {
+      "Dead": false,
+      "Error": "",
+      "ExitCode": 0,
+      "FinishedAt": "0001-01-01T00:00:00Z",
+      "OOMKilled": false,
+      "Paused": false,
+      "Pid": 2705,
+      "Restarting": false,
+      "Running": true,
+      "StartedAt": "2026-10-04T20:56:57.48578538Z",
+      "Status": "running"
+    }
+  },
+  "evidence_sha256": {
+    "001-docker-version.log": "58d5180149fd3334dbb3ff73de521946336e4052a1b769cb475f72486c934b1b",
+    "002-buildx-version.log": "d6a1fdd95fd9b2615b359b42e82829b1cad6bb22202cff355e55be8242e8c395",
+    "003-pull-postgres.log": "c400ac7665b22a935ed0e92324429fabece319b4280051ee32afad7d34b291f3",
+    "004-image-inspect.log": "7f1463ddd1758ffea514b727d7c2ab64f2449f58d63d61a6b870ffb801c1273d",
+    "005-postgres-uid.log": "94d59b76e5b10f74d285313f8c69cc4799f538481dbc05edb8dc62f7a59f6eab",
+    "006-postgres-gid.log": "94d59b76e5b10f74d285313f8c69cc4799f538481dbc05edb8dc62f7a59f6eab",
+    "007-start-postgres.log": "2596e08da4899eb8ad79e5642d851fbbb5642d73ebb005922599d459b98924be",
+    "008-wait-postgres.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "009-server-version-num.log": "006d4a6d9f28eaba51e60a551ca1140858fc9b663dd9982a46f611e93f3e6eb9",
+    "010-server-runtime.log": "ab08c6c82767403ac445429e8ffcd7b625a1324596879ee1fa6f7b2b7810111b",
+    "011-os-packages.log": "e21cb3bc8e6657f9f20026a4e4c9a37e5ae902ac607217829a374530516a2417",
+    "012-container-inspect.log": "27cd978ed4ef6c52fdc729919848619d64a5fa309ad278a838053b73d5d2e70c",
+    "013-listen-addresses.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "014-create-fixture-roles.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "015-create-source.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "016-schema-source.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "017-seed-source.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "018-enable-source.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "019-source-writer-read.log": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+    "020-quiesce-source.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "021-source-write-denied.log": "82d6de692f8d56b21f36d5ad9a47cc2c3023046ac8b24d1c624d14dbe8df620f",
+    "022-initial-capture-snapshot.log": "2d5781d6378079211184cf30f38a19ca166ff86112c28116479caa8d7efe1f3d",
+    "023-initial-capture-pg-dump-stdout.base64.txt": "6a2a0d2eab201e48c1f6a29ebad014a73d2bc263e774640d77a343b5a5eb0eeb",
+    "023-initial-capture-pg-dump.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "024-initial-capture-stable-source-snapshot.log": "2d5781d6378079211184cf30f38a19ca166ff86112c28116479caa8d7efe1f3d",
+    "025-initial-capture-stable-source-relationships.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "026-corrupted-dump-no-target.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "027-missing-attachment-no-target.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "028-unexpected-file-no-target.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "029-modified-manifest-no-target.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "030-initial-restore-check-absent.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "031-initial-restore-create.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "032-initial-restore-pg-restore.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "033-initial-restore-writer-grants.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "034-initial-restore-verify-snapshot.log": "2d5781d6378079211184cf30f38a19ca166ff86112c28116479caa8d7efe1f3d",
+    "035-initial-restore-verify-relationships.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "036-target-quarantine-write-denied.log": "016bef8724f29d3a2bd0625fdfdb06e1bc577f5cd431a0f72ddb35ab3e93bf70",
+    "037-cross-tenant-relationship-denied.log": "e3d61ca50f3d7e31926472ae211fad3afffa63974325893461226c8144447a57",
+    "038-after-negative-relationship-snapshot.log": "2d5781d6378079211184cf30f38a19ca166ff86112c28116479caa8d7efe1f3d",
+    "039-after-negative-relationship-relationships.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "040-enable-source.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "041-pre-target-write-source-return.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "042-source-return-readback.log": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "043-quiesce-source.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "044-final-capture-snapshot.log": "752dac6e9f373aa34c80c58b0006d079a31de2384ca052e72dda51ac4b4b6ddb",
+    "045-final-capture-pg-dump-stdout.base64.txt": "f3a4823adc769e8f0a2cab37612cb70ca7e544e01b6c8f390408a2fbff87aa3f",
+    "045-final-capture-pg-dump.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "046-final-capture-stable-source-snapshot.log": "752dac6e9f373aa34c80c58b0006d079a31de2384ca052e72dda51ac4b4b6ddb",
+    "047-final-capture-stable-source-relationships.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "048-discard-quarantined-target.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "049-final-restore-check-absent.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "050-final-restore-create.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "051-final-restore-pg-restore.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "052-final-restore-writer-grants.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "053-final-restore-verify-snapshot.log": "752dac6e9f373aa34c80c58b0006d079a31de2384ca052e72dda51ac4b4b6ddb",
+    "054-final-restore-verify-relationships.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "055-enable-target.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "056-known-target-write.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "057-quiesce-target.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "058-retained-source-still-denied.log": "82d6de692f8d56b21f36d5ad9a47cc2c3023046ac8b24d1c624d14dbe8df620f",
+    "059-retained-source-marker.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "060-post-write-capture-snapshot.log": "63cf837681bc17a3450b463a8ddd373d7765e5cc7860cd35980096a9c0508819",
+    "061-post-write-capture-pg-dump-stdout.base64.txt": "548f170910b4cfeb019630c201d83572467f6dd37d0da294d8d1602c96be33cc",
+    "061-post-write-capture-pg-dump.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "062-post-write-capture-stable-source-snapshot.log": "63cf837681bc17a3450b463a8ddd373d7765e5cc7860cd35980096a9c0508819",
+    "063-post-write-capture-stable-source-relationships.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "064-post-write-recovery-check-absent.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "065-post-write-recovery-create.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "066-post-write-recovery-pg-restore.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "067-post-write-recovery-writer-grants.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "068-post-write-recovery-verify-snapshot.log": "63cf837681bc17a3450b463a8ddd373d7765e5cc7860cd35980096a9c0508819",
+    "069-post-write-recovery-verify-relationships.log": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "070-enable-recovery.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "071-recovered-known-write.log": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "072-recovered-service-write.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "073-recovery-new-write-readback.log": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "074-quiesce-recovery.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "075-postgres-final-log.log": "483bc43f8e082bcf52afdba753549e4fa43696d607e85abcfa42284834ff5acf",
+    "076-cleanup-postgres.log": "4dee0164eb137908323937c4261f67f8b732dd9e4e019fa407ebc4ad8406ae57",
+    "final-capture-bundle.json": "7cb46d1d3e2bc122e10438748e7bb83a8f173302151af809adaf67354ed26ebe",
+    "initial-capture-bundle.json": "1ea10d44699e7248dc103f6dbf05d19dc4432390693b3d5d17d82ce98e129fdb",
+    "inputs.lock.json": "122ba9014bb072c4304d7dc7764d17e4ecd0e29df8c9ef8cea5cdccc457fcda9",
+    "post-write-capture-bundle.json": "b7aa7db46f1dc1c186d618b319b526a455435c0b8d4ad0a7573e593d0dbe1aba"
+  },
+  "finished_at": "2026-10-04T20:57:07.088924+00:00",
+  "image": {
+    "config_digest": "sha256:8d76d8de17e883d3995f76252e260bc6b7761e9c23edbf3356b0676d37c49ddb",
+    "layers": [
+      "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+      "sha256:8f045a3ab0a089995123e77d6a7bd7a0e2bc9632d000a2dcdc22273310736566",
+      "sha256:adb195a998402ee496b46f19dc2010048f69c92cbef37cc1c7b32f1bdbf57966",
+      "sha256:7af66262fa283cf5d3de6fcaf3b70b7de6bc4d870fa6e5d3636a1e2aacee705f",
+      "sha256:8c44c9b8475091503263b0d13713534614522018794d15e9bcdd79a17f6f647d",
+      "sha256:145212acd9861542f7e0e21886a27d942480bb8bbfc46af5c357e4866968f0d2",
+      "sha256:e2fb01ca3015fe414db9e171b8015e08aaa6358b93cfc5da74b7eb93cf53f927",
+      "sha256:32429d5a0f22ecd7edc84dd1757b6e33b0ae2fb0a0fa025e9a668dcdd30ba686",
+      "sha256:1723d234ab75f6d9ccabfc2e82a877c9631f4c7ee3600997b8f3bd261b1f8777",
+      "sha256:012ae39ecbccaba1c0515d28019f702e4fd5a5bb724a9aa98583c7801b5187d5",
+      "sha256:f14c0baaa388fa3d2f8b3855b54dc32f1c1b61e8ba60d4e67205c0af97fc3b8f",
+      "sha256:f1f20a65bc98d0b9a981a6fa982d35e14cb15f801183ff47a897b9addbd8bab1",
+      "sha256:a00fbd9ec7b83b1c2a6aec49c29cc9915153ff118832e69ebe0d25eac8749509"
+    ],
+    "reference": "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+    "repo_digests": [
+      "postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d"
+    ]
+  },
+  "lock_sha256": "122ba9014bb072c4304d7dc7764d17e4ecd0e29df8c9ef8cea5cdccc457fcda9",
+  "mode": "replay",
+  "native_experiments": "NOT_RUN",
+  "orchestrator_runtime": {
+    "executable": "/usr/bin/python3",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+  },
+  "result": "PASS",
+  "run_attempt": "1",
+  "run_id": "37234051654",
+  "schema_version": 1,
+  "scope": "Synthetic PostgreSQL and attachment fixture on one disposable Docker host; no VMware/OpenStack, native fence, business application, operating acceptance or G00 pass",
+  "server_version_num": "180006",
+  "source_ref": "refs/heads/greenfield/enterprise-microservices-plan",
+  "source_sha": "fcb9fe0ea9bde275b09dfc8c0547e89021edafc9",
+  "source_sha256": {
+    ".github/workflows/architecture-policy.yml": "d923b16b39b9c1ea605d4925593b1e98fc3b54f2aa559b3e89552e3fb3d24bf0",
+    ".github/workflows/p00-contract-compatibility.yml": "243bf673db65cb5ca9a7110f1fb9771842ddc41ac3e1d036b3185efb2c6939e8",
+    ".github/workflows/p00-image-compatibility.yml": "0be149662fedf61f05f58ba7cfe8237e12e892ddc32710b8d87572b6f954bf1e",
+    ".github/workflows/p00-php-compatibility.yml": "1541fa5851b52126c8dc1d9e2821a0a802cee6109da9b5bd3773cb710980797e",
+    ".github/workflows/p00-restore-feasibility.yml": "b348ce14ad1e0779f09bf8549ba38a73aaa1f30b25e1e2854e9742707ae8fd46",
+    "spikes/compatibility/restore/README.md": "d29ca957973aaba04746e198b83f0352cd573a699ea8a5b7797170ba16d24258",
+    "spikes/compatibility/restore/candidate.json": "6fccf8251c591f3253cd12c32583cbbf694ffc7d3379e192779b789ac64484cd",
+    "spikes/compatibility/restore/inputs.lock.json": "122ba9014bb072c4304d7dc7764d17e4ecd0e29df8c9ef8cea5cdccc457fcda9",
+    "spikes/compatibility/restore/run.py": "9b0655ba6c9137b70ee1ad68273a414c92e729cf383195369e3e18e1a6f86c14",
+    "spikes/compatibility/restore/schema.sql": "6024d300a3ada764a3796493313cd91aefa6bd7845ebe4c2755affafeeba727d",
+    "spikes/compatibility/restore/snapshot.sql": "6a1ecd6a2ab2d8c5a490142708e4d212136c445c837c4075f4c84304168f093d"
+  },
+  "started_at": "2026-10-04T20:56:48.135355+00:00"
+}

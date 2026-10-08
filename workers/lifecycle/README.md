@@ -1,0 +1,62 @@
+# Lifecycle worker
+
+This independently owned Python package contributes to P01.01. Lifecycle owns explicitly scoped execution. P06 supplies the separately owned PostgreSQL simulation effect store, sealed readback and grant redemption. The Temporal orchestrator lives in the Lifecycle service. P07 adds native adapter components and read-only inspection; native product dispatch is not enabled. The intended responsibilities remain in the [Lifecycle service specification](../../docs/services/lifecycle.md).
+
+`lifecycle-worker-health liveness` exits 0 and reports only that its short-lived diagnostic process loaded, with `scope=process_bootstrap`. `lifecycle-worker-health readiness` exits 1 with `worker_dependencies_not_implemented`. Unsupported arguments exit 2 without a success payload. Native dispatch is disabled. These diagnostics do not establish a running service, dependency readiness or a consuming worker. Worker responses identify lifecycle as the owning service and declare `task_consumption_enabled=false`.
+
+P08 adds separately invoked `lifecycle-worker-native --config <protected-file>` and
+`lifecycle-migration-accounts --config <protected-file>` commands. The first composes
+the authenticated native effects server with its protected scoped registry; the
+second performs read-only source/target account commissioning checks. Both are
+declared in the owned image entrypoint registry. The default image entrypoint remains
+the diagnostic command. See [commissioning](../../docs/implementation/p08-runtime-commissioning.md)
+for configuration and the outstanding native owner/qualification requirements.
+
+## Ownership and structure
+
+`src/lifecycle_worker/bootstrap/` composes the command; `src/lifecycle_worker/interfaces/` handles diagnostic input/output. Importing the root package has no composition side effects. Application and Infrastructure modules implement simulated effect ownership under the [Python context convention](../../docs/architecture/context-code-structure.md#7-python-services-and-site-workers). The architecture registry allows an explicit same-context owner artifact as a future build input, but this package currently has no dependency on the owner service package. It does not import an owner or sibling directory at runtime. It owns the simulation database and has no native authority.
+
+## Install, check and build
+
+Use Python 3.12.14 and uv 0.12.19, the measured development candidates. From this directory, with `UV_PYTHON_DOWNLOADS=never` set:
+
+```sh
+uv sync --locked --group build --no-managed-python --no-editable
+uv run --locked --no-sync ruff check .
+uv run --locked --no-sync ruff format --check .
+uv run --locked --no-sync mypy
+uv run --locked --no-sync pytest -q
+uv build --no-build-isolation --wheel
+uv run --locked --no-sync lifecycle-worker-health liveness
+uv run --locked --no-sync lifecycle-worker-health readiness
+```
+
+The last command intentionally exits 1. The owned `uv.lock` resolves exact Ruff 0.16.10, mypy 2.4.0, pytest 9.1.1, setuptools 84.0.0 and wheel 0.48.0. Runtime dependencies remain the locked psycopg and Uvicorn closure used by the simulator and read-only inspection. The backend and wheel helper have matching exact pins in the build-system requirements and the locked build group. Build with `--no-build-isolation` after installing that group.
+
+Install the wheel into an empty Python 3.12 environment using `uv pip install --python <environment-python> --no-index --no-deps <wheel-path>`, then run the installed command outside this checkout with `PYTHONPATH` unset. The [Python foundations report](../../docs/implementation/p01-python-foundations.md) records the four packages' isolated builds and runtime checks. Tests also verify that sibling Python service and worker modules are absent in the independent installed environment. The diagnostic command does not start the separate P06 simulator. Install its complete hash-locked runtime requirements before installing the owned wheel, as the Dockerfile does.
+
+## Isolated effect owner
+
+`lifecycle-simulator` exposes distinct authenticated effect, reconciliation and
+read-only observation routes over verified TLS. It redeems each short-lived grant
+with Lifecycle before accepting a simulated effect. Reconciliation seals absence
+against late arrivals. The Console cannot call these routes. Apply the worker-owned
+SQL migration as `simulation_owner`; runtime receives only its explicit grants.
+The default image diagnostic remains non-consuming. See the
+[simulation runbook](../../docs/operations/runbooks/durable-simulation.md).
+
+## P07 native adapter components
+
+`lifecycle-native-inspect` validates a protected native operation plan and binding.
+Optional `--observe --receipts` uses an independent OpenStack observer and exact
+journaled native IDs. It grants no write or retry authority.
+
+`NativeApiEffect` resolves protected runtime connections, redeems current Lifecycle
+authority, and invokes the durable native API adapter. Each request is journaled
+before submission; returned object/request IDs are retained; unknown outcomes
+hold custody without automatic retry. The internal effect API trusts only its
+independently composed caller resolver and never accepts caller identity or commands.
+
+See [native adapter operations](../../docs/operations/runbooks/openstack-native-adapters.md)
+for the exact plan, runtime and journal boundaries. P08 owns the separate
+[VM migration architecture](../../docs/implementation/p08-native-migration.md).

@@ -1,0 +1,144 @@
+schema_version: 2
+# Architecture declarations are reviewed code. They do not prove runtime isolation.
+# Each PHP service is an independent Laravel application. Repeated App\ namespaces
+# resolve locally; Domain/Application capability folders are not service contexts.
+layer_policies:
+  php:
+    domain: {directory: Domain, depends_on: []}
+    application: {directory: Application, depends_on: [domain]}
+    infrastructure: {directory: Infrastructure, depends_on: [domain, application]}
+    # Standard Laravel adapters remain in app/, outside capability directories.
+    delivery:
+      directories: [Broadcasting, Console, Events, Exceptions, Http, Jobs, Listeners, Mail, Notifications, Policies, Providers, Rules, View]
+      depends_on: [domain, application, infrastructure]
+  python:
+    domain: {directory: domain, depends_on: []}
+    application: {directory: application, depends_on: [domain]}
+    infrastructure: {directory: infrastructure, depends_on: [domain, application]}
+    interfaces: {directory: interfaces, depends_on: [domain, application]}
+services:
+  - id: console
+    package_name: product/console
+    owner_role: console-maintainer
+    language: php
+    root: apps/console
+    composition_only: true
+    context: {id: console, source_root: apps/console/app, namespace: 'App\'}
+    host_roots: [build/download-apks.php, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, resources, public, vite.config.ts, playwright.config.ts, playwright.p02.config.ts]
+    allowed_packages: [php-contracts, php-technical, typescript-contracts, typescript-technical]
+  - id: governance
+    package_name: product/governance
+    owner_role: governance-maintainer
+    language: php
+    root: services/governance
+    context: {id: governance, source_root: services/governance/app, namespace: 'App\'}
+    host_roots: [build/download-apks.php, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
+    allowed_packages: [php-contracts, php-technical]
+  - id: catalogue
+    package_name: product/catalogue
+    owner_role: catalogue-maintainer
+    language: php
+    root: services/catalogue
+    context: {id: catalogue, source_root: services/catalogue/app, namespace: 'App\'}
+    host_roots: [build/download-apks.php, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
+    allowed_packages: [php-contracts, php-technical]
+  - id: inventory
+    package_name: product-inventory
+    owner_role: inventory-maintainer
+    language: python
+    root: services/inventory
+    context: {id: inventory, source_root: services/inventory/src/inventory, module: inventory}
+    host_roots: [src/inventory/bootstrap, tests, migrations]
+    allowed_packages: [python-contracts, python-technical]
+  - id: planning
+    package_name: product-planning
+    owner_role: planning-maintainer
+    language: python
+    root: services/planning
+    context: {id: planning, source_root: services/planning/src/planning, module: planning}
+    host_roots: [src/planning/bootstrap, tests, migrations]
+    allowed_packages: [python-contracts, python-technical]
+  - id: lifecycle
+    package_name: product-lifecycle
+    owner_role: lifecycle-maintainer
+    language: python
+    root: services/lifecycle
+    context: {id: lifecycle, source_root: services/lifecycle/src/lifecycle, module: lifecycle}
+    host_roots: [src/lifecycle/bootstrap, tests, migrations]
+    allowed_packages: [python-contracts, python-technical]
+  - id: assurance
+    package_name: product/assurance
+    owner_role: assurance-maintainer
+    language: php
+    root: services/assurance
+    context: {id: assurance, source_root: services/assurance/app, namespace: 'App\'}
+    host_roots: [build/download-apks.php, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
+    allowed_packages: [php-contracts, php-technical]
+workers:
+  - id: inventory-workers
+    owner_service_id: inventory
+    root: workers/inventory
+    language: python
+    module: inventory_worker
+    owner_role: inventory-maintainer
+    allowed_packages: [python-contracts, python-technical]
+    # Builds may include the owner's source artifact at the same commit. No sibling mount.
+    include_owner_source: true
+  - id: lifecycle-workers
+    owner_service_id: lifecycle
+    root: workers/lifecycle
+    language: python
+    module: lifecycle_worker
+    host_roots: [src/lifecycle_worker/bootstrap, tests, migrations]
+    owner_role: lifecycle-maintainer
+    allowed_packages: [python-contracts, python-technical]
+    include_owner_source: true
+packages:
+  - id: php-contracts
+    kind: generated
+    language: php
+    root: packages/generated/php
+    namespace: 'Product\Contracts\'
+    package_name: product/contracts-php
+    owner_role: contract-maintainer
+    dependencies: []
+  - id: python-contracts
+    kind: generated
+    language: python
+    root: packages/generated/python
+    module: product_contracts
+    package_name: product-contracts-python
+    owner_role: contract-maintainer
+    dependencies: []
+  - id: typescript-contracts
+    kind: generated
+    language: typescript
+    root: packages/generated/typescript
+    module: '@product/contracts'
+    package_name: '@product/contracts'
+    owner_role: contract-maintainer
+    dependencies: []
+  - id: php-technical
+    kind: technical
+    language: php
+    root: packages/technical/php
+    namespace: 'Product\Technical\'
+    package_name: product/technical-php
+    owner_role: engineering-maintainer
+    dependencies: []
+  - id: python-technical
+    kind: technical
+    language: python
+    root: packages/technical/python
+    module: product_technical
+    package_name: product-technical-python
+    owner_role: engineering-maintainer
+    dependencies: []
+  - id: typescript-technical
+    kind: technical
+    language: typescript
+    root: packages/technical/typescript
+    module: '@product/technical'
+    package_name: '@product/technical'
+    owner_role: engineering-maintainer
+    dependencies: []

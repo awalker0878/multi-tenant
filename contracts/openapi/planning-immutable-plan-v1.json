@@ -1,0 +1,152 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Immutable planning binding consumed by Governance",
+    "version": "1.0.0",
+    "description": "Consumer contract; P05.04 produces this endpoint later. P02 tests use synthetic plans. Digest is SHA-256 over UTF-8 compact JSON of all fields except digest, recursively lexicographically sorted object keys and original array order, unescaped slashes. Binding strings are ASCII, integers are JSON integers; no floating point. No mutable latest alias."
+  },
+  "security": [
+    {
+      "GovernanceWorkload": []
+    }
+  ],
+  "paths": {
+    "/v1/plans/{plan}/revisions/{revision}": {
+      "get": {
+        "operationId": "getImmutablePlan",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plan",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoundPlan"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid workload or user session"
+          },
+          "403": {
+            "description": "Current scope/action denied"
+          },
+          "404": {
+            "description": "Unknown resource or no membership"
+          },
+          "409": {
+            "description": "Revision, retry, binding or transition conflict"
+          },
+          "422": {
+            "description": "Invalid input"
+          },
+          "503": {
+            "description": "Required authority unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "GovernanceWorkload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "BoundPlan": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "plan_id",
+          "revision",
+          "tenant_id",
+          "action",
+          "site_id",
+          "environment",
+          "resource_id",
+          "requested_by",
+          "executor_ids",
+          "valid_until",
+          "digest"
+        ],
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "application.provision",
+              "application.migrate",
+              "application.recover",
+              "application.retire"
+            ]
+          },
+          "site_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+          },
+          "environment": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+          },
+          "resource_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+          },
+          "requested_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "executor_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 32,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "valid_until": {
+            "type": "integer"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,107 @@
+
+   PASS  Tests\Feature\CataloguePersistenceTest
+  ✓ it commits full immutable intent receipt audit event and typed tena… 0.20s  
+  ✓ it returns the original receipt after a lost response and later edi… 0.23s  
+  ✓ it rejects foreign retired stale shared and wrong-kind references w… 0.06s  
+  ✓ it rejects foreign retired stale shared and wrong-kind references w… 0.06s  
+  ✓ it rejects foreign retired stale shared and wrong-kind references w… 0.06s  
+  ✓ it rejects foreign retired stale shared and wrong-kind references w… 0.06s  
+  ✓ it enforces separate reference administration and refuses ZIP immut… 0.09s  
+  ✓ it rolls back revision pointer receipt audit and workload bindings…  0.08s  
+  ✓ it denies runtime modification of immutable history even outside El… 0.08s  
+  ✓ it reauthorizes duplicate receipts history and detail after revocat… 0.17s  
+  ✓ it never reassigns workloads or deployment identities to another ap… 0.09s  
+  ✓ it holds explicit non-shared references across applications          0.08s  
+  ✓ it bounds representative large tenant pages and rejects foreign cur… 0.25s  
+  ✓ it retains stable event identity on uncertain delivery and publishe… 0.10s  
+  ✓ it replays controlled migrations without altering published history… 0.08s  
+
+   PASS  Tests\Feature\DelegatedAdmissionTest
+  ✓ it uses its independent service credential and route scope and igno… 0.04s  
+  ✓ it requires independent caller identity and actor delegation before… 0.01s  
+  ✓ it never caches authority between allowed revoked and recovered req… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority respo… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority respo… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority respo… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority respo… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority respo… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority respo… 0.01s  
+  ✓ it holds malformed stale widened and wrong-audience authority responses with ('expires_at', '2000-01-01T00:00:00Z')
+  ✓ it holds malformed stale widened and wrong-audience authority responses with ('evaluated_at', '2000-01-01T00:00:00Z')
+  ✓ it fails closed on redirects and missing workload custody            0.01s  
+  ✓ it retains the owning resource tenant check even if a remote respon… 0.01s  
+
+   PASS  Tests\Feature\DependencyHealthTest
+  ✓ unknown or malformed health identities never reach a dependency wit… 0.02s  
+  ✓ unknown or malformed health identities never reach a dependency with ('Bearer short')
+  ✓ unknown or malformed health identities never reach a dependency with ('Bearer xxxxxxxxxxxxxxxxxxxxxx…xxxxxx')
+  ✓ unknown or malformed health identities never reach a dependency with ('Basic TOKEN')
+  ✓ unknown or malformed health identities never reach a dependency with ('Basic Bearer TOKEN')
+  ✓ unknown or malformed health identities never reach a dependency with ('Bearer TOKEN extra')
+  ✓ an absent or malformed mounted identity denies even the formerly va… 0.01s  
+  ✓ an absent or malformed mounted identity denies even the formerly valid credential with ('empty')
+  ✓ an absent or malformed mounted identity denies even the formerly valid credential with ('multiline')
+  ✓ an absent or malformed mounted identity denies even the formerly valid credential with ('oversize')
+  ✓ authenticated dependency failure is sanitized and never changes product readiness
+  ✓ successful foundation checks grant only dependency readiness and no… 0.01s  
+  ✓ replacing a credential file revokes the old token without restartin… 0.01s  
+  ✓ credential paths cannot use a stream wrapper
+  ✓ mounted application key wins and an unavailable file never falls back to the environment key
+  ✓ a TCP peer that never answers TLS negotiation fails within the conn… 2.01s  
+
+   PASS  Tests\Feature\HealthTest
+  ✓ liveness reports only a running process with no configured service…  0.02s  
+  ✓ readiness remains closed until the catalogue dependencies are implemented
+  ✓ health endpoints reject writes with ('/health/live')
+  ✓ health endpoints reject writes with ('/health/ready')
+  ✓ business routes are absent and expose no exception diagnostics with ('/v1/tenants/tenant-a/applications')
+  ✓ business routes are absent and expose no exception diagnostics with ('/v1/tenants/tenant-a/wsds')
+  ✓ business routes are absent and expose no exception diagnostics with ('/v1/tenants/tenant-a/security-domains')
+  ✓ a caller cannot configure readiness or start a browser session through health input
+  ✓ unknown routes return JSON even without an accept header
+
+   PASS  Tests\Feature\IntentDocumentTest
+  ✓ it preserves complete multi-domain intent and unsupported mandatory… 0.01s  
+  ✓ it rejects structural, native-credential and placement ambiguity wi… 0.01s  
+  ✓ it rejects structural, native-credential and placement ambiguity with ('native')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('fractional')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('empty')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('missing')
+  ✓ it rejects structural, native-credential and placement ambiguity with ('huge')
+  ✓ it rejects structural, native-credential and placement ambiguity wi… 0.01s  
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('cycle', 'dependency_cycle')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('self', 'dangling_or_self_dependency')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('dangling', 'dangling_or_self_dependency')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('duplicate', 'duplicate_identity')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('nic', 'nic_domain_mismatch')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('order', 'device_order_gap')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('boot', 'one_boot_disk_required')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('dataset', 'dangling_dataset')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('interface', 'controlled_interface_required')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('port', 'protocol_port_mismatch')
+  ✓ it rejects invalid owned graph associations with a stable actionable field with ('service', 'dangling_service_workload')
+  ✓ it permits bidirectional communication while checking startup and shutdown graphs independently
+  ✓ it rejects integer values that a browser would silently round with…  0.01s  
+  ✓ it rejects integer values that a browser would silently round with…  0.01s  
+  ✓ it preserves typed requirement values at the interoperable integer boundary
+  ✓ it rejects an overflowing JSON integer before it can become rounded immutable intent
+
+   PASS  Tests\Feature\TelemetryTest
+  ✓ diagnostic buffer is bounded and stale acknowledgement preserves ne… 0.02s  
+  ✓ lock contention and oversized records are explicit without overwriting accepted data
+  ✓ unavailable buffer preserves liveness and reports missing collection
+  ✓ request signals redact arbitrary inputs and correlate without granting authority
+  ✓ malformed or zero correlation is replaced and never echoed with ('malformed')
+  ✓ malformed or zero correlation is replaced and never echoed with ('00-00000000000000000000000000…ccc-01')
+  ✓ malformed or zero correlation is replaced and never echoed with ('00-bbbbbbbbbbbbbbbbbbbbbbbbbb…000-01')
+
+   PASS  Tests\Architecture\FoundationTest
+  ✓ service autoload exposes only its own application and tests
+  ✓ the actual bootstrap classes are loaded from the service source
+  ✓ implemented application classes use strict types                     0.08s  
+  ✓ implemented application classes are final
+  ✓ delivery does not reference sibling source or frontend transport     0.02s  
+
+  Tests:    89 passed (335 assertions)
+  Duration: 4.28s
+

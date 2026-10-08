@@ -1,0 +1,37 @@
+
+   PASS  Tests\Feature\LocalIdentityTest
+  ✓ it generates one high entropy credential and never redisplays or re… 0.09s  
+  ✓ it requires independent mounted console identity and rejects health… 0.04s  
+  ✓ it enforces first-login restrictions in direct APIs then rotates al… 0.06s  
+  ✓ it requires the current password and rejects reuse, short or mismat… 0.04s  
+  ✓ it expires temporary sessions and invalidates an explicitly logged…  0.04s  
+  ✓ it commits throttling across requests and denies attempts during th… 0.05s  
+  ✓ it never recreates a retired identity and rejects its existing sess… 0.04s  
+  ✓ it rolls back identity and audit together when outbox persistence f… 0.03s  
+  ✓ it refuses bootstrap through redirected or noninteractive command o… 0.05s  
+
+   PASS  Tests\Feature\OidcIdentityTest
+  ✓ it stores secret references with encrypted custody and rejects pre-… 0.24s  
+  ✓ it preserves local setup after provider failure and never activates… 0.07s  
+  ✓ it uses real signed tokens, verifies PKCE and atomically retires ev… 0.09s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.06s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.15s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.06s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.06s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.05s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.05s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.06s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.06s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.06s  
+  ✓ it denies forged issuer audience expiry nonce authorized party and…  0.06s  
+  ✓ it rejects a forged signature and consumes the failed flow           0.06s  
+  ✓ it binds browser state and proof to their initiating session and se… 0.08s  
+  ✓ it expires sign-in attempts and handover proofs                      0.07s  
+  ✓ it keeps the active connection during draft edits and denies setup…  0.09s  
+  ✓ it rolls activation back if its audit outbox cannot commit           0.07s  
+  ✓ it refuses insecure URLs and discovery that redirects authority or…  0.05s  
+  ✓ it denies metadata and loopback targets and permits only selected p… 0.04s  
+
+  Tests:    29 passed (336 assertions)
+  Duration: 2.03s
+

@@ -1,0 +1,2537 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/default-container": "cilium-agent"
+                },
+                "creationTimestamp": "2026-10-05T03:47:49Z",
+                "generateName": "cilium-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "cilium-agent",
+                    "app.kubernetes.io/part-of": "cilium",
+                    "controller-revision-hash": "84f9fdd7fd",
+                    "helm.sh/chart": "cilium-1.20.2",
+                    "k8s-app": "cilium",
+                    "pod-template-generation": "1"
+                },
+                "name": "cilium-dpdwf",
+                "namespace": "kube-system",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "DaemonSet",
+                        "name": "cilium",
+                        "uid": "9f364dd8-3b43-471c-b2fa-fdbfc064d1b0"
+                    }
+                ],
+                "resourceVersion": "664",
+                "uid": "c5bf1810-c3f9-498c-93e9-3774e9f37090"
+            },
+            "spec": {
+                "affinity": {
+                    "nodeAffinity": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": {
+                            "nodeSelectorTerms": [
+                                {
+                                    "matchFields": [
+                                        {
+                                            "key": "metadata.name",
+                                            "operator": "In",
+                                            "values": [
+                                                "p01-72188a2dcf97-908488b6-worker"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    "podAntiAffinity": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": [
+                            {
+                                "labelSelector": {
+                                    "matchLabels": {
+                                        "k8s-app": "cilium"
+                                    }
+                                },
+                                "topologyKey": "kubernetes.io/hostname"
+                            }
+                        ]
+                    }
+                },
+                "automountServiceAccountToken": true,
+                "containers": [
+                    {
+                        "args": [
+                            "--config-dir=/tmp/cilium/config-map"
+                        ],
+                        "command": [
+                            "cilium-agent"
+                        ],
+                        "env": [
+                            {
+                                "name": "K8S_NODE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "spec.nodeName"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "CILIUM_K8S_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "CILIUM_CLUSTERMESH_CONFIG",
+                                "value": "/var/lib/cilium/clustermesh/"
+                            },
+                            {
+                                "name": "GOMEMLIMIT",
+                                "valueFrom": {
+                                    "resourceFieldRef": {
+                                        "divisor": "1",
+                                        "resource": "limits.memory"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBE_CLIENT_BACKOFF_BASE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "KUBE_CLIENT_BACKOFF_DURATION",
+                                "value": "120"
+                            }
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "lifecycle": {
+                            "postStart": {
+                                "exec": {
+                                    "command": [
+                                        "bash",
+                                        "-c",
+                                        "set -o errexit\nset -o pipefail\nset -o nounset\n\n# When running in AWS ENI mode, it's likely that 'aws-node' has\n# had a chance to install SNAT iptables rules. These can result\n# in dropped traffic, so we should attempt to remove them.\n# We do it using a 'postStart' hook since this may need to run\n# for nodes which might have already been init'ed but may still\n# have dangling rules. This is safe because there are no\n# dependencies on anything that is part of the startup script\n# itself, and can be safely run multiple times per node (e.g. in\n# case of a restart).\nif [[ \"$(iptables-save | grep -E -c 'AWS-SNAT-CHAIN|AWS-CONNMARK-CHAIN')\" != \"0\" ]];\nthen\n    echo 'Deleting iptables rules created by the AWS CNI VPC plugin'\n    iptables-save | grep -E -v 'AWS-SNAT-CHAIN|AWS-CONNMARK-CHAIN' | iptables-restore\nfi\necho 'Done!'\n"
+                                    ]
+                                }
+                            },
+                            "preStop": {
+                                "exec": {
+                                    "command": [
+                                        "/cni-uninstall.sh"
+                                    ]
+                                }
+                            }
+                        },
+                        "livenessProbe": {
+                            "failureThreshold": 10,
+                            "httpGet": {
+                                "host": "127.0.0.1",
+                                "httpHeaders": [
+                                    {
+                                        "name": "brief",
+                                        "value": "true"
+                                    },
+                                    {
+                                        "name": "require-k8s-connectivity",
+                                        "value": "false"
+                                    }
+                                ],
+                                "path": "/healthz",
+                                "port": "health",
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 30,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 5
+                        },
+                        "name": "cilium-agent",
+                        "ports": [
+                            {
+                                "containerPort": 9879,
+                                "hostPort": 9879,
+                                "name": "health",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "host": "127.0.0.1",
+                                "httpHeaders": [
+                                    {
+                                        "name": "brief",
+                                        "value": "true"
+                                    }
+                                ],
+                                "path": "/healthz",
+                                "port": "health",
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 30,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 5
+                        },
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {
+                                "add": [
+                                    "CHOWN",
+                                    "KILL",
+                                    "NET_ADMIN",
+                                    "NET_RAW",
+                                    "IPC_LOCK",
+                                    "SYS_MODULE",
+                                    "SYS_ADMIN",
+                                    "SYS_RESOURCE",
+                                    "DAC_OVERRIDE",
+                                    "FOWNER",
+                                    "SETGID",
+                                    "SETUID",
+                                    "SYSLOG"
+                                ],
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "seLinuxOptions": {
+                                "level": "s0",
+                                "type": "spc_t"
+                            }
+                        },
+                        "startupProbe": {
+                            "failureThreshold": 300,
+                            "httpGet": {
+                                "host": "127.0.0.1",
+                                "httpHeaders": [
+                                    {
+                                        "name": "brief",
+                                        "value": "true"
+                                    }
+                                ],
+                                "path": "/healthz",
+                                "port": "health",
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/host/proc/sys/net",
+                                "name": "host-proc-sys-net"
+                            },
+                            {
+                                "mountPath": "/host/proc/sys/kernel",
+                                "name": "host-proc-sys-kernel"
+                            },
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "mountPropagation": "HostToContainer",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium",
+                                "name": "cilium-run"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium/netns",
+                                "mountPropagation": "HostToContainer",
+                                "name": "cilium-netns"
+                            },
+                            {
+                                "mountPath": "/host/etc/cni/net.d",
+                                "name": "etc-cni-netd"
+                            },
+                            {
+                                "mountPath": "/var/lib/cilium/clustermesh",
+                                "name": "clustermesh-secrets",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/lib/modules",
+                                "name": "lib-modules",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/run/xtables.lock",
+                                "name": "xtables-lock"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "hostNetwork": true,
+                "hostUsers": true,
+                "initContainers": [
+                    {
+                        "command": [
+                            "cilium-dbg",
+                            "build-config",
+                            "--k8s-api-server-urls="
+                        ],
+                        "env": [
+                            {
+                                "name": "K8S_NODE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "spec.nodeName"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "CILIUM_K8S_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "config",
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {
+                                "add": [
+                                    "NET_ADMIN"
+                                ],
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "command": [
+                            "bash",
+                            "-ec",
+                            "cp /usr/bin/cilium-mount /hostbin/cilium-mount;\nnsenter --cgroup=/hostproc/1/ns/cgroup --mount=/hostproc/1/ns/mnt \"${BIN_PATH}/cilium-mount\" $CGROUP_ROOT;\nrm /hostbin/cilium-mount\n"
+                        ],
+                        "env": [
+                            {
+                                "name": "CGROUP_ROOT",
+                                "value": "/run/cilium/cgroupv2"
+                            },
+                            {
+                                "name": "BIN_PATH",
+                                "value": "/opt/cni/bin"
+                            }
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "mount-cgroup",
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {
+                                "add": [
+                                    "SYS_ADMIN",
+                                    "SYS_CHROOT",
+                                    "SYS_PTRACE"
+                                ],
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "seLinuxOptions": {
+                                "level": "s0",
+                                "type": "spc_t"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/hostproc",
+                                "name": "hostproc"
+                            },
+                            {
+                                "mountPath": "/hostbin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "command": [
+                            "bash",
+                            "-ec",
+                            "cp /usr/bin/cilium-sysctlfix /hostbin/cilium-sysctlfix;\nnsenter --mount=/hostproc/1/ns/mnt \"${BIN_PATH}/cilium-sysctlfix\";\nrm /hostbin/cilium-sysctlfix\n"
+                        ],
+                        "env": [
+                            {
+                                "name": "BIN_PATH",
+                                "value": "/opt/cni/bin"
+                            }
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "apply-sysctl-overwrites",
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {
+                                "add": [
+                                    "SYS_ADMIN",
+                                    "SYS_CHROOT",
+                                    "SYS_PTRACE"
+                                ],
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "seLinuxOptions": {
+                                "level": "s0",
+                                "type": "spc_t"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/hostproc",
+                                "name": "hostproc"
+                            },
+                            {
+                                "mountPath": "/hostbin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "args": [
+                            "mount | grep \"/sys/fs/bpf type bpf\" || mount -t bpf bpf /sys/fs/bpf"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "mount-bpf-fs",
+                        "resources": {},
+                        "securityContext": {
+                            "privileged": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "mountPropagation": "Bidirectional",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "command": [
+                            "/init-container.sh"
+                        ],
+                        "env": [
+                            {
+                                "name": "CILIUM_ALL_STATE",
+                                "valueFrom": {
+                                    "configMapKeyRef": {
+                                        "key": "clean-cilium-state",
+                                        "name": "cilium-config",
+                                        "optional": true
+                                    }
+                                }
+                            },
+                            {
+                                "name": "CILIUM_BPF_STATE",
+                                "valueFrom": {
+                                    "configMapKeyRef": {
+                                        "key": "clean-cilium-bpf-state",
+                                        "name": "cilium-config",
+                                        "optional": true
+                                    }
+                                }
+                            },
+                            {
+                                "name": "WRITE_CNI_CONF_WHEN_READY",
+                                "valueFrom": {
+                                    "configMapKeyRef": {
+                                        "key": "write-cni-conf-when-ready",
+                                        "name": "cilium-config",
+                                        "optional": true
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "clean-cilium-state",
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {
+                                "add": [
+                                    "NET_ADMIN",
+                                    "SYS_MODULE",
+                                    "SYS_ADMIN",
+                                    "SYS_RESOURCE"
+                                ],
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "seLinuxOptions": {
+                                "level": "s0",
+                                "type": "spc_t"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/run/cilium/cgroupv2",
+                                "mountPropagation": "HostToContainer",
+                                "name": "cilium-cgroup"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium",
+                                "name": "cilium-run"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "command": [
+                            "/install-plugin.sh"
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "install-cni-binaries",
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "100m",
+                                "memory": "10Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "seLinuxOptions": {
+                                "level": "s0",
+                                "type": "spc_t"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/host/opt/cni/bin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "p01-72188a2dcf97-908488b6-worker",
+                "nodeSelector": {
+                    "kubernetes.io/os": "linux"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 2000001000,
+                "priorityClassName": "system-node-critical",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "appArmorProfile": {
+                        "type": "Unconfined"
+                    },
+                    "seccompProfile": {
+                        "type": "Unconfined"
+                    }
+                },
+                "serviceAccount": "cilium",
+                "serviceAccountName": "cilium",
+                "terminationGracePeriodSeconds": 1,
+                "tolerations": [
+                    {
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/disk-pressure",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/memory-pressure",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/pid-pressure",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/unschedulable",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/network-unavailable",
+                        "operator": "Exists"
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {},
+                        "name": "tmp"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/var/run/cilium",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "cilium-run"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/var/run/netns",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "cilium-netns"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/sys/fs/bpf",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "bpf-maps"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/proc",
+                            "type": "Directory"
+                        },
+                        "name": "hostproc"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/run/cilium/cgroupv2",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "cilium-cgroup"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/opt/cni/bin",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "cni-path"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/etc/cni/net.d",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "etc-cni-netd"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/lib/modules",
+                            "type": ""
+                        },
+                        "name": "lib-modules"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/run/xtables.lock",
+                            "type": "FileOrCreate"
+                        },
+                        "name": "xtables-lock"
+                    },
+                    {
+                        "name": "clustermesh-secrets",
+                        "projected": {
+                            "defaultMode": 256,
+                            "sources": [
+                                {
+                                    "secret": {
+                                        "name": "cilium-clustermesh",
+                                        "optional": true
+                                    }
+                                },
+                                {
+                                    "secret": {
+                                        "items": [
+                                            {
+                                                "key": "tls.key",
+                                                "path": "common-etcd-client.key"
+                                            },
+                                            {
+                                                "key": "tls.crt",
+                                                "path": "common-etcd-client.crt"
+                                            },
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "common-etcd-client-ca.crt"
+                                            }
+                                        ],
+                                        "name": "clustermesh-apiserver-remote-cert",
+                                        "optional": true
+                                    }
+                                },
+                                {
+                                    "secret": {
+                                        "items": [
+                                            {
+                                                "key": "tls.key",
+                                                "path": "local-etcd-client.key"
+                                            },
+                                            {
+                                                "key": "tls.crt",
+                                                "path": "local-etcd-client.crt"
+                                            },
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "local-etcd-client-ca.crt"
+                                            }
+                                        ],
+                                        "name": "clustermesh-apiserver-local-cert",
+                                        "optional": true
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/proc/sys/net",
+                            "type": "Directory"
+                        },
+                        "name": "host-proc-sys-net"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/proc/sys/kernel",
+                            "type": "Directory"
+                        },
+                        "name": "host-proc-sys-kernel"
+                    },
+                    {
+                        "name": "kube-api-access-4xsbs",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "100m",
+                    "memory": "10Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T03:47:49Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T03:48:09Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T03:48:15Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T03:48:15Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T03:47:49Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://f7a2cf2ebd46e256b95c2a673d1fb3b4e71e1030892f82c1eaa787815d96c6b8",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "cilium-agent",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-05T03:48:09Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/host/proc/sys/net",
+                                "name": "host-proc-sys-net"
+                            },
+                            {
+                                "mountPath": "/host/proc/sys/kernel",
+                                "name": "host-proc-sys-kernel"
+                            },
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium",
+                                "name": "cilium-run"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium/netns",
+                                "name": "cilium-netns"
+                            },
+                            {
+                                "mountPath": "/host/etc/cni/net.d",
+                                "name": "etc-cni-netd"
+                            },
+                            {
+                                "mountPath": "/var/lib/cilium/clustermesh",
+                                "name": "clustermesh-secrets",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/lib/modules",
+                                "name": "lib-modules",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/run/xtables.lock",
+                                "name": "xtables-lock"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.2",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.2"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "containerID": "containerd://cab1550ea56c76dc5eb8b476ca2eb781c23b94127ab3d94f20d85a3a9cd885e6",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "config",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://cab1550ea56c76dc5eb8b476ca2eb781c23b94127ab3d94f20d85a3a9cd885e6",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:00Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:00Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "containerID": "containerd://78df04963e5669a917071b31ff36e8981522f60cecff705ec9cb707ea1a13dd0",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "mount-cgroup",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://78df04963e5669a917071b31ff36e8981522f60cecff705ec9cb707ea1a13dd0",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:04Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:04Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/hostproc",
+                                "name": "hostproc"
+                            },
+                            {
+                                "mountPath": "/hostbin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "containerID": "containerd://5d95f1920bc6929e62950e9b65a42d1541a054aaf3fa4ccfab643ab04374d831",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "apply-sysctl-overwrites",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://5d95f1920bc6929e62950e9b65a42d1541a054aaf3fa4ccfab643ab04374d831",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:05Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:05Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/hostproc",
+                                "name": "hostproc"
+                            },
+                            {
+                                "mountPath": "/hostbin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "containerID": "containerd://e434ed29785e4403853cd7cba9200ea0347fd0c9b71d845ebde1f9ad894808ee",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "mount-bpf-fs",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://e434ed29785e4403853cd7cba9200ea0347fd0c9b71d845ebde1f9ad894808ee",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:06Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:06Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "containerID": "containerd://3f34241a530e16b4f5de5f72d766b23a0660fdef5bff6982dde198cfcb6022ef",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "clean-cilium-state",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://3f34241a530e16b4f5de5f72d766b23a0660fdef5bff6982dde198cfcb6022ef",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:07Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:07Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/run/cilium/cgroupv2",
+                                "name": "cilium-cgroup"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium",
+                                "name": "cilium-run"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "allocatedResources": {
+                            "cpu": "100m",
+                            "memory": "10Mi"
+                        },
+                        "containerID": "containerd://6b24fe987efe63df2b0e7368db2787596ab3802ce939effca4aeb42ce15ca366",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "install-cni-binaries",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "100m",
+                                "memory": "10Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://6b24fe987efe63df2b0e7368db2787596ab3802ce939effca4aeb42ce15ca366",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:08Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:08Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/host/opt/cni/bin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4xsbs",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "172.18.0.2",
+                "podIPs": [
+                    {
+                        "ip": "172.18.0.2"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                    },
+                    "requests": {
+                        "cpu": "79m",
+                        "memory": "10Mi"
+                    }
+                },
+                "startTime": "2026-10-05T03:47:49Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/default-container": "cilium-agent"
+                },
+                "creationTimestamp": "2026-10-05T03:47:49Z",
+                "generateName": "cilium-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "cilium-agent",
+                    "app.kubernetes.io/part-of": "cilium",
+                    "controller-revision-hash": "84f9fdd7fd",
+                    "helm.sh/chart": "cilium-1.20.2",
+                    "k8s-app": "cilium",
+                    "pod-template-generation": "1"
+                },
+                "name": "cilium-gdmg7",
+                "namespace": "kube-system",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "DaemonSet",
+                        "name": "cilium",
+                        "uid": "9f364dd8-3b43-471c-b2fa-fdbfc064d1b0"
+                    }
+                ],
+                "resourceVersion": "728",
+                "uid": "83b75326-606e-4a4e-a2b9-322c360de150"
+            },
+            "spec": {
+                "affinity": {
+                    "nodeAffinity": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": {
+                            "nodeSelectorTerms": [
+                                {
+                                    "matchFields": [
+                                        {
+                                            "key": "metadata.name",
+                                            "operator": "In",
+                                            "values": [
+                                                "p01-72188a2dcf97-908488b6-control-plane"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    "podAntiAffinity": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": [
+                            {
+                                "labelSelector": {
+                                    "matchLabels": {
+                                        "k8s-app": "cilium"
+                                    }
+                                },
+                                "topologyKey": "kubernetes.io/hostname"
+                            }
+                        ]
+                    }
+                },
+                "automountServiceAccountToken": true,
+                "containers": [
+                    {
+                        "args": [
+                            "--config-dir=/tmp/cilium/config-map"
+                        ],
+                        "command": [
+                            "cilium-agent"
+                        ],
+                        "env": [
+                            {
+                                "name": "K8S_NODE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "spec.nodeName"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "CILIUM_K8S_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "CILIUM_CLUSTERMESH_CONFIG",
+                                "value": "/var/lib/cilium/clustermesh/"
+                            },
+                            {
+                                "name": "GOMEMLIMIT",
+                                "valueFrom": {
+                                    "resourceFieldRef": {
+                                        "divisor": "1",
+                                        "resource": "limits.memory"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBE_CLIENT_BACKOFF_BASE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "KUBE_CLIENT_BACKOFF_DURATION",
+                                "value": "120"
+                            }
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "lifecycle": {
+                            "postStart": {
+                                "exec": {
+                                    "command": [
+                                        "bash",
+                                        "-c",
+                                        "set -o errexit\nset -o pipefail\nset -o nounset\n\n# When running in AWS ENI mode, it's likely that 'aws-node' has\n# had a chance to install SNAT iptables rules. These can result\n# in dropped traffic, so we should attempt to remove them.\n# We do it using a 'postStart' hook since this may need to run\n# for nodes which might have already been init'ed but may still\n# have dangling rules. This is safe because there are no\n# dependencies on anything that is part of the startup script\n# itself, and can be safely run multiple times per node (e.g. in\n# case of a restart).\nif [[ \"$(iptables-save | grep -E -c 'AWS-SNAT-CHAIN|AWS-CONNMARK-CHAIN')\" != \"0\" ]];\nthen\n    echo 'Deleting iptables rules created by the AWS CNI VPC plugin'\n    iptables-save | grep -E -v 'AWS-SNAT-CHAIN|AWS-CONNMARK-CHAIN' | iptables-restore\nfi\necho 'Done!'\n"
+                                    ]
+                                }
+                            },
+                            "preStop": {
+                                "exec": {
+                                    "command": [
+                                        "/cni-uninstall.sh"
+                                    ]
+                                }
+                            }
+                        },
+                        "livenessProbe": {
+                            "failureThreshold": 10,
+                            "httpGet": {
+                                "host": "127.0.0.1",
+                                "httpHeaders": [
+                                    {
+                                        "name": "brief",
+                                        "value": "true"
+                                    },
+                                    {
+                                        "name": "require-k8s-connectivity",
+                                        "value": "false"
+                                    }
+                                ],
+                                "path": "/healthz",
+                                "port": "health",
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 30,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 5
+                        },
+                        "name": "cilium-agent",
+                        "ports": [
+                            {
+                                "containerPort": 9879,
+                                "hostPort": 9879,
+                                "name": "health",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "host": "127.0.0.1",
+                                "httpHeaders": [
+                                    {
+                                        "name": "brief",
+                                        "value": "true"
+                                    }
+                                ],
+                                "path": "/healthz",
+                                "port": "health",
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 30,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 5
+                        },
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {
+                                "add": [
+                                    "CHOWN",
+                                    "KILL",
+                                    "NET_ADMIN",
+                                    "NET_RAW",
+                                    "IPC_LOCK",
+                                    "SYS_MODULE",
+                                    "SYS_ADMIN",
+                                    "SYS_RESOURCE",
+                                    "DAC_OVERRIDE",
+                                    "FOWNER",
+                                    "SETGID",
+                                    "SETUID",
+                                    "SYSLOG"
+                                ],
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "seLinuxOptions": {
+                                "level": "s0",
+                                "type": "spc_t"
+                            }
+                        },
+                        "startupProbe": {
+                            "failureThreshold": 300,
+                            "httpGet": {
+                                "host": "127.0.0.1",
+                                "httpHeaders": [
+                                    {
+                                        "name": "brief",
+                                        "value": "true"
+                                    }
+                                ],
+                                "path": "/healthz",
+                                "port": "health",
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/host/proc/sys/net",
+                                "name": "host-proc-sys-net"
+                            },
+                            {
+                                "mountPath": "/host/proc/sys/kernel",
+                                "name": "host-proc-sys-kernel"
+                            },
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "mountPropagation": "HostToContainer",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium",
+                                "name": "cilium-run"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium/netns",
+                                "mountPropagation": "HostToContainer",
+                                "name": "cilium-netns"
+                            },
+                            {
+                                "mountPath": "/host/etc/cni/net.d",
+                                "name": "etc-cni-netd"
+                            },
+                            {
+                                "mountPath": "/var/lib/cilium/clustermesh",
+                                "name": "clustermesh-secrets",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/lib/modules",
+                                "name": "lib-modules",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/run/xtables.lock",
+                                "name": "xtables-lock"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "hostNetwork": true,
+                "hostUsers": true,
+                "initContainers": [
+                    {
+                        "command": [
+                            "cilium-dbg",
+                            "build-config",
+                            "--k8s-api-server-urls="
+                        ],
+                        "env": [
+                            {
+                                "name": "K8S_NODE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "spec.nodeName"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "CILIUM_K8S_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "config",
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {
+                                "add": [
+                                    "NET_ADMIN"
+                                ],
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "command": [
+                            "bash",
+                            "-ec",
+                            "cp /usr/bin/cilium-mount /hostbin/cilium-mount;\nnsenter --cgroup=/hostproc/1/ns/cgroup --mount=/hostproc/1/ns/mnt \"${BIN_PATH}/cilium-mount\" $CGROUP_ROOT;\nrm /hostbin/cilium-mount\n"
+                        ],
+                        "env": [
+                            {
+                                "name": "CGROUP_ROOT",
+                                "value": "/run/cilium/cgroupv2"
+                            },
+                            {
+                                "name": "BIN_PATH",
+                                "value": "/opt/cni/bin"
+                            }
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "mount-cgroup",
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {
+                                "add": [
+                                    "SYS_ADMIN",
+                                    "SYS_CHROOT",
+                                    "SYS_PTRACE"
+                                ],
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "seLinuxOptions": {
+                                "level": "s0",
+                                "type": "spc_t"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/hostproc",
+                                "name": "hostproc"
+                            },
+                            {
+                                "mountPath": "/hostbin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "command": [
+                            "bash",
+                            "-ec",
+                            "cp /usr/bin/cilium-sysctlfix /hostbin/cilium-sysctlfix;\nnsenter --mount=/hostproc/1/ns/mnt \"${BIN_PATH}/cilium-sysctlfix\";\nrm /hostbin/cilium-sysctlfix\n"
+                        ],
+                        "env": [
+                            {
+                                "name": "BIN_PATH",
+                                "value": "/opt/cni/bin"
+                            }
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "apply-sysctl-overwrites",
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {
+                                "add": [
+                                    "SYS_ADMIN",
+                                    "SYS_CHROOT",
+                                    "SYS_PTRACE"
+                                ],
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "seLinuxOptions": {
+                                "level": "s0",
+                                "type": "spc_t"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/hostproc",
+                                "name": "hostproc"
+                            },
+                            {
+                                "mountPath": "/hostbin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "args": [
+                            "mount | grep \"/sys/fs/bpf type bpf\" || mount -t bpf bpf /sys/fs/bpf"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "mount-bpf-fs",
+                        "resources": {},
+                        "securityContext": {
+                            "privileged": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "mountPropagation": "Bidirectional",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "command": [
+                            "/init-container.sh"
+                        ],
+                        "env": [
+                            {
+                                "name": "CILIUM_ALL_STATE",
+                                "valueFrom": {
+                                    "configMapKeyRef": {
+                                        "key": "clean-cilium-state",
+                                        "name": "cilium-config",
+                                        "optional": true
+                                    }
+                                }
+                            },
+                            {
+                                "name": "CILIUM_BPF_STATE",
+                                "valueFrom": {
+                                    "configMapKeyRef": {
+                                        "key": "clean-cilium-bpf-state",
+                                        "name": "cilium-config",
+                                        "optional": true
+                                    }
+                                }
+                            },
+                            {
+                                "name": "WRITE_CNI_CONF_WHEN_READY",
+                                "valueFrom": {
+                                    "configMapKeyRef": {
+                                        "key": "write-cni-conf-when-ready",
+                                        "name": "cilium-config",
+                                        "optional": true
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "clean-cilium-state",
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {
+                                "add": [
+                                    "NET_ADMIN",
+                                    "SYS_MODULE",
+                                    "SYS_ADMIN",
+                                    "SYS_RESOURCE"
+                                ],
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "seLinuxOptions": {
+                                "level": "s0",
+                                "type": "spc_t"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/run/cilium/cgroupv2",
+                                "mountPropagation": "HostToContainer",
+                                "name": "cilium-cgroup"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium",
+                                "name": "cilium-run"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "command": [
+                            "/install-plugin.sh"
+                        ],
+                        "image": "quay.io/cilium/cilium:v1.20.2@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "install-cni-binaries",
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "100m",
+                                "memory": "10Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "seLinuxOptions": {
+                                "level": "s0",
+                                "type": "spc_t"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/host/opt/cni/bin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "p01-72188a2dcf97-908488b6-control-plane",
+                "nodeSelector": {
+                    "kubernetes.io/os": "linux"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 2000001000,
+                "priorityClassName": "system-node-critical",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "appArmorProfile": {
+                        "type": "Unconfined"
+                    },
+                    "seccompProfile": {
+                        "type": "Unconfined"
+                    }
+                },
+                "serviceAccount": "cilium",
+                "serviceAccountName": "cilium",
+                "terminationGracePeriodSeconds": 1,
+                "tolerations": [
+                    {
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/disk-pressure",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/memory-pressure",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/pid-pressure",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/unschedulable",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/network-unavailable",
+                        "operator": "Exists"
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {},
+                        "name": "tmp"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/var/run/cilium",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "cilium-run"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/var/run/netns",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "cilium-netns"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/sys/fs/bpf",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "bpf-maps"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/proc",
+                            "type": "Directory"
+                        },
+                        "name": "hostproc"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/run/cilium/cgroupv2",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "cilium-cgroup"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/opt/cni/bin",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "cni-path"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/etc/cni/net.d",
+                            "type": "DirectoryOrCreate"
+                        },
+                        "name": "etc-cni-netd"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/lib/modules",
+                            "type": ""
+                        },
+                        "name": "lib-modules"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/run/xtables.lock",
+                            "type": "FileOrCreate"
+                        },
+                        "name": "xtables-lock"
+                    },
+                    {
+                        "name": "clustermesh-secrets",
+                        "projected": {
+                            "defaultMode": 256,
+                            "sources": [
+                                {
+                                    "secret": {
+                                        "name": "cilium-clustermesh",
+                                        "optional": true
+                                    }
+                                },
+                                {
+                                    "secret": {
+                                        "items": [
+                                            {
+                                                "key": "tls.key",
+                                                "path": "common-etcd-client.key"
+                                            },
+                                            {
+                                                "key": "tls.crt",
+                                                "path": "common-etcd-client.crt"
+                                            },
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "common-etcd-client-ca.crt"
+                                            }
+                                        ],
+                                        "name": "clustermesh-apiserver-remote-cert",
+                                        "optional": true
+                                    }
+                                },
+                                {
+                                    "secret": {
+                                        "items": [
+                                            {
+                                                "key": "tls.key",
+                                                "path": "local-etcd-client.key"
+                                            },
+                                            {
+                                                "key": "tls.crt",
+                                                "path": "local-etcd-client.crt"
+                                            },
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "local-etcd-client-ca.crt"
+                                            }
+                                        ],
+                                        "name": "clustermesh-apiserver-local-cert",
+                                        "optional": true
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/proc/sys/net",
+                            "type": "Directory"
+                        },
+                        "name": "host-proc-sys-net"
+                    },
+                    {
+                        "hostPath": {
+                            "path": "/proc/sys/kernel",
+                            "type": "Directory"
+                        },
+                        "name": "host-proc-sys-kernel"
+                    },
+                    {
+                        "name": "kube-api-access-sv8r9",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "100m",
+                    "memory": "10Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T03:47:49Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T03:48:14Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T03:48:19Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T03:48:19Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-05T03:47:49Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://f909771487cb4e6bf95d355d84ae16794d8134a24b87213618dc76043f5e8a33",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "cilium-agent",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-05T03:48:14Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/host/proc/sys/net",
+                                "name": "host-proc-sys-net"
+                            },
+                            {
+                                "mountPath": "/host/proc/sys/kernel",
+                                "name": "host-proc-sys-kernel"
+                            },
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium",
+                                "name": "cilium-run"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium/netns",
+                                "name": "cilium-netns"
+                            },
+                            {
+                                "mountPath": "/host/etc/cni/net.d",
+                                "name": "etc-cni-netd"
+                            },
+                            {
+                                "mountPath": "/var/lib/cilium/clustermesh",
+                                "name": "clustermesh-secrets",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/lib/modules",
+                                "name": "lib-modules",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/run/xtables.lock",
+                                "name": "xtables-lock"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.3"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "containerID": "containerd://f6581522d0f08b2c5431b912ab8e819983f3b90dd9f01146e7deee8ece0f4fc9",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "config",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://f6581522d0f08b2c5431b912ab8e819983f3b90dd9f01146e7deee8ece0f4fc9",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:08Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:08Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "containerID": "containerd://b7f50abdd0589266b283827a4b96dbba373085b3c0232b157a77974d579ab97e",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "mount-cgroup",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://b7f50abdd0589266b283827a4b96dbba373085b3c0232b157a77974d579ab97e",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:09Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:09Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/hostproc",
+                                "name": "hostproc"
+                            },
+                            {
+                                "mountPath": "/hostbin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "containerID": "containerd://4ebd1176694a58173ed27c58d9f39eec028b192d4b3ace03000defd3b3eff0ea",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "apply-sysctl-overwrites",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://4ebd1176694a58173ed27c58d9f39eec028b192d4b3ace03000defd3b3eff0ea",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:10Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:10Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/hostproc",
+                                "name": "hostproc"
+                            },
+                            {
+                                "mountPath": "/hostbin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "containerID": "containerd://920726db6318f166ed0768c42389337607686d8278a059b1335aa318ef908cb5",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "mount-bpf-fs",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://920726db6318f166ed0768c42389337607686d8278a059b1335aa318ef908cb5",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:11Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:11Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "containerID": "containerd://fad8e92100c0eae36328223d5ebc93b516fa67c7793b78433378be1d354616b3",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "clean-cilium-state",
+                        "ready": true,
+                        "resources": {},
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://fad8e92100c0eae36328223d5ebc93b516fa67c7793b78433378be1d354616b3",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:12Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:12Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/sys/fs/bpf",
+                                "name": "bpf-maps"
+                            },
+                            {
+                                "mountPath": "/run/cilium/cgroupv2",
+                                "name": "cilium-cgroup"
+                            },
+                            {
+                                "mountPath": "/var/run/cilium",
+                                "name": "cilium-run"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "allocatedResources": {
+                            "cpu": "100m",
+                            "memory": "10Mi"
+                        },
+                        "containerID": "containerd://af4625d12744298aaf94313a8738556b9ef67dd57cabcf3425f2e0e545f94ad2",
+                        "image": "sha256:e8a7b89d30c0711e31b5ee947e0493786824413ecda8349416155b39663570b3",
+                        "imageID": "quay.io/cilium/cilium@sha256:2939231d0d3e3ebddcd80fffa168b7ddcc78fdf0dc864d1c8c126ff523c54f01",
+                        "lastState": {},
+                        "name": "install-cni-binaries",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "100m",
+                                "memory": "10Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://af4625d12744298aaf94313a8738556b9ef67dd57cabcf3425f2e0e545f94ad2",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-05T03:48:13Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-05T03:48:13Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0
+                                ],
+                                "uid": 0
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/host/opt/cni/bin",
+                                "name": "cni-path"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-sv8r9",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "172.18.0.3",
+                "podIPs": [
+                    {
+                        "ip": "172.18.0.3"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                    },
+                    "requests": {
+                        "cpu": "79m",
+                        "memory": "10Mi"
+                    }
+                },
+                "startTime": "2026-10-05T03:47:49Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

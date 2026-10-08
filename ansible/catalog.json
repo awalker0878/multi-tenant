@@ -1,8 +1,0 @@
-{
-  "format": "hosting-ansible-catalog/1",
-  "playbooks": [
-    {"path": "playbooks/local/stage_reference.yml", "profile": "local"},
-    {"path": "playbooks/local/validate_readback.yml", "profile": "local"},
-    {"path": "playbooks/native/configure_linux.yml", "profile": "native-linux"}
-  ]
-}

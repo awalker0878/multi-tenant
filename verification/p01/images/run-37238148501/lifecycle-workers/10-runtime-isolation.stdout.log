@@ -1,0 +1,1 @@
+{"application_source_absent": true, "capabilities_effective": 0, "gid": 10001, "installed_distributions": [["product-lifecycle-worker", "0.1.0.dev0"]], "module_file": "/opt/venv/lib/python3.12/site-packages/lifecycle_worker/__init__.py", "network_interfaces": ["lo"], "no_new_privileges": 1, "python_version": "3.12.14", "root_read_only": true, "uid": 10001}

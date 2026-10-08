@@ -1,0 +1,96 @@
+{
+  "source_revision": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+  "runs": [
+    {
+      "id": 37704372048,
+      "name": "P06 execution",
+      "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372048",
+      "updated_at": "2026-10-07T23:49:09Z"
+    },
+    {
+      "id": 37704372095,
+      "name": "Context policy",
+      "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372095",
+      "updated_at": "2026-10-07T23:49:21Z"
+    },
+    {
+      "id": 37704372071,
+      "name": "P01 policy controls",
+      "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372071",
+      "updated_at": "2026-10-07T23:49:18Z"
+    },
+    {
+      "id": 37704372056,
+      "name": "P01 foundation contracts",
+      "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372056",
+      "updated_at": "2026-10-07T23:49:55Z"
+    },
+    {
+      "id": 37704372043,
+      "name": "P01 foundation packages",
+      "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372043",
+      "updated_at": "2026-10-07T23:51:31Z"
+    },
+    {
+      "id": 37704372065,
+      "name": "P08 native migration components",
+      "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372065",
+      "updated_at": "2026-10-07T23:51:29Z"
+    },
+    {
+      "id": 37704372049,
+      "name": "P07 native readiness preparation",
+      "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372049",
+      "updated_at": "2026-10-07T23:51:10Z"
+    },
+    {
+      "id": 37704372032,
+      "name": "P01 bootstrap images",
+      "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372032",
+      "updated_at": "2026-10-07T23:51:42Z"
+    },
+    {
+      "id": 37704372087,
+      "name": "P09 platform expansion conformance",
+      "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372087",
+      "updated_at": "2026-10-07T23:51:35Z"
+    },
+    {
+      "id": 37704372041,
+      "name": "P10 operating qualification engineering",
+      "head_sha": "0ba5d986d6ba20ec9303f016baf468cedaa3c352",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37704372041",
+      "updated_at": "2026-10-07T23:51:41Z"
+    }
+  ],
+  "limitations": "Observation only; in-progress jobs are not counted as passing. See each immutable source run for subsequent completion."
+}

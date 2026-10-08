@@ -1,0 +1,118 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Current Inventory collection admission",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/tenants/{tenant}/inventory-collection-checks": {
+      "post": {
+        "operationId": "checkInventoryCollection",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "owner_id",
+                  "site_id",
+                  "policy_digest"
+                ],
+                "properties": {
+                  "owner_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "site_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "policy_digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current owner and tenant admission; not endpoint or native-write authority",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "allowed",
+                    "tenant_id",
+                    "owner_id",
+                    "site_id",
+                    "policy_digest",
+                    "evaluated_at",
+                    "native_write_authorized"
+                  ],
+                  "properties": {
+                    "allowed": {
+                      "const": true
+                    },
+                    "tenant_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "owner_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "site_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "policy_digest": {
+                      "type": "string",
+                      "maxLength": 255
+                    },
+                    "evaluated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "native_write_authorized": {
+                      "const": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "InventoryWorkload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "InventoryWorkload": []
+    }
+  ]
+}

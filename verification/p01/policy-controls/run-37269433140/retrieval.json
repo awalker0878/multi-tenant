@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "source_revision": "48a998c8b4517f5d27933973d9d4b04677b48e49",
+  "source_tree": "f3853058cb0ed8f304015304740a329e08431ee6",
+  "workflow_run_id": 37269433140,
+  "workflow_conclusion": "success",
+  "observed_at": "2026-10-05T05:52:20.320334+00:00",
+  "archives": [
+    {
+      "id": 11328030594,
+      "name": "p01-repository-secrets-48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "size_in_bytes": 206829,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11328030594",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11328030594/zip",
+      "expired": false,
+      "created_at": "2026-10-05T05:49:09Z",
+      "expires_at": "2026-10-19T05:49:08Z",
+      "updated_at": "2026-10-05T05:49:09Z",
+      "digest": "sha256:64026ae3da8f696f6c85a89c7efa9f0d3ec9b990ccce2c725b7238466c2659cb",
+      "workflow_run": {
+        "id": 37269433140,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "48a998c8b4517f5d27933973d9d4b04677b48e49"
+      }
+    },
+    {
+      "id": 11327537007,
+      "name": "p01-policy-controls-48a998c8b4517f5d27933973d9d4b04677b48e49",
+      "size_in_bytes": 5214,
+      "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11327537007",
+      "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11327537007/zip",
+      "expired": false,
+      "created_at": "2026-10-05T05:49:03Z",
+      "expires_at": "2026-10-19T05:49:02Z",
+      "updated_at": "2026-10-05T05:49:03Z",
+      "digest": "sha256:126aa8b5d1eaf4efc59d3a532a688c57ec19cee5a9979c82a2b4ddebf661a6c0",
+      "workflow_run": {
+        "id": 37269433140,
+        "repository_id": 1374801496,
+        "head_repository_id": 1374801496,
+        "head_branch": "greenfield/enterprise-microservices-plan",
+        "head_sha": "48a998c8b4517f5d27933973d9d4b04677b48e49"
+      }
+    }
+  ],
+  "repository_scan": {
+    "result": "PASSED",
+    "tracked_files": 9766,
+    "secrets": 0,
+    "detector_positive_control": "PASSED",
+    "original_report_sha256": "1ca5ccc2be848986cee825db42ce1ba49ef01a592963e12a47f47cb035f24e56",
+    "archive_path": "repository-secrets.zip",
+    "scanner_sha256": "93f9da8e4ba5e0c1c76d8234ed2494cf9afb0a96fd21953e424bb795f3299b8e"
+  },
+  "tests": 59,
+  "command_log_hashes_verified": 7,
+  "unique_source_bindings_verified": 9766,
+  "source_verification_method": "Every report source SHA-256 matched retained/local or connector-fetched original bytes and an independently calculated Git blob ID in the exact immutable Git tree.",
+  "limitations": [
+    "Review and operating identities in fixtures are synthetic; no repository protection or operated trust is activated.",
+    "Secret detection is heuristic, scans the tracked source revision only, and does not scan Git history.",
+    "The exact redacted source-inventory report is retained in the original hash-verified ZIP. No raw detector output or synthetic token is retained."
+  ],
+  "retained_file_sha256": {
+    "release-set.log": "1724d8a4980076eeee8b63e02d0313fb3d9e08edcb06a756a47d9fd069d567d1",
+    "bundles.log": "0fda56c7b83964511a7492367fc43b33dde9fb5a7a65cbdca57a4018461ff623",
+    "operating-inputs.log": "a88c1904e34b7249aee5e167062d6f78b69ed8bf340b5ea8945dfd8b90545099",
+    "check-sources.log": "1654fe68060ba7356c7c604a26efb138acba00d15510b2c47828846e6c21d2da",
+    "repository-secrets.zip": "64026ae3da8f696f6c85a89c7efa9f0d3ec9b990ccce2c725b7238466c2659cb",
+    "report.json": "59cd044b400f891f3006dfd4937eacae01ca655a5a4353ae737ca92cc26a324f",
+    "reviews.log": "34abaf14f3d39e70a6f5c77ca2e33b2c53145443a5b0693f6fafe08b3de0ea14",
+    "redaction.log": "da9a317c635f709d8c8aa5f921554eeea792b99c0ab1347d79e8c7b8f1e09c96",
+    "exclusions.log": "01f614fd7293a95c49afb80d71dec01facf491a01787fe30cd51ea336d78d2e3"
+  }
+}

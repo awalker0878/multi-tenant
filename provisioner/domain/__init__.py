@@ -1,1 +1,0 @@
-"""Canonical domain models for the portable provisioning core."""

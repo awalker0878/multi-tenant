@@ -1,0 +1,653 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.example.invalid/catalogue/intent-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "deployment_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ]
+    },
+    "service_owner_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "minItems": 1,
+      "maxItems": 50
+    },
+    "workloads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "wsd": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "version"
+            ]
+          },
+          "security_domain": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "version"
+            ]
+          },
+          "compute": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "vcpus": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4096
+              },
+              "memory_mib": {
+                "type": "integer",
+                "minimum": 128,
+                "maximum": 16777216
+              },
+              "architecture": {
+                "enum": [
+                  "x86_64",
+                  "aarch64"
+                ]
+              }
+            },
+            "required": [
+              "vcpus",
+              "memory_mib",
+              "architecture"
+            ]
+          },
+          "guest": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "os": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "image": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "firmware": {
+                "enum": [
+                  "bios",
+                  "uefi"
+                ]
+              },
+              "secure_boot": {
+                "type": "boolean"
+              },
+              "hardening_profile": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "os",
+              "image",
+              "firmware",
+              "secure_boot",
+              "hardening_profile"
+            ]
+          },
+          "disks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "order": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 63
+                },
+                "size_gib": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1048576
+                },
+                "storage_class": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "boot": {
+                  "type": "boolean"
+                },
+                "dataset_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "encryption": {
+                  "enum": [
+                    "required",
+                    "preferred",
+                    "optional"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "order",
+                "size_gib",
+                "storage_class",
+                "boot",
+                "dataset_id",
+                "encryption"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 64
+          },
+          "nics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "order": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 15
+                },
+                "security_domain_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "address_families": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "ipv4",
+                      "ipv6"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 2,
+                  "uniqueItems": true
+                },
+                "address_intent": {
+                  "enum": [
+                    "dynamic",
+                    "reserved",
+                    "static"
+                  ]
+                },
+                "network_class": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                }
+              },
+              "required": [
+                "id",
+                "order",
+                "security_domain_id",
+                "address_families",
+                "address_intent",
+                "network_class"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 16
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_.-]{0,127}$"
+                },
+                "strength": {
+                  "enum": [
+                    "required",
+                    "preferred",
+                    "optional"
+                  ]
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "integer",
+                    "boolean"
+                  ],
+                  "maxLength": 2048
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                }
+              },
+              "required": [
+                "key",
+                "strength",
+                "value",
+                "reason"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 100
+          },
+          "failure_domain": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "group": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "mode": {
+                "enum": [
+                  "affinity",
+                  "anti_affinity",
+                  "independent"
+                ]
+              },
+              "strength": {
+                "enum": [
+                  "required",
+                  "preferred",
+                  "optional"
+                ]
+              }
+            },
+            "required": [
+              "group",
+              "mode",
+              "strength"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role",
+          "wsd",
+          "security_domain",
+          "compute",
+          "guest",
+          "disks",
+          "nics",
+          "requirements",
+          "failure_domain"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 100
+    },
+    "datasets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "owner_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "consistency_group": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "consistency": {
+            "enum": [
+              "application",
+              "crash",
+              "quiesced"
+            ]
+          },
+          "recovery": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "rpo_seconds": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 31536000
+              },
+              "rto_seconds": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 31536000
+              },
+              "method": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "strength": {
+                "enum": [
+                  "required",
+                  "preferred",
+                  "optional"
+                ]
+              }
+            },
+            "required": [
+              "rpo_seconds",
+              "rto_seconds",
+              "method",
+              "strength"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "owner_id",
+          "consistency_group",
+          "consistency",
+          "recovery"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 200
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "kind": {
+            "enum": [
+              "startup",
+              "shutdown",
+              "communication"
+            ]
+          },
+          "readiness": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "protocol": {
+            "enum": [
+              "tcp",
+              "udp",
+              "icmp",
+              "none"
+            ]
+          },
+          "port": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "controlled_interface": {
+            "type": "boolean"
+          },
+          "dataset_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "strength": {
+            "enum": [
+              "required",
+              "preferred",
+              "optional"
+            ]
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "kind",
+          "readiness",
+          "protocol",
+          "port",
+          "controlled_interface",
+          "dataset_id",
+          "strength"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 500
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "owner_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "workload_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_.-]{0,127}$"
+                },
+                "strength": {
+                  "enum": [
+                    "required",
+                    "preferred",
+                    "optional"
+                  ]
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "integer",
+                    "boolean"
+                  ],
+                  "maxLength": 2048
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                }
+              },
+              "required": [
+                "key",
+                "strength",
+                "value",
+                "reason"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "name",
+          "owner_id",
+          "workload_id",
+          "requirements"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 100
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,127}$"
+          },
+          "strength": {
+            "enum": [
+              "required",
+              "preferred",
+              "optional"
+            ]
+          },
+          "value": {
+            "type": [
+              "string",
+              "integer",
+              "boolean"
+            ],
+            "maxLength": 2048
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "key",
+          "strength",
+          "value",
+          "reason"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "schema_version",
+    "deployment_id",
+    "environment",
+    "service_owner_id",
+    "acceptance_criteria",
+    "workloads",
+    "datasets",
+    "dependencies",
+    "services",
+    "requirements"
+  ]
+}

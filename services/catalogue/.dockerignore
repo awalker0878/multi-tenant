@@ -1,0 +1,23 @@
+# The build context is this service directory, never the repository root.
+# Start closed so local dependencies, credentials, tests and evidence stay outside.
+**
+!Dockerfile
+!.dockerignore
+!composer.json
+!composer.lock
+!artisan
+!app/
+!app/**
+!bootstrap/
+!bootstrap/app.php
+!bootstrap/providers.php
+!config/
+!config/**
+!public/
+!public/index.php
+!routes/
+!routes/**
+!resources/
+!resources/**
+!build/
+!build/snapshot.sh

@@ -1,0 +1,13 @@
+{
+  "original_source": "576643e3102ab02a8fd0fc23edd2f2e90d2ec74e",
+  "original_run_id": "37684327980",
+  "original_job_id": "113008124629",
+  "original_conclusion": "failure",
+  "log": "context-policy-original-failure.log",
+  "log_sha256": "b53f00b79613aaf05e30089abbea69d053ceb52d56414b77927c9febd862ed90",
+  "cause": "Native owner infrastructure imported plan_requirements from the HTTP interface layer.",
+  "corrected_source": "f765eb9fba61a16565d4085d8e51a4e0ec681ddd",
+  "corrected_run_id": "37684992982",
+  "corrected_conclusion": "success",
+  "change": "Moved canonical immutable-plan validation to domain/campaign_plan.py and updated every caller. Architecture policy remains unchanged."
+}

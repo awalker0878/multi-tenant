@@ -1,0 +1,16 @@
+{
+  "vhosts": [{"name": "product"}],
+  "permissions": [
+    {"user": "catalogue", "vhost": "product", "configure": "^$", "write": "^catalogue\\.events$", "read": "^$"},
+    {"user": "planning", "vhost": "product", "configure": "^$", "write": "^$", "read": "^planning\\.intent$"}
+  ],
+  "exchanges": [
+    {"name": "catalogue.events", "vhost": "product", "type": "direct", "durable": true, "auto_delete": false, "internal": false, "arguments": {}}
+  ],
+  "queues": [
+    {"name": "planning.intent", "vhost": "product", "durable": true, "auto_delete": false, "arguments": {"x-queue-type": "quorum", "x-delivery-limit": -1}}
+  ],
+  "bindings": [
+    {"source": "catalogue.events", "vhost": "product", "destination": "planning.intent", "destination_type": "queue", "routing_key": "catalogue.intent.changed.v1", "arguments": {}}
+  ]
+}

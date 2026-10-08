@@ -1,0 +1,535 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 3.93kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174
+#2 ...
+
+#3 [auth] library/node:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [auth] library/composer:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#5 [internal] load metadata for docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d
+#5 ...
+
+#2 [internal] load metadata for docker.io/library/node@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174
+#2 DONE 0.6s
+
+#5 [internal] load metadata for docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d
+#5 DONE 0.6s
+
+#6 [internal] load metadata for docker.io/library/php@sha256:aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005
+#6 DONE 0.6s
+
+#7 [internal] load .dockerignore
+#7 transferring context: 523B done
+#7 DONE 0.0s
+
+#8 [php-base 1/4] FROM docker.io/library/php@sha256:aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005
+#8 resolve docker.io/library/php@sha256:aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005 done
+#8 ...
+
+#9 [internal] load build context
+#9 transferring context: 594.36kB 0.0s done
+#9 DONE 0.0s
+
+#8 [php-base 1/4] FROM docker.io/library/php@sha256:aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005
+#8 sha256:85f9cb16cda15e529ff77ae3e00e7e8d3a843ceee194b9c2dfd8c0d74309cca1 10.34kB / 10.34kB done
+#8 sha256:aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005 3.06kB / 3.06kB done
+#8 sha256:934d19571d8a4f7b570ed89cb61f5bcb538475fbc4938299f4599d3a3596193b 0B / 3.49MB 1.6s
+#8 sha256:934d19571d8a4f7b570ed89cb61f5bcb538475fbc4938299f4599d3a3596193b 3.49MB / 3.49MB 1.8s
+#8 sha256:4c278b0a8d2c61c0a002423a220cfdf9ca79aab868a97f7e5b3eb16d94088547 0B / 930B 2.4s
+#8 sha256:4c278b0a8d2c61c0a002423a220cfdf9ca79aab868a97f7e5b3eb16d94088547 930B / 930B 2.5s
+#8 sha256:934d19571d8a4f7b570ed89cb61f5bcb538475fbc4938299f4599d3a3596193b 3.49MB / 3.49MB 2.5s done
+#8 extracting sha256:934d19571d8a4f7b570ed89cb61f5bcb538475fbc4938299f4599d3a3596193b
+#8 sha256:4c278b0a8d2c61c0a002423a220cfdf9ca79aab868a97f7e5b3eb16d94088547 930B / 930B 2.6s done
+#8 sha256:4f5c3887d482c8caa210c801211fc5eb67e44983796b4660cb729b000e3f56de 0B / 223B 3.0s
+#8 sha256:4f5c3887d482c8caa210c801211fc5eb67e44983796b4660cb729b000e3f56de 223B / 223B 3.1s
+#8 sha256:1648a51c22c2f4ef597100b621c5c7e25c17142413fd33a0e1aca12b4033eae5 0B / 488B 3.2s
+#8 sha256:4f5c3887d482c8caa210c801211fc5eb67e44983796b4660cb729b000e3f56de 223B / 223B 3.3s done
+#8 sha256:1648a51c22c2f4ef597100b621c5c7e25c17142413fd33a0e1aca12b4033eae5 488B / 488B 3.4s
+#8 sha256:57b8ec589d859e1168ce64a7fbc82824564ca41c25e46de2875e9aa3aa7e5fef 1.05MB / 14.49MB 3.4s
+#8 sha256:1648a51c22c2f4ef597100b621c5c7e25c17142413fd33a0e1aca12b4033eae5 488B / 488B 3.4s done
+#8 sha256:57b8ec589d859e1168ce64a7fbc82824564ca41c25e46de2875e9aa3aa7e5fef 9.44MB / 14.49MB 3.5s
+#8 sha256:57b8ec589d859e1168ce64a7fbc82824564ca41c25e46de2875e9aa3aa7e5fef 14.49MB / 14.49MB 3.6s
+#8 sha256:6548a80622581338b724b916df3347c97fe9dac3d1014f33ffcb031bdfd6e461 0B / 16.86MB 3.6s
+#8 extracting sha256:934d19571d8a4f7b570ed89cb61f5bcb538475fbc4938299f4599d3a3596193b 1.1s done
+#8 sha256:57b8ec589d859e1168ce64a7fbc82824564ca41c25e46de2875e9aa3aa7e5fef 14.49MB / 14.49MB 3.7s done
+#8 sha256:6548a80622581338b724b916df3347c97fe9dac3d1014f33ffcb031bdfd6e461 16.86MB / 16.86MB 3.8s
+#8 sha256:ff3df8f32479794328057f8a707add445da333f9cc82c9f1750dca2ce16854d0 2.45kB / 2.45kB 3.8s
+#8 sha256:d17435b90723edae2dde2757045a29da3c2f4b0ba24a47f7d1a03fd473648732 0B / 22.43kB 3.8s
+#8 sha256:6548a80622581338b724b916df3347c97fe9dac3d1014f33ffcb031bdfd6e461 16.86MB / 16.86MB 3.9s done
+#8 sha256:ff3df8f32479794328057f8a707add445da333f9cc82c9f1750dca2ce16854d0 2.45kB / 2.45kB 3.8s done
+#8 sha256:d17435b90723edae2dde2757045a29da3c2f4b0ba24a47f7d1a03fd473648732 22.43kB / 22.43kB 3.9s
+#8 extracting sha256:4c278b0a8d2c61c0a002423a220cfdf9ca79aab868a97f7e5b3eb16d94088547 done
+#8 sha256:d17435b90723edae2dde2757045a29da3c2f4b0ba24a47f7d1a03fd473648732 22.43kB / 22.43kB 3.9s done
+#8 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 4.0s done
+#8 sha256:760ec49cf7f828a1bca9e0cb21b2ef44a9e854b5aee73dc93b769f09cb9f83c6 9.26kB / 9.26kB 4.0s done
+#8 extracting sha256:4f5c3887d482c8caa210c801211fc5eb67e44983796b4660cb729b000e3f56de done
+#8 extracting sha256:57b8ec589d859e1168ce64a7fbc82824564ca41c25e46de2875e9aa3aa7e5fef 0.1s done
+#8 extracting sha256:1648a51c22c2f4ef597100b621c5c7e25c17142413fd33a0e1aca12b4033eae5 done
+#8 extracting sha256:6548a80622581338b724b916df3347c97fe9dac3d1014f33ffcb031bdfd6e461
+#8 extracting sha256:6548a80622581338b724b916df3347c97fe9dac3d1014f33ffcb031bdfd6e461 0.6s done
+#8 extracting sha256:ff3df8f32479794328057f8a707add445da333f9cc82c9f1750dca2ce16854d0 done
+#8 extracting sha256:d17435b90723edae2dde2757045a29da3c2f4b0ba24a47f7d1a03fd473648732 done
+#8 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+#8 extracting sha256:760ec49cf7f828a1bca9e0cb21b2ef44a9e854b5aee73dc93b769f09cb9f83c6
+#8 ...
+
+#10 [frontend 1/5] FROM docker.io/library/node@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174
+#10 resolve docker.io/library/node@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174 0.0s done
+#10 sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174 1.93kB / 1.93kB done
+#10 sha256:622f209f6c16ba5af4d9a337cae6577d096f17174b904cfc6a5b0c81a2679c24 6.76kB / 6.76kB done
+#10 sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 28.23MB / 28.23MB 0.6s done
+#10 sha256:990581063f5c8a03a57db7a0d116679ea6e6e335d4ac48ef457f26f82d917eba 3.32kB / 3.32kB 0.1s done
+#10 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 50.50MB / 50.50MB 0.6s done
+#10 sha256:f95897c2a1fb7bce26b018dd74b2845f816f7b86d5adff2939c6482b1d5b474c 1.71MB / 1.71MB 0.4s done
+#10 extracting sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 1.3s done
+#10 sha256:c35748eaa5ecc949b0f7cc349a9f7c4a5417dc008e2d9bebd53678d87238fcbf 450B / 450B 0.7s done
+#10 extracting sha256:990581063f5c8a03a57db7a0d116679ea6e6e335d4ac48ef457f26f82d917eba done
+#10 extracting sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 1.8s done
+#10 extracting sha256:f95897c2a1fb7bce26b018dd74b2845f816f7b86d5adff2939c6482b1d5b474c 0.1s done
+#10 extracting sha256:c35748eaa5ecc949b0f7cc349a9f7c4a5417dc008e2d9bebd53678d87238fcbf done
+#10 DONE 7.3s
+
+#11 [frontend 2/5] WORKDIR /frontend
+#11 DONE 0.0s
+
+#8 [php-base 1/4] FROM docker.io/library/php@sha256:aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005
+#8 extracting sha256:760ec49cf7f828a1bca9e0cb21b2ef44a9e854b5aee73dc93b769f09cb9f83c6 done
+#8 ...
+
+#12 [frontend 3/5] COPY package.json package-lock.json tsconfig.json vite.config.ts ./
+#12 DONE 0.0s
+
+#8 [php-base 1/4] FROM docker.io/library/php@sha256:aba7168955e4b1e1f5e61e2e5a0257eff5b1563d3fc4ca272373183b57f53005
+#8 DONE 7.4s
+
+#13 [php-base 2/4] COPY build/download-apks.php build/apk.lock.json /tmp/service-build/
+#13 DONE 0.0s
+
+#14 [php-base 2/4] COPY build/download-apks.php build/apk.lock.json /tmp/service-build/
+#14 CACHED
+
+#15 [frontend 4/5] COPY resources/ ./resources/
+#15 DONE 0.0s
+
+#16 [frontend 5/5] RUN node -e 'if (process.version !== "v24.19.0") throw new Error(process.version)'     && npm --version     && npm ci --ignore-scripts --no-audit --no-fund     && npm run typecheck && npm run build
+#16 0.309 11.17.0
+#16 ...
+
+#17 [composer-tool 1/1] FROM docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d
+#17 resolve docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d done
+#17 sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d 3.61kB / 3.61kB done
+#17 sha256:87ef1f7078ab07ff3822199a1572016cd47bc5dc5cd9aae9e6f2d9b2884a50f9 12.14kB / 12.14kB done
+#17 sha256:c74954296e3dcddf622cc98260e98c4dcf93fa3a75aa35323873dd266bd4bd1e 3.49MB / 3.49MB 0.8s done
+#17 sha256:406faa0b22ce98d8b28e44c625e146357adf030ab36c13a5bcdc3d4d05696978 931B / 931B 0.8s done
+#17 sha256:108ad594590ceb72747aa8d762dc9fb9d1f6377ac3e991684c4ee9c46d38e2fa 215B / 215B 0.8s done
+#17 sha256:88c97ededfa581ed39cd2fad6551d825b2f6527397e92c2eafa80648778438b6 14.49MB / 14.49MB 1.0s done
+#17 sha256:0bfa53ef058425d39dda0dc330b0afa6aef24ed3cac2b9cb8461ee73d98e1667 490B / 490B 0.8s done
+#17 extracting sha256:c74954296e3dcddf622cc98260e98c4dcf93fa3a75aa35323873dd266bd4bd1e 0.2s done
+#17 sha256:6361c0c16a9abd0a1ac1a96c836fd6273a651e1a15d291e2811f1e36904c0f96 22.83MB / 22.83MB 1.8s done
+#17 sha256:b7fa1c822b375082f66aed3706a736de5ac75f201b684d75f728d3f8218d94be 2.45kB / 2.45kB 0.9s done
+#17 sha256:52bc90a67a58631429510dce4678820c6c9f4f7401f893e131eab5e61d6e4ba1 22.43kB / 22.43kB 1.0s done
+#17 sha256:8806a571cc741e14b8f9231f56c52579b3d524dfddf2ba831dfc13dbdafcb292 253B / 253B 1.1s done
+#17 sha256:6f7b1962d76481345b26e2686cfd94cb8f3d3d9d4b9bd5473b4c8e9a7929cd76 1.08MB / 1.08MB 1.3s done
+#17 sha256:b643345218f3d9927c0c0a2c77e668efb8875590c035958d065feb6c5ae2b1b1 31.96MB / 31.96MB 2.4s done
+#17 sha256:92421a00585b560d1bf778295d236587186c4650824389f597ff4f21925040f8 419B / 419B 4.0s done
+#17 sha256:1755349a9517f4193071aca80c53be43652721fbd4ca9b15bb18c4fb1fed3a96 93B / 93B 4.1s done
+#17 extracting sha256:406faa0b22ce98d8b28e44c625e146357adf030ab36c13a5bcdc3d4d05696978 done
+#17 extracting sha256:108ad594590ceb72747aa8d762dc9fb9d1f6377ac3e991684c4ee9c46d38e2fa done
+#17 extracting sha256:88c97ededfa581ed39cd2fad6551d825b2f6527397e92c2eafa80648778438b6 0.2s done
+#17 extracting sha256:0bfa53ef058425d39dda0dc330b0afa6aef24ed3cac2b9cb8461ee73d98e1667 done
+#17 extracting sha256:6361c0c16a9abd0a1ac1a96c836fd6273a651e1a15d291e2811f1e36904c0f96 0.6s done
+#17 extracting sha256:b7fa1c822b375082f66aed3706a736de5ac75f201b684d75f728d3f8218d94be done
+#17 extracting sha256:52bc90a67a58631429510dce4678820c6c9f4f7401f893e131eab5e61d6e4ba1 done
+#17 extracting sha256:b643345218f3d9927c0c0a2c77e668efb8875590c035958d065feb6c5ae2b1b1 0.9s done
+#17 extracting sha256:8806a571cc741e14b8f9231f56c52579b3d524dfddf2ba831dfc13dbdafcb292 done
+#17 extracting sha256:6f7b1962d76481345b26e2686cfd94cb8f3d3d9d4b9bd5473b4c8e9a7929cd76 0.0s done
+#17 extracting sha256:92421a00585b560d1bf778295d236587186c4650824389f597ff4f21925040f8 done
+#17 extracting sha256:1755349a9517f4193071aca80c53be43652721fbd4ca9b15bb18c4fb1fed3a96 done
+#17 DONE 9.0s
+
+#18 [php-base 3/4] RUN : > /etc/apk/repositories     && php /tmp/service-build/download-apks.php build     && apk add --no-network --repositories-file /dev/null --virtual .phpize-deps /tmp/service-apks/*.apk     && docker-php-ext-install -j2 pdo_pgsql     && apk add --no-network --repositories-file /dev/null libpq=18.6-r0 openssl=3.5.9-r0     && apk del --no-network .phpize-deps     && rm -rf /tmp/service-apks /tmp/service-build     && cp "/usr/local/etc/php/php.ini-production" "/usr/local/etc/php/php.ini"
+#18 ...
+
+#16 [frontend 5/5] RUN node -e 'if (process.version !== "v24.19.0") throw new Error(process.version)'     && npm --version     && npm ci --ignore-scripts --no-audit --no-fund     && npm run typecheck && npm run build
+#16 3.345 
+#16 3.345 added 77 packages in 3s
+#16 3.346 npm notice
+#16 3.346 npm notice New major version of npm available! 11.17.0 -> 12.2.0
+#16 3.346 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+#16 3.346 npm notice To update run: npm install -g npm@12.2.0
+#16 3.346 npm notice
+#16 3.462 
+#16 3.462 > product-console@0.0.0 typecheck
+#16 3.462 > vue-tsc --noEmit
+#16 3.462 
+#16 9.106 
+#16 9.106 > product-console@0.0.0 build
+#16 9.106 > vite build
+#16 9.106 
+#16 9.433 vite v8.3.2 building client environment for production...
+#16 9.445 transforming...
+#16 9.634 ✓ 580 modules transformed.
+#16 9.654 rendering chunks...
+#16 9.709 computing gzip size...
+#16 9.712 public/build/manifest.json                         2.53 kB │ gzip:  0.47 kB
+#16 9.712 public/build/assets/IdentityLayout-DWjcmymb.css    0.88 kB │ gzip:  0.35 kB
+#16 9.712 public/build/assets/app-CN-OKntt.css              11.98 kB │ gzip:  3.21 kB
+#16 9.712 public/build/assets/IdentityLayout-Bqprw4NY.js     1.23 kB │ gzip:  0.76 kB
+#16 9.712 public/build/assets/Foundation-CieiHnOE.js         1.60 kB │ gzip:  0.83 kB
+#16 9.712 public/build/assets/Login-BcXJ95l6.js              1.75 kB │ gzip:  0.82 kB
+#16 9.712 public/build/assets/Password-DwbQCgBL.js           2.17 kB │ gzip:  0.88 kB
+#16 9.712 public/build/assets/Account-6Wf0OiPl.js            3.05 kB │ gzip:  1.42 kB
+#16 9.712 public/build/assets/Setup-MowN2YpX.js              5.09 kB │ gzip:  2.13 kB
+#16 9.712 public/build/assets/Tenant-CT20B1wK.js             8.41 kB │ gzip:  3.03 kB
+#16 9.712 public/build/assets/app-BWEr__-a.js              182.60 kB │ gzip: 62.46 kB
+#16 9.712 
+#16 9.713 ✓ built in 278ms
+#16 ...
+
+#18 [php-base 3/4] RUN : > /etc/apk/repositories     && php /tmp/service-build/download-apks.php build     && apk add --no-network --repositories-file /dev/null --virtual .phpize-deps /tmp/service-apks/*.apk     && docker-php-ext-install -j2 pdo_pgsql     && apk add --no-network --repositories-file /dev/null libpq=18.6-r0 openssl=3.5.9-r0     && apk del --no-network .phpize-deps     && rm -rf /tmp/service-apks /tmp/service-build     && cp "/usr/local/etc/php/php.ini-production" "/usr/local/etc/php/php.ini"
+#18 11.14 ( 1/57) Installing m4 (1.4.20-r1)
+#18 11.27 ( 2/57) Installing libbz2 (1.0.8-r6)
+#18 11.28 ( 3/57) Installing perl (5.42.2-r1)
+#18 11.79 ( 4/57) Installing autoconf (2.73-r0)
+#18 11.80 ( 5/57) Installing jansson (2.15.0-r0)
+#18 11.80 ( 6/57) Installing libstdc++ (15.2.0-r5)
+#18 11.81 ( 7/57) Installing binutils (2.45.1-r1)
+#18 11.87 ( 8/57) Installing clang22-headers (22.1.3-r2)
+#18 11.92 ( 9/57) Installing libffi (3.5.2-r1)
+#18 11.92 (10/57) Installing llvm22-libs (22.1.3-r0)
+#18 12.75 (11/57) Installing clang22-libs (22.1.3-r2)
+#18 13.22 (12/57) Installing fortify-headers (3.0.1-r2)
+#18 13.22 (13/57) Installing libgcc-static (15.2.0-r5)
+#18 13.23 (14/57) Installing libstdc++-dev (15.2.0-r5)
+#18 13.34 (15/57) Installing llvm22-linker-tools (22.1.3-r0)
+#18 13.34 (16/57) Installing musl-dev (1.2.6-r2)
+#18 13.39 (17/57) Installing clang22 (22.1.3-r2)
+#18 13.40 (18/57) Installing libmd (1.2.0-r0)
+#18 13.40 (19/57) Installing dpkg (1.23.7-r0)
+#18 13.46 (20/57) Installing pkgconf (2.5.1-r0)
+#18 13.46 (21/57) Installing dpkg-dev (1.23.7-r0)
+#18 13.48 (22/57) Installing libmagic (5.47-r2)
+#18 13.53 (23/57) Installing file (5.47-r2)
+#18 13.53 (24/57) Installing libgomp (15.2.0-r5)
+#18 13.54 (25/57) Installing libatomic (15.2.0-r5)
+#18 13.54 (26/57) Installing gmp (6.3.0-r4)
+#18 13.54 (27/57) Installing isl26 (0.26-r2)
+#18 13.55 (28/57) Installing mpfr4 (4.2.2-r0)
+#18 13.55 (29/57) Installing mpc1 (1.3.1-r1)
+#18 13.56 (30/57) Installing gcc (15.2.0-r5)
+#18 14.33 (31/57) Installing g++ (15.2.0-r5)
+#18 14.55 (32/57) Installing icu-data-en (78.1-r0)
+#18 14.56   Executing icu-data-en-78.1-r0.post-install
+#18 14.57   * If you need ICU with non-English locales and legacy charset support, install
+#18 14.57   * package icu-data-full.
+#18 14.57 (33/57) Installing icu-libs (78.1-r0)
+#18 14.59 (34/57) Installing icu (78.1-r0)
+#18 14.92 (35/57) Installing icu-dev (78.1-r0)
+#18 14.96 (36/57) Upgrading libcrypto3 (3.5.8-r0 -> 3.5.9-r0)
+#18 15.28 (37/57) Upgrading nghttp2-libs (1.69.0-r0 -> 1.70.0-r0)
+#18 15.28 (38/57) Upgrading libssl3 (3.5.8-r0 -> 3.5.9-r0)
+#18 15.29 (39/57) Installing libpq (18.6-r0)
+#18 15.29 (40/57) Installing libecpg (18.6-r0)
+#18 15.29 (41/57) Installing openssl-dev (3.5.9-r0)
+#18 15.30 (42/57) Installing libpq-dev (18.6-r0)
+#18 15.31 (43/57) Installing libecpg-dev (18.6-r0)
+#18 15.32 (44/57) Installing liburing (2.14-r0)
+#18 15.32 (45/57) Installing liburing-ffi (2.14-r0)
+#18 15.32 (46/57) Installing liburing-dev (2.14-r0)
+#18 15.32 (47/57) Installing linux-headers (7.0.0-r1)
+#18 15.47 (48/57) Installing llvm22 (22.1.3-r0)
+#18 16.05 (49/57) Installing lz4-libs (1.10.0-r1)
+#18 16.05 (50/57) Installing lz4-dev (1.10.0-r1)
+#18 16.05 (51/57) Installing make (4.4.1-r4)
+#18 16.05 (52/57) Upgrading openssl (3.5.8-r0 -> 3.5.9-r0)
+#18 16.06 (53/57) Installing zstd (1.5.7-r2)
+#18 16.06 (54/57) Installing zstd-dev (1.5.7-r2)
+#18 16.06 (55/57) Installing postgresql18-dev (18.6-r0)
+#18 16.18 (56/57) Installing re2c (4.5.1-r0)
+#18 16.22 (57/57) Installing .phpize-deps (20261005.204055)
+#18 16.22 Executing busybox-1.37.0-r31.trigger
+#18 16.22 Executing ca-certificates-20260909-r0.trigger
+#18 16.63 OK: 778.5 MiB in 94 packages
+#18 ...
+
+#16 [frontend 5/5] RUN node -e 'if (process.version !== "v24.19.0") throw new Error(process.version)'     && npm --version     && npm ci --ignore-scripts --no-audit --no-fund     && npm run typecheck && npm run build
+#16 DONE 16.9s
+
+#18 [php-base 3/4] RUN : > /etc/apk/repositories     && php /tmp/service-build/download-apks.php build     && apk add --no-network --repositories-file /dev/null --virtual .phpize-deps /tmp/service-apks/*.apk     && docker-php-ext-install -j2 pdo_pgsql     && apk add --no-network --repositories-file /dev/null libpq=18.6-r0 openssl=3.5.9-r0     && apk del --no-network .phpize-deps     && rm -rf /tmp/service-apks /tmp/service-build     && cp "/usr/local/etc/php/php.ini-production" "/usr/local/etc/php/php.ini"
+#18 18.84 Configuring for:
+#18 18.84 PHP Version:             8.5
+#18 18.84 PHP Api Version:         20250925
+#18 18.84 Zend Module Api No:      20250925
+#18 18.84 Zend Extension Api No:   420250925
+#18 19.64 checking for grep that handles long lines and -e... /bin/grep
+#18 20.60 checking for egrep... /bin/grep -E
+#18 20.60 checking for a sed that does not truncate output... /bin/sed
+#18 20.61 checking build system type... x86_64-pc-linux-musl
+#18 20.62 checking host system type... x86_64-pc-linux-musl
+#18 20.62 checking target system type... x86_64-pc-linux-musl
+#18 20.63 shtool:echo:Warning: unable to determine terminal sequence for bold mode
+#18 20.64 shtool:echo:Warning: unable to determine terminal sequence for bold mode
+#18 20.65 checking for gawk... no
+#18 20.65 checking for nawk... no
+#18 20.65 checking for awk... awk
+#18 20.65 checking if awk is broken... no
+#18 20.65 checking for pkg-config... /usr/bin/pkg-config
+#18 20.65 checking pkg-config is at least version 0.9.0... yes
+#18 20.65 checking for cc... cc
+#18 20.67 checking whether the C compiler works... yes
+#18 20.90 checking for C compiler default output file name... a.out
+#18 20.90 checking for suffix of executables... 
+#18 20.95 checking whether we are cross compiling... no
+#18 21.22 checking for suffix of object files... o
+#18 21.43 checking whether the compiler supports GNU C... yes
+#18 21.57 checking whether cc accepts -g... yes
+#18 21.61 checking for cc option to enable C23 features... unsupported
+#18 21.99 checking for cc option to enable C11 features... none needed
+#18 22.07 checking how to run the C preprocessor... cc -E
+#18 22.13 checking for egrep -e... (cached) /bin/grep -E
+#18 22.13 checking for icc... no
+#18 22.14 checking for suncc... no
+#18 22.15 checking for system library directory... lib
+#18 22.15 checking if compiler supports -Wl,-rpath,... yes
+#18 22.19 checking for PHP prefix... /usr/local
+#18 22.19 checking for PHP includes... -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib
+#18 22.19 checking for PHP extension directory... /usr/local/lib/php/extensions/no-debug-non-zts-20250925
+#18 22.19 checking for PHP installed headers prefix... /usr/local/include/php
+#18 22.19 checking if debugging is enabled... no
+#18 22.20 checking if PHP is built with thread safety (ZTS)... no
+#18 22.21 
+#18 22.21 Configuring extension
+#18 22.21 checking for PostgreSQL support for PDO... yes, shared
+#18 22.21 checking for libpq >= 10.0... yes
+#18 22.22 checking for PQencryptPasswordConn in -lpq... yes
+#18 22.26 checking for PQresultMemorySize in -lpq... yes
+#18 22.31 checking for PQclosePrepared in -lpq... yes
+#18 22.36 checking for PQclosePortal in -lpq... yes
+#18 22.45 checking for PDO includes... /usr/local/include/php/ext
+#18 22.45 
+#18 22.45 Configuring libtool
+#18 22.45 checking for a sed that does not truncate output... /bin/sed
+#18 22.46 checking for ld used by cc... /usr/x86_64-alpine-linux-musl/bin/ld
+#18 22.46 checking if the linker (/usr/x86_64-alpine-linux-musl/bin/ld) is GNU ld... yes
+#18 22.46 checking for /usr/x86_64-alpine-linux-musl/bin/ld option to reload object files... -r
+#18 22.46 checking for BSD-compatible nm... /usr/bin/nm -B
+#18 22.46 checking whether ln -s works... yes
+#18 22.46 checking how to recognize dependent libraries... pass_all
+#18 22.52 checking for stdio.h... yes
+#18 22.55 checking for stdlib.h... yes
+#18 22.60 checking for string.h... yes
+#18 22.66 checking for inttypes.h... yes
+#18 22.69 checking for stdint.h... yes
+#18 22.71 checking for strings.h... yes
+#18 22.73 checking for sys/stat.h... yes
+#18 22.76 checking for sys/types.h... yes
+#18 22.81 checking for unistd.h... yes
+#18 22.90 checking for dlfcn.h... yes
+#18 22.93 checking the maximum length of command line arguments... 98304
+#18 22.93 checking command to parse /usr/bin/nm -B output from cc object... ok
+#18 23.11 checking for objdir... .libs
+#18 23.11 checking for ar... ar
+#18 23.11 checking for ranlib... ranlib
+#18 23.11 checking for strip... strip
+#18 23.17 checking if cc supports -fno-rtti -fno-exceptions... no
+#18 23.20 checking for cc option to produce PIC... -fPIC
+#18 23.21 checking if cc PIC flag -fPIC works... yes
+#18 23.22 checking if cc static flag -static works... yes
+#18 23.28 checking if cc supports -c -o file.o... yes
+#18 23.31 checking whether the cc linker (/usr/x86_64-alpine-linux-musl/bin/ld -m elf_x86_64) supports shared libraries... yes
+#18 23.32 checking whether -lc should be explicitly linked in... no
+#18 23.39 checking dynamic linker characteristics... GNU/Linux ld.so
+#18 23.40 checking how to hardcode library paths into programs... immediate
+#18 23.40 checking whether stripping libraries is possible... yes
+#18 23.40 checking if libtool supports shared libraries... yes
+#18 23.40 checking whether to build shared libraries... yes
+#18 23.40 checking whether to build static libraries... no
+#18 23.47 
+#18 23.47 creating libtool
+#18 23.51 appending configuration tag "CXX" to libtool
+#18 23.53 
+#18 23.53 Generating files
+#18 23.55 configure: creating build directories
+#18 23.57 configure: creating Makefile
+#18 23.57 configure: patching config.h.in
+#18 23.59 configure: creating ./config.status
+#18 23.62 config.status: creating config.h
+#18 23.65 /bin/sh /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=compile cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE    -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pdo_pgsql.c -o pdo_pgsql.lo  -MMD -MF pdo_pgsql.dep -MT pdo_pgsql.lo
+#18 23.65 /bin/sh /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=compile cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE    -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_driver.c -o pgsql_driver.lo  -MMD -MF pgsql_driver.dep -MT pgsql_driver.lo
+#18 23.71 mkdir .libs
+#18 23.72  cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_driver.c -MMD -MF pgsql_driver.dep -MT pgsql_driver.lo  -fPIC -DPIC -o .libs/pgsql_driver.o
+#18 23.72  cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pdo_pgsql.c -MMD -MF pdo_pgsql.dep -MT pdo_pgsql.lo  -fPIC -DPIC -o .libs/pdo_pgsql.o
+#18 24.24 /bin/sh /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=compile cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE    -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_statement.c -o pgsql_statement.lo  -MMD -MF pgsql_statement.dep -MT pgsql_statement.lo
+#18 24.31  cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_statement.c -MMD -MF pgsql_statement.dep -MT pgsql_statement.lo  -fPIC -DPIC -o .libs/pgsql_statement.o
+#18 24.88 /bin/sh /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=compile cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE    -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_sql_parser.c -o pgsql_sql_parser.lo  -MMD -MF pgsql_sql_parser.dep -MT pgsql_sql_parser.lo
+#18 24.92  cc -I. -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DZEND_COMPILE_DL_EXT=1 -c /usr/src/php/ext/pdo_pgsql/pgsql_sql_parser.c -MMD -MF pgsql_sql_parser.dep -MT pgsql_sql_parser.lo  -fPIC -DPIC -o .libs/pgsql_sql_parser.o
+#18 25.09 /bin/sh /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=link cc -shared -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE  -Wl,-O1 -pie  -o pdo_pgsql.la -export-dynamic -avoid-version -prefer-pic -module -rpath /usr/src/php/ext/pdo_pgsql/modules  pdo_pgsql.lo pgsql_driver.lo pgsql_statement.lo pgsql_sql_parser.lo -lpq
+#18 25.13 cc -shared  .libs/pdo_pgsql.o .libs/pgsql_driver.o .libs/pgsql_statement.o .libs/pgsql_sql_parser.o  -lpq  -Wl,-O1 -Wl,-soname -Wl,pdo_pgsql.so -o .libs/pdo_pgsql.so
+#18 25.14 creating pdo_pgsql.la
+#18 25.15 (cd .libs && rm -f pdo_pgsql.la && ln -s ../pdo_pgsql.la pdo_pgsql.la)
+#18 25.15 /bin/sh /usr/src/php/ext/pdo_pgsql/libtool --tag=CC --mode=install cp ./pdo_pgsql.la /usr/src/php/ext/pdo_pgsql/modules
+#18 25.16 cp ./.libs/pdo_pgsql.so /usr/src/php/ext/pdo_pgsql/modules/pdo_pgsql.so
+#18 25.16 cp ./.libs/pdo_pgsql.lai /usr/src/php/ext/pdo_pgsql/modules/pdo_pgsql.la
+#18 25.17 PATH="$PATH:/sbin" ldconfig -n /usr/src/php/ext/pdo_pgsql/modules
+#18 25.17 ----------------------------------------------------------------------
+#18 25.17 Libraries have been installed in:
+#18 25.17    /usr/src/php/ext/pdo_pgsql/modules
+#18 25.17 
+#18 25.17 If you ever happen to want to link against installed libraries
+#18 25.17 in a given directory, LIBDIR, you must either use libtool, and
+#18 25.17 specify the full pathname of the library, or use the `-LLIBDIR'
+#18 25.17 flag during linking and do at least one of the following:
+#18 25.17    - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+#18 25.17      during execution
+#18 25.17    - add LIBDIR to the `LD_RUN_PATH' environment variable
+#18 25.17      during linking
+#18 25.17    - use the `-Wl,--rpath -Wl,LIBDIR' linker flag
+#18 25.17 
+#18 25.17 See any operating system documentation about shared libraries for
+#18 25.17 more information, such as the ld(1) and ld.so(8) manual pages.
+#18 25.17 ----------------------------------------------------------------------
+#18 25.17 
+#18 25.17 Build complete.
+#18 25.17 Don't forget to run 'make test'.
+#18 25.17 
+#18 25.19 + strip --strip-all modules/pdo_pgsql.so
+#18 25.20 Installing shared extensions:     /usr/local/lib/php/extensions/no-debug-non-zts-20250925/
+#18 25.26 find . -name \*.gcno -o -name \*.gcda | xargs rm -f
+#18 25.27 find . -name \*.lo -o -name \*.o -o -name \*.dep | xargs rm -f
+#18 25.27 find . -name \*.la -o -name \*.a | xargs rm -f
+#18 25.27 find . -name \*.so | xargs rm -f
+#18 25.27 find . -name .libs -a -type d|xargs rm -rf
+#18 25.27 rm -f libphp.la        modules/* libs/*
+#18 25.27 rm -f ext/opcache/jit/ir/gen_ir_fold_hash
+#18 25.27 rm -f ext/opcache/jit/ir/minilua
+#18 25.27 rm -f ext/opcache/jit/ir/ir_fold_hash.h
+#18 25.27 rm -f ext/opcache/jit/ir/ir_emit_x86.h
+#18 25.27 rm -f ext/opcache/jit/ir/ir_emit_aarch64.h
+#18 29.20 OK: 778.5 MiB in 94 packages
+#18 29.21 ( 1/52) Purging .phpize-deps (20261005.204055)
+#18 29.21 ( 2/52) Purging autoconf (2.73-r0)
+#18 29.21 ( 3/52) Purging dpkg (1.23.7-r0)
+#18 29.22 ( 4/52) Purging dpkg-dev (1.23.7-r0)
+#18 29.24 ( 5/52) Purging file (5.47-r2)
+#18 29.24 ( 6/52) Purging g++ (15.2.0-r5)
+#18 29.24 ( 7/52) Purging gcc (15.2.0-r5)
+#18 29.35 ( 8/52) Purging binutils (2.45.1-r1)
+#18 29.38 ( 9/52) Purging isl26 (0.26-r2)
+#18 29.38 (10/52) Purging jansson (2.15.0-r0)
+#18 29.38 (11/52) Purging libatomic (15.2.0-r5)
+#18 29.38 (12/52) Purging libgomp (15.2.0-r5)
+#18 29.38 (13/52) Purging libmagic (5.47-r2)
+#18 29.38 (14/52) Purging libmd (1.2.0-r0)
+#18 29.38 (15/52) Purging linux-headers (7.0.0-r1)
+#18 29.54 (16/52) Purging m4 (1.4.20-r1)
+#18 29.54 (17/52) Purging make (4.4.1-r4)
+#18 29.54 (18/52) Purging mpc1 (1.3.1-r1)
+#18 29.54 (19/52) Purging mpfr4 (4.2.2-r0)
+#18 29.54 (20/52) Purging perl (5.42.2-r1)
+#18 29.76 (21/52) Purging postgresql18-dev (18.6-r0)
+#18 29.88 (22/52) Purging libecpg-dev (18.6-r0)
+#18 29.89 (23/52) Purging libecpg (18.6-r0)
+#18 29.89 (24/52) Purging liburing-dev (2.14-r0)
+#18 29.89 (25/52) Purging liburing-ffi (2.14-r0)
+#18 29.89 (26/52) Purging liburing (2.14-r0)
+#18 29.89 (27/52) Purging clang22 (22.1.3-r2)
+#18 29.89 (28/52) Purging fortify-headers (3.0.1-r2)
+#18 29.90 (29/52) Purging libgcc-static (15.2.0-r5)
+#18 29.90 (30/52) Purging libstdc++-dev (15.2.0-r5)
+#18 30.01 (31/52) Purging musl-dev (1.2.6-r2)
+#18 30.04 (32/52) Purging clang22-headers (22.1.3-r2)
+#18 30.09 (33/52) Purging icu-dev (78.1-r0)
+#18 30.12 (34/52) Purging llvm22 (22.1.3-r0)
+#18 30.14 (35/52) Purging llvm22-linker-tools (22.1.3-r0)
+#18 30.14 (36/52) Purging lz4-dev (1.10.0-r1)
+#18 30.14 (37/52) Purging lz4-libs (1.10.0-r1)
+#18 30.14 (38/52) Purging re2c (4.5.1-r0)
+#18 30.14 (39/52) Purging zstd-dev (1.5.7-r2)
+#18 30.14 (40/52) Purging zstd (1.5.7-r2)
+#18 30.14 (41/52) Purging clang22-libs (22.1.3-r2)
+#18 30.15 (42/52) Purging gmp (6.3.0-r4)
+#18 30.15 (43/52) Purging icu (78.1-r0)
+#18 30.15 (44/52) Purging icu-libs (78.1-r0)
+#18 30.15 (45/52) Purging libbz2 (1.0.8-r6)
+#18 30.15 (46/52) Purging libpq-dev (18.6-r0)
+#18 30.15 (47/52) Purging llvm22-libs (22.1.3-r0)
+#18 30.17 (48/52) Purging openssl-dev (3.5.9-r0)
+#18 30.19 (49/52) Purging pkgconf (2.5.1-r0)
+#18 30.19 (50/52) Purging icu-data-en (78.1-r0)
+#18 30.19 (51/52) Purging libffi (3.5.2-r1)
+#18 30.19 (52/52) Purging libstdc++ (15.2.0-r5)
+#18 30.19 Executing busybox-1.37.0-r31.trigger
+#18 30.19 OK: 20.7 MiB in 42 packages
+#18 DONE 30.4s
+
+#19 [php-base 4/4] WORKDIR /app
+#19 DONE 0.0s
+
+#20 [dependencies 1/5] COPY --from=composer-tool /usr/bin/composer /usr/local/bin/composer
+#20 DONE 0.0s
+
+#21 [dependencies 2/5] COPY build/download-apks.php build/apk.lock.json /tmp/service-build/
+#21 DONE 0.0s
+
+#22 [dependencies 3/5] RUN php /tmp/service-build/download-apks.php composer     && apk add --no-network --repositories-file /dev/null /tmp/service-apks/*.apk     && rm -rf /tmp/service-apks /tmp/service-build
+#22 0.338 (1/1) Installing unzip (6.0-r16)
+#22 0.341 Executing busybox-1.37.0-r31.trigger
+#22 0.345 OK: 20.9 MiB in 43 packages
+#22 DONE 0.4s
+
+#23 [dependencies 4/5] COPY . ./
+#23 DONE 0.1s
+
+#24 [dependencies 5/5] RUN composer --version     && composer validate --strict --no-check-all     && composer install --no-dev --no-plugins --no-scripts --no-interaction         --prefer-dist --no-progress --classmap-authoritative     && composer check-platform-reqs --no-dev     && mkdir -p resources bootstrap/cache
+#24 0.180 Composer version 2.10.3 2026-08-27 13:34:23
+#24 0.180 PHP version 8.5.11 (/usr/local/bin/php)
+#24 0.180 Run the "diagnose" command to get more detailed diagnostics output.
+#24 0.283 ./composer.json is valid
+#24 0.372 Installing dependencies from lock file
+#24 0.375 Verifying lock file contents can be installed on current platform.
+#24 0.523 Your lock file does not contain a compatible set of packages. Please run composer update.
+#24 0.523 
+#24 0.523   Problem 1
+#24 0.523     - php-amqplib/php-amqplib is locked to version v3.7.5 and an update of this package was not requested.
+#24 0.523     - php-amqplib/php-amqplib v3.7.5 requires ext-sockets * -> it is missing from your system. Install or enable PHP's sockets extension.
+#24 0.523 
+#24 0.523 To enable extensions, verify that they are enabled in your .ini files:
+#24 0.523     - /usr/local/etc/php/php.ini
+#24 0.523     - /usr/local/etc/php/conf.d/docker-fpm.ini
+#24 0.523     - /usr/local/etc/php/conf.d/docker-php-ext-pdo_pgsql.ini
+#24 0.523     - /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini
+#24 0.523 You can also run `php --ini` in a terminal to see which files are used by PHP in CLI mode.
+#24 0.523 Alternatively, you can run Composer with `--ignore-platform-req=ext-sockets` to temporarily ignore these required extensions.
+#24 ERROR: process "/bin/sh -c composer --version     && composer validate --strict --no-check-all     && composer install --no-dev --no-plugins --no-scripts --no-interaction         --prefer-dist --no-progress --classmap-authoritative     && composer check-platform-reqs --no-dev     && mkdir -p resources bootstrap/cache" did not complete successfully: exit code: 2
+------
+ > [dependencies 5/5] RUN composer --version     && composer validate --strict --no-check-all     && composer install --no-dev --no-plugins --no-scripts --no-interaction         --prefer-dist --no-progress --classmap-authoritative     && composer check-platform-reqs --no-dev     && mkdir -p resources bootstrap/cache:
+0.523     - php-amqplib/php-amqplib is locked to version v3.7.5 and an update of this package was not requested.
+0.523     - php-amqplib/php-amqplib v3.7.5 requires ext-sockets * -> it is missing from your system. Install or enable PHP's sockets extension.
+0.523 
+0.523 To enable extensions, verify that they are enabled in your .ini files:
+0.523     - /usr/local/etc/php/php.ini
+0.523     - /usr/local/etc/php/conf.d/docker-fpm.ini
+0.523     - /usr/local/etc/php/conf.d/docker-php-ext-pdo_pgsql.ini
+0.523     - /usr/local/etc/php/conf.d/docker-php-ext-sodium.ini
+0.523 You can also run `php --ini` in a terminal to see which files are used by PHP in CLI mode.
+0.523 Alternatively, you can run Composer with `--ignore-platform-req=ext-sockets` to temporarily ignore these required extensions.
+------
+Dockerfile:35
+--------------------
+  34 |     # Require a matching private lock; exact version pins are deliberate.
+  35 | >>> RUN composer --version \
+  36 | >>>     && composer validate --strict --no-check-all \
+  37 | >>>     && composer install --no-dev --no-plugins --no-scripts --no-interaction \
+  38 | >>>         --prefer-dist --no-progress --classmap-authoritative \
+  39 | >>>     && composer check-platform-reqs --no-dev \
+  40 | >>>     && mkdir -p resources bootstrap/cache
+  41 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c composer --version     && composer validate --strict --no-check-all     && composer install --no-dev --no-plugins --no-scripts --no-interaction         --prefer-dist --no-progress --classmap-authoritative     && composer check-platform-reqs --no-dev     && mkdir -p resources bootstrap/cache" did not complete successfully: exit code: 2

@@ -1,0 +1,7 @@
+{
+  "invokerPackage": "P01\\Infrastructure\\Generated",
+  "composerPackageName": "p01/foundation-health-client",
+  "library": "guzzle",
+  "hideGenerationTimestamp": true,
+  "disallowAdditionalPropertiesIfNotPresent": false
+}

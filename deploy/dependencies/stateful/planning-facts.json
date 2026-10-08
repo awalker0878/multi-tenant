@@ -1,0 +1,117 @@
+{
+  "vhosts": [
+    {
+      "name": "product"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "inventory",
+      "vhost": "product",
+      "configure": "^$",
+      "write": "^inventory\\.events$",
+      "read": "^$"
+    },
+    {
+      "user": "catalogue",
+      "vhost": "product",
+      "configure": "^$",
+      "write": "^catalogue\\.events$",
+      "read": "^$"
+    },
+    {
+      "user": "planning",
+      "vhost": "product",
+      "configure": "^$",
+      "write": "^planning\\.events$",
+      "read": "^planning\\.(inventory|intent)$"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "inventory.events",
+      "vhost": "product",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "catalogue.events",
+      "vhost": "product",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "planning.events",
+      "vhost": "product",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "planning.inventory",
+      "vhost": "product",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-delivery-limit": -1
+      }
+    },
+    {
+      "name": "planning.intent",
+      "vhost": "product",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-delivery-limit": -1
+      }
+    },
+    {
+      "name": "assurance.planning",
+      "vhost": "product",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-delivery-limit": -1
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "inventory.events",
+      "vhost": "product",
+      "destination": "planning.inventory",
+      "destination_type": "queue",
+      "routing_key": "inventory.facts.v1",
+      "arguments": {}
+    },
+    {
+      "source": "catalogue.events",
+      "vhost": "product",
+      "destination": "planning.intent",
+      "destination_type": "queue",
+      "routing_key": "catalogue.intent.changed.v1",
+      "arguments": {}
+    },
+    {
+      "source": "planning.events",
+      "vhost": "product",
+      "destination": "assurance.planning",
+      "destination_type": "queue",
+      "routing_key": "planning.facts.v1",
+      "arguments": {}
+    }
+  ]
+}

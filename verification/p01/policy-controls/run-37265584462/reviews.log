@@ -1,0 +1,21 @@
+test_author_cannot_approve (__main__.PolicyTests.test_author_cannot_approve) ... ok
+test_changed_or_unprivileged_identity_denied (__main__.PolicyTests.test_changed_or_unprivileged_identity_denied) ... ok
+test_comment_does_not_clear_blocking_review (__main__.PolicyTests.test_comment_does_not_clear_blocking_review) ... ok
+test_deleted_dependency_edge_still_selects_old_consumer (__main__.PolicyTests.test_deleted_dependency_edge_still_selects_old_consumer) ... ok
+test_exact_source_distinct_roles_and_checks_pass (__main__.PolicyTests.test_exact_source_distinct_roles_and_checks_pass) ... ok
+test_exception_expiry_wildcard_and_untrusted_reviewer (__main__.PolicyTests.test_exception_expiry_wildcard_and_untrusted_reviewer) ... ok
+test_failed_cancelled_skipped_and_pending_check_denied (__main__.PolicyTests.test_failed_cancelled_skipped_and_pending_check_denied) ... ok
+test_missing_wrong_app_stale_check_denied (__main__.PolicyTests.test_missing_wrong_app_stale_check_denied) ... ok
+test_old_success_cannot_hide_latest_failure (__main__.PolicyTests.test_old_success_cannot_hide_latest_failure) ... ok
+test_one_person_with_all_roles_is_insufficient (__main__.PolicyTests.test_one_person_with_all_roles_is_insufficient) ... ok
+test_rename_uses_both_owner_inventories (__main__.PolicyTests.test_rename_uses_both_owner_inventories) ... ok
+test_stale_dismissed_and_blocking_reviews_denied (__main__.PolicyTests.test_stale_dismissed_and_blocking_reviews_denied) ... ok
+test_unconfigured_mapping_cannot_pass (__main__.PolicyTests.test_unconfigured_mapping_cannot_pass) ... ok
+test_unknown_path_is_not_a_green_empty_selection (__main__.PolicyTests.test_unknown_path_is_not_a_green_empty_selection) ... ok
+test_unresolved_thread_and_unknown_source_denied (__main__.PolicyTests.test_unresolved_thread_and_unknown_source_denied) ... ok
+test_wrong_source_and_changed_source_denied (__main__.PolicyTests.test_wrong_source_and_changed_source_denied) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.003s
+
+OK

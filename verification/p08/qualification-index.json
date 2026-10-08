@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "evidence_level": "E2",
+  "source_revision": "a72d0e88b3626b6912cf189c46ce45cf2fc4878c",
+  "native_platforms_tested": [],
+  "native_write_authorized": false,
+  "production_native_dispatch_enabled": false,
+  "campaigns": [
+    {
+      "archive": "archives/p08-components-37588926432-1.zip",
+      "archive_sha256": "01fd9fab276f2e1eaa02907c6c0f784266e673d127ea5131834032810364f30d",
+      "artifact_id": "11467727383",
+      "run_id": "37588926432",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37588926432",
+      "source_revision": "e850ea258e85ae7a2020eaab5ee967cffc6b8931",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T07:42:23.746685+00:00",
+      "source_bindings_verified": 252,
+      "command_logs_verified": 20,
+      "test_suites": [
+        {
+          "name": "lifecycle",
+          "tests": 295,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "worker",
+          "tests": 155,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "inventory-worker",
+          "tests": 58,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "original_nonzero_commands": [],
+      "report": "reports/p08-components-37588926432-1/report.json",
+      "report_sha256": "b8370785933d21e61de9cb41f882a0d1509e8d13706e0d1202a63170dad8bb06"
+    },
+    {
+      "archive": "archives/p08-components-37591411211-1.zip",
+      "archive_sha256": "7e6a2038a373af9a8fe42aaa025cced6fb00964b07ddce69ccb65257db2dd5d1",
+      "artifact_id": "11468427622",
+      "run_id": "37591411211",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37591411211",
+      "source_revision": "8d536e4cd34df0b637ccbe041bebbbfb7e4e1923",
+      "result": "FAILED",
+      "observed_at": "2026-10-07T08:05:10.125892+00:00",
+      "source_bindings_verified": 261,
+      "command_logs_verified": 20,
+      "test_suites": [
+        {
+          "name": "lifecycle",
+          "tests": 295,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "worker",
+          "tests": 193,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "inventory-worker",
+          "tests": 59,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "original_nonzero_commands": [
+        {
+          "directory": "workers/lifecycle",
+          "argv": [
+            "uv",
+            "run",
+            "--frozen",
+            "mypy",
+            "src",
+            "tests"
+          ],
+          "exit_code": 1,
+          "log": "09.log",
+          "sha256": "435e20f96cc3ee5e44bc016b7c791a07da92b421b357658d838a7e87aa1a3968"
+        }
+      ],
+      "report": "reports/p08-components-37591411211-1/report.json",
+      "report_sha256": "d318eef59926a6adde2d284f2e0ef2cea5f6894c0fd698ee78c8a76ee30eaa65"
+    },
+    {
+      "archive": "archives/p08-components-37592736006-1.zip",
+      "archive_sha256": "f6061656b60dbb26f1b8644e9538c08d5ea44e3e9e38fc30dade88775e140521",
+      "artifact_id": "11469153459",
+      "run_id": "37592736006",
+      "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37592736006",
+      "source_revision": "a72d0e88b3626b6912cf189c46ce45cf2fc4878c",
+      "result": "PASSED",
+      "observed_at": "2026-10-07T08:17:13.542244+00:00",
+      "source_bindings_verified": 262,
+      "command_logs_verified": 20,
+      "test_suites": [
+        {
+          "name": "lifecycle",
+          "tests": 295,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "worker",
+          "tests": 204,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "inventory-worker",
+          "tests": 59,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "original_nonzero_commands": [],
+      "report": "reports/p08-components-37592736006-1/report.json",
+      "report_sha256": "7db418561e5460723496d3fbb76f9f64c7f1f8a3cd8b29a031d8fa71d5f6a1d7"
+    }
+  ],
+  "regression_failure": {
+    "artifact_id": "11469053471",
+    "archive": "p06-live-firefox-37592344371-1.zip",
+    "archive_sha256": "b180bd3d12a769bcf62fa5f65f2a79c52438786572b2aefaaf3696401b801d37",
+    "run_id": "37592344371",
+    "source_revision": "712ea5d8b2e8d12ec1095c36730a5a5d87722e77",
+    "result": "FAIL",
+    "original_error": "p06-real-temporal-namespace failed: ",
+    "original_exit_code": -11,
+    "command_logs_verified": 41,
+    "source_bindings_verified": 1078,
+    "source_binding_mismatches": [],
+    "requalification_run_id": "37592736181",
+    "requalification_source_revision": "a72d0e88b3626b6912cf189c46ce45cf2fc4878c",
+    "requalification_conclusion": "success",
+    "scope_note": "Original namespace-bootstrap process crashed before P06 Temporal journey. Root cause not established; unchanged P06 scripts passed in all three browsers on the final source run. This is not a corrected native or P08 guest journey.",
+    "artifact_hashes_verified": 54
+  },
+  "limitations": [
+    "Real PostgreSQL, TLS and subprocess limits; synthetic vSphere/OpenStack and current-owner/application peers.",
+    "No installed QEMU/bubblewrap rootfs or guest boot/transform is qualified.",
+    "Inventory/Planning/Console migration integration and commissioned current-owner/trust/stage composition remain unfinished.",
+    "Native fencing, selected guest/service/delta/traffic/recovery interfaces and actual Q07 results are not supplied.",
+    "No G07/G08 receiving decision, native route support, P08 completion or operating acceptance is established."
+  ]
+}

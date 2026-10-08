@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "source_revision": "f7001d3e75cffa13b28701f184c076a1bd1854af",
+  "run_id": 37697578952,
+  "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37697578952",
+  "job_id": 113052992483,
+  "conclusion": "success",
+  "evidence_level": "E2",
+  "artifact_id": 11516266465,
+  "artifact_name": "p09-conformance-37697578952-1",
+  "github_reported_archive_sha256": "8a72e59de59099bbbcc2d2daca0ac14814518871ee0afa38f9a2d5ec3215b246",
+  "artifact_expires_at": "2026-10-21T22:41:54Z",
+  "artifact_bytes_downloaded": false,
+  "source_tree": "fc060c93ea6e96c43dbfdcad371a3815991f00ed",
+  "scope": "Published P09 full PostgreSQL-backed component conformance; runner forbids skipped database cases. Native owner/platform responses remain synthetic.",
+  "publication": "User explicitly approved public publication and selected greenfield/enterprise-microservices-plan. All nine prepared commits recreated with identical trees on that branch; original local implementation branch preserved.",
+  "followup_run": {
+    "source_revision": "58807949bca43c46bbee77bd3fda382f983351a5",
+    "run_id": 37699712413,
+    "conclusion": "success",
+    "artifact_id": 11516489743,
+    "github_reported_archive_sha256": "c9ecf5cc595c703faaae8e1c2e046fada86aafbc387a0e6e9092b4d8837f88c6"
+  },
+  "native_qualification_established": false,
+  "release_authorized": false,
+  "limitations": [
+    "GitHub API run and artifact metadata observed; artifact ZIP not independently rehashed in this workspace.",
+    "Actual native tranche, owner integration and G09 receiving qualification remain open."
+  ]
+}

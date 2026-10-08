@@ -1,13 +1,14 @@
-# Working design and acceptance templates
+# Documentation templates
 
-Original editable-field prompts are retained as Markdown values. Copy a template into a controlled solution/site working area; do not mark sample placeholders as accepted data.
+Copy the relevant structure when a concrete work item begins. Replace instructional text with actual scoped content and link the new document from its owning index. These templates are authoring aids, not completed decisions, tests or approvals.
 
-| Content | How to use it |
+| Template | Destination and use |
 | --- | --- |
-| [AT — High-level design and architecture review template](hld/README.md) | HLD and architecture review |
-| [ET — Low-level design and engineering review template](lld/README.md) | LLD and engineering review |
-| [IT — Method of procedure, test and handover template](implementation-mop/README.md) | Implementation method, qualification and handover |
+| [Service specification](service-specification.md) | `docs/services/<service>.md`; ownership and behavior of a deployable |
+| [Work package](work-package.md) | A section of `docs/implementation/phases/pNN.md`; an implementable increment |
+| [Architecture decision](adr.md) | `docs/decisions/adr-NNN-title.md`; options, rationale and consequences |
+| [Gate review](gate-review.md) | Approved evidence system; sanitized review references in the delivery register |
+| [Runbook](runbook.md) | `docs/operations/runbooks/<action>.md`; a versioned, rehearsed operating procedure |
+| [Qualification campaign](qualification-campaign.md) | `docs/qualification/<campaign>.md`; synthetic test design and protected evidence references |
 
-These links open the full converted narrative, tables, placeholders, diagrams and cross-references—not a summary of the Word files. Source metadata and originals remain linked in every chapter.
-
-[Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
+The [documentation guide](../documentation-guide.md) defines canonical ownership. Follow the [status model](../implementation/status-model.md) rather than creating a new checklist status vocabulary. Raw operational evidence, personal approvals and site secrets remain in approved systems.

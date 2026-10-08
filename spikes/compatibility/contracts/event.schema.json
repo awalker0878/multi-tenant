@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contract.invalid/sample-event.schema.json",
+  "title": "Synthetic sample event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "occurred_at",
+    "revision",
+    "producer",
+    "tenant_id",
+    "aggregate_id",
+    "aggregate_version",
+    "correlation_id",
+    "causation_id"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "producer": {
+      "const": "p00-synthetic"
+    },
+    "tenant_id": {
+      "type": "string",
+      "pattern": "^tenant_[a-z0-9]+$"
+    },
+    "aggregate_id": {
+      "type": "string",
+      "pattern": "^sample_[a-z0-9]+$"
+    },
+    "aggregate_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "causation_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

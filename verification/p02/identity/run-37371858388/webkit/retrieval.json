@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED_ORIGINAL_FAILURE",
+  "source_revision": "b13996d13db9b54736667a04be23c53f74269424",
+  "run_id": 37371858388,
+  "artifact_id": 11369952323,
+  "archive_sha256": "c120b2abc779ebfd66758292275b6e1c22a3be19802909c68a4ada7a4bb6648a",
+  "retrieved_at": "2026-10-05T20:59:26.179623+00:00",
+  "matched_source_bindings": 284,
+  "verified_artifact_bindings": 8,
+  "retained_file_sha256": {
+    "browser.log": "77ed3ac1b283e2cc4bbb7bbc8c1cdfb3fd6903165083ab9e15cbdc6f147dc423",
+    "campaign.zip": "c120b2abc779ebfd66758292275b6e1c22a3be19802909c68a4ada7a4bb6648a",
+    "console-http.log": "c0e6674ad5df6a32dfe8556f1726473b262e4ef3e8f2f20df5b26ac54a329aa5",
+    "console-notification-features.log": "f4a591369aae81cb369f5624a3df7e7ae49e8e192f7488ea27efeac46f200b63",
+    "governance-http.log": "d1779527b57a4556e3438807071bc384b3a98624006258164c184770e1807541",
+    "noninteractive-denial.log": "350a8d53e709600769f9a42f98d128cb95e74590e18ff67a444bd8ce7a7ce5ce",
+    "notification-broker-ready.log": "334459dc7c11f121513f698791bde3abf223e2f550d91d7b5a46e69111b2cbf6",
+    "notification-broker-start.log": "56b5c0e07c783c033e41a69befb80b9804b49584b531123d1bb3681912982c3b",
+    "postgres-features.log": "db219f8e5297e600bd54cca0d9af26cb2ce813f6f21abcc7d6f6c585426a1e98",
+    "report.json": "641281777f8f0a7e236eaddfc51a801da1cd98eb2a2ec2fbc47e7f9ece25a11e"
+  },
+  "scope": "Original WebKit campaign; bootstrap passes, federation journey fails on an uncaught quota request network error. No result is relabeled."
+}

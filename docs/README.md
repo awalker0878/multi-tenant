@@ -1,32 +1,69 @@
-# Portable multi-tenant secure hosting — documentation
+# Documentation index
 
-**Infrastructure architecture → engineering → solution design → implementation → operational acceptance.**
+This documentation describes a proposed enterprise product and its delivery programme. Read the repository [README](../README.md) for the application, intended users and first release. A design example, candidate contract or planned test is not evidence of implemented behavior.
 
-This repository now contains the Word documents' actual content as Markdown chapters. The active source baseline remains the supplied v1.4 reference architecture, delivery-kit v1.1 development documents and Implementation Increment 04. Conversion does not issue approval or replace unknown site values with defaults.
+## Product and user behavior
 
-| Start with | Content |
+| Document | Question answered |
 | --- | --- |
-| [Terraform and Ansible delivery program](implementation/automation/README.md) | Terraform/Ansible coverage across Nutanix, VMware/NSX and OpenStack; remaining work, delivery sequence and acceptance gates |
-| [Architecture](architecture/README.md) / [RAD reading view](architecture/RAD.md) | Scope, physical/logical design, security and service boundaries, portability and adoption |
-| [Engineering](engineering/README.md) / [TAD reading view](engineering/TAD.md) | Fabric, native stacks, forward/reply paths, dependencies and supported build responsibilities |
-| [Solution designs](solutions/README.md) | Service alternatives and a connected two-tenant OZ/RZ worked environment |
-| [Implementation](implementation/README.md) | Commissioning work packages, code coverage, readback, safe stopping and handover |
-| [Portable provisioning](provisioning/README.md) | Parameter-driven request → profile → policy → placement → desired state → compiler pipeline and its command line |
-| [Operations](operations/README.md) | Change, recovery, migration, failback, retention and operating ownership |
-| [Assurance](assurance/README.md) | Gap map, requirements, test specifications, qualification and audit boundaries |
-| [ADRs](adr/README.md) | Proposed source-backed design decisions and original decision-ID mapping |
-| [Templates](templates/README.md) | Full HLD, LLD, implementation, review and acceptance prompts |
-| [Governance](governance/README.md) | Delivery framework, gate dependencies and responsibilities |
-| [Archive](archive/README.md) | Historical handbook editions, audit and content-disposition review |
+| [Product overview](product/README.md) | Who uses the product, what tasks matter and what outcomes define success? |
+| [Domain model](product/domain-model.md) | What do the entities mean, how do they relate and which invariants apply? |
+| [Application walkthrough](product/application-walkthrough.md) | What happens to one application, including failure and recovery? |
 
-## Review one connected path
+## Architecture and service design
 
-Read [the inter-domain boundary](architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md) → [its forward and return routing](engineering/network-boundaries/2-walk-f14-01-through-the-forward-and-reply-routes.md) → [its vendor realization](solutions/internal-protected-workload/8-mapping-the-schedules-into-each-vendor-stack.md) → [its provisioning sequence](implementation/provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md) → [its verification observations](assurance/qualification-campaign/3-observe-network-paths-and-boundary-enforcement.md). The chapters preserve their source diagrams, tables and cross-references.
+| Document | Question answered |
+| --- | --- |
+| [Target architecture](architecture/target-architecture.md) | Where do data, decisions and execution authority belong? |
+| [Context code structure](architecture/context-code-structure.md) and [context map](../architecture/context-map.yaml) | How do service ownership, pragmatic Laravel capabilities, Python layers and worker pools map to source code? |
+| [Code controls](engineering/code-control.md) | Which dependencies, changes, reviewers and CI checks govern that source structure? |
+| [Service specifications](services/README.md) | What does each deployable own and expose? |
+| [Contracts](contracts/README.md) and [examples](contracts/examples.md) | How do the PHP/Python services communicate? |
+| [Engineering standards](engineering/README.md) | How are Laravel services, tenant persistence, Inertia/Vue, tests and CI implemented consistently? |
+| [Engineering coverage](engineering/coverage.md) and [research assessment](reference/laravel-practices-review.md) | Which best-practice controls apply, why, and which packages and gates verify them? |
+| [Architecture decisions](decisions/README.md) and [register](decisions/decision-register.md) | What is the reasoning, disposition and deadline for each choice? |
 
-## Source and change rules
+[ADR-024](decisions/adr-024-pragmatic-laravel-domain-convention.md) records the selected Laravel convention. Its capability folders retain normal Laravel behavior inside an independently owned service; the service boundary still controls data access and integration contracts.
 
-[Conversion coverage and maintenance](DOCUMENTATION_MIGRATION.md) records what was moved, what is historical and what source artifacts were unavailable. [The binary catalogue](ARTIFACT_CATALOG.md) remains for provenance and workbook access. The [implementation coverage map](implementation/code-map.md) distinguishes candidate code from actual platform qualification.
+## Implementation and assurance
 
-Do not silently change inherited requirements while copying them into an ADR. Source-derived ADRs have no recorded organizational acceptance. Initial operational and promised recovery readiness remains a prerequisite to production activation—not a later paperwork step.
+| Document | Question answered |
+| --- | --- |
+| [Phased plan](implementation/phased-plan.md) | What is the overall sequence, scope and dependency chain? |
+| [Phase work packages](implementation/phases/README.md) | What must each phase deliver, depend on and demonstrate? |
+| [Next work](../next_work.md) | Which tasks are next, and what do they depend on? |
+| [Requirements and qualification](implementation/requirements-and-qualification.md) | Which requirements and acceptance campaigns must be covered? |
+| [Traceability](implementation/traceability.md) | How do requirements connect to packages, decisions, contracts and gates? |
+| [Delivery register](implementation/delivery-register.yaml) | What is the canonical structured record of delivery state and evidence references? |
+| [Status definitions](implementation/status-model.md) | What does each status mean, and what evidence permits changing it? |
+| [Progress](implementation/progress.md) and [gates](implementation/gates.md) | What is the current state and what must a reviewer verify? |
+| [Support matrix](implementation/support-matrix.md) | Which platform operations and migration combinations are planned or excluded? |
+| [Qualification procedures](qualification/README.md) | How are feasibility, campaigns and gate reviews performed and evidenced? |
+| [Estimation and dependencies](implementation/estimation-and-dependencies.md) | Which staffing, access and sequencing assumptions drive the estimate? |
 
-[Maintained design workspace](current/README.md) — current editable records, separately versioned from frozen transcriptions. See [completion-audit dispositions](assurance/completion-corrections.md). The [portable provisioning refactor completion audit](deepseek-refactor-completion-audit.md) is the authoritative record of the gates that produced the current portable path; remaining work is only external and is listed in [next work](NEXT_WORK.md).
+## Deployment, contribution and provenance
+
+| Document | Question answered |
+| --- | --- |
+| [Operations index](operations/README.md) and [deployment model](operations/deployment-model.md) | How will the application be installed, upgraded, observed and recovered? |
+| [Documentation guide](documentation-guide.md) | Where does additional work belong and when must it change? |
+| [Templates](templates/README.md) | What should a new decision, service design, work package, gate or runbook contain? |
+| [Contribution workflow](../CONTRIBUTING.md) | How should a coherent change be prepared and reviewed? |
+| [Release documentation](releases/README.md) | How are candidates, manifests, support, readiness and release notes managed? |
+| [Sources and reset](reference/sources-and-reset.md) | Which source direction applies and what is historical reference only? |
+
+Use the linked phase, decision, qualification, operations and release indexes to navigate the working documents. The [guide](documentation-guide.md) defines ownership and update rules. Executable schemas, test results and release-specific evidence are added through their implementation work packages.
+
+## Approved baseline and P01 implementation
+
+The [baseline review](implementation/p00-baseline-review.md) links current scope/domain analysis, historical-source dispositions, compatibility results and route/operating-measure reviews. It separates completed analytical or experimental work from decisions, installed facts and qualification still required. The [delivery register](implementation/delivery-register.yaml) and generated views remain the status authority.
+
+Detailed execution evidence is separated into [Laravel HTTP/PHP quality](implementation/p00-integration-results.md), [Chromium transport](implementation/p00-browser-results.md) and [Python tooling](implementation/p00-python-tooling-results.md). Each report binds actual source/lock identities, failures, corrections and limits. The compatibility index preserves earlier experiments rather than retargeting their hashes to newer locks.
+
+
+The [image/BOM report](implementation/p00-image-results.md) and [contract-tool report](implementation/p00-contract-tooling-results.md) add digest-pinned runtime builds and deterministic PHP/Python/TypeScript contract generation. The [decision and input review](implementation/p00-decision-and-input-review.md) consolidates the remaining choices, accountable roles, exact native inputs and G00 criterion mapping. These records distinguish completed experiments from owner decisions and native feasibility still outstanding.
+
+
+The [P00 engineering selections](implementation/p00-engineering-selections.md) now resolve development choices. [Real database/attachment restore](implementation/p00-restore-fixture-results.md) supplies bounded recovery observations. The [RT/IP input record](qualification/feasibility/input-record.md) makes supplied/missing information checkable, and the [G00 engineering assessment](qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md) records criterion findings without inventing accountable acceptance or native outcomes.
+
+The [accountable G00 decision](qualification/gate-reviews/g00-user-decision-2026-10-04.md) accepts advancement to P01/G01, with the remaining application/configuration and topology feasibility assigned to the foundation work. The [Planning bootstrap report](implementation/p01-planning-bootstrap.md) records the first independently owned package, actual build/install checks and hosted CI. The [complete nine-component package replay](implementation/p01-laravel-foundations.md), [additional Python foundations](implementation/p01-python-foundations.md), [complete image verification history](implementation/p01-laravel-images.md), [Governance foundation](implementation/p01-governance-bootstrap.md) and [Console foundation](implementation/p01-console-foundation.md) separate implemented diagnostics from measured outcomes and remaining work. The [CI-control record](implementation/p01-code-control.md) reports tested feedback mechanisms and the remaining admission controls. P01.02 isolated installation is the next increment; these records do not pass G01. The [package verification runner](../scripts/p01/README.md) and [image build controls](../deploy/build/README.md) explain reproducible checks. Follow [next work](../next_work.md) for the next implementation increment.

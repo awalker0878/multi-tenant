@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-04T18:41:57.372537+00:00",
+  "cwd": "spikes/compatibility/frontend",
+  "command": [
+    "npm",
+    "ls",
+    "--depth=0",
+    "--json"
+  ],
+  "input_sha256": {
+    "frontend/.gitignore": "d2395b7cf7c53f3e5124960e07d9a70e63b85e1b1c3fb5098ae889595d63acdd",
+    "frontend/package-lock.json": "510497df56757fa3d56cce7669f2a5372a2cb274f7f9bfd898d310dce778af36",
+    "frontend/package.json": "be43b016a03bb3dba911c02e694b305496489cbac95ace7c0109c63c105b503f",
+    "frontend/playwright.config.ts": "155e6735ef84db4fd1fb2a92feb84ab0683b0511c71af9be2b2afde39ae1b17e",
+    "frontend/resources/css/app.css": "0edbcbeadeea753c2c0c6a726186d33475731d0947e4cf3b4927ed60b3718a69",
+    "frontend/resources/js/Pages/Compatibility.vue": "f172e47187a1e74c8be6aad904c0f57fcc53615a9e5830348b0310a2db7c1e23",
+    "frontend/resources/js/app.ts": "61cfdda46d7b429717bd5973befbdc30c8b9adf9217e0a401f4323c10113fad4",
+    "frontend/tests/browser/compatibility.spec.ts": "dd4a5545dc61c1640f6b6e4d91022b8e2a429f72db16de3a6cd0eb9ff6d9a025",
+    "frontend/tsconfig.json": "cebfa811ff51fd9f0d9afac1bc1f0e11532d13cc99f106a5f979a4adf03b43ab",
+    "frontend/vite.config.ts": "df9065a949f3905c2e92c5671b0d9d592594546278114aaaf0d42e0e4b6a7318"
+  },
+  "finished_at": "2026-10-04T18:41:57.753617+00:00",
+  "exit_code": 0,
+  "stdout": "{\n  \"version\": \"0.0.0\",\n  \"name\": \"p00-frontend-compatibility\",\n  \"dependencies\": {\n    \"@inertiajs/vite\": {\n      \"version\": \"3.8.0\",\n      \"resolved\": \"https://registry.npmjs.org/@inertiajs/vite/-/vite-3.8.0.tgz\",\n      \"overridden\": false\n    },\n    \"@inertiajs/vue3\": {\n      \"version\": \"3.8.0\",\n      \"resolved\": \"https://registry.npmjs.org/@inertiajs/vue3/-/vue3-3.8.0.tgz\",\n      \"overridden\": false\n    },\n    \"@playwright/test\": {\n      \"version\": \"1.63.0\",\n      \"resolved\": \"https://registry.npmjs.org/@playwright/test/-/test-1.63.0.tgz\",\n      \"overridden\": false\n    },\n    \"@tailwindcss/vite\": {\n      \"version\": \"4.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@tailwindcss/vite/-/vite-4.3.3.tgz\",\n      \"overridden\": false\n    },\n    \"@types/node\": {\n      \"version\": \"24.19.1\",\n      \"resolved\": \"https://registry.npmjs.org/@types/node/-/node-24.19.1.tgz\",\n      \"overridden\": false\n    },\n    \"@vitejs/plugin-vue\": {\n      \"version\": \"6.0.9\",\n      \"resolved\": \"https://registry.npmjs.org/@vitejs/plugin-vue/-/plugin-vue-6.0.9.tgz\",\n      \"overridden\": false\n    },\n    \"laravel-vite-plugin\": {\n      \"version\": \"3.2.0\",\n      \"resolved\": \"https://registry.npmjs.org/laravel-vite-plugin/-/laravel-vite-plugin-3.2.0.tgz\",\n      \"overridden\": false\n    },\n    \"tailwindcss\": {\n      \"version\": \"4.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.3.3.tgz\",\n      \"overridden\": false\n    },\n    \"typescript\": {\n      \"version\": \"6.0.3\",\n      \"resolved\": \"https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz\",\n      \"overridden\": false\n    },\n    \"vite\": {\n      \"version\": \"8.3.2\",\n      \"resolved\": \"https://registry.npmjs.org/vite/-/vite-8.3.2.tgz\",\n      \"overridden\": false\n    },\n    \"vue-tsc\": {\n      \"version\": \"3.3.12\",\n      \"resolved\": \"https://registry.npmjs.org/vue-tsc/-/vue-tsc-3.3.12.tgz\",\n      \"overridden\": false\n    },\n    \"vue\": {\n      \"version\": \"3.5.43\",\n      \"resolved\": \"https://registry.npmjs.org/vue/-/vue-3.5.43.tgz\",\n      \"overridden\": false\n    }\n  }\n}\n",
+  "stderr": "npm warn Unknown env config \"http-proxy\". This will stop working in the next major version of npm.\n",
+  "outcome": "PASS"
+}

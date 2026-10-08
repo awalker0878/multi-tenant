@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "scope": "P01 synthetic local integration only; no signed promotion or operated support",
+  "platform": "linux/amd64",
+  "images": {
+    "nginx": {
+      "candidate": "docker.io/library/nginx:1.30.5-trixie",
+      "purpose": "TLS public-root proxy for the private PHP FPM foundation applications",
+      "source": "https://hub.docker.com/_/nginx",
+      "index_digest": "sha256:b972f831f200b19ef0767938224f9711e74cd783718738cd7405d5cabf75c442",
+      "digest": "sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+      "reference": "docker.io/library/nginx@sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae"
+    },
+    "postgres": {
+      "candidate": "docker.io/library/postgres:18.6-bookworm",
+      "reference": "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+      "digest": "sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+      "index_digest": "sha256:3725f4e2499eef5134592b3b4ab79a543ed7f8e533b05b5b637af926630f6650"
+    }
+  },
+  "provenance": {
+    "nginx_run": 37243953788,
+    "nginx_source": "4f483fe96244984c4a6dacf68035c9db5a7f48ef",
+    "postgres_source_path": "spikes/compatibility/restore/inputs.lock.json",
+    "postgres_source_sha256": "122ba9014bb072c4304d7dc7764d17e4ecd0e29df8c9ef8cea5cdccc457fcda9"
+  }
+}

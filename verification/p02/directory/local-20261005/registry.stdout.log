@@ -1,0 +1,4 @@
+Architecture registry passed: 7 services; 10 manifests checked.
+Retained evidence: 48 manifest snapshots classified separately; source and artifact hashes matched their reports.
+Source placement passed: 361 files; Python AST imports: 66; PHP conservative precheck: 278; frontend placement only: 17.
+Resolved PHP/TypeScript graphs, dynamic imports, runtime wiring and behavior require their implementation CI gates.

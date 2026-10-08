@@ -1,6 +1,0 @@
----
-- name: Restart owned chrony configuration
-  become: true
-  ansible.builtin.service:
-    name: chrony
-    state: restarted

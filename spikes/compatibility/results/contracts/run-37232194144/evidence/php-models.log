@@ -1,0 +1,1 @@
+{"status":"PASS","negative_model_cases":2,"known_gap":"constructor accepts numeric revision; validate wire schema before deserialization"}

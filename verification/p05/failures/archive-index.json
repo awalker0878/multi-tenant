@@ -1,0 +1,42 @@
+[
+  {
+    "path": "failures/archives/p05-initial-governance.zip",
+    "sha256": "9a36c1f1fcd9fa2c1c0c657eaccb4a22592e0da400aa6d25da9eae7399128054",
+    "bytes": 96731,
+    "artifact_id": 11415566595,
+    "source_revision": "55b03c131b1439ee622a9e8afbfa5b547a191c95",
+    "archive_digest_matched_github_metadata": true
+  },
+  {
+    "path": "failures/archives/p05-initial-lifecycle.zip",
+    "sha256": "89fba41f3038e1324fa8bccbe07423e1ee98b7b1cb95602048fd3d50ef9b18e0",
+    "bytes": 26255,
+    "artifact_id": 11415656589,
+    "source_revision": "55b03c131b1439ee622a9e8afbfa5b547a191c95",
+    "archive_digest_matched_github_metadata": true
+  },
+  {
+    "path": "failures/archives/p05-initial-planning.zip",
+    "sha256": "0a47dd3dd44151e80ad36eae6625bff28e72833c56c864e56e255d83a69f2318",
+    "bytes": 32118,
+    "artifact_id": 11415106860,
+    "source_revision": "55b03c131b1439ee622a9e8afbfa5b547a191c95",
+    "archive_digest_matched_github_metadata": true
+  },
+  {
+    "path": "failures/archives/p05-regression-contracts.zip",
+    "sha256": "18cfa4b043597925955e2078b567c0bfddfb395eed0ceeb6d207ebb1b7a606e3",
+    "bytes": 3561,
+    "artifact_id": 11416260956,
+    "source_revision": "6051eacf4f422e426825b25799d4d32565825011",
+    "archive_digest_matched_github_metadata": true
+  },
+  {
+    "path": "failures/archives/p05-regression-p04-webkit.zip",
+    "sha256": "48ba06925637d61ad5e3229f0975eb3919b691c6024f7250169f978656f83eb3",
+    "bytes": 36117,
+    "artifact_id": 11415982978,
+    "source_revision": "6051eacf4f422e426825b25799d4d32565825011",
+    "archive_digest_matched_github_metadata": true
+  }
+]

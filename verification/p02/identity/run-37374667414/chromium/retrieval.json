@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "result": "VERIFIED",
+  "source_revision": "5c789a1ed2a79f50611dd512855385a00b759b76",
+  "run_id": 37374667414,
+  "artifact_id": 11370034520,
+  "archive_sha256": "7328a4c49ac1326abf5b4a66ce29a04439f41ebb3a46002e67d52da6e5884963",
+  "retrieved_at": "2026-10-05T21:20:45.172290+00:00",
+  "matched_source_bindings": 290,
+  "verified_artifact_bindings": 9,
+  "retained_file_sha256": {
+    "browser.json": "c62da70d2cb7aeda95aabe545caa9387dd27deb43f7ade9c2e9681205fe4be7f",
+    "browser.log": "a5b78dce32953e58a7807e2c3864e643edd2b4fb10873b63f1236e9b0827e8b9",
+    "campaign.zip": "7328a4c49ac1326abf5b4a66ce29a04439f41ebb3a46002e67d52da6e5884963",
+    "console-http.log": "284e91f68be0771cd43d91348622a432c8e16015a3121941239b7ddfce65bd3a",
+    "console-notification-features.log": "59ce8ef3e3eb39f2c5e8fd2131eb0fc2d0fb991dd0b31af5c2ed51860cd505df",
+    "governance-http.log": "9c6f97ef5ebd6cf44d8470c6f655eae4a54572796c54083dfd5d7b37e364be96",
+    "noninteractive-denial.log": "350a8d53e709600769f9a42f98d128cb95e74590e18ff67a444bd8ce7a7ce5ce",
+    "notification-broker-ready.log": "334459dc7c11f121513f698791bde3abf223e2f550d91d7b5a46e69111b2cbf6",
+    "notification-broker-start.log": "2928ff141fb3cc916eb19dbaefb4f71d719bca70a90da2adfe85c944377eeaae",
+    "postgres-features.log": "53bf0f0cebcea1a5263055362ff116ac54204355f84e4e4eb94f011099dfa205",
+    "report.json": "c39caf20a61f9fa3ca381f9bd549cc0da3d05f5ca3722a51c5dee60ffd1e6c53"
+  },
+  "scope": "Chromium hosted directory-source campaign; independent queued Firefox/WebKit jobs retain separate results."
+}

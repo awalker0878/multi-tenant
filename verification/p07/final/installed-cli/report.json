@@ -1,0 +1,98 @@
+{
+  "source_revision": "249a77e9fda5c0a3e25918ce3efdb52f4ab415de",
+  "wheel_sha256": "27ca16509dcd1f39d87873f546f4f607041f1f30a4cd86a103b1f95f4767d5ce",
+  "result": "PASSED",
+  "evidence_level": "E1",
+  "commands": [
+    {
+      "command": [
+        "uv",
+        "venv",
+        "--offline",
+        "--python",
+        "/workspace/scratch/dcf309239113/multi-tenant/services/lifecycle/.venv/bin/python",
+        "/tmp/p07-isolated-cli-wki6ik07/venv"
+      ],
+      "exit_code": 0,
+      "expected": 0,
+      "log": "00-venv.log",
+      "sha256": "0378eeccd4c87d5681a3eed75eaf07239f7577280428f192fe5bdbad3179d77b"
+    },
+    {
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--offline",
+        "--python",
+        "/tmp/p07-isolated-cli-wki6ik07/venv/bin/python",
+        "--no-deps",
+        "/workspace/scratch/dcf309239113/multi-tenant/services/lifecycle/dist/product_lifecycle-0.1.0.dev0-py3-none-any.whl"
+      ],
+      "exit_code": 0,
+      "expected": 0,
+      "log": "01-install.log",
+      "sha256": "e6c29907bc3b176e5c180078923ac29cfbb7463a3c65fe4700db6557e85aa4c1"
+    },
+    {
+      "command": [
+        "/tmp/p07-isolated-cli-wki6ik07/venv/bin/python",
+        "-I",
+        "-m",
+        "lifecycle.bootstrap.commissioning",
+        "--input",
+        "/workspace/scratch/dcf309239113/multi-tenant/release/p07-native-inputs.json",
+        "--require-complete"
+      ],
+      "exit_code": 2,
+      "expected": 2,
+      "log": "02-readiness.log",
+      "sha256": "ba8ba099525b14090a2d5769d7337a79ef26bdfb74952c4ea86365dc6276e069"
+    },
+    {
+      "command": [
+        "/tmp/p07-isolated-cli-wki6ik07/venv/bin/python",
+        "-I",
+        "-m",
+        "lifecycle.bootstrap.native_preflight",
+        "--plan",
+        "/tmp/p07-isolated-cli-wki6ik07/plan.json",
+        "--commissioning",
+        "/tmp/p07-isolated-cli-wki6ik07/commissioning.json",
+        "--toolchain",
+        "/tmp/p07-isolated-cli-wki6ik07/toolchain.json",
+        "--snapshot",
+        "/tmp/p07-isolated-cli-wki6ik07/snapshot.json",
+        "--saved-plan",
+        "/tmp/p07-isolated-cli-wki6ik07/fixture.tfplan"
+      ],
+      "exit_code": 0,
+      "expected": 0,
+      "log": "03-matching-preflight.log",
+      "sha256": "da8006f572c2e1c042e96a827d1a59b849e65359767fb90bb15a98134778c290"
+    },
+    {
+      "command": [
+        "/tmp/p07-isolated-cli-wki6ik07/venv/bin/python",
+        "-I",
+        "-m",
+        "lifecycle.bootstrap.native_preflight",
+        "--plan",
+        "/tmp/p07-isolated-cli-wki6ik07/plan.json",
+        "--commissioning",
+        "/tmp/p07-isolated-cli-wki6ik07/commissioning.json",
+        "--toolchain",
+        "/tmp/p07-isolated-cli-wki6ik07/toolchain.json",
+        "--snapshot",
+        "/tmp/p07-isolated-cli-wki6ik07/snapshot.json",
+        "--saved-plan",
+        "/tmp/p07-isolated-cli-wki6ik07/fixture.tfplan"
+      ],
+      "exit_code": 2,
+      "expected": 2,
+      "log": "04-changed-bytes.log",
+      "sha256": "4276534bd9e5f50317ed9aa14219a83da27fb6ce1bb4f9dbb91da34f4019807e"
+    }
+  ],
+  "limitations": "Installed offline CLI smoke only, with no dependency installation or sibling imports. P01 package CI separately verifies the complete runtime closure. Preflight files are synthetic; no native effect or authority."
+}

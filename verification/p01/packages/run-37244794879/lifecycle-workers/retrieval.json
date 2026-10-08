@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "run_id": 37244794879,
+  "source_revision": "c28c87e6c6804450fea9f6d6817a818eed37fc03",
+  "component": "lifecycle-workers",
+  "artifact": {
+    "id": 11318253973,
+    "name": "p01-lifecycle-workers-37244794879-1",
+    "size_in_bytes": 30306,
+    "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11318253973",
+    "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11318253973/zip",
+    "expired": false,
+    "created_at": "2026-10-04T23:44:05Z",
+    "expires_at": "2026-10-18T23:44:05Z",
+    "updated_at": "2026-10-04T23:44:05Z",
+    "digest": "sha256:475bb2e696b10cf4940860f74a886b56f92e4398edcc614a3b2cf4521b4091bc",
+    "workflow_run": {
+      "id": 37244794879,
+      "repository_id": 1374801496,
+      "head_repository_id": 1374801496,
+      "head_branch": "greenfield/enterprise-microservices-plan",
+      "head_sha": "c28c87e6c6804450fea9f6d6817a818eed37fc03"
+    }
+  },
+  "archive_sha256": "475bb2e696b10cf4940860f74a886b56f92e4398edcc614a3b2cf4521b4091bc",
+  "archive_bytes": 30306,
+  "archive_checksum_verified": true,
+  "archive_size_verified": true,
+  "report_sha256": "e0e1f82ecfae78c3c18082cc3a734040a07efa8fda051c61f4d097932639ec32",
+  "result": "PASS",
+  "failure": null,
+  "source_checks": {
+    "workers/lifecycle/.dockerignore": {
+      "sha256": "59e9a97d2a5cf9b6df4160b1c1b558f281a7c6335efb3fe00e446442b5ee407b",
+      "git_blob_sha": "1136d4f7741b5f591074f437f3056fcbc0f31234"
+    },
+    "workers/lifecycle/.gitignore": {
+      "sha256": "c95d538d814abdee4b85b0190ecdff09a9cf312e47e64374c78f984994ab34b6",
+      "git_blob_sha": "8196a38558683fad4617d19116e05138f1048fb8"
+    },
+    "workers/lifecycle/.python-version": {
+      "sha256": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+      "git_blob_sha": "f36fa5fd8017a085e301126c8c3fc30f1a2550b9"
+    },
+    "workers/lifecycle/Dockerfile": {
+      "sha256": "58c12e7c1f58c63abb70f11509c1d9e2d9836cc2bb46ca9a8718938ffe9745fe",
+      "git_blob_sha": "0b9a3b9937a7c071f493164fb360402a0edc0df5"
+    },
+    "workers/lifecycle/README.md": {
+      "sha256": "bff664a9dedaf5db900cf3374228d1ce300816466d906849237f11943b4c3bd6",
+      "git_blob_sha": "ae50dc96bea567ed07ef6439a8e26893c54c6d78"
+    },
+    "workers/lifecycle/pyproject.toml": {
+      "sha256": "334d96e07543023f0b1c054c2c4856454feb4c8177841e908a8a929ba5718e7b",
+      "git_blob_sha": "22b93820b3edd8b3deaf8c619658238524fd103a"
+    },
+    "workers/lifecycle/src/lifecycle_worker/__init__.py": {
+      "sha256": "3b4010b8d05a3a439446a408740b15251146c27372a571087ea99d5f296ccf90",
+      "git_blob_sha": "aba6cf1bc134b63913eaa256cae9779b159a8aad"
+    },
+    "workers/lifecycle/src/lifecycle_worker/bootstrap/__init__.py": {
+      "sha256": "8010e6643d45e15dca091684e6b4b8de191cbb88e3b8bd1e3f57255e3f6f40e2",
+      "git_blob_sha": "5ceddb5155eef1aaaf157b671ed78499a00cd92e"
+    },
+    "workers/lifecycle/src/lifecycle_worker/bootstrap/health.py": {
+      "sha256": "6596ef06eb795b66bcc439341caafc694759fbd70e53c7a69a77341e0de8780a",
+      "git_blob_sha": "c4855649ba1478db33bdd0e99b1f67ec501b7c10"
+    },
+    "workers/lifecycle/src/lifecycle_worker/interfaces/__init__.py": {
+      "sha256": "daea91f1463c254186d8ee783019199308090814320a0de8e59b05fa11cb67b9",
+      "git_blob_sha": "9594467b886d5fd090b87c18b0dcb344c132be30"
+    },
+    "workers/lifecycle/src/lifecycle_worker/interfaces/health.py": {
+      "sha256": "778c57a85f0e87e8335e9438c84f114333bd830ad44e3b00e6968723500dc6c7",
+      "git_blob_sha": "3f07b5db9643f4fec6869cca4a478e2df6e1a4ac"
+    },
+    "workers/lifecycle/tests/test_health.py": {
+      "sha256": "92fb1e442ccd163324965cce072460a2970dd181a0f3d50ef5455660b7d912f6",
+      "git_blob_sha": "6b0f964c08c24023cbb01a1a3143b5162a84ce07"
+    },
+    "workers/lifecycle/uv.lock": {
+      "sha256": "119e31605521f64e26fac8ea549eb3a50189a705eb3856b3936f7c795df39ac3",
+      "git_blob_sha": "7bf360c64d2232a2b8c83a43949c17d83d5aa59c"
+    },
+    "scripts/p01/README.md": {
+      "sha256": "c43804617f0f238bb226742ffefecf8f3f2c2131aa688b6ae4e0bfbf989c1812",
+      "git_blob_sha": "8568cd6366b24facc6f5ba628b7d1e4094829149"
+    },
+    "scripts/p01/candidates.json": {
+      "sha256": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+      "git_blob_sha": "afa963d567cef41c678d47732bc692470855b48c"
+    },
+    "scripts/p01/check_jobs.py": {
+      "sha256": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+      "git_blob_sha": "67494c7fbee17097e2ee656b8fc4baff6034323c"
+    },
+    "scripts/p01/local_runtime.py": {
+      "sha256": "86b3029b42d91f647453d4535e76cca55ce9d799826f7b102473035a3685060f",
+      "git_blob_sha": "4ed4f6529099c8dcc00472b313238ddb300c379a"
+    },
+    "scripts/p01/php_image_probe.php": {
+      "sha256": "f4ac97d5b8638258e6d595869d7324cc624d3c5958199e9f969d6f77badbaf74",
+      "git_blob_sha": "968e38f291368ef278d5de2a92e30653b1258ed0"
+    },
+    "scripts/p01/python_lock.py": {
+      "sha256": "05b4074482edb8899c95da980b4886975a9ce36adb19c2894bd4e42b40d76769",
+      "git_blob_sha": "3c4c5cf63af395b12015764e3cac8cbfb2549f4e"
+    },
+    "scripts/p01/resolve_dependencies.py": {
+      "sha256": "5bf284a7bff395bd29a344dfc311c4e2b97ad814da58f373c4a0703dc16e9210",
+      "git_blob_sha": "a678b8423df27a68295cb8189036514bff4ac935"
+    },
+    "scripts/p01/run_images.py": {
+      "sha256": "7898d827e081ee477ff99ad154bd289d571350a4483aa5b74d64e8bdbde72c8b",
+      "git_blob_sha": "86b8e47487cbdb7ff1cac83d1a7d6885e843f597"
+    },
+    "scripts/p01/run_local.py": {
+      "sha256": "e7569816ae9662c5091b4251adcec41cb8f54b57a1381a8ff0c13cd5c7c4abe5",
+      "git_blob_sha": "ddc26263a06b988f6d628ff0b3e4170e2eca9314"
+    },
+    "scripts/p01/run_quality.py": {
+      "sha256": "134733b7907e0484eda4971bd7af7d8d16383966b257de7b6570d8813c85b496",
+      "git_blob_sha": "4fc3971cd687931a8a0cedf1a23da5788e9914c3"
+    },
+    "scripts/p01/select_components.py": {
+      "sha256": "37575f2fb29659ae7d72d477c9b09f1d981571386ef20ccd0ce4d039b5cd79d7",
+      "git_blob_sha": "ad1a608ea86fd1c5dd66b16e1d4c75af8cb3ade8"
+    },
+    "scripts/p01/test_jobs.py": {
+      "sha256": "b103af1562f26ceb28e13e36fa13a09fb131333bc8cf4144e071d05b7c23bbf5",
+      "git_blob_sha": "39e6eda6731a45d62ac13ce98c72f3e2d4ee9cb0"
+    },
+    "scripts/p01/test_local_runtime.py": {
+      "sha256": "24a7bed777b0ac072143416a4a6459c29bec33a15e24c39df9f4548ef79d6833",
+      "git_blob_sha": "fc8fc028ffced10fdfcc566b99a4660a70b84b82"
+    },
+    "scripts/p01/test_python_lock.py": {
+      "sha256": "0e64837b214d31eaa2fa8004e3c5a49230f039742f15a1b2d6875a1b983d173b",
+      "git_blob_sha": "a2de3f67f3d27b1adf13c69610122a41f900a360"
+    },
+    "scripts/p01/test_recorder.py": {
+      "sha256": "afc5002982dfb8d1d71a71974fdf5a2d3471854c6cfccc91f31f06b0d3bbe56f",
+      "git_blob_sha": "e76c76d21d2808271ce2a67fc5feb6d23bd21bc9"
+    },
+    "scripts/p01/test_selection.py": {
+      "sha256": "d6122c2ac881b206f4871e3f77dda8e5f0194f3f1b790864154cd6bf20367ab6",
+      "git_blob_sha": "d25462046b36c9cdfd959b47374db6f104862987"
+    },
+    ".github/workflows/p01-foundations.yml": {
+      "sha256": "7843fd6cca1c4116fec105ad8f5e9101aa67014304b21a2a3bf2343af70e0b00",
+      "git_blob_sha": "6f0ddbf0a6e984bdfb4025716a21c550d5ecdc58"
+    }
+  },
+  "source_bindings_verified_against_commit": 30,
+  "command_log_hashes_verified": 42,
+  "artifact_hashes_verified": 46,
+  "retained_file_sha256": {
+    "01-python-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-python-version.stdout.log": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "02-uv-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "02-uv-version.stdout.log": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6",
+    "03-lock-check.stderr.log": "eeb273ddf0a8107e7b374d55a38b522027a819b92da6a3f0e00034838635755e",
+    "03-lock-check.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-clean-locked-install.stderr.log": "a798f1592002050a6bf16e73820cb33a3c36332631aef0822096ca90a79d6225",
+    "04-clean-locked-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "05-installed-quality-inventory.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "05-installed-quality-inventory.stdout.log": "0922d7d889038f9cb7ef5ffa92f34d522a5d9d1880aa4cc4191621012b1dda5b",
+    "06-ruff.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-ruff.stdout.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "07-format.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "07-format.stdout.log": "ef7d13d02214e98ca902b05257cdbe6a8e84f3b4714508efdc19766460b54209",
+    "08-mypy.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-mypy.stdout.log": "ab35ee42183d4d6d3ba483825ab037d18a5a15622d03be01d82220b1564851ff",
+    "09-tests.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "09-tests.stdout.log": "f31552d70249eaa50ce81008149595eaad2d9db8e69d7779355a91425366f800",
+    "10-wheel-build.stderr.log": "547f76daa3b817d2cd4875d4b95a6ec8c7c1ecc4cfbf6330a3e90d0394b23996",
+    "10-wheel-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "11-empty-runtime.stderr.log": "88b6bafc565e7b9c8f4bfc2231a1fef35f6dbbcd4c7077c154d9c29d2ec301d4",
+    "11-empty-runtime.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "12-export-production-lock.stderr.log": "788c1acbc633dd7a75d56233eab31374cad28ec38a0aac0b4d5e663af42077bf",
+    "12-export-production-lock.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "13-isolated-production-install.stderr.log": "3d95068d8835334a19030d9402ff66c2cfe51aadaa065502c34d67cbf30b8d4e",
+    "13-isolated-production-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "14-isolated-wheel-install.stderr.log": "fb10f58ee8b9faa8a46acf4d04718a30a4f84cee65c8d77018fb1f494671bc49",
+    "14-isolated-wheel-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "15-runtime-dependency-check.stderr.log": "00033ffed6b80d7f2b078763c2e8323713dcfc26a0daddcb7a8358296ff804ac",
+    "15-runtime-dependency-check.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "16-runtime-inventory.stderr.log": "78ec6a56cf4cd8f0eb0a6502996a948aa8c0f175f7dbeebae140cdadabde0cbf",
+    "16-runtime-inventory.stdout.log": "3bb4d4ab0de12c7c083dd4e5c7485cbab861e15661daf106d4a573f5e06cfcc9",
+    "17-isolated-import.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "17-isolated-import.stdout.log": "f64674fd0c6b9a54ff1bf020b42b55e02ad1f376526e84c4fe7e3182f325ccd0",
+    "18-isolated-liveness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "18-isolated-liveness.stdout.log": "59a4b0a1dd0bde6b27c6b7b8302f6d369c48ce7d5b2524931c14071d87040865",
+    "19-isolated-readiness.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "19-isolated-readiness.stdout.log": "84da603c1b85b2079b527b283f82b2a185ec53e4d13f201b394a171e98fd5b43",
+    "20-isolated-invalid-input.stderr.log": "ebc00588ffb1941e91dd7cecbcfb2609b3b903fc2512899b79a646f24ac80301",
+    "20-isolated-invalid-input.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "21-installed-entrypoint.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "21-installed-entrypoint.stdout.log": "59a4b0a1dd0bde6b27c6b7b8302f6d369c48ce7d5b2524931c14071d87040865",
+    "production-requirements.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pyproject.toml": "334d96e07543023f0b1c054c2c4856454feb4c8177841e908a8a929ba5718e7b",
+    "report.json": "e0e1f82ecfae78c3c18082cc3a734040a07efa8fda051c61f4d097932639ec32",
+    "uv.lock": "119e31605521f64e26fac8ea549eb3a50189a705eb3856b3936f7c795df39ac3",
+    "wheel-envelope.json": "95010ea0be3d00dd196374003e5e1c8e39b5e0f9ee9d97b555ff8b5fe6410d8b"
+  },
+  "binary_envelope_files_verified": 1,
+  "wheel_envelope_verified": true,
+  "run_attempt": "1",
+  "dependency_mode": null
+}

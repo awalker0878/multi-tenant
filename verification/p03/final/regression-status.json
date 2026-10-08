@@ -1,0 +1,117 @@
+{
+  "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+  "observation": "GitHub connector read of Actions run records; status receipt, not an independent reexecution of every campaign.",
+  "current_source_runs": [
+    {
+      "id": 37405120291,
+      "name": "Context policy",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37405120291",
+      "updated_at": "2026-10-06T02:38:50Z"
+    },
+    {
+      "id": 37405120379,
+      "name": "P01 isolated Kubernetes integration",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "status": "pending",
+      "conclusion": null,
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37405120379",
+      "updated_at": "2026-10-06T02:38:36Z"
+    },
+    {
+      "id": 37405120555,
+      "name": "P01 policy controls",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37405120555",
+      "updated_at": "2026-10-06T02:39:03Z"
+    },
+    {
+      "id": 37405120374,
+      "name": "P01 foundation contracts",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37405120374",
+      "updated_at": "2026-10-06T02:39:30Z"
+    },
+    {
+      "id": 37405120516,
+      "name": "P03 catalogue",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37405120516",
+      "updated_at": "2026-10-06T02:41:08Z"
+    },
+    {
+      "id": 37405120453,
+      "name": "P01 bootstrap images",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37405120453",
+      "updated_at": "2026-10-06T02:40:12Z"
+    },
+    {
+      "id": 37405120443,
+      "name": "P01 foundation packages",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37405120443",
+      "updated_at": "2026-10-06T02:40:26Z"
+    },
+    {
+      "id": 37405120332,
+      "name": "P01 isolated Compose integration",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37405120332",
+      "updated_at": "2026-10-06T02:41:47Z"
+    },
+    {
+      "id": 37405120466,
+      "name": "P02 identity",
+      "source_revision": "1c51f56a928291870e5125508aeb04935583fd56",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37405120466",
+      "updated_at": "2026-10-06T02:43:50Z"
+    }
+  ],
+  "other_sources": [
+    {
+      "id": 37404840942,
+      "name": "P01 transactional messaging",
+      "source_revision": "1d66d416ce725e1ce20f734f16cdff1cf251be4b",
+      "status": "completed",
+      "conclusion": "success",
+      "impact_review": "Catalogue, Planning, messaging harness and workflow inputs unchanged between this source and final P03 source."
+    },
+    {
+      "id": 37404118806,
+      "name": "P02 Governance events",
+      "source_revision": "208938142f8bc4bb8436b519d6d31cef9c3a6781",
+      "status": "completed",
+      "conclusion": "success",
+      "impact_review": "Governance, P02 harness, contracts and event workflow inputs unchanged between this source and final P03 source."
+    },
+    {
+      "id": 37401541630,
+      "name": "P01 isolated Kubernetes integration",
+      "source_revision": "55f67f9edb6c747fb8857d89135e73093e1ff806",
+      "status": "completed",
+      "conclusion": "success",
+      "impact_review": "Historical passing foundation run only. The final-source queued run is not a pass. Kubernetes installer, manifests and workflow are unchanged; current-source images, Compose and P03 dependency campaigns pass. No current-source Kubernetes claim."
+    }
+  ],
+  "limitations": [
+    "Current-source Kubernetes remains queued behind earlier branch campaigns; its result must be checked before claiming that broader requalification.",
+    "Actions status records supplement the independently verified P03 raw reports; no native, operating or independent receiving approval is inferred."
+  ]
+}

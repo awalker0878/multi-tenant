@@ -1,0 +1,9 @@
+{
+  "namespace": "p01-5122e256fb49-d9bfefab",
+  "native_operations_enabled": false,
+  "readiness_scope": "foundation_dependencies; product /health/ready remains 503",
+  "rendered_only": true,
+  "scope": "synthetic-kind-foundation",
+  "secrets_must_not_be_retained": true,
+  "source_revision": "5122e256fb49ba55ee797f02771e7b12c4109481"
+}
