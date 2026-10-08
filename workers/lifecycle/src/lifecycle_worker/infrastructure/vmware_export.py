@@ -1,5 +1,7 @@
 """Vmware export; platform mechanisms retain native semantics."""
 
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
+
 import hashlib
 import http.client
 import re
