@@ -23,6 +23,9 @@ KEYS = {
     "decision_sha256",
     "evidence_level",
     "definition_sha256",
+    "adapter_sha256",
+    "runtime_sha256",
+    "native_tuple_sha256",
     "platform",
     "method",
     "expires_at",
@@ -74,9 +77,16 @@ def document(path: Path) -> tuple[dict[str, Any], str]:
             fail("epoch")
         if (not isinstance(item["state"], str) or item["state"] not in STATES
                 or item["evidence_level"] is not None and
-                (not isinstance(item["evidence_level"], str) or item["evidence_level"] not in LEVELS)):
+                (
+                    not isinstance(item["evidence_level"], str)
+                    or item["evidence_level"] not in LEVELS
+                )
+        ):
             fail("state/evidence level")
-        for key in ("decision_sha256", "definition_sha256"):
+        for key in (
+            "decision_sha256", "definition_sha256", "adapter_sha256",
+            "runtime_sha256", "native_tuple_sha256",
+        ):
             sha = item[key]
             if sha is not None and (not isinstance(sha, str) or not HASH.fullmatch(sha)):
                 fail(key)
@@ -122,6 +132,12 @@ def reconcile(before: dict[str, Any], after: dict[str, Any]) -> list[dict[str, A
                 reasons.append("decision_changed")
             if a["definition_sha256"] != b["definition_sha256"]:
                 reasons.append("definition_changed")
+            if a["adapter_sha256"] != b["adapter_sha256"]:
+                reasons.append("adapter_bytes_changed")
+            if a["runtime_sha256"] != b["runtime_sha256"]:
+                reasons.append("runtime_observation_changed")
+            if a["native_tuple_sha256"] != b["native_tuple_sha256"]:
+                reasons.append("installed_native_tuple_changed")
             if a["platform"] != b["platform"] or a["method"] != b["method"]:
                 reasons.append("platform_or_method_changed")
             if a["expires_at"] != b["expires_at"]:
