@@ -233,3 +233,42 @@ def test_missing_scope_binding_fails_closed_before_any_plan_effects(
     with pytest.raises(Rejected, match="qualification_scope_unverified"):
         p.execution_plan(TENANT, identity, 1)
 
+
+
+def test_concurrent_qualification_revoke_and_new_plan_cannot_leave_an_eligible_plan(
+    database: Postgres,
+) -> None:
+    p, actor, body = setup(database)
+    created = p.assessment(actor, str(uuid4()), body, {})
+    assessed = p.get(TENANT, APP, ENV, created["id"], "assessment")
+    scope_hash = digest(assessed["inputs"][0]["qualification"]["scope"])
+    revoked = {
+        "event_id": str(uuid4()),
+        "tenant_id": TENANT,
+        "scope_sha256": scope_hash,
+        "authority_epoch": 1,
+        "operation": "revoke",
+        "state": "revoked",
+        "decision_sha256": "a" * 64,
+        "event_sha256": "b" * 64,
+    }
+
+    def create_plan() -> dict[str, Any]:
+        return p.plan(
+            actor,
+            str(uuid4()),
+            {"assessment_id": created["id"], "candidate": 0, "request": request()},
+            assessed,
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        plan_future = pool.submit(create_plan)
+        revoke_future = pool.submit(QualificationInvalidations(database).accept, revoked)
+        plan = plan_future.result()
+        assert revoke_future.result()["persisted"] is True
+
+    with database.transaction() as tx:
+        hold = p.qualification_hold(tx, TENANT, plan["id"])
+    assert hold in {"qualification_authority_withdrawn", "owner_change_requires_new_assessment"}
+    saved = p.get(TENANT, APP, ENV, plan["id"], "plan")
+    assert not p.validity(actor, saved, {})["current"]
