@@ -101,7 +101,9 @@ def collect_vmware(
                 before_request()
                 option = exchange(
                     stream, prefix + "EnvironmentBrowser/" + browser["value"] + "/QueryConfigOption",
-                    headers, method="POST", body={},
+                    headers, method="POST",
+                    body={"host": {"_typeName": "ManagedObjectReference",
+                                   "type": "HostSystem", "value": key}},
                 )
                 if not isinstance(option, dict):
                     continue
