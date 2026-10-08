@@ -24,6 +24,38 @@ CREATE TABLE app.planning_qualification_heads (
     state text NOT NULL CHECK (state IN ('qualified','suspended','revoked'))
 );
 
+-- Immutable plan bytes stay unchanged; store the review-time scope as a
+-- separate index. An absent/unknown binding conservatively matches any change.
+CREATE TABLE app.planning_plan_qualification_scopes (
+    plan uuid PRIMARY KEY REFERENCES app.planning_records(id),
+    tenant uuid NOT NULL,
+    scope_sha256 text CHECK (scope_sha256 ~ '^[0-9a-f]{64}
+CREATE FUNCTION app.guard_planning_qualification_head()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    IF TG_OP = 'UPDATE' AND (
+        NEW.tenant <> OLD.tenant OR
+        NEW.authority_epoch <= OLD.authority_epoch
+    ) THEN
+        RAISE EXCEPTION 'qualification authority epoch may only advance'
+            USING ERRCODE = '23514';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+CREATE TRIGGER planning_qualification_head_monotonic
+    BEFORE UPDATE ON app.planning_qualification_heads
+    FOR EACH ROW EXECUTE FUNCTION app.guard_planning_qualification_head();
+
+GRANT SELECT, INSERT ON app.planning_qualification_inbox TO planning_runtime;
+GRANT SELECT, INSERT, UPDATE ON app.planning_qualification_heads TO planning_runtime;
+COMMIT;
+)
+);
+CREATE INDEX planning_plan_qualification_by_scope
+    ON app.planning_plan_qualification_scopes(tenant,scope_sha256);
+GRANT SELECT, INSERT ON app.planning_plan_qualification_scopes TO planning_runtime;
+
 -- Immutable inbox; the runtime can only advance the per-scope head.
 CREATE FUNCTION app.guard_planning_qualification_head()
 RETURNS trigger LANGUAGE plpgsql AS $$
