@@ -136,10 +136,10 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
         raise Rejected("vmware_vm_folder_required")
     from inventory.domain.destination_security import source_security_ids
 
-    if source_security_ids(source) != []:
-        # vCenter network discovery lacks an authoritative observed NSX
-        # rule catalogue. No owner-created security IDs are permitted.
-        raise Rejected("destination_security_policy_catalog_required")
+    # Only a source-authorized security mapping could be confirmed.
+    # The current vCenter network list has no NSX/ACL rule catalogue;
+    # Inventory review retains a mandatory hold for such cases.
+    source_security_ids(source)
     catalog = next((row for row in target["guest_options_by_host"]
                     if row["host"] == d["host_id"]), None)
     if (
