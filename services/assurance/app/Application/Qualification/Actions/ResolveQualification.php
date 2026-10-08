@@ -53,7 +53,15 @@ final class ResolveQualification
         try {
             $resolved = (new NativeQualification)->resolve($records[0], $trust['keys'], $scope, time());
             if ($authorityHead !== null) {
-                $resolved['verification']['authority_epoch'] = $authorityHead['authority_epoch'];
+                // A revocation or superseding publication during RSA verification
+                // cannot escape the current resolver through a stale SQL snapshot.
+                $latest = (new QualificationAuthorityLedger)->current($scope);
+                if ($latest === null || $latest['state'] !== 'qualified'
+                    || $latest['authority_epoch'] !== $authorityHead['authority_epoch']
+                    || $latest['decision_sha256'] !== $authorityHead['decision_sha256']) {
+                    return $unknown;
+                }
+                $resolved['verification']['authority_epoch'] = $latest['authority_epoch'];
             }
 
             return $resolved;
