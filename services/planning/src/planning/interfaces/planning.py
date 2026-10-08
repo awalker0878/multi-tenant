@@ -88,7 +88,17 @@ class PlanningApp:
                 rf"/v1/tenants/({UUID})/execution-plans/({UUID})/revisions/([1-9][0-9]{{0,8}})",
                 scope["path"],
             )
-            if execution and scope["method"] == "GET":
+            placement = re.fullmatch(
+                rf"/internal/tenants/({UUID})/placement-proposals/({UUID})/"
+                rf"revisions/([1-9][0-9]{{0,8}})", scope["path"],
+            )
+            if placement and scope["method"] == "GET":
+                await asyncio.to_thread(self.authority.caller, credential, "lifecycle_reader")
+                payload = await asyncio.to_thread(
+                    self.planning.placement_proposal, placement[1], placement[2], int(placement[3])
+                )
+                status = 200
+            elif execution and scope["method"] == "GET":
                 await asyncio.to_thread(self.authority.caller, credential, "lifecycle_reader")
                 payload = await asyncio.to_thread(
                     self.planning.execution_plan, execution[1], execution[2], int(execution[3])

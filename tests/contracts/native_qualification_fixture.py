@@ -14,7 +14,7 @@ def digest(value):
                                     separators=(',', ':')).encode()).hexdigest()
 
 
-def signed_fixture(record, directory, now=None):
+def signed_fixture(record, directory, now=None, inventory=None, snapshot=None):
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     now = int(time.time()) if now is None else now
@@ -51,6 +51,9 @@ def signed_fixture(record, directory, now=None):
                        | {'dimension:' + k: 'passed' for k in record['dimensions']}
                        | {'adapter_behavior':'passed','installed_identity':'passed','runtime_artifacts':'passed'}),
              'observed_at': now, 'expires_at': now + 3600, 'subject_id': keys['observer']['subject_id']}
+    if inventory is not None:
+        proof['inventory']=copy.deepcopy(inventory)
+        proof['snapshot']=copy.deepcopy(snapshot)
     evidence = sign(proof, 'observer')
     record['evidence_refs'] = [evidence['sha256']]
     decision = sign({'kind': 'qualification_decision', 'decision': 'accepted_native',
@@ -67,6 +70,12 @@ def refresh_runtime(envelope, directory, now=None):
     now = int(time.time()) if now is None else now
     payload = json.loads(base64.b64decode(envelope['content_base64']))
     payload.update(observed_at=now, expires_at=now+120)
+    # E2 peer measurements are deliberately simulated, never native commissioning evidence.
+    snapshot=payload.get('snapshot',{})
+    if snapshot:
+        snapshot['isolation'].update(observed_at=now,expires_at=now+120)
+        for row in snapshot['network']['measurements']+snapshot['recovery_measurements']:
+            row.update(observed_at=now,expires_at=now+120)
     raw=json.dumps(payload,sort_keys=True,ensure_ascii=True,separators=(',',':')).encode()
     signature=subprocess.check_output(['openssl','dgst','-sha256','-sign',str(Path(directory)/'observer.pem')],input=raw)
     return {'key_id':envelope['key_id'],'content_base64':base64.b64encode(raw).decode(),

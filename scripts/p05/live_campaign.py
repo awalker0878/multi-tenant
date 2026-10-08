@@ -65,11 +65,32 @@ def campaign(c, extension=None):
     registry_file=private/'planning-registry.json';registry_file.write_text(json.dumps(registry))
     sys.path.insert(0, str(root/'tests/contracts'))
     from native_qualification_fixture import FixtureRuntimePublisher, signed_fixture
+    # A synthetic native wire peer exercises the signed protocol without E3 promotion.
+    sys.path.insert(0, str(root/'services/planning/src'))
+    sys.path.insert(0, str(root/'services/planning/tests'))
+    import planning_fixture as capability_fixture
+    capability_fixture.NOW = now
+    policy['allowed_zones'] = ['zone-1']
+    policy['recovery_profile'] = {
+        'minimum_load': 1, 'parallel_restores': 1, 'load_unit': 'requests_per_second',
+    }
+    policy['forbidden_flows'] = [{
+        'from': 'foreign-tenant', 'to': model['intent']['workloads'][0]['id'],
+        'protocol': 'tcp', 'port': 22,
+    }]
+    # Rewrite the independently mounted policy after adding the explicit assessment controls.
+    registry_file.write_text(json.dumps(registry))
     quals={'schema_version':2,'records':[]}
     trust={'schema_version':1,'keys':{}}
     for d in [a,b]:
         q=copy.deepcopy(model['qualification']);q['scope'].update({k:d[k] for k in ['tenant_id','site_id','endpoint_id','native_scope','installed_tuple']})
-        bundle,keys=signed_fixture(q,private/('fixture-keys-'+d['site_id']))
+        q['version']=2
+        capability_fixture.verify_fixture(q, now)
+        d['capability_snapshot']=capability_fixture.snapshot_fixture(model['intent'],d,policy,q)
+        bundle,keys=signed_fixture(
+            q,private/('fixture-keys-'+d['site_id']),inventory=d,
+            snapshot=d['capability_snapshot']['data'],
+        )
         # Scope-specific enrolled keys; these are isolated E2 peer fixtures.
         prefix=d['site_id']+':'
         for envelope in [bundle['decision'],bundle['runtime'],*bundle['evidence']]:
@@ -110,7 +131,7 @@ def campaign(c, extension=None):
     actual=planning('assessments',dict(create,candidates=candidates[:1]),sites=[a['site_id']],expected=201)
     actual_view=planning('assessments/'+actual['id'],sites=[a['site_id']])
     check('actual-P04-owner-declarations-never-imply-support',actual_view['results'][0]['operationally_eligible'] is False and any(f['reason']=='installed_tuple_only_declared' for f in actual_view['results'][0]['findings']))
-    peer=InventoryContractPeer(c['certificate'],c['key'],credentials['planning-inventory'][0],credentials['inventory-governance'][0],{a['endpoint_id']:a,b['endpoint_id']:b})
+    peer=InventoryContractPeer(c['certificate'],c['key'],credentials['planning-inventory'][0],credentials['inventory-governance'][0],{a['endpoint_id']:a,b['endpoint_id']:b},runtime_file=runtime_file)
     c['proxies'].append(peer)
     c['stop']('planning');envs['planning']['INVENTORY_URL']='https://127.0.0.1:8448';c['start']('planning')
     key=str(uuid.uuid4())

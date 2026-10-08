@@ -21,7 +21,7 @@ TlsProxy=module.TlsProxy
 
 
 class InventoryContractPeer:
-    def __init__(self, certificate, key, caller, governance, destinations):
+    def __init__(self, certificate, key, caller, governance, destinations, runtime_file=None):
         self.destinations=destinations
         self.reads=[]
         peer=self
@@ -40,6 +40,21 @@ class InventoryContractPeer:
                         found=peer.destinations.get(endpoint)
                         if decision.get('allowed') is True and found and all(found[k]==v for k,v in {'tenant_id':tenant,'site_id':site,'generation_id':generation}.items()):
                             status,body=200,copy.deepcopy(found)
+                            if runtime_file:
+                                runtime=json.loads(Path(runtime_file).read_text())
+                                proofs=[(r,json.loads(base64.b64decode(r['content_base64']))) for r in runtime['records'].values()]
+                                matched=[(r,p) for r,p in proofs if p.get('inventory',{}).get('endpoint_id')==endpoint]
+                                if len(matched)==1:
+                                    envelope,payload=matched[0]
+                                    body['capability_snapshot']={
+                                        'definition_sha256':payload['definition_sha256'],
+                                        'source_sha256':envelope['sha256'],
+                                        'decision_sha256':payload['decision_sha256'],
+                                        'scope_sha256':payload['scope_sha256'],
+                                        'observed_at':payload['observed_at'],
+                                        'expires_at':payload['expires_at'],
+                                        'data':payload['snapshot'],
+                                    }
                     except (OSError,ValueError):pass
                 peer.reads.append({'path':self.path,'status':status})
                 raw=json.dumps(body).encode();self.send_response(status);self.send_header('Content-Type','application/json');self.send_header('Cache-Control','no-store, private');self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)

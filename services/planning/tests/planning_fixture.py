@@ -280,7 +280,7 @@ def snapshot_fixture(
         "protocol": "tcp", "port": 22, "kind": "domain",
         "security_domain_id": workload["security_domain"]["id"],
     } for index, workload in enumerate(intent["workloads"])]
-    topology = {
+    topology: dict[str, Any] = {
         "nodes": {w["id"]: "fixture://native-port-" + w["id"] for w in intent["workloads"]},
         "routes": [{"from": d["from"], "to": d["to"], "native_ref": "fixture://route"}
                    for d in communication],

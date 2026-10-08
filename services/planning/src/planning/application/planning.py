@@ -9,6 +9,7 @@ from uuid import uuid4
 from planning.application.ports import Database, Sources, Transaction
 from planning.application.validation import PlanValidation
 from planning.domain.assessment import assess
+from planning.domain.placement import fit
 from planning.domain.compilation import bind, compile_plan
 from planning.domain.model import Actor, Rejected, canonical, digest, identifier, integer, shape
 
@@ -303,6 +304,55 @@ class Planning:
                 <= self.clock()
             ):
                 raise Rejected("migration_plan_expired", 423)
+
+    def placement_proposal(
+        self, tenant: str, identity: str, revision: int
+    ) -> dict[str, Any]:
+        """Expose a deterministic witness; a proposal is never an owner receipt."""
+        if revision != 1:
+            raise Rejected("not_found", 404)
+        with self.database.transaction() as tx:
+            row = tx.one(
+                "SELECT payload FROM app.planning_records WHERE id=%s AND tenant=%s "
+                "AND kind='plan'", (identifier(identity), identifier(tenant)),
+            )
+            if row is None:
+                raise Rejected("not_found", 404)
+            plan = row["payload"]
+            retained = tx.one(
+                "SELECT payload FROM app.planning_records WHERE id=%s AND tenant=%s "
+                "AND kind='assessment'", (plan["assessment_id"], tenant),
+            )
+        content = plan["content"]
+        if (
+            retained is None or content["execution_ready"] is not True
+            or content["lane"] != "operational"
+            or min(content["valid_until"], content["input_fresh_until"]) <= self.clock()
+        ):
+            raise Rejected("placement_proposal_held", 423)
+        assessment = retained["payload"]
+        inputs = assessment["inputs"][plan["candidate"]]
+        try:
+            placed = fit(
+                assessment["intent"]["intent"],
+                inputs["destination"]["capability_snapshot"]["data"]["pools"],
+                inputs["policy"], self.clock(),
+            )
+        except (KeyError, TypeError, ValueError):
+            raise Rejected("placement_proposal_unverified", 423) from None
+        if placed["status"] != "eligible":
+            raise Rejected("placement_proposal_unfit", 423)
+        return {
+            "scope": content["scope"],
+            "plan_id": plan["id"],
+            "plan_revision": 1,
+            "plan_digest": plan["binding"]["digest"],
+            "generation_id": content["inventory_generation"],
+            "policy_sha256": digest(inputs["policy"]),
+            "placement_sha256": digest(placed["allocations"]),
+            "allocations": placed["allocations"],
+            "native_write_authorized": False,
+        }
 
     def bound_plan(self, identity: str, revision: int) -> dict[str, Any]:
         if revision != 1:

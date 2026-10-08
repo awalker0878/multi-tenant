@@ -154,3 +154,16 @@ the commissioned capacity owner. The receipt binds plan digest, allocation witne
 generation and policy. No browser delegation or simulation receipt can satisfy it.
 Real PostgreSQL tests cover competing tenants, exact retry after restart, conflicting
 requests, expiry with live allocation and confirmed consumption without double debit.
+
+## CT-06 integration observations
+
+The Console action and strategy choices and direction counts now come from the
+canonical generated metadata. A separate read-only placement proposal endpoint
+exposes the deterministic allocation witness for capacity-owner review without
+changing existing v1 plan bytes or granting effects. The E2 live Inventory peer now
+returns signed, scope-bound native-protocol snapshots, while actual uncommissioned
+Inventory still returns unknown. Composed unattended-read tests cover missing or
+released receipts, allocation tampering, network drift, failed restore and legacy
+qualification. The v2 source contract documents the new Inventory and service-only
+qualification reads. The four-product CI matrix records independent format, lint,
+type and test outcomes and cancels obsolete runs of that matrix.

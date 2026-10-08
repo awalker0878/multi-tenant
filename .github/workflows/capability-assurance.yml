@@ -3,6 +3,9 @@ on:
   pull_request:
   push:
     branches: [main]
+concurrency:
+  group: capability-assurance-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:

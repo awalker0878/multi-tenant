@@ -103,201 +103,6 @@
         }
       }
     },
-    "/v1/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{revision}": {
-      "get": {
-        "operationId": "readPlanningIntent",
-        "tags": [
-          "catalogue"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "tenant",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "path",
-            "name": "application",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "path",
-            "name": "environment",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "path",
-            "name": "site",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "path",
-            "name": "revision",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Actor-Delegation",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^[0-9a-f]{64}$"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Planning-Action",
-            "required": true,
-            "schema": {
-              "enum": [
-                "plan.read",
-                "plan.create"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Current owner response; no-store, private",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CatalogueInput"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Current scope denied"
-          },
-          "503": {
-            "description": "Owner or authority unavailable"
-          }
-        }
-      }
-    },
-    "/v1/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{endpoint}/{generation}": {
-      "get": {
-        "operationId": "readPlanningInventory",
-        "tags": [
-          "inventory"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "tenant",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "path",
-            "name": "application",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "path",
-            "name": "environment",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "path",
-            "name": "site",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "path",
-            "name": "endpoint",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "path",
-            "name": "generation",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Actor-Delegation",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^[0-9a-f]{64}$"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Planning-Action",
-            "required": true,
-            "schema": {
-              "enum": [
-                "plan.read",
-                "plan.create"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Current owner response; no-store, private",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InventoryInput"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Current scope denied"
-          },
-          "503": {
-            "description": "Owner or authority unavailable"
-          }
-        }
-      }
-    },
     "/v1/tenants/{tenant}/planning-qualification-v2": {
       "post": {
         "operationId": "readPlanningQualification",
@@ -477,6 +282,339 @@
                 ]
               }
             }
+          }
+        }
+      }
+    },
+    "/internal/tenants/{tenant}/qualification-checks": {
+      "post": {
+        "operationId": "checkCurrentNativeQualification",
+        "tags": [
+          "assurance"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current owner response; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Qualification"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope denied"
+          },
+          "503": {
+            "description": "Owner or authority unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "qualification_scope": {
+                    "$ref": "#/components/schemas/QualificationScope"
+                  }
+                },
+                "required": [
+                  "qualification_scope"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{revision}": {
+      "get": {
+        "operationId": "readPlanningIntent",
+        "tags": [
+          "catalogue"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "site",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Action",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan.read",
+                "plan.create"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current owner response; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogueInput"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope denied"
+          },
+          "503": {
+            "description": "Owner or authority unavailable"
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/planning-capability-inputs/{application}/{environment}/{site}/{endpoint}/{generation}": {
+      "get": {
+        "operationId": "readPlanningInventory",
+        "tags": [
+          "inventory"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "site",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "endpoint",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "generation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Action",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan.read",
+                "plan.create"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current owner response; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryInput"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope denied"
+          },
+          "503": {
+            "description": "Owner or authority unavailable"
+          }
+        }
+      }
+    },
+    "/internal/tenants/{tenant}/planning-capability-inputs/{application}/{environment}/{site}/{endpoint}/{generation}": {
+      "get": {
+        "operationId": "readNativeCapabilityGeneration",
+        "tags": [
+          "inventory"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "site",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "endpoint",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "generation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current owner response; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryInput"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope denied"
+          },
+          "503": {
+            "description": "Owner or authority unavailable"
           }
         }
       }
@@ -1720,6 +1858,7 @@
         ]
       },
       "InventoryInput": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -1939,6 +2078,55 @@
           },
           "workload_bindings": {
             "type": "object"
+          },
+          "capability_snapshot": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "definition_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "source_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "decision_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "scope_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "observed_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "expires_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "data": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "definition_sha256",
+                  "source_sha256",
+                  "decision_sha256",
+                  "scope_sha256",
+                  "observed_at",
+                  "expires_at",
+                  "data"
+                ]
+              }
+            ]
           }
         },
         "required": [
@@ -1958,7 +2146,8 @@
           "capabilities",
           "capacity",
           "domain_bindings",
-          "workload_bindings"
+          "workload_bindings",
+          "capability_snapshot"
         ]
       },
       "Qualification": {
