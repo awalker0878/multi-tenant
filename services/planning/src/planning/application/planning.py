@@ -429,12 +429,16 @@ class Planning:
             raise Rejected("not_found", 404)
         with self.database.transaction() as tx:
             row = tx.one(
-                "SELECT payload FROM app.planning_records WHERE id=%s AND kind='plan'",
+                "SELECT tenant,payload FROM app.planning_records WHERE id=%s AND kind='plan'",
                 (identifier(identity),),
             )
             if row is None:
                 raise Rejected("not_found", 404)
-            tenant = row["payload"]["content"]["scope"]["tenant_id"]
+            tenant = str(row["tenant"])
+            try:
+                assert row["payload"]["content"]["scope"]["tenant_id"] == tenant
+            except (KeyError, TypeError, AssertionError):
+                raise Rejected("plan_tenant_mismatch", 423) from None
             if self.qualification_hold(tx, tenant, identity) is not None:
                 raise Rejected("qualification_invalidation_held", 423)
             self.check_native_recipe(row["payload"])
