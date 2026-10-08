@@ -266,3 +266,30 @@ format/strict-type failures, confirm that a failed/missing/late HTTP receipt kee
 SQL outbox rows pending, implement recipient inbox custody and monotonic
 invalidation semantics, run A01–A16 composed tests including effect-boundary
 revocations, and complete E3/E4 and shadow-rollout separately.
+
+### A10/A11 follow-on — Planning receiving inbox (direct branch commits)
+
+- `c0174fc6`: bind the immutable Assurance outbox event to its originating
+  tenant; `7958bc54` cross-checks the outbox payload against the stored
+  authority-history tenant before delivery.
+- `a2540f5c`: Planning-owned `003_qualification_invalidations.sql` provides a
+  tenant-scoped, append-only inbox and monotonically advancing per-scope heads.
+- `14c16164` and `04515ce3`: durable receive/ack application boundary and
+  authenticated, bounded internal HTTP transport; `35bcaf6c` wires the new
+  endpoint into Planning's router.
+- `40bce52c` and `9aec2823`: E2 PostgreSQL and HTTP denial/replay tests.
+  These require CI to report a current-source pass before being counted as passed.
+- `fe958a89`, `27d308aa`, `b4db098d`: independent plan-to-qualification-scope
+  index, exact-scope invalidations and conservative holds when source scope is
+  unknown. Immutable plan content is unchanged; known unrelated scopes remain
+  unaffected.
+- `085755c5` and `c79770e2`: serialize plan creation against a
+  qualification-scope invalidation and add a late-revocation regression.
+- `4fc4fadd`: operator protocol updated with the Planning receiver configuration
+  and still-uncommissioned HTTPS/credential custody gate.
+
+**Outstanding:** CI was queued at the last current-head inspection and tests
+have not been verified green. A receiving endpoint is now present in source but
+has not been commissioned, TLS/secret custody has not been enrolled and no
+live end-to-end campaign or independent E3 native review has passed. Existing
+effect-boundary direct source revalidation remains mandatory.
