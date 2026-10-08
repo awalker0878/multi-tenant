@@ -92,7 +92,10 @@ native effect boundary.
 
 Optional omission acceptance is bound to the exact route, tenant,
 application, environment, capability and side, and requires **E4** evidence
-from the independently reviewed Assurance record. The site console shows
+from the independently reviewed Assurance record, including a separate
+`effect_suppressed_sha256` witness identifying the affected native effect
+that is actually omitted. A mere administrator acknowledgement or declared
+missing endpoint cannot stand in for suppression evidence. The site console shows
 blocking versus optional warnings, their impact, and the observed API
 release per feature. It does not issue approvals and cannot self-assert
 an E4 omission. An E3 route-level record without per-feature evidence
