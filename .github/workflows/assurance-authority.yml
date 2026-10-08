@@ -70,6 +70,9 @@ jobs:
         run: |
           ./vendor/bin/pest tests/Feature/QualificationAuthorityLedgerTest.php --fail-on-warning --fail-on-risky
           ./vendor/bin/pest tests/Feature/QualificationPublicationTest.php --fail-on-warning --fail-on-risky
+          ./vendor/bin/pest tests/Feature/QualificationInvalidationPublisherTest.php --fail-on-warning --fail-on-risky
       - name: Verify migration and service file formatting
         working-directory: services/assurance
-        run: ./vendor/bin/pint --test app/Application/Qualification/Actions/QualificationAuthorityLedger.php tests/Feature/QualificationAuthorityLedgerTest.php
+        run: |
+          ./vendor/bin/pint --test app/Application/Qualification/Actions/QualificationAuthorityLedger.php tests/Feature/QualificationAuthorityLedgerTest.php
+          ./vendor/bin/pint --test app/Application/Qualification/Actions/DeliverQualificationInvalidation.php app/Infrastructure/Qualification/ConfirmedHttpInvalidationPublisher.php tests/Feature/QualificationInvalidationPublisherTest.php
