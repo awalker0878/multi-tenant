@@ -88,10 +88,11 @@ def test_ahv_destination_enforced_policy_choices_follow_observed_source_groups()
                       "state": "ENFORCE"}],
     }
     source = {
-        "platform": "openstack", "schema_version": 3, "firmware": "efi",
+        "platform": "openstack", "schema_version": 3,
+        "native_scope": "source-project", "firmware": "efi",
         "nics": [{"key": 0}], "disks": [{"key": 0}],
         "native": {"metadata": {"ports": [
-            {"id": "port-1", "port_security_enabled": True,
+            {"id": "port-1", "project_id": "source-project", "port_security_enabled": True,
              "security_groups": ["source-rule"]},
         ]}},
     }
