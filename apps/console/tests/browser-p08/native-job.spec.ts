@@ -10,8 +10,14 @@ test('shows independent stages, continues once after uncertainty, stops, and cle
   await expect(page.getByText(/1,073,741,824 bytes \(1.00 GiB\)/)).toBeVisible();
   await expect(page.getByRole('progressbar', { name: 'Independently verified stages' })).toHaveAttribute('value', '1');
   await request.post('/__native', { data: { uncertain: true } });
+  let releaseStatus!: () => void;
+  const statusGate = new Promise<void>(resolve => { releaseStatus = resolve; });
+  await page.route(`**${nativeRoute}/status`, async route => { await statusGate; await route.continue(); });
   await page.getByRole('button', { name: 'Continue immutable download', exact: true }).click();
-  await expect(page.getByRole('alert')).toContainText('Refresh current state');
+  await expect(page.getByRole('alert').filter({ hasText: /^outcome uncertain\. Refresh current state before another command\.$/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Stop migration', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Continue immutable download', exact: true })).toBeDisabled();
+  releaseStatus();
   await expect(page.getByRole('heading', { name: 'Migration state: running', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: '2 of 8 stages independently verified', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Continue immutable download', exact: true })).toHaveCount(0);
