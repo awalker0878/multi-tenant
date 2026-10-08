@@ -21,7 +21,7 @@ from planning_fixture import (
 
 from planning.application.planning import Planning
 from planning.application.validation import PlanValidation
-from planning.domain.model import Actor, Rejected
+from planning.domain.model import Actor, Rejected, digest
 from planning.infrastructure.store import Postgres
 
 
@@ -92,6 +92,15 @@ def test_plan_persistence_invalidation_duplicate_and_conflict(database: Postgres
         a, str(uuid4()), {"assessment_id": r["id"], "candidate": 0, "request": request()}, assessed
     )
     saved = p.get(TENANT, APP, ENV, plan["id"], "plan")
+    with database.transaction() as tx:
+        index = tx.one(
+            "SELECT scope_sha256 FROM app.planning_plan_qualification_scopes WHERE plan=%s",
+            (plan["id"],),
+        )
+    assert index is not None
+    assert index["scope_sha256"] == digest(
+        assessed["inputs"][0]["qualification"]["scope"]
+    )
     assert p.validity(a, saved, {})["current"]
     event = {
         "event_id": str(uuid4()),
