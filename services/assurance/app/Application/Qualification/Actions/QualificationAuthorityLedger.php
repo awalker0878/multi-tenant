@@ -144,7 +144,8 @@ final class QualificationAuthorityLedger
                 'event_id' => $eventId, 'scope_sha256' => $scopeSha,
                 'authority_epoch' => $nextEpoch,
                 'payload' => json_encode([
-                    'event_id' => $eventId, 'scope_sha256' => $scopeSha,
+                    'event_id' => $eventId, 'tenant_id' => $scope['tenant_id'],
+                    'scope_sha256' => $scopeSha,
                     'authority_epoch' => $nextEpoch, 'operation' => $operation,
                     'decision_sha256' => $newDecision, 'state' => $state,
                     'event_sha256' => $eventSha,
