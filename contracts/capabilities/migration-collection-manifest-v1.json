@@ -3608,6 +3608,19 @@
           "condition": "always",
           "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
           "collection_status": "native_field_candidate"
+        },
+        {
+          "id": "storage.server_volume_refs",
+          "scope": "source",
+          "api_family": "nova",
+          "api_field": "server.os-extended-volumes:volumes_attached",
+          "owner_evidence_field": null,
+          "collection_method": "native_get",
+          "max_age_seconds": 60,
+          "severity": "critical",
+          "condition": "always",
+          "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_workload.py",
+          "collection_status": "native_field_candidate"
         }
       ]
     }
