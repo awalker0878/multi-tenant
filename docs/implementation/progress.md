@@ -19,7 +19,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | P06 | Durable execution in simulation | IN_PROGRESS | PASSED | NOT_STARTED | NOT_STARTED | G06: NOT_REVIEWED | 3 / 1 |
 | P07 | Native OpenStack provisioning | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G07: NOT_REVIEWED | 7 / 1 |
 | P08 | VMware-to-OpenStack migration | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G08: NOT_REVIEWED | 8 / 2 |
-| P09 | Platform and capability expansion | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G09: NOT_REVIEWED | 2 / 2 |
+| P09 | Platform and capability expansion | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G09: NOT_REVIEWED | 3 / 2 |
 | P10 | Enterprise operating qualification | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G10: NOT_REVIEWED | 4 / 2 |
 | P11 | Pilot and supported release | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G11: NOT_REVIEWED | 0 / 0 |
 
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **102**. Blocker records: **22**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **103**. Blocker records: **22**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -205,6 +205,7 @@ Evidence records: **102**. Blocker records: **22**. Planning inputs awaiting sel
 | EV-P10-002 | E2 | GitHub Actions Ubuntu 24.04/Python 3.12.14, actual PostgreSQL 16/TLS/Cosign; synthetic native owners and local alert receiver. | b7411590868138ce2e240658ddbd2c167607a300 | Synthetic native/owner/load/alert scope only. No native throughput, full control-plane RTO, restricted install, real recipient or G10 acceptance. Original decoded job log and GitHub-reported artifact metadata retained; ZIP not independently downloaded or rehashed here. |
 | EV-P10-003 | E2 | GitHub Actions Ubuntu 24.04/Python 3.12.14, actual PostgreSQL 16/TLS/Cosign; synthetic native owners and local alert receiver. Local P10 tool checks use Python 3.12.14 against the same source. | 0ba5d986d6ba20ec9303f016baf468cedaa3c352 | E2 with synthetic native owners only; no installed platform, native throughput, coordinated RPO/RTO, restricted installation, actual alert recipient or operating acceptance. Artifact download returned HTTP 403; its recorded GitHub digest is not a local archive rehash. N01-N15 and OP01-OP07 remain unbound or unreviewed. |
 | EV-P10-004 | E2 | GitHub Actions Ubuntu 24.04/Python 3.12.14, actual PostgreSQL 16/TLS/Cosign with synthetic native peers and local alert receiver. Local P10 tools use Python 3.12.14 against the same source. | b1ee0355580f06620fc723f7120f11725fade743 | E2 synthetic native owners only. No installed platform, native throughput, coordinated RPO/RTO, restricted installation, actual alert recipient or operating acceptance. Archive digest is GitHub-reported and has not been independently rehashed here. N01-N15 and OP01-OP07 remain unbound or unreviewed; selected owner-specific implementations and receiving evidence remain required. |
+| EV-P09-003 | E2 | Local Linux with locked Python packages, synthetic native/owner TLS peers and Chromium 153.0.8010.0. PostgreSQL cannot obtain the required unprivileged identity; PHP unavailable. | b0bc25c7bf6ed2400a26c72485ed4823a9fe3620 | Partial E2 only. PostgreSQL/PHP/full hosted runtime gates unverified. Local Chromium differs from pinned CI browser. No installed platform, guest transformer, application/storage owner implementation, native E3, operating acceptance or G09/G10/G11 decision. Windows templates are bounded driver preparation, not universal conversion. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
 | BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, P01, P01.02, P01.04, P01.05, P01.06, G01, R29, R30 | Requesting user for baseline decisions; actual integration, operating and records owners at their affected checkpoints | OPEN | Supply the concrete runtime, registry/signer, trust, operating or records input before the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward checkpoints; do not request baseline approval again. | Complete the exact OP01–OP07 receiving inputs in release/operating-inputs.json with actual identities and immutable evidence. Run operating_inputs.py --require-complete, then integrate and qualify the affected trust/runtime/operations path. Preserve the accepted G00 decision and later P08/P10/P11 receiving checkpoints. |

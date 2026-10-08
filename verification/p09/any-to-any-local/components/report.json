@@ -1,0 +1,71 @@
+{
+  "source_revision": "b0bc25c7bf6ed2400a26c72485ed4823a9fe3620",
+  "observed_at": "2026-10-08T09:01:42.846203+00:00",
+  "evidence_level": "E2-partial",
+  "native_platforms_tested": [],
+  "full_qualification": "not_established",
+  "suites": [
+    {
+      "component": "services/inventory",
+      "suite": {
+        "tests": 188,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 46
+      },
+      "result": "LOCAL_PASS_WITH_DATABASE_SKIPS"
+    },
+    {
+      "component": "services/planning",
+      "suite": {
+        "tests": 365,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 6
+      },
+      "result": "LOCAL_PASS_WITH_DATABASE_SKIPS"
+    },
+    {
+      "component": "services/lifecycle",
+      "suite": {
+        "tests": 425,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 67
+      },
+      "result": "LOCAL_PASS_WITH_DATABASE_SKIPS"
+    },
+    {
+      "component": "workers/inventory",
+      "suite": {
+        "tests": 95,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "result": "LOCAL_PASS_WITH_DATABASE_SKIPS"
+    },
+    {
+      "component": "workers/lifecycle",
+      "suite": {
+        "tests": 710,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 27
+      },
+      "result": "LOCAL_PASS_WITH_DATABASE_SKIPS"
+    }
+  ],
+  "limitations": [
+    "PostgreSQL fixtures require an unprivileged process identity unavailable in this workspace; skips are not passes.",
+    "PHP/runtime image CI is not executed locally.",
+    "Synthetic platform and owner peers do not establish native E3 or receiving E4."
+  ],
+  "reports": {
+    "services-inventory/report.json": "704332ebaa5b839ad2868bd602e3b359038b341387546e40d8c1c2dc1084865c",
+    "services-planning/report.json": "45a4d37d5825c1b896bc28e7ed83f03dfb9d6e411e77eff1fe6450483fbe9e73",
+    "services-lifecycle/report.json": "73e00115666bb6d55e08458652fe0aa60a03a1fadb65c569e1880bd5aef38baa",
+    "workers-inventory/report.json": "1faf0be3e98b9e0f27fe1e2a0bc4c5215b00eeaff4a45a94cc7e085db4b4bace",
+    "workers-lifecycle/report.json": "b10db6f5fe179a762ffd11f5df8123a8cf6fc01184f87bd356465799e4a285b4"
+  }
+}

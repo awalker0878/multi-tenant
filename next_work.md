@@ -1,3 +1,28 @@
+# Current handoff — P0 / P09-A completion work
+
+Continue on `enhancement/p09-any-to-any`. The uncommitted handoff was recovered
+from `91acffa4200a7e3a4d5d5d767f6db981149d0774`; the approved audit baseline was
+`eda64354816b4884530118f6595c037a5a556807`. Platform discovery, typed outcomes,
+source/destination mechanisms, guest preparation, method contracts, durable
+continuation, native observations, progress and console parity are implemented.
+The [P09-A record](docs/implementation/p09-any-to-any.md) maps G1–G6 and A01–A11;
+the [runbook](docs/operations/runbooks/any-to-any-migration.md) names concrete
+commissioning and operating requirements.
+
+Current changes are local commits. Automatic approval review rejected the push to
+`https://github.com/awalker0878/multi-tenant.git` because it did not recognize
+publication authorization. Do not try a different transport to bypass that rejection.
+After explicit publication approval, push this enhancement branch and open a PR to
+main, run the restored main-targeted CI and resolve all actual failures before merge.
+
+Local PostgreSQL fixtures cannot create the required unprivileged process identity;
+PHP 8.5 is unavailable. These checks remain unverified. Installed native platforms,
+owner application/storage interfaces, guest conversion artifacts and independent
+receiving records are also required. Local/synthetic evidence grants no native
+support and does not complete P09/P10/P11 or G09–G11.
+
+# Historical handoffs
+
 # Contextual commissioning and recovery increment
 
 Operator readiness now follows the selected task, migration method and observed

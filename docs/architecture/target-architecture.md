@@ -23,6 +23,26 @@ The [context code structure](context-code-structure.md) applies the selected [pr
 
 The preferred P00 proposal provisions a selected Linux application on OpenStack, then qualifies VMware-to-OpenStack application rebuild/restore. The target is rebuilt from reviewed image/application/configuration artifacts; application-consistent capture and restore, source-writer fencing and controlled cutover preserve the selected data and service requirements. P00 confirms reproducibility, version/restore compatibility, platform/guest tuple, acceptance checks and native test environments. ADR-014 remains proposed until the required review and feasibility results exist. Whole-VM disk conversion for applications that cannot be rebuilt is a separately selected P09 method, never an implicit fallback or a capability inherited from earlier code.
 
+### Any-to-any migration invariant
+
+VMware, OpenStack and Nutanix AHV each occupy source and destination roles.
+All nine directed combinations, including distinct installations of one platform,
+compose through a common migration contract. Qualification is directional and
+binds exact installed versions, guest/method, conversion artifacts, policy,
+enterprise services, data and recovery. The original VMware-to-OpenStack pilot
+sequence does not define a preferred source in the product model.
+
+Inventory owns discovered facts and confirmed owner inputs; Planning selects an
+exact qualified route; Governance approves its immutable plan; Lifecycle rechecks
+current authority and support at admission and each effect boundary. Platform
+adapters implement capture, export and import. Common migration modules own data
+custody, offline copy conversion, continuation, outcomes and recovery. Independent
+observers establish guest, security and each enterprise-service outcome before
+activation. Terraform is outside the VM data path.
+
+The [P09-A implementation record](../implementation/p09-any-to-any.md) and
+[runbook](../operations/runbooks/any-to-any-migration.md) define the current bounds.
+
 ## 2. Logical topology
 
 ```mermaid

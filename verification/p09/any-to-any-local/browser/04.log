@@ -1,0 +1,22 @@
+
+Running 9 tests using 1 worker
+
+  ✓  1 tests/browser-p08/campaign.spec.ts:3:1 › schedules measured migrations, recovers a lost receipt, pauses, and clears revoked access (7.1s)
+  ✓  2 tests/browser-p08/fleet.spec.ts:4:1 › discovers, groups and prepares source VMs with independent holds and current-group checks (18.2s)
+  ✓  3 tests/browser-p08/migration.spec.ts:4:1 › selects each source and destination direction without assuming a VMware source (3.3s)
+  ✓  4 tests/browser-p08/migration.spec.ts:23:1 › maps every observed disk, preserves uncertain commands, confirms exact review, and clears revoked access (18.2s)
+  ✓  5 tests/browser-p08/migration.spec.ts:81:1 › selects AHV resources and saves complete quarantine mappings without authorizing migration (2.2s)
+  ✓  6 tests/browser-p08/migration.spec.ts:122:1 › maps VMware placement, every disk and isolated NICs while preserving source firmware (2.6s)
+  ✓  7 tests/browser-p08/native-job.spec.ts:3:1 › shows independent stages, continues once after uncertainty, stops, and clears revoked access (929ms)
+  ✓  8 tests/browser-p08/native-job.spec.ts:33:1 › rejects stale revisions and keeps read-only operators from sending native controls (592ms)
+  ✓  9 tests/browser-p08/operator-inputs.spec.ts:3:1 › collects operator inputs, preserves zero and uncertain saves, and remains usable on mobile (16.7s)
+
+  9 passed (1.2m)
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+[WebServer] (node:198) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+[WebServer] (node:211) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:247) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

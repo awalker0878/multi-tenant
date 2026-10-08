@@ -1,0 +1,71 @@
+{
+  "source_revision": "b0bc25c7bf6ed2400a26c72485ed4823a9fe3620",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "scripts/p04/generate_clients.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "00.log",
+      "sha256": "ac80e42edef23870ed8b98c3bafd12107c16415fd36b68bd689b8436691cdff9"
+    },
+    {
+      "argv": [
+        "python",
+        "scripts/p09/generate_contract.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "01.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--project",
+        "scripts/p01/contracts",
+        "--frozen",
+        "python",
+        "scripts/p08/check_any_to_any.py"
+      ],
+      "exit_code": 0,
+      "log": "02.log",
+      "sha256": "b6315e75eada7a2df9d75939aaaff965eaabc362b8ee806d04f569cc0b739e7c"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--project",
+        "services/planning",
+        "--frozen",
+        "python",
+        "scripts/p09/check_directional_workflow.py"
+      ],
+      "exit_code": 0,
+      "log": "03.log",
+      "sha256": "c618cf43fbc9e7e005af44695d622232f52dead996125b663827da9e62d1b303"
+    },
+    {
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts/p01",
+        "-p",
+        "test_*.py",
+        "-q"
+      ],
+      "exit_code": 0,
+      "log": "04.log",
+      "sha256": "ded35c70ba2d32f91e6132f42a984f3dd8c8fee9d0b6072996c7e2de5fa55e29"
+    }
+  ],
+  "result": "PASSED",
+  "native_qualification": "not_established"
+}

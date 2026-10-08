@@ -360,12 +360,18 @@ phases:
   evidence_ids:
   - EV-P09-001
   - EV-P09-002
+  - EV-P09-003
   blocker_ids:
   - BL-P09-002
   - BL-P09-003
-  delivery_note: Published with explicit user approval to greenfield/enterprise-microservices-plan. Full hosted
-    PostgreSQL conformance passes; exact native tranche, selected owner/native integrations and independent receiving
-    campaigns remain open.
+  delivery_note: P09-A implements role-neutral migration, exact directional outcomes, native capture/import,
+    copy preparation, typed data-owner methods, durable continuation and Console parity. Local evidence records
+    1637 passing Python tests, 146 database skips and nine browser journeys. New-source PostgreSQL/PHP and hosted
+    gates remain unverified; publication requires explicit authorization after automatic approval rejection.
+    Installed guest/platform/owner integration and independent receiving qualification remain open.
+  doc_refs:
+  - docs/implementation/p09-any-to-any.md
+  - docs/operations/runbooks/any-to-any-migration.md
 - id: P10
   title: Enterprise operating qualification
   owner_role: Platform/SRE and security leads
@@ -7570,6 +7576,30 @@ evidence:
     restricted installation, actual alert recipient or operating acceptance. Archive digest is GitHub-reported
     and has not been independently rehashed here. N01-N15 and OP01-OP07 remain unbound or unreviewed; selected
     owner-specific implementations and receiving evidence remain required.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P09-003
+  level: E2
+  artifact_uri: verification/p09/any-to-any-local/qualification-index.json
+  sha256: 9f0c7f0a2b6ac3dc9553fbc99494b14fb6417c7288db23182f2432a5d59d5250
+  source_revision: b0bc25c7bf6ed2400a26c72485ed4823a9fe3620
+  artifact_revisions:
+    browser_source: d676cdfe9a224c6d8c290bad9a477035713f71ad
+    publication: Local commits; push rejected pending explicit destination authorization
+  environment: Local Linux with locked Python packages, synthetic native/owner TLS peers and Chromium 153.0.8010.0.
+    PostgreSQL cannot obtain the required unprivileged identity; PHP unavailable.
+  scope: 'P0 G1-G6 and P09-A A01-A11 engineering: 1637 component passes, 146 explicit database skips, five clean
+    lint/type/format/wheel checks, nine browser journeys. 270 directional workflow scenarios and 126 typed data-method
+    contract combinations. Original failures and source/log/artifact hashes retained.'
+  campaign_ids: []
+  criterion_ids: []
+  observed_at: '2026-10-08T09:05:49.998528+00:00'
+  observer: Codex local automated commands and retained original reports.
+  reviewer: Engineering source/evidence consistency only; independent receiving owners remain required.
+  limitations: Partial E2 only. PostgreSQL/PHP/full hosted runtime gates unverified. Local Chromium differs from
+    pinned CI browser. No installed platform, guest transformer, application/storage owner implementation, native
+    E3, operating acceptance or G09/G10/G11 decision. Windows templates are bounded driver preparation, not universal
+    conversion.
   valid_until: null
   invalidated_at: null
 blockers:

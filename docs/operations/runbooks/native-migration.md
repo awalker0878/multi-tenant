@@ -6,6 +6,11 @@ It does not enable a native deployment. Use the
 [P08 completion packet](../../implementation/p08-completion-review.md) for the
 remaining integration and native acceptance work.
 
+For all source/destination combinations, use the [any-to-any extension](any-to-any-migration.md)
+and [current directional matrix](../../implementation/p09-any-to-any.md). The VMware/OpenStack
+sections below describe the original custody path; P09-A adds AHV sources, VMware
+destinations, copy-only guest preparation and typed independent outcomes.
+
 ## Collect and confirm migration profiles
 
 Apply Inventory migrations through `005_workload_profiles.sql` with its schema

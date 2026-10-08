@@ -1,0 +1,211 @@
+Building wheel...
+running bdist_wheel
+running build
+running build_py
+creating build/lib/planning
+copying src/planning/__init__.py -> build/lib/planning
+creating build/lib/planning/interfaces
+copying src/planning/interfaces/http.py -> build/lib/planning/interfaces
+copying src/planning/interfaces/__init__.py -> build/lib/planning/interfaces
+copying src/planning/interfaces/health.py -> build/lib/planning/interfaces
+copying src/planning/interfaces/migration.py -> build/lib/planning/interfaces
+copying src/planning/interfaces/native_plans.py -> build/lib/planning/interfaces
+copying src/planning/interfaces/planning.py -> build/lib/planning/interfaces
+copying src/planning/interfaces/telemetry.py -> build/lib/planning/interfaces
+creating build/lib/planning/domain
+copying src/planning/domain/compilation.py -> build/lib/planning/domain
+copying src/planning/domain/expansion.py -> build/lib/planning/domain
+copying src/planning/domain/__init__.py -> build/lib/planning/domain
+copying src/planning/domain/migration_plan.py -> build/lib/planning/domain
+copying src/planning/domain/migration.py -> build/lib/planning/domain
+copying src/planning/domain/native_plan.py -> build/lib/planning/domain
+copying src/planning/domain/migration_outcomes.py -> build/lib/planning/domain
+copying src/planning/domain/assessment.py -> build/lib/planning/domain
+copying src/planning/domain/model.py -> build/lib/planning/domain
+creating build/lib/planning/application
+copying src/planning/application/foundation.py -> build/lib/planning/application
+copying src/planning/application/__init__.py -> build/lib/planning/application
+copying src/planning/application/migration_plans.py -> build/lib/planning/application
+copying src/planning/application/migration_support.py -> build/lib/planning/application
+copying src/planning/application/ports.py -> build/lib/planning/application
+copying src/planning/application/native_plans.py -> build/lib/planning/application
+copying src/planning/application/planning.py -> build/lib/planning/application
+copying src/planning/application/events.py -> build/lib/planning/application
+creating build/lib/planning/infrastructure
+copying src/planning/infrastructure/migration_recipes.py -> build/lib/planning/infrastructure
+copying src/planning/infrastructure/foundation.py -> build/lib/planning/infrastructure
+copying src/planning/infrastructure/__init__.py -> build/lib/planning/infrastructure
+copying src/planning/infrastructure/store.py -> build/lib/planning/infrastructure
+copying src/planning/infrastructure/owners.py -> build/lib/planning/infrastructure
+copying src/planning/infrastructure/migration_support.py -> build/lib/planning/infrastructure
+copying src/planning/infrastructure/migration.py -> build/lib/planning/infrastructure
+copying src/planning/infrastructure/telemetry.py -> build/lib/planning/infrastructure
+creating build/lib/planning/bootstrap
+copying src/planning/bootstrap/__init__.py -> build/lib/planning/bootstrap
+copying src/planning/bootstrap/health.py -> build/lib/planning/bootstrap
+copying src/planning/bootstrap/facts.py -> build/lib/planning/bootstrap
+copying src/planning/bootstrap/server.py -> build/lib/planning/bootstrap
+creating build/lib/planning/infrastructure/messaging
+copying src/planning/infrastructure/messaging/codec.py -> build/lib/planning/infrastructure/messaging
+copying src/planning/infrastructure/messaging/consumer.py -> build/lib/planning/infrastructure/messaging
+copying src/planning/infrastructure/messaging/__init__.py -> build/lib/planning/infrastructure/messaging
+copying src/planning/infrastructure/messaging/inbox.py -> build/lib/planning/infrastructure/messaging
+copying src/planning/infrastructure/messaging/generated.py -> build/lib/planning/infrastructure/messaging
+creating build/lib/planning/infrastructure/facts
+copying src/planning/infrastructure/facts/__init__.py -> build/lib/planning/infrastructure/facts
+copying src/planning/infrastructure/facts/broker.py -> build/lib/planning/infrastructure/facts
+creating build/lib/planning/infrastructure/inputs
+copying src/planning/infrastructure/inputs/__init__.py -> build/lib/planning/infrastructure/inputs
+running egg_info
+writing src/product_planning.egg-info/PKG-INFO
+writing dependency_links to src/product_planning.egg-info/dependency_links.txt
+writing entry points to src/product_planning.egg-info/entry_points.txt
+writing requirements to src/product_planning.egg-info/requires.txt
+writing top-level names to src/product_planning.egg-info/top_level.txt
+reading manifest file 'src/product_planning.egg-info/SOURCES.txt'
+writing manifest file 'src/product_planning.egg-info/SOURCES.txt'
+copying src/planning/infrastructure/messaging/foundation-event.json -> build/lib/planning/infrastructure/messaging
+copying src/planning/infrastructure/facts/catalogue.json -> build/lib/planning/infrastructure/facts
+copying src/planning/infrastructure/facts/inventory.json -> build/lib/planning/infrastructure/facts
+copying src/planning/infrastructure/inputs/catalogue-input-v1.json -> build/lib/planning/infrastructure/inputs
+copying src/planning/infrastructure/inputs/inventory-input-v1.json -> build/lib/planning/infrastructure/inputs
+copying src/planning/infrastructure/inputs/migration-input-v1.json -> build/lib/planning/infrastructure/inputs
+copying src/planning/infrastructure/inputs/migration-input-v2.json -> build/lib/planning/infrastructure/inputs
+copying src/planning/infrastructure/inputs/migration-input-v3.json -> build/lib/planning/infrastructure/inputs
+copying src/planning/infrastructure/inputs/migration-support-v1.json -> build/lib/planning/infrastructure/inputs
+copying src/planning/infrastructure/inputs/qualification-v1.json -> build/lib/planning/infrastructure/inputs
+installing to build/bdist.linux-x86_64/wheel
+running install
+running install_lib
+creating build/bdist.linux-x86_64/wheel
+creating build/bdist.linux-x86_64/wheel/planning
+copying build/lib/planning/__init__.py -> build/bdist.linux-x86_64/wheel/./planning
+creating build/bdist.linux-x86_64/wheel/planning/interfaces
+copying build/lib/planning/interfaces/http.py -> build/bdist.linux-x86_64/wheel/./planning/interfaces
+copying build/lib/planning/interfaces/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/interfaces
+copying build/lib/planning/interfaces/health.py -> build/bdist.linux-x86_64/wheel/./planning/interfaces
+copying build/lib/planning/interfaces/migration.py -> build/bdist.linux-x86_64/wheel/./planning/interfaces
+copying build/lib/planning/interfaces/native_plans.py -> build/bdist.linux-x86_64/wheel/./planning/interfaces
+copying build/lib/planning/interfaces/planning.py -> build/bdist.linux-x86_64/wheel/./planning/interfaces
+copying build/lib/planning/interfaces/telemetry.py -> build/bdist.linux-x86_64/wheel/./planning/interfaces
+creating build/bdist.linux-x86_64/wheel/planning/domain
+copying build/lib/planning/domain/compilation.py -> build/bdist.linux-x86_64/wheel/./planning/domain
+copying build/lib/planning/domain/expansion.py -> build/bdist.linux-x86_64/wheel/./planning/domain
+copying build/lib/planning/domain/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/domain
+copying build/lib/planning/domain/migration_plan.py -> build/bdist.linux-x86_64/wheel/./planning/domain
+copying build/lib/planning/domain/migration.py -> build/bdist.linux-x86_64/wheel/./planning/domain
+copying build/lib/planning/domain/native_plan.py -> build/bdist.linux-x86_64/wheel/./planning/domain
+copying build/lib/planning/domain/migration_outcomes.py -> build/bdist.linux-x86_64/wheel/./planning/domain
+copying build/lib/planning/domain/assessment.py -> build/bdist.linux-x86_64/wheel/./planning/domain
+copying build/lib/planning/domain/model.py -> build/bdist.linux-x86_64/wheel/./planning/domain
+creating build/bdist.linux-x86_64/wheel/planning/application
+copying build/lib/planning/application/foundation.py -> build/bdist.linux-x86_64/wheel/./planning/application
+copying build/lib/planning/application/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/application
+copying build/lib/planning/application/migration_plans.py -> build/bdist.linux-x86_64/wheel/./planning/application
+copying build/lib/planning/application/migration_support.py -> build/bdist.linux-x86_64/wheel/./planning/application
+copying build/lib/planning/application/ports.py -> build/bdist.linux-x86_64/wheel/./planning/application
+copying build/lib/planning/application/native_plans.py -> build/bdist.linux-x86_64/wheel/./planning/application
+copying build/lib/planning/application/planning.py -> build/bdist.linux-x86_64/wheel/./planning/application
+copying build/lib/planning/application/events.py -> build/bdist.linux-x86_64/wheel/./planning/application
+creating build/bdist.linux-x86_64/wheel/planning/infrastructure
+copying build/lib/planning/infrastructure/migration_recipes.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure
+copying build/lib/planning/infrastructure/foundation.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure
+copying build/lib/planning/infrastructure/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure
+copying build/lib/planning/infrastructure/store.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure
+copying build/lib/planning/infrastructure/owners.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure
+copying build/lib/planning/infrastructure/migration_support.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure
+copying build/lib/planning/infrastructure/migration.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure
+creating build/bdist.linux-x86_64/wheel/planning/infrastructure/messaging
+copying build/lib/planning/infrastructure/messaging/codec.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/messaging
+copying build/lib/planning/infrastructure/messaging/consumer.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/messaging
+copying build/lib/planning/infrastructure/messaging/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/messaging
+copying build/lib/planning/infrastructure/messaging/foundation-event.json -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/messaging
+copying build/lib/planning/infrastructure/messaging/inbox.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/messaging
+copying build/lib/planning/infrastructure/messaging/generated.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/messaging
+creating build/bdist.linux-x86_64/wheel/planning/infrastructure/facts
+copying build/lib/planning/infrastructure/facts/catalogue.json -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/facts
+copying build/lib/planning/infrastructure/facts/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/facts
+copying build/lib/planning/infrastructure/facts/broker.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/facts
+copying build/lib/planning/infrastructure/facts/inventory.json -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/facts
+copying build/lib/planning/infrastructure/telemetry.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure
+creating build/bdist.linux-x86_64/wheel/planning/infrastructure/inputs
+copying build/lib/planning/infrastructure/inputs/migration-input-v3.json -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/inputs
+copying build/lib/planning/infrastructure/inputs/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/inputs
+copying build/lib/planning/infrastructure/inputs/migration-support-v1.json -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/inputs
+copying build/lib/planning/infrastructure/inputs/catalogue-input-v1.json -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/inputs
+copying build/lib/planning/infrastructure/inputs/migration-input-v2.json -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/inputs
+copying build/lib/planning/infrastructure/inputs/qualification-v1.json -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/inputs
+copying build/lib/planning/infrastructure/inputs/inventory-input-v1.json -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/inputs
+copying build/lib/planning/infrastructure/inputs/migration-input-v1.json -> build/bdist.linux-x86_64/wheel/./planning/infrastructure/inputs
+creating build/bdist.linux-x86_64/wheel/planning/bootstrap
+copying build/lib/planning/bootstrap/__init__.py -> build/bdist.linux-x86_64/wheel/./planning/bootstrap
+copying build/lib/planning/bootstrap/health.py -> build/bdist.linux-x86_64/wheel/./planning/bootstrap
+copying build/lib/planning/bootstrap/facts.py -> build/bdist.linux-x86_64/wheel/./planning/bootstrap
+copying build/lib/planning/bootstrap/server.py -> build/bdist.linux-x86_64/wheel/./planning/bootstrap
+running install_egg_info
+Copying src/product_planning.egg-info to build/bdist.linux-x86_64/wheel/./product_planning-0.1.0.dev0-py3.12.egg-info
+running install_scripts
+creating build/bdist.linux-x86_64/wheel/product_planning-0.1.0.dev0.dist-info/WHEEL
+creating '/workspace/scratch/a327913cf034/multi-tenant/services/planning/dist/.tmp-z17ch5o8/product_planning-0.1.0.dev0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+adding 'planning/__init__.py'
+adding 'planning/application/__init__.py'
+adding 'planning/application/events.py'
+adding 'planning/application/foundation.py'
+adding 'planning/application/migration_plans.py'
+adding 'planning/application/migration_support.py'
+adding 'planning/application/native_plans.py'
+adding 'planning/application/planning.py'
+adding 'planning/application/ports.py'
+adding 'planning/bootstrap/__init__.py'
+adding 'planning/bootstrap/facts.py'
+adding 'planning/bootstrap/health.py'
+adding 'planning/bootstrap/server.py'
+adding 'planning/domain/__init__.py'
+adding 'planning/domain/assessment.py'
+adding 'planning/domain/compilation.py'
+adding 'planning/domain/expansion.py'
+adding 'planning/domain/migration.py'
+adding 'planning/domain/migration_outcomes.py'
+adding 'planning/domain/migration_plan.py'
+adding 'planning/domain/model.py'
+adding 'planning/domain/native_plan.py'
+adding 'planning/infrastructure/__init__.py'
+adding 'planning/infrastructure/foundation.py'
+adding 'planning/infrastructure/migration.py'
+adding 'planning/infrastructure/migration_recipes.py'
+adding 'planning/infrastructure/migration_support.py'
+adding 'planning/infrastructure/owners.py'
+adding 'planning/infrastructure/store.py'
+adding 'planning/infrastructure/telemetry.py'
+adding 'planning/infrastructure/facts/__init__.py'
+adding 'planning/infrastructure/facts/broker.py'
+adding 'planning/infrastructure/facts/catalogue.json'
+adding 'planning/infrastructure/facts/inventory.json'
+adding 'planning/infrastructure/inputs/__init__.py'
+adding 'planning/infrastructure/inputs/catalogue-input-v1.json'
+adding 'planning/infrastructure/inputs/inventory-input-v1.json'
+adding 'planning/infrastructure/inputs/migration-input-v1.json'
+adding 'planning/infrastructure/inputs/migration-input-v2.json'
+adding 'planning/infrastructure/inputs/migration-input-v3.json'
+adding 'planning/infrastructure/inputs/migration-support-v1.json'
+adding 'planning/infrastructure/inputs/qualification-v1.json'
+adding 'planning/infrastructure/messaging/__init__.py'
+adding 'planning/infrastructure/messaging/codec.py'
+adding 'planning/infrastructure/messaging/consumer.py'
+adding 'planning/infrastructure/messaging/foundation-event.json'
+adding 'planning/infrastructure/messaging/generated.py'
+adding 'planning/infrastructure/messaging/inbox.py'
+adding 'planning/interfaces/__init__.py'
+adding 'planning/interfaces/health.py'
+adding 'planning/interfaces/http.py'
+adding 'planning/interfaces/migration.py'
+adding 'planning/interfaces/native_plans.py'
+adding 'planning/interfaces/planning.py'
+adding 'planning/interfaces/telemetry.py'
+adding 'product_planning-0.1.0.dev0.dist-info/METADATA'
+adding 'product_planning-0.1.0.dev0.dist-info/WHEEL'
+adding 'product_planning-0.1.0.dev0.dist-info/entry_points.txt'
+adding 'product_planning-0.1.0.dev0.dist-info/top_level.txt'
+adding 'product_planning-0.1.0.dev0.dist-info/RECORD'
+removing build/bdist.linux-x86_64/wheel
+Successfully built dist/product_planning-0.1.0.dev0-py3-none-any.whl
