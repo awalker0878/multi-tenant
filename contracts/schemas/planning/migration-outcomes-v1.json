@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:multi-tenant:migration-outcomes:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "source_platform",
+    "target_platform",
+    "owner_inputs_sha256",
+    "route_sha256",
+    "guest_profile_sha256",
+    "guest",
+    "services",
+    "security",
+    "datasets"
+  ],
+  "properties": {
+    "source_platform": {
+      "enum": [
+        "vmware",
+        "openstack",
+        "ahv"
+      ]
+    },
+    "target_platform": {
+      "enum": [
+        "vmware",
+        "openstack",
+        "ahv"
+      ]
+    },
+    "owner_inputs_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "route_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "guest_profile_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "guest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "boot",
+        "drivers",
+        "storage",
+        "network",
+        "identity"
+      ],
+      "properties": {
+        "boot": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "drivers": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "storage": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "network": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "identity": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "services": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ipam",
+        "dns",
+        "identity",
+        "time",
+        "trust",
+        "logging",
+        "monitoring",
+        "backup"
+      ],
+      "properties": {
+        "ipam": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "dns": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "identity": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "time": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "trust": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "logging": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "monitoring": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "backup": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "security": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "source_rule_sha256",
+          "target_rule_sha256",
+          "semantics_sha256"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_-]{1,60}$"
+          },
+          "source_rule_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "target_rule_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "semantics_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "datasets": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 128,
+      "propertyNames": {
+        "format": "uuid"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    }
+  }
+}

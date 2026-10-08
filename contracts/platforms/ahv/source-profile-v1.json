@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "vm": [
+    "extId",
+    "name",
+    "createTime",
+    "generationUuid",
+    "biosUuid",
+    "project",
+    "projectExtId",
+    "cluster",
+    "categories",
+    "numSockets",
+    "numCoresPerSocket",
+    "numThreadsPerCore",
+    "memorySizeBytes",
+    "bootConfig",
+    "vtpmConfig",
+    "disks",
+    "nics",
+    "cdRoms",
+    "gpus",
+    "pcieDevices",
+    "storageConfig"
+  ]
+}

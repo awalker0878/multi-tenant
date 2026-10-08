@@ -1,0 +1,666 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Lifecycle native jobs and immutable transfer continuation",
+    "version": "1.1.0",
+    "description": "Protected internal interface. Maximum request 4096 bytes. Workload and delegated actor authority are independently current. Plans and responses never grant provider write authority."
+  },
+  "security": [
+    {
+      "Workload": []
+    }
+  ],
+  "paths": {
+    "/v1/tenants/{tenant}/native-jobs": {
+      "post": {
+        "operationId": "admitNativeJob",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-Actor-Delegation",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Current tenant-scoped result; Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NativeJob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Denied or held; no native write permission."
+          },
+          "401": {
+            "description": "Denied or held; no native write permission."
+          },
+          "403": {
+            "description": "Denied or held; no native write permission."
+          },
+          "404": {
+            "description": "Denied or held; no native write permission."
+          },
+          "409": {
+            "description": "Denied or held; no native write permission."
+          },
+          "413": {
+            "description": "Denied or held; no native write permission."
+          },
+          "415": {
+            "description": "Denied or held; no native write permission."
+          },
+          "422": {
+            "description": "Denied or held; no native write permission."
+          },
+          "423": {
+            "description": "Denied or held; no native write permission."
+          },
+          "503": {
+            "description": "Denied or held; no native write permission."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanReference"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/native-jobs/{job}": {
+      "get": {
+        "operationId": "readNativeJob",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-Actor-Delegation",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current tenant-scoped result; Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NativeJob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Denied or held; no native write permission."
+          },
+          "401": {
+            "description": "Denied or held; no native write permission."
+          },
+          "403": {
+            "description": "Denied or held; no native write permission."
+          },
+          "404": {
+            "description": "Denied or held; no native write permission."
+          },
+          "409": {
+            "description": "Denied or held; no native write permission."
+          },
+          "413": {
+            "description": "Denied or held; no native write permission."
+          },
+          "415": {
+            "description": "Denied or held; no native write permission."
+          },
+          "422": {
+            "description": "Denied or held; no native write permission."
+          },
+          "423": {
+            "description": "Denied or held; no native write permission."
+          },
+          "503": {
+            "description": "Denied or held; no native write permission."
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/native-jobs/{job}/stop": {
+      "post": {
+        "operationId": "stopNativeJob",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-Actor-Delegation",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Current tenant-scoped result; Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NativeJob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Denied or held; no native write permission."
+          },
+          "401": {
+            "description": "Denied or held; no native write permission."
+          },
+          "403": {
+            "description": "Denied or held; no native write permission."
+          },
+          "404": {
+            "description": "Denied or held; no native write permission."
+          },
+          "409": {
+            "description": "Denied or held; no native write permission."
+          },
+          "413": {
+            "description": "Denied or held; no native write permission."
+          },
+          "415": {
+            "description": "Denied or held; no native write permission."
+          },
+          "422": {
+            "description": "Denied or held; no native write permission."
+          },
+          "423": {
+            "description": "Denied or held; no native write permission."
+          },
+          "503": {
+            "description": "Denied or held; no native write permission."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Stop"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/native-jobs/{job}/continue-transfer": {
+      "post": {
+        "operationId": "continueNativeTransfer",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-Actor-Delegation",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Current tenant-scoped result; Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NativeJob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Denied or held; no native write permission."
+          },
+          "401": {
+            "description": "Denied or held; no native write permission."
+          },
+          "403": {
+            "description": "Denied or held; no native write permission."
+          },
+          "404": {
+            "description": "Denied or held; no native write permission."
+          },
+          "409": {
+            "description": "Denied or held; no native write permission."
+          },
+          "413": {
+            "description": "Denied or held; no native write permission."
+          },
+          "415": {
+            "description": "Denied or held; no native write permission."
+          },
+          "422": {
+            "description": "Denied or held; no native write permission."
+          },
+          "423": {
+            "description": "Denied or held; no native write permission."
+          },
+          "503": {
+            "description": "Denied or held; no native write permission."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Stop"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Workload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "PlanReference": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "plan_id",
+          "plan_revision",
+          "plan_digest",
+          "approval_id"
+        ],
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "approval_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "Stop": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expected_revision"
+        ],
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "NativeJob": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "job_id",
+          "tenant_id",
+          "state",
+          "revision",
+          "stopped",
+          "hold_reason",
+          "transfer_continuation_candidate",
+          "plan_sha256",
+          "scope",
+          "operations",
+          "retry_authorized",
+          "native_qualification",
+          "measurements"
+        ],
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "prepared",
+              "running",
+              "held",
+              "stopped",
+              "complete",
+              "retired",
+              "active",
+              "migrated",
+              "recovered",
+              "rolled_back",
+              "rehearsed",
+              "cleaned"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "stopped": {
+            "type": "boolean"
+          },
+          "hold_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "transfer_continuation_candidate": {
+            "type": "boolean"
+          },
+          "plan_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tenant_id",
+              "site_id",
+              "environment",
+              "resource_id",
+              "project_id"
+            ],
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "project_id": {
+                "type": "string",
+                "pattern": "^([a-f0-9]{32}|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}|datacenter-[1-9][0-9]{0,18})$"
+              }
+            }
+          },
+          "operations": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stage",
+                "operation_id",
+                "redeemed",
+                "observation_digest"
+              ],
+              "properties": {
+                "stage": {
+                  "type": "string"
+                },
+                "operation_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "redeemed": {
+                  "type": "boolean"
+                },
+                "observation_digest": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "retry_authorized": {
+            "const": false
+          },
+          "native_qualification": {
+            "const": "not_established"
+          },
+          "measurements": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "observed_at",
+              "started_at",
+              "total_stages",
+              "completed_stages",
+              "operations",
+              "transfer"
+            ],
+            "properties": {
+              "observed_at": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "started_at": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "total_stages": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "completed_stages": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "operations": {
+                "type": "array",
+                "maxItems": 64,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "stage",
+                    "operation_id",
+                    "prepared_at",
+                    "started_at",
+                    "observed_at",
+                    "elapsed_seconds"
+                  ],
+                  "properties": {
+                    "stage": {
+                      "type": "string"
+                    },
+                    "operation_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "prepared_at": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "started_at": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 0
+                    },
+                    "observed_at": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 0
+                    },
+                    "elapsed_seconds": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 0
+                    }
+                  }
+                }
+              },
+              "transfer": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "operation_id",
+                      "measured_at",
+                      "bytes_completed",
+                      "disks_completed",
+                      "artifact_complete",
+                      "evidence_source"
+                    ],
+                    "properties": {
+                      "operation_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "measured_at": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "bytes_completed": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "disks_completed": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 32
+                      },
+                      "artifact_complete": {
+                        "type": "boolean"
+                      },
+                      "evidence_source": {
+                        "const": "worker_custody_journal"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

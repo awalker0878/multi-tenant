@@ -395,6 +395,11 @@
                 "type": "integer",
                 "minimum": 0,
                 "maximum": 9007199254740991
+              },
+              "maximum_data_loss_bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
               }
             },
             "required": [
@@ -467,6 +472,10 @@
             "minItems": 0,
             "maxItems": 64,
             "uniqueItems": true
+          },
+          "guest_outcomes_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
           }
         },
         "required": [

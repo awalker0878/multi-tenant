@@ -1,0 +1,1372 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Commissioned migration data method owner protocol",
+    "version": "2.0.0",
+    "description": "Application backup/restore, application delta, file metadata delta and storage block replication use separate typed operations. Native VM disk adapters do not implement these data-system methods. Every direction, mechanism version, dataset and recovery procedure needs exact qualification; E2 tests do not grant E3/E4 support."
+  },
+  "security": [
+    {
+      "OwnerBearer": []
+    }
+  ],
+  "paths": {
+    "/v2/migration/method-effects": {
+      "post": {
+        "operationId": "submitCommissionedDataMethod",
+        "description": "Enrolled product owner protocol. Exact method, dataset, source/destination identities and limits must be implemented and qualified by the owner. No retry of uncertain data mutations; independent observations remain available without effect authority. Payloads are bounded to 131072 bytes.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MethodEffectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bound receipt; submission never establishes readiness or write admission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MethodEffectReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          },
+          "403": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          },
+          "409": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          },
+          "422": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          },
+          "423": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          },
+          "503": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          }
+        }
+      }
+    },
+    "/v2/migration/method-observations": {
+      "post": {
+        "operationId": "observeCommissionedDataMethod",
+        "description": "Enrolled product owner protocol. Exact method, dataset, source/destination identities and limits must be implemented and qualified by the owner. No retry of uncertain data mutations; independent observations remain available without effect authority. Payloads are bounded to 131072 bytes.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MethodObservationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bound receipt; submission never establishes readiness or write admission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MethodObservation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          },
+          "403": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          },
+          "409": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          },
+          "422": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          },
+          "423": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          },
+          "503": {
+            "description": "Operation held; unknown submissions require reconciliation."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "OwnerBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "NativeBinding": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tenant_id",
+          "site_id",
+          "resource_id",
+          "job_id",
+          "operation_id",
+          "attempt_id",
+          "campaign_id",
+          "executor_id",
+          "epoch",
+          "custody_id",
+          "project_id",
+          "plan_digest",
+          "operation_plan_sha256",
+          "ownership_digest",
+          "custody_generation",
+          "expires_at"
+        ],
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "site_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "resource_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attempt_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "campaign_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "executor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "epoch": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "custody_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": "string",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "pattern": "^[a-f0-9]{32}$"
+              },
+              {
+                "pattern": "^datacenter-[1-9][0-9]{0,18}$"
+              }
+            ]
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "operation_plan_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "ownership_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "custody_generation": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          }
+        }
+      },
+      "EnvironmentIdentity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "platform",
+          "installation_id",
+          "native_identity_sha256"
+        ],
+        "properties": {
+          "platform": {
+            "enum": [
+              "vmware",
+              "openstack",
+              "ahv"
+            ]
+          },
+          "installation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "native_identity_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "DatasetBinding": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_sha256",
+          "target_sha256",
+          "consistency_sha256"
+        ],
+        "properties": {
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "target_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "consistency_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "Mechanism": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "version",
+          "artifact_sha256",
+          "qualification_sha256"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "application_backup_restore",
+              "application_native_delta",
+              "file_metadata_delta",
+              "storage_block_replication"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160,
+            "pattern": "^[^\\u0000-\\u001f]*$"
+          },
+          "artifact_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "qualification_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "Limits": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "max_seconds",
+          "max_lag_seconds",
+          "max_data_loss_bytes"
+        ],
+        "properties": {
+          "max_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "max_lag_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "max_data_loss_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          }
+        }
+      },
+      "MethodContract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "method",
+          "operation",
+          "source",
+          "target",
+          "datasets",
+          "mechanism",
+          "consistency_boundary_sha256",
+          "writer_fence_sha256",
+          "recovery_sha256",
+          "predecessor_receipt_sha256",
+          "reverse_qualification_sha256",
+          "limits"
+        ],
+        "properties": {
+          "method": {
+            "enum": [
+              "APPLICATION_REBUILD_RESTORE",
+              "VM_SNAPSHOT_BASELINE_APP_DELTA",
+              "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+              "EXTERNAL_BLOCK_REPLICATION"
+            ]
+          },
+          "operation": {
+            "enum": [
+              "application_backup",
+              "application_final_restore",
+              "application_final_sync",
+              "application_restore",
+              "application_reverse_restore",
+              "application_reverse_sync",
+              "application_tracking_start",
+              "block_replica_attach",
+              "block_replication_baseline",
+              "block_replication_final_sync",
+              "block_replication_reverse_sync",
+              "file_metadata_final_sync",
+              "file_metadata_reverse_sync",
+              "file_tracking_start"
+            ]
+          },
+          "source": {
+            "$ref": "#/components/schemas/EnvironmentIdentity"
+          },
+          "target": {
+            "$ref": "#/components/schemas/EnvironmentIdentity"
+          },
+          "datasets": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 256,
+            "propertyNames": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DatasetBinding"
+            }
+          },
+          "mechanism": {
+            "$ref": "#/components/schemas/Mechanism"
+          },
+          "consistency_boundary_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "writer_fence_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "recovery_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "predecessor_receipt_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reverse_qualification_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "limits": {
+            "$ref": "#/components/schemas/Limits"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "method": {
+                  "const": "APPLICATION_REBUILD_RESTORE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "operation": {
+                  "enum": [
+                    "application_backup",
+                    "application_restore",
+                    "application_final_restore",
+                    "application_reverse_restore"
+                  ]
+                },
+                "mechanism": {
+                  "properties": {
+                    "kind": {
+                      "const": "application_backup_restore"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "method": {
+                  "const": "VM_SNAPSHOT_BASELINE_APP_DELTA"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "operation": {
+                  "enum": [
+                    "application_tracking_start",
+                    "application_final_sync",
+                    "application_reverse_sync"
+                  ]
+                },
+                "mechanism": {
+                  "properties": {
+                    "kind": {
+                      "const": "application_native_delta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "method": {
+                  "const": "VM_SNAPSHOT_BASELINE_FILE_DELTA"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "operation": {
+                  "enum": [
+                    "file_tracking_start",
+                    "file_metadata_final_sync",
+                    "file_metadata_reverse_sync"
+                  ]
+                },
+                "mechanism": {
+                  "properties": {
+                    "kind": {
+                      "const": "file_metadata_delta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "method": {
+                  "const": "EXTERNAL_BLOCK_REPLICATION"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "operation": {
+                  "enum": [
+                    "block_replication_baseline",
+                    "block_replica_attach",
+                    "block_replication_final_sync",
+                    "block_replication_reverse_sync"
+                  ]
+                },
+                "mechanism": {
+                  "properties": {
+                    "kind": {
+                      "const": "storage_block_replication"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "MethodPlan": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "kind",
+          "stage",
+          "protocol_sha256",
+          "parameters",
+          "method_contract"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": 2
+          },
+          "kind": {
+            "const": "migration_owner_protocol"
+          },
+          "stage": {
+            "enum": [
+              "capture",
+              "export_copy",
+              "final_sync",
+              "import_target",
+              "restart_baseline_source",
+              "reverse_sync"
+            ]
+          },
+          "protocol_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [],
+            "properties": {}
+          },
+          "method_contract": {
+            "$ref": "#/components/schemas/MethodContract"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "export_copy"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "APPLICATION_REBUILD_RESTORE"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "application_backup"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "import_target"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "APPLICATION_REBUILD_RESTORE"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "application_restore"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "final_sync"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "APPLICATION_REBUILD_RESTORE"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "application_final_restore"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "reverse_sync"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "APPLICATION_REBUILD_RESTORE"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "application_reverse_restore"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "restart_baseline_source"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "VM_SNAPSHOT_BASELINE_APP_DELTA"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "application_tracking_start"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "final_sync"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "VM_SNAPSHOT_BASELINE_APP_DELTA"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "application_final_sync"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "reverse_sync"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "VM_SNAPSHOT_BASELINE_APP_DELTA"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "application_reverse_sync"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "restart_baseline_source"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "VM_SNAPSHOT_BASELINE_FILE_DELTA"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "file_tracking_start"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "final_sync"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "VM_SNAPSHOT_BASELINE_FILE_DELTA"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "file_metadata_final_sync"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "reverse_sync"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "VM_SNAPSHOT_BASELINE_FILE_DELTA"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "file_metadata_reverse_sync"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "capture"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "EXTERNAL_BLOCK_REPLICATION"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "block_replication_baseline"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "import_target"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "EXTERNAL_BLOCK_REPLICATION"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "block_replica_attach"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "final_sync"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "EXTERNAL_BLOCK_REPLICATION"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "block_replication_final_sync"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "reverse_sync"
+                },
+                "method_contract": {
+                  "properties": {
+                    "method": {
+                      "const": "EXTERNAL_BLOCK_REPLICATION"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "operation": {
+                      "const": "block_replication_reverse_sync"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "not": {
+                    "enum": [
+                      "capture",
+                      "export_copy"
+                    ]
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "predecessor_receipt_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "stage": {
+                  "const": "reverse_sync"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method_contract": {
+                  "properties": {
+                    "reverse_qualification_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "oneOf": [
+          {
+            "properties": {
+              "stage": {
+                "enum": [
+                  "export_copy",
+                  "import_target",
+                  "final_sync",
+                  "reverse_sync"
+                ]
+              },
+              "method_contract": {
+                "properties": {
+                  "method": {
+                    "const": "APPLICATION_REBUILD_RESTORE"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "properties": {
+              "stage": {
+                "enum": [
+                  "restart_baseline_source",
+                  "final_sync",
+                  "reverse_sync"
+                ]
+              },
+              "method_contract": {
+                "properties": {
+                  "method": {
+                    "const": "VM_SNAPSHOT_BASELINE_APP_DELTA"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "properties": {
+              "stage": {
+                "enum": [
+                  "restart_baseline_source",
+                  "final_sync",
+                  "reverse_sync"
+                ]
+              },
+              "method_contract": {
+                "properties": {
+                  "method": {
+                    "const": "VM_SNAPSHOT_BASELINE_FILE_DELTA"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "properties": {
+              "stage": {
+                "enum": [
+                  "capture",
+                  "import_target",
+                  "final_sync",
+                  "reverse_sync"
+                ]
+              },
+              "method_contract": {
+                "properties": {
+                  "method": {
+                    "const": "EXTERNAL_BLOCK_REPLICATION"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "MethodEffectRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "binding",
+          "intent"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": 2
+          },
+          "binding": {
+            "$ref": "#/components/schemas/NativeBinding"
+          },
+          "intent": {
+            "$ref": "#/components/schemas/MethodPlan"
+          }
+        }
+      },
+      "MethodEffectReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "binding_sha256",
+          "intent_sha256",
+          "receipt_sha256",
+          "submitted",
+          "retry_authorized",
+          "method_contract_sha256",
+          "task_id"
+        ],
+        "properties": {
+          "binding_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "intent_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "receipt_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "submitted": {
+            "const": true
+          },
+          "retry_authorized": {
+            "const": false
+          },
+          "method_contract_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "task_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.:/-]{1,200}$"
+          }
+        }
+      },
+      "MethodObservationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "binding",
+          "objects",
+          "intent"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": 2
+          },
+          "binding": {
+            "$ref": "#/components/schemas/NativeBinding"
+          },
+          "objects": {
+            "type": "object"
+          },
+          "intent": {
+            "$ref": "#/components/schemas/MethodPlan"
+          }
+        }
+      },
+      "MethodObservation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "binding_sha256",
+          "intent_sha256",
+          "observer_id",
+          "independent",
+          "outcome",
+          "observed_at",
+          "evidence_sha256",
+          "measurement"
+        ],
+        "properties": {
+          "binding_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "intent_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "observer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "independent": {
+            "const": true
+          },
+          "outcome": {
+            "enum": [
+              "observed_present",
+              "held"
+            ]
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "evidence_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "measurement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Measurement"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "outcome": {
+                  "const": "observed_present"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "measurement": {
+                  "$ref": "#/components/schemas/Measurement"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "measurement": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Measurement": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "method_contract_sha256",
+          "datasets",
+          "source_writer_fenced",
+          "target_writer_fenced",
+          "elapsed_seconds",
+          "consistency_boundary_sha256",
+          "recovery_sha256"
+        ],
+        "properties": {
+          "method_contract_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "datasets": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 256,
+            "propertyNames": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DatasetMeasurement"
+            }
+          },
+          "source_writer_fenced": {
+            "type": "boolean"
+          },
+          "target_writer_fenced": {
+            "const": true
+          },
+          "elapsed_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "consistency_boundary_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "recovery_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "DatasetMeasurement": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "dataset_sha256",
+          "source_boundary_sha256",
+          "target_boundary_sha256",
+          "evidence_sha256",
+          "observed_at",
+          "lag_seconds",
+          "data_loss_bytes",
+          "integrity_verified",
+          "metadata_verified"
+        ],
+        "properties": {
+          "dataset_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "source_boundary_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "target_boundary_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "evidence_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "lag_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "data_loss_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "integrity_verified": {
+            "const": true
+          },
+          "metadata_verified": {
+            "const": true
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,160}$"
+          }
+        }
+      }
+    }
+  }
+}
