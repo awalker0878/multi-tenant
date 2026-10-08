@@ -28,6 +28,40 @@ const target = computed(() => props.workspace.profiles.find(p => p.id === form.r
 const disks = computed(() => source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.disks : []);
 const ahv = computed(() => target.value?.facts.profile_type === 'TargetCapabilityProfile' && target.value.facts.platform === 'ahv' ? target.value.facts : null);
 const vmware = computed(() => target.value?.facts.profile_type === 'TargetCapabilityProfile' && target.value.facts.platform === 'vmware' ? target.value.facts : null);
+const openstack = computed(() => target.value?.facts.profile_type === 'TargetCapabilityProfile' && target.value.facts.platform === 'openstack' ? target.value.facts : null);
+/** Null = source network security not collected, not "no rules". */
+const sourceSecurityIds = computed<string[] | null>(() => {
+  const facts = source.value?.facts;
+  if (!facts || facts.profile_type !== 'SourceWorkloadProfile') return null;
+  if (!facts.nics.length) return [];
+  if (facts.platform !== 'openstack' || facts.schema_version !== 3) return null;
+  const ports = facts.native.metadata.ports;
+  if (!Array.isArray(ports) || ports.length !== facts.nics.length) return null;
+  const set = new Set<string>();
+  for (const row of ports) {
+    if (typeof row !== 'object' || row === null) return null;
+    const port = row as Record<string, unknown>;
+    if (port.port_security_enabled !== true || !Array.isArray(port.security_groups)
+        || !port.security_groups.every(v => typeof v === 'string' && v.length > 0)) return null;
+    for (const id of port.security_groups as string[]) set.add(id);
+  }
+  return [...set].sort();
+});
+const sourceCategoryPresent = computed(() => {
+  const facts = source.value?.facts;
+  if (!facts || facts.profile_type !== 'SourceWorkloadProfile' || facts.platform !== 'ahv' || facts.schema_version !== 3) return false;
+  const vm = facts.native.metadata.vm as Record<string, unknown> | undefined;
+  return Array.isArray(vm?.categories) && vm.categories.length > 0;
+});
+function syncOpenstackPolicies() {
+  // Selection remains a source-key -> observed-target-ID reference, not a rule edit.
+  if (form.review.destination?.platform !== 'openstack') return;
+  const observed = new Set(openstack.value?.security_groups.map(item => item.id) ?? []);
+  for (const mapping of form.review.destination.security_mappings) {
+    if (!observed.has(mapping.destination_id)) mapping.destination_id = '';
+  }
+}
+
 watch(() => [form.review.source_profile_id, form.review.target_profile_id], (_, previous) => {
   if (!previous && form.review.destination) return;
   if (vmware.value) {
@@ -41,10 +75,17 @@ watch(() => [form.review.source_profile_id, form.review.target_profile_id], (_, 
     form.review.method = 'VM_COLD_EXPORT';
     return;
   }
+  if (openstack.value) {
+    form.review.destination = sourceSecurityIds.value?.length
+      ? { platform: 'openstack', project_id: openstack.value.project_id, security_mappings: sourceSecurityIds.value.map(source_id => ({ source_id, destination_id: '' })) }
+      : undefined;
+    form.review.method = '';
+    return;
+  }
   if (!ahv.value) { delete form.review.destination; return; }
   form.review.destination = {
     platform: 'ahv', project_id: ahv.value.project_id, prism_central_id: ahv.value.prism_central_id,
-    cluster_id: ahv.value.cluster_id, vpc_id: null, storage_container_id: '', category_ids: [], policy_ids: [], firmware: source.value?.facts.profile_type === 'SourceWorkloadProfile' && source.value.facts.firmware === 'efi' ? 'efi' : 'bios',
+    cluster_id: ahv.value.cluster_id, vpc_id: null, storage_container_id: '', category_ids: [], policy_ids: [], security_mappings: (sourceSecurityIds.value ?? []).map(source_id => ({ source_id, destination_id: '' })), firmware: source.value?.facts.profile_type === 'SourceWorkloadProfile' && source.value.facts.firmware === 'efi' ? 'efi' : 'bios',
     disks: disks.value.map((d, index) => ({ source_key: d.key, index })),
     nics: (source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.nics : []).map(n => ({ source_key: n.key, quarantine_subnet_id: '', production_subnet_id: '' })),
   };
@@ -142,7 +183,21 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
           </table>
         </details>
       </section>
-      <AhvDestination v-if="ahv && form.review.destination?.platform === 'ahv'" v-model="form.review.destination" :profile="ahv" :source-firmware="source?.facts.profile_type === 'SourceWorkloadProfile' ? source.facts.firmware : null" />
+      <AhvDestination v-if="ahv && form.review.destination?.platform === 'ahv'" v-model="form.review.destination" :profile="ahv" :source-firmware="source?.facts.profile_type === 'SourceWorkloadProfile' ? source.facts.firmware : null" :source-security-ids="sourceSecurityIds" :source-category-present="sourceCategoryPresent" />
+      <section v-if="openstack && sourceSecurityIds?.length && form.review.destination?.platform === 'openstack'" class="rounded border p-4">
+        <h3 class="font-semibold">Existing OpenStack destination security groups</h3>
+        <p>Each source group must map to a destination group discovered from Neutron. This selection does not replace independent allow/deny flow validation.</p>
+        <div v-for="mapping in form.review.destination.security_mappings" :key="mapping.source_id">
+          <label>Source security group {{ mapping.source_id }}
+            <select v-model="mapping.destination_id" required @change="syncOpenstackPolicies">
+              <option value="">Select a destination API security group</option>
+              <option v-for="group in openstack.security_groups" :key="group.id" :value="group.id">{{ group.name }} ({{ group.id }})</option>
+            </select>
+          </label>
+        </div>
+        <p v-if="!openstack.security_groups.length" role="alert">No destination security groups were discovered for the target project. No manual destination value is accepted.</p>
+      </section>
+      <p v-if="sourceSecurityIds === null && source?.facts.nics?.length" role="alert">Source security intent is not discoverable from this profile. Destination policy choices are unavailable until source security evidence is collected.</p>
       <VmwareDestination v-if="vmware && form.review.destination?.platform === 'vmware'" v-model="form.review.destination" :profile="vmware" />
       <h2 class="text-xl font-semibold">All disks and application datasets</h2>
       <table class="w-full text-left"><thead><tr><th>Disk key</th><th>Capacity (bytes)</th><th>Dataset coverage</th></tr></thead><tbody><tr v-for="disk in disks" :key="disk.key" class="border-t"><td class="p-2">{{ disk.key }}</td><td>{{ disk.capacity_bytes ?? 'Unknown' }}</td><td>{{ missing.some(d => d.key === disk.key) ? 'Mapping required' : 'Accounted for' }}</td></tr></tbody></table>
