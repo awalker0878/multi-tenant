@@ -149,3 +149,30 @@ def test_scope_identity_cannot_transfer_between_tenants(database: Postgres) -> N
     inbox.accept(event(a, scope, 1))
     with pytest.raises(Rejected, match="invalidation_scope_conflict"):
         inbox.accept(event(b, scope, 2))
+
+
+def test_same_tenant_unrelated_qualified_scope_is_not_withdrawn(database: Postgres) -> None:
+    tenant = str(uuid4())
+    first, second, unindexed = (add_plan(database, tenant) for _ in range(3))
+    with database.transaction() as tx:
+        for plan, scope in ((first, "a" * 64), (second, "b" * 64)):
+            tx.execute(
+                "INSERT INTO app.planning_plan_qualification_scopes"
+                "(plan,tenant,scope_sha256) VALUES(%s,%s,%s)",
+                (plan, tenant, scope),
+            )
+
+    QualificationInvalidations(database).accept(event(tenant, "a" * 64, 1))
+    with database.transaction() as tx:
+        counts = {
+            plan: tx.one(
+                "SELECT count(*) AS n FROM app.planning_invalidations WHERE plan=%s",
+                (plan,),
+            )
+            for plan in (first, second, unindexed)
+        }
+    assert all(value is not None for value in counts.values())
+    assert counts[first] is not None and counts[first]["n"] == 1
+    assert counts[second] is not None and counts[second]["n"] == 0
+    # Missing review-time scope remains fail-closed, never falsely unaffected.
+    assert counts[unindexed] is not None and counts[unindexed]["n"] == 1
