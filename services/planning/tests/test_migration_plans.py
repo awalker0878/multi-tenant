@@ -278,6 +278,8 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     from planning_fixture import verify_fixture
 
     verify_fixture(qualification)
+    destination = planner.sources.value["inputs"][0]["destination"]
+    destination["capability_snapshot"]["scope_sha256"] = digest(qualification["scope"])
     assessment_body.update(action="application.migrate", method="native_api_export_import")
     assessment_receipt = planner.assessment(actor, str(uuid4()), assessment_body, {})
     assessed = planner.get(TENANT, APP, ENV, assessment_receipt["id"], "assessment")

@@ -230,7 +230,7 @@ def test_optional_capability_does_not_shorten_required_freshness() -> None:
     verify_fixture(q)
     result = assess(i, d, p, policy, q, "application.provision", "native_api", NOW)
     assert result["operationally_eligible"]
-    assert result["expires_at"] == NOW + 1800
+    assert result["expires_at"] == NOW + 120
 
 
 @pytest.mark.parametrize(

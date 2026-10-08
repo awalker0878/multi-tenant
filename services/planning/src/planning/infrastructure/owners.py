@@ -77,7 +77,7 @@ def request(
             if owner in {"CATALOGUE", "INVENTORY", "ASSURANCE"}:
                 name = {
                     "CATALOGUE": "catalogue-input-v1",
-                    "INVENTORY": "inventory-input-v1",
+                    "INVENTORY": "inventory-input-v2",
                     "ASSURANCE": "qualification-v2",
                 }[owner]
                 if schema_name is not None:
@@ -223,7 +223,8 @@ class OwnerSources:
                 destination = request(
                     "INVENTORY",
                     "GET",
-                    base + f"/{site}/{candidate['endpoint_id']}/{candidate['generation_id']}",
+                    base.replace("/planning-inputs/", "/planning-capability-inputs/")
+                    + f"/{site}/{candidate['endpoint_id']}/{candidate['generation_id']}",
                     delegation=delegations[site],
                     action=actor.action,
                 )

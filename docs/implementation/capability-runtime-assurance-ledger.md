@@ -99,3 +99,16 @@ Focused E2 tests exercise signature rejection, expiry, tuple drift, sticky failu
 artifact drift and preservation of Inventory holds. A dedicated GitHub matrix runs
 format, lint, strict types and product tests; local execution became unavailable
 before this increment, so its verification results are recorded from CI.
+
+## CT-03a observations
+
+Planning now requires the v2 Inventory projection to bind the current Assurance
+runtime signature, decision, exact scope and definition before positive placement.
+Placement fits each workload against physical pool vectors, existing usage and
+pending reservations, storage/network classes, architecture, zone policy and actual
+failure-domain labels. CPU overcommit requires explicit dated approval; memory and
+storage retain physical bounds. Bounded search returns unknown on exhaustion.
+The immutable inventory digest excludes runtime fetch timestamps but retains the
+complete measured snapshot and authority bindings. Assessment remains unreserved.
+Focused E2 tests cover fragmentation, pending debits, fault-domain collision and
+missing/foreign/stale native snapshots. Authoritative admission follows separately.

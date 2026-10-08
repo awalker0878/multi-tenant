@@ -43,6 +43,7 @@ def inputs() -> tuple[
         "requirements": [],
         "artifacts": artifacts,
         "downtime_seconds": 3600,
+        "allowed_zones": ["zone-1"],
         "reservation_owners": {
             k: "synthetic-" + k for k in ("vcpus", "memory_mib", "storage_gib", "addresses")
         },
@@ -189,6 +190,7 @@ def inputs() -> tuple[
     for capability in q["capabilities"].values():
         capability["status"] = "supported"
     verify_fixture(q)
+    d["capability_snapshot"] = snapshot_fixture(intent, d, policy, q)
     return intent, d, p, policy, q
 
 
@@ -235,4 +237,41 @@ def request() -> dict[str, Any]:
         "lane": "operational",
         "executor_ids": [ACTOR],
         "valid_until": NOW + 300,
+    }
+
+
+def snapshot_fixture(
+    intent: dict[str, Any], destination: dict[str, Any], policy: dict[str, Any], q: dict[str, Any]
+) -> dict[str, Any]:
+    pools = []
+    for index, workload in enumerate(intent["workloads"]):
+        vector = {
+            "vcpus": workload["compute"]["vcpus"],
+            "memory_mib": workload["compute"]["memory_mib"],
+            "storage_gib": sum(d["size_gib"] for d in workload["disks"]),
+            "addresses": sum(len(n["address_families"]) for n in workload["nics"]),
+        }
+        pools.append({
+            "id": "pool-" + str(index),
+            "native_ref": "fixture://physical-host-" + str(index),
+            "failure_domain": "rack-" + str(index),
+            "zone": "zone-1",
+            "zone_allowed": True,
+            "architecture": "x86_64",
+            "storage_classes": ["standard"],
+            "network_classes": ["private"],
+            "policy_sha256": digest(policy),
+            "ledger_revision": 1,
+            "total": vector,
+            "used": {k: 0 for k in vector},
+            "pending": {k: 0 for k in vector},
+        })
+    return {
+        "definition_sha256": DEFINITION_SHA256,
+        "source_sha256": q["verification"]["runtime_sha256"],
+        "decision_sha256": q["verification"]["decision_sha256"],
+        "scope_sha256": digest(q["scope"]),
+        "observed_at": NOW,
+        "expires_at": NOW + 120,
+        "data": {"pools": pools},
     }

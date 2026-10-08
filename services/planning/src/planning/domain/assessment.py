@@ -5,6 +5,8 @@ from typing import Any
 from planning.domain.capability_definitions import STRATEGIES
 from planning.domain.matching import matches
 from planning.domain.model import ACTIONS, DIMENSIONS, Rejected, digest, integer
+from planning.domain.operational_evidence import inventory_digest, snapshot
+from planning.domain.placement import PlacementUnknown, fit
 from planning.domain.qualification import binding_digest, verified
 
 
@@ -108,7 +110,7 @@ def assess(
         )
 
     bindings = {
-        "inventory": digest(destination),
+        "inventory": inventory_digest(destination),
         "profile": profile["digest"],
         "policy": digest(policy),
         "qualification": binding_digest(qualification),
@@ -268,6 +270,21 @@ def assess(
             else "observed_capacity_insufficient",
             "Lifecycle must acquire authoritative owner receipts.",
         )
+    native_snapshot = snapshot(destination, qualification, now) if qualified else None
+    placement_status, placement_reason = "unknown", "placement_native_snapshot_missing"
+    if native_snapshot is not None:
+        expiries.append(destination["capability_snapshot"]["expires_at"])
+        try:
+            placement = fit(intent, native_snapshot["pools"], policy, now)
+            placement_status, placement_reason = placement["status"], placement["reason"]
+        except (PlacementUnknown, KeyError, TypeError, ValueError) as error:
+            placement_reason = str(error)
+    finding(
+        "capacity.placement",
+        placement_status,
+        placement_reason,
+        "Observe physical pools, pending reservations, policy and placement constraints.",
+    )
     mandatory_states = {f["status"] for f in findings if f["mandatory"]}
     state = next(
         (s for s in ("blocked", "unknown", "conditional") if s in mandatory_states), "eligible"
