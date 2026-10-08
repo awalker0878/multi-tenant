@@ -328,3 +328,31 @@ there is no proven CI pass, integrated TLS receiver, E3 native reviewer, E4
 receiving acceptance, or production rollout. The next gate is to execute and
 repair the real PostgreSQL/PHP/Python jobs, followed by source-bound
 A01–A16 composition and explicitly authorized native campaigns.
+
+## PR #64 follow-on — exact receipt, read-only shadow and provider readback
+
+This increment remains **E2 implemented, not E2 verified or E3/E4 accepted**:
+
+- Assurance's external relay now requires a response within 8 KiB with
+  exactly five acknowledgment fields, not a copied outbound event. The
+  configured HTTPS URL must use the approved private receiving path.
+  Test: `services/assurance/tests/Feature/QualificationInvalidationPublisherTest.php`.
+- The read-only `scripts/assurance/shadow_compare.py` produces source
+  revisions, SHA-256 manifest bindings and per-scope changes without
+  granting authority, even when no diff exists. Negative and drift tests
+  are at `scripts/assurance/test_shadow_compare.py`; a new separate
+  E2 GitHub job runs the stdlib suite. A native signed comparison, owner
+  reviews, and an approved promotion decision remain unperformed.
+- Lifecycle rechecks fresh provider-used physical capacity, the sum of
+  all live reservation debits and native class-specific limits on
+  reservation receipt readback, not only at initial allocation. Its
+  SQL tests cover provider drift, tenant withdrawal and omitted class
+  limits. Only actual operated providers can establish exclusivity.
+- E2 Lifecycle tests prove a plan/approval withdrawal after preflight and
+  loss of provider fencing between redemption and effect lead to denial;
+  no live signed cross-service campaign is claimed.
+
+At inspection of source `d279e408a48c05cf3cd4796346478dc2fabfb093`,
+40 checks were queued. Two P01 runs reported failure without job records.
+Do not invent failure logs or claim green. The **authoritative remaining
+work and per-scenario traceability** is `next_work.md` (CT-N01–CT-N13).

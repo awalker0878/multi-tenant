@@ -20,19 +20,19 @@ at every checkpoint.
 
 | ID | Priority | Owner / boundary | Status | Required next action and completion evidence |
 | --- | --- | --- | --- | --- |
-| CT-N01 | P0 | Engineering / CI | **BLOCKED: queued** | Obtain a finished result for **every required check** on the exact PR head, including Assurance PostgreSQL, P05 Planning, Lifecycle, Inventory and capability assurance. Fix the actual failures, rerun, attach exact run/job URLs, no skipped or unrun mandatory checks. All 39 checks on head `7a17079c396dcb1d39b7c038fdf3cddf1a56f667` were queued when last inspected. |
+| CT-N01 | P0 | Engineering / CI | **BLOCKED: queued/early workflow failures** | Obtain a finished result for **every required check** on the exact PR head, including Assurance PostgreSQL, P05 Planning, Lifecycle, Inventory and capability assurance. Fix the actual failures, rerun, attach exact run/job URLs, no skipped or unrun mandatory checks. All 39 checks on head `7a17079c396dcb1d39b7c038fdf3cddf1a56f667` were queued when last inspected. |
 | CT-N02 | P0 | Assurance + Planning / PostgreSQL | **Implemented, unverified** | Run disposable PostgreSQL migrations `services/assurance/database/migrations/002_qualification_authority.sql` and `services/planning/migrations/003_qualification_invalidations.sql` from scratch; confirm least-privilege role grants, append-only history, epoch triggers, outbox/inbox commit-before-ack, atomic failure and rollback. Retain tests and full execution logs. |
 | CT-N03 | P0 | Planning / P05 CI | **Implemented, unverified** | Prove `scripts/p05/qualify.py` and P05 live jobs exercise the new qualification inbox, read-boundary guards, concurrent plan-save/revocation and tenant isolation; run Ruff format/lint, mypy and the database tests. Capture source-bound pytest/JUnit artifacts and fix failures. |
 | CT-N04 | P0 | Assurance → Planning / E2 composed delivery | **PARTIAL: real Planning DB/ASGI replay test committed** | Provision **disposable** HTTPS/TLS peers and independent tokens; publish a real Assurance SQL event, relay, persist Planning inbox, return exact durable receipt, and deny/hold affected execution. Test lost response, same-event replay, stale/out-of-order epochs, conflicting identity, tenant isolation, TLS failure, sink outage and restart. No accepted E2 cross-service result yet. |
 | CT-N05 | P0 | Security / receiving trust | **OPEN** | Commission TLS certificate/SAN/CA, distinct caller secret custody, network-only ingress authorization, bounded retries, audit logs, receiver ownership and replay/quarantine policy. Verify no reviewer/observer/owner token reuse. The private endpoint is **code only**. |
-| CT-N06 | P0 | Planning/Lifecycle / fail-closed authority | **PARTIAL** | Test every approval, execution, native effect, placement, and retry boundary against **current** Assurance authority, not only a cached hint. Ensure delayed/missing invalidations and unknown scope always hold. Add cross-service revocation between preflight and effect and revoked approval replay. |
-| CT-N07 | P1 | Assurance + Planning / contract | **Implemented vectors, unverified** | Prove byte-for-byte PHP/Python canonical scope hash and wire schema compatibility for representative Unicode/slashes, installed tuple, tenant, action/method, null decisions, and epochs. Reject unrecognized/changed event contracts; preserve append-only event IDs. |
-| CT-N08 | P1 | Capacity owners / P07 | **OPEN** | Replace proposed/synthetic capacity with operated owner-backed **exclusive** reservations per physical CPU, memory, storage and address source; check source generations and native readback; verify collision, expiration and multi-owner compensation. No fabricated physical capacity receipt. |
+| CT-N06 | P0 | Planning/Lifecycle / fail-closed authority | **E2 boundary tests added; live revocation OPEN** | Test every approval, execution, native effect, placement, and retry boundary against **current** Assurance authority, not only a cached hint. Ensure delayed/missing invalidations and unknown scope always hold. Add cross-service revocation between preflight and effect and revoked approval replay. |
+| CT-N07 | P1 | Assurance + Planning / contract | **E2 strict receipt/vectors coded; CI OPEN** | Prove byte-for-byte PHP/Python canonical scope hash and wire schema compatibility for representative Unicode/slashes, installed tuple, tenant, action/method, null decisions, and epochs. Reject unrecognized/changed event contracts; preserve append-only event IDs. |
+| CT-N08 | P1 | Capacity owners / P07 | **E2 current vector/class readback coded; native owner OPEN** | Replace proposed/synthetic capacity with operated owner-backed **exclusive** reservations per physical CPU, memory, storage and address source; check source generations and native readback; verify collision, expiration and multi-owner compensation. No fabricated physical capacity receipt. |
 | CT-N09 | P1 | Native VMware → OpenStack / E3 | **NOT RUN** | Enroll installed-source tuple, export/export lease, guest OS/driver/UEFI, disk conversion/import, native target and independent observer receipts; run selected `VM_COLD_EXPORT` positive, refusal, resume and rollback cases under approved authorization. Do not infer native support from test fixtures. |
 | CT-N10 | P1 | Native network/isolation/recovery / E3 | **NOT RUN** | Qualify real IPv4/IPv6 flows, VRF/VPC tenancy, return paths, ingress/egress, RBAC, keys and storage, topology/fault domains, failure-trigger RTO/RPO, application/dependency recovery and source/target fences with independent observations. |
 | CT-N11 | P1 | Assurance reviewer + receiving owner / E3/E4 | **NOT REVIEWED** | Obtain evidence-bound independent E3 reviewer decisions and E4 receiver sign-off on actual native recovery, service ownership, accepted residual risks, monitoring and operating runbooks. Missing credentials/decision authority cannot be replaced by mock acceptance. |
-| CT-N12 | P1 | Platform governance / shadow adoption | **OPEN** | Read-only shadow comparison of qualification decisions, profile/adapter behaviour and native outcome changes; reconcile false confidence, stale qualification and method catalogue differences. Record rollout/rollback gates, versioned replay and promotion authority before any cutover. |
-| CT-N13 | P1 | Verification / A01–A16 | **PARTIAL** | Build and run the complete source-bound acceptance matrix with positive, negative, timeout/retry, cross-tenant, authority-revocation and native-effect cases. Map each A01–A16 to code, test and evidence in the implementation ledger; do not close an A-ID with a mere fixture. |
+| CT-N12 | P1 | Platform governance / shadow adoption | **E2 read-only comparator coded; native shadow OPEN** | Read-only shadow comparison of qualification decisions, profile/adapter behaviour and native outcome changes; reconcile false confidence, stale qualification and method catalogue differences. Record rollout/rollback gates, versioned replay and promotion authority before any cutover. |
+| CT-N13 | P1 | Verification / A01–A16 | **PARTIAL: E2 tests mapped, source CI/native OPEN** | Build and run the complete source-bound acceptance matrix with positive, negative, timeout/retry, cross-tenant, authority-revocation and native-effect cases. Map each A01–A16 to code, test and evidence in the implementation ledger; do not close an A-ID with a mere fixture. |
 
 ## A01–A16 acceptance coverage (CT-N13)
 
@@ -113,12 +113,53 @@ workflow or external native/receiving acceptance):
   unexpected, mismatched state/operation and malformed tenant/scope wire bytes
   *before* any request; adapt positive and negative Pest fixtures.
 
-**Current CI evidence:** latest inspected branch head
-`7a17079c396dcb1d39b7c038fdf3cddf1a56f667`, PR #64, 118 commits,
-39 checks queued and zero completed confirmations. Do **not** mark CT-N01,
-CT-N02, CT-N03, CT-N04 or CT-N07 DONE. The Planning ASGI/PostgreSQL test is
+**Current CI evidence:** the latest inspected engineering head
+`d279e408a48c05cf3cd4796346478dc2fabfb093` (PR #64, 135 commits)
+had 40 queued check runs, with **no passing confirmations**. Two P01
+workflow runs for that same head failed almost immediately and returned no
+job records; root cause is **unknown**, not declared a code/test failure.
+See https://github.com/awalker0878/multi-tenant/actions/runs/37852674326
+and https://github.com/awalker0878/multi-tenant/actions/runs/37852674490.
+CT-N01, CT-N02, CT-N03, CT-N04 and CT-N07 remain OPEN. The Planning ASGI/PostgreSQL test is
 not a commissioned HTTPS Assurance-to-Planning service campaign. Independent
 E3/E4 proof and provider-backed capacity remain outstanding.
+
+### Continued source changes — E2 engineering only
+
+- `7d67a629`, `5e95d9cc`: enforce exact five-field durable inbox
+  acknowledgment, bounded HTTP body, exact approved sink path and epoch range;
+  malformed/surplus HTTP replies are negative Pest scenarios.
+- `6d0e2be7`, `1a17b453`, `318420d6`, `81c82498`,
+  `0778bad3`, `468c60c4`, `d279e408`: read-only shadow comparison
+  tool plus seven unit test scenarios and a GitHub Actions E2 job. Diff
+  coverage includes runtime evidence, adapter bytes, installed tuple,
+  definition, method, status/epoch and expiry. Comparator exit zero means
+  only that supplied snapshots match; it confers no reviewer approval.
+  Runbook: [qualification-shadow-reconciliation.md](docs/operations/runbooks/qualification-shadow-reconciliation.md).
+- `1268adfc`: Lifecycle E2 regression exercises revocation between
+  preflight and effect, and provider fencing lost after grant redemption.
+  Neither grants a native write nor establishes an E3 owner proof.
+- `9a1bd65e`, `888a8914`, `d1c7dc0e`, `dedd6b8f`: provider-used
+  physical capacity, outstanding debits and class-specific physical limits
+  are revalidated on reservation readback; tenant authorization withdrawal
+  and quota drift are negative SQL tests. **No provider-native exclusive
+  capacity owner has been commissioned.**
+
+### Traceability for current E2 test candidates
+
+| Case | Committed E2 test locations | Acceptance status |
+| --- | --- | --- |
+| A01–A03 | `tests/contracts/test_native_qualification.py`; `services/inventory/tests/test_capability_observations.py`; `services/assurance/tests/Feature/QualificationAuthorityLedgerTest.php` | Native signed observer/reviewer proof and exact-head CI open |
+| A04–A05 | `services/lifecycle/tests/test_placement_reservations.py`; `services/planning/tests/test_placement.py` | Operated physical capacity exclusivity open |
+| A06–A07 | `services/planning/tests/test_network_evidence.py`; placement/negative-isolation E2 fixtures | Native topology and security proof open |
+| A08–A09 | `services/planning/tests/test_recovery_evidence.py`; typed matching E2 tests | Native measured RTO/RPO and restoration open |
+| A10–A11 | `services/assurance/tests/Feature/QualificationAuthorityLedgerTest.php`; `services/planning/tests/test_qualification_invalidations.py`; `services/planning/tests/test_qualification_invalidation_http.py`; `services/lifecycle/tests/test_native_workflow.py` | HTTPS composed outage/reorder + native effect interception open |
+| A12–A14 | Lifecycle validation/reconciliation/owner loss fixtures; `services/lifecycle/tests/test_native_workflow.py` | Versioned replay and owner proof open |
+| A15–A16 | Versioned capability registry projections; `services/assurance/tests/Feature/QualificationScopeDigestTest.php`; `services/planning/tests/test_qualification_scope_digests.py` | Unsupported native method and independent E3/E4 gates open |
+
+Nothing in this table asserts that all scenarios passed on the latest source.
+For **each** scenario, retain exact-head CI, independently authorized native
+negative/recovery observations and operating sign-off where required.
 
 ## Retained historical handoffs
 
