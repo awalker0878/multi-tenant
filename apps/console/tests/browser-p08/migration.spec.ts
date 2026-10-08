@@ -67,15 +67,15 @@ test('selects AHV resources and saves complete quarantine mappings without autho
   page.on('pageerror', e => errors.push(e.message));
   await page.goto(base);
   await page.getByLabel('Source VM profile').selectOption(source.id);
-  await page.getByLabel('Destination profile', { exact: true }).selectOption(target.id);
+  await page.getByRole('combobox', { name: 'Destination profile', exact: true }).selectOption(target.id);
   await expect(page.getByLabel('Explicit migration method')).toHaveValue('VM_COLD_EXPORT');
   await expect(page.getByText('AHV destination mapping', { exact: true })).toBeVisible();
-  await page.getByLabel('Storage container', { exact: true }).selectOption(target.facts.storage_containers[0].extId);
+  await page.getByRole('combobox', { name: 'Storage container', exact: true }).selectOption(target.facts.storage_containers[0].extId);
   await page.getByLabel('Migration: Quarantine', { exact: true }).check();
   await page.getByLabel('Synthetic isolation · ENFORCE', { exact: true }).check();
   for (const nic of source.facts.nics) {
-    await page.getByLabel(`NIC ${nic.key} quarantine subnet`, { exact: true }).selectOption(target.facts.subnets[0].extId);
-    await page.getByLabel(`NIC ${nic.key} production subnet`, { exact: true }).selectOption(target.facts.subnets[1].extId);
+    await page.getByRole('combobox', { name: `NIC ${nic.key} quarantine subnet`, exact: true }).selectOption(target.facts.subnets[0].extId);
+    await page.getByRole('combobox', { name: `NIC ${nic.key} production subnet`, exact: true }).selectOption(target.facts.subnets[1].extId);
   }
   await page.getByRole('button', { name: 'Add dataset', exact: true }).click();
   await page.getByLabel('Name', { exact: true }).fill('All application data');

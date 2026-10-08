@@ -22,7 +22,7 @@ def main():
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
     report = {'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'observed_at': datetime.now(timezone.utc).isoformat(), 'evidence_level': 'E2', 'native_write_authorized': False,
-              'source_bindings': {p: sha(ROOT/p) for p in paths if p.startswith(('apps/console/', 'scripts/p08/', 'contracts/fixtures/inventory/migration-', 'contracts/fixtures/inventory/ahv-', '.github/workflows/p08-')) and (ROOT/p).is_file()},
+              'source_bindings': {p: sha(ROOT/p) for p in paths if p.startswith(('apps/console/', 'scripts/p08/', 'contracts/fixtures/inventory/migration-', 'contracts/fixtures/inventory/ahv-', '.github/workflows/p08-', '.github/workflows/ahv-destination.yml')) and (ROOT/p).is_file()},
               'commands': [], 'limitations': ['Actual Vue/Inertia review page with isolated synthetic HTTP observations.', 'Service persistence/authority is qualified separately; no native migration, representative-user review or assistive-tool acceptance.']}
     commands = [['node', '--version'], ['npm', 'run', 'typecheck'], ['npm', 'run', 'test:boundaries'], ['npm', 'run', 'build'], ['npx', 'playwright', 'test', '--config', 'tests/browser-p08/playwright.config.ts']]
     for index, argv in enumerate(commands):

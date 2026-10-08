@@ -20,8 +20,9 @@ from inventory.infrastructure.policies import parse_policy
 pytest_plugins = ["test_discovery"]
 
 
+@pytest.mark.parametrize("operation", ["discover", "configuration_pull"])
 def test_ahv_destination_roundtrip_binds_profiles_and_revokes_with_enrollment(
-    campaign: Campaign, monkeypatch: pytest.MonkeyPatch
+    campaign: Campaign, monkeypatch: pytest.MonkeyPatch, operation: str
 ) -> None:
     c = campaign
     monkeypatch.setattr(
@@ -59,7 +60,16 @@ def test_ahv_destination_roundtrip_binds_profiles_and_revokes_with_enrollment(
     c.endpoint = c.service.command(
         c.actor, "enroll", {"policy_id": c.policy.policy_id, "label": "AHV lab"}, uid()
     )["endpoint_id"]
-    c.start()
+    c.service.command(
+        replace(
+            c.actor,
+            action="inventory.discover" if operation == "discover" else "inventory.admin",
+        ),
+        operation,
+        {},
+        uid(),
+        c.endpoint,
+    )
     c.now += 2
     lease = c.service.claim(c.worker)["job"]
     observed = c.now
