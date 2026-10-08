@@ -109,6 +109,50 @@ const migrationFeatures = computed(() => featurePolicy.features.map(feature => (
   ...feature,
   proposal: featureDirection.value?.features.find(item => item.feature_id === feature.id),
 })));
+function sourceFeatureDefined(id: string): boolean {
+  const facts = source.value?.facts;
+  if (!facts || facts.profile_type !== 'SourceWorkloadProfile') return false;
+  const nics = facts.nics.length;
+  const disks = facts.disks.length;
+  const metadata = facts.schema_version === 3 ? facts.native.metadata : null;
+  const vm = metadata && typeof metadata.vm === 'object' && metadata.vm !== null
+    ? metadata.vm as Record<string, unknown> : null;
+  const ports = metadata && Array.isArray(metadata.ports) ? metadata.ports as Array<Record<string, unknown>> : [];
+  switch (id) {
+    case 'guest.firmware': return facts.firmware === 'bios' || facts.firmware === 'efi';
+    case 'guest.drivers': return typeof facts.guest_id === 'string' && facts.guest_id.length > 0;
+    case 'guest.devices': return Boolean(
+      vm && (Array.isArray(vm.gpus) && vm.gpus.length
+      || Array.isArray(vm.pcieDevices) && vm.pcieDevices.length
+      || Array.isArray(vm.cdRoms) && vm.cdRoms.length
+      || vm.vtpmConfig)
+    );
+    case 'storage.disks':
+    case 'storage.controller':
+    case 'storage.sharing':
+    case 'storage.encryption':
+    case 'storage.target':
+    case 'storage.transfer': return disks > 0;
+    case 'network.nics':
+    case 'network.routing':
+    case 'network.flows': return nics > 0;
+    case 'network.security': return Boolean(sourceSecurityIds.value?.length);
+    case 'network.qos': return ports.some(p => typeof p.qos_policy_id === 'string' && p.qos_policy_id.length > 0);
+    case 'metadata.optional': return Boolean(
+      (vm && Array.isArray(vm.categories) && vm.categories.length)
+      || (metadata && typeof metadata.server === 'object' && metadata.server !== null
+          && typeof (metadata.server as Record<string, unknown>).name === 'string')
+    );
+    case 'vm.compute': return facts.cpu !== null && facts.memory_mb !== null;
+    case 'vm.power': return facts.power_state !== null;
+    default: return true;  // Required owner and operational obligations remain visible.
+  }
+}
+const displayedMigrationFeatures = computed(() => migrationFeatures.value.filter(feature => sourceFeatureDefined(feature.id)));
+const missingSourceFacts = computed(() => migrationFeatures.value.filter(
+  feature => feature.criticality === 'critical' && !sourceFeatureDefined(feature.id)
+));
+
 const operatorObligations = computed(() => featurePolicy.operator_requirements.filter(item =>
   item.criticality === 'critical'
   && !(item.attribute_id === 'application.final_delta' && form.review.method === 'VM_COLD_EXPORT')
@@ -158,13 +202,14 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
         <p class="mt-2 text-sm">The mapping identifies possible translations, never asserts that this installation supports them. Native API facts must come from Inventory; the application and platform owners supply decisions, and Assurance independently validates required behavior.</p>
         <p v-if="!featureDirection" role="status" class="mt-2">Choose both VM source and destination environments to see their 30 feature mappings.</p>
         <template v-else>
-          <p class="mt-2 font-medium">{{ source?.facts.platform }} → {{ target?.facts.platform }} · {{ migrationFeatures.filter(item => item.criticality === 'critical').length }} critical feature areas · no native eligibility implied</p>
+          <p v-if="missingSourceFacts.length" role="alert" class="mt-2">Required source attributes have not been observed for {{ missingSourceFacts.map(item => item.label).join(', ') }}. Destination options for these areas are hidden; restore source discovery instead of inventing values.</p>
+          <p class="mt-2 font-medium">{{ source?.facts.platform }} → {{ target?.facts.platform }} · {{ displayedMigrationFeatures.filter(item => item.criticality === 'critical').length }} source-defined critical areas · no native eligibility implied</p>
           <details class="mt-3">
             <summary class="cursor-pointer font-medium">Show feature-by-feature mappings and migration holds</summary>
             <table class="mt-3 w-full text-left text-sm">
               <thead><tr><th scope="col" class="p-2">Feature</th><th scope="col" class="p-2">Required</th><th scope="col" class="p-2">Proposed treatment</th></tr></thead>
               <tbody>
-                <tr v-for="feature in migrationFeatures" :key="feature.id" class="border-t">
+                <tr v-for="feature in displayedMigrationFeatures" :key="feature.id" class="border-t">
                   <td class="p-2"><strong>{{ feature.label }}</strong><p class="text-xs">{{ feature.notes }}</p></td>
                   <td class="p-2">{{ feature.criticality }}</td>
                   <td class="p-2">{{ feature.proposal?.mapping_proposal.replaceAll('_', ' ') ?? 'Unassessed' }}<p class="text-xs">Unknown until installed API and independent receiving evidence are reviewed.</p></td>
