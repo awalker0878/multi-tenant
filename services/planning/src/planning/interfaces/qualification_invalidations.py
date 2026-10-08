@@ -3,6 +3,7 @@
 import asyncio
 import hmac
 import json
+import os
 from typing import Any
 
 import psycopg
@@ -33,6 +34,15 @@ class QualificationInvalidationApp:
             # The read-only Assurance and outgoing Governance credentials cannot
             # stand in for a separately enrolled inbound invalidation principal.
             expected = mounted_secret("PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE")
+            for other in (
+                "PLANNING_ASSURANCE_CREDENTIAL_FILE",
+                "PLANNING_GOVERNANCE_CREDENTIAL_FILE",
+                "PLANNING_CONSOLE_CREDENTIAL_FILE",
+            ):
+                if os.environ.get(other) and hmac.compare_digest(
+                    expected, mounted_secret(other)
+                ):
+                    raise Rejected("invalidation_authority_not_independent", 503)
             authorization = [v for k, v in headers if k.lower() == b"authorization"]
             if (
                 len(authorization) != 1
