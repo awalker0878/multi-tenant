@@ -163,3 +163,78 @@ def test_negative_qualification_arriving_before_plan_save_cannot_be_missed(
     assert holds is not None and holds["n"] == 1
     saved = p.get(TENANT, APP, ENV, planned["id"], "plan")
     assert not p.validity(actor, saved, {})["current"]
+
+
+def test_revocation_blocks_approval_execution_and_placement_boundaries(
+    database: Postgres,
+) -> None:
+    p, actor, body = setup(database)
+    assessment_reply = p.assessment(actor, str(uuid4()), body, {})
+    assessed = p.get(TENANT, APP, ENV, assessment_reply["id"], "assessment")
+    planned = p.plan(
+        actor,
+        str(uuid4()),
+        {
+            "assessment_id": assessment_reply["id"],
+            "candidate": 0,
+            "request": request(),
+        },
+        assessed,
+    )
+    scope_hash = digest(assessed["inputs"][0]["qualification"]["scope"])
+    QualificationInvalidations(database).accept(
+        {
+            "event_id": str(uuid4()),
+            "tenant_id": TENANT,
+            "scope_sha256": scope_hash,
+            "authority_epoch": 1,
+            "operation": "revoke",
+            "state": "revoked",
+            "decision_sha256": "a" * 64,
+            "event_sha256": "b" * 64,
+        }
+    )
+    saved = p.get(TENANT, APP, ENV, planned["id"], "plan")
+    assert not p.validity(actor, saved, {})["current"]
+    for boundary in (
+        lambda: p.bound_plan(planned["id"], 1),
+        lambda: p.execution_plan(TENANT, planned["id"], 1),
+        lambda: p.placement_proposal(TENANT, planned["id"], 1),
+    ):
+        with pytest.raises(Rejected) as denied:
+            boundary()
+        assert denied.value.status == 423
+
+
+def test_missing_scope_binding_fails_closed_before_any_plan_effects(
+    database: Postgres,
+) -> None:
+    identity = str(uuid4())
+    with database.transaction() as tx:
+        tx.execute(
+            "INSERT INTO app.planning_records"
+            "(id,tenant,actor,application,environment,kind,payload,digest,created_at) "
+            "VALUES(%s,%s,%s,%s,%s,'plan',%s::jsonb,%s,%s)",
+            (
+                identity,
+                TENANT,
+                ACTOR,
+                APP,
+                ENV,
+                '{"content":{"scope":{"tenant_id":"' + TENANT + '"}}}',
+                "a" * 64,
+                NOW,
+            ),
+        )
+        assert p_scope_unverified(tx, identity)
+
+    p, _, _ = setup(database)
+    with pytest.raises(Rejected, match="qualification_invalidation_held"):
+        p.bound_plan(identity, 1)
+    with pytest.raises(Rejected, match="qualification_scope_unverified"):
+        p.execution_plan(TENANT, identity, 1)
+
+
+def p_scope_unverified(tx: Any, identity: str) -> bool:
+    p, _, _ = setup(Postgres())
+    return p.qualification_hold(tx, TENANT, identity) == "qualification_scope_unverified"
