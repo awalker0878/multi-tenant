@@ -5,7 +5,7 @@ server and exact complete disk mapping are mandatory. Native submissions are
 never replayed by this adapter; partial resource receipts remain in custody.
 """
 
-MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
+
 
 import re
 import time
@@ -31,6 +31,9 @@ from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites
 from lifecycle_worker.infrastructure.openstack_source_contract import configuration
+
+
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
 
 
 def validate_capture(p: dict[str, Any], binding: NativeBinding) -> dict[str, Any]:
