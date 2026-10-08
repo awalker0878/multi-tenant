@@ -43,11 +43,11 @@ it('rejects merely successful HTTP replies and accepts only the exact durable in
             'event_sha256' => str_repeat('b', 64),
         ];
         $publisher = new ConfirmedHttpInvalidationPublisher(new MountedSecret);
-        Http::fake(['receiving.test/*' => Http::response(['persisted' => true], 200)]);
+        Http::fake(['https://receiving.test/*' => Http::response(['persisted' => true], 200)]);
         expect(fn () => $publisher->publish($event))
             ->toThrow(RuntimeException::class, 'qualification_invalidation_unconfirmed');
 
-        Http::fake(['receiving.test/*' => Http::response([
+        Http::fake(['https://receiving.test/*' => Http::response([
             'persisted' => true,
             'event_id' => $event['event_id'],
             'scope_sha256' => $event['scope_sha256'],
@@ -57,7 +57,7 @@ it('rejects merely successful HTTP replies and accepts only the exact durable in
         expect(fn () => $publisher->publish($event))
             ->toThrow(RuntimeException::class, 'qualification_invalidation_unconfirmed');
 
-        Http::fake(['receiving.test/*' => Http::response(['persisted' => true] + $event, 200)]);
+        Http::fake(['https://receiving.test/*' => Http::response(['persisted' => true] + $event, 200)]);
         $publisher->publish($event);
         Http::assertSentCount(1);
     } finally {
