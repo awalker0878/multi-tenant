@@ -7,6 +7,8 @@ opt into same-lease byte-range continuation. The
 [implementation and operating instructions](docs/implementation/contextual-commissioning.md)
 record the exact behavior, verification commands and remaining native boundaries.
 The user authorizes publishing these tested changes to main.
+[Retained verification](verification/p08/commissioning/README.md) records 1,336
+component tests without skips and five passing browser journeys.
 
 The next concrete work is to enroll the actual source/destination and owner
 producers, populate the existing native/operating input records, and execute the
