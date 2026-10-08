@@ -2,6 +2,7 @@
 """Validate documentation structure and delivery references, not product behavior."""
 
 from pathlib import Path
+import os
 import re
 import sys
 from urllib.parse import unquote, urlsplit
@@ -17,6 +18,50 @@ STATUS = {
     "operational_acceptance": {"NOT_STARTED", "IN_REVIEW", "ACCEPTED", "REJECTED", "NOT_APPLICABLE_REVIEWED"},
 }
 GATE_VALUES = {"NOT_REVIEWED", "IN_REVIEW", "PASSED", "FAILED"}
+
+
+def markdown_documents(root):
+    """Find authored documents without walking installed package contents.
+
+    Only dependency directories beside their owning manifest are excluded; an
+    authored directory named vendor elsewhere is still part of the check.
+    """
+    documents = []
+    for current, directories, files in os.walk(root):
+        path = Path(current)
+        excluded = {".git"} if path == root else set()
+        if path == root or "pyproject.toml" in files:
+            excluded.add(".venv")
+        if "composer.json" in files:
+            excluded.add("vendor")
+        if "package.json" in files:
+            excluded.add("node_modules")
+        directories[:] = [name for name in directories if name not in excluded]
+        documents.extend(path / name for name in files if name.endswith(".md"))
+    return sorted(documents)
+
+
+def validate_markdown(root):
+    errors = []
+    documents = markdown_documents(root)
+    for path in documents:
+        content = path.read_text()
+        fences = re.findall(r"^\s*(`{3,}|~{3,})", content, re.M)
+        if len(fences) % 2 != 0:
+            errors.append(f"Unclosed Markdown fence: {path.relative_to(root)}")
+        # Remove fenced examples before validating authored local links.
+        prose = re.sub(r"^\s*```[^\n]*\n.*?^\s*```\s*$", "", content, flags=re.M | re.S)
+        for link in re.findall(r"\]\(([^)]+)\)", prose):
+            target = link.split(' "', 1)[0]
+            parts = urlsplit(target)
+            if parts.scheme or target.startswith("#") or not parts.path:
+                continue
+            resolved = (path.parent / unquote(parts.path)).resolve()
+            if not resolved.is_relative_to(root):
+                errors.append(f"Link escapes repository: {path.relative_to(root)} → {target}")
+            if not resolved.exists():
+                errors.append(f"Broken local link: {path.relative_to(root)} → {target}")
+    return documents, errors
 
 
 def validate():
@@ -174,21 +219,8 @@ def validate():
         for key in ("owner_role", "description", "unblock_condition", "next_action"):
             require(bool(record.get(key)), f"Missing blocker {key}: {record['id']}")
 
-    markdown_files = sorted(ROOT.rglob("*.md"))
-    for path in markdown_files:
-        content = path.read_text()
-        fences = re.findall(r"^\s*(`{3,}|~{3,})", content, re.M)
-        require(len(fences) % 2 == 0, f"Unclosed Markdown fence: {path.relative_to(ROOT)}")
-        # Remove fenced examples before validating authored local links.
-        prose = re.sub(r"^\s*```[^\n]*\n.*?^\s*```\s*$", "", content, flags=re.M | re.S)
-        for link in re.findall(r"\]\(([^)]+)\)", prose):
-            target = link.split(' "', 1)[0]
-            parts = urlsplit(target)
-            if parts.scheme or target.startswith("#") or not parts.path:
-                continue
-            resolved = (path.parent / unquote(parts.path)).resolve()
-            require(resolved.is_relative_to(ROOT), f"Link escapes repository: {path.relative_to(ROOT)} → {target}")
-            require(resolved.exists(), f"Broken local link: {path.relative_to(ROOT)} → {target}")
+    markdown_files, markdown_errors = validate_markdown(ROOT)
+    errors.extend(markdown_errors)
     for path, expected in render_views(register).items():
         require(path.exists() and path.read_text() == expected, f"Stale generated view: {path.relative_to(ROOT)}")
     if errors:

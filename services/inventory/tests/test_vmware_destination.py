@@ -97,9 +97,7 @@ def test_rejects_incomplete_or_unobserved_vmware_mapping(fault: str) -> None:
 
 def test_vmware_contract_fixture_is_valid_for_profile_intake_and_review() -> None:
     fixture = json.loads(
-        (
-            Path(__file__).parents[3] / "contracts/fixtures/inventory/vmware-destination-v1.json"
-        ).read_text()
+        (Path(__file__).with_name("fixtures") / "vmware-destination-v1.json").read_text()
     )
     source, target, review = (fixture[key] for key in ("source", "target", "review"))
     for p, stream in (

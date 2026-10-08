@@ -321,3 +321,63 @@ def test_pool_pause_applies_to_prepared_work_and_release_requires_independent_cl
         assert c.execute("SELECT count(*) FROM app.migration_allocation_releases").fetchone() == (
             1,
         )
+
+
+@pytest.mark.parametrize("stopped", [False, True])
+def test_campaign_hold_clears_only_after_successful_nonstopped_reconciliation(
+    database: Any, postgres: dict[str, Any], stopped: bool
+) -> None:
+    campaigns, plan, m, campaign = prepared(database, postgres)
+    owner = MigrationOwners(plan)
+    workflow = NativeWorkflow(database, owner, lambda: 1000)
+    tenant = plan["scope"]["tenant_id"]
+    job = workflow.admit(plan, str(uuid4()), (campaign, m["id"]))
+    binding = workflow.prepare(tenant, job, "source_prepare")
+    workflow.boundary(tenant, binding, plan["executor_id"], "before_api_sequence")
+    owner.omit = "provider_requests_quiescent"
+    with pytest.raises(Rejected, match="reconciliation"):
+        workflow.reconcile(tenant, binding)
+    assert campaigns.read(tenant, campaign)["members"][0]["state"] == "held"
+    if stopped:
+        workflow.stop(tenant, job)
+    owner.omit = None
+    assert workflow.reconcile(tenant, binding) == ("stopped" if stopped else "running")
+    member_view = campaigns.read(tenant, campaign)["members"][0]
+    assert member_view["state"] == ("held" if stopped else "admitted")
+    if not stopped:
+        assert member_view["reason"] is None
+        assert workflow.checkpoint(tenant, job)["action"] == "prepare"
+    with psycopg.connect(**postgres) as c:
+        assert c.execute("SELECT count(*) FROM app.migration_allocation_releases").fetchone() == (
+            0,
+        )
+
+
+def test_capacity_reduction_revokes_prepared_work_without_releasing_allocations(
+    database: Any, postgres: dict[str, Any]
+) -> None:
+    campaigns, plan, m, campaign = prepared(database, postgres)
+    workflow = NativeWorkflow(database, MigrationOwners(plan), lambda: 1000)
+    tenant = plan["scope"]["tenant_id"]
+    job = workflow.admit(plan, str(uuid4()), (campaign, m["id"]))
+    binding = workflow.prepare(tenant, job, "source_prepare")
+    campaigns.capacity(
+        tenant,
+        str(uuid4()),
+        str(uuid4()),
+        {
+            "pool_key": next(iter(m["demands"])),
+            "capacity": 1024,
+            "paused": False,
+            "observed_at": 1000,
+            "expires_at": 1100,
+            "evidence_sha256": digest("reduced-capacity"),
+        },
+    )
+    with pytest.raises(Rejected, match="campaign_capacity_wait"):
+        workflow.boundary(tenant, binding, plan["executor_id"], "before_api_sequence")
+    with psycopg.connect(**postgres) as c:
+        assert c.execute("SELECT count(*) FROM app.native_redemptions").fetchone() == (0,)
+        assert c.execute("SELECT count(*) FROM app.migration_allocation_releases").fetchone() == (
+            0,
+        )

@@ -17,6 +17,7 @@ from test_native_http import native_tls as native_tls
 from lifecycle_worker.application.native import NativeBinding, NativeHeld, digest
 from lifecycle_worker.infrastructure.migration_transfer import NativeBlobDownload
 from lifecycle_worker.infrastructure.native_image_archive import NativeImageArchive
+from lifecycle_worker.infrastructure.native_image_observer import CapturedImageObserver
 from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites
 from lifecycle_worker.infrastructure.openstack_capture import OpenStackCapture
@@ -295,6 +296,8 @@ def test_native_archive_keeps_all_disks_and_interrupted_custody(
             return {
                 "format": "raw",
                 "size": len(data) + (1 if fault == "changed" and self.downloaded else 0),
+                "checksum_algorithm": "sha256",
+                "checksum": hashlib.sha256(data).hexdigest(),
             }
 
         def download(self, image: dict[str, Any], sink: Any, boundary: Any) -> dict[str, Any]:
@@ -323,6 +326,16 @@ def test_native_archive_keeps_all_disks_and_interrupted_custody(
             "data",
         }
         assert journal.events[-1][0] == "export_complete"
+        # Keystone principals may use compact 32-character native IDs, even
+        # though the worker's own identities use canonical UUID strings.
+        observer = CapturedImageObserver(
+            source, p, source, journal, "a" * 32, "b" * 32, lambda: 100
+        )
+        assert observer.observe(b, {})["outcome"] == "observed_present"
+        with pytest.raises(NativeHeld, match="independent_native_identity_required"):
+            CapturedImageObserver(source, p, source, journal, "a" * 32, "a" * 32, lambda: 100)
+        with pytest.raises(NativeHeld, match="invalid_native_identity"):
+            CapturedImageObserver(source, p, source, journal, "a" * 32, "invalid", lambda: 100)
         with pytest.raises(FileExistsError):
             tool.execute(b, lambda: None)
 

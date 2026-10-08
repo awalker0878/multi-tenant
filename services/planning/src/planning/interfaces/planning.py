@@ -198,7 +198,7 @@ class PlanningApp:
                         identifier(body["other_plan_id"]),
                         "plan",
                     )
-                    await asyncio.to_thread(
+                    other_actor = await asyncio.to_thread(
                         self.authorize,
                         credential,
                         tokens,
@@ -208,6 +208,8 @@ class PlanningApp:
                         environment,
                         other["candidates"],
                     )
+                    if other_actor != actor:
+                        raise Rejected("actor_mismatch", 403)
                     payload = {
                         "changes": diff(record["content"], other["content"]),
                         "approval_reusable": record["binding"]["digest"]

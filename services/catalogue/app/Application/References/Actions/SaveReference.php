@@ -34,7 +34,7 @@ final class SaveReference
                 throw new IntentFailure('unknown_reference_fields');
             }
             Validator::make($definition, ['name' => ['required', 'string', 'max:200'], 'owner_id' => ['required', 'uuid', 'lowercase'],
-                ...($kind === 'environment' ? [] : ['shareable' => ['required', 'boolean']]), ...($kind === 'security-domain' ? ['zone' => ['required', Rule::in(['PAZ', 'OZ', 'RZ', 'HRZ'])]] : [])])->validate();
+                ...($kind === 'environment' ? [] : ['shareable' => ['required', 'boolean:strict']]), ...($kind === 'security-domain' ? ['zone' => ['required', Rule::in(['PAZ', 'OZ', 'RZ', 'HRZ'])]] : [])])->validate();
             $this->owners->assertOwners($actor, [$definition['owner_id']]);
         } elseif ($definition !== []) {
             throw new IntentFailure('retirement_body_must_be_empty');

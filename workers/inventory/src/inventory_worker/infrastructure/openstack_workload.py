@@ -41,7 +41,10 @@ def collect_openstack_source(
     server = read("compute", "/servers/" + native_id(vm), "server")
     if not isinstance(server, dict) or server.get("id") != vm or server.get("tenant_id") != project:
         raise CollectionFailure("permission_denied")
-    flavor_id = server.get("flavor", {}).get("id")
+    flavor_reference = server.get("flavor")
+    if not isinstance(flavor_reference, dict):
+        raise CollectionFailure("invalid_response")
+    flavor_id = flavor_reference.get("id")
     if not isinstance(flavor_id, str) or re.fullmatch(r"[A-Za-z0-9_.:-]{1,200}", flavor_id) is None:
         raise CollectionFailure("invalid_response")
     flavor = read("compute", "/flavors/" + flavor_id, "flavor")
@@ -165,7 +168,7 @@ def collect_openstack_source(
     )
     if firmware is None:
         holds.append("firmware_unknown")
-    if server.get("status") not in {"ACTIVE", "SHUTOFF"}:
+    if server.get("status") not in ("ACTIVE", "SHUTOFF"):
         holds.append("source_power_state_unsupported")
     reread = read("compute", "/servers/" + vm, "server")
     if reread != server:

@@ -42,3 +42,27 @@ it('keeps exact tuple values typed and fails closed on ambiguous custody records
         unlink($file);
     }
 });
+
+it('rejects qualification registries with unsafe custody or excessive bytes', function (string $fault): void {
+    $file = tempnam(sys_get_temp_dir(), 'p05-custody-');
+    $link = $file.'-link';
+    $record = ['scope' => $this->body['qualification_scope'], 'status' => 'qualified'];
+    file_put_contents($file, json_encode(['schema_version' => 1, 'records' => [$record]], JSON_THROW_ON_ERROR));
+    config(['planning.qualification_registry_file' => $file]);
+    try {
+        if ($fault === 'writable') {
+            chmod($file, 0666);
+        } elseif ($fault === 'symlink') {
+            symlink($file, $link);
+            config(['planning.qualification_registry_file' => $link]);
+        } else {
+            file_put_contents($file, str_repeat(' ', 524289));
+        }
+        $this->postJson($this->path, $this->body)->assertStatus(503);
+    } finally {
+        if (is_link($link)) {
+            unlink($link);
+        }
+        unlink($file);
+    }
+})->with(['writable', 'symlink', 'oversized']);

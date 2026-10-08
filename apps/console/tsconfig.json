@@ -15,16 +15,15 @@
     "types": [
       "vite/client",
       "node"
-    ]
+    ],
+    "allowImportingTsExtensions": true
   },
   "include": [
     "resources/js/**/*.ts",
     "resources/js/**/*.vue",
-    "tests/browser/**/*.ts",
-    "tests/browser-p02/**/*.ts",
+    "tests/**/*.ts",
     "playwright.p02.config.ts",
     "playwright.config.ts",
-    "vite.config.ts",
-    "tests/architecture/**/*.ts"
+    "vite.config.ts"
   ]
 }

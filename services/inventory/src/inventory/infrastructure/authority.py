@@ -77,6 +77,8 @@ class GovernanceAuthority:
                 body = json.loads(raw)
             finally:
                 connection.close()
+            if not isinstance(body, dict) or body.get("allowed") is not True:
+                raise ValueError("Invalid authority decision")
             if (
                 body.get("allowed"),
                 body.get("audience"),
@@ -253,7 +255,11 @@ def planning_actor(
             "scope": scope,
             "authority_use": "request_bound",
         }
-        if any(body.get(k) != v for k, v in expected.items()):
+        if (
+            not isinstance(body, dict)
+            or body.get("allowed") is not True
+            or any(body.get(k) != v for k, v in expected.items())
+        ):
             raise ValueError
         expiry = datetime.fromisoformat(body["expires_at"].replace("Z", "+00:00")).timestamp()
         evaluated = datetime.fromisoformat(body["evaluated_at"].replace("Z", "+00:00")).timestamp()

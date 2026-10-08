@@ -25,7 +25,7 @@ const state = (endpoint: Endpoint) => endpoint.expires_at !== null && endpoint.e
   <CatalogueLayout title="Site inventory" :tenant-id="tenantId">
     <Link :href="`/tenants/${tenantId}/inventory`" class="text-teal-800 underline">All inventory sites</Link>
     <Link v-if="canAdminister" :href="base + '/configuration'" class="action secondary ml-4">Environment configuration</Link>
-    <Link v-if="canAdminister" :href="base + '/migration-fleet'" class="action secondary ml-4">Migrate to OpenStack</Link>
+    <Link v-if="canAdminister" :href="base + '/migration-fleet'" class="action secondary ml-4">Migrate virtual machines</Link>
     <Link v-if="canAdminister" :href="base + '/operator-inputs'" class="action secondary ml-4">Operator readiness</Link>
     <p class="mt-3 break-all text-sm text-slate-600">Site {{ siteId }}</p>
     <p class="mt-4 max-w-3xl">Read-only enrollment allows approved discovery. Native changes require separate commissioning. Observed capacity remains unreserved.</p>

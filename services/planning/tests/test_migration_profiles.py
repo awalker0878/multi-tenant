@@ -44,6 +44,34 @@ def test_native_capacities_and_datasets_are_derived_from_current_owner() -> None
     assert bound["owner_inputs_sha256"] == digest(i["owner_inputs"])
 
 
+@pytest.mark.parametrize("duplicate", ["native_sha256", "key"])
+def test_ambiguous_owner_disk_identities_cannot_silently_drop_disks(duplicate: str) -> None:
+    i, rows = inputs(), mapping()
+    second = {"key": 2001, "native_sha256": digest("second"), "capacity_bytes": 2048}
+    second[duplicate] = i["disks"][0][duplicate]
+    i["disks"].append(second)
+    i["datasets"][0]["disk_keys"].append(2001)
+    if duplicate == "key":
+        rows.append(
+            {"source_disk_sha256": digest("second"), "target_key": str(uuid4()), "format": "raw"}
+        )
+    with pytest.raises(Rejected, match="migration_disk_identity_ambiguous"):
+        bind_migration(i, rows, 1000)
+
+
+@pytest.mark.parametrize("fault", ["foreign_disk", "duplicate_dataset", "empty_dataset"])
+def test_owner_dataset_inventory_must_match_observed_disks(fault: str) -> None:
+    i = inputs()
+    if fault == "foreign_disk":
+        i["datasets"].append({"id": str(uuid4()), "disk_keys": [9999]})
+    elif fault == "duplicate_dataset":
+        i["datasets"].append(deepcopy(i["datasets"][0]))
+    else:
+        i["datasets"].append({"id": str(uuid4()), "disk_keys": []})
+    with pytest.raises(Rejected, match="migration_datasets_incomplete"):
+        bind_migration(i, mapping(), 1000)
+
+
 @pytest.mark.parametrize(
     "fault", ["stale", "unconfirmed", "missing", "foreign", "capacity", "format", "duplicate"]
 )

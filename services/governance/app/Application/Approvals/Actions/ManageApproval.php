@@ -48,7 +48,7 @@ final class ManageApproval
                 if ($approval === null || $approval->revision !== $input['revision']) {
                     throw new IdentityDenied('revision_conflict', 409);
                 }
-                if (Carbon::parse($approval->expires_at)->isPast() || $plan->binding['valid_until'] <= now()->getTimestamp()) {
+                if (! Carbon::parse($approval->expires_at)->isFuture() || $plan->binding['valid_until'] <= now()->getTimestamp()) {
                     throw new IdentityDenied('approval_expired', 409);
                 }
                 if (($operation === 'revoke' && $approval->state !== 'approved') || ($operation !== 'revoke' && $approval->state !== 'requested')) {
@@ -85,7 +85,7 @@ final class ManageApproval
         if ($plan->binding['requested_by'] !== $actor->subject) {
             throw new IdentityDenied('wrong_plan_actor', 403);
         }
-        if ($expires->isPast() || $expires->greaterThan(now()->addDay()) || $expires->getTimestamp() > $plan->binding['valid_until']) {
+        if (! $expires->isFuture() || $expires->greaterThan(now()->addDay()) || $expires->getTimestamp() > $plan->binding['valid_until']) {
             throw new IdentityDenied('invalid_approval_expiry', 422);
         }
         $id = (string) Str::uuid();

@@ -7,6 +7,7 @@ namespace App\Application\Evidence\Actions;
 use App\Application\Evidence\Contracts\EvidenceAuthority;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use JsonException;
 
 final class ManageEvidence
 {
@@ -18,7 +19,11 @@ final class ManageEvidence
     {
         $raw = base64_decode($input['content_base64'], true);
         abort_unless(is_string($raw) && strlen($raw) <= 65536 && hash_equals($input['digest'], hash('sha256', $raw)), 422, 'digest_mismatch');
-        $observations = json_decode($raw, true, 32, JSON_THROW_ON_ERROR);
+        try {
+            $observations = json_decode($raw, true, 32, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            abort(422, 'invalid_observation');
+        }
         abort_unless(is_array($observations) && array_is_list($observations) && count($observations) >= 1 && count($observations) <= 32, 422);
         $keys = ['tenant_id', 'job_id', 'operation_id', 'attempt_id', 'plan_digest', 'epoch', 'simulation', 'sealed', 'effect_count', 'observed_at', 'outcome'];
         $ids = [];

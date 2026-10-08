@@ -2,6 +2,10 @@
 
 This independently owned Python package implements P04 bounded read-only native collection. `inventory-worker-collect --pages 1` obtains one Inventory lease, validates the independently mounted policy and performs a scoped HTTPS GET. The separate diagnostic commands below retain their original limited meaning. See [the discovery runbook](../../docs/operations/runbooks/inventory-discovery.md) for deployment inputs, cadence and explicit native qualification gaps.
 
+Malformed native profile objects are reported through the leased collection failure
+path as `invalid_response`. OpenStack destination resource and extension identities
+must be present and unique before a capability profile can be submitted.
+
 `inventory-worker-health liveness` exits 0 and reports only that its short-lived diagnostic process loaded, with `scope=process_bootstrap`. `inventory-worker-health readiness` exits 1 with `worker_dependencies_not_implemented`. Unsupported arguments exit 2 without a success payload. Native writes are absent. These diagnostics do not establish a running service, dependency readiness or a consuming worker. Worker responses identify inventory as the owning service and declare `task_consumption_enabled=false`.
 
 ## Ownership and structure

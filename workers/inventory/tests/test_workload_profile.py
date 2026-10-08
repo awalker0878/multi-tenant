@@ -114,10 +114,41 @@ def test_source_scope_and_configuration_change_are_denied() -> None:
         reader.collect("vm-1")
 
 
-def test_target_formats_and_import_routes_are_observed_not_inferred() -> None:
-    from inventory_worker.infrastructure.openstack_capabilities import target_profile
+@pytest.mark.parametrize(
+    "path",
+    [
+        ("config",),
+        ("runtime",),
+        ("guest",),
+        ("content",),
+        ("capability",),
+        ("host_capability",),
+        ("config", "hardware"),
+        ("config", "bootOptions"),
+        ("content", "about"),
+    ],
+)
+def test_malformed_vmware_objects_are_reported_as_invalid_native_responses(
+    path: tuple[str, ...],
+) -> None:
+    r = records()
+    parent = r
+    for key in path[:-1]:
+        parent = parent[key]
+    parent[path[-1]] = None
+    with pytest.raises(CollectionFailure, match="invalid_response"):
+        normalize("vm-1", "9.1.1.0", r, 1000)
 
-    r: dict[str, Any] = {
+
+def test_malformed_vmware_nic_connectivity_is_rejected() -> None:
+    r = records()
+    r["config"]["hardware"]["device"][2]["connectable"] = []
+    with pytest.raises(CollectionFailure, match="invalid_response"):
+        normalize("vm-1", "9.1.1.0", r, 1000)
+
+
+def target_records() -> dict[str, Any]:
+    return {
         "image_schema": {"properties": {"disk_format": {"enum": ["raw", "qcow2"]}}},
         "image_import": {"import-methods": {"value": ["glance-direct"]}},
         "flavors": {"flavors": [{"id": "small", "vcpus": 2, "ram": 4096, "disk": 0}]},
@@ -126,6 +157,12 @@ def test_target_formats_and_import_routes_are_observed_not_inferred() -> None:
         "compute_version": {"min_version": "2.1", "version": "2.100"},
         "volume_version": {"min_version": "3.0", "version": "3.75"},
     }
+
+
+def test_target_formats_and_import_routes_are_observed_not_inferred() -> None:
+    from inventory_worker.infrastructure.openstack_capabilities import target_profile
+
+    r = target_records()
     p = target_profile("project-1", r, 1000)
     assert p["disk_formats"] == ["qcow2", "raw"]
     assert "vmdk" not in p["disk_formats"]
@@ -135,4 +172,54 @@ def test_target_formats_and_import_routes_are_observed_not_inferred() -> None:
     assert target_profile("project-1", r, 1000)["holds"] == ["image_formats_unobserved"]
     r["flavors"]["flavors_links"] = [{"rel": "next", "href": "https://untrusted.invalid"}]
     with pytest.raises(CollectionFailure):
+        target_profile("project-1", r, 1000)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        ("image_schema",),
+        ("image_schema", "properties"),
+        ("image_schema", "properties", "disk_format"),
+        ("image_import", "import-methods"),
+    ],
+)
+def test_malformed_openstack_capability_objects_are_rejected(path: tuple[str, ...]) -> None:
+    from inventory_worker.infrastructure.openstack_capabilities import target_profile
+
+    r = target_records()
+    parent = r
+    for key in path[:-1]:
+        parent = parent[key]
+    parent[path[-1]] = None
+    with pytest.raises(CollectionFailure, match="invalid_response"):
+        target_profile("project-1", r, 1000)
+
+
+@pytest.mark.parametrize(
+    ("field", "collection", "identity"),
+    [
+        ("flavors", "flavors", "id"),
+        ("volume_types", "volume_types", "id"),
+        ("network_extensions", "extensions", "alias"),
+    ],
+)
+@pytest.mark.parametrize("fault", ["duplicate", "missing", "malformed"])
+def test_ambiguous_openstack_capability_identities_are_rejected(
+    field: str,
+    collection: str,
+    identity: str,
+    fault: str,
+) -> None:
+    from inventory_worker.infrastructure.openstack_capabilities import target_profile
+
+    r = target_records()
+    rows = r[field][collection]
+    if fault == "duplicate":
+        rows *= 2
+    elif fault == "missing":
+        rows[0].pop(identity)
+    else:
+        rows[0][identity] = []
+    with pytest.raises(CollectionFailure, match="invalid_response"):
         target_profile("project-1", r, 1000)

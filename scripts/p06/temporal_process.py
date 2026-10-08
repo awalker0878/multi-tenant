@@ -1,5 +1,7 @@
 """Process-level witnesses around the shipped dispatcher, workflows and authority clients."""
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
+import faulthandler
 import json
 import os
 from pathlib import Path
@@ -37,10 +39,14 @@ async def main():
         c=await client()
         if mode=='replay':
             histories=[]
-            for workflow in json.loads(Path(sys.argv[2]).read_text()):
-                history=await c.get_workflow_handle(workflow).fetch_history()
-                await Replayer(workflows=[SimulationJourney]).replay_workflow(history)
-                histories.append({'workflow_id':workflow,'events':len(history.events),'replay':'PASS'})
+            # The SDK does not shut down implicit replay executors. Own one pool
+            # for the campaign and join it before publishing successful results.
+            with ThreadPoolExecutor() as executor:
+                replayer=Replayer(workflows=[SimulationJourney],workflow_task_executor=executor)
+                for workflow in json.loads(Path(sys.argv[2]).read_text()):
+                    history=await c.get_workflow_handle(workflow).fetch_history()
+                    await replayer.replay_workflow(history)
+                    histories.append({'workflow_id':workflow,'events':len(history.events),'replay':'PASS'})
             Path(sys.argv[3]).write_text(json.dumps(histories,indent=2)+'\n');return
         if mode=='dispatch_lost':
             class LostStart:
@@ -65,4 +71,6 @@ async def main():
         return
     raise ValueError('unknown witness')
 
-asyncio.run(main())
+if __name__=='__main__':
+    faulthandler.enable()
+    asyncio.run(main())

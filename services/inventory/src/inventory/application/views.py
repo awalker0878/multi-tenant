@@ -35,13 +35,18 @@ class InventoryViews:
             if operation == "policies":
                 if actor.action != "inventory.admin":
                     raise Rejected("action_denied", 403)
-                return {
-                    "items": [
-                        p.public()
+                policies = sorted(
+                    (
+                        p
                         for p in d.policies.load().values()
                         if (p.tenant, p.site, p.owner) == (actor.tenant, actor.site, actor.actor)
-                    ][:50],
-                    "next_cursor": None,
+                        and p.policy_id > after
+                    ),
+                    key=lambda p: p.policy_id,
+                )
+                return {
+                    "items": [p.public() for p in policies[:50]],
+                    "next_cursor": policies[49].policy_id if len(policies) > 50 else None,
                 }
             if operation == "endpoints":
                 rows = tx.all(

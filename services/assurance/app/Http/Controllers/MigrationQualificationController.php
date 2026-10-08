@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Infrastructure\Foundation\MountedSecret;
+use App\Application\Foundation\Contracts\SecretReader;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -12,7 +12,7 @@ use Throwable;
 /** Service-only current support read; requests cannot publish qualification. */
 final class MigrationQualificationController
 {
-    public function __invoke(Request $request, string $tenant, MountedSecret $secrets): JsonResponse
+    public function __invoke(Request $request, string $tenant, SecretReader $secrets): JsonResponse
     {
         $token = $secrets->read(config('planning.credential_file'));
         $outgoing = $secrets->read(config('planning.governance_credential_file'));
@@ -33,7 +33,7 @@ final class MigrationQualificationController
         $path = config('planning.migration_support_registry_file');
         $records = [];
         if ($path !== null) {
-            abort_unless(is_string($path) && str_starts_with($path, '/') && ! is_link($path) && is_readable($path), 503);
+            abort_unless(is_string($path) && str_starts_with($path, '/') && ! is_link($path) && is_file($path) && is_readable($path), 503);
             for ($parent = dirname($path); $parent !== '/'; $parent = dirname($parent)) {
                 abort_if(is_link($parent), 503);
             }
@@ -42,9 +42,23 @@ final class MigrationQualificationController
             try {
                 $info = fstat($handle);
                 abort_unless(is_array($info) && ($info['mode'] & 0170000) === 0100000 && ($info['mode'] & 0022) === 0 && $info['size'] <= 2097152, 503);
-                $registry = json_decode(stream_get_contents($handle, 2097153) ?: '', true, 64, JSON_THROW_ON_ERROR);
+                $raw = stream_get_contents($handle, 2097153);
+                abort_unless(is_string($raw) && strlen($raw) <= 2097152, 503);
+                $registry = json_decode($raw, true, 64, JSON_THROW_ON_ERROR);
                 abort_unless(is_array($registry) && ($registry['schema_version'] ?? null) === 1 && is_array($registry['assignments'] ?? null) && count($registry['assignments']) <= 256, 503);
-                $matches = array_values(array_filter($registry['assignments'], static fn ($row): bool => is_array($row) && ($row['scope'] ?? null) == $input['scope'] && ($row['tranche_sha256'] ?? null) === $input['tranche_sha256'] && ($row['release_sha256'] ?? null) === $input['release_sha256']));
+                $expectedScope = $input['scope'];
+                ksort($expectedScope, SORT_STRING);
+                $matches = [];
+                foreach ($registry['assignments'] as $row) {
+                    if (! is_array($row) || ! is_array($row['scope'] ?? null)) {
+                        continue;
+                    }
+                    $scope = $row['scope'];
+                    ksort($scope, SORT_STRING);
+                    if ($scope === $expectedScope && ($row['tranche_sha256'] ?? null) === $input['tranche_sha256'] && ($row['release_sha256'] ?? null) === $input['release_sha256']) {
+                        $matches[] = $row;
+                    }
+                }
                 abort_if(count($matches) > 1, 503, 'migration_support_conflict');
                 $records = $matches[0]['records'] ?? [];
                 abort_unless(is_array($records) && array_is_list($records) && count($records) <= 512, 503);

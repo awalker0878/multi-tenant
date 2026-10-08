@@ -121,12 +121,15 @@ class PostgresNativeJournal:
         for row in rows:
             facts = row["facts"]
             key = facts["resource_key"]
-            if key in result or facts["kind"] not in {"server", "port", "volume", "image"}:
+            if key in result or facts["kind"] not in {"server", "port", "volume", "image", "vm"}:
                 raise NativeHeld("ambiguous_native_receipt")
             value = facts["native_id"]
             if (
-                facts["kind"] == "server"
-                and re.fullmatch(r"datacenter-[1-9][0-9]{0,18}", binding.project_id)
+                (
+                    facts["kind"] == "vm"
+                    or facts["kind"] == "server"
+                    and re.fullmatch(r"datacenter-[1-9][0-9]{0,18}", binding.project_id)
+                )
                 and isinstance(value, str)
                 and re.fullmatch(r"vm-[1-9][0-9]{0,18}", value)
             ):

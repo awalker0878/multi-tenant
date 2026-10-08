@@ -182,3 +182,31 @@ def test_foreign_prism_central_response_cannot_change_authority() -> None:
         pytest.raises(CollectionFailure),
     ):
         collect_ahv({"native_scope": uid()}, stream, 100, lambda: None)
+
+
+@pytest.mark.parametrize("fault", ["cluster_config", "pc_config", "hypervisors", "hypervisor_type"])
+def test_malformed_ahv_installation_objects_are_rejected(fault: str) -> None:
+    stream = {
+        "cluster_id": uid(),
+        "prism_central_id": uid(),
+        "credential_file": "/secret",
+        "shared_resource_ids": [],
+    }
+
+    def read(connection: Any, path: str, headers: Any) -> dict[str, Any]:
+        if "?$limit=" in path:
+            return {"data": [], "metadata": {"totalAvailableResults": 0}}
+        config: Any = {}
+        cluster = "/clusters/" in path
+        if (cluster and fault == "cluster_config") or (not cluster and fault == "pc_config"):
+            config = None
+        elif cluster and fault in {"hypervisors", "hypervisor_type"}:
+            config = {"hypervisorTypes": None if fault == "hypervisors" else "AHV"}
+        return {"data": {"extId": path.rsplit("/", 1)[-1], "config": config}}
+
+    with (
+        patch("inventory_worker.infrastructure.ahv_profile.exchange", side_effect=read),
+        patch("inventory_worker.infrastructure.ahv_profile.secret", return_value="secret"),
+        pytest.raises(CollectionFailure, match="invalid_response"),
+    ):
+        collect_ahv({"native_scope": uid()}, stream, 100, lambda: None)

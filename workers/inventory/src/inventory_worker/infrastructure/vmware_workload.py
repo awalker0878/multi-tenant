@@ -20,15 +20,23 @@ def ref(value: Any, kind: str) -> str:
 
 
 def normalize(vm: str, release: str, records: dict[str, Any], observed_at: int) -> dict[str, Any]:
+    if any(
+        not isinstance(records.get(key), dict)
+        for key in ("config", "runtime", "guest", "content", "capability", "host_capability")
+    ):
+        raise CollectionFailure("invalid_response")
     config, runtime, guest = records["config"], records["runtime"], records["guest"]
     about = records["content"].get("about", {})
+    hardware = config.get("hardware", {})
+    boot = config.get("bootOptions", {})
+    if any(not isinstance(value, dict) for value in (about, hardware, boot)):
+        raise CollectionFailure("invalid_response")
     holds: list[str] = []
     for key in ("uuid", "instanceUuid", "guestId", "firmware"):
         if not isinstance(config.get(key), str) or not config[key]:
             holds.append("source_" + key + "_unknown")
     if not about.get("instanceUuid") or not about.get("version") or not about.get("apiVersion"):
         holds.append("vcenter_identity_or_version_unknown")
-    hardware = config.get("hardware", {})
     if any(type(hardware.get(k)) is not int or hardware[k] <= 0 for k in ("numCPU", "memoryMB")):
         holds.append("compute_shape_unknown")
     rows = hardware.get("device")
@@ -65,14 +73,14 @@ def normalize(vm: str, release: str, records: dict[str, Any], observed_at: int) 
                 backing = backing.get("parent")
             if not chain or any(
                 c["type"]
-                not in {
+                not in (
                     "VirtualDiskFlatVer2BackingInfo",
                     "VirtualDiskSparseVer2BackingInfo",
                     "VirtualDiskSeSparseBackingInfo",
-                }
+                )
                 or c["mode"] != "persistent"
                 or c["encrypted"]
-                or c["sharing"] not in {None, "sharingNone"}
+                or c["sharing"] not in (None, "sharingNone")
                 for c in chain
             ):
                 holds.append("disk_backing_requires_qualification")
@@ -89,6 +97,9 @@ def normalize(vm: str, release: str, records: dict[str, Any], observed_at: int) 
                 }
             )
         elif "macAddress" in d or "Ethernet" in kind or "Vmxnet" in kind or "E1000" in kind:
+            connectable = d.get("connectable", {})
+            if not isinstance(connectable, dict):
+                raise CollectionFailure("invalid_response")
             nics.append(
                 {
                     "key": d["key"],
@@ -96,7 +107,7 @@ def normalize(vm: str, release: str, records: dict[str, Any], observed_at: int) 
                     "mac": d.get("macAddress"),
                     "backing_sha256": fingerprint(d.get("backing")),
                     "connectable": {
-                        k: d.get("connectable", {}).get(k)
+                        k: connectable.get(k)
                         for k in ("connected", "startConnected", "allowGuestControl")
                     },
                 }
@@ -117,7 +128,10 @@ def normalize(vm: str, release: str, records: dict[str, Any], observed_at: int) 
     if not disks:
         holds.append("disk_inventory_empty")
     controller_keys = {c["key"] for c in controllers}
-    if any(d["controller_key"] not in controller_keys for d in disks):
+    if any(
+        type(d["controller_key"]) is not int or d["controller_key"] not in controller_keys
+        for d in disks
+    ):
         holds.append("disk_controller_unknown")
     if config.get("keyId") is not None:
         holds.append("encryption_key_custody_required")
@@ -125,11 +139,11 @@ def normalize(vm: str, release: str, records: dict[str, Any], observed_at: int) 
         holds.append("snapshot_configuration_unsupported")
     if records["host_capability"].get("cloneFromSnapshotSupported") is not True:
         holds.append("exact_snapshot_clone_unsupported")
-    if config.get("bootOptions", {}).get("efiSecureBootEnabled") is True:
+    if boot.get("efiSecureBootEnabled") is True:
         holds.append("secure_boot_requires_separate_qualification")
-    if config.get("firmware") not in {"bios", "efi"}:
+    if config.get("firmware") not in ("bios", "efi"):
         holds.append("firmware_unknown")
-    if runtime.get("powerState") not in {"poweredOff", "poweredOn"}:
+    if runtime.get("powerState") not in ("poweredOff", "poweredOn"):
         holds.append("source_power_state_unsupported")
     return {
         "schema_version": 1,
@@ -203,6 +217,11 @@ class VmwareWorkloadDiscovery:
             field: self.read("VirtualMachine", vm, field)
             for field in ("config", "runtime", "guest", "capability", "snapshot")
         }
+        if any(
+            not isinstance(records[field], dict)
+            for field in ("config", "runtime", "guest", "capability")
+        ):
+            raise CollectionFailure("invalid_response")
         records["content"] = self.read("ServiceInstance", "ServiceInstance", "content")
         host = ref(records["runtime"].get("host"), "HostSystem")
         records["host_capability"] = self.read("HostSystem", host, "capability")

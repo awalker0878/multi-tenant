@@ -22,13 +22,16 @@ from lifecycle_worker.application.native import NativeHeld, decode, digest, sha2
 from lifecycle_worker.infrastructure.native_files import protected_read, sync_directory
 
 
-def file_digest(path: Path, maximum: int, current: Callable[[], None]) -> dict[str, Any]:
+def file_digest(
+    path: Path, maximum: int, current: Callable[[], None], *, allow_empty: bool = False
+) -> dict[str, Any]:
     if not path.is_absolute() or any(p.is_symlink() for p in (path, *path.parents)):
         raise NativeHeld("conversion_path_not_owned")
     fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
     with os.fdopen(fd, "rb") as stream:
         info = os.fstat(stream.fileno())
-        if not stat.S_ISREG(info.st_mode) or not 0 < info.st_size <= maximum:
+        minimum = 0 if allow_empty else 1
+        if not stat.S_ISREG(info.st_mode) or not minimum <= info.st_size <= maximum:
             raise NativeHeld("conversion_file_bound")
         hashes = {name: hashlib.new(name) for name in ("sha256", "sha512")}
         size = 0
@@ -63,7 +66,7 @@ def rootfs_digest(root: Path, current: Callable[[], None]) -> str:
             if stat.S_ISLNK(info.st_mode):
                 payload: Any = {"link": os.readlink(p)}
             elif stat.S_ISREG(info.st_mode):
-                payload = file_digest(p, 2**31, current)["sha256"]
+                payload = file_digest(p, 2**31, current, allow_empty=True)["sha256"]
             elif stat.S_ISDIR(info.st_mode):
                 payload = "directory"
             else:

@@ -21,11 +21,23 @@ def target_profile(project_id: str, records: dict[str, Any], observed_at: int) -
         "compute_version",
         "volume_version",
     }
-    if set(records) != required or not isinstance(project_id, str) or not project_id:
+    if (
+        set(records) != required
+        or any(not isinstance(record, dict) for record in records.values())
+        or not isinstance(project_id, str)
+        or not project_id
+    ):
         raise CollectionFailure("invalid_response")
     schema = records["image_schema"]
-    methods = records["image_import"].get("import-methods", {}).get("value")
-    formats = schema.get("properties", {}).get("disk_format", {}).get("enum")
+    properties = schema.get("properties", {})
+    import_methods = records["image_import"].get("import-methods", {})
+    if not isinstance(properties, dict) or not isinstance(import_methods, dict):
+        raise CollectionFailure("invalid_response")
+    disk_format = properties.get("disk_format", {})
+    if not isinstance(disk_format, dict):
+        raise CollectionFailure("invalid_response")
+    methods = import_methods.get("value")
+    formats = disk_format.get("enum")
     holds = []
     if not isinstance(formats, list) or not formats or not all(isinstance(v, str) for v in formats):
         formats = []
@@ -50,6 +62,12 @@ def target_profile(project_id: str, records: dict[str, Any], observed_at: int) -
             or not all(isinstance(v, dict) for v in rows)
         ):
             raise CollectionFailure("invalid_response")
+    for rows, identity in ((flavors, "id"), (types, "id"), (extensions, "alias")):
+        identities = [row.get(identity) for row in rows]
+        if any(not isinstance(value, str) or not value for value in identities) or len(
+            set(identities)
+        ) != len(identities):
+            raise CollectionFailure("invalid_response")
     # These services can hide deployment choices behind policy or custom backends.
     # The API advertises what was observed, never an assumed firmware/driver tuple.
     return {
@@ -73,7 +91,7 @@ def target_profile(project_id: str, records: dict[str, Any], observed_at: int) -
             }
             for row in types
         ],
-        "network_extensions": sorted(str(row["alias"]) for row in extensions if "alias" in row),
+        "network_extensions": sorted(row["alias"] for row in extensions),
         "compute_version": {
             k: records["compute_version"].get(k) for k in ("min_version", "version")
         },

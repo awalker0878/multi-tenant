@@ -32,9 +32,7 @@ def test_ahv_destination_roundtrip_binds_profiles_and_revokes_with_enrollment(
     )
     source = collected(c, True)
     fixture = json.loads(
-        (
-            Path(__file__).parents[3] / "contracts/fixtures/inventory/ahv-destination-v1.json"
-        ).read_text()
+        (Path(__file__).with_name("fixtures") / "ahv-destination-v1.json").read_text()
     )
     target = fixture["target"]
     if pages == 2:

@@ -87,3 +87,18 @@ API-contract and observation files with the canonical native operation plan. See
 required file arguments. It has no native effect path and cannot issue apply/retry
 authority; current owner authentication, actual tool bytes and native fencing
 remain responsibilities of the selected native integration.
+
+## Native recovery and campaign boundaries
+
+An independently reconciled native operation closes its grant: the original worker
+cannot reuse that grant while later stages run. Late activity failures preserve an
+independently accepted terminal result. Successful reconciliation of a held stage
+restores its campaign member to admitted only while the native journey is still
+running; an explicit stop remains effective and retained allocations stay held.
+
+Campaign effect boundaries recheck current pool capacity against all unreleased
+allocations as well as pause and observation expiry. Reduced capacity blocks a
+prepared grant without treating the allocation as released. Lifecycle API and
+owner JSON also reject nonfinite numbers instead of interpreting them as null.
+The service tests cover these controls; the durable transaction regressions require
+the disposable PostgreSQL fixture selected with `P05_POSTGRES_BIN`.

@@ -10,21 +10,31 @@ const props = defineProps<{ tenantId: string; siteId: string; applicationId: str
 const current = ref(props.support);
 const unavailable = ref(false);
 const url = `/tenants/${props.tenantId}/applications/${props.applicationId}/environments/${props.environment}/planning/migration-support/${props.siteId}`;
-const controller = new AbortController();
+let active = true, running = false;
+let controller: AbortController | undefined;
 let timer: ReturnType<typeof setTimeout> | undefined;
 async function refresh() {
+  if (!active || running) return;
+  if (document.hidden) { timer = setTimeout(refresh, 15_000); return; }
+  clearTimeout(timer); running = true;
+  const request = new AbortController(); controller = request;
+  const deadline = setTimeout(() => request.abort(), 12_000);
   try {
-    const response = await fetch(url + '/status', { credentials: 'same-origin', cache: 'no-store', redirect: 'manual', headers: { Accept: 'application/json' }, signal: controller.signal });
-    if (response.type === 'opaqueredirect' || [401, 403, 404].includes(response.status)) { controller.abort(); router.clearHistory(); window.location.replace('/account'); return; }
-    if (!response.ok) throw new Error();
+    const response = await fetch(url + '/status', { credentials: 'same-origin', cache: 'no-store', redirect: 'manual', headers: { Accept: 'application/json' }, signal: request.signal });
+    if (!active || request.signal.aborted) return;
+    if (response.type === 'opaqueredirect' || [401, 403, 404].includes(response.status)) { active = false; router.clearHistory(); window.location.replace('/account'); return; }
+    if (!response.ok || !response.headers.get('Content-Type')?.includes('application/json')) throw new Error();
     const data = await response.json() as { available: boolean; support: Support };
+    if (!active || request.signal.aborted) return;
     if (!data.available || data.support.directions.length !== 9) throw new Error();
     current.value = data.support; unavailable.value = false;
-  } catch { if (!controller.signal.aborted) unavailable.value = true; }
-  finally { if (!controller.signal.aborted) timer = setTimeout(refresh, 15_000); }
+  } catch { if (active) unavailable.value = true; }
+  finally { clearTimeout(deadline); running = false; if (active) timer = setTimeout(refresh, 15_000); }
 }
-onMounted(() => { timer = setTimeout(refresh, 15_000); });
-onUnmounted(() => { controller.abort(); clearTimeout(timer); });
+function visible() { if (!document.hidden) void refresh(); }
+function hide() { unavailable.value = true; controller?.abort(); }
+onMounted(() => { timer = setTimeout(refresh, 15_000); document.addEventListener('visibilitychange', visible); window.addEventListener('pagehide', hide); window.addEventListener('pageshow', visible); });
+onUnmounted(() => { active = false; controller?.abort(); clearTimeout(timer); document.removeEventListener('visibilitychange', visible); window.removeEventListener('pagehide', hide); window.removeEventListener('pageshow', visible); });
 const versions = (platform: Platform) => Object.entries(platform.versions).map(([key, value]) => `${key}: ${value}`).join('; ');
 </script>
 

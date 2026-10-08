@@ -29,7 +29,9 @@ def group_body(fleet: MigrationFleet, c: Campaign, target: str) -> dict[str, Any
         "environment_id": uid(),
         "target_profile_id": target,
         "format": "qcow2",
-        "resource_ids": [v["resource_id"] for v in fleet.read(c.actor)["items"]],
+        "resource_ids": [
+            v["resource_id"] for v in fleet.read(c.actor)["items"] if v["profile_id"] is not None
+        ],
     }
 
 
@@ -64,6 +66,24 @@ def test_each_vm_keeps_its_confirmed_review_and_bulk_preparations_are_exact(
     assert len(set(keys)) == len(keys)
     assert fleet.detail(c.actor, saved["id"]) == detail
     assert {m["preparation"]["review"]["revision"] for m in detail["members"]} == {1, 2}
+
+
+def test_destination_inventory_remains_visible_without_a_source_profile(
+    campaign: Campaign,
+) -> None:
+    c = campaign
+    fleet, _, sources, target = setup(c)
+    items = fleet.read(c.actor)["items"]
+    assert len(items) == 3
+    assert {item["profile_id"] for item in items if item["profile_id"]} == set(sources)
+    unprofiled = next(item for item in items if item["profile_id"] is None)
+    assert unprofiled["endpoint_id"] == c.endpoint
+    assert "source_profile_required" in unprofiled["holds"]
+    body = group_body(fleet, c, target) | {"resource_ids": [unprofiled["resource_id"]]}
+    saved = fleet.command(c.actor, "migration_group_save", body, uid())
+    member = fleet.detail(c.actor, saved["id"])["members"][0]
+    assert member["preparation"] is None
+    assert "source_profile_required" in member["holds"]
 
 
 def test_group_replay_revision_and_cross_tenant_selection_are_enforced(campaign: Campaign) -> None:

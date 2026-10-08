@@ -1,15 +1,14 @@
 // Isolated E2 UI harness. No Governance, Inventory or native authority is issued.
 import '../../resources/css/app.css';
-import { createApp, h } from 'vue';
+import { createApp, h, type DefineComponent } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
-import OperatorInputs from '../../resources/js/pages/inventory/OperatorInputs.vue';
-import Fleet from '../../resources/js/pages/inventory/Fleet.vue';
-import Migration from '../../resources/js/pages/inventory/Migration.vue';
-import NativeJob from '../../resources/js/pages/jobs/NativeJob.vue';
-import Campaigns from '../../resources/js/pages/jobs/Campaigns.vue';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 
 void createInertiaApp({
   page: JSON.parse(document.getElementById('app')!.dataset.page!),
-  resolve: name => name === 'jobs/NativeJob' ? NativeJob : name === 'inventory/OperatorInputs' ? OperatorInputs : name === 'jobs/Campaigns' ? Campaigns : name === 'inventory/Fleet' ? Fleet : Migration,
+  resolve: name => resolvePageComponent<DefineComponent>(
+    `../../resources/js/pages/${name}.vue`,
+    import.meta.glob<DefineComponent>('../../resources/js/pages/**/*.vue'),
+  ),
   setup({ el, App, props, plugin }) { createApp({ render: () => h(App, props) }).use(plugin).mount(el); },
 });

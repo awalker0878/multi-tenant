@@ -28,6 +28,7 @@ for name in (
     "lifecycle-native-jobs-v1.1.json",
     "worker-migration-effect-v2.1.json",
     "worker-migration-method-v2.json",
+    "planning-migration-v1.5.json",
 ):
     spec = json.loads((ROOT / "contracts/openapi" / name).read_text())
     validate_spec(spec)

@@ -47,11 +47,16 @@ final class PlanningInputAuthority implements AuthorityContract
                 throw new HttpException(403, 'source_access_denied');
             }
             $body = $response->json();
+            $returnedScope = is_array($body) ? ($body['scope'] ?? null) : null;
+            if (is_array($returnedScope)) {
+                ksort($returnedScope, SORT_STRING);
+            }
+            ksort($scope, SORT_STRING);
             if ($response->status() !== 200 || strlen($response->body()) > 16384 || ! is_array($body)
                 || ($body['allowed'] ?? null) !== true || ($body['audience'] ?? null) !== 'planning'
                 || ($body['source_owner'] ?? null) !== 'catalogue' || ($body['source_use'] ?? null) !== 'planning_read_only'
                 || ($body['tenant_id'] ?? null) !== $tenant || ($body['action'] ?? null) !== $actions[0]
-                || ($body['scope'] ?? null) != $scope || ($body['authority_use'] ?? null) !== 'request_bound'
+                || $returnedScope !== $scope || ($body['authority_use'] ?? null) !== 'request_bound'
                 || Carbon::parse($body['expires_at'])->lessThanOrEqualTo(now()) || Carbon::parse($body['expires_at'])->greaterThan(now()->addSeconds(65))
                 || abs(Carbon::parse($body['evaluated_at'])->diffInSeconds(now())) > 5) {
                 throw new HttpException(503, 'source_authority_unavailable');

@@ -1,0 +1,209 @@
+{
+  "evidence_level": "E2",
+  "native_platforms_tested": [],
+  "source": {
+    "schema_version": 1,
+    "profile_type": "SourceWorkloadProfile",
+    "platform": "vmware",
+    "vm_id": "vm-1",
+    "instance_uuid": "0c4fc434-a2f4-4018-9c10-26412da29ec2",
+    "bios_uuid": "f3a4418f-e7dc-4d45-85df-279d487f695d",
+    "vcenter_uuid": "79b0175d-d4d7-4ab1-8b20-c73513eb3cbc",
+    "vcenter_version": "9.1.1",
+    "api_version": "9.1.1.0",
+    "native_api_version": "9.1.1.0",
+    "config_sha256": "d3e3200ea7218bee36b8adfe9ab8eda05c3172f8c50b79b4a172927ef581db50",
+    "observations_sha256": "f8c1723f1d34d92d7cb9925183ff018f3bc976213c3c7cf5008b793d9c13d3d3",
+    "observed_at": 1000,
+    "power_state": "poweredOn",
+    "guest_id": "otherLinux64Guest",
+    "tools_status": "guestToolsRunning",
+    "tools_version": "123",
+    "firmware": "efi",
+    "cpu": 2,
+    "memory_mb": 4096,
+    "disks": [
+      {
+        "key": 2000,
+        "capacity_bytes": 1048576,
+        "controller_key": 1000,
+        "unit_number": 0,
+        "backing_chain": [
+          {
+            "type": "VirtualDiskFlatVer2BackingInfo",
+            "mode": "persistent",
+            "identity_sha256": "16aa99dee9363d3129e9d699fb0e703fd96fbadfa611fe11030c19261210d4fb",
+            "encrypted": false,
+            "datastore": null,
+            "sharing": null
+          }
+        ],
+        "native_sha256": "e18256f0e8b357ba37916a5c22e3f07a14371ed2a265694dd0824792dd3bc039"
+      }
+    ],
+    "nics": [
+      {
+        "key": 4000,
+        "model": "VirtualVmxnet3",
+        "mac": "00:50:56:00:00:01",
+        "backing_sha256": "3b6baa7f3203f0fd42b5b6ecdcdbc5265f6bd87d19feb71b5c02007334251760",
+        "connectable": {
+          "connected": null,
+          "startConnected": null,
+          "allowGuestControl": null
+        }
+      }
+    ],
+    "controllers": [
+      {
+        "key": 1000,
+        "model": "VirtualLsiLogicController",
+        "bus": 0,
+        "sharing": null
+      }
+    ],
+    "snapshot_tree_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "key_custody_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "required_owner_inputs": [
+      "datasets_and_dependencies",
+      "application_consistency",
+      "guest_transformation_profile",
+      "outage_and_data_objectives"
+    ],
+    "holds": [],
+    "native_qualification": "not_established"
+  },
+  "target": {
+    "schema_version": 3,
+    "profile_type": "TargetCapabilityProfile",
+    "platform": "vmware",
+    "project_id": "datacenter-1",
+    "vcenter_uuid": "79b0175d-d4d7-4ab1-8b20-c73513eb3cbc",
+    "api_version": "9.1.1.0",
+    "installed": {
+      "version": "9.1.1",
+      "build": "synthetic",
+      "instanceUuid": "79b0175d-d4d7-4ab1-8b20-c73513eb3cbc",
+      "apiVersion": "9.1.1.0"
+    },
+    "observed_at": 1000,
+    "observations_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "inventory_complete": true,
+    "disk_formats": [
+      "vmdk"
+    ],
+    "image_import_methods": [
+      "vi-json-nfc"
+    ],
+    "required_capability_evidence": [],
+    "holds": [],
+    "native_qualification": "not_established",
+    "folders": [
+      {
+        "folder": "group-v1",
+        "name": "folder primary",
+        "native_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "type": "VIRTUAL_MACHINE"
+      }
+    ],
+    "resource_pools": [
+      {
+        "resource_pool": "resgroup-1",
+        "name": "resource_pool primary",
+        "native_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "type": null
+      }
+    ],
+    "hosts": [
+      {
+        "host": "host-1",
+        "name": "host primary",
+        "native_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "type": null
+      }
+    ],
+    "datastores": [
+      {
+        "datastore": "datastore-1",
+        "name": "datastore primary",
+        "native_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "type": null
+      }
+    ],
+    "networks": [
+      {
+        "network": "network-1",
+        "name": "network primary",
+        "native_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "type": null
+      },
+      {
+        "network": "network-2",
+        "name": "Production",
+        "native_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "type": null
+      }
+    ]
+  },
+  "review": {
+    "source_profile_id": "00000000-0000-4000-8000-000000000001",
+    "target_profile_id": "00000000-0000-4000-8000-000000000002",
+    "method": "VM_COLD_EXPORT",
+    "datasets": [
+      {
+        "id": "3c2aec23-5dfd-4c7a-9295-d1ddc47c2fe0",
+        "name": "Complete boot and application disk",
+        "disk_keys": [
+          2000
+        ],
+        "mounts": [
+          "/"
+        ],
+        "consistency_group": "application-1",
+        "validation_reference": "owner-check-1"
+      }
+    ],
+    "owner_inputs": {
+      "application_consistency": "owner-protocol-reference",
+      "dependencies": "owner-protocol-reference",
+      "guest_transformation_profile": "owner-protocol-reference",
+      "delta_protocol": "",
+      "recovery_protocol": "owner-protocol-reference",
+      "service_and_policy_validation": "owner-protocol-reference",
+      "writer_fencing": "owner-protocol-reference",
+      "retention_and_cleanup": "owner-protocol-reference"
+    },
+    "objectives": {
+      "owner_id": "72da13b9-4838-45fb-880e-5c1065b3e1a0",
+      "acceptance_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "max_outage_seconds": 3600,
+      "max_data_loss_bytes": 0
+    },
+    "overrides": [],
+    "destination": {
+      "platform": "vmware",
+      "project_id": "datacenter-1",
+      "vcenter_uuid": "79b0175d-d4d7-4ab1-8b20-c73513eb3cbc",
+      "folder_id": "group-v1",
+      "resource_pool_id": "resgroup-1",
+      "host_id": "host-1",
+      "datastore_id": "datastore-1",
+      "guest_id": "rhel9_64Guest",
+      "hardware_version": "vmx-21",
+      "firmware": "efi",
+      "disks": [
+        {
+          "source_key": 2000,
+          "index": 0
+        }
+      ],
+      "nics": [
+        {
+          "source_key": 4000,
+          "quarantine_network_id": "network-1",
+          "production_network_id": "network-2"
+        }
+      ]
+    }
+  }
+}

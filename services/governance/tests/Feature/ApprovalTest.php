@@ -114,6 +114,18 @@ it('expires approval authoritatively and records the transition once', function 
     expect(DB::table('app.governance_audit')->where('event', 'governance.approval.expired')->count())->toBe(1);
 });
 
+it('refuses a decision at the exact approval deadline', function (): void {
+    $deadline = now()->addMinute()->startOfSecond();
+    $this->input['expires_at'] = $deadline->toIso8601String();
+    $id = requestApproval($this);
+    $this->travelTo($deadline);
+
+    tenantCommand($this, $this->path.'/'.$id.'/approve', ['revision' => 1, 'reason' => 'Elapsed deadline'], $this->reviewer)
+        ->assertStatus(409)->assertJsonPath('error', 'approval_expired');
+    expect(DB::table('app.approvals')->where('id', $id)->value('state'))->toBe('requested')
+        ->and(DB::table('app.governance_audit')->where('event', 'governance.approval.approved')->count())->toBe(0);
+});
+
 it('requires fresh authority and cannot resurrect an approval after membership regrant', function (): void {
     $id = approvePlan($this);
     tenantMember($this, $this->tenant, 'reviewer', 'reviewer', [], 1, 'revoked');
@@ -264,3 +276,26 @@ it('keeps operational approval consent separate from simulation and native write
     }
     expect(fn () => $action->native($this->tenant, $input))->toThrow(IdentityDenied::class);
 })->with(['digest', 'expiry', 'revoked', 'disabled', 'operator', 'reviewer', 'author']);
+
+it('commits approval expiry once when an execution boundary denies expired consent', function (string $lane): void {
+    $binding = $this->plan;
+    unset($binding['digest']);
+    $binding += ['content_digest' => str_repeat('a', 64), 'canonicalization' => 'p05-json-v1', 'lane' => $lane];
+    $this->plan = $binding + ['digest' => GovernanceLedger::digest($binding)];
+    app()->instance(ImmutablePlanSource::class, new SyntheticPlanSource($this->plan));
+    $this->input['plan_digest'] = $this->plan['digest'];
+    $this->input['expires_at'] = now()->addMinute()->toIso8601String();
+    $id = approvePlan($this);
+    $input = ['actor_id' => $this->operatorMember['actor_id'], 'approval_id' => $id, 'plan_id' => $this->plan['plan_id'],
+        'plan_revision' => 1, 'plan_digest' => $this->plan['digest']];
+    $this->travel(2)->minutes();
+    $action = app(InspectExecution::class);
+    $inspect = fn () => $lane === 'operational' ? $action->native($this->tenant, $input) : $action->handle($this->tenant, $input);
+
+    expect($inspect)->toThrow(IdentityDenied::class, 'execution_binding_denied');
+    expect($inspect)->toThrow(IdentityDenied::class, 'execution_binding_denied');
+    $approval = DB::table('app.approvals')->where('id', $id)->sole();
+    expect($approval->state)->toBe('expired')->and($approval->revision)->toBe(3)
+        ->and(DB::table('app.governance_audit')->where('resource_id', $id)->where('event', 'governance.approval.expired')->count())->toBe(1)
+        ->and(DB::table('app.governance_outbox')->where('event', 'governance.approval.expired')->count())->toBe(1);
+})->with(['isolated_campaign', 'operational']);

@@ -1,5 +1,21 @@
 import { test, expect } from '@playwright/test';
 const route = '/tenants/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/inventory/sites/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb/operator-inputs';
+test('rechecking evidence refreshes the input revision and its matching form values', async ({ page, request }) => {
+  const record = { revision: 1, digest: 'a'.repeat(64), values: { source_writer_ref: 'vault:site/original' }, configuration_digest: null, saved_at: Date.now() / 1000 };
+  await request.post('/__operators', { data: { reset: true, record } });
+  await page.goto(route);
+  await expect(page.getByLabel('Source platform execution account reference', { exact: true })).toHaveValue('vault:site/original');
+  await request.post('/__operators', { data: { record: { ...record, revision: 2, digest: 'b'.repeat(64), values: { source_writer_ref: 'vault:site/current' } } } });
+  await page.getByRole('button', { name: 'Recheck evidence' }).click();
+  await expect(page.getByLabel('Source platform execution account reference', { exact: true })).toHaveValue('vault:site/current');
+  await expect(page.getByText('Revision 2', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Save operator inputs', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('Operator inputs saved.');
+  const state = await (await request.get('/__operators')).json();
+  expect(state.posts[0].revision).toBe(2);
+  expect(state.posts[0].input.values.source_writer_ref).toBe('vault:site/current');
+});
+
 test('collects operator inputs, preserves zero and uncertain saves, and remains usable on mobile', async ({ page, request }, info) => {
   await request.post('/__operators', { data: { reset: true } });
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
@@ -39,6 +55,7 @@ test('collects operator inputs, preserves zero and uncertain saves, and remains 
   await page.getByRole('button', { name: /Operating targets/ }).click();
   await request.post('/__operators', { data: { evidence: { field_id: 'max_outage_seconds', state: 'verified', expires_at: Math.floor(Date.now()/1000) + 3 } } });
   await page.getByRole('button', { name: 'Recheck evidence' }).click();
+  await page.getByRole('button', { name: /Operating targets/ }).click();
   await expect(page.getByText('Evidence verified', { exact: true })).toBeVisible();
   await expect(page.getByText('Review expired', { exact: true })).toBeVisible({ timeout: 5000 });
   await page.setViewportSize({ width: 390, height: 844 });

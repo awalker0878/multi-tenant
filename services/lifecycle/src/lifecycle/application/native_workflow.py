@@ -374,6 +374,13 @@ class NativeWorkflow:
             row, operation = self.bound(tx, tenant, binding, worker)
             if row["state"] != "running" or binding["expires_at"] <= self.clock():
                 raise Rejected("native_grant_held", 423)
+            if tx.one(
+                "SELECT operation FROM app.native_observations WHERE operation=%s",
+                (operation["id"],),
+            ):
+                # Independent drain closes the grant as well as releasing its stage slot.
+                # A previous worker cannot keep writing while the next stage is running.
+                raise Rejected("native_grant_completed", 423)
             expected = (
                 {"preflight", "before_api_sequence", "during_api_sequence"}
                 if api_stage(row["plan"], binding["stage"])
@@ -479,6 +486,12 @@ class NativeWorkflow:
                     state == terminal,
                     self.clock(),
                 )
+                if state == "running":
+                    tx.execute(
+                        "UPDATE app.migration_members SET state='admitted',reason=NULL "
+                        "WHERE job=%s AND state='held'",
+                        (binding["job_id"],),
+                    )
                 self.project(tx, binding["job_id"], state)
                 return state
         except Exception:
@@ -495,6 +508,9 @@ class NativeWorkflow:
         with self.database.transaction() as tx:
             self.lock(tx)
             row = self.load(tx, tenant, job)
+            if row["state"] == terminal_for(row["plan"]):
+                # A late activity failure cannot overturn independently accepted completion.
+                return
             self.project(tx, job, "stopped" if row["stopped"] else "held", reason)
             tx.execute(
                 "UPDATE app.migration_members SET state='held',reason=%s WHERE job=%s",

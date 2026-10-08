@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
+from unittest.mock import MagicMock
 from uuid import uuid4
 
 import psycopg
@@ -19,6 +20,32 @@ from psycopg.rows import dict_row
 
 from lifecycle_worker.application.native import NativeBinding, NativeHeld, digest
 from lifecycle_worker.infrastructure.native_journal import PostgresNativeJournal
+
+
+@pytest.mark.parametrize("native_id", ["vm-42", "fa7d15b1-a4d1-41b3-9cd2-f89acb50f188"])
+def test_platform_lifecycle_receipts_use_native_vm_identities(native_id: str) -> None:
+    request = binding()
+    connection = MagicMock()
+    connection.__enter__.return_value = connection
+    connection.execute.return_value.fetchone.return_value = {"fingerprint": request.fingerprint}
+    connection.execute.return_value.fetchall.return_value = [
+        {"facts": {"resource_key": "vm", "kind": "vm", "native_id": native_id}}
+    ]
+    ledger = PostgresNativeJournal(lambda: connection)
+    assert ledger.resources(request) == {"vm": {"kind": "vm", "id": native_id}}
+
+
+@pytest.mark.parametrize("native_id", ["foreign/vm-42", "vm-0", "unbound"])
+def test_platform_lifecycle_receipts_reject_invalid_vm_identities(native_id: str) -> None:
+    request = binding()
+    connection = MagicMock()
+    connection.__enter__.return_value = connection
+    connection.execute.return_value.fetchone.return_value = {"fingerprint": request.fingerprint}
+    connection.execute.return_value.fetchall.return_value = [
+        {"facts": {"resource_key": "vm", "kind": "vm", "native_id": native_id}}
+    ]
+    with pytest.raises(NativeHeld, match="invalid_native_identity"):
+        PostgresNativeJournal(lambda: connection).resources(request)
 
 
 @pytest.fixture(scope="module")

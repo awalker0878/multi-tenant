@@ -8,7 +8,7 @@ from lifecycle_worker.application.native import (
     NativeHeld,
     NativeJournal,
     digest,
-    identity,
+    native_identity,
 )
 from lifecycle_worker.infrastructure.migration_custody import CaptureCustody
 from lifecycle_worker.infrastructure.native_image_archive import NativeImageSource
@@ -32,7 +32,7 @@ class CapturedImageObserver:
         current: Callable[[], None] = lambda: None,
         capture_recovery: Callable[[NativeBinding], dict[str, Any]] | None = None,
     ) -> None:
-        if identity(observer_id) == identity(writer_id):
+        if native_identity(observer_id) == native_identity(writer_id):
             raise NativeHeld("independent_native_identity_required")
         self.source, self.plan, self.custody, self.journal, self.clock = (
             source,

@@ -79,7 +79,9 @@ npx playwright test --config tests/browser-p08/playwright.config.ts
 The P08 browser suite renders actual Vue/Inertia pages with an isolated HTTP
 fixture. It covers migration review, inventory grouping, campaigns and operator
 inputs, including desktop/mobile layout, unchanged retry, stale edits and revoked
-access. Inventory's separate PostgreSQL tests cover owner persistence and tenant
+access. It also checks campaign dependency cleanup, destination selection after
+site edits, bounded support refreshes, and readiness evidence refreshes against
+the matching saved input revision. Inventory's separate PostgreSQL tests cover owner persistence and tenant
 isolation. Native platform qualification and independent receiving review require
 their original live observations; neither is inferred from the browser suite.
 

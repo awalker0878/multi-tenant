@@ -11,10 +11,12 @@ beforeEach(function (): void {
         $this->markTestSkipped('Real PostgreSQL concurrency campaign only.');
     }
     initializeSupportFixture($this);
+    $this->databasePasswordFile = tempnam(sys_get_temp_dir(), 'p02-concurrency-password-');
+    file_put_contents($this->databasePasswordFile, (string) getenv('P02_TEST_PASSWORD'));
     $this->supportProcess = function (array $request, string $operation, string $token, array $body): Process {
         $process = new Process([PHP_BINARY, '-c', php_ini_loaded_file(), base_path('../../scripts/p02/support_process.php')], base_path(), [
             'DB_HOST' => '127.0.0.1', 'DB_PORT' => getenv('P02_TEST_PORT') ?: '5432',
-            'DB_DATABASE' => 'p02_identity_test', 'DB_USERNAME' => 'postgres', 'DB_PASSWORD' => getenv('P02_TEST_PASSWORD'),
+            'DB_DATABASE' => 'p02_identity_test', 'DB_USERNAME' => 'postgres', 'DB_PASSWORD_FILE' => $this->databasePasswordFile,
             'DB_SSLMODE' => 'prefer', 'APP_ENV' => 'testing', 'APP_KEY' => config('app.key'),
         ]);
         $process->setInput(json_encode(['token' => $token, 'tenant' => $this->tenant, 'id' => $request['id'], 'operation' => $operation,
@@ -29,6 +31,9 @@ beforeEach(function (): void {
 afterEach(function (): void {
     if (isset($this->credentialFile)) {
         unlink($this->credentialFile);
+    }
+    if (isset($this->databasePasswordFile)) {
+        unlink($this->databasePasswordFile);
     }
 });
 

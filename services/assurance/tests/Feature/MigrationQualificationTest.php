@@ -45,3 +45,20 @@ it('binds every scope dimension and rejects ambiguous or writable custody', func
         unlink($file);
     }
 });
+
+it('requires typed migration scope values and accepts reordered keys', function (string $field): void {
+    $file = tempnam(sys_get_temp_dir(), 'migration-scope-');
+    config(['planning.migration_support_registry_file' => $file]);
+    $this->withToken(str_repeat('a', 64));
+    $record = $this->body + ['records' => [['level' => 'E3']]];
+    try {
+        $record['scope'] = array_reverse($record['scope'], true);
+        file_put_contents($file, json_encode(['schema_version' => 1, 'assignments' => [$record]], JSON_THROW_ON_ERROR));
+        $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('records.0.level', 'E3');
+        $record['scope'][$field] = true;
+        file_put_contents($file, json_encode(['schema_version' => 1, 'assignments' => [$record]], JSON_THROW_ON_ERROR));
+        $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('records', []);
+    } finally {
+        unlink($file);
+    }
+})->with(['tenant_id', 'site_id', 'resource_id', 'environment']);

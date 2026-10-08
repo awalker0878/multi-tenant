@@ -18,6 +18,7 @@ from lifecycle_worker.application.native import (
     identity,
 )
 from lifecycle_worker.application.platform_plan import achieved, request, validate
+from lifecycle_worker.infrastructure.ahv_tasks import task_identity
 from lifecycle_worker.infrastructure.extension_trust import ExtensionTrust
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection
@@ -195,12 +196,7 @@ class PlatformApi:
         reply = self.transport.send(plan["platform"], document, current_boundary)
         task_id = None
         if plan["platform"] == "ahv":
-            task_id = reply["document"].get("data", {}).get("extId")
-            if (
-                not isinstance(task_id, str)
-                or re.fullmatch(r"[A-Za-z0-9:_-]{1,160}", task_id) is None
-            ):
-                raise NativeHeld("ahv_task_identity_missing")
+            task_id = task_identity(reply["document"].get("data", {}).get("extId"))
         self.journal.record(
             binding,
             "request_accepted",
