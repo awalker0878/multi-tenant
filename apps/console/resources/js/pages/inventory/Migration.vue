@@ -78,7 +78,7 @@ watch(() => [form.review.source_profile_id, form.review.target_profile_id], (_, 
     form.review.destination = {
       platform: 'vmware', project_id: vmware.value.project_id, vcenter_uuid: vmware.value.vcenter_uuid,
       folder_id: '', resource_pool_id: '', host_id: '', datastore_id: '', guest_id: '', hardware_version: '',
-      firmware: source.value?.facts.profile_type === 'SourceWorkloadProfile' && source.value.facts.firmware === 'efi' ? 'efi' : 'bios',
+      firmware: source.value?.facts.profile_type === 'SourceWorkloadProfile' && ['efi', 'bios'].includes(source.value.facts.firmware ?? '') ? source.value.facts.firmware as 'efi' | 'bios' : '',
       disks: disks.value.map((d, index) => ({ source_key: d.key, index })),
       nics: (source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.nics : []).map(n => ({ source_key: n.key, quarantine_network_id: '', production_network_id: '' })),
     };
@@ -95,7 +95,7 @@ watch(() => [form.review.source_profile_id, form.review.target_profile_id], (_, 
   if (!ahv.value) { delete form.review.destination; return; }
   form.review.destination = {
     platform: 'ahv', project_id: ahv.value.project_id, prism_central_id: ahv.value.prism_central_id,
-    cluster_id: ahv.value.cluster_id, vpc_id: null, storage_container_id: '', category_ids: [], policy_ids: [], security_mappings: (sourceSecurityIds.value ?? []).map(source_id => ({ source_id, destination_id: '' })), firmware: source.value?.facts.profile_type === 'SourceWorkloadProfile' && source.value.facts.firmware === 'efi' ? 'efi' : 'bios',
+    cluster_id: ahv.value.cluster_id, vpc_id: null, storage_container_id: '', category_ids: [], policy_ids: [], security_mappings: (sourceSecurityIds.value ?? []).map(source_id => ({ source_id, destination_id: '' })), firmware: source.value?.facts.profile_type === 'SourceWorkloadProfile' && ['efi', 'bios'].includes(source.value.facts.firmware ?? '') ? source.value.facts.firmware as 'efi' | 'bios' : '',
     disks: disks.value.map((d, index) => ({ source_key: d.key, index })),
     nics: (source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.nics : []).map(n => ({ source_key: n.key, quarantine_subnet_id: '', production_subnet_id: '' })),
   };
@@ -209,7 +209,7 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
         <p v-if="form.review.destination.security_mappings.some(m => matchingOpenstackGroups(m.source_id).length === 0)" role="alert">Some source rules have no exact semantic equivalent in this destination inventory. No arbitrary security-group selection is offered. An independently qualified translation is required.</p>
       </section>
       <p v-if="sourceSecurityIds === null && source?.facts.profile_type === 'SourceWorkloadProfile' && source.facts.nics.length" role="alert">Source security intent is not discoverable from this profile. Destination policy choices are unavailable until source security evidence is collected.</p>
-      <VmwareDestination v-if="vmware && form.review.destination?.platform === 'vmware'" v-model="form.review.destination" :profile="vmware" :source-guest-id="source?.facts.profile_type === 'SourceWorkloadProfile' ? source.facts.guest_id : null" />
+      <VmwareDestination v-if="vmware && form.review.destination?.platform === 'vmware'" v-model="form.review.destination" :profile="vmware" :source-guest-id="source?.facts.profile_type === 'SourceWorkloadProfile' ? source.facts.guest_id : null" :source-firmware="source?.facts.profile_type === 'SourceWorkloadProfile' ? source.facts.firmware : null" />
       <h2 class="text-xl font-semibold">All disks and application datasets</h2>
       <table class="w-full text-left"><thead><tr><th>Disk key</th><th>Capacity (bytes)</th><th>Dataset coverage</th></tr></thead><tbody><tr v-for="disk in disks" :key="disk.key" class="border-t"><td class="p-2">{{ disk.key }}</td><td>{{ disk.capacity_bytes ?? 'Unknown' }}</td><td>{{ missing.some(d => d.key === disk.key) ? 'Mapping required' : 'Accounted for' }}</td></tr></tbody></table>
       <p v-if="missing.length" role="status">{{ missing.length }} disks still require dataset mapping.</p>
