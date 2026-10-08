@@ -469,3 +469,26 @@ readiness/conditionality, installed-version capability observations,
 Assurance signed independent proof, accepted optional omissions
 and Lifecycle per-effect admission. Current UI is advisory, not
 native execution authority. Required work CT-N17 in `next_work.md`.
+
+## CT-N18 — Source-defined destination API option controls
+
+Committed source-driven selectors in Console and server validation:
+Neutron SGs (project-scoped source/target, per-rule normalized semantic
+hashes, exact one-to-one existing destination IDs), Prism enforced
+policies/categories/subnets, and VI/JSON host-scoped supported guest OS
+and virtual-hardware versions. Empty native option lists provide no
+manual fallback. Source guest/firmware, attached NIC and source
+category/security applicability drive visibility. The Inventory
+review is held if required source security is unknown, if VMware
+destination lacks native flow support, or if cross-platform
+AHV firewall translation has not been independently qualified.
+OpenStack source-target native policy hashes must match exactly to
+accept selection; packet/negative-path tests remain separate.
+Read-only operator evidence references never alter source native data.
+New unit and revised worker tests cover the changes.
+
+**Limits:** AHV effective source microseg and VMware NSX/ACL source and
+destination rule inventories are missing. They must be commissioned
+before cross-hypervisor security portability can be approved.
+Native E3/E4 and actual CI green remain unverified. The implementation
+is **not** a declaration that every migration method is ready.

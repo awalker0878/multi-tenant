@@ -35,6 +35,56 @@ at every checkpoint.
 | CT-N13 | P1 | Verification / A01–A16 | **PARTIAL: E2 tests mapped, source CI/native OPEN** | Build and run the complete source-bound acceptance matrix with positive, negative, timeout/retry, cross-tenant, authority-revocation and native-effect cases. Map each A01–A16 to code, test and evidence in the implementation ledger; do not close an A-ID with a mere fixture. |
 | CT-N14 | P0 | Planning + Assurance + Inventory + Console / vendor API compatibility | **PARTIAL: version-aware E2 path and on-screen alerts committed** | Extend exact route `api_usage` coverage to every actual migration method/callsite; live-discover and pin per-site API versions/entitlements; qualify negative+positive probes, E4-approved optional omissions with effect suppression, and end-to-end version/failover readback. Detailed CT-API tasks below. |
 
+## CT-N18 — Source-gated destination fields and native API-backed selections
+
+**E2 code and tests committed; independent/native E3/E4 OPEN.**
+[Design, source observation and security requirements](docs/implementation/source-gated-destination-selection.md).
+
+- Destination selectors appear only when the source has the relevant
+  property: source observed NICs -> network mapping, source AHV
+  categories -> optional category options, source guest identity ->
+  host-scoped VMware guest/hardware dropdown, source Neutron security
+  groups -> destination policy/security-group mapping. Missing source
+  firmware is **unknown**, not silently BIOS.
+- Destination options come from the current API-owned target profile.
+  OpenStack Neutron `GET /security-groups` is collected project-scoped
+  with rule IDs, rule checksum and a normalized flow-semantics SHA.
+  Source OpenStack ports supply source SG IDs; source SGs are individually
+  reread from their scoped native API. The Console only offers target SGs
+  with identical source/target normalized security rule semantics.
+  The backend rejects forged/foreign/duplicate/missing/unequal mappings.
+- AHV policy/category/subnet options use the existing Prism v4 native
+  resource inventory; only observed ENFORCE policies are selectable.
+  Source policy unknown => no policy picker or synthetic mapping.
+  Cross-provider AHV/Neutron security equivalence is not inferred
+  from labels or ENFORCE state: the review can be saved **as draft**
+  but cannot be confirmed until native E3/E4 is available.
+- VMware host compatibility now comes from pinning the native
+  `HostSystem.parent -> ComputeResource.environmentBrowser ->
+  EnvironmentBrowser.QueryConfigOption(host)` read-only VI/JSON
+  sequence, with per-host guest IDs and observed vmx version.
+  The backend rejects invented guest/hardware/host values.
+  Source v1 VMware does **not** collect full NSX/firewall flows.
+  VMware destinations do **not** yet supply a full policy-rule
+  catalogue; critical required flows are held from confirmation.
+- Inventory `WorkloadProfiles.review` adds explicit holds for missing
+  source security discovery and cross-provider unsupported/unevaluated
+  policy translations; `migration_confirm` and Planning reject held
+  reviews. Operator evidence references are not substitutes for
+  native source/target network observations.
+- Domain/worker tests added for source-only filtering, forced
+  dropdown selection, Neutron semantics and VMware guest options.
+  Exact-head hosted CI, E3 and E4 are NOT asserted as passed.
+
+**Follow-on work:** Commission source-effective AHV microseg policy
+discovery and VMware NSX/ACL source + destination APIs, qualified
+Neutron-to-Prism/NSX semantic translation, source/target native
+readback and allow/deny traffic probes; provide a separately
+authorized missing-feature waiver only for nonfunctional E4
+suppressed effects. Review constraints **immediately before native
+effects**. Resolve the paused/queued hosted CI and end-to-end UI
+tests before declaring release eligibility.
+
 ## CT-N17 — Feature-wise portability, mandatory owner inputs and Console validation
 
 **Declarative feature policy and Console review guidance committed (E2 only):**
