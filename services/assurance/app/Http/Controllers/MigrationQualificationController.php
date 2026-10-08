@@ -34,6 +34,7 @@ final class MigrationQualificationController
         abort_unless($input['scope']['tenant_id'] === $tenant, 403);
         $path = config('planning.migration_support_registry_file');
         $records = [];
+        $apiEvidence = [];
         if ($path !== null) {
             abort_unless(is_string($path) && str_starts_with($path, '/') && ! is_link($path) && is_file($path) && is_readable($path), 503);
             for ($parent = dirname($path); $parent !== '/'; $parent = dirname($parent)) {
@@ -82,6 +83,39 @@ final class MigrationQualificationController
                     if (($resolved['evidence_level'] ?? null) !== 'E4') {
                         $records = array_values(array_filter($records, fn (array $record): bool => ($record['level'] ?? null) !== 'E4'));
                     }
+                    // API feature observations are a separate Assurance capability.
+                    // A registry entry alone cannot give Planning positive support:
+                    // the independent signed native resolver must have reviewed
+                    // the exact source/target route-evidence document.
+                    $candidateApiEvidence = $assignment['api_evidence'] ?? [];
+                    if (is_array($candidateApiEvidence) && count($candidateApiEvidence) <= 512) {
+                        $apiBinding = NativeQualification::digest([
+                            'scope' => $input['scope'],
+                            'tranche_sha256' => $input['tranche_sha256'],
+                            'release_sha256' => $input['release_sha256'],
+                            'api_evidence' => $candidateApiEvidence,
+                        ]);
+                        $apiCapability = $resolved['capabilities']['migration.api_records'] ?? [];
+                        $hasOmissions = false;
+                        foreach ($candidateApiEvidence as $routeId => $document) {
+                            if (! is_string($routeId)
+                                || preg_match('/^[a-f0-9]{64}$/D', $routeId) !== 1
+                                || ! is_array($document)
+                                || ($document['route_sha256'] ?? null) !== $routeId) {
+                                $hasOmissions = true;
+                                break;
+                            }
+                            if (! empty($document['omissions'])) {
+                                $hasOmissions = true;
+                            }
+                        }
+                        if (($resolved['verification']['valid'] ?? false) === true
+                            && ($apiCapability['status'] ?? null) === 'supported'
+                            && in_array($apiBinding, $apiCapability['values'] ?? [], true)
+                            && (! $hasOmissions || ($resolved['evidence_level'] ?? null) === 'E4')) {
+                            $apiEvidence = $candidateApiEvidence;
+                        }
+                    }
                 }
             } catch (Throwable) {
                 abort(503, 'migration_support_unavailable');
@@ -90,6 +124,12 @@ final class MigrationQualificationController
             }
         }
 
-        return response()->json(['schema_version' => 1, ...$input, 'records' => $records, 'native_write_authorized' => false])->header('Cache-Control', 'no-store, private');
+        return response()->json([
+            'schema_version' => 1,
+            ...$input,
+            'records' => $records,
+            'api_evidence' => (object) $apiEvidence,
+            'native_write_authorized' => false,
+        ])->header('Cache-Control', 'no-store, private');
     }
 }
