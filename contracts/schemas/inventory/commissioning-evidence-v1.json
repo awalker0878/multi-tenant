@@ -231,6 +231,30 @@
                   "maxLength": 4096,
                   "pattern": "^/"
                 }
+              },
+              "scopes": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "uniqueItems": true,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "tenant_id",
+                    "site_id"
+                  ],
+                  "properties": {
+                    "tenant_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "site_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
               }
             },
             "required": [
@@ -238,7 +262,8 @@
               "public_key",
               "expires_at",
               "fields",
-              "receipts"
+              "receipts",
+              "scopes"
             ]
           }
         }

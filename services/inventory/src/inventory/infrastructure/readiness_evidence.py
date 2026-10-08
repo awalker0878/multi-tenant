@@ -14,7 +14,7 @@ from typing import Any
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-from inventory.domain.discovery import canonical, digest, shape
+from inventory.domain.discovery import canonical, digest, identifier, shape
 from inventory.domain.operator_inputs import FIELDS
 from inventory.infrastructure.native_readers import decode, protected
 
@@ -40,10 +40,11 @@ def read_evidence(
             raise ValueError
         result: dict[str, Any] = {}
         identities: set[str] = set()
+        keys: set[bytes] = set()
         receipt_count, evidence_bytes = 0, 0
         known_fields = {field["id"] for field in FIELDS}
         for producer in producers:
-            shape(producer, {"id", "public_key", "expires_at", "fields", "receipts"})
+            shape(producer, {"id", "public_key", "expires_at", "fields", "scopes", "receipts"})
             if (
                 not isinstance(producer["id"], str)
                 or not re.fullmatch(r"[A-Za-z0-9_-]{1,80}", producer["id"])
@@ -60,10 +61,23 @@ def read_evidence(
             receipt_count += len(producer["receipts"])
             if receipt_count > 128:
                 raise ValueError
-            key = Ed25519PublicKey.from_public_bytes(
-                base64.b64decode(producer["public_key"], validate=True)
-            )
+            encoded_key = base64.b64decode(producer["public_key"], validate=True)
+            if encoded_key in keys:
+                raise ValueError
+            keys.add(encoded_key)
+            key = Ed25519PublicKey.from_public_bytes(encoded_key)
+            if not isinstance(producer["scopes"], list) or not 1 <= len(producer["scopes"]) <= 128:
+                raise ValueError
+            scopes: set[tuple[str, str]] = set()
+            for scope in producer["scopes"]:
+                shape(scope, {"tenant_id", "site_id"})
+                bound_scope = (identifier(scope["tenant_id"]), identifier(scope["site_id"]))
+                if bound_scope in scopes:
+                    raise ValueError
+                scopes.add(bound_scope)
             if type(producer["expires_at"]) is not int or producer["expires_at"] <= now:
+                continue
+            if (tenant, site) not in scopes:
                 continue
             for path in producer["receipts"]:
                 receipt = decode(protected(path, 262144))
@@ -98,7 +112,7 @@ def read_evidence(
                     payload["configuration_digest"],
                 ) != (tenant, site, packet, configuration):
                     continue
-                if not isinstance(payload["checks"], list) or len(payload["checks"]) > 32:
+                if not isinstance(payload["checks"], list) or not 1 <= len(payload["checks"]) <= 32:
                     raise ValueError
                 for check in payload["checks"]:
                     shape(

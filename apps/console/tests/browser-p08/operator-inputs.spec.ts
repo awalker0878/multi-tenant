@@ -36,6 +36,7 @@ test('collects operator inputs, preserves zero and uncertain saves, and remains 
   const download = await request.get(route + '/download');
   expect((await download.json()).native_write_authorized).toBe(false);
   await expect(page.getByRole('link', { name: 'Download saved packet' })).toBeVisible();
+  await page.getByRole('button', { name: /Operating targets/ }).click();
   await request.post('/__operators', { data: { evidence: { field_id: 'max_outage_seconds', state: 'verified', expires_at: Math.floor(Date.now()/1000) + 3 } } });
   await page.getByRole('button', { name: 'Recheck evidence' }).click();
   await expect(page.getByText('Evidence verified', { exact: true })).toBeVisible();

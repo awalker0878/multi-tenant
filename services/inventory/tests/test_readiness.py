@@ -84,8 +84,8 @@ def evidence(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Any:
     payload = {
         "schema_version": 1,
         "producer_id": "platform-observer",
-        "tenant_id": "tenant-a",
-        "site_id": "site-a",
+        "tenant_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "site_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
         "packet_digest": "a" * 64,
         "configuration_digest": "b" * 64,
         "checks": [
@@ -128,6 +128,7 @@ def evidence(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Any:
                 "public_key": base64.b64encode(private.public_key().public_bytes_raw()).decode(),
                 "expires_at": 300,
                 "fields": ["source_writer_ref"],
+                "scopes": [{"tenant_id": payload["tenant_id"], "site_id": payload["site_id"]}],
                 "receipts": [str(receipt)],
             }
         ],
@@ -138,9 +139,16 @@ def evidence(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Any:
     return payload, sign, receipt, original, registry, config
 
 
-def read(now: int = 150, tenant: str = "tenant-a", packet: str = "a" * 64) -> dict[str, Any]:
+def read(
+    now: int = 150, tenant: str = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", packet: str = "a" * 64
+) -> dict[str, Any]:
     return read_evidence(
-        tenant, "site-a", packet, "b" * 64, {"source_writer_ref": "secret:source"}, now
+        tenant,
+        "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        packet,
+        "b" * 64,
+        {"source_writer_ref": "secret:source"},
+        now,
     )
 
 
@@ -149,7 +157,7 @@ def test_receipts_require_exact_packet_original_bytes_and_current_producer(evide
     assert read()["source_writer_ref"]["state"] == "verified"
     assert read(200)["source_writer_ref"]["state"] == "stale"
     assert read(99)["source_writer_ref"]["state"] == "stale"
-    assert read(tenant="tenant-b") == {}
+    assert read(tenant="cccccccc-cccc-4ccc-8ccc-cccccccccccc") == {}
     assert read(packet="c" * 64) == {}
     payload["checks"][0]["result"] = "failed"
     sign()
@@ -292,6 +300,7 @@ def test_owner_publication_checks_the_packet_and_preserves_original_observations
                         ).decode(),
                         "expires_at": 300,
                         "fields": ["source_writer_ref"],
+                        "scopes": [{"tenant_id": tenant, "site_id": site}],
                         "receipts": [str(receipt)],
                     }
                 ],
@@ -310,3 +319,18 @@ def test_owner_publication_checks_the_packet_and_preserves_original_observations
     packet_file.write_text(canonical(packet))
     with pytest.raises(ValueError, match="input_packet_binding_changed"):
         publish(*args)
+
+
+def test_producer_is_enrolled_for_the_exact_tenant_and_site(evidence: Any) -> None:
+    payload, sign, _, _, registry, config = evidence
+    payload["tenant_id"] = "cccccccc-cccc-4ccc-8ccc-cccccccccccc"
+    sign()
+    assert read(tenant=payload["tenant_id"]) == {}
+    config["producers"][0]["scopes"].append(
+        {"tenant_id": payload["tenant_id"], "site_id": payload["site_id"]}
+    )
+    registry.write_text(canonical(config))
+    assert read(tenant=payload["tenant_id"])["source_writer_ref"]["state"] == "verified"
+    config["producers"].append({**config["producers"][0], "id": "different-owner-same-key"})
+    registry.write_text(canonical(config))
+    assert read(tenant=payload["tenant_id"])["source_writer_ref"]["state"] == "unavailable"

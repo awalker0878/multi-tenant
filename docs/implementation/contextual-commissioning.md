@@ -62,10 +62,10 @@ run a native check or derive a successful result from a reference string.
    then the canonical report. Inventory never receives the private signing key.
 4. Mount the receipt and original bytes at their signed absolute paths. Set
    `INVENTORY_COMMISSIONING_EVIDENCE_FILE` to the protected registry. Each producer
-   has an ID, base64 raw 32-byte public key, expiry, allowed field IDs and receipt
-   paths. Enroll trust independently of the operator/browser who supplied inputs.
+   has an ID, a distinct base64 raw 32-byte public key, expiry, allowed field IDs,
+   explicit tenant/site `scopes` and receipt paths. Enroll trust independently of the operator/browser who supplied inputs.
    Use an atomic registry replacement when adding, revoking or rotating producers.
-5. Recheck evidence in the Console. Registry, signatures, field allowlists,
+5. Recheck evidence in the Console. Registry, signatures, producer scope/field allowlists,
    tenant/site/packet/configuration/value bindings, time and original byte digests
    are revalidated on each read. Change an input and publish a newly bound receipt.
    Remove old receipts for the same field; conflicting current observations hold.
