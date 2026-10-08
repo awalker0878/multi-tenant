@@ -14,4 +14,7 @@ return [
     'qualification_authority_mode' => env('ASSURANCE_QUALIFICATION_AUTHORITY_MODE', 'mounted'),
     'qualification_reviewer_credential_file' => env('ASSURANCE_PUBLICATION_REVIEWER_CREDENTIAL_FILE'),
     'qualification_observer_credential_file' => env('ASSURANCE_PUBLICATION_OBSERVER_CREDENTIAL_FILE'),
+    'qualification_invalidation_url' => env('ASSURANCE_INVALIDATION_SINK_URL'),
+    'qualification_invalidation_ca_file' => env('ASSURANCE_INVALIDATION_CA_FILE'),
+    'qualification_invalidation_credential_file' => env('ASSURANCE_INVALIDATION_CREDENTIAL_FILE'),
 ];
