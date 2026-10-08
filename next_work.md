@@ -33,6 +33,44 @@ at every checkpoint.
 | CT-N11 | P1 | Assurance reviewer + receiving owner / E3/E4 | **NOT REVIEWED** | Obtain evidence-bound independent E3 reviewer decisions and E4 receiver sign-off on actual native recovery, service ownership, accepted residual risks, monitoring and operating runbooks. Missing credentials/decision authority cannot be replaced by mock acceptance. |
 | CT-N12 | P1 | Platform governance / shadow adoption | **E2 read-only comparator coded; native shadow OPEN** | Read-only shadow comparison of qualification decisions, profile/adapter behaviour and native outcome changes; reconcile false confidence, stale qualification and method catalogue differences. Record rollout/rollback gates, versioned replay and promotion authority before any cutover. |
 | CT-N13 | P1 | Verification / A01–A16 | **PARTIAL: E2 tests mapped, source CI/native OPEN** | Build and run the complete source-bound acceptance matrix with positive, negative, timeout/retry, cross-tenant, authority-revocation and native-effect cases. Map each A01–A16 to code, test and evidence in the implementation ledger; do not close an A-ID with a mere fixture. |
+| CT-N14 | P0 | Planning + Assurance + Inventory + Console / vendor API compatibility | **PARTIAL: version-aware E2 path and on-screen alerts committed** | Extend exact route `api_usage` coverage to every actual migration method/callsite; live-discover and pin per-site API versions/entitlements; qualify negative+positive probes, E4-approved optional omissions with effect suppression, and end-to-end version/failover readback. Detailed CT-API tasks below. |
+
+## CT-N14 — Migration API-version compatibility and administrator warnings
+
+[Design, source paths and trust model](docs/implementation/migration-api-capability-compatibility.md).
+
+**E2 code committed, not native support commissioned:** Planning's
+`domain/api_compatibility.py` evaluates per-feature, per-environment
+negotiated API versions and entitlements. `migration_support.py` gates
+current route preview and admission using separately reviewed Assurance
+`migration.api_records` evidence. Existing Planning native validation
+rechecks this on plan create and execution. Console displays **critical
+blockers**, **optional warnings** and a per-feature selected API version.
+`contracts/schemas/capabilities/api-version-record-v1.json` provides
+immutable vendor documentation metadata. Native disk source and target
+adapters for VMware/OpenStack/AHV have code-level usage tags with a
+static test. This is still a **partial rollout**: historical routes lacking
+`api_usage` are visibly labelled unassessed rather than falsely claiming
+per-feature verification.
+
+| ID | Priority | State | Required closure |
+| --- | --- | --- | --- |
+| CT-API-01 | P0 | **OPEN** | Populate official per-API release, spec SHA/URL, version introduction/change/deprecation/sunset catalogue for vSphere VI/JSON/REST, Nova/Neutron/Glance/Cinder/Placement and Prism v4 namespaces. Mark unknown dates, do not guess. Run spec diff + semantically versioned contract tests in CI. |
+| CT-API-02 | P0 | **OPEN** | Enroll exact VMware, OpenStack and AHV installations; observe version ranges, extensions, available namespaces, caller permissions, license entitlements, source identity, observation timestamps and TTL. Independently verify every API version before it enters a route. |
+| CT-API-03 | P0 | **PARTIAL** | Expand code-derived capability tags beyond disk capture/import to VM boot/power, guest preparation, storage formats, network, recovery, data/application interfaces and platform-specific calls; enforce required usage coverage for every selected method and all nine directions. Source tags are not yet a complete static call graph. |
+| CT-API-04 | P0 | **OPEN** | Build bounded live capability probes (authorized create → read → cleanup, with loss/retry/reconciliation and negative tests) per installed API version. Retain E2 contracts separately from native E3 owner evidence; document operations impossible to test without effects. |
+| CT-API-05 | P0 | **PARTIAL / unverified** | Commission Assurance's separately reviewed `migration.api_records` entitlement/observation binding and test producer→Assurance→Planning with real signed E3/E4 records, negative tamper, expiry, multiple versions, missing permissions, wrong scope and revocation. All source-bound PHP/Python/UI CI remains unverified. |
+| CT-API-06 | P0 | **PARTIAL** | Administrator alert UI and impact reasons are implemented. Commission owner-reviewed E4 acceptance for nonessential omissions, verify exact `effect_suppressed_sha256` against a real skipped native operation, persist and display audit/notification/acknowledgment, and reject missing approval or suppression. Required firewall and tenant-isolation flows are **never** an optional bypass. |
+| CT-API-07 | P0 | **OPEN** | Persist each qualified selected API family/version and required capability set with immutable migration/native effect grants; re-check current owner API versions, entitlements and capability qualification immediately before every write and retry; hold if version or adapter bytes changed. |
+| CT-API-08 | P1 | **OPEN** | Model independently qualified adapter substitutions when destination lacks the source capability. Require equivalent outcomes, target API probe, approved adapter identity/expiry and native negative cases; an unqualified mapping must be blocked. |
+| CT-API-09 | P1 | **OPEN** | Execute A01–A16 + multi-version E2 campaigns and native E3 migration tests across all three platforms. Validate admin accessibility, security effects, actual optional suppression, alert delivery and independent E4 receiving sign-off before rollout. |
+
+A version string, API spec, operator statement or synthetic E2 fixture
+must never be interpreted as installed support. Missing `api_usage`,
+expired observations, incomplete host entitlement and unqualified critical
+capabilities remain **unknown or blocked**, not silently supported. The
+new API gating is engaged only for routes with reviewed `api_usage`;
+do not claim full programme coverage until CT-API-03/05/07 are closed.
 
 ## A01–A16 acceptance coverage (CT-N13)
 

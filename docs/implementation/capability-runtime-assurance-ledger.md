@@ -356,3 +356,43 @@ At inspection of source `d279e408a48c05cf3cd4796346478dc2fabfb093`,
 40 checks were queued. Two P01 runs reported failure without job records.
 Do not invent failure logs or claim green. The **authoritative remaining
 work and per-scenario traceability** is `next_work.md` (CT-N01–CT-N13).
+
+## CT-N14 — API-version-aware migration capability admission (E2 only)
+
+Implementation addition to draft PR #64:
+- `planning/domain/api_compatibility.py` selects only fresh
+  environment- and API-release-scoped, entitlement-authorized native
+  `live_probe` evidence carrying independent E3/E4 Assurance review.
+  A route may use VMware VI/JSON 8.x and target OpenStack 2.x or AHV v4.3
+  simultaneously; there is no cross-product version equality check.
+  Outdated/unsupported individual versions are not inherited by another
+  release, and only the separately qualified release is selected.
+- Approved route `api_usage` is bound in `planning/domain/expansion.py`
+  and evaluated at `MigrationSupport.read` and `require`. Critical
+  disk, boot, storage/data, security/isolation, required network and
+  recovery feature categories cannot be relabelled optional.
+- Assurance `MigrationQualificationController` only returns the
+  API evidence when an independently resolved `migration.api_records`
+  capability covers the exact scope, tranche, release and API bytes.
+  E4 is additionally required for omission claims. Planning consumes
+  the new bounded closed `api_evidence` response from that authenticated
+  service boundary; no browser-provided observation is accepted.
+- Console's MigrationSupport page reports per-route API warnings and
+  selected native API release, including a warning on historical routes
+  that have not been enrolled for feature-level evaluation.
+- Disk export/import source code tags cover all three platform families;
+  `scripts/assurance/test_migration_api_usage.py` verifies AST tags.
+  `services/planning/tests/test_api_compatibility.py` covers mixed
+  API generations, stale discovery, missing mandatory disks, untrusted
+  documentation evidence, optional E4 impact acknowledgements, and
+  route admission rechecks. This test evidence remains **unverified**
+  until exact-head CI runs actually complete.
+- `contracts/schemas/capabilities/api-version-record-v1.json` provides
+  a documentation record model, not an automatically populated catalogue.
+
+**Outstanding:** full call-site mapping and route rollout, commissioned
+version discovery and live probes, independently enrolled E3/E4 evidence,
+actual no-op/skip receipts for optional capabilities, required API
+version pinning into effect grants, adapter equivalence and native
+recovery tests. See CT-N14 / CT-API-01–09 in `next_work.md`. None of
+these external gates can be closed by synthetic fixtures.
