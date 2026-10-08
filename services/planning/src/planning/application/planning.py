@@ -269,6 +269,29 @@ class Planning:
         }
         return self.save(actor, key, fingerprint, "plan", payload)
 
+    @staticmethod
+    def qualification_hold(tx: Transaction, tenant: str, plan_id: str) -> str | None:
+        """An absent pin or an unseen negative epoch can never imply eligible."""
+        row = tx.one(
+            "SELECT s.scope_sha256, h.state, "
+            "EXISTS(SELECT 1 FROM app.planning_invalidations i "
+            "WHERE i.tenant=p.tenant AND i.plan=p.id) AS invalidated "
+            "FROM app.planning_records p "
+            "LEFT JOIN app.planning_plan_qualification_scopes s "
+            "ON s.plan=p.id AND s.tenant=p.tenant "
+            "LEFT JOIN app.planning_qualification_heads h "
+            "ON h.scope_sha256=s.scope_sha256 AND h.tenant=p.tenant "
+            "WHERE p.id=%s AND p.tenant=%s AND p.kind='plan'",
+            (identifier(plan_id), identifier(tenant)),
+        )
+        if row is None or row["scope_sha256"] is None:
+            return "qualification_scope_unverified"
+        if row["state"] in {"suspended", "revoked"}:
+            return "qualification_authority_withdrawn"
+        if row["invalidated"]:
+            return "owner_change_requires_new_assessment"
+        return None
+
     def validity(
         self, actor: Actor, plan: dict[str, Any], delegations: dict[str, str]
     ) -> dict[str, Any]:
@@ -322,15 +345,9 @@ class Planning:
         if min(content["valid_until"], content["input_fresh_until"]) <= self.clock():
             holds.append("plan_or_facts_expired")
         with self.database.transaction() as tx:
-            invalidations = tx.all(
-                (
-                    "SELECT event_id FROM app.planning_invalidations WHERE "
-                    "tenant=%s AND plan=%s LIMIT 100"
-                ),
-                (actor.tenant, plan["id"]),
-            )
-        if invalidations:
-            holds.append("owner_change_requires_new_assessment")
+            qualification_hold = self.qualification_hold(tx, actor.tenant, plan["id"])
+        if qualification_hold is not None:
+            holds.append(qualification_hold)
         return {
             "current": not holds,
             "holds": sorted(set(holds)),
@@ -366,6 +383,8 @@ class Planning:
             )
             if row is None:
                 raise Rejected("not_found", 404)
+            if self.qualification_hold(tx, tenant, identity) is not None:
+                raise Rejected("placement_proposal_held", 423)
             plan = row["payload"]
             retained = tx.one(
                 "SELECT payload FROM app.planning_records WHERE id=%s AND tenant=%s "
@@ -415,6 +434,9 @@ class Planning:
             )
             if row is None:
                 raise Rejected("not_found", 404)
+            tenant = row["payload"]["content"]["scope"]["tenant_id"]
+            if self.qualification_hold(tx, tenant, identity) is not None:
+                raise Rejected("qualification_invalidation_held", 423)
             self.check_native_recipe(row["payload"])
             return dict(row["payload"]["binding"])
 
@@ -429,15 +451,16 @@ class Planning:
             )
             if row is None:
                 raise Rejected("not_found", 404)
+            hold = self.qualification_hold(tx, tenant, identity_value)
+            # Fail closed even when the downstream caller reads this field as
+            # advisory only. A positive hint never cancels a historical hold.
+            if hold is not None:
+                raise Rejected(hold, 423)
             self.check_native_recipe(row["payload"])
-            invalidated = tx.one(
-                "SELECT event_id FROM app.planning_invalidations WHERE plan=%s LIMIT 1",
-                (identity_value,),
-            )
             return {
                 "content": row["payload"]["content"],
                 "binding": row["payload"]["binding"],
-                "invalidated": invalidated is not None,
+                "invalidated": False,
             }
 
     def invalidate(self, event: dict[str, Any]) -> bool:
