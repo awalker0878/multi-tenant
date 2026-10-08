@@ -77,9 +77,14 @@ def route(value: Any) -> dict[str, Any]:
             {"guest_outcomes_sha256"}
             if isinstance(value, dict) and "guest_outcomes_sha256" in value
             else set()
-        ),
+        )
+        | ({"api_usage"} if isinstance(value, dict) and "api_usage" in value else set()),
     )
     identifier(row["id"])
+    if "api_usage" in row:
+        from planning.domain.api_compatibility import usage
+
+        usage(row["api_usage"])
     platform_tuple(row["source"])
     platform_tuple(row["target"])
     if row["guest"] not in GUESTS or row["method"] not in METHODS:
