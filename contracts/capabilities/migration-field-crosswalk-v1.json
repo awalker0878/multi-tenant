@@ -10,10 +10,10 @@
     "freshness": "Use minimum age of needed contributing observations; revalidate all critical source, target, owner and API-version evidence at native effect."
   },
   "summary": {
-    "groups": 115,
+    "groups": 116,
     "shared_columns": 59,
-    "partial_columns": 56,
-    "platform_specific": 43,
+    "partial_columns": 57,
+    "platform_specific": 45,
     "owner_common": 27,
     "manifest_fields": {
       "vmware": {
@@ -2362,8 +2362,8 @@
     {
       "canonical_id": "target.compute.capacity",
       "scope": "target",
-      "relationship": "conditional",
-      "normalization": "owner_measured_capacity",
+      "relationship": "platform_specific",
+      "normalization": "no_direct_equivalent",
       "platforms": {
         "vmware": {
           "manifest_attribute_ids": [
@@ -2385,29 +2385,11 @@
           ]
         },
         "ahv": null,
-        "openstack": {
-          "manifest_attribute_ids": [
-            "target.placement_traits"
-          ],
-          "api_fields": [
-            "GET /traits.traits[*]"
-          ],
-          "owner_evidence_fields": [
-            null
-          ],
-          "methods": [
-            "native_list"
-          ],
-          "max_age_seconds": 120,
-          "severity": "critical",
-          "conditions": [
-            "always"
-          ]
-        }
+        "openstack": null
       },
       "criticality": "critical",
       "maximum_age_seconds": 15,
-      "semantic_constraints": "vSphere host/resource pool summary represents a different compute availability and policy boundary than OpenStack Placement traits; owner-exclusive available capacity must be measured separately.",
+      "semantic_constraints": "VMware resource pool / host compute capacity is not interchangeable with OpenStack qualitative resource-provider traits; owner-exclusive measured capacity must be separately verified.",
       "qualification": "not_qualified",
       "migration_policy": "independent_qualification_required"
     },
@@ -6429,6 +6411,40 @@
       "criticality": "critical",
       "maximum_age_seconds": 60,
       "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+      "qualification": "not_qualified",
+      "migration_policy": "independent_qualification_required"
+    },
+    {
+      "canonical_id": "target.openstack.placement_traits",
+      "scope": "target",
+      "relationship": "platform_specific",
+      "normalization": "no_direct_equivalent",
+      "platforms": {
+        "vmware": null,
+        "ahv": null,
+        "openstack": {
+          "manifest_attribute_ids": [
+            "target.placement_traits"
+          ],
+          "api_fields": [
+            "GET /traits.traits[*]"
+          ],
+          "owner_evidence_fields": [
+            null
+          ],
+          "methods": [
+            "native_list"
+          ],
+          "max_age_seconds": 120,
+          "severity": "critical",
+          "conditions": [
+            "always"
+          ]
+        }
+      },
+      "criticality": "critical",
+      "maximum_age_seconds": 120,
+      "semantic_constraints": "OpenStack Placement traits describe provider capabilities, not available vCPU/RAM, inventory allocations, or an exclusive reservation. A distinct owner capacity measurement is mandatory.",
       "qualification": "not_qualified",
       "migration_policy": "independent_qualification_required"
     }
