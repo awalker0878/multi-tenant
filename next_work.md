@@ -35,6 +35,61 @@ at every checkpoint.
 | CT-N13 | P1 | Verification / A01–A16 | **PARTIAL: E2 tests mapped, source CI/native OPEN** | Build and run the complete source-bound acceptance matrix with positive, negative, timeout/retry, cross-tenant, authority-revocation and native-effect cases. Map each A01–A16 to code, test and evidence in the implementation ledger; do not close an A-ID with a mere fixture. |
 | CT-N14 | P0 | Planning + Assurance + Inventory + Console / vendor API compatibility | **PARTIAL: version-aware E2 path and on-screen alerts committed** | Extend exact route `api_usage` coverage to every actual migration method/callsite; live-discover and pin per-site API versions/entitlements; qualify negative+positive probes, E4-approved optional omissions with effect suppression, and end-to-end version/failover readback. Detailed CT-API tasks below. |
 
+## CT-N17 — Feature-wise portability, mandatory owner inputs and Console validation
+
+**Declarative feature policy and Console review guidance committed (E2 only):**
+[feature policy](contracts/capabilities/migration-feature-policy-v1.json),
+[JSON Schema](contracts/schemas/capabilities/migration-feature-policy-v1.json),
+and [operator/feature responsibility table](docs/implementation/migration-feature-portability-and-console-requirements.md).
+
+- **30 feature areas** from all 116 field crosswalk groups; **28 critical**
+  at feature-level (worst-case group severity), **2 conditional optional**
+  (nonfunctional metadata and nonessential QoS); **27 owner/independent
+  evidence requirements** bound to existing review and operator-readiness
+  identifiers, with source applicability and maximum ages retained.
+  Critical conditional attributes remain required when applicable and
+  cannot be made optional by a missing API or operator opinion.
+- All **nine directions** produce candidate mappings only: numeric
+  normalization with readback, qualified native adapter, operator plus
+  independent validation, or no direct field requiring a qualified
+  alternative. No route is auto-qualified from field equivalence.
+- `apps/console/resources/js/pages/inventory/Migration.vue`
+  shows per-direction feature treatment and a mandatory owner/
+  independent evidence checklist. It **never claims the entries
+  are verified**; missing review inputs disable save and confirmation.
+  It links to existing operator-readiness fields for service, scope,
+  security, RTO/RPO, reservation, backup, policy and recovery.
+- `services/inventory/tests/test_workload_profiles.py` now tests
+  the existing authoritative Inventory review validation for all
+  eight owner references, the conditional delta, disk dataset
+  coverage and accepted objectives.
+- `scripts/assurance/test_migration_feature_policy.py` validates
+  complete crosswalk groups, nine-direction bindings, operator
+  Console field names, criticality/age, impossible affirmative
+  qualifications, and byte-identical Console projection. Included
+  in `capability-assurance.yml`. Browser test covers the warnings.
+  Hosted **CI remains unverified at the exact head**.
+
+**Still required for completion (do not declare 30 features qualified):**
+
+1. Make the authoritative Inventory read expose per-feature current
+   native/owner evidence with version, expiry, condition applicability
+   and exact source profile/site/tenant/application binding.
+2. Join per-VM review values with operator-readiness evidence and
+   Assurance independent E3/E4 receipts at the **server**. The
+   separate operator-readiness screen currently records references;
+   it does not yet prove per-VM completion or enforce those references
+   at native-effect admission. Do not use Vue completeness as authority.
+3. Add operator selection/acceptance of actual optional omissions
+   with source/target impact and signed E4 effect-suppressed witness,
+   including post-approval drift/revocation handling.
+4. Execute all 30 feature transformations against real versioned
+   VMware/Prism/OpenStack APIs and native effect/rollback/readback
+   tests; qualify approved target substitutions, security allow/deny
+   and application/service outcomes for each of nine directions.
+5. Reconcile latest PHP/Python/Vue/browser CI, independent E3 labs
+   and E4 receiving sign-off. Keep PR draft until gates pass.
+
 ## CT-N16 — Versioned VMware, AHV, OpenStack field crosswalk
 
 **Complete field-level data mapping; native translation OPEN.**

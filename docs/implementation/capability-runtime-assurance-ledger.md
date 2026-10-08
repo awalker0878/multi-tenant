@@ -442,3 +442,30 @@ adapter equivalence, automatic per-VM impact alerts and native effect
 gates are **not** implemented/qualified by this mapping. See CT-N16
 and CT-N15/CT-API-01–10 in `next_work.md`. GitHub hosted CI and
 independent E3/E4 closure are still required.
+
+## CT-N17 — Feature-level mapping, operator console requirements and evidence split
+
+**E2 contracts/UI committed:** `migration-feature-policy-v1.json`
+defines 30 typed feature categories and all nine directional candidate
+plans, covering the 116 canonical crosswalk groups and 278 original
+collection attributes. Feature severity is critical if any contributing
+crosswalk group is critical, with conditional requirements evaluated
+independently. 27 operator/independent input obligations link to exact
+pre-existing per-VM review or operator-readiness Console fields. No
+vendor API observation may be overwritten by operator input; E4
+effect suppression is needed for an approved nonessential omission.
+
+Read-only Console UI shows feature treatment and required
+operator/independent references without claiming verification.
+Inventory server review constraints were regression-tested for all
+eight owner reference fields, datasets and objectives. A closed
+schema, exact Console JSON mirror and E2 contract validators were
+added to CI and browser coverage. Original source crosswalk,
+field/owner age, criticality and nine-direction correspondence were
+cross-checked programmatically without errors.
+
+**Native truth still missing:** full server-side per-VM joined
+readiness/conditionality, installed-version capability observations,
+Assurance signed independent proof, accepted optional omissions
+and Lifecycle per-effect admission. Current UI is advisory, not
+native execution authority. Required work CT-N17 in `next_work.md`.
