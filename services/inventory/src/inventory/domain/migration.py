@@ -4,7 +4,11 @@ from typing import Any
 
 from inventory.domain.ahv import destination_input as ahv_destination
 from inventory.domain.discovery import Rejected, shape
-from inventory.domain.destination_security import select_security_mappings, source_security_ids
+from inventory.domain.destination_security import (
+    require_matching_openstack_rules,
+    select_security_mappings,
+    source_security_ids,
+)
 from inventory.domain.vmware import destination_input as vmware_destination
 
 
@@ -30,5 +34,7 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
             d["security_mappings"], source_ids,
             {g["id"] for g in target["security_groups"]},
         )
+        if source_ids:
+            require_matching_openstack_rules(source, d["security_mappings"], target)
     else:
         raise Rejected("supported_target_required")
