@@ -1,0 +1,75 @@
+name: Assurance qualification authority PostgreSQL
+on:
+  pull_request:
+    paths:
+      - 'services/assurance/**'
+      - '.github/workflows/assurance-authority.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'services/assurance/**'
+      - '.github/workflows/assurance-authority.yml'
+permissions:
+  contents: read
+jobs:
+  authority:
+    name: E2 authority SQL triggers and epoch transaction tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d
+        env:
+          POSTGRES_PASSWORD: synthetic-authority-postgres
+          POSTGRES_DB: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: synthetic-authority-postgres
+      ASSURANCE_AUTHORITY_TEST_DATABASE: '1'
+      ASSURANCE_AUTHORITY_TEST_PASSWORD: synthetic-authority-runtime
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, mbstring, openssl, pdo, pdo_pgsql, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+      - name: Provision isolated, least-privilege PostgreSQL authority
+        run: |
+          psql -X -v ON_ERROR_STOP=1 -d postgres <<'SQL'
+          CREATE ROLE assurance_owner NOLOGIN;
+          CREATE ROLE assurance_runtime LOGIN NOINHERIT PASSWORD 'synthetic-authority-runtime';
+          CREATE ROLE assurance_migrator LOGIN NOINHERIT PASSWORD 'synthetic-authority-migrator';
+          GRANT assurance_owner TO assurance_migrator WITH INHERIT FALSE, SET TRUE;
+          CREATE DATABASE assurance OWNER assurance_owner;
+          SQL
+          psql -X -v ON_ERROR_STOP=1 -d assurance <<'SQL'
+          CREATE SCHEMA app AUTHORIZATION assurance_owner;
+          GRANT USAGE ON SCHEMA app TO assurance_runtime;
+          SQL
+          for migration in services/assurance/database/migrations/*.sql; do
+            PGUSER=assurance_migrator PGPASSWORD=synthetic-authority-migrator \
+              psql -X -v ON_ERROR_STOP=1 -d assurance -f "$migration"
+          done
+      - name: Install pinned Assurance dependencies
+        run: |
+          mkdir -p services/assurance/bootstrap/cache services/assurance/storage/framework/{cache,sessions,views} services/assurance/storage/logs
+          touch services/assurance/.env
+          composer install --working-dir=services/assurance --no-interaction --prefer-dist --no-progress --no-scripts
+      - name: Verify durable authority, replay, isolation and suspension (E2 only)
+        working-directory: services/assurance
+        run: |
+          ./vendor/bin/pest tests/Feature/QualificationAuthorityLedgerTest.php --fail-on-warning --fail-on-risky
+          ./vendor/bin/pest tests/Feature/QualificationPublicationTest.php --fail-on-warning --fail-on-risky
+      - name: Verify migration and service file formatting
+        working-directory: services/assurance
+        run: ./vendor/bin/pint --test app/Application/Qualification/Actions/QualificationAuthorityLedger.php tests/Feature/QualificationAuthorityLedgerTest.php
