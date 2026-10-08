@@ -86,6 +86,9 @@ def profile_payload(
         return validate_source(value, stream, scope, platform or value.get("platform", ""))
     ahv = not source and isinstance(value, dict) and value.get("platform") == "ahv"
     vmware = not source and isinstance(value, dict) and value.get("platform") == "vmware"
+    if not source and isinstance(value, dict) and value.get("platform") == "vmware":
+        # Older observations cannot supply editable compatibility guesses.
+        value = {**value, "guest_options_by_host": value.get("guest_options_by_host", [])}
     p = shape(
         value,
         SOURCE_FIELDS
