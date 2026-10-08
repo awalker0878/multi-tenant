@@ -5,7 +5,7 @@ passthrough/key-bearing devices require their own route qualification. Native
 task acceptance is retained before polling and uncertain submissions are held.
 """
 
-MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
+
 
 import re
 import time
@@ -28,6 +28,9 @@ from lifecycle_worker.infrastructure.ahv_source_contract import configuration
 from lifecycle_worker.infrastructure.ahv_tasks import AhvJournal, completed, submit
 from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.native_files import protected_read
+
+
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
 
 
 def validate(p: dict[str, Any], binding: NativeBinding) -> dict[str, Any]:
