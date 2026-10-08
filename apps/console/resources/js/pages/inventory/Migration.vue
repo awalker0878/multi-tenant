@@ -55,7 +55,7 @@ function matchingOpenstackGroups(sourceId: string) {
   if (!Array.isArray(records)) return [];
   const sourceRule = records.find(item => typeof item === 'object' && item !== null && (item as Record<string, unknown>).id === sourceId) as Record<string, unknown> | undefined;
   if (!sourceRule || typeof sourceRule.semantics_sha256 !== 'string' || !sourceRule.semantics_sha256) return [];
-  return openstack.value?.security_groups.filter(item => item.semantics_sha256 === sourceRule.semantics_sha256) ?? [];
+  return openstack.value?.security_groups?.filter(item => item.semantics_sha256 === sourceRule.semantics_sha256) ?? [];
 }
 const sourceCategoryPresent = computed(() => {
   const facts = source.value?.facts;
@@ -66,7 +66,7 @@ const sourceCategoryPresent = computed(() => {
 function syncOpenstackPolicies() {
   // Selection remains a source-key -> observed-target-ID reference, not a rule edit.
   if (form.review.destination?.platform !== 'openstack') return;
-  const observed = new Set(openstack.value?.security_groups.map(item => item.id) ?? []);
+  const observed = new Set(openstack.value?.security_groups?.map(item => item.id) ?? []);
   for (const mapping of form.review.destination.security_mappings) {
     if (!observed.has(mapping.destination_id)) mapping.destination_id = '';
   }
