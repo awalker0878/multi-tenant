@@ -123,7 +123,9 @@ def test_reordered_epochs_and_restoration_cannot_clear_prior_plan_holds(
         assert remaining is not None and remaining["n"] == 5
 
 
-@pytest.mark.parametrize("fault", ["boolean_epoch", "foreign_tenant", "bad_scope", "invalid_operation"])
+@pytest.mark.parametrize(
+    "fault", ["boolean_epoch", "foreign_tenant", "bad_scope", "invalid_operation"]
+)
 def test_invalid_wire_semantics_never_create_qualification(fault: str, database: Postgres) -> None:
     tenant, scope = str(uuid4()), "d" * 64
     inbox = QualificationInvalidations(database)
