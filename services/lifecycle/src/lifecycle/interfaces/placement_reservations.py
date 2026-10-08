@@ -21,6 +21,8 @@ class PlacementReservationApp:
     ) -> None:
         payload: dict[str, Any]
         try:
+            if scope["type"] != "http":
+                raise Held("placement_route_invalid")
             route = re.fullmatch(
                 r"/internal/tenants/([0-9a-f-]{36})/placement-reservations/"
                 r"(reserve|checks|confirm|renew|release)",
