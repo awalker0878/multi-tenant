@@ -7,6 +7,11 @@ runs the full Planning/Lifecycle/worker suites without permitted skips, validate
 P07/P08 compiler composition, exercises local TLS alert receipt and artifact
 controls, and records the synthetic workload and real database restore.
 
+Failed P09 component commands and P10 campaign commands also print bounded
+diagnostic excerpts into the job log. Complete originals remain in the artifact;
+workflow-command interpretation is disabled while emitting the excerpt. This
+keeps failures diagnosable when artifact download is unavailable.
+
 A passing engineering report is E2. It does not establish native throughput,
 full control-plane RPO/RTO, actual on-call receipt, restricted installation or G10.
 

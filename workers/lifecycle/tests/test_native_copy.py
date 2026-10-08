@@ -73,6 +73,7 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
         "calls": [],
         "images": {},
         "upload_finished": threading.Event(),
+        "first_upload_chunk": threading.Event(),
     }
 
     class Handler(BaseHTTPRequestHandler):
@@ -102,7 +103,18 @@ def copy_campaign(binding: NativeBinding, tmp_path: Path) -> Iterator[Any]:
                     "token": self.headers.get("X-Auth-Token"),
                 }
             )
-            return self.rfile.read(int(self.headers.get("Content-Length", "0")))
+            length = int(self.headers.get("Content-Length", "0"))
+            if self.command != "PUT":
+                return self.rfile.read(length)
+            received = bytearray()
+            while len(received) < length:
+                part = self.rfile.read1(min(65536, length - len(received)))
+                if not part:
+                    break
+                received.extend(part)
+                if len(received) >= 65536:
+                    fixture["first_upload_chunk"].set()
+            return bytes(received)
 
         def do_GET(self) -> None:
             self.record()
@@ -401,6 +413,10 @@ def test_glance_upload_stops_before_next_chunk_after_credential_change(
     def current() -> None:
         nonlocal boundaries
         boundaries += 1
+        if when in {"during_upload", "expiry"} and stream.tell() > 65536:
+            # Observe acceptance of the first chunk before revoking. Closing TLS
+            # can discard buffered, unacknowledged bytes on different runtimes.
+            assert fixture["first_upload_chunk"].wait(3)
         if (when == "before_upload" and boundaries == 3) or (
             when == "during_upload" and stream.tell() > 65536
         ):
