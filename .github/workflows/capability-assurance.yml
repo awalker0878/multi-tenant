@@ -62,5 +62,9 @@ jobs:
           python-version: '3.12.14'
       - name: Check migration VM collection manifest, API fields, freshness and severity
         run: python scripts/assurance/test_migration_collection_manifest.py -v
+      - name: Check exact VMware AHV OpenStack field mapping and non-equivalence
+        run: |
+          python scripts/assurance/validate_migration_field_crosswalk.py
+          python scripts/assurance/test_migration_field_crosswalk.py -v
       - name: Validate fail-closed source-bound shadow reconciliation
         run: python -m unittest discover -s scripts/assurance -p 'test_*.py' -v
