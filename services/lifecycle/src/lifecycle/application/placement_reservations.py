@@ -192,14 +192,48 @@ class PlacementReservations:
                 pool = candidates[0]
                 if (
                     pool["native_ref"] != allocation["native_ref"]
+                    or pool["id"] != digest(
+                        {"provider_id": pool["provider_id"], "native_ref": pool["native_ref"]}
+                    )
                     or pool["exclusive_owner"] != "lifecycle-resource-owner"
                     or not pool["native_lease_id"]
                     or pool["lease_expires_at"] <= self.clock()
                     or pool["expires_at"] <= self.clock()
                     or not 0 <= self.clock() - pool["observed_at"] <= 5
                     or pool["policy_sha256"] != row["request"]["policy_sha256"]
+                    or tenant not in pool["allowed_tenants"]
                 ):
                     raise Held("placement_native_authority_unavailable")
+                # A previously accepted reservation is not necessarily feasible
+                # now: real provider-used vectors, native physical limits or
+                # another tenant's debits can change after its original receipt.
+                limits = vector(pool["limits"])
+                used = vector(pool["provider_used"])
+                with self.database.transaction() as ledger:
+                    ledger.execute("SELECT pg_advisory_xact_lock(7503016)")
+                    debits = ledger.all(
+                        "SELECT d.vector,r.state,r.id,d.native_ref "
+                        "FROM app.placement_debits d "
+                        "JOIN app.placement_reservations r ON r.id=d.reservation "
+                        "WHERE d.pool_id=%s AND r.state NOT IN ('released','denied')",
+                        (allocation["pool_id"],),
+                    )
+                    outstanding = {kind: 0 for kind in limits}
+                    for debit in debits:
+                        if debit["native_ref"] != pool["native_ref"]:
+                            raise Held("placement_pool_identity_collision")
+                        if (debit["state"] == "confirmed"
+                            and str(debit["id"]) in pool["accounted_reservation_ids"]):
+                            continue
+                        for kind, amount in vector(debit["vector"]).items():
+                            if kind not in outstanding:
+                                raise Held("placement_pool_limit_missing")
+                            outstanding[kind] += amount
+                    if any(
+                        used[kind] + outstanding[kind] > capacity
+                        for kind, capacity in limits.items()
+                    ):
+                        raise Held("placement_provider_capacity_changed")
                 row["expires_at"] = min(
                     row["expires_at"], pool["expires_at"], pool["lease_expires_at"]
                 )
