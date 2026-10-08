@@ -15,6 +15,7 @@ it('requires a configured HTTPS sink, read-only TLS trust and separate mounted s
     $publisher = new ConfirmedHttpInvalidationPublisher(new MountedSecret);
     $event = [
         'event_id' => '10000000-0000-4000-8000-000000000001',
+        'tenant_id' => '10000000-0000-4000-8000-000000000002',
         'scope_sha256' => str_repeat('a', 64),
         'authority_epoch' => 1,
         'event_sha256' => str_repeat('b', 64),
