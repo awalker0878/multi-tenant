@@ -7,19 +7,30 @@ from typing import Any
 from uuid import uuid4
 
 from planning.application.ports import Database, Sources, Transaction
+from planning.application.validation import PlanValidation
 from planning.domain.assessment import assess
 from planning.domain.compilation import bind, compile_plan
 from planning.domain.model import Actor, Rejected, canonical, digest, identifier, integer, shape
 
 
 class Planning:
-    def __init__(self, database: Database, sources: Sources, clock: Callable[[], int]) -> None:
+    __slots__ = ("database", "sources", "clock", "_validation")
+
+    def __init__(
+        self,
+        database: Database,
+        sources: Sources,
+        clock: Callable[[], int],
+        validation: PlanValidation,
+    ) -> None:
+        if not isinstance(validation, PlanValidation):
+            raise ValueError("required_plan_validation")
         self.database, self.sources, self.clock = database, sources, clock
-        self.migration_execution_current: Callable[[dict[str, Any]], None] | None = None
-        self.native_execution_current: Callable[[dict[str, Any]], None] | None = None
-        self.migration_current: Callable[[Actor, dict[str, Any], dict[str, str]], None] | None = (
-            None
-        )
+        self._validation = validation
+
+    @property
+    def validation(self) -> PlanValidation:
+        return self._validation
 
     def get(
         self, tenant: str, application: str, environment: str, identity: str, kind: str
@@ -220,9 +231,7 @@ class Planning:
                 holds.append(error.reason)
         if "native_migration" in content:
             try:
-                if self.migration_current is None:
-                    raise Rejected("migration_owners_unavailable", 503)
-                self.migration_current(actor, plan, delegations)
+                self.validation.migration.current(actor, plan, delegations)
             except Rejected as error:
                 holds.append(error.reason)
         try:
@@ -282,13 +291,9 @@ class Planning:
 
     def check_native_recipe(self, record: dict[str, Any]) -> None:
         if "native_provisioning" in record["content"]:
-            if self.native_execution_current is None:
-                raise Rejected("native_recipe_authority_unavailable", 423)
-            self.native_execution_current(record)
+            self.validation.native.current(record)
         if "native_migration" in record["content"]:
-            if self.migration_execution_current is None:
-                raise Rejected("migration_recipe_authority_unavailable", 423)
-            self.migration_execution_current(record)
+            self.validation.migration.execution_current(record)
             if (
                 min(record["content"]["valid_until"], record["content"]["input_fresh_until"])
                 <= self.clock()

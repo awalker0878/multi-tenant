@@ -6,6 +6,7 @@ from collections.abc import Sequence
 
 from planning.application.events import publish_one
 from planning.application.planning import Planning
+from planning.application.validation import PlanValidation
 from planning.infrastructure.facts.broker import connection, consume_one, publish
 from planning.infrastructure.owners import OwnerSources
 from planning.infrastructure.store import Postgres
@@ -29,7 +30,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             try:
                 channel = conn.channel()
                 channel.basic_qos(prefetch_count=1)
-                service = Planning(database, OwnerSources(), lambda: int(time.time()))
+
+                def clock() -> int:
+                    return int(time.time())
+
+                service = Planning(
+                    database, OwnerSources(), clock, PlanValidation.unavailable(clock)
+                )
                 for _ in range(args.limit):
                     if consume_one(channel, service, args.operation) == "empty":
                         break

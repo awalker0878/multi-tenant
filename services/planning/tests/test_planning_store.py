@@ -20,6 +20,7 @@ from planning_fixture import (
 )
 
 from planning.application.planning import Planning
+from planning.application.validation import PlanValidation
 from planning.domain.model import Actor, Rejected
 from planning.infrastructure.store import Postgres
 
@@ -42,7 +43,7 @@ class Sources:
 
 def setup(database: Postgres) -> tuple[Planning, Actor, dict[str, Any]]:
     return (
-        Planning(database, Sources(), lambda: NOW),
+        Planning(database, Sources(), lambda: NOW, PlanValidation.unavailable(lambda: NOW)),
         Actor(TENANT, ACTOR, "plan.create", APP, ENV),
         {
             "revision_id": REVISION,
@@ -59,7 +60,9 @@ def test_atomic_retry_race_and_restart(database: Postgres) -> None:
     with ThreadPoolExecutor(2) as pool:
         replies = list(pool.map(lambda _: p.assessment(a, key, b, {}), range(2)))
     assert replies[0] == replies[1]
-    second = Planning(database, Sources(), lambda: NOW + 2)
+    second = Planning(
+        database, Sources(), lambda: NOW + 2, PlanValidation.unavailable(lambda: NOW + 2)
+    )
     assert second.assessment(a, key, b, {}) == replies[0]
     with database.transaction() as tx:
         records = tx.one("SELECT count(*) AS n FROM app.planning_records")

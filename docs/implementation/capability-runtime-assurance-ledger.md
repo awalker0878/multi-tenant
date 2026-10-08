@@ -9,7 +9,8 @@ do not establish E3 native qualification or E4 receiving acceptance.
 
 | Increment | Scope | State | Verification |
 | --- | --- | --- | --- |
-| CT-00 | Precise assessment status and immutable required validation composition | Planned | Pending |
+| CT-00a | Required immutable validation composition | Implemented | Planning Ruff, format and strict mypy pass; 383 tests pass locally, 6 PostgreSQL tests await GitHub runner |
+| CT-00b | Verified provenance and precise assessment status | Planned | Pending |
 | CT-01 | Canonical definition registry, generated consumers and typed matching | Planned | Pending |
 | CT-02 | Verified qualification records, native observation projection and runtime invalidation | Planned | Pending |
 | CT-03 | Concrete placement and authoritative reservation owner integration | Planned | Pending |
@@ -35,3 +36,19 @@ Each code commit includes its focused tests or generator checks and updates this
 ledger with the implemented boundary and observed results. Publish through the
 GitHub connector using the preceding branch head as a lease. Keep the pull request
 draft while mandatory checks or integration work remain incomplete.
+
+
+## CT-00a observations
+
+Planning now requires a frozen validation composition at construction. Migration
+creation, current-plan review and unattended execution use the same required
+support authority. Native and migration plan services reject a different
+composition. Facts-only consumers use an explicit unavailable authority.
+A12 covers omitted validators, attempted hook rewiring, composition mismatch and
+support revocation before an unattended recipe read.
+
+Local qualification does not include PostgreSQL: this workspace has no PostgreSQL
+binary and cannot change process user IDs. The GitHub PostgreSQL/TLS jobs remain
+required. Initial documentation-only CI also reports pre-existing failures:
+retained evaluation.log is absent, release-set policy fails and the Governance
+broker is not ready. These failures are not waived by this implementation.

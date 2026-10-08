@@ -11,6 +11,7 @@ from planning.application.migration_plans import MigrationPlans
 from planning.application.migration_support import MigrationSupport
 from planning.application.native_plans import NativePlans
 from planning.application.planning import Planning
+from planning.application.validation import MigrationValidation, NativeValidation, PlanValidation
 from planning.infrastructure.foundation import database_ready
 from planning.infrastructure.migration import prepare_migration
 from planning.infrastructure.migration_recipes import recipe_for, visible_recipes
@@ -27,32 +28,28 @@ from planning.interfaces.telemetry import RequestTelemetry
 
 class PlanningRouter:
     def __init__(self) -> None:
+        def clock() -> int:
+            return int(time.time())
+
+        self.support = MigrationSupport(selected_tranche, qualification_records, clock)
+        validation = PlanValidation(
+            NativeValidation(
+                lambda actor, site, recipe: recipe_for(
+                    actor, site, recipe, file_variable="PLANNING_NATIVE_RECIPES_FILE"
+                ),
+                clock,
+            ),
+            MigrationValidation(prepare_migration, recipe_for, self.support.require, clock),
+        )
         self.planning = PlanningApp(
-            Planning(Postgres(), OwnerSources(), lambda: int(time.time())), GovernanceAuthority()
+            Planning(Postgres(), OwnerSources(), clock, validation), GovernanceAuthority()
         )
         self.foundation = FoundationApp(database_ready)
-        self.support = MigrationSupport(
-            selected_tranche, qualification_records, lambda: int(time.time())
-        )
-        migrations = MigrationPlans(
-            self.planning.planning,
-            prepare_migration,
-            recipe_for,
-            visible_recipes,
-            self.support.require,
-        )
-        self.planning.planning.migration_current = migrations.current
-        self.planning.planning.migration_execution_current = migrations.execution_current
+        migrations = MigrationPlans(self.planning.planning, validation.migration, visible_recipes)
         self.migration = MigrationPreparationApp(
             self.planning.authority, prepare_migration, migrations, self.support
         )
-        native = NativePlans(
-            self.planning.planning,
-            lambda actor, site, recipe: recipe_for(
-                actor, site, recipe, file_variable="PLANNING_NATIVE_RECIPES_FILE"
-            ),
-        )
-        self.planning.planning.native_execution_current = native.current
+        native = NativePlans(self.planning.planning, validation.native)
         self.native = NativePlansApp(self.planning.authority, native)
 
     async def __call__(
