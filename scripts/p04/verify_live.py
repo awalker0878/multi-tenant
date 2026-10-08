@@ -25,7 +25,7 @@ import uuid
 from jsonschema import Draft202012Validator
 from openapi_schema_validator import OAS31Validator
 from openapi_spec_validator import validate_spec
-from generated_operations import OPERATIONS
+from generated_operations import OPERATIONS, SOURCE_SHA256
 from live_fixture import InventoryBroker, NativePeer, TlsProxy
 
 
@@ -103,7 +103,9 @@ def main():
                     (out/'browser.json').write_text(redact(browser_file.read_text()))
 
     try:
-        api = json.loads((root/'contracts/openapi/inventory-v1.6.json').read_text())
+        api_source = (root/'contracts/openapi/inventory-v1.8.json').read_bytes()
+        check('validation-contract-matches-generated-client', hashlib.sha256(api_source).hexdigest() == SOURCE_SHA256)
+        api = json.loads(api_source)
         validate_spec(api)
         check('independent-openapi-specification-validation', True)
         run(['python', 'scripts/p04/generate_clients.py', '--check'], label='generated-clients')
