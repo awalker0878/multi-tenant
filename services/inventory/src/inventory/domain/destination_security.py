@@ -74,3 +74,32 @@ def select_security_mappings(
     if seen_source != set(source_ids):
         raise Rejected("required_security_mappings_incomplete")
     return [row["destination_id"] for row in chosen]
+
+def require_matching_openstack_rules(
+    source: dict[str, Any], chosen: list[dict[str, str]], target: dict[str, Any],
+) -> None:
+    """Selection is allowed only where observed rules are behaviorally identical.
+
+    Unknown statefulness, group references, missing proofs and differing
+    allow/deny rules fail closed, pending a separately qualified translation.
+    """
+    native = source.get("native", {})
+    metadata = native.get("metadata", {}) if isinstance(native, dict) else {}
+    originals = metadata.get("security_groups") if isinstance(metadata, dict) else None
+    if not isinstance(originals, list):
+        raise Rejected("source_security_rules_unobserved")
+    source_by_id = {row.get("id"): row for row in originals if isinstance(row, dict)}
+    if len(source_by_id) != len(originals):
+        raise Rejected("source_security_rules_ambiguous")
+    destination_by_id = {row["id"]: row for row in target["security_groups"]}
+    for mapping in chosen:
+        original = source_by_id.get(mapping["source_id"])
+        destination = destination_by_id.get(mapping["destination_id"])
+        if (
+            not isinstance(original, dict)
+            or destination is None
+            or not isinstance(original.get("semantics_sha256"), str)
+            or not original["semantics_sha256"]
+            or original["semantics_sha256"] != destination.get("semantics_sha256")
+        ):
+            raise Rejected("destination_security_flow_equivalence_unproven")
