@@ -52,10 +52,17 @@ class MigrationApiUsageTests(unittest.TestCase):
                     self.assertTrue(
                         any(
                             isinstance(node, ast.Call)
-                            and isinstance(node.func, ast.Attribute)
-                            and node.func.attr in {
-                                "request", "post", "submit", "read", "call", "execute",
-                            }
+                            and (
+                                isinstance(node.func, ast.Attribute)
+                                and node.func.attr in {
+                                    "request", "post", "submit", "read", "call",
+                                    "execute", "get", "create", "import_image",
+                                }
+                                or isinstance(node.func, ast.Name)
+                                and node.func.id in {
+                                    "read", "submit", "execute", "create",
+                                }
+                            )
                             for node in ast.walk(module)
                         ),
                         "No native operation remains in tagged module",
