@@ -108,6 +108,32 @@ class Planning:
                     self.clock(),
                 ),
             )
+            if kind == "plan":
+                retained = tx.one(
+                    "SELECT payload FROM app.planning_records "
+                    "WHERE id=%s AND tenant=%s AND kind='assessment'",
+                    (payload["assessment_id"], actor.tenant),
+                )
+                scope_sha256: str | None = None
+                try:
+                    if retained is not None:
+                        qualification_scope = retained["payload"]["inputs"][
+                            payload["candidate"]
+                        ]["qualification"]["scope"]
+                        if (
+                            isinstance(qualification_scope, dict)
+                            and qualification_scope.get("tenant_id") == actor.tenant
+                        ):
+                            scope_sha256 = digest(qualification_scope)
+                except (KeyError, IndexError, TypeError, Rejected):
+                    # A scope with insufficient provenance must never escape
+                    # invalidation. The nullable index forces a tenant hold.
+                    pass
+                tx.execute(
+                    "INSERT INTO app.planning_plan_qualification_scopes"
+                    "(plan,tenant,scope_sha256) VALUES(%s,%s,%s)",
+                    (payload["id"], actor.tenant, scope_sha256),
+                )
             tx.execute(
                 (
                     "INSERT INTO "
