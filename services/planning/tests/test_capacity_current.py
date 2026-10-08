@@ -30,10 +30,14 @@ def test_every_unattended_read_rechecks_evidence_and_reserved_vectors(
     plan: dict[str, Any] = {
         "content": content,
         "binding": {"digest": "e" * 64},
-        "inputs": [{
-            "destination": destination, "profile": profile, "policy": policy,
-            "qualification": qualification,
-        }],
+        "inputs": [
+            {
+                "destination": destination,
+                "profile": profile,
+                "policy": policy,
+                "qualification": qualification,
+            }
+        ],
         "source_intent": intent,
     }
     current_destination = deepcopy(destination)
@@ -41,11 +45,15 @@ def test_every_unattended_read_rechecks_evidence_and_reserved_vectors(
         "allocations"
     ]
     receipt = {
-        "state": "reserved", "tenant_id": destination["tenant_id"],
+        "state": "reserved",
+        "tenant_id": destination["tenant_id"],
         "plan_digest": plan["binding"]["digest"],
-        "placement_sha256": digest(allocations), "allocations": allocations,
-        "generation_id": destination["generation_id"], "policy_sha256": digest(policy),
-        "observed_at": NOW, "expires_at": NOW + 30,
+        "placement_sha256": digest(allocations),
+        "allocations": allocations,
+        "generation_id": destination["generation_id"],
+        "policy_sha256": digest(policy),
+        "observed_at": NOW,
+        "expires_at": NOW + 30,
     }
     if fault == "missing_receipt":
         receipt = {}
