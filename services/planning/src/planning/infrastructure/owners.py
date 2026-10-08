@@ -334,7 +334,8 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
     content, pinned = plan["content"], plan["inputs"][0]
     scope = content["scope"]
     destination = request(
-        "INVENTORY", "GET",
+        "INVENTORY",
+        "GET",
         f"/internal/tenants/{scope['tenant_id']}/planning-capability-inputs/"
         f"{scope['resource_id']}/{scope['environment']}/{scope['site_id']}/"
         f"{scope['endpoint_id']}/{content['inventory_generation']}",
@@ -408,7 +409,5 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
     pools = destination["capability_snapshot"]["data"]["pools"]
     for allocation in placed["allocations"]:
         pool = next((p for p in pools if p["id"] == allocation["pool_id"]), None)
-        if pool is None or any(
-            pool[k] != allocation[k] for k in ("native_ref", "failure_domain")
-        ):
+        if pool is None or any(pool[k] != allocation[k] for k in ("native_ref", "failure_domain")):
             raise Rejected("reserved_placement_topology_changed", 423)
