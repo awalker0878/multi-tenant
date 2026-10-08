@@ -43,6 +43,13 @@ def test_asserted_capacity_without_bound_native_evidence_cannot_be_eligible(faul
     else:
         current["observed_at"] = NOW - 61
     result = assess(
-        intent, destination, profile, policy, qualification, "application.provision", "native_api", NOW
+        intent,
+        destination,
+        profile,
+        policy,
+        qualification,
+        "application.provision",
+        "native_api",
+        NOW,
     )
     assert not result["operationally_eligible"]
