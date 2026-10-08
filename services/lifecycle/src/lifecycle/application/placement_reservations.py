@@ -1,6 +1,7 @@
 """Atomic vector admission against independently observed, exclusively owned physical pools."""
 
 import json
+import re
 from collections.abc import Callable
 from typing import Any, Protocol
 from uuid import uuid4
@@ -16,7 +17,11 @@ class PoolSnapshots(Protocol):
 
 def vector(value: dict[str, Any]) -> dict[str, int]:
     kinds = {"vcpus", "memory_mib", "storage_gib", "addresses"}
-    if set(value) != kinds or any(
+    if not kinds <= set(value) or any(
+        k not in kinds and not re.fullmatch(
+            r"storage_gib:[^:]{1,64}|addresses:[^:]{1,64}:(?:ipv4|ipv6)", k
+        ) for k in value
+    ) or any(
         type(v) is not int or v < 0 or v > 2**53 - 1 for v in value.values()
     ):
         raise Held("placement_vector_invalid")
@@ -67,7 +72,7 @@ class PlacementReservations:
             values = vector(allocation["vector"])
             total = demand.setdefault(identity, {k: 0 for k in values})
             for kind, value in values.items():
-                total[kind] += value
+                total[kind] = total.get(kind, 0) + value
         with self.database.transaction() as tx:
             # One authority for physical pool identities; tenant IDs never partition this lock.
             tx.execute("SELECT pg_advisory_xact_lock(7503016)")
@@ -165,7 +170,12 @@ class PlacementReservations:
                     "WHERE id=%s AND state IN ('reserved','confirmed') AND expires_at<=%s",
                     (row["id"], self.clock()),
                 )
-            row["state"] = "expired_held"
+                latest = tx.one(
+                    "SELECT * FROM app.placement_reservations WHERE id=%s", (row["id"],)
+                )
+                if latest is not None and latest["revision"] != row["revision"]:
+                    self.event(tx, str(row["id"]), "expired_held", {"release_dispatched": False})
+                    row = latest
         if row["state"] in {"reserved", "confirmed"}:
             pools = self.snapshots.pools(row["request"])
             for allocation in row["request"]["allocations"]:

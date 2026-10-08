@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Application\Qualification\Actions;
 
 use App\Domain\Qualification\NativeQualification;
-use RuntimeException;
 use Throwable;
 
 final class ResolveQualification
@@ -43,7 +42,7 @@ final class ResolveQualification
         $records[0]['runtime'] = $runtime['records'][$decision] ?? [];
         try {
             return (new NativeQualification)->resolve($records[0], $trust['keys'], $scope, time());
-        } catch (RuntimeException) {
+        } catch (Throwable) {
             return $unknown;
         }
     }

@@ -79,6 +79,9 @@ final class MigrationQualificationController
                         || ! in_array($binding, $capability['values'] ?? [], true)) {
                         $records = [];
                     }
+                    if (($resolved['evidence_level'] ?? null) !== 'E4') {
+                        $records = array_values(array_filter($records, fn (array $record): bool => ($record['level'] ?? null) !== 'E4'));
+                    }
                 }
             } catch (Throwable) {
                 abort(503, 'migration_support_unavailable');

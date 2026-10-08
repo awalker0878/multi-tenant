@@ -14,7 +14,7 @@ def digest(value):
                                     separators=(',', ':')).encode()).hexdigest()
 
 
-def signed_fixture(record, directory, now=None, inventory=None, snapshot=None):
+def signed_fixture(record, directory, now=None, inventory=None, snapshot=None, receiving=False):
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     now = int(time.time()) if now is None else now
@@ -22,7 +22,7 @@ def signed_fixture(record, directory, now=None, inventory=None, snapshot=None):
     definition = digest(json.loads(source.read_text()))
     scope = record['scope']
     keys = {}
-    for role in ('observer', 'reviewer'):
+    for role in (('observer', 'reviewer', 'receiver') if receiving else ('observer', 'reviewer')):
         private = directory / (role + '.pem')
         if not private.is_file():
             subprocess.run(['openssl', 'genpkey', '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:2048',
@@ -42,7 +42,7 @@ def signed_fixture(record, directory, now=None, inventory=None, snapshot=None):
 
     record = copy.deepcopy(record)
     record.pop('verification', None)
-    record.update(version=2, evidence_level='E3')
+    record.update(version=2, evidence_level='E4' if receiving else 'E3')
     proof = {'kind': 'native_conformance', 'simulation': False, 'finalized': True,
              'scope_sha256': digest(scope), 'definition_sha256': definition,
              'runtime_artifacts': scope['artifacts'], 'adapter_conformant': True,
@@ -63,7 +63,16 @@ def signed_fixture(record, directory, now=None, inventory=None, snapshot=None):
                      'subject_id': keys['reviewer']['subject_id'], 'observed_at': now,
                      'expires_at': now + 3600}, 'reviewer')
     runtime = sign(proof | {'decision_sha256': decision['sha256'], 'expires_at': now + 120}, 'observer')
-    return {'record': record, 'decision': decision, 'evidence': [evidence], 'runtime': runtime}, keys
+    bundle={'record': record, 'decision': decision, 'evidence': [evidence], 'runtime': runtime}
+    if receiving:
+        bundle['acceptance']=sign({
+            'kind':'operating_acceptance','decision':'accepted','revoked':False,
+            'qualification_sha256':decision['sha256'],'record_sha256':digest(record),
+            'definition_sha256':definition,'scope_sha256':digest(scope),
+            'subject_id':keys['receiver']['subject_id'],
+            'observed_at':now,'expires_at':now+3600,
+        },'receiver')
+    return bundle, keys
 
 
 def refresh_runtime(envelope, directory, now=None):

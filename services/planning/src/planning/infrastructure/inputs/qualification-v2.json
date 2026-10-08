@@ -217,6 +217,13 @@
             "expires_at": {
               "type": "integer",
               "minimum": 0
+            },
+            "acceptance_sha256": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[a-f0-9]{64}$"
             }
           },
           "required": [

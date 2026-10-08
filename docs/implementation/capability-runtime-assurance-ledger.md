@@ -167,3 +167,16 @@ released receipts, allocation tampering, network drift, failed restore and legac
 qualification. The v2 source contract documents the new Inventory and service-only
 qualification reads. The four-product CI matrix records independent format, lint,
 type and test outcomes and cancels obsolete runs of that matrix.
+
+## Receiving acceptance and resource refinement
+
+An E4 record now requires a separately enrolled receiver with distinct identity and
+key material, an unrevoked signed acceptance, and exact qualification/record/scope/
+definition bindings. Missing or substituted acceptance cannot establish E4. Review
+and acceptance digests remain pinned during unattended reads, so a new review does
+not silently upgrade an old plan. Synthetic RSA controls exercise this protocol as
+E2 only. No receiving environment is commissioned by these tests.
+
+Placement vectors include storage-class and network/address-family sublimits,
+preventing aggregate storage or address headroom from hiding exhausted classes.
+The runtime observer suspends a decision when the latest restore outcome failed.

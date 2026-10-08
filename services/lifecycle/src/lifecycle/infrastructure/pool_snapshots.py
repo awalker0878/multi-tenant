@@ -48,10 +48,22 @@ class NativePoolSnapshots:
                 },
             )
             response = connection.getresponse()
-            result = decode(response.read(2097153))
+            chunks = bytearray()
+            deadline = time.monotonic() + 5
+            while True:
+                if time.monotonic() >= deadline:
+                    raise Held("pool_native_observation_timeout")
+                part = response.read1(min(65536, 2097153 - len(chunks)))
+                if not part:
+                    break
+                chunks.extend(part)
+                if len(chunks) > 2097152:
+                    raise Held("pool_native_observation_bound")
+            result = decode(bytes(chunks))
             if (
                 response.status != 200
                 or response.getheader("Content-Encoding", "identity") != "identity"
+                or response.getheader("Content-Type", "").split(";")[0] != "application/json"
                 or result["reader_principal"] != config["reader_principal"]
                 or result["request_digest"] != digest(request)
                 or protected(str(self.configuration), 2097152) != raw

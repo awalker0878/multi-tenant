@@ -97,6 +97,16 @@ class ConformancePublisher:
                     observed["capabilities"][name[11:]]["values"]
                 ):
                     raise NativeHeld("conformance_native_values_changed")
+            latest_restores: dict[str, dict[str, Any]] = {}
+            for sample in observed["snapshot"].get("recovery_measurements", []):
+                prior = latest_restores.get(sample["dataset_id"])
+                if prior is None or sample["sequence"] > prior["sequence"]:
+                    latest_restores[sample["dataset_id"]] = sample
+            if any(
+                r["outcome"] != "passed" or r["consistency_passed"] is not True
+                for r in latest_restores.values()
+            ):
+                raise NativeHeld("conformance_latest_restore_failed")
             payload.update(
                 adapter_conformant=True,
                 dimensions=list(DIMENSIONS),

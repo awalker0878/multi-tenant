@@ -18,7 +18,7 @@ final class NativeQualification
         $record = $bundle['record'] ?? [];
         $this->require(is_array($record) && ($record['version'] ?? null) === 2
             && ($record['status'] ?? null) === 'qualified' && ($record['revoked'] ?? null) === false
-            && ($record['evidence_level'] ?? null) === 'E3' && ($record['expires_at'] ?? 0) > $now
+            && in_array($record['evidence_level'] ?? null, ['E3', 'E4'], true) && ($record['expires_at'] ?? 0) > $now
             && self::canonical($record['scope'] ?? null) === self::canonical($scope), 'qualification_unverified');
         $decision = $this->verify($bundle['decision'] ?? [], $keys, 'reviewer', $scope, $now);
         $this->require(($decision['kind'] ?? null) === 'qualification_decision'
@@ -77,9 +77,26 @@ final class NativeQualification
                 && self::canonical($runtime['capabilities'][$name]['values'] ?? null) === self::canonical($capability['values'] ?? null), 'native_capability_changed');
         }
 
+        if ($record['evidence_level'] === 'E4') {
+            $acceptance = $this->verify($bundle['acceptance'] ?? [], $keys, 'receiver', $scope, $now);
+            $this->require(($acceptance['kind'] ?? null) === 'operating_acceptance'
+                && ($acceptance['decision'] ?? null) === 'accepted'
+                && ($acceptance['revoked'] ?? null) === false
+                && ($acceptance['qualification_sha256'] ?? null) === $bundle['decision']['sha256']
+                && ($acceptance['record_sha256'] ?? null) === self::digest($record)
+                && ($acceptance['definition_sha256'] ?? null) === CapabilityDefinitions::SHA256
+                && $acceptance['_key_sha256'] !== $decision['_key_sha256']
+                && ! in_array($acceptance['_key_sha256'], $observerKeys, true)
+                && $acceptance['subject_id'] !== $decision['subject_id']
+                && ! in_array($acceptance['subject_id'], $observers, true),
+                'independent_receiving_acceptance_required');
+            $expiry = min($expiry, $acceptance['expires_at']);
+        }
+
         return $record + ['verification' => ['valid' => true, 'definition_sha256' => CapabilityDefinitions::SHA256,
             'decision_sha256' => $bundle['decision']['sha256'], 'runtime_sha256' => $bundle['runtime']['sha256'],
-            'record_sha256' => self::digest($record), 'resolved_at' => $now, 'expires_at' => $expiry]];
+            'record_sha256' => self::digest($record), 'resolved_at' => $now, 'expires_at' => $expiry,
+            'acceptance_sha256' => $record['evidence_level'] === 'E4' ? $bundle['acceptance']['sha256'] : null]];
     }
 
     /** @param array<string, mixed> $value
@@ -89,7 +106,8 @@ final class NativeQualification
     private function verify(array $value, array $keys, string $role, array $scope, int $now): array
     {
         $key = $keys[$value['key_id'] ?? ''] ?? null;
-        $this->require(is_array($key) && ($key['role'] ?? null) === $role && ($key['expires_at'] ?? 0) > $now, 'evidence_key_unenrolled');
+        $this->require(is_array($key) && ($key['role'] ?? null) === $role && ($key['expires_at'] ?? 0) > $now
+            && ($key['revoked'] ?? false) === false, 'evidence_key_unenrolled');
         foreach (['tenant_id', 'site_id', 'endpoint_id'] as $field) {
             $this->require(($key['scope'][$field] ?? null) === ($scope[$field] ?? null), 'evidence_key_scope_denied');
         }

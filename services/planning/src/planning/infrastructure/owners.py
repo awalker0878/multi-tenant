@@ -20,7 +20,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from planning.domain.assessment import assess
 from planning.domain.model import Actor, Rejected, decode, digest, identifier, profile
 from planning.domain.placement import fit
-from planning.domain.qualification import verified
+from planning.domain.qualification import binding_digest, verified
 from planning.infrastructure.foundation import mounted_secret
 from planning.infrastructure.store import Postgres
 
@@ -323,8 +323,7 @@ def qualification_current(plan: dict[str, Any]) -> None:
         not verified(current, int(time.time()))
         or current.get("status") != "qualified"
         or current.get("revoked") is not False
-        or current["verification"]["record_sha256"]
-        != (pinned.get("verification") or {}).get("record_sha256")
+        or binding_digest(current) != binding_digest(pinned)
     ):
         raise Rejected("current_qualification_required", 423)
     placement_current(plan, current)

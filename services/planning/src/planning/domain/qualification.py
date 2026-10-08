@@ -30,5 +30,6 @@ def binding_digest(qualification: dict[str, Any]) -> str:
             "valid": receipt.get("valid"),
             "definition_sha256": receipt.get("definition_sha256"),
             "decision_sha256": receipt.get("decision_sha256"),
+            "acceptance_sha256": receipt.get("acceptance_sha256"),
         }
     )

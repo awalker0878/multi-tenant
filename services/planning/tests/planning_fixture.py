@@ -258,6 +258,13 @@ def snapshot_fixture(
             "storage_gib": sum(d["size_gib"] for d in workload["disks"]),
             "addresses": sum(len(n["address_families"]) for n in workload["nics"]),
         }
+        for disk in workload["disks"]:
+            key = "storage_gib:" + disk["storage_class"]
+            vector[key] = vector.get(key, 0) + disk["size_gib"]
+        for nic in workload["nics"]:
+            for family in nic["address_families"]:
+                key = "addresses:" + nic["network_class"] + ":" + family
+                vector[key] = vector.get(key, 0) + 1
         pools.append({
             "id": "pool-" + str(index),
             "native_ref": "fixture://physical-host-" + str(index),

@@ -330,7 +330,83 @@
                 "additionalProperties": false,
                 "properties": {
                   "qualification_scope": {
-                    "$ref": "#/components/schemas/QualificationScope"
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "tenant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "endpoint_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "native_scope": {
+                        "type": "string"
+                      },
+                      "installed_tuple": {
+                        "type": "object"
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "application.provision",
+                          "application.migrate",
+                          "application.recover",
+                          "application.retire"
+                        ]
+                      },
+                      "method": {
+                        "type": "string"
+                      },
+                      "profile_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "artifacts": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "compiler": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "adapter": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "automation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "contracts": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "compiler",
+                          "adapter",
+                          "automation",
+                          "contracts"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "endpoint_id",
+                      "native_scope",
+                      "installed_tuple",
+                      "action",
+                      "method",
+                      "profile_digest",
+                      "artifacts"
+                    ]
                   }
                 },
                 "required": [
@@ -2151,6 +2227,7 @@
         ]
       },
       "Qualification": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -2368,6 +2445,13 @@
                   "expires_at": {
                     "type": "integer",
                     "minimum": 0
+                  },
+                  "acceptance_sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[a-f0-9]{64}$"
                   }
                 },
                 "required": [
@@ -2396,6 +2480,7 @@
           "capabilities",
           "verification"
         ],
+        "$id": "urn:multi-tenant:qualification:v2",
         "title": "Verified native qualification v2"
       },
       "SourceDecision": {

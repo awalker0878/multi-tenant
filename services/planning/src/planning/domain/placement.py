@@ -16,12 +16,20 @@ def amount(value: Any) -> int:
 
 
 def workload_vector(workload: dict[str, Any]) -> dict[str, int]:
-    return {
+    result = {
         "vcpus": amount(workload["compute"]["vcpus"]),
         "memory_mib": amount(workload["compute"]["memory_mib"]),
         "storage_gib": sum(amount(d["size_gib"]) for d in workload["disks"]),
         "addresses": sum(len(n["address_families"]) for n in workload["nics"]),
     }
+    for disk in workload["disks"]:
+        key = "storage_gib:" + disk["storage_class"]
+        result[key] = result.get(key, 0) + amount(disk["size_gib"])
+    for nic in workload["nics"]:
+        for family in nic["address_families"]:
+            key = "addresses:" + nic["network_class"] + ":" + family
+            result[key] = result.get(key, 0) + 1
+    return result
 
 
 def fit(
@@ -60,7 +68,7 @@ def fit(
             )
         free[pool["id"]] = {
             k: limits[k] - amount(pool["used"][k]) - amount(pool["pending"][k])
-            for k in ("vcpus", "memory_mib", "storage_gib", "addresses")
+            for k in limits
         }
         if any(v < 0 for v in free[pool["id"]].values()):
             return {"status": "blocked", "reason": "placement_pool_overallocated", "allocations": []}
@@ -83,7 +91,7 @@ def fit(
                 or any(d["storage_class"] not in pool["storage_classes"] for d in workload["disks"])
                 or any(n["network_class"] not in pool["network_classes"] for n in workload["nics"])
                 or pool["zone"] not in policy["allowed_zones"]
-                or any(free[pool["id"]][k] < v for k, v in vector.items())
+                or any(free[pool["id"]].get(k, -1) < v for k, v in vector.items())
             ):
                 continue
             siblings = [r for r in selected if r["failure_group"] == failure["group"]]
