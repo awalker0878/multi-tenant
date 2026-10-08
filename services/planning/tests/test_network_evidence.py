@@ -71,3 +71,40 @@ def test_identical_four_tuple_cannot_cross_native_network_contexts(
     elif fault == "egress_denied":
         data["firewall_rules"][0]["egress_action"] = "deny"
     assert traffic(flow, data, policy, NOW) == expected
+
+
+@pytest.mark.parametrize(
+    ("fault", "key", "expected"),
+    [
+        ("missing_rbac", "placement.isolation.rbac", "unknown"),
+        ("failed_rbac", "placement.isolation.rbac", "blocked"),
+        ("missing_storage", "placement.isolation.storage", "unknown"),
+        ("failed_keys", "placement.isolation.keys", "blocked"),
+        ("missing_hierarchy", "placement.fault_hierarchy", "unknown"),
+        ("wrong_hierarchy", "placement.fault_hierarchy", "blocked"),
+        ("missing_negative", "placement.tenant_boundary", "unknown"),
+    ],
+)
+def test_native_isolation_controls_distinguish_missing_from_failed(
+    fault: str, key: str, expected: str
+) -> None:
+    intent, destination, _, policy, _ = inputs()
+    data = deepcopy(destination["capability_snapshot"]["data"])
+    isolation = data["isolation"]
+    if fault == "missing_rbac":
+        isolation["boundary_controls"].pop("rbac")
+    elif fault == "failed_rbac":
+        isolation["boundary_controls"]["rbac"]["outcome"] = "failed"
+    elif fault == "missing_storage":
+        isolation["boundary_controls"].pop("storage")
+    elif fault == "failed_keys":
+        isolation["boundary_controls"]["keys"]["outcome"] = "failed"
+    elif fault == "missing_hierarchy":
+        isolation.pop("fault_hierarchy")
+    elif fault == "wrong_hierarchy":
+        first = intent["workloads"][0]["id"]
+        isolation["fault_hierarchy"][first]["rack"] = "different-rack"
+    elif fault == "missing_negative":
+        isolation["negative_flows"] = []
+    results = isolation_checks(intent, destination, data, policy, NOW)
+    assert next(status for name, status, _, _ in results if name == key) == expected
