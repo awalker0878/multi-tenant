@@ -1,0 +1,368 @@
+{
+  "tenant_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "site_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+  "groups": [
+    {
+      "id": "access",
+      "label": "Accounts and trust",
+      "owner": "Platform and identity owners",
+      "scope": "P07 / P08"
+    },
+    {
+      "id": "control",
+      "label": "Execution and independent verification",
+      "owner": "Platform and security owners",
+      "scope": "P07 / P08"
+    },
+    {
+      "id": "recovery",
+      "label": "Application recovery and cutover",
+      "owner": "Application and service owners",
+      "scope": "P07 / P08"
+    },
+    {
+      "id": "targets",
+      "label": "Operating targets",
+      "owner": "Application and operations owners",
+      "scope": "P08 / P10"
+    },
+    {
+      "id": "receiving",
+      "label": "Qualification and service handover",
+      "owner": "Qualification and receiving teams",
+      "scope": "P10"
+    }
+  ],
+  "fields": [
+    {
+      "id": "source_writer_ref",
+      "group": "access",
+      "label": "Source platform execution account reference",
+      "help": "Protected secret-store record for the scoped execution identity. Supply its record identifier, never its secret value.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "source_observer_ref",
+      "group": "access",
+      "label": "Source platform verification account reference",
+      "help": "Separate read-only identity used to verify effects independently of the execution account.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "target_writer_ref",
+      "group": "access",
+      "label": "Destination platform execution account reference",
+      "help": "Protected secret-store record for the scoped execution identity. Supply its record identifier, never its secret value.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "target_observer_ref",
+      "group": "access",
+      "label": "Destination platform verification account reference",
+      "help": "Separate read-only identity used to verify effects independently of the execution account.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "image_writer_ref",
+      "group": "access",
+      "label": "Image transfer execution account reference",
+      "help": "Protected secret-store record for the scoped execution identity. Supply its record identifier, never its secret value.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "image_observer_ref",
+      "group": "access",
+      "label": "Image transfer verification account reference",
+      "help": "Separate read-only identity used to verify effects independently of the execution account.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "account_scope_ref",
+      "group": "access",
+      "label": "Account permissions and scope record",
+      "help": "Approved projects, datacentres, resource scope, expiry and permissions for all six accounts.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "trust_bundle_ref",
+      "group": "access",
+      "label": "TLS trust and rotation record",
+      "help": "Approved certificate authorities, endpoint identity checks, secret rotation and revocation procedure.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "custody_ref",
+      "group": "control",
+      "label": "Independent recovery custody record",
+      "help": "Owner and protected provider state used to reconcile effects after a worker or journal restore.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "worker_fencing_ref",
+      "group": "control",
+      "label": "Stale worker exclusion procedure",
+      "help": "How the platform prevents a revoked or restored worker from issuing further native changes.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "reservation_ref",
+      "group": "control",
+      "label": "Capacity and address reservation procedure",
+      "help": "Reserve, confirm, reconcile and release capacity, IP addresses and service allocations.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "guest_recipe_ref",
+      "group": "control",
+      "label": "Guest preparation recipe",
+      "help": "Reviewed image, driver and hardening recipe, including the tested converter image when applicable.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "service_protocol_ref",
+      "group": "control",
+      "label": "Shared service integration procedures",
+      "help": "Owner protocols for DNS, IPAM, identity, time, trust, logging, monitoring and backup.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "measurement_ref",
+      "group": "control",
+      "label": "Transfer and concurrency measurement record",
+      "help": "Measured route throughput, API limits, phase concurrency and current resource capacity. Supply the retained observation reference.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "consistency_ref",
+      "group": "recovery",
+      "label": "Application consistency procedure",
+      "help": "Application owner procedure for quiescing writes and establishing a consistent migration baseline.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "delta_ref",
+      "group": "recovery",
+      "label": "Data synchronization method record",
+      "help": "Selected application/file delta or cold-export method, scope and owner acceptance. Record an explicit cold-export decision when no delta is used.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "writer_fencing_ref",
+      "group": "recovery",
+      "label": "Application writer isolation procedure",
+      "help": "How source and destination writers are fenced at cutover, with independent verification.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "traffic_ref",
+      "group": "recovery",
+      "label": "Traffic switch and policy validation procedure",
+      "help": "Approved traffic change plus application tests and allowed/denied network-path verification.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "restore_ref",
+      "group": "recovery",
+      "label": "Backup and restore validation record",
+      "help": "Restoration of application data, attachments and dependencies, with retained original results.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "recovery_ref",
+      "group": "recovery",
+      "label": "Recovery before and after destination writes",
+      "help": "Separate source-return and post-write recovery procedures, including data reconciliation.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "retention_ref",
+      "group": "recovery",
+      "label": "Retirement and retention authorization",
+      "help": "Owner-approved retention of source data and keys, deletion authority and cleanup verification.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "objectives_ref",
+      "group": "targets",
+      "label": "Approved operating objectives record",
+      "help": "Accountable owner's acceptance of the targets below and representative workload used to measure them.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "campaign_ref",
+      "group": "receiving",
+      "label": "Authorized qualification campaign",
+      "help": "Exact lab scope and campaign authorization for native Q05\u2013Q10 observations.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "artifact_ref",
+      "group": "receiving",
+      "label": "Installed release and artifact record",
+      "help": "Installed candidate digest, signed component versions, trust roots and mirror closure.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "security_ref",
+      "group": "receiving",
+      "label": "Security findings and custody assessment",
+      "help": "Actual application-security results, required finding dispositions and jurisdiction/custody review.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "alert_ref",
+      "group": "receiving",
+      "label": "Alert routing and escalation record",
+      "help": "Receiving route, acknowledgement objective, on-call rota and tested escalation evidence.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "receiving_team_ref",
+      "group": "receiving",
+      "label": "Receiving team and independent reviewers",
+      "help": "Named operations, security, application and qualification reviewers with responsibilities and conflict checks.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "support_ref",
+      "group": "receiving",
+      "label": "Support and operational rehearsal record",
+      "help": "Support ownership, operator rehearsal, patching, retained evidence and accessibility receiving checks.",
+      "kind": "reference",
+      "minimum": null,
+      "maximum": null
+    },
+    {
+      "id": "max_outage_seconds",
+      "group": "targets",
+      "label": "Maximum application outage (seconds)",
+      "help": "Owner-approved outage limit. Zero means no outage is permitted.",
+      "kind": "integer",
+      "minimum": 0,
+      "maximum": 604800
+    },
+    {
+      "id": "max_data_loss_bytes",
+      "group": "targets",
+      "label": "Maximum data loss (bytes)",
+      "help": "Owner-approved data-loss limit. Zero means no data loss is permitted.",
+      "kind": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    {
+      "id": "recovery_time_seconds",
+      "group": "targets",
+      "label": "Recovery time objective (seconds)",
+      "help": "Maximum accepted time to recover the service after a failure.",
+      "kind": "integer",
+      "minimum": 1,
+      "maximum": 2592000
+    },
+    {
+      "id": "max_active_migrations",
+      "group": "targets",
+      "label": "Maximum simultaneous migrations",
+      "help": "Planning limit for the representative workload; admission still requires current measurements.",
+      "kind": "integer",
+      "minimum": 1,
+      "maximum": 1000
+    }
+  ],
+  "record": null,
+  "configuration": null,
+  "missing_fields": [
+    "source_writer_ref",
+    "source_observer_ref",
+    "target_writer_ref",
+    "target_observer_ref",
+    "image_writer_ref",
+    "image_observer_ref",
+    "account_scope_ref",
+    "trust_bundle_ref",
+    "custody_ref",
+    "worker_fencing_ref",
+    "reservation_ref",
+    "guest_recipe_ref",
+    "service_protocol_ref",
+    "measurement_ref",
+    "consistency_ref",
+    "delta_ref",
+    "writer_fencing_ref",
+    "traffic_ref",
+    "restore_ref",
+    "recovery_ref",
+    "retention_ref",
+    "objectives_ref",
+    "campaign_ref",
+    "artifact_ref",
+    "security_ref",
+    "alert_ref",
+    "receiving_team_ref",
+    "support_ref",
+    "max_outage_seconds",
+    "max_data_loss_bytes",
+    "recovery_time_seconds",
+    "max_active_migrations"
+  ],
+  "holds": [
+    "required_operator_inputs_missing",
+    "environment_review_required"
+  ],
+  "collection_complete": false,
+  "native_write_authorized": false
+}

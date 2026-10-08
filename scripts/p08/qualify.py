@@ -77,6 +77,7 @@ def main():
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_contract.py')])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_profiles.py')])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_fleet.py')])
+        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_operator_inputs.py')])
     except Exception as error:
         report['error'] = str(error)
     report['result'] = 'PASSED' if report['commands'] and not report.get('error') and all(c['exit_code'] == 0 for c in report['commands']) else 'FAILED'

@@ -11,6 +11,7 @@ from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 from inventory.application.configuration import PortingConfiguration
 from inventory.application.discovery import Discovery
 from inventory.application.fleet import MigrationFleet
+from inventory.application.operator_inputs import OperatorInputs
 from inventory.application.ports import Authority
 from inventory.application.profile_collection import authorize_read
 from inventory.application.views import InventoryViews
@@ -19,6 +20,18 @@ from inventory.domain.discovery import Rejected
 
 UUID = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
 ROUTES = (
+    (
+        "GET",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/operator-inputs",
+        "operator_inputs",
+        "inventory.admin",
+    ),
+    (
+        "POST",
+        rf"/v1/tenants/({UUID})/sites/({UUID})/operator-inputs",
+        "operator_inputs_save",
+        "inventory.admin",
+    ),
     (
         "GET",
         rf"/v1/tenants/({UUID})/sites/({UUID})/migration-inventory",
@@ -187,6 +200,7 @@ class InventoryApp:
         self.authority = authority
         self.views = InventoryViews(discovery)
         self.configuration = PortingConfiguration(discovery)
+        self.operator_inputs = OperatorInputs(discovery)
         self.workloads = WorkloadProfiles(discovery)
         self.fleet = MigrationFleet(discovery)
 
@@ -271,7 +285,11 @@ class InventoryApp:
                     raise Rejected("invalid_query")
                 target = values[2] if len(values) > 2 else None
                 if scope["method"] == "GET":
-                    if operation == "migration_fleet":
+                    if operation == "operator_inputs":
+                        if params:
+                            raise Rejected("invalid_query")
+                        payload = await asyncio.to_thread(self.operator_inputs.read, actor)
+                    elif operation == "migration_fleet":
                         payload = await asyncio.to_thread(
                             self.fleet.read, actor, params.get("cursor", [None])[0]
                         )
@@ -302,7 +320,9 @@ class InventoryApp:
                     if expected and not re.fullmatch(r'"[1-9][0-9]{0,8}"', expected):
                         raise Rejected("invalid_revision")
                     payload = await asyncio.to_thread(
-                        self.fleet.command
+                        self.operator_inputs.command
+                        if operation == "operator_inputs_save"
+                        else self.fleet.command
                         if operation == "migration_group_save"
                         else self.workloads.command
                         if operation in {"migration_save", "migration_confirm"}
