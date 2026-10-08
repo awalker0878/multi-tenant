@@ -2407,7 +2407,7 @@
       },
       "criticality": "critical",
       "maximum_age_seconds": 15,
-      "semantic_constraints": "Measured compute usage and a separate owner reservation are required.",
+      "semantic_constraints": "vSphere host/resource pool summary represents a different compute availability and policy boundary than OpenStack Placement traits; owner-exclusive available capacity must be measured separately.",
       "qualification": "not_qualified",
       "migration_policy": "independent_qualification_required"
     },
@@ -2491,7 +2491,7 @@
       "migration_policy": "independent_qualification_required"
     },
     {
-      "canonical_id": "target.storage.free_bytes",
+      "canonical_id": "target.storage.capacity_indicators",
       "scope": "target",
       "relationship": "conditional",
       "normalization": "physical_owner_allocation",
@@ -2560,7 +2560,7 @@
       },
       "criticality": "critical",
       "maximum_age_seconds": 15,
-      "semantic_constraints": "Nutanix maxCapacityBytes is maximum, not allocatable free capacity; never infer availability.",
+      "semantic_constraints": "VMware datastore freeSpace is not a reservation; AHV maxCapacityBytes is total capacity, and OpenStack Placement inventories/allocations are different resources. No canonical free-byte value may be inferred. Independent physical reservations and current per-storage backend availability must be evidenced.",
       "qualification": "not_qualified",
       "migration_policy": "independent_qualification_required"
     },
