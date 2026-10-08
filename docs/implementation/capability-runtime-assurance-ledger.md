@@ -416,3 +416,29 @@ data collection, freshness enforcement, an operator alert or E3/E4
 acceptance.** Real per-environment collection, append-only evidence, owner
 review, conditional applicability, native-effect admission and independent
 tests are outstanding as CT-N15 / CT-API-10.
+
+## CT-N16 — VMware / AHV / OpenStack field-by-field semantic mapping
+
+Committed:
+- `contracts/capabilities/migration-field-crosswalk-v1.json` — **116**
+  canonical field groups linking every one of the **278** manifest inputs
+  to corresponding VMware/AHV/OpenStack API or owner fields, source/target
+  scope, freshness, severity, conditional applicability and an explicit
+  `not_qualified` sentinel. Gaps become null/unknown.
+- `contracts/schemas/capabilities/migration-field-crosswalk-v1.json`
+  — closed schema; no affirmative native support status.
+- `scripts/assurance/validate_migration_field_crosswalk.py` and
+  `test_migration_field_crosswalk.py` — enforce lossless per-platform
+  coverage, field provenance, criticality, scope, min-TTL, negative
+  security/unknown and capacity/identity boundaries. Explicit E2 CI step
+  added to `capability-assurance.yml`.
+- `docs/implementation/migration-field-crosswalk.md` — full human
+  comparison (61 source, 28 destination and 27 owner groups), including
+  transformations and critical non-equivalences.
+
+**Truth status:** Mapping requirements are version-controlled; installed
+API support, live source field extraction, executable conversion, destination
+adapter equivalence, automatic per-VM impact alerts and native effect
+gates are **not** implemented/qualified by this mapping. See CT-N16
+and CT-N15/CT-API-01–10 in `next_work.md`. GitHub hosted CI and
+independent E3/E4 closure are still required.

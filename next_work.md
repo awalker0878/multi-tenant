@@ -35,6 +35,45 @@ at every checkpoint.
 | CT-N13 | P1 | Verification / A01–A16 | **PARTIAL: E2 tests mapped, source CI/native OPEN** | Build and run the complete source-bound acceptance matrix with positive, negative, timeout/retry, cross-tenant, authority-revocation and native-effect cases. Map each A01–A16 to code, test and evidence in the implementation ledger; do not close an A-ID with a mere fixture. |
 | CT-N14 | P0 | Planning + Assurance + Inventory + Console / vendor API compatibility | **PARTIAL: version-aware E2 path and on-screen alerts committed** | Extend exact route `api_usage` coverage to every actual migration method/callsite; live-discover and pin per-site API versions/entitlements; qualify negative+positive probes, E4-approved optional omissions with effect suppression, and end-to-end version/failover readback. Detailed CT-API tasks below. |
 
+## CT-N16 — Versioned VMware, AHV, OpenStack field crosswalk
+
+**Complete field-level data mapping; native translation OPEN.**
+The [machine-readable crosswalk](contracts/capabilities/migration-field-crosswalk-v1.json)
+and [full readable 116-row matrix](docs/implementation/migration-field-crosswalk.md)
+reconcile **all 278** current manifest attributes (VMware 86, AHV 89,
+OpenStack 103) into **116** canonical source/target/owner groups.
+Every original attribute is referenced **exactly once**. The crosswalk
+preserves exact API field/source, role, collection method, criticality,
+minimum observation TTL, conditional applicability, and missing platform
+equivalents. No row claims installed support or a qualified adapter.
+
+- 59 groups have source-field entries for all three platforms, of which
+  27 are separately attested common owner/independent obligations;
+  57 groups lack at least one platform field; 45 are explicitly
+  platform-specific. Null means **no mapped field / unknown**, not
+  an automatic assertion that the destination is unsupported.
+- Only power state, total CPU, memory and MAC have explicitly described
+  proposed field normalizations. Storage backing/disk sharing, export and
+  import, incarnation, boot/guest drivers, network security and policy,
+  quotas and entitlements remain semantic qualification boundaries.
+- `contracts/schemas/capabilities/migration-field-crosswalk-v1.json`
+  supplies the closed data schema. `scripts/assurance/validate_migration_field_crosswalk.py`
+  rejects any lost/duplicated manifest entry, forged API field, scope
+  drift, criticality downgrade, too-generous freshness or inferred
+  native support. Eight negative/positive regressions live in
+  `scripts/assurance/test_migration_field_crosswalk.py`. The
+  `capability-assurance.yml` E2 lane runs both explicitly. **Hosted CI
+  source verification and native E3/E4 remain OPEN.**
+
+**Outstanding integration:** resolve the crosswalk against installed,
+version-qualified source and destination observations; implement executable
+typed normalization and conversion/adapters; compute nine directed migration
+reports with per-VM critical blockers and optional-E4 omission alerts;
+include readback, backend-specific device/storage/network/rule semantics and
+version/entitlement revocation at each Lifecycle effect. Reconcile exact-head
+CI and signed independent E3/E4 evidence. A crosswalk is not an execution
+license or an automated migration method.
+
 ## CT-N15 — Per-VM API collection manifest and freshness obligations
 
 **Requirements/data committed**, not a completed installed discovery,
