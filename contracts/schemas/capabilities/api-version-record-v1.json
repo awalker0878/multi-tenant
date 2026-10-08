@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Immutable vendor API version documentation record (not native qualification)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "platform",
+    "api_family",
+    "api_version",
+    "product_release",
+    "released_on",
+    "deprecated_on",
+    "sunset_on",
+    "spec_url",
+    "spec_sha256",
+    "capabilities"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "platform": {
+      "enum": [
+        "vmware",
+        "openstack",
+        "ahv"
+      ]
+    },
+    "api_family": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+    },
+    "api_version": {
+      "type": "string",
+      "pattern": "^v?[0-9]+(\\.[0-9]+){0,3}$"
+    },
+    "product_release": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "released_on": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "deprecated_on": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sunset_on": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "spec_url": {
+      "type": "string",
+      "pattern": "^https://[^\\s]+$"
+    },
+    "spec_sha256": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "capabilities": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "capability_id",
+          "declared_state",
+          "first_version",
+          "removed_in",
+          "behavior_notes"
+        ],
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){1,7}$"
+          },
+          "declared_state": {
+            "enum": [
+              "documented",
+              "deprecated",
+              "removed",
+              "unknown"
+            ]
+          },
+          "first_version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "removed_in": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "behavior_notes": {
+            "type": "string",
+            "maxLength": 512
+          }
+        }
+      }
+    }
+  }
+}
