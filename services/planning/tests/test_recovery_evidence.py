@@ -5,6 +5,7 @@ from copy import deepcopy
 import pytest
 from planning_fixture import NOW, inputs
 
+from planning.domain.model import digest
 from planning.domain.recovery_evidence import recovery_checks
 
 
@@ -55,9 +56,7 @@ def test_restore_measurements_feed_back_into_the_next_assessment(fault: str) -> 
         latest.pop("application_readiness")
     elif fault == "stale_review":
         policy["recovery_profile"]["review"]["expires_at"] = NOW - 1
-        latest["policy_sha256"] = __import__(
-            "planning.domain.model", fromlist=["digest"]
-        ).digest(policy)
+        latest["policy_sha256"] = digest(policy)
     data["recovery_measurements"].append(latest)
     checks = recovery_checks(intent, destination, profile, policy, data, NOW)
     expected = (
