@@ -57,8 +57,10 @@ def document(path: Path) -> tuple[dict[str, Any], str]:
         raise ValueError("shadow_manifest_invalid: parse") from e
     if type(value) is not dict or set(value) != {"schema_version", "source_revision", "records"}:
         fail("document keys")
-    if value["schema_version"] != 1 or not isinstance(value["source_revision"], str):
+    if type(value["schema_version"]) is not int or value["schema_version"] != 1:
         fail("manifest version")
+    if not isinstance(value["source_revision"], str):
+        fail("source revision")
     if REVISION.fullmatch(value["source_revision"]) is None:
         fail("source revision")
     rows = value["records"]
