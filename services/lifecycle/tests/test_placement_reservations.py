@@ -88,7 +88,9 @@ def test_two_tenants_compete_for_one_atomic_vector(database: Postgres) -> None:
         receipts = list(pool.map(lambda r: service.reserve(r["scope"]["tenant_id"], r), requests))
     assert sorted(r["state"] for r in receipts) == ["denied", "reserved"]
     with database.transaction() as tx:
-        assert tx.one("SELECT count(*) AS n FROM app.placement_debits")["n"] == 1
+        row = tx.one("SELECT count(*) AS n FROM app.placement_debits")
+        assert row is not None
+        assert row["n"] == 1
     winner = next(
         r
         for r in requests
