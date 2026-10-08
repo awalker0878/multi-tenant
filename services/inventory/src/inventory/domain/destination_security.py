@@ -20,6 +20,9 @@ def source_security_ids(source: dict[str, Any]) -> list[str] | None:
     ports = metadata.get("ports") if isinstance(metadata, dict) else None
     if not isinstance(ports, list) or len(ports) != len(source["nics"]):
         return None
+    scope = source.get("native_scope")
+    if not isinstance(scope, str) or not scope:
+        return None
     keys: set[str] = set()
     port_ids: set[str] = set()
     for port in ports:
@@ -30,6 +33,7 @@ def source_security_ids(source: dict[str, Any]) -> list[str] | None:
         if (
             not isinstance(port_id, str) or not port_id
             or port_id in port_ids
+            or port.get("project_id", port.get("tenant_id")) != scope
             or type(port.get("port_security_enabled")) is not bool
             or not isinstance(groups, list)
             or len(groups) > 64
