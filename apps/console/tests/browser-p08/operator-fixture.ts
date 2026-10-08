@@ -13,7 +13,7 @@ export function operatorFixture(): Plugin { return { name: 'operator-inputs-fixt
     let body = ''; for await (const chunk of req) body += chunk;
     const send = (value: unknown, status = 200) => { res.statusCode = status; res.setHeader('Content-Type', 'application/json'); res.setHeader('Cache-Control', 'no-store'); res.end(JSON.stringify(value)); };
     if (path === '/__operators') {
-      if (req.method === 'POST') { const control = JSON.parse(body); if (control.reset) reset(); for (const key of ['uncertain', 'stale', 'access']) if (key in control) state[key] = control[key]; }
+      if (req.method === 'POST') { const control = JSON.parse(body); if (control.reset) reset(); if (control.record) state.workspace.record = control.record; for (const key of ['uncertain', 'stale', 'access']) if (key in control) state[key] = control[key]; }
       if (req.method === 'POST') { const control = JSON.parse(body); if (control.evidence) { state.workspace.checks = state.workspace.checks.map((check: any) => check.field_id === control.evidence.field_id ? { ...check, ...control.evidence } : check); } } return send(state);
     }
     if (path.endsWith('/status')) return send({ available: true }, state.access);
