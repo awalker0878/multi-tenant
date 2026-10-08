@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Planning migration preparation and immutable composition",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "description": "Current Inventory bindings and separately commissioned immutable migration recipes. Composition creates a new plan for independent approval; it does not grant native execution. Maximum request 32768 bytes. Version 1.2 explicitly reports deterministic commissioning holds (423)."
   },
   "security": [
@@ -1540,6 +1540,11 @@
                           "maximum_data_loss_seconds": {
                             "type": "integer",
                             "minimum": 0
+                          },
+                          "maximum_data_loss_bytes": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
                           }
                         },
                         "required": [
@@ -1587,6 +1592,10 @@
                       },
                       "operationally_accepted": {
                         "type": "boolean"
+                      },
+                      "guest_outcomes_sha256": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
                       }
                     },
                     "required": [

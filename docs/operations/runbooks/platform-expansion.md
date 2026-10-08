@@ -7,12 +7,20 @@ No native tuple or deployment is enabled by the software tests.
 
 ## Freeze the intended tranche
 
-Validate the versioned baseline using `contracts/schemas/expansion/tranche-v1.json`
+Validate new baselines using `contracts/schemas/expansion/tranche-v1.1.json`
 and `planning.domain.expansion.tranche`. A protected baseline binds exact source and
 target Inventory observations, all eleven profile dimensions, guest/method/topology,
 datasets, policy, services, recovery, artifact digests and owner objectives. Record
 all nine directions as selected or explicitly deferred. Generate each route's
 qualification plan with `planning.domain.expansion.qualification_plan`.
+
+The published `tranche-v1.json` retains its original bytes and fields. The v1.1
+schema adds optional guest-outcome digests and maximum data-loss bytes while
+retaining the v1 envelope; existing v1 records remain valid. Consumers needing
+those fields must use v1.1. This corrects their earlier in-place addition to v1.
+The corresponding Planning support response is published as
+`contracts/openapi/planning-migration-v1.5.json`; the Console validates against
+that version. The v1.4 response schema retains its original published bytes.
 
 The matrix consumes current Assurance-owner records. Do not promote caller-submitted
 JSON to Assurance authority. An exact accepted E3 row can establish native qualification;

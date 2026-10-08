@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the frozen P09 v1 exact-tuple schema; --check detects contract drift."""
+"""Generate frozen P09 exact-tuple schema versions; --check detects contract drift."""
 
 import argparse
 import json
@@ -16,7 +16,9 @@ def array(items, low=1, high=512):
     return {'type': 'array', 'items': items, 'minItems': low, 'maxItems': high, 'uniqueItems': True}
 
 
-def schema():
+def schema(version='1'):
+    if version not in {'1', '1.1'}:
+        raise ValueError('Unsupported tranche schema version')
     sha = {'type': 'string', 'pattern': '^[a-f0-9]{64}$'}
     uid = {'type': 'string', 'format': 'uuid'}
     label = {'type': 'string', 'minLength': 1, 'maxLength': 160, 'pattern': '^[^\\u0000-\\u001f]*$'}
@@ -32,14 +34,16 @@ def schema():
                        'guest_mutation': {'enum': ['copy_only', 'prohibited']}, 'writer_fencing': sha,
                        'target_write_recovery': sha, 'maximum_outage_seconds': integer,
                        'maximum_data_loss_seconds': integer})
-    constraints['properties']['maximum_data_loss_bytes'] = integer
+    if version == '1.1':
+        constraints['properties']['maximum_data_loss_bytes'] = integer
     route = obj({'id': uid, 'source': installed, 'target': installed,
                  'guest': {'enum': ['linux', 'windows', 'appliance']},
                  'method': {'enum': ['cold_export', 'rebuild_restore', 'application_delta', 'file_delta', 'block_replication']},
                  **{k + '_sha256': sha for k in ['guest_profile', 'topology', 'data', 'policy', 'services', 'recovery', 'artifacts']},
                  'constraints': constraints, 'requirement_ids': array({'enum': [f'R{i:02}' for i in range(1, 36)]}, 1, 35),
                  'exclusions': array(label, 0, 64)})
-    route['properties']['guest_outcomes_sha256'] = sha
+    if version == '1.1':
+        route['properties']['guest_outcomes_sha256'] = sha
     route['allOf'] = [{'if': {'properties': {'guest': {'const': 'appliance'}}},
                        'then': {'properties': {'constraints': {'properties': {'guest_mutation': {'const': 'prohibited'}}}}}}]
     triggers = ['artifact', 'platform', 'api', 'backend', 'guest', 'method', 'policy', 'service', 'topology', 'recovery', 'ownership', 'expiry', 'revocation']
@@ -51,7 +55,7 @@ def schema():
                   'deferred_directions': array({'enum': [a + '->' + b for a in platforms for b in platforms]}, 0, 9),
                   'retest_triggers': array({'enum': triggers}, len(triggers), len(triggers))})
     return {'$schema': 'https://json-schema.org/draft/2020-12/schema',
-            '$id': 'urn:multi-tenant:expansion-tranche:v1', 'title': 'P09 exact expansion tranche', **result}
+            '$id': 'urn:multi-tenant:expansion-tranche:v' + version, 'title': 'P09 exact expansion tranche', **result}
 
 
 def main():
@@ -73,7 +77,7 @@ def main():
                '$id': 'urn:multi-tenant:adapter-package:v1', 'title': 'Signed installed adapter package',
                **obj({'manifest': manifest, 'key_id': label,
                       'signature': {'type': 'string', 'pattern': '^[A-Za-z0-9+/]{86}==$'}})}
-    for name, document in [('tranche-v1', schema()), ('adapter-package-v1', package)]:
+    for name, document in [('tranche-v1', schema()), ('tranche-v1.1', schema('1.1')), ('adapter-package-v1', package)]:
         path = ROOT / f'contracts/schemas/expansion/{name}.json'
         rendered = json.dumps(document, indent=2) + '\n'
         if args.check:
