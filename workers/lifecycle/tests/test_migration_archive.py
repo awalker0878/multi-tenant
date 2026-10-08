@@ -74,7 +74,14 @@ class Source(VmwareExport):
         }
 
     def download(
-        self, url: str, limit: int, target: DownloadSink, heartbeat: Any
+        self,
+        url: str,
+        limit: int,
+        target: DownloadSink,
+        heartbeat: Any,
+        *,
+        allow_range_continuation: bool = False,
+        on_continuation: Any = None,
     ) -> dict[str, Any]:
         heartbeat()
         target.write(self.data)
@@ -199,7 +206,10 @@ def test_ovf_mapping_ambiguity_denied(fault: str) -> None:
         validate_descriptor(descriptor, [{"path": "disk-2000.vmdk", "size": 99}])
 
 
-def test_retained_archive_over_real_tls(copy_campaign: Any, tmp_path: Path) -> None:
+@pytest.mark.parametrize("continuation", [False, True])
+def test_retained_archive_over_real_tls(
+    copy_campaign: Any, tmp_path: Path, continuation: bool
+) -> None:
     b, execution, fixture, journal = copy_campaign
     old = execution.adapter
     assert isinstance(old, NativeVmCopy)
@@ -228,6 +238,9 @@ def test_retained_archive_over_real_tls(copy_campaign: Any, tmp_path: Path) -> N
         "bytes_per_second": 2**30,
         "spool_bytes": 1048576,
     }
+    if continuation:
+        p.update(schema_version=2, range_continuation=True)
+        fixture["range_fault"] = "continue"
     plan_file = tmp_path / "archive.json"
     plan_file.write_text(json.dumps(p))
     bound = replace(b, operation_plan_sha256=digest(p))
@@ -238,3 +251,5 @@ def test_retained_archive_over_real_tls(copy_campaign: Any, tmp_path: Path) -> N
     paths = [r["path"].rsplit("/", 1)[-1] for r in fixture["calls"]]
     assert paths.index("CreateDescriptor") < paths.index("HttpNfcLeaseComplete")
     assert journal.events[-1][0] == "export_complete"
+    assert sum(kind == "transfer_continued" for kind, _ in journal.events) == int(continuation)
+    assert paths.count("ExportVm") == 1
