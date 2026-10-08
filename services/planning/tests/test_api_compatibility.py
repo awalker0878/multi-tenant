@@ -46,12 +46,20 @@ def owner_input(route: dict[str, Any], now: int = 100) -> dict[str, Any]:
             "source": {
                 "installation_id": source["installation_id"],
                 "profile_sha256": source["profile_sha256"],
+                "observed_at": now - 10,
+                "expires_at": now + 40,
+                "source": "live_probe",
+                "evidence_sha256": "5" * 64,
                 "apis": {"vmware.vi_json": ["8.0.3.0", "9.0.0.0"]},
                 "entitlements": {"vm.disk.export": "allowed"},
             },
             "target": {
                 "installation_id": target["installation_id"],
                 "profile_sha256": target["profile_sha256"],
+                "observed_at": now - 10,
+                "expires_at": now + 40,
+                "source": "live_probe",
+                "evidence_sha256": "6" * 64,
                 "apis": {"openstack.nova": ["2.1", "2.104"]},
                 "entitlements": {
                     "vm.disk.import": "allowed",
@@ -157,6 +165,15 @@ def test_missing_or_unqualified_disk_prevents_approval() -> None:
         assert result["status"] == "blocked"
         assert result["operationally_eligible"] is False
         assert result["administrator_alerts"][0]["severity"] == "blocker"
+
+
+def test_stale_destination_version_inventory_never_inherits_old_support() -> None:
+    row = selected()
+    evidence = owner_input(row)
+    evidence["environments"]["target"]["expires_at"] = 100
+    result = evaluate(row, evidence, 100)
+    assert result["status"] == "blocked"
+    assert result["cases"][1]["reason"] == "api_environment_discovery_stale"
 
 
 def test_optional_omission_needs_exact_scope_E4_owner_acceptance() -> None:
