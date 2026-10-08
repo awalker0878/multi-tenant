@@ -173,7 +173,7 @@ test('describes feature translations and separates mandatory Console evidence fr
   await expect(page.getByRole('heading', { name: 'Cross-platform feature mapping (not qualification)' })).toBeVisible();
   await expect(page.getByText('Mandatory operator and independent evidence', { exact: true })).toBeVisible();
   await page.getByText('Show feature-by-feature mappings and migration holds').click();
-  await expect(page.getByText('Firewall, microsegmentation and isolation', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Required source attributes have not been observed/)).toBeVisible();
   await page.getByText('Show all applicable owner, security and receiving requirements').click();
   await expect(page.getByText('security · tenant isolation')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Open operator readiness and independent verification' })).toHaveAttribute('href', new RegExp('/operator-inputs$'));
