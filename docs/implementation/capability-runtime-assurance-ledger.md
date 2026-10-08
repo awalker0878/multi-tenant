@@ -294,3 +294,37 @@ have not been verified green. A receiving endpoint is now present in source but
 has not been commissioned, TLS/secret custody has not been enrolled and no
 live end-to-end campaign or independent E3 native review has passed. Existing
 effect-boundary direct source revalidation remains mandatory.
+
+
+### Follow-on audit repair — SQL integrity and negative-admission read paths
+
+A fresh direct audit of PR #64 found an invalid `003_qualification_invalidations.sql`
+file: a previous splice had cut the scope SHA check midway and duplicated its
+trigger, grants and transaction end. Commit `6eb16a1b` replaces the file with
+one complete transaction, separate scope index, append-only inbox and proper
+owner/runtime grants. No prior migration success is claimed. The disposable
+Planning PostgreSQL test fixture now executes migrations 002 and 003.
+
+Commits `89717fc5` and `88c16f8d` strengthen Assurance's deferred SQL
+constraint: an epoch update must agree with its stored tenant, signed-decision
+metadata, immutable predecessor, result projection and outbox payload. This is
+in addition to application-side checking; it does not make an unsigned SQL
+event E3 proof. Commit `23c04467` adds SQL negative tests for an unjournaled
+head advance and runtime mutation of outbox wire bytes.
+
+Commit `ad864083` introduces `Planning.qualification_hold` and requires the
+persisted scope index/current negative head/append-only invalidations to be
+checked before approval bindings, execution plans and placement proposals can
+be released. Absence of a pinned scope now denies admission, even if no
+invalidation event has yet been seen. Commits `4974e530`, `62d0cc24`,
+and `ce5142e1` add unknown-scope, withdrawn-source, and concurrent
+plan-save/revocation PostgreSQL tests. Commits `9dcb31b1`, `4da3bd36`
+and `695e41b1` bind the approval read to the persisted database tenant
+rather than trusting tenant information inside a plan payload.
+
+**All changes above are engineering implementations, not acceptance
+measurements.** GitHub's current-head checks were still queued as inspected;
+there is no proven CI pass, integrated TLS receiver, E3 native reviewer, E4
+receiving acceptance, or production rollout. The next gate is to execute and
+repair the real PostgreSQL/PHP/Python jobs, followed by source-bound
+A01–A16 composition and explicitly authorized native campaigns.
