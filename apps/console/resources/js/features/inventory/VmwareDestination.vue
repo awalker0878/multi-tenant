@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { VmwareDestinationSelection, VmwareTargetCapabilityProfile } from './contracts';
-const props = defineProps<{ profile: VmwareTargetCapabilityProfile; sourceGuestId: string | null }>();
+const props = defineProps<{ profile: VmwareTargetCapabilityProfile; sourceGuestId: string | null; sourceFirmware: string | null }>();
 const model = defineModel<VmwareDestinationSelection>({ required: true });
 const catalog = computed(() => props.profile.guest_options_by_host?.find(item => item.host === model.value.host_id));
 function hostChanged() { model.value.guest_id = ''; model.value.hardware_version = ''; }
@@ -21,7 +21,8 @@ function hostChanged() { model.value.guest_id = ''; model.value.hardware_version
       <p v-if="!sourceGuestId" role="alert">Source guest OS is not known; no destination compatibility selection is available.</p>
       <p v-else-if="!catalog" role="alert">The destination API did not return guest and hardware compatibility for this host. No manual override is accepted.</p>
     </div>
-    <p>Firmware: {{ model.firmware }}. Changing firmware requires its own qualified preparation procedure.</p>
+    <p v-if="sourceFirmware">Source-observed firmware: {{ model.firmware }}. Firmware translation requires qualification.</p>
+    <p v-else role="alert">Source firmware is unknown. Destination firmware cannot be inferred or selected.</p>
     <label v-for="d in model.disks" :key="d.source_key">Source disk {{ d.source_key }} → disk order<input v-model.number="d.index" type="number" min="0" :max="model.disks.length - 1" required /></label>
     <div v-for="nic in model.nics" :key="nic.source_key" class="grid gap-4 md:grid-cols-2">
       <label>NIC {{ nic.source_key }} quarantine network<select v-model="nic.quarantine_network_id" required><option value="">Select quarantine network</option><option v-for="r in profile.networks" :key="r.network" :value="r.network">{{ r.name }}</option></select></label>
