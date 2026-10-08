@@ -1,5 +1,7 @@
 """Cold Nova/Cinder capture into owned images, with no guest changes.
 
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
+
 Image-backed root and Cinder disks have distinct native capture paths. A stopped
 server and exact complete disk mapping are mandatory. Native submissions are
 never replayed by this adapter; partial resource receipts remain in custody.
