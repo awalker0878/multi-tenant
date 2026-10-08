@@ -47,6 +47,16 @@ const sourceSecurityIds = computed<string[] | null>(() => {
   }
   return [...set].sort();
 });
+function matchingOpenstackGroups(sourceId: string) {
+  const facts = source.value?.facts;
+  if (!facts || facts.profile_type !== 'SourceWorkloadProfile'
+      || facts.platform !== 'openstack' || facts.schema_version !== 3) return [];
+  const records = facts.native.metadata.security_groups;
+  if (!Array.isArray(records)) return [];
+  const sourceRule = records.find(item => typeof item === 'object' && item !== null && (item as Record<string, unknown>).id === sourceId) as Record<string, unknown> | undefined;
+  if (!sourceRule || typeof sourceRule.semantics_sha256 !== 'string' || !sourceRule.semantics_sha256) return [];
+  return openstack.value?.security_groups.filter(item => item.semantics_sha256 === sourceRule.semantics_sha256) ?? [];
+}
 const sourceCategoryPresent = computed(() => {
   const facts = source.value?.facts;
   if (!facts || facts.profile_type !== 'SourceWorkloadProfile' || facts.platform !== 'ahv' || facts.schema_version !== 3) return false;
@@ -191,11 +201,12 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
           <label>Source security group {{ mapping.source_id }}
             <select v-model="mapping.destination_id" required @change="syncOpenstackPolicies">
               <option value="">Select a destination API security group</option>
-              <option v-for="group in openstack.security_groups" :key="group.id" :value="group.id">{{ group.name }} ({{ group.id }})</option>
+              <option v-for="group in matchingOpenstackGroups(mapping.source_id)" :key="group.id" :value="group.id">{{ group.name }} ({{ group.id }})</option>
             </select>
           </label>
         </div>
         <p v-if="!openstack.security_groups.length" role="alert">No destination security groups were discovered for the target project. No manual destination value is accepted.</p>
+        <p v-if="form.review.destination.security_mappings.some(m => matchingOpenstackGroups(m.source_id).length === 0)" role="alert">Some source rules have no exact semantic equivalent in this destination inventory. No arbitrary security-group selection is offered. An independently qualified translation is required.</p>
       </section>
       <p v-if="sourceSecurityIds === null && source?.facts.profile_type === 'SourceWorkloadProfile' && source.facts.nics.length" role="alert">Source security intent is not discoverable from this profile. Destination policy choices are unavailable until source security evidence is collected.</p>
       <VmwareDestination v-if="vmware && form.review.destination?.platform === 'vmware'" v-model="form.review.destination" :profile="vmware" :source-guest-id="source?.facts.profile_type === 'SourceWorkloadProfile' ? source.facts.guest_id : null" />
