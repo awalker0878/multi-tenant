@@ -409,6 +409,26 @@ def snapshot_fixture(
         "writer_principal": "fixture-writer",
         "observed_at": NOW, "expires_at": NOW + 120,
         "negative_flows": negative,
+        "boundary_controls": {
+            kind: {
+                "outcome": "passed",
+                "native_ref": "fixture://native-" + kind + "-negative-probe",
+                "native_scope": destination["native_scope"],
+                "policy_sha256": policy_sha,
+                "observed_at": NOW,
+                "expires_at": NOW + 120,
+            }
+            for kind in ("rbac", "storage", "keys")
+        },
+        "fault_hierarchy": {
+            w["id"]: {
+                "native_ref": pools[i]["native_ref"],
+                "rack": pools[i]["failure_domain"],
+                "zone": pools[i]["zone"],
+                "site_id": destination["site_id"],
+            }
+            for i, w in enumerate(intent["workloads"])
+        },
     }
     recoveries = [{
         "dataset_id": dataset["id"], "sequence": 1,
