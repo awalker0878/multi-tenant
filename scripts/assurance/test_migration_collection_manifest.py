@@ -24,7 +24,7 @@ MANDATORY = {
     "network.required_paths", "network.address_ownership",
     "security.tenant_isolation", "security.credential_scope",
     "operations.backup_coverage", "operations.monitoring",
-    "operations.cleanup_and_retention",
+    "operations.cleanup_and_retention", "placement.native_reserved_capacity",
 }
 SOURCE_DISK = {
     "vmware": {"storage.disk_inventory", "storage.disk_identity", "storage.disk_size",
@@ -150,6 +150,9 @@ class MigrationCollectionManifestTests(unittest.TestCase):
             self.assertEqual(rows["compute.power_state"]["max_age_seconds"], 10)
             self.assertLessEqual(rows["network.required_paths"]["max_age_seconds"], 300)
             self.assertLessEqual(rows["security.tenant_isolation"]["max_age_seconds"], 300)
+            self.assertLessEqual(
+                rows["placement.native_reserved_capacity"]["max_age_seconds"], 15
+            )
 
     def test_native_vm_and_volume_contract_field_names_are_traceable(self) -> None:
         specs = {
