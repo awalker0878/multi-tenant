@@ -20,6 +20,7 @@ class Snapshots:
         self.now = NOW
         self.in_use = False
         self.accounted: list[str] = []
+        self.withdrawn_tenants: set[str] = set()
         self.used = {"vcpus": 0, "memory_mib": 0, "storage_gib": 0, "addresses": 0}
         self.pool_id = digest({"provider_id": "physical-provider", "native_ref": "physical-host"})
 
@@ -35,7 +36,10 @@ class Snapshots:
                 "native_lease_id": "fixture-lease",
                 "lease_expires_at": self.now + 3600,
                 "policy_sha256": request["policy_sha256"],
-                "allowed_tenants": [request["scope"]["tenant_id"]],
+                "allowed_tenants": (
+                    [] if request["scope"]["tenant_id"] in self.withdrawn_tenants
+                    else [request["scope"]["tenant_id"]]
+                ),
                 "limits": {"vcpus": 8, "memory_mib": 8192, "storage_gib": 80, "addresses": 2},
                 "provider_used": self.used,
                 "accounted_reservation_ids": self.accounted,
@@ -124,3 +128,37 @@ def test_expiry_retains_debits_and_confirmed_usage_is_counted_once(database: Pos
         service.transition(first["scope"]["tenant_id"], first["plan_digest"], "release")
     third = request(source, 4)
     assert service.reserve(third["scope"]["tenant_id"], third)["state"] == "denied"
+
+
+def test_provider_usage_drift_revokes_previous_readback_without_freeing_debits(
+    database: Postgres,
+) -> None:
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    accepted = service.reserve(selected["scope"]["tenant_id"], selected)
+    assert accepted["state"] == "reserved"
+    source.used = {
+        "vcpus": 6, "memory_mib": 6144, "storage_gib": 60, "addresses": 2,
+    }
+    with pytest.raises(Held, match="provider_capacity_changed"):
+        service.check(selected["scope"]["tenant_id"], selected["plan_digest"])
+    # No silent compensating delete or speculative release on changed facts.
+    with database.transaction() as tx:
+        debit = tx.one(
+            "SELECT count(*) AS n FROM app.placement_debits WHERE reservation=%s",
+            (accepted["reservation_id"],),
+        )
+        assert debit is not None and debit["n"] == 1
+
+
+def test_provider_tenant_authorization_withdrawal_rejects_current_receipt(
+    database: Postgres,
+) -> None:
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    assert service.reserve(selected["scope"]["tenant_id"], selected)["state"] == "reserved"
+    source.withdrawn_tenants.add(selected["scope"]["tenant_id"])
+    with pytest.raises(Held, match="native_authority_unavailable"):
+        service.check(selected["scope"]["tenant_id"], selected["plan_digest"])
