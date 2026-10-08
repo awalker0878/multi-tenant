@@ -3,16 +3,9 @@
 from collections.abc import Callable
 from typing import Any
 
+from planning.domain.capability_definitions import METHOD_ALIASES as METHODS
 from planning.domain.expansion import matrix, tranche
 from planning.domain.model import Actor, Rejected, digest
-
-METHODS = {
-    "VM_COLD_EXPORT": "cold_export",
-    "VM_SNAPSHOT_BASELINE_APP_DELTA": "application_delta",
-    "VM_SNAPSHOT_BASELINE_FILE_DELTA": "file_delta",
-    "APPLICATION_REBUILD_RESTORE": "rebuild_restore",
-    "EXTERNAL_BLOCK_REPLICATION": "block_replication",
-}
 
 
 class MigrationSupport:

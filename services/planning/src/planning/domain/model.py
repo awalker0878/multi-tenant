@@ -7,26 +7,10 @@ from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
 
-DIMENSIONS = (
-    "installed_identity",
-    "compute_placement",
-    "storage_datasets",
-    "network_vpc",
-    "security_edge",
-    "guest_image",
-    "lifecycle_adoption",
-    "mobility",
-    "shared_services",
-    "resilience_operations",
-    "assurance_sovereignty",
-)
-PLATFORMS = ("vmware", "ahv", "openstack")
-ACTIONS = (
-    "application.provision",
-    "application.migrate",
-    "application.recover",
-    "application.retire",
-)
+from planning.domain.capability_definitions import ACTIONS as ACTIONS
+from planning.domain.capability_definitions import DIMENSIONS as DIMENSIONS
+from planning.domain.capability_definitions import PLATFORMS as PLATFORMS
+
 CANONICALIZATION = "p05-json-v1"
 
 

@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from planning.domain.capability_definitions import STRATEGIES
+from planning.domain.matching import matches
 from planning.domain.model import ACTIONS, DIMENSIONS, Rejected, digest, integer
 
 
@@ -81,12 +83,7 @@ def assess(
     method: str,
     now: int,
 ) -> dict[str, Any]:
-    if action not in ACTIONS or method not in {
-        "native_api_export_import",
-        "native_api",
-        "forward_recovery",
-        "owned_retirement",
-    }:
+    if action not in ACTIONS or method not in STRATEGIES:
         raise Rejected("unsupported_method")
     findings: list[dict[str, Any]] = []
 
@@ -205,7 +202,9 @@ def assess(
         key, value = row["key"], row["value"]
         mandatory = row["strength"] == "required"
         observation, support = observed.get(key), supported.get(key)
-        if observation is None:
+        if matches(key, value, []) is None:
+            status, reason = "unknown", "requirement_definition_unregistered"
+        elif observation is None:
             status, reason = "unknown", "mandatory_evidence_missing"
         # Observation safety is evaluated independently of qualification. A lab
         # waiver must never mask stale/unsupported facts or unresolved dependencies.
@@ -215,7 +214,7 @@ def assess(
             status, reason = "unknown", "requirement_evidence_unassessed"
         elif observation.get("expires_at", 0) <= now:
             status, reason = "unknown", "requirement_observation_expired"
-        elif digest(value) not in [digest(v) for v in observation.get("values", [])]:
+        elif not matches(key, value, observation.get("values", [])):
             status, reason = "blocked", "constraint_not_satisfied"
         elif observation.get("dependencies"):
             status, reason = "conditional", "dependency_requires_confirmation"
@@ -227,7 +226,7 @@ def assess(
             status, reason = "unknown", "requirement_evidence_unassessed"
         elif support.get("expires_at", 0) <= now:
             status, reason = "unknown", "requirement_qualification_expired"
-        elif digest(value) not in [digest(v) for v in support.get("values", [])]:
+        elif not matches(key, value, support.get("values", [])):
             status, reason = "blocked", "constraint_not_satisfied"
         elif support.get("dependencies"):
             status, reason = "conditional", "dependency_requires_confirmation"

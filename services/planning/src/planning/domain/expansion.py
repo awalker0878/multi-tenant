@@ -3,6 +3,10 @@
 from itertools import product
 from typing import Any
 
+from planning.domain.capability_definitions import GUESTS as GUESTS
+from planning.domain.capability_definitions import METHODS as METHODS
+from planning.domain.capability_definitions import OPERATIONS as OPERATIONS
+from planning.domain.capability_definitions import RETEST_TRIGGERS
 from planning.domain.model import (
     DIMENSIONS,
     PLATFORMS,
@@ -14,38 +18,7 @@ from planning.domain.model import (
     shape,
 )
 
-METHODS = ("cold_export", "rebuild_restore", "application_delta", "file_delta", "block_replication")
-GUESTS = ("linux", "windows", "appliance")
-OPERATIONS = (
-    "power_on",
-    "shutdown",
-    "power_off",
-    "resize_cpu",
-    "resize_memory",
-    "policy_change",
-    "patch",
-    "credential_rotation",
-    "scale_out",
-    "scale_in",
-    "ha_failover",
-    "relocate",
-    "adopt",
-)
-RETEST = (
-    "artifact",
-    "platform",
-    "api",
-    "backend",
-    "guest",
-    "method",
-    "policy",
-    "service",
-    "topology",
-    "recovery",
-    "ownership",
-    "expiry",
-    "revocation",
-)
+RETEST = RETEST_TRIGGERS
 
 
 def text(value: Any) -> str:

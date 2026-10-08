@@ -11,7 +11,7 @@ do not establish E3 native qualification or E4 receiving acceptance.
 | --- | --- | --- | --- |
 | CT-00a | Required immutable validation composition | Implemented | Planning Ruff, format and strict mypy pass; 383 tests pass locally, 6 PostgreSQL tests await GitHub runner |
 | CT-00b | Verified provenance and precise assessment status | Planned | Pending |
-| CT-01 | Canonical definition registry, generated consumers and typed matching | Planned | Pending |
+| CT-01 | Canonical definition registry, generated consumers and typed matching | Implemented | Generated projections agree; 30 stage combinations preserved; typed maximum/unit and handler tests pass; strict mypy passes in four products |
 | CT-02 | Verified qualification records, native observation projection and runtime invalidation | Planned | Pending |
 | CT-03 | Concrete placement and authoritative reservation owner integration | Planned | Pending |
 | CT-04 | Evidence-bound network, isolation and failure-domain evaluation | Planned | Pending |
@@ -52,3 +52,17 @@ binary and cannot change process user IDs. The GitHub PostgreSQL/TLS jobs remain
 required. Initial documentation-only CI also reports pre-existing failures:
 retained evaluation.log is absent, release-set policy fails and the Governance
 broker is not ready. These failures are not waived by this implementation.
+
+## CT-01 observations
+
+The versioned definition registry owns platform/action/strategy/method vocabularies,
+legacy aliases, method stage orders, base safety cases and requirement comparisons.
+Seven generated projections stay private to their contexts. CI checks projection
+bytes and method implementation/conformance coverage. Existing frozen v1 transport
+schemas are retained; later assurance contracts pin the definition digest.
+
+Maximum RPO/RTO fields accept a 60-second bound for a 120-second target and reject
+180 seconds, invalid numbers and wrong units. Unscoped legacy lists must meet the
+objective in every profile; no fastest-sample selection is allowed. Unknown
+requirement definitions remain unknown. The registry is metadata, never a native
+qualification decision.

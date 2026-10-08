@@ -7,20 +7,9 @@ from dataclasses import dataclass
 from typing import Any
 from uuid import UUID, uuid5
 
-DIMENSIONS = (
-    "installed_identity",
-    "compute_placement",
-    "storage_datasets",
-    "network_vpc",
-    "security_edge",
-    "guest_image",
-    "lifecycle_adoption",
-    "mobility",
-    "shared_services",
-    "resilience_operations",
-    "assurance_sovereignty",
-)
-PLATFORMS = ("openstack", "vmware", "ahv")
+from inventory.domain.capability_definitions import DIMENSIONS as DIMENSIONS
+from inventory.domain.capability_definitions import PLATFORMS as PLATFORMS
+
 KINDS = ("server", "network", "volume", "datastore")
 NAMESPACE = UUID("b4359728-538d-4dcf-8180-992e8923b74f")
 

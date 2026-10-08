@@ -1,0 +1,784 @@
+{
+  "schema_version": 1,
+  "definition_version": "1.0.0",
+  "platforms": [
+    "vmware",
+    "ahv",
+    "openstack"
+  ],
+  "dimensions": [
+    "installed_identity",
+    "compute_placement",
+    "storage_datasets",
+    "network_vpc",
+    "security_edge",
+    "guest_image",
+    "lifecycle_adoption",
+    "mobility",
+    "shared_services",
+    "resilience_operations",
+    "assurance_sovereignty"
+  ],
+  "actions": [
+    "application.provision",
+    "application.migrate",
+    "application.recover",
+    "application.retire"
+  ],
+  "strategies": [
+    "native_api_export_import",
+    "native_api",
+    "forward_recovery",
+    "owned_retirement"
+  ],
+  "guests": [
+    "linux",
+    "windows",
+    "appliance"
+  ],
+  "operations": [
+    "power_on",
+    "shutdown",
+    "power_off",
+    "resize_cpu",
+    "resize_memory",
+    "policy_change",
+    "patch",
+    "credential_rotation",
+    "scale_out",
+    "scale_in",
+    "ha_failover",
+    "relocate",
+    "adopt"
+  ],
+  "retest_triggers": [
+    "artifact",
+    "platform",
+    "api",
+    "backend",
+    "guest",
+    "method",
+    "policy",
+    "service",
+    "topology",
+    "recovery",
+    "ownership",
+    "expiry",
+    "revocation"
+  ],
+  "methods": {
+    "cold_export": {
+      "v1_alias": "VM_COLD_EXPORT",
+      "delta": "none",
+      "implementation_required": true,
+      "stages": {
+        "rehearsal": [
+          "source_prepare",
+          "capture",
+          "export_copy",
+          "convert_copy",
+          "import_target",
+          "transform_copy",
+          "rehearsal_validate",
+          "retain_rehearsal"
+        ],
+        "cutover": [
+          "source_prepare",
+          "capture",
+          "export_copy",
+          "convert_copy",
+          "import_target",
+          "transform_copy",
+          "fence_source",
+          "final_sync",
+          "shutdown_source",
+          "validate_target",
+          "admit_writes",
+          "verify_activation"
+        ],
+        "rollback": [
+          "fence_target",
+          "verify_no_divergence",
+          "restore_source",
+          "verify_source"
+        ],
+        "forward_recovery": [
+          "fence_target",
+          "preserve_target",
+          "recover_target",
+          "verify_recovery"
+        ],
+        "reverse_recovery": [
+          "fence_target",
+          "preserve_target",
+          "reverse_sync",
+          "verify_source_data",
+          "restore_source",
+          "verify_source"
+        ],
+        "cleanup": [
+          "remove_copy",
+          "remove_snapshot",
+          "verify_consolidation",
+          "revoke_migration_access"
+        ]
+      },
+      "implementation": {
+        "handler": "workers/lifecycle/src/lifecycle_worker/infrastructure/openstack_capture.py",
+        "conformance": "workers/lifecycle/tests/test_openstack_source.py"
+      }
+    },
+    "rebuild_restore": {
+      "v1_alias": "APPLICATION_REBUILD_RESTORE",
+      "delta": "restore",
+      "implementation_required": true,
+      "stages": {
+        "rehearsal": [
+          "source_prepare",
+          "export_copy",
+          "import_target",
+          "transform_copy",
+          "rehearsal_validate",
+          "retain_rehearsal"
+        ],
+        "cutover": [
+          "source_prepare",
+          "export_copy",
+          "import_target",
+          "transform_copy",
+          "fence_source",
+          "final_sync",
+          "shutdown_source",
+          "validate_target",
+          "admit_writes",
+          "verify_activation"
+        ],
+        "rollback": [
+          "fence_target",
+          "verify_no_divergence",
+          "restore_source",
+          "verify_source"
+        ],
+        "forward_recovery": [
+          "fence_target",
+          "preserve_target",
+          "recover_target",
+          "verify_recovery"
+        ],
+        "reverse_recovery": [
+          "fence_target",
+          "preserve_target",
+          "reverse_sync",
+          "verify_source_data",
+          "restore_source",
+          "verify_source"
+        ],
+        "cleanup": [
+          "remove_copy",
+          "remove_snapshot",
+          "verify_consolidation",
+          "revoke_migration_access"
+        ]
+      },
+      "implementation": {
+        "handler": "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_method.py",
+        "conformance": "workers/lifecycle/tests/test_method_protocol.py"
+      }
+    },
+    "application_delta": {
+      "v1_alias": "VM_SNAPSHOT_BASELINE_APP_DELTA",
+      "delta": "application",
+      "implementation_required": true,
+      "stages": {
+        "rehearsal": [
+          "source_prepare",
+          "capture",
+          "restart_baseline_source",
+          "export_copy",
+          "convert_copy",
+          "import_target",
+          "transform_copy",
+          "rehearsal_validate",
+          "retain_rehearsal"
+        ],
+        "cutover": [
+          "source_prepare",
+          "capture",
+          "restart_baseline_source",
+          "export_copy",
+          "convert_copy",
+          "import_target",
+          "transform_copy",
+          "fence_source",
+          "final_sync",
+          "shutdown_source",
+          "validate_target",
+          "admit_writes",
+          "verify_activation"
+        ],
+        "rollback": [
+          "fence_target",
+          "verify_no_divergence",
+          "restore_source",
+          "verify_source"
+        ],
+        "forward_recovery": [
+          "fence_target",
+          "preserve_target",
+          "recover_target",
+          "verify_recovery"
+        ],
+        "reverse_recovery": [
+          "fence_target",
+          "preserve_target",
+          "reverse_sync",
+          "verify_source_data",
+          "restore_source",
+          "verify_source"
+        ],
+        "cleanup": [
+          "remove_copy",
+          "remove_snapshot",
+          "verify_consolidation",
+          "revoke_migration_access"
+        ]
+      },
+      "implementation": {
+        "handler": "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_method.py",
+        "conformance": "workers/lifecycle/tests/test_method_protocol.py"
+      }
+    },
+    "file_delta": {
+      "v1_alias": "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+      "delta": "file",
+      "implementation_required": true,
+      "stages": {
+        "rehearsal": [
+          "source_prepare",
+          "capture",
+          "restart_baseline_source",
+          "export_copy",
+          "convert_copy",
+          "import_target",
+          "transform_copy",
+          "rehearsal_validate",
+          "retain_rehearsal"
+        ],
+        "cutover": [
+          "source_prepare",
+          "capture",
+          "restart_baseline_source",
+          "export_copy",
+          "convert_copy",
+          "import_target",
+          "transform_copy",
+          "fence_source",
+          "final_sync",
+          "shutdown_source",
+          "validate_target",
+          "admit_writes",
+          "verify_activation"
+        ],
+        "rollback": [
+          "fence_target",
+          "verify_no_divergence",
+          "restore_source",
+          "verify_source"
+        ],
+        "forward_recovery": [
+          "fence_target",
+          "preserve_target",
+          "recover_target",
+          "verify_recovery"
+        ],
+        "reverse_recovery": [
+          "fence_target",
+          "preserve_target",
+          "reverse_sync",
+          "verify_source_data",
+          "restore_source",
+          "verify_source"
+        ],
+        "cleanup": [
+          "remove_copy",
+          "remove_snapshot",
+          "verify_consolidation",
+          "revoke_migration_access"
+        ]
+      },
+      "implementation": {
+        "handler": "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_method.py",
+        "conformance": "workers/lifecycle/tests/test_method_protocol.py"
+      }
+    },
+    "block_replication": {
+      "v1_alias": "EXTERNAL_BLOCK_REPLICATION",
+      "delta": "block",
+      "implementation_required": true,
+      "stages": {
+        "rehearsal": [
+          "source_prepare",
+          "capture",
+          "import_target",
+          "transform_copy",
+          "rehearsal_validate",
+          "retain_rehearsal"
+        ],
+        "cutover": [
+          "source_prepare",
+          "capture",
+          "import_target",
+          "transform_copy",
+          "fence_source",
+          "final_sync",
+          "shutdown_source",
+          "validate_target",
+          "admit_writes",
+          "verify_activation"
+        ],
+        "rollback": [
+          "fence_target",
+          "verify_no_divergence",
+          "restore_source",
+          "verify_source"
+        ],
+        "forward_recovery": [
+          "fence_target",
+          "preserve_target",
+          "recover_target",
+          "verify_recovery"
+        ],
+        "reverse_recovery": [
+          "fence_target",
+          "preserve_target",
+          "reverse_sync",
+          "verify_source_data",
+          "restore_source",
+          "verify_source"
+        ],
+        "cleanup": [
+          "remove_copy",
+          "remove_snapshot",
+          "verify_consolidation",
+          "revoke_migration_access"
+        ]
+      },
+      "implementation": {
+        "handler": "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_method.py",
+        "conformance": "workers/lifecycle/tests/test_method_protocol.py"
+      }
+    }
+  },
+  "modes": [
+    "rehearsal",
+    "cutover",
+    "rollback",
+    "forward_recovery",
+    "reverse_recovery",
+    "cleanup"
+  ],
+  "stage_before": {
+    "source_prepare": [
+      "source_profile_current",
+      "target_profile_current",
+      "datasets_complete",
+      "application_capture_authorized",
+      "capacity_reserved",
+      "recoverability"
+    ],
+    "capture": [
+      "application_stopped",
+      "source_powered_off",
+      "all_source_writers_fenced"
+    ],
+    "restart_baseline_source": [
+      "snapshot_bound",
+      "delta_qualified",
+      "source_restart_authorized"
+    ],
+    "export_copy": [
+      "copy_isolated",
+      "copy_powered_off",
+      "snapshot_bound"
+    ],
+    "convert_copy": [
+      "export_integrity",
+      "copy_custody",
+      "conversion_artifact_current"
+    ],
+    "import_target": [
+      "converted_integrity",
+      "target_quarantine",
+      "capacity_reserved"
+    ],
+    "transform_copy": [
+      "target_quarantine",
+      "copy_custody",
+      "guest_profile_qualified"
+    ],
+    "rehearsal_validate": [
+      "target_quarantine",
+      "business_effects_suppressed",
+      "guest_ready"
+    ],
+    "retain_rehearsal": [
+      "rehearsal_integrity",
+      "business_effects_suppressed"
+    ],
+    "fence_source": [
+      "rehearsal_accepted",
+      "change_window_current",
+      "source_profile_current"
+    ],
+    "final_sync": [
+      "all_source_writers_fenced",
+      "application_stopped",
+      "delta_access_ready"
+    ],
+    "shutdown_source": [
+      "final_integrity",
+      "all_source_writers_fenced"
+    ],
+    "validate_target": [
+      "source_powered_off",
+      "all_source_writers_fenced",
+      "target_quarantine"
+    ],
+    "admit_writes": [
+      "source_powered_off",
+      "all_source_writers_fenced",
+      "final_integrity",
+      "guest_ready",
+      "application_health",
+      "policy_paths",
+      "required_services",
+      "backup_restore",
+      "change_window_current"
+    ],
+    "verify_activation": [
+      "source_powered_off",
+      "all_source_writers_fenced",
+      "target_writer_admitted"
+    ],
+    "fence_target": [
+      "recovery_decision_current",
+      "source_writer_fenced"
+    ],
+    "verify_no_divergence": [
+      "target_writer_fenced",
+      "target_requests_quiescent"
+    ],
+    "preserve_target": [
+      "target_writer_fenced",
+      "target_requests_quiescent",
+      "target_keys_readable"
+    ],
+    "recover_target": [
+      "accepted_target_changes_retained",
+      "source_writer_fenced"
+    ],
+    "reverse_sync": [
+      "accepted_target_changes_retained",
+      "source_writer_fenced",
+      "reverse_adapter_qualified"
+    ],
+    "verify_source_data": [
+      "reverse_sync_integrity",
+      "source_writer_fenced",
+      "target_writer_fenced"
+    ],
+    "restore_source": [
+      "source_return_integrity",
+      "target_writer_fenced",
+      "target_requests_quiescent"
+    ],
+    "verify_source": [
+      "source_writer_admitted",
+      "target_writer_fenced"
+    ],
+    "verify_recovery": [
+      "recovered_integrity",
+      "accepted_target_changes_retained",
+      "source_writer_fenced"
+    ],
+    "remove_copy": [
+      "separate_cleanup_authority",
+      "copy_owned",
+      "copy_powered_off",
+      "retained_evidence"
+    ],
+    "remove_snapshot": [
+      "separate_cleanup_authority",
+      "copy_absent",
+      "snapshot_owned",
+      "retained_evidence"
+    ],
+    "verify_consolidation": [
+      "snapshot_absent",
+      "source_retained"
+    ],
+    "revoke_migration_access": [
+      "snapshot_consolidated",
+      "retained_evidence",
+      "source_retained"
+    ]
+  },
+  "stage_after": {
+    "source_prepare": [
+      "application_stopped",
+      "source_powered_off",
+      "all_source_writers_fenced"
+    ],
+    "capture": [
+      "snapshot_bound",
+      "copy_isolated",
+      "copy_powered_off"
+    ],
+    "restart_baseline_source": [
+      "source_application_healthy",
+      "delta_tracking_active"
+    ],
+    "export_copy": [
+      "export_integrity",
+      "copy_custody",
+      "ovf_bound"
+    ],
+    "convert_copy": [
+      "converted_integrity",
+      "copy_custody"
+    ],
+    "import_target": [
+      "target_quarantine",
+      "target_disk_mapping",
+      "import_integrity"
+    ],
+    "transform_copy": [
+      "guest_ready",
+      "target_quarantine",
+      "business_effects_suppressed"
+    ],
+    "rehearsal_validate": [
+      "rehearsal_integrity",
+      "application_health",
+      "policy_paths",
+      "required_services"
+    ],
+    "retain_rehearsal": [
+      "rehearsal_dossier",
+      "target_writer_fenced",
+      "retained_evidence"
+    ],
+    "fence_source": [
+      "all_source_writers_fenced",
+      "application_stopped"
+    ],
+    "final_sync": [
+      "final_integrity",
+      "last_source_write_bound",
+      "all_source_writers_fenced"
+    ],
+    "shutdown_source": [
+      "source_powered_off",
+      "all_source_writers_fenced"
+    ],
+    "validate_target": [
+      "final_integrity",
+      "guest_ready",
+      "application_health",
+      "policy_paths",
+      "required_services",
+      "backup_restore",
+      "target_quarantine"
+    ],
+    "admit_writes": [
+      "target_writer_admitted",
+      "source_writer_fenced",
+      "traffic_active"
+    ],
+    "verify_activation": [
+      "application_health",
+      "policy_paths",
+      "required_services",
+      "outage_objective_met",
+      "data_objective_met",
+      "one_writer",
+      "source_retained"
+    ],
+    "fence_target": [
+      "target_writer_fenced",
+      "target_requests_quiescent"
+    ],
+    "verify_no_divergence": [
+      "source_return_integrity",
+      "no_target_divergence"
+    ],
+    "preserve_target": [
+      "accepted_target_changes_retained",
+      "target_keys_readable"
+    ],
+    "recover_target": [
+      "recovered_integrity",
+      "accepted_target_changes_retained"
+    ],
+    "reverse_sync": [
+      "reverse_sync_integrity",
+      "accepted_target_changes_retained"
+    ],
+    "verify_source_data": [
+      "source_return_integrity",
+      "accepted_target_changes_retained"
+    ],
+    "restore_source": [
+      "source_writer_admitted",
+      "target_writer_fenced"
+    ],
+    "verify_source": [
+      "application_health",
+      "one_writer",
+      "data_objective_met",
+      "outage_objective_met"
+    ],
+    "verify_recovery": [
+      "application_health",
+      "one_writer",
+      "data_objective_met",
+      "outage_objective_met"
+    ],
+    "remove_copy": [
+      "copy_absent",
+      "source_retained"
+    ],
+    "remove_snapshot": [
+      "snapshot_absent",
+      "source_retained"
+    ],
+    "verify_consolidation": [
+      "snapshot_consolidated",
+      "source_retained"
+    ],
+    "revoke_migration_access": [
+      "migration_access_revoked",
+      "buffers_removed",
+      "retained_evidence",
+      "source_retained"
+    ]
+  },
+  "terminals": {
+    "rehearsal": "rehearsed",
+    "cutover": "migrated",
+    "rollback": "recovered",
+    "forward_recovery": "recovered",
+    "reverse_recovery": "recovered",
+    "cleanup": "cleaned"
+  },
+  "requirements": {
+    "compute.architecture": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "data.consistency": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "guest.firmware": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "guest.hardening_profile": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "guest.image": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "guest.os": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "guest.secure_boot": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "network.address_intent": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "network.class": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "network.controlled_interface": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "network.family": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "placement.domain_isolation": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "placement.failure_domain.anti_affinity": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "placement.tenant_isolation": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "placement.zone_allowed": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "recovery.method": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "recovery.rpo_seconds": {
+      "comparison": "maximum",
+      "unit": "seconds"
+    },
+    "recovery.rto_seconds": {
+      "comparison": "maximum",
+      "unit": "seconds"
+    },
+    "service.backup": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "service.backup.owner": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "sovereignty.custody": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "sovereignty.data_path": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "sovereignty.location": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "storage.class": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "storage.encryption": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "service.*.owner": {
+      "comparison": "exact",
+      "unit": null
+    },
+    "placement.failure_domain.*": {
+      "comparison": "exact",
+      "unit": null
+    }
+  }
+}

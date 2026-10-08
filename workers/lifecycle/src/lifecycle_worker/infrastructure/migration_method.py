@@ -9,6 +9,7 @@ from typing import Any
 
 from lifecycle_worker.application.api_plan import shape
 from lifecycle_worker.application.native import NativeHeld, digest, identity, sha256
+from lifecycle_worker.domain.capability_definitions import PLATFORMS
 
 OPERATIONS = {
     "APPLICATION_REBUILD_RESTORE": {
@@ -69,7 +70,7 @@ def contract(value: Any, stage: str) -> dict[str, Any]:
     for side in ("source", "target"):
         row = c[side]
         shape(row, {"platform", "installation_id", "native_identity_sha256"})
-        if row["platform"] not in {"vmware", "openstack", "ahv"}:
+        if row["platform"] not in PLATFORMS:
             raise NativeHeld("migration_method_platform_unsupported")
         identity(row["installation_id"])
         if not sha256(row["native_identity_sha256"]):

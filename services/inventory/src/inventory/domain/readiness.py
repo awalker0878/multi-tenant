@@ -2,9 +2,11 @@
 
 from typing import Any
 
+from inventory.domain.capability_definitions import LEGACY_METHODS
 from inventory.domain.discovery import Rejected, shape
 from inventory.domain.operator_inputs import FIELDS, GROUPS
 
+METHODS = LEGACY_METHODS
 OPERATIONS = [
     {"id": "discover", "label": "Discover an environment"},
     {"id": "provision", "label": "Provision an application"},
@@ -12,13 +14,6 @@ OPERATIONS = [
     {"id": "adopt", "label": "Adopt existing resources"},
     {"id": "operate", "label": "Accept a service into operation"},
     {"id": "retire", "label": "Retire managed resources"},
-]
-METHODS = [
-    "APPLICATION_REBUILD_RESTORE",
-    "VM_SNAPSHOT_BASELINE_APP_DELTA",
-    "VM_SNAPSHOT_BASELINE_FILE_DELTA",
-    "VM_COLD_EXPORT",
-    "EXTERNAL_BLOCK_REPLICATION",
 ]
 
 
