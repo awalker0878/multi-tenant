@@ -271,14 +271,19 @@ def validate(m: dict[str, Any], now: int) -> None:
             "objectives",
             "rehearsal_sha256",
             "recovery_of_sha256",
-        },
+        }
+        | ({"destination_sha256"} if "destination_sha256" in m else set()),
     )
-    if type(m["schema_version"]) is not int or m["schema_version"] != 2:
+    if type(m["schema_version"]) is not int or m["schema_version"] != (
+        3 if "destination_sha256" in m else 2
+    ):
         raise Rejected("invalid_migration_version", 422)
     review = exact(m["review"], {"revision", "digest"})
     integer(review["revision"], 1)
     checksum(review["digest"])
     checksum(m["owner_inputs_sha256"])
+    if "destination_sha256" in m:
+        checksum(m["destination_sha256"])
     if m["method"] not in METHODS or m["mode"] not in MODES:
         raise Rejected("migration_method_or_mode_not_selected", 422)
     for side in ("source", "target"):

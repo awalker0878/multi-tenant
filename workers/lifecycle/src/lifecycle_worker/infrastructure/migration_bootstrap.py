@@ -267,6 +267,61 @@ class MountedMigrationRuntime:
                 raise NativeHeld("unexpected_image_observer")
             adapter.inspect(binding)
             return self.bound(adapter, binding, entry, image_identity_check), observer
+        elif kind == "ahv_destination" and set(config) == {"writer", "reader", "staging"}:
+            from lifecycle_worker.infrastructure.ahv_accounts import probe, validate_account
+            from lifecycle_worker.infrastructure.ahv_destination import (
+                AhvDestination,
+                AhvDestinationObserver,
+            )
+            from lifecycle_worker.infrastructure.ahv_http import AhvHttp
+            from lifecycle_worker.infrastructure.ahv_staging import AhvStaging
+
+            writer_account, reader_account = config["writer"], config["reader"]
+            writer_endpoint, reader_endpoint = (
+                endpoint(writer_account["endpoint"]),
+                endpoint(reader_account["endpoint"]),
+            )
+            if (writer_endpoint.base_url, writer_endpoint.address, writer_endpoint.ca_file) != (
+                reader_endpoint.base_url,
+                reader_endpoint.address,
+                reader_endpoint.ca_file,
+            ):
+                raise NativeHeld("ahv_observer_origin_changed")
+            writer_api, reader_api = (
+                AhvHttp(writer_endpoint),
+                AhvHttp(reader_endpoint, read_only=True),
+            )
+
+            def ahv_identity_check() -> None:
+                distinct_credentials(writer_endpoint, reader_endpoint)
+                if writer_account["user_id"] == reader_account["user_id"]:
+                    raise NativeHeld("independent_ahv_observer_required")
+                validate_account(writer_account, writer_endpoint)
+                validate_account(reader_account, reader_endpoint)
+
+            ahv_identity_check()
+            probe(writer_api, writer_account, writer_endpoint, self.clock, ahv_identity_check)
+            probe(reader_api, reader_account, reader_endpoint, self.clock, ahv_identity_check)
+            staged = config["staging"]
+            if not isinstance(staged, dict) or set(staged) != {"root", "spool", "origin"}:
+                raise NativeHeld("invalid_ahv_staging_configuration")
+            staging = AhvStaging(
+                Path(staged["root"]), Path(staged["spool"]), staged["origin"], self.clock
+            )
+            adapter = AhvDestination(path, writer_api, self.journal, self.journal, staging)
+            ahv_observer = AhvDestinationObserver(
+                path,
+                reader_api,
+                self.journal,
+                self.clock,
+                reader_account["user_id"],
+                writer_account["user_id"],
+                ahv_identity_check,
+            )
+            if entry["observer"] is not None:
+                raise NativeHeld("unexpected_ahv_observer")
+            adapter.inspect(binding)
+            return self.bound(adapter, binding, entry, ahv_identity_check), ahv_observer
         elif kind == "platform_lifecycle" and set(config) == {
             "writer",
             "reader",

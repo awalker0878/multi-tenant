@@ -48,3 +48,5 @@ Store the tranche baseline, per-row run manifests, conformance reports, Q02/Q04â
 ## Cleanup and reruns
 
 Reconcile active/unknown operations before retiring owned test resources and releasing budgets. Preserve source/target recovery datasets required by each route. Rerun changed rows and affected common cases when adapters, platform features, guest/method, enforcement, scheduling or recovery changes.
+
+The initial VMware â†’ AHV destination tranche has a [scoped native campaign](ahv-destination-tranche.md). Its component implementation and synthetic tests do not establish E3 or receiving acceptance.

@@ -23,10 +23,16 @@ NATIVE_KEYS = CUSTODY_KEYS | {
 
 def validate_contracts(manifest: dict[str, Any]) -> None:
     shape(manifest, {"schema_version", "api_versions", "adapter_sha256", "worker_image_digest"})
+    ahv = manifest.get("schema_version") == 2
+    expected = (
+        dict.fromkeys(("vmm", "prism", "clustermgmt", "networking", "microseg", "iam"), "v4.3")
+        if ahv
+        else {"compute": "2.1", "network": "2.0", "volume": "3.0"}
+    )
     if (
         type(manifest["schema_version"]) is not int
-        or manifest["schema_version"] != 1
-        or manifest["api_versions"] != {"compute": "2.1", "network": "2.0", "volume": "3.0"}
+        or manifest["schema_version"] not in {1, 2}
+        or manifest["api_versions"] != expected
         or not sha256(manifest["adapter_sha256"])
         or not isinstance(manifest["worker_image_digest"], str)
         or re.fullmatch(r"sha256:[a-f0-9]{64}", manifest["worker_image_digest"]) is None
@@ -160,7 +166,9 @@ def assess_native_plan(
         content.get("action") != "application.provision"
         or content.get("method") != "native_api"
         or content.get("lane") != "isolated_campaign"
-        or content["installed_tuple"].get("platform") != "openstack"
+        or (content["installed_tuple"].get("platform"), api_contracts["schema_version"])
+        not in {("openstack", 1), ("ahv", 2)}
+        or (api_contracts["schema_version"] == 2 and operation.get("kind") != "ahv_destination")
     ):
         holds.append("outside_initial_native_campaign")
     if any(

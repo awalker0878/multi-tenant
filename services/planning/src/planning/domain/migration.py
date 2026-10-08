@@ -46,6 +46,11 @@ def bind_migration(
             }
         )
     return {
+        **(
+            {"destination_sha256": digest(inputs["destination"])}
+            if inputs.get("destination") is not None
+            else {}
+        ),
         "review": {"revision": integer(inputs["revision"], 1), "digest": sha(inputs["digest"])},
         "method": inputs["method"],
         "source": inputs["source"],

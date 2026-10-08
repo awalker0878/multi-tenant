@@ -35,13 +35,14 @@ final class MigrationReviewController
         $input = $request->validate([
             'operation' => ['required', 'in:save,confirm'], 'command_key' => ['required', 'uuid', 'lowercase'],
             'revision' => ['nullable', 'integer', 'min:1', 'max:999999999'],
-            'review' => ['required_if:operation,save', 'array:source_profile_id,target_profile_id,method,datasets,owner_inputs,objectives,overrides'],
+            'review' => ['required_if:operation,save', 'array:source_profile_id,target_profile_id,method,datasets,owner_inputs,objectives,overrides,destination'],
             'review.source_profile_id' => ['required_if:operation,save', 'uuid', 'lowercase'],
             'review.target_profile_id' => ['required_if:operation,save', 'uuid', 'lowercase'],
             'review.method' => ['required_if:operation,save', 'string', 'max:80'],
             'review.datasets' => ['required_if:operation,save', 'array', 'min:1', 'max:256'],
             'review.owner_inputs' => ['required_if:operation,save', 'array', 'size:8'],
             'review.objectives' => ['required_if:operation,save', 'array'],
+            'review.destination' => ['sometimes', 'nullable', 'array:platform,project_id,prism_central_id,cluster_id,vpc_id,storage_container_id,category_ids,policy_ids,disks,nics,firmware'],
             'review.overrides' => ['present_if:operation,save', 'array', 'max:8'],
             'digest' => ['required_if:operation,confirm', 'nullable', 'regex:/\A[0-9a-f]{64}\z/'],
         ]);

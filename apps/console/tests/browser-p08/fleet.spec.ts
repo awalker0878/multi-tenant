@@ -6,7 +6,7 @@ test('discovers, groups and prepares source VMs with independent holds and curre
   const initial = await (await request.get('/__fleet')).json();
   const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto(base);
-  await expect(page.getByRole('heading', { name: 'Migrate to OpenStack', exact: true })).toBeFocused();
+  await expect(page.getByRole('heading', { name: 'Migrate virtual machines', exact: true })).toBeFocused();
   await page.getByLabel('Source connection', { exact: true }).selectOption(initial.endpoints.items[0].endpoint_id);
   await page.getByRole('button', { name: 'Refresh from API', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('API discovery queued.');
@@ -21,12 +21,12 @@ test('discovers, groups and prepares source VMs with independent holds and curre
   await expect(page.getByText('batch-worker', { exact: true })).toBeVisible();
   await expect(page.getByRole('checkbox', { checked: true })).toHaveCount(2);
   await page.getByLabel('Group name', { exact: true }).fill('Accounts · wave 1');
-  await page.getByLabel('OpenStack destination').selectOption(initial.workspace.targets[0].id);
+  await page.getByLabel('Destination profile').selectOption(initial.workspace.targets[0].id);
   await page.getByLabel('Catalogue application ID').fill(initial.endpoints.items[0].endpoint_id);
   await page.getByLabel('Catalogue environment ID').fill(initial.endpoints.items[0].endpoint_id);
   await page.getByRole('button', { name: 'Save migration group', exact: true }).click();
   await expect(page).toHaveURL(/\/groups\//);
-  await page.getByRole('button', { name: 'Prepare group for OpenStack', exact: true }).click();
+  await page.getByRole('button', { name: 'Prepare group for the selected destination', exact: true }).click();
   await expect(page.getByText('1 prepared · 1 held', { exact: true })).toBeVisible();
   let state = await (await request.get('/__fleet')).json();
   expect(state.preparations).toHaveLength(2);
@@ -49,10 +49,10 @@ test('discovers, groups and prepares source VMs with independent holds and curre
   expect(Object.keys(composed[0]).sort()).toEqual(['base_plan_id', 'command_key', 'digest', 'operation', 'recipe_id', 'resource_id', 'revision']);
   await page.screenshot({ path: info.outputPath('migration-fleet.png'), fullPage: true });
   await page.getByLabel('Group name', { exact: true }).fill('changed');
-  await expect(page.getByRole('button', { name: 'Prepare group for OpenStack', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Prepare group for the selected destination', exact: true })).toBeDisabled();
   await page.reload();
   await request.post('/__fleet', { data: { stale: true } });
-  await page.getByRole('button', { name: 'Prepare group for OpenStack', exact: true }).click();
+  await page.getByRole('button', { name: 'Prepare group for the selected destination', exact: true }).click();
   await expect(page.getByText('Batch paused. Refresh current findings before preparing again.', { exact: true })).toBeVisible();
   state = await (await request.get('/__fleet')).json(); expect(state.preparations).toHaveLength(3);
   await request.post('/__fleet', { data: { access: 403 } });

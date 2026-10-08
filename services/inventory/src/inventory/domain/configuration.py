@@ -163,17 +163,36 @@ def configuration_fact(value: Any, query: str) -> dict[str, Any]:
     return fact
 
 
-def manual_input(body: dict[str, Any]) -> None:
+AHV_CAPABILITIES = [
+    {
+        "id": "ahv_" + key,
+        "label": label,
+        "query": "ahv_" + key,
+        "match": "",
+        "meaning": "configured",
+    }
+    for key, label in (
+        ("storage_containers", "AHV storage containers"),
+        ("subnets", "AHV quarantine and production subnets"),
+        ("vpcs", "AHV virtual private clouds"),
+        ("categories", "AHV categories"),
+        ("policies", "Flow security policies"),
+    )
+]
+
+
+def manual_input(body: dict[str, Any], platform: str = "openstack") -> None:
+    capabilities = AHV_CAPABILITIES if platform == "ahv" else CAPABILITIES
     shape(body, {"source_endpoint", "target_endpoint", "manual", "choices"})
     shape(body["manual"], set(), set(MANUAL_FIELDS))
     for value in body["manual"].values():
         text(value, 240)
-    if not isinstance(body["choices"], list) or len(body["choices"]) != len(CAPABILITIES):
+    if not isinstance(body["choices"], list) or len(body["choices"]) != len(capabilities):
         raise Rejected("invalid_capability_choices")
     seen = set()
     for choice in body["choices"]:
         shape(choice, {"id", "required", "interpretation", "reason"})
-        if choice["id"] not in {c["id"] for c in CAPABILITIES} or choice["id"] in seen:
+        if choice["id"] not in {c["id"] for c in capabilities} or choice["id"] in seen:
             raise Rejected("invalid_capability_choices")
         seen.add(choice["id"])
         if type(choice["required"]) is not bool or choice["interpretation"] not in {

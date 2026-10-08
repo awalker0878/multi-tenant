@@ -377,3 +377,23 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
                 planning.execution_plan(tenant, key, 1)
             else:
                 planning.bound_plan(key, 1)
+
+
+def test_ahv_recipe_binds_exact_reviewed_destination_devices() -> None:
+    base, bound, recipe = values()
+    bound["destination_sha256"] = digest({"cluster": "observed", "quarantine": "selected"})
+    recipe.update(schema_version=2, destination_sha256=bound["destination_sha256"])
+    base["native_api"]["operation_plan"] = {
+        "kind": "ahv_destination",
+        "destination_sha256": bound["destination_sha256"],
+    }
+    recipe["base_content_sha256"] = digest(base)
+    recipe["intents"]["import_target"] = digest(base["native_api"]["operation_plan"])
+    result = compose_migration(base, bound, recipe, 1000)
+    assert result["native_migration"]["migration"]["schema_version"] == 3
+    assert (
+        result["native_migration"]["migration"]["destination_sha256"] == bound["destination_sha256"]
+    )
+    recipe["destination_sha256"] = digest("different NIC mapping")
+    with pytest.raises(Rejected, match="destination_mapping_changed"):
+        compose_migration(base, bound, recipe, 1000)

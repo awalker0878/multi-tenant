@@ -269,3 +269,26 @@ def test_cli_hashes_actual_bytes_and_redacts_errors(
     assert main(arguments) == 1
     error = capsys.readouterr().out
     assert "must-not-escape" not in error and str(tmp_path) not in error
+
+
+def test_ahv_v43_campaign_preserves_commissioning_and_never_grants_writes() -> None:
+    values = inputs()
+    plan, commissioning, manifest, snapshot = values
+    versions = dict.fromkeys(
+        ("vmm", "prism", "clustermgmt", "networking", "microseg", "iam"), "v4.3"
+    )
+    manifest.update(schema_version=2, api_versions=versions)
+    content = plan["content"]
+    content["installed_tuple"]["platform"] = "ahv"
+    operation = content["native_api"]["operation_plan"]
+    operation.update(kind="ahv_destination", api_versions=deepcopy(versions))
+    content["native_api"]["operation_plan_sha256"] = digest(operation)
+    content["native_api"]["api_contracts_sha256"] = digest(manifest)
+    snapshot["installed_tuple"] = deepcopy(content["installed_tuple"])
+    snapshot["api_contracts_sha256"] = digest(manifest)
+    rebind(plan, commissioning)
+    result = check(values)
+    assert result["holds"] == [] and not result["native_write_authorized"]
+    manifest["api_versions"]["vmm"] = "v4.4"
+    with pytest.raises(Rejected, match="unpinned_native_api_contracts"):
+        check(values)

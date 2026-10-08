@@ -7,12 +7,12 @@ import { operatorFixture } from './operator-fixture.ts';
 import { fleetFixture } from './fleet-fixture.ts';
 import { campaignFixture } from './campaign-fixture.ts';
 
-const fixture = JSON.parse(readFileSync('../../contracts/fixtures/inventory/migration-profile-v1.json', 'utf8'));
 export const tenant = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 export const site = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
 export const route = `/tenants/${tenant}/inventory/sites/${site}/migration`;
 let state: any;
-function reset() {
+function reset(ahv = false) {
+  const fixture = JSON.parse(readFileSync(`../../contracts/fixtures/inventory/${ahv ? 'ahv-destination-v1' : 'migration-profile-v1'}.json`, 'utf8'));
   const now = Math.floor(Date.now() / 1000);
   state = { posts: [], errors: {}, notice: null, uncertain: false, access: 200,
     workspace: { methods: ['VM_COLD_EXPORT', 'VM_SNAPSHOT_BASELINE_APP_DELTA'], owner_fields: Object.keys(fixture.review.owner_inputs), review: null,
@@ -30,7 +30,7 @@ export default defineConfig({
       if (path === '/__fixture') {
         if (req.method === 'POST') {
           const control = JSON.parse(body);
-          if (control.reset) reset();
+          if (control.reset) reset(!!control.ahv);
           if (control.uncertain) state.uncertain = true;
           if (control.access) state.access = control.access;
           if (control.expire) state.workspace.profiles.forEach((p: any) => { p.expires_at = Math.floor(Date.now()/1000) - 1; p.current = false; });

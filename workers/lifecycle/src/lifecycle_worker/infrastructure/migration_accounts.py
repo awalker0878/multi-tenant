@@ -52,7 +52,7 @@ class MigrationAccountProbe:
         raw = protected_read(self.path, 262144)
         config = decode(raw)
         shape(config, {"schema_version", "scope", "expires_at", "source", "target"})
-        if type(config["schema_version"]) is not int or config["schema_version"] != 1:
+        if type(config["schema_version"]) is not int or config["schema_version"] not in {1, 2}:
             raise NativeHeld("invalid_account_manifest")
         scope = shape(config["scope"], {"tenant_id", "site_id", "environment", "executor_id"})
         for value in scope.values():
@@ -81,7 +81,17 @@ class MigrationAccountProbe:
         for field in ("session_manager", "authorization_manager"):
             text(source[field], r"[A-Za-z0-9_-]{1,80}")
         shape(source["accounts"], ROLES)
-        target = shape(config["target"], {"project_id", "accounts"})
+        ahv = config["schema_version"] == 2
+        target = shape(
+            config["target"],
+            {"project_id", "accounts"}
+            | ({"platform", "prism_central_id", "cluster_id"} if ahv else set()),
+        )
+        if ahv:
+            if target["platform"] != "ahv":
+                raise NativeHeld("invalid_account_manifest")
+            identity(target["prism_central_id"])
+            identity(target["cluster_id"])
         native_identity(target["project_id"])
         shape(target["accounts"], ROLES)
         # Compare credential bytes as well as configured identities, including aliases.
@@ -93,6 +103,14 @@ class MigrationAccountProbe:
                     account,
                     {"user_name", "endpoint", "privileges"}
                     if side is source
+                    else {
+                        "user_id",
+                        "key_id",
+                        "credential_sha256",
+                        "authorization_policies",
+                        "endpoint",
+                    }
+                    if ahv
                     else {"user_id", "endpoints", "roles"},
                 )
                 principal = (
@@ -100,13 +118,15 @@ class MigrationAccountProbe:
                     if side is source
                     else native_identity(account["user_id"])
                 )
-                principal = ("vmware:" if side is source else "openstack:") + principal.casefold()
+                principal = (
+                    "vmware:" if side is source else "ahv:" if ahv else "openstack:"
+                ) + principal.casefold()
                 if principal in users:
                     raise NativeHeld("distinct_migration_accounts_required")
                 users.add(principal)
                 token_file = (
                     endpoint(account["endpoint"]).token_file
-                    if side is source
+                    if side is source or ahv
                     else endpoints(account["endpoints"])["identity"].token_file
                 )
                 secret = protected_read(token_file, 4096).rstrip(b"\r\n")
@@ -208,6 +228,35 @@ class MigrationAccountProbe:
         for role in sorted(ROLES):
             current()
             account = target["accounts"][role]
+            if ahv:
+                from lifecycle_worker.infrastructure.ahv_accounts import probe
+                from lifecycle_worker.infrastructure.ahv_http import AhvHttp, read
+
+                connection = endpoint(account["endpoint"])
+                api_ahv = AhvHttp(connection, read_only=True)
+                evidence_ahv = probe(api_ahv, account, connection, self.clock, current)
+                for namespace, resource, field in (
+                    ("prism", "domain-managers", "prism_central_id"),
+                    ("clustermgmt", "clusters", "cluster_id"),
+                ):
+                    observed_ahv = read(
+                        api_ahv,
+                        "/api/" + namespace + "/v4.3/config/" + resource + "/" + target[field],
+                        current,
+                    )
+                    if observed_ahv.get("extId") != target[field]:
+                        raise NativeHeld("ahv_destination_identity_changed")
+                results.append(
+                    {
+                        "side": "target",
+                        "role": role,
+                        **evidence_ahv,
+                        "scope_sha256": digest(
+                            [target["project_id"], target["prism_central_id"], target["cluster_id"]]
+                        ),
+                    }
+                )
+                continue
             reads = NativeReads(endpoints(account["endpoints"]))
             token = reads.get("identity", "/auth/tokens", subject=True).get("token", {})
             expiry = datetime.fromisoformat(token.get("expires_at", "").replace("Z", "+00:00"))
