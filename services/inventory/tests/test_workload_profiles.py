@@ -70,6 +70,7 @@ def profile(now: float, source: bool = True) -> dict[str, Any]:
             compute_version={"version": "2.100", "min_version": "2.1"},
             volume_version={"version": "3.75", "min_version": "3.0"},
             required_capability_evidence=["guest_driver_profile"],
+            security_groups=[],
         )
     return p
 
