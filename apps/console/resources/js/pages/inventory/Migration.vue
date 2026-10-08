@@ -105,7 +105,7 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
       <section class="rounded border border-slate-300 p-4" aria-labelledby="feature-map-title">
         <h2 id="feature-map-title" class="text-lg font-semibold">Cross-platform feature mapping (not qualification)</h2>
         <p class="mt-2 text-sm">The mapping identifies possible translations, never asserts that this installation supports them. Native API facts must come from Inventory; the application and platform owners supply decisions, and Assurance independently validates required behavior.</p>
-        <p v-if="!featureDirection" role="status" class="mt-2">Choose both VM source and destination environments to see their 29 feature mappings.</p>
+        <p v-if="!featureDirection" role="status" class="mt-2">Choose both VM source and destination environments to see their 30 feature mappings.</p>
         <template v-else>
           <p class="mt-2 font-medium">{{ source?.facts.platform }} → {{ target?.facts.platform }} · {{ migrationFeatures.filter(item => item.criticality === 'critical').length }} critical feature areas · no native eligibility implied</p>
           <details class="mt-3">
