@@ -203,6 +203,7 @@ def current_application_flow_proof(
         raise Rejected("native_security_e4_cases_missing", 423)
     if platform in {"vmware", "ahv"}:
         from planning.domain.effective_security import qualify as qualify_effective_security
+        from planning.domain.security_boundary import compare as compare_policy_boundary
 
         selected = {row["source_flow_id"]: row for row in selected_bindings}
         if len(selected) != len(selected_bindings):
@@ -210,7 +211,7 @@ def current_application_flow_proof(
         checked: set[str] = set()
         for case in security_cases:
             if not isinstance(case, dict) or set(case) != {
-                "source_flow_id", "flow", "source_document", "document"
+                "source_flow_id", "flow", "source_document", "document", "boundary"
             }:
                 raise Rejected("native_security_e4_case_invalid", 423)
             flow_id = case["source_flow_id"]
@@ -226,6 +227,11 @@ def current_application_flow_proof(
                 or case["source_document"].get("platform") != source_platform
             ):
                 raise Rejected("native_security_e4_case_mismatch", 423)
+            boundary = compare_policy_boundary(
+                case["source_document"], case["document"], case["boundary"], now,
+            )
+            if boundary["status"] != "qualified":
+                raise Rejected("native_security_policy_boundary_unqualified", 423)
             source_result = qualify_effective_security(
                 case["source_document"], source, now,
             )
