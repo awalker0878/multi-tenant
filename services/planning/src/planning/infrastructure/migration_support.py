@@ -120,6 +120,7 @@ def api_capability_records(
 
 def current_application_flow_proof(
     actor: Actor, site: str, saved: dict[str, Any], now: int,
+    binding: dict[str, Any],
 ) -> None:
     """Service-only fresh E4 gate, independent of saved Console approval.
 
@@ -163,6 +164,13 @@ def current_application_flow_proof(
     ):
         raise Rejected("application_flow_qualification_scope_changed", 423)
     receipt = result["flow_evidence"]
+    source_platform = binding.get("source", {}).get("platform")
+    target_platform = binding.get("target", {}).get("platform")
+    if (
+        source_platform not in {"openstack", "vmware", "ahv"}
+        or target_platform != payload.get("destination_platform")
+    ):
+        raise Rejected("application_flow_migration_platform_mismatch", 423)
     if not isinstance(receipt, dict) or any(
         receipt.get(field) != expected
         for field, expected in (
@@ -174,7 +182,8 @@ def current_application_flow_proof(
             ("native_controls_sha256", payload.get("native_controls_sha256")),
             ("omissions_sha256", digest(payload.get("omissions", []))),
             ("destination_generation_id", payload.get("destination_generation_id")),
-            ("platform", payload.get("destination_platform")),
+            ("platform", target_platform),
+            ("source_platform", source_platform),
             ("level", "E4"),
             ("decision", "accepted"),
             ("native_write_authorized", False),
@@ -198,7 +207,7 @@ def current_application_flow_proof(
         checked: set[str] = set()
         for case in security_cases:
             if not isinstance(case, dict) or set(case) != {
-                "source_flow_id", "flow", "document"
+                "source_flow_id", "flow", "source_document", "document"
             }:
                 raise Rejected("native_security_e4_case_invalid", 423)
             flow_id = case["source_flow_id"]
@@ -210,8 +219,15 @@ def current_application_flow_proof(
                 or digest(source) != flow_id
                 or not isinstance(case["document"], dict)
                 or case["document"].get("platform") != platform
+                or not isinstance(case["source_document"], dict)
+                or case["source_document"].get("platform") != source_platform
             ):
                 raise Rejected("native_security_e4_case_mismatch", 423)
+            source_result = qualify_effective_security(
+                case["source_document"], source, now,
+            )
+            if source_result["status"] != "qualified":
+                raise Rejected("native_source_security_e4_unqualified", 423)
             result = qualify_effective_security(case["document"], source, now)
             if (
                 result["status"] != "qualified"
