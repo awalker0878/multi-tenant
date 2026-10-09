@@ -34,13 +34,14 @@ async function refresh() {
     if (!data.available || data.support.directions.length !== capabilityDefinitions.platforms.length ** 2) throw new Error();
     current.value = data.support; unavailable.value = false;
     void refreshFlowChoices();
+    void refreshWorkloadReadiness();
   } catch { if (active) unavailable.value = true; }
   finally { clearTimeout(deadline); running = false; if (active) timer = setTimeout(refresh, 15_000); }
 }
 function visible() { if (!document.hidden) void refresh(); }
 function hide() { unavailable.value = true; controller?.abort(); }
 onMounted(() => { timer = setTimeout(refresh, 15_000); document.addEventListener('visibilitychange', visible); window.addEventListener('pagehide', hide); window.addEventListener('pageshow', visible); });
-onUnmounted(() => { active = false; controller?.abort(); clearTimeout(timer); document.removeEventListener('visibilitychange', visible); window.removeEventListener('pagehide', hide); window.removeEventListener('pageshow', visible); });
+onUnmounted(() => { active = false; controller?.abort(); clearTimeout(timer); clearTimeout(workloadExpiryTimer); document.removeEventListener('visibilitychange', visible); window.removeEventListener('pagehide', hide); window.removeEventListener('pageshow', visible); });
 const versions = (platform: Platform) => Object.entries(platform.versions).map(([key, value]) => `${key}: ${value}`).join('; ');
 
 type NativeChoice = {
@@ -158,13 +159,79 @@ function saveFlowChoices() {
     onError: () => { void refreshFlowChoices(); },
   });
 }
-onMounted(() => { void refreshFlowChoices(); });
+onMounted(() => { void refreshFlowChoices(); void refreshWorkloadReadiness(); });
 
+type WorkloadField = { field: string; disposition: string; required: boolean };
+type WorkloadDecision = {
+  schema_version: 2; kind: 'migration_workload_readiness'; status: 'eligible' | 'held';
+  holds: string[]; expires_at: number; readiness_sha256: string; native_write_authorized: false;
+  workload_reconciliation: { workloads: { workload_id: string; status: string; holds: string[]; field_dispositions: WorkloadField[] }[] };
+  collection_coverages: { scope: string; status: string; holds: string[]; attributes: { attribute_id: string; status: string; reason: string }[] }[];
+};
+const workload = ref<WorkloadDecision | null>(null);
+const workloadHolds = ref<string[]>([]);
+const workloadUnavailable = ref(true);
+const workloadExpired = ref(true);
+let workloadExpiryTimer: ReturnType<typeof setTimeout> | undefined;
+async function refreshWorkloadReadiness(): Promise<void> {
+  try {
+    const response = await fetch(url + '/workload-readiness', {
+      credentials: 'same-origin', cache: 'no-store', redirect: 'manual',
+      headers: { Accept: 'application/json' },
+    });
+    if (!active) return;
+    if (!response.ok || !response.headers.get('Content-Type')?.includes('application/json')) throw new Error();
+    const result = await response.json() as {
+      available: boolean; readiness?: WorkloadDecision; holds: string[]; status: string;
+    };
+    if (!active || !result.available || !Array.isArray(result.holds)) throw new Error();
+    workload.value = result.readiness ?? null;
+    workloadHolds.value = result.holds;
+    workloadUnavailable.value = false;
+    clearTimeout(workloadExpiryTimer);
+    workloadExpired.value = !result.readiness || result.readiness.expires_at <= Math.floor(Date.now() / 1000);
+    if (result.readiness && !workloadExpired.value) {
+      workloadExpiryTimer = setTimeout(() => { workloadExpired.value = true; },
+        Math.min(2_147_483_647, Math.max(1, result.readiness!.expires_at * 1000 - Date.now())));
+    }
+  } catch {
+    if (active) { workloadUnavailable.value = true; workloadExpired.value = true; workload.value = null; }
+  }
+}
 </script>
 
 <template>
   <CatalogueLayout title="Directional migration support" :tenant-id="tenantId">
     <Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}/migration-fleet`" class="text-teal-800 underline">Migration fleet</Link>
+    <section class="mt-5 rounded border border-slate-300 p-4" aria-label="Current application workload admission preview">
+      <h2 class="text-lg font-semibold">Complete workload migration readiness (Planning v2)</h2>
+      <p class="mt-2">This read-only decision is resolved from the confirmed Inventory review, current Catalogue intent, independent field receipts and Planning's admission resolver. It is not an operator-supplied claim or an authorization to execute.</p>
+      <p v-if="workloadUnavailable" role="alert" class="mt-2">Current workload decision is unavailable. Migration remains held.</p>
+      <template v-else>
+        <p :role="workload?.status === 'eligible' && !workloadExpired ? 'status' : 'alert'" class="mt-2 font-semibold">
+          {{ workload?.status === 'eligible' && !workloadExpired ? 'Current workload evidence resolved — no native write granted' : 'Workload migration held' }}
+        </p>
+        <p v-if="workload" class="text-xs break-all">Contract: {{ workload.readiness_sha256 }} · Valid until {{ new Date(workload.expires_at * 1000).toLocaleString() }}</p>
+        <p v-if="workloadHolds.length" role="alert">Unresolved: {{ workloadHolds.join(', ').replaceAll('_', ' ') }}</p>
+        <div v-for="entry in workload?.workload_reconciliation.workloads ?? []" :key="entry.workload_id" class="mt-3 border-t pt-2">
+          <strong>Logical VM {{ entry.workload_id }} — {{ entry.status }}</strong>
+          <p v-for="hold in entry.holds" :key="hold" class="text-sm">{{ hold.replaceAll('_', ' ') }}</p>
+          <details v-if="entry.field_dispositions.length"><summary>Required native semantics and dispositions</summary>
+            <ul class="list-disc pl-5 text-sm">
+              <li v-for="field in entry.field_dispositions" :key="field.field">{{ field.field }}: {{ field.disposition.replaceAll('_', ' ') }}{{ field.required ? ' (required)' : ' (optional)' }}</li>
+            </ul>
+          </details>
+        </div>
+        <details v-if="workload?.collection_coverages.length" class="mt-3">
+          <summary>Scoped collection evidence and missing attributes</summary>
+          <div v-for="item in workload?.collection_coverages ?? []" :key="item.scope">
+            <strong>{{ item.scope }} — {{ item.status }}</strong>
+            <p v-for="hold in item.holds" :key="hold">{{ hold.replaceAll('_', ' ') }}</p>
+          </div>
+        </details>
+      </template>
+      <button type="button" class="mt-3 underline" @click="refreshWorkloadReadiness">Refresh current workload evidence</button>
+    </section>
     <section class="mt-5 rounded border border-slate-300 p-4" aria-label="Source-approved application flow mapping">
       <h2 class="text-lg font-semibold">Required application flows → existing destination controls</h2>
       <p class="mt-2">These dependencies come from the verified application owner's Planning intent—not from VM NICs or generic firewall ACLs. Select only API-discovered destination firewall rules and routes. Save records the choices, but does not authorize migration or replace independent allow/deny, return-path, and tenant-isolation tests.</p>
