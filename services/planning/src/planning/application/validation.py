@@ -60,8 +60,12 @@ class MigrationValidation:
         )
         composition = plan["content"]["native_migration"]
         readiness = self.support(actor, scope["site_id"], composition["migration"])
-        if (not isinstance(readiness, dict) or readiness.get("status") != "eligible"
-                or readiness.get("holds") != [] or readiness.get("native_write_authorized") is not False):
+        if (
+            not isinstance(readiness, dict)
+            or readiness.get("status") != "eligible"
+            or readiness.get("holds") != []
+            or readiness.get("native_write_authorized") is not False
+        ):
             raise Rejected("migration_readiness_held", 423)
         recipe = self.recipes(actor, scope["site_id"], composition["recipe_id"])
         if digest(recipe) != composition["recipe_sha256"] or recipe["expires_at"] <= self.clock():
