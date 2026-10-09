@@ -148,7 +148,7 @@ def test_empty_collection_cannot_be_attested_by_matching_checksums() -> None:
     value["readiness_sha256"] = digest({
         k: v for k, v in value.items() if k != "readiness_sha256"
     })
-    with pytest.raises(Rejected, match="migration_readiness_contract_invalid"):
+    with pytest.raises(Rejected, match="migration_collection_coverage_not_current"):
         verify(value, content, "10000000-0000-4000-8000-000000000001", 101)
 
 def test_nested_workload_status_and_coverage_expiry_are_independent_gates() -> None:
