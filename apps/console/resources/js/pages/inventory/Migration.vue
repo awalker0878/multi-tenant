@@ -108,9 +108,11 @@ function attestUncataloguedDisk(id: string): void {
       disposition: 'uncatalogued_attested', owner_approval_sha256: '', impact_sha256: '' });
   }
 }
-function beginCatalogueAssociation(): void {
-  if (!source.value || source.value.facts.profile_type !== 'SourceWorkloadProfile') return;
-  void loadCatalogueChoices();
+function updateUncataloguedEvidence(
+  id: string, field: 'owner_approval_sha256' | 'impact_sha256', value: string,
+): void {
+  const entry = form.review.catalogue_binding?.disk_dispositions?.find(d => d.logical_device_id === id);
+  if (entry) entry[field] = value.trim();
 }
 onMounted(() => { void loadCatalogueChoices(); });
 watch(() => form.review.source_profile_id, (next, previous) => {
@@ -484,10 +486,10 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
             <button type="button" class="secondary" :disabled="blocked || !form.review.catalogue_binding.disk_mappings.some(m => m.logical_device_id === disk.id)" @click="attestUncataloguedDisk(disk.id)">Add owner attestation</button>
             <div v-if="form.review.catalogue_binding.disk_dispositions?.some(d => d.logical_device_id === disk.id)" class="mt-2 grid gap-3 md:grid-cols-2">
               <label>Owner approval evidence SHA-256
-                <input v-model.trim="form.review.catalogue_binding.disk_dispositions![form.review.catalogue_binding.disk_dispositions!.findIndex(d => d.logical_device_id === disk.id)].owner_approval_sha256" pattern="[a-f0-9]{64}" required />
+                <input :value="form.review.catalogue_binding.disk_dispositions?.find(d => d.logical_device_id === disk.id)?.owner_approval_sha256 ?? ''" pattern="[a-f0-9]{64}" required @input="updateUncataloguedEvidence(disk.id, 'owner_approval_sha256', ($event.target as HTMLInputElement).value)" />
               </label>
               <label>Measured migration impact SHA-256
-                <input v-model.trim="form.review.catalogue_binding.disk_dispositions![form.review.catalogue_binding.disk_dispositions!.findIndex(d => d.logical_device_id === disk.id)].impact_sha256" pattern="[a-f0-9]{64}" required />
+                <input :value="form.review.catalogue_binding.disk_dispositions?.find(d => d.logical_device_id === disk.id)?.impact_sha256 ?? ''" pattern="[a-f0-9]{64}" required @input="updateUncataloguedEvidence(disk.id, 'impact_sha256', ($event.target as HTMLInputElement).value)" />
               </label>
             </div>
           </div>
