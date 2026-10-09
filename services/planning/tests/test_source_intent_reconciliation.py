@@ -79,6 +79,14 @@ def test_native_identity_or_application_flow_cannot_be_inferred() -> None:
         reconcile(intent, digest(intent), links, profiles, 100)
     intent, links, profiles = values()
     intent["dependencies"] = [{"kind": "communication"}]
+    links[0]["catalogue_digest"] = digest(intent)
     assert "application_dependency_e4_validation_required" in reconcile(
         intent, digest(intent), links, profiles, 100
     )["holds"]
+
+
+def test_catalogue_document_cannot_be_substituted_behind_receipt_digest() -> None:
+    intent, links, profiles = values()
+    intent["workloads"][0]["compute"]["vcpus"] = 8
+    with pytest.raises(Rejected, match="catalogue_document_changed"):
+        reconcile(intent, links[0]["catalogue_digest"], links, profiles, 100)
