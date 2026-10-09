@@ -121,7 +121,7 @@ class PlacementReservations:
                         if kind not in held:
                             raise Held("placement_pool_class_limit_missing")
                         held[kind] += value
-                if any(used[k] + held[k] + requested[k] > limits[k] for k in limits):
+                if any(used[k] + held[k] + requested.get(k, 0) > limits[k] for k in limits):
                     state = "denied"
             identity = str(uuid4())
             tx.execute(

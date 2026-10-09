@@ -189,3 +189,23 @@ def test_provider_usage_class_not_in_limits_invalidates_existing_receipt(
     source.used["storage_gib:premium"] = 10
     with pytest.raises(Held, match="class_limit_missing"):
         service.check(selected["scope"]["tenant_id"], selected["plan_digest"])
+
+
+def test_unused_class_limit_does_not_require_an_allocation_in_that_class(
+    database: Postgres,
+) -> None:
+    """A pool may offer IPv6 headroom to an IPv4-only VM."""
+
+    class PoolWithExtraClass(Snapshots):
+        def pools(self, request: dict[str, Any]) -> list[dict[str, Any]]:
+            observed = super().pools(request)
+            observed[0]["limits"]["addresses:private:ipv6"] = 2
+            observed[0]["provider_used"]["addresses:private:ipv6"] = 0
+            return observed
+
+    source = PoolWithExtraClass()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    receipt = service.reserve(selected["scope"]["tenant_id"], selected)
+    assert receipt["state"] == "reserved"
+    assert service.check(selected["scope"]["tenant_id"], selected["plan_digest"])["state"] == "reserved"
