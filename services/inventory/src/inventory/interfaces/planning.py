@@ -117,17 +117,19 @@ class PlanningInputApp:
                 payload = await asyncio.to_thread(
                     planning_input, self.discovery, tenant, site, endpoint, generation
                 )
-            if scope["path"].startswith("/internal/"):
+            if capability_internal:
+                assert self.capability_authority is not None
+                await asyncio.to_thread(
+                    self.capability_authority,
+                    auth[7:], tenant, application, environment,
+                    site, endpoint, generation,
+                )
+            elif scope["path"].startswith("/internal/"):
                 assert self.native_authority is not None
                 await asyncio.to_thread(
                     self.native_authority,
-                    auth[7:],
-                    tenant,
-                    application,
-                    environment,
-                    site,
-                    int(endpoint),
-                    generation,
+                    auth[7:], tenant, application, environment,
+                    site, int(endpoint), generation,
                 )
             status = 200
         except Rejected as e:
