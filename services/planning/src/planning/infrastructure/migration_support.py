@@ -116,3 +116,80 @@ def api_capability_records(
     if not isinstance(matches, dict) or len(matches) > 512:
         raise Rejected("migration_api_evidence_invalid", 423)
     return matches.get(digest(route))
+
+
+def current_application_flow_proof(
+    actor: Actor, site: str, saved: dict[str, Any], now: int,
+) -> None:
+    """Service-only fresh E4 gate, independent of saved Console approval.
+
+    Catalogue confirms the current published source revision. Assurance must
+    independently resolve an E4 runtime-qualified, exact-scope and exact-
+    selection evidence record with current allow/deny/return/isolation probes.
+    A mounted registry record alone cannot grant migration admission.
+    """
+    from planning.domain.expansion import tranche
+
+    payload = saved["payload"]
+    current = request(
+        "CATALOGUE", "GET",
+        f"/internal/tenants/{actor.tenant}/applications/{actor.application}"
+        f"/environments/{actor.environment}/current-planning-intent",
+        schema_name="catalogue-current-v1",
+    )
+    if (
+        current["revision_id"] != payload.get("source_revision_id")
+        or current["intent_sha256"] != payload.get("source_intent_sha256")
+    ):
+        raise Rejected("application_flow_source_revision_superseded", 423)
+    selected = tranche(selected_tranche(actor, site))
+    scope = {
+        "tenant_id": actor.tenant, "site_id": identifier(site),
+        "resource_id": actor.application, "environment": actor.environment,
+    }
+    result = request(
+        "ASSURANCE", "POST",
+        f"/v1/tenants/{actor.tenant}/migration-qualifications",
+        {
+            "scope": scope, "tranche_sha256": digest(selected),
+            "release_sha256": selected["release_sha256"],
+        },
+        schema_name="migration-support-v1",
+    )
+    if (
+        result["scope"] != scope
+        or result["tranche_sha256"] != digest(selected)
+        or result["release_sha256"] != selected["release_sha256"]
+    ):
+        raise Rejected("application_flow_qualification_scope_changed", 423)
+    receipt = result["flow_evidence"]
+    if not isinstance(receipt, dict) or any(
+        receipt.get(field) != expected
+        for field, expected in (
+            ("assessment_id", payload.get("assessment_id")),
+            ("source_revision_id", payload.get("source_revision_id")),
+            ("source_intent_sha256", payload.get("source_intent_sha256")),
+            ("context_sha256", saved["context_sha256"]),
+            ("selections_sha256", digest(payload["selections"])),
+            ("destination_generation_id", payload.get("destination_generation_id")),
+            ("platform", "openstack"),
+            ("level", "E4"),
+            ("decision", "accepted"),
+            ("native_write_authorized", False),
+        )
+    ):
+        raise Rejected("independent_application_flow_e4_required", 423)
+    if (
+        type(receipt["observed_at"]) is not int
+        or not 0 <= now - receipt["observed_at"] <= 30
+        or type(receipt["expires_at"]) is not int
+        or not now < receipt["expires_at"] <= receipt["observed_at"] + 60
+        or receipt["checks"] != {
+            k: "passed" for k in (
+                "native_controls", "source_completeness", "allowed_traffic",
+                "denied_traffic", "return_path", "tenant_isolation",
+                "application_validation",
+            )
+        }
+    ):
+        raise Rejected("independent_application_flow_evidence_expired", 423)
