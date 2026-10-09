@@ -319,3 +319,38 @@ def test_optional_dependencies_can_be_offered_for_explicit_waiver():
     assert choices[1]["required"] is False
     assert choices[1]["status"] == "held_optional"
     assert choices[1]["destination_firewall_rule_ids"] == []
+
+
+def test_short_lived_probe_refresh_does_not_change_reviewed_native_semantics():
+    from planning.domain.effective_security import semantic_security_digest
+    current = document("ahv", "destination")
+    renewed = deepcopy(current)
+    renewed["observed_at"] += 5
+    renewed["expires_at"] += 5
+    for proof in renewed["path_probes"].values():
+        proof["observed_at"] += 5
+        proof["expires_at"] += 5
+    for proof in renewed["boundary_probes"].values():
+        proof["observed_at"] += 5
+        proof["expires_at"] += 5
+    assert semantic_security_digest(renewed) == semantic_security_digest(current)
+    renewed["rules"][0]["action"] = "deny"
+    assert semantic_security_digest(renewed) != semantic_security_digest(current)
+
+
+def test_nutanix_installed_microseg_api_version_is_feature_qualified():
+    doc = document("ahv")
+    p = doc["api_profile"]
+    p["api_version"] = "v4.2"
+    p["installed"]["version"] = "v4.2"
+    p["evidence_sha256"] = digest({
+        "platform": "ahv", "namespace": "microseg", "api_version": "v4.2",
+        "installed": p["installed"], "features": p["qualified_features"],
+        "environment_scope": p["environment_scope"],
+        "profile_sha256": p["profile_sha256"],
+        "native_origin_id": p["native_origin_id"],
+    })
+    assert decision(doc, REQUIRED)[0] == "allow"
+    p["qualified_features"]["effective-categories"] = "unknown"
+    with pytest.raises(Unqualified, match="installed_native_api_features_unqualified"):
+        decision(doc, REQUIRED)
