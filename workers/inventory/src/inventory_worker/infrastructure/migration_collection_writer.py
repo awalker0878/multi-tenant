@@ -11,7 +11,6 @@ import re
 from collections.abc import Callable
 from typing import Any
 
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 HEX = re.compile(r"^[a-f0-9]{64}$")
 
@@ -78,9 +77,9 @@ def build_signed_envelope(
     manifest: dict[str, Any],
     scope: dict[str, str],
     signed_scopes: list[dict[str, Any]],
-    expires_at: int, private_key_bytes: bytes,
+    expires_at: int, sign: Callable[[bytes], bytes],
 ) -> dict[str, Any]:
-    """Signer must be mounted in an independently administered worker pod.
+    """Signer must be an independently administered attestation authority.
 
     All three scopes are explicit even when an attribute is unobserved.
     Owner evidence and conditional applicability are never synthesized.
@@ -91,7 +90,7 @@ def build_signed_envelope(
             or {r.get("scope") for r in signed_scopes} !=
                {"source", "target", "owner"}
             or type(expires_at) is not int
-            or len(private_key_bytes) != 32
+            or not callable(sign)
             or set(scope) != {"tenant_id", "site_id",
                               "source_profile_sha256", "target_profile_sha256"}
             or any(not isinstance(v, str) or not v for v in scope.values())):
@@ -114,7 +113,12 @@ def build_signed_envelope(
     payload = {"schema_version": 1, **scope, "expires_at": expires_at,
                "scopes": signed_scopes}
     message = b"multi-tenant/migration-collection-evidence/v1\x00" + canonical(payload)
-    signature = Ed25519PrivateKey.from_private_bytes(private_key_bytes).sign(message)
+    # No private signing key crosses into the Inventory collection worker.
+    # An externally commissioned authority must attest the exact message;
+    # Inventory verifies with its separately provisioned Ed25519 trust root.
+    signature = sign(message)
+    if not isinstance(signature, bytes) or len(signature) != 64:
+        raise ValueError("independent_collection_signature_invalid")
     return {"payload": payload,
             "signature": base64.b64encode(signature).decode("ascii")}
 
