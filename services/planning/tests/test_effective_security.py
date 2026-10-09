@@ -77,8 +77,15 @@ def document(platform="vmware", generation="source", nat=False, multipath=False)
         "schema_version": 2, "source": "independent_native_observer",
         "platform": platform, "native_api_qualified": True,
         "native_scope": "tenant-prod",
-        "enforcement_layer": "dfw", "microseg_policy_priority_qualified": True,
-        "policy_types_complete": True, "address_family": "ipv4",
+        "enforcement_layer": "dfw",
+        "firewall_chain_complete": True, "effective_firewall_layers": ["dfw"],
+        "microseg_policy_priority_qualified": True,
+        "policy_types_complete": True,
+        "policy_exceptions_qualified": True,
+        "quarantine_and_isolation_qualified": True,
+        "built_in_sg_rules_observed": True,
+        "anti_spoof_behavior_qualified": True,
+        "address_family": "ipv4",
         "observer_principal": "security-observer", "writer_principal": "network-writer",
         "observed_at": NOW, "expires_at": NOW + 45,
         "topology_sha256": "topology-current",
@@ -336,6 +343,17 @@ def test_short_lived_probe_refresh_does_not_change_reviewed_native_semantics():
     assert semantic_security_digest(renewed) == semantic_security_digest(current)
     renewed["rules"][0]["action"] = "deny"
     assert semantic_security_digest(renewed) != semantic_security_digest(current)
+
+
+def test_unqualified_bypass_rules_and_second_firewall_layer_are_held():
+    for platform, property_name in (
+        ("vmware", "firewall_chain_complete"),
+        ("ahv", "policy_exceptions_qualified"),
+        ("openstack", "anti_spoof_behavior_qualified"),
+    ):
+        d = document(platform)
+        d[property_name] = False
+        assert qualify(d, REQUIRED, NOW)["status"] == "held"
 
 
 def test_nutanix_installed_microseg_api_version_is_feature_qualified():
