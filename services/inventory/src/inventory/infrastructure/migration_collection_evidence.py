@@ -53,6 +53,7 @@ def _profile_environment(profile: dict[str, Any], bound: dict[str, Any]) -> dict
 def read_collection_coverages(
     tenant: str, site: str, source: dict[str, Any], target: dict[str, Any],
     source_binding: dict[str, Any], target_binding: dict[str, Any], now: int,
+    signed_envelope: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     """Return 3 complete independently observed scopes, else no approvals.
 
@@ -78,7 +79,12 @@ def read_collection_coverages(
                 or manifest.get("schema_version") != 1):
             raise ValueError
         key = Ed25519PublicKey.from_public_bytes(protected(config["public_key_file"], 32))
-        envelope = decode(protected(config["signed_receipt_file"], 524288))
+        # A durable SQL-custodied envelope is verified with the same
+        # installed public key and scope rules as the mounted bootstrap file.
+        envelope = (
+            signed_envelope if signed_envelope is not None
+            else decode(protected(config["signed_receipt_file"], 524288))
+        )
         shape(envelope, {"payload", "signature"})
         signature = base64.b64decode(envelope["signature"], validate=True)
         payload = envelope["payload"]
