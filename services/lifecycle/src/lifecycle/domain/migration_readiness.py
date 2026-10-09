@@ -109,6 +109,13 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
         if (
             item.get("status") != "complete"
             or item.get("holds") != []
+            or not isinstance(item.get("attributes"), list)
+            or not item["attributes"]
+            or len({a.get("attribute_id") for a in item["attributes"]
+                    if isinstance(a, dict)}) != len(item["attributes"])
+            or any(not isinstance(a, dict)
+                   or a.get("status") not in {"observed", "not_applicable"}
+                   for a in item["attributes"])
             or item.get("native_write_authorized") is not False
             or item.get("independent_e3_e4_qualification") is not False
             or type(item.get("evaluated_at")) is not int
