@@ -19,6 +19,44 @@ from inventory.domain.migration_collection_coverage import evaluate
 from inventory.infrastructure.native_readers import decode, protected
 
 
+def installed_namespaces(facts: dict[str, Any]) -> dict[str, list[str]]:
+    """Only propagate releases discovered from this installed native profile.
+
+    Product versions are not operation namespaces. OpenStack's source
+    collector uses compute/volume/network aliases; reconcile these to their
+    native API family names without inferring unobserved services.
+    """
+    platform = facts.get("platform")
+    raw = facts.get("versions") or facts.get("api_versions") or {}
+    if not isinstance(raw, dict):
+        raw = {}
+    aliases = {
+        "openstack": {"compute": "nova", "volume": "cinder",
+                      "network": "neutron", "image": "glance"},
+    }.get(platform, {})
+    result: dict[str, list[str]] = {}
+    for family, value in raw.items():
+        if family == "product" or not isinstance(family, str):
+            continue
+        names = [value] if isinstance(value, str) else value
+        if (not isinstance(names, list)
+                or not names or not all(isinstance(x, str) and x for x in names)):
+            continue
+        key = aliases.get(family, family)
+        result[key] = sorted(set(names))
+    if platform == "vmware":
+        if isinstance(facts.get("api_version"), str):
+            result.setdefault("vim", [facts["api_version"]])
+        if isinstance(facts.get("vcenter_version"), str):
+            result.setdefault("vcenter", [facts["vcenter_version"]])
+    elif platform == "openstack" and facts.get("profile_type") == "TargetCapabilityProfile":
+        for original, key in (("compute_version", "nova"), ("volume_version", "cinder")):
+            version = facts.get(original)
+            if isinstance(version, dict) and isinstance(version.get("version"), str):
+                result[key] = [version["version"]]
+    return result
+
+
 def _profile_environment(profile: dict[str, Any], bound: dict[str, Any]) -> dict[str, Any]:
     facts = profile["facts"]
     if facts["profile_type"] == "SourceWorkloadProfile":
@@ -37,16 +75,7 @@ def _profile_environment(profile: dict[str, Any], bound: dict[str, Any]) -> dict
         "installed_tuple_sha256": bound["tuple_sha256"],
         # Only independently captured installed namespace releases may
         # authorize field receipts; an arbitrary receipt string never does.
-        "installed_namespaces": {
-            family: [version] if isinstance(version, str) else version
-            for family, version in (
-                facts.get("versions") or facts.get("api_versions") or {}
-            ).items()
-            if isinstance(family, str)
-            and (isinstance(version, str)
-                 or isinstance(version, list)
-                 and all(isinstance(v, str) for v in version))
-        },
+        "installed_namespaces": installed_namespaces(facts),
     }
 
 
