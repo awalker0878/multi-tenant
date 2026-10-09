@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.example.invalid/planning/migration-readiness-v1",
+  "title": "Resolved exact-route migration readiness: Planning source, Console and Lifecycle consumers",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "side": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "platform": {
+          "enum": [
+            "vmware",
+            "ahv",
+            "openstack"
+          ]
+        },
+        "installation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "profile_sha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "versions": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 20,
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          }
+        }
+      },
+      "required": [
+        "platform",
+        "installation_id",
+        "profile_sha256",
+        "versions"
+      ]
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "capability_id": {
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "source",
+            "target"
+          ]
+        },
+        "criticality": {
+          "enum": [
+            "critical",
+            "optional"
+          ]
+        },
+        "status": {
+          "enum": [
+            "eligible",
+            "blocked",
+            "conditional",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "evidence_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selected_api_family": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "selected_api_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "omission_accepted": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "capability_id",
+        "side",
+        "criticality",
+        "status",
+        "reason",
+        "evidence_sha256",
+        "selected_api_family",
+        "selected_api_version",
+        "omission_accepted"
+      ]
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "migration_route_readiness"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tenant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "application_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environment_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "site_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "tenant_id",
+        "application_id",
+        "environment_id",
+        "site_id"
+      ]
+    },
+    "route_sha256": {
+      "$ref": "#/$defs/sha"
+    },
+    "tranche_sha256": {
+      "$ref": "#/$defs/sha"
+    },
+    "release_sha256": {
+      "$ref": "#/$defs/sha"
+    },
+    "source": {
+      "$ref": "#/$defs/side"
+    },
+    "target": {
+      "$ref": "#/$defs/side"
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1
+    },
+    "api_compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "eligible",
+            "blocked",
+            "conditional",
+            "unknown"
+          ]
+        },
+        "operationally_eligible": {
+          "type": "boolean"
+        },
+        "cases": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/case"
+          }
+        },
+        "administrator_alerts": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "type": "object"
+          }
+        },
+        "native_write_authorized": {
+          "const": false
+        }
+      },
+      "required": [
+        "status",
+        "operationally_eligible",
+        "cases",
+        "administrator_alerts",
+        "native_write_authorized"
+      ]
+    },
+    "native_e3_qualified": {
+      "type": "boolean"
+    },
+    "receiving_e4_accepted": {
+      "type": "boolean"
+    },
+    "status": {
+      "enum": [
+        "eligible",
+        "held"
+      ]
+    },
+    "holds": {
+      "type": "array",
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "expires_at": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "evaluated_at": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "workload_admission_authorized": {
+      "const": false
+    },
+    "native_write_authorized": {
+      "const": false
+    },
+    "readiness_sha256": {
+      "$ref": "#/$defs/sha"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "scope",
+    "route_sha256",
+    "tranche_sha256",
+    "release_sha256",
+    "source",
+    "target",
+    "method",
+    "api_compatibility",
+    "native_e3_qualified",
+    "receiving_e4_accepted",
+    "status",
+    "holds",
+    "expires_at",
+    "evaluated_at",
+    "workload_admission_authorized",
+    "native_write_authorized",
+    "readiness_sha256"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "eligible"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "holds": {
+            "maxItems": 0
+          },
+          "native_e3_qualified": {
+            "const": true
+          },
+          "receiving_e4_accepted": {
+            "const": true
+          },
+          "api_compatibility": {
+            "properties": {
+              "operationally_eligible": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
