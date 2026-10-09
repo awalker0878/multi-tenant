@@ -101,8 +101,21 @@ def reconcile(
             elif set(n.get("key") for n in nics if isinstance(n, dict)) != set(
                     n["order"] for n in workload["nics"]):
                 holds.append("source_nic_identity_ambiguous")
-            if not isinstance(facts.get("native"), dict):
+            native = facts.get("native")
+            identity = native.get("identity") if isinstance(native, dict) else None
+            if (
+                not isinstance(identity, dict)
+                or identity.get("vm_id") is None
+                or not any(identity.get(key) for key in (
+                    "created", "generation_uuid", "instance_uuid",
+                ))
+            ):
                 holds.append("native_incarnation_and_topology_not_observed")
+            if (
+                p.get("network_semantics_sha256") != digest(workload["nics"])
+                or p.get("network_semantics_independently_verified") is not True
+            ):
+                holds.append("source_network_semantics_not_verified")
         status = "matched" if not holds else "held"
         result_rows.append({"workload_id": wid, "status": status, "holds": sorted(set(holds)),
                             "source_identity_sha256":
