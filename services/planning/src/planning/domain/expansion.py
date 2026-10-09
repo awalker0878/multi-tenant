@@ -271,6 +271,15 @@ def matrix(value: dict[str, Any], records: list[dict[str, Any]], now: int) -> li
                     "requirement_ids": r["requirement_ids"],
                     "exclusions": r["exclusions"],
                     "blockers": blockers,
+                    # Both independent qualification TTLs constrain the
+                    # common readiness projection; tranche expiry alone
+                    # must never extend revoked or stale native evidence.
+                    "expires_at": min(
+                        [item["expires_at"] for item in (q, operating[0] if len(operating) == 1 else {})
+                         if type(item.get("expires_at")) is int]
+                        or [now]
+                    ) if len(operating) == 1 and type(q.get("expires_at")) is int
+                    and type(operating[0].get("expires_at")) is int else now,
                     "native_qualified": not blockers,
                     "operationally_accepted": not blockers
                     and len(operating) == 1
