@@ -380,7 +380,12 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     denied = Planning(database, Mock(), clock, PlanValidation.unavailable(clock))
     validation = PlanValidation.unavailable(clock)
     validation = PlanValidation(
-        validation.native, MigrationValidation(Mock(), recipes, Mock(), clock), Mock()
+        validation.native, MigrationValidation(
+            Mock(), recipes,
+            Mock(return_value={
+                "status": "eligible", "holds": [], "native_write_authorized": False,
+            }), clock,
+        ), Mock()
     )
     planning = Planning(database, Mock(), clock, validation)
     key, tenant = str(uuid4()), recipe["scope"]["tenant_id"]
