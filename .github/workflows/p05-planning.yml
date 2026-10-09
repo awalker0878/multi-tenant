@@ -24,6 +24,8 @@ jobs:
         with:
           version: '0.12.19'
           enable-cache: false
+      - name: Verify Inventory producer / installed Planning owner contract stays in sync
+        run: python scripts/p05/sync_migration_inputs.py --check
       - name: Verify native security API feature registry matches provider resolvers
         run: python scripts/verify_native_security_api.py
       - name: Exercise exact scope, canonical plans, PostgreSQL races and independent simulated allocations
