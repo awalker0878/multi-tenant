@@ -28,7 +28,11 @@ def extended_intent_fields(
     fields: list[dict[str, Any]] = []
 
     def compare(path: str, required: Any, actual: Any, mandatory: bool = True) -> None:
-        proof_age: int | None = None
+        time_value = observed.get("observed_at")
+        proof_age: int | None = (
+            now - time_value if actual is not None and type(time_value) is int
+            and 0 <= now - time_value <= 31536000 else None
+        )
         evidence_source = "inventory_native_profile" if actual is not None else "unobserved"
         if actual is None:
             status = "unobserved"
