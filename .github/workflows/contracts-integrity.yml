@@ -49,4 +49,4 @@ jobs:
       - name: Validate real Planning and Lifecycle readiness producers and consumers
         env:
           PYTHONPATH: services/planning/src:services/lifecycle/src:services/inventory/src:services/planning/tests
-        run: python -m pytest -q services/inventory/tests/test_migration_collection_coverage.py services/inventory/tests/test_migration_collection_evidence.py services/planning/tests/test_migration_readiness.py services/lifecycle/tests/test_migration_readiness.py services/planning/tests/test_migration_support.py
+        run: python -m pytest -q services/inventory/tests/test_migration_collection_coverage.py services/inventory/tests/test_migration_collection_evidence.py services/planning/tests/test_migration_readiness.py services/lifecycle/tests/test_migration_readiness.py services/lifecycle/tests/test_native_owners.py services/planning/tests/test_migration_support.py
