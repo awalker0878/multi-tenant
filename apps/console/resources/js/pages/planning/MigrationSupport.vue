@@ -113,6 +113,10 @@ async function refreshFlowChoices(): Promise<void> {
 }
 function saveFlowChoices() {
   if (!selectionsComplete.value || flowForm.processing || flowFailure.value || !flowState.value) return;
+  // An optional application dependency may be left unmapped; an incomplete
+  // optional selection is not an operator-created rule and is never posted.
+  flowForm.selections = flowForm.selections.filter(s =>
+    Boolean(s.rule_native_ref) && Boolean(s.route_native_ref));
   flowForm.command_key = crypto.randomUUID();
   flowForm.post(flowSave, {
     preserveScroll: true,
