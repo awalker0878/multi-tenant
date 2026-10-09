@@ -78,13 +78,23 @@ def test_current_direction_binding_and_revocation_are_rechecked() -> None:
         lambda *_: selected, lambda *_: [proof, operating], lambda: 100,
         lambda _actor, _site, row: api_owner(row),
     )
+    # Route qualification fixtures intentionally omit real full-application E4
+    # and per-field Inventory receipts. Exercise route constraints but require
+    # the final workload gate to hold instead of granting admission.
+    support.flow_require = lambda *_: {}
+    support.collection_manifest = lambda *_: {}
+    support.workload_current = lambda *_: {
+        "reconciliation": {"status": "held", "holds": ["uncommissioned_evidence"]},
+        "collection_coverages": [],
+    }
     binding = {
         "source": {"profile_sha256": route["source"]["profile_sha256"]},
         "target": {"profile_sha256": route["target"]["profile_sha256"]},
         "method": "VM_COLD_EXPORT",
     }
     assert len(support.read(actor, str(uuid4()))["directions"]) == 9
-    support.require(actor, str(uuid4()), binding)
+    with pytest.raises(Rejected, match="migration_workload_readiness_held"):
+        support.require(actor, str(uuid4()), binding)
     reverse = deepcopy(binding)
     reverse["source"], reverse["target"] = reverse["target"], reverse["source"]
     with pytest.raises(Rejected, match="not_selected"):
@@ -267,6 +277,15 @@ def test_execution_support_binds_entire_qualified_artifact_set(fault: str) -> No
         lambda *_: selected, lambda *_: [proof, operating], lambda: 100,
         lambda _actor, _site, row: api_owner(row),
     )
+    # Route qualification fixtures intentionally omit real full-application E4
+    # and per-field Inventory receipts. Exercise route constraints but require
+    # the final workload gate to hold instead of granting admission.
+    support.flow_require = lambda *_: {}
+    support.collection_manifest = lambda *_: {}
+    support.workload_current = lambda *_: {
+        "reconciliation": {"status": "held", "holds": ["uncommissioned_evidence"]},
+        "collection_coverages": [],
+    }
     if fault in {"services", "datasets"}:
         key = next(iter(o[fault]))
         o[fault][key] = digest("changed")
@@ -288,14 +307,16 @@ def test_execution_support_binds_entire_qualified_artifact_set(fault: str) -> No
         with pytest.raises(Rejected):
             support.require(actor, SITE, bound)
     else:
-        support.require(actor, SITE, bound)
+        with pytest.raises(Rejected, match="migration_workload_readiness_held"):
+            support.require(actor, SITE, bound)
         # Before recipe selection the review may match several qualified variants.
         review_only = {k: bound[k] for k in ("source", "target", "method")}
         if fault == "qualified_variant":
             with pytest.raises(Rejected, match="route_ambiguous"):
                 support.require(actor, SITE, review_only)
         else:
-            support.require(actor, SITE, review_only)
+            with pytest.raises(Rejected, match="migration_workload_readiness_held"):
+                support.require(actor, SITE, review_only)
 
 
 def test_workload_readiness_http_is_read_only_and_denies_browser_evidence() -> None:
