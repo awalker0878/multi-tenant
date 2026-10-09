@@ -83,6 +83,7 @@ def inputs() -> tuple[
         digest({k: item[k] for k in ("from", "to", "protocol", "port")}): {
             "address_family": "ipv4",
             "vrf_id": "fixture-vrf-" + SITE,
+            "vpc_id": "fixture-vpc-" + SITE,
             "direction": "source_to_destination",
             "return_path_policy": "stateful_allow",
         }
