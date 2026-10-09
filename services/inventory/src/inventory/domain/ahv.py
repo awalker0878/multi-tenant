@@ -93,9 +93,30 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
                             or not isinstance(rule.get("type"), str)
                             or not isinstance(rule.get("spec_sha256"), str)
                             or re.fullmatch(r"[a-f0-9]{64}", rule["spec_sha256"]) is None
-                            or set(rule) != {"extId", "type", "spec_sha256"}
+                            or set(rule) != {
+                                "extId", "type", "spec_sha256", "category_ids",
+                                "address_group_ids", "service_group_ids",
+                                "reference_resolution",
+                            }
                         ):
                             raise Rejected("invalid_ahv_policy_rules")
+                        for kind in ("category_ids", "address_group_ids", "service_group_ids"):
+                            refs = rule[kind]
+                            if (
+                                not isinstance(refs, list) or len(refs) > 64
+                                or len(set(refs)) != len(refs)
+                                or any(not isinstance(v, str) or not v for v in refs)
+                            ):
+                                raise Rejected("invalid_ahv_rule_references")
+                        known_categories = {item["extId"] for item in p["categories"]}
+                        unresolved = (
+                            bool(set(rule["category_ids"]) - known_categories)
+                            or bool(rule["address_group_ids"] or rule["service_group_ids"])
+                        )
+                        if rule["reference_resolution"] != (
+                            "unresolved" if unresolved else "catalogue_ids_only"
+                        ):
+                            raise Rejected("invalid_ahv_rule_reference_status")
                         seen_rule_ids.add(rule["extId"])
         if len(ids) != len(set(ids)):
             raise Rejected("invalid_ahv_inventory")
