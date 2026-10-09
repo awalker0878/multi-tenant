@@ -16,6 +16,7 @@ from lifecycle.domain.admission import digest
 from lifecycle.domain.campaign_plan import native_plan_record, plan_requirements
 from lifecycle.domain.execution import Rejected, decode, identity
 from lifecycle.domain.migration import current_profiles
+from lifecycle.domain.migration_readiness import verify as verify_migration_readiness
 from lifecycle.domain.native_workflow import (
     checksum,
     current_authority,
@@ -259,6 +260,12 @@ class NativeOwners:
         requirements = native_plan_record(record, ref, tenant)
         content, binding = record["content"], record["binding"]
         migrating = content["action"] == "application.migrate"
+        if migrating:
+            # Re-read through the authenticated Planning owner on initial
+            # resolution and every subsequent Lifecycle current-authority check.
+            verify_migration_readiness(
+                record.get("migration_readiness"), content, tenant, self.clock()
+            )
         key = "native_migration" if migrating else "native_provisioning"
         if ("native_migration" in content) == ("native_provisioning" in content):
             raise Rejected("one_native_composition_required", 423)
