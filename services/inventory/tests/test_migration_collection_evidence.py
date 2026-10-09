@@ -121,3 +121,19 @@ def test_uncommissioned_or_expired_signature_held(monkeypatch):
     ) == []
     payload["expires_at"] = 99
     assert payload["expires_at"] < 100
+
+
+def test_openstack_target_preserves_discovered_microversion_interval() -> None:
+    facts = {
+        "profile_type": "TargetCapabilityProfile", "platform": "openstack",
+        "api_versions": {"neutron": ["2.0"]},
+        "compute_version": {"min_version": "2.1", "version": "2.104"},
+        "volume_version": {"min_version": "3.0", "version": "3.70"},
+    }
+    actual = module.installed_namespaces(facts)
+    assert actual["nova"] == {"min_version": "2.1", "max_version": "2.104"}
+    assert actual["cinder"] == {"min_version": "3.0", "max_version": "3.70"}
+    assert actual["neutron"] == ["2.0"]
+    assert "glance" not in actual
+    facts["compute_version"]["min_version"] = None
+    assert "nova" not in module.installed_namespaces(facts)
