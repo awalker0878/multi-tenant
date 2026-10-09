@@ -300,6 +300,7 @@ def current_application_flow_proof(
         "evidence_sha256": digest(receipt),
         "workload_interface_cases": receipt.get("workload_interface_cases", []),
         "disk_disposition_cases": receipt.get("disk_disposition_cases", []),
+        "workload_semantic_cases": receipt.get("workload_semantic_cases", []),
         "expires_at": receipt["expires_at"],
         "native_write_authorized": False,
     }
