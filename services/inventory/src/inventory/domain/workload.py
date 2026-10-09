@@ -88,7 +88,8 @@ def profile_payload(
     vmware = not source and isinstance(value, dict) and value.get("platform") == "vmware"
     if not source and isinstance(value, dict) and value.get("platform") == "vmware":
         # Older observations cannot supply editable compatibility guesses.
-        value = {**value, "guest_options_by_host": value.get("guest_options_by_host", [])}
+        value = {**value, "guest_options_by_host": value.get("guest_options_by_host", []),
+                 "nsx_policy_observation": value.get("nsx_policy_observation")}
     p = shape(
         value,
         SOURCE_FIELDS
