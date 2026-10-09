@@ -48,6 +48,41 @@ class MigrationCollectionLedger:
             )
             if len(coverage) != 3:
                 raise Rejected("migration_collection_signature_or_scope_invalid", 423)
+            # The independent receipt must be causally linked to the worker's
+            # successful native GET in the exact source/target generation.
+            # Signatures alone cannot manufacture a collection read.
+            pages = tx.all(
+                "SELECT job,payload->'native_read_receipts' AS reads "
+                "FROM inventory.pages WHERE job IN (%s,%s) "
+                "ORDER BY job,sequence LIMIT 1001",
+                (source["generation_id"], target["generation_id"]),
+            )
+            if len(pages) > 1000:
+                raise Rejected("migration_native_read_outbox_unbounded", 423)
+            observed_reads = set()
+            for page in pages:
+                if not isinstance(page["reads"], list):
+                    continue
+                for entry in page["reads"]:
+                    if isinstance(entry, dict):
+                        observed_reads.add((
+                            str(page["job"]), entry.get("native_operation"),
+                            entry.get("response_sha256"), entry.get("observed_at"),
+                        ))
+            for part in envelope["payload"]["scopes"]:
+                generation = (
+                    target["generation_id"] if part["scope"] == "target"
+                    else source["generation_id"]
+                )
+                for field in part["observations"]:
+                    if field.get("collection_method") != "native_get":
+                        continue
+                    if (
+                        generation, field.get("native_operation"),
+                        field.get("source_response_sha256"),
+                        field.get("observed_at"),
+                    ) not in observed_reads:
+                        raise Rejected("migration_field_native_get_outbox_unverified", 423)
             # Even an incomplete signed observation is retained for diagnostics;
             # no field status is promoted merely because ingestion succeeded.
             envelope_sha = digest(envelope)
@@ -115,14 +150,15 @@ class MigrationCollectionLedger:
                             "INSERT INTO inventory.migration_collection_fields "
                             "(envelope_id,tenant,site,scope,attribute_id,evidence_kind,"
                             "api_family,api_version,native_operation,value_sha256,"
-                            "evidence_sha256,observed_at) "
-                            "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
+                            "source_response_sha256,evidence_sha256,observed_at) "
+                            "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
                             "ON CONFLICT DO NOTHING",
                             (
                                 str(parent["id"]), tenant, site, part["scope"],
                                 entry["attribute_id"], evidence_kind,
                                 entry.get("api_family"), entry.get("api_version"),
                                 entry.get("native_operation"), entry.get("value_sha256"),
+                                entry.get("source_response_sha256"),
                                 evidence_sha, entry["observed_at"],
                             ),
                         )
