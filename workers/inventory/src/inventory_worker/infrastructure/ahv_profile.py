@@ -162,6 +162,34 @@ def collect_ahv(
             if r.get("projectExtId") == policy["native_scope"]
             or r["extId"] in stream["shared_resource_ids"]
         ]
+    # A policy-list response is not the authoritative rule-list endpoint.
+    # Use the independently documented per-policy native rule GET, subject to
+    # a strict eight-policy/one-page E2 discovery budget. Never follow links
+    # or assume a partial list is complete. Larger scopes remain held.
+    rules_budget_exceeded = len(inventory["policies"]) > 8
+    if not rules_budget_exceeded:
+        for policy_row in inventory["policies"]:
+            native_id = policy_row["extId"]
+            if not isinstance(native_id, str) or not native_id or "/" in native_id:
+                raise CollectionFailure("invalid_response")
+            rules, raw_pages = collect_list(
+                stream, routes["policies"] + "/" + native_id + "/rules",
+                1, before_request,
+            )
+            # If the API also embeds rule bodies, it must agree with the
+            # separate native endpoint rather than silently winning.
+            inline = policy_row.get("rules")
+            if inline is not None and (
+                not isinstance(inline, list)
+                or fingerprint(inline) != fingerprint(rules)
+            ):
+                raise CollectionFailure("invalid_response")
+            policy_row["rules"] = rules
+            records["rules:" + native_id] = raw_pages
+    else:
+        for policy_row in inventory["policies"]:
+            policy_row["rules"] = None
+
     # Prism's policy list may include native rule bodies; absence is UNKNOWN.
     # Never infer rules from policy names, ENFORCE state or category memberships.
     # Referenced service/address/category groups need independent resolution.
@@ -239,6 +267,8 @@ def collect_ahv(
         "hypervisors": hypervisors,
     }
     holds = []
+    if rules_budget_exceeded:
+        holds.append("ahv_security_policy_list_exceeds_rule_read_budget")
     if config.get("isAvailable") is not True:
         holds.append("ahv_cluster_unavailable")
     if "AHV" not in installed["hypervisors"]:
