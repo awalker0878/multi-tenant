@@ -201,13 +201,41 @@ def check_events():
 
 
 def check_schema_dialects():
-    """Fail on malformed published JSON Schemas, beyond duplicate-id checks."""
+    """Validate every schema; only explicitly archived v1 releases may omit $id."""
+    archival_without_id = {
+        "capabilities/api-version-record-v1.json",
+        "capabilities/migration-collection-manifest-v1.json",
+        "capabilities/migration-feature-policy-v1.json",
+        "capabilities/migration-field-crosswalk-v1.json",
+        "events/catalogue-intent-v1.json",
+        "planning/admission-record-v1.json",
+        "planning/catalogue-input-v1.json",
+        "planning/content-v1.json",
+        "planning/fact-v1.json",
+        "planning/inventory-input-v1.json",
+        "planning/inventory-input-v2.json",
+        "planning/migration-input-v1.json",
+        "planning/migration-input-v2.json",
+        "planning/migration-input-v3.json",
+        "planning/migration-support-v1.json",
+        "planning/qualification-v1.json",
+        "planning/reservation-receipt-v1.json",
+    }
     found = 0
     for path in sorted((ROOT / "contracts/schemas").rglob("*.json")):
         schema = json.loads(path.read_text(encoding="utf-8"))
+        relative = str(path.relative_to(ROOT / "contracts/schemas"))
         if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
             raise ValueError(f"Unsupported JSON Schema dialect: {path}")
+        identifier = schema.get("$id")
+        if (identifier is None) != (relative in archival_without_id):
+            raise ValueError(f"Schema identity required or archival exception changed: {path}")
+        if identifier is not None and (
+            not isinstance(identifier, str) or not identifier.strip()
+        ):
+            raise ValueError(f"Invalid published schema identifier: {path}")
         Draft202012Validator.check_schema(schema)
+        local_refs(schema, str(path))
         found += 1
     return found
 
