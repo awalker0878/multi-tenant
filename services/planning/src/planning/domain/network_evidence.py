@@ -154,6 +154,8 @@ def selected_native_flow(flow: dict[str, Any], network: dict[str, Any],
         or chosen["topology_sha256"] != digest(network.get("topology"))
         or network.get("policy_sha256") != digest(policy)
         or network.get("topology_sha256") != chosen["topology_sha256"]
+        or not isinstance(network.get("writer_principal"), str)
+        or not network["writer_principal"]
     ):
         return "unknown"
     rules = [
@@ -187,6 +189,23 @@ def network_checks(
 ) -> list[tuple[str, str, str, bool]]:
     network = data["network"]
     checks = []
+    # Do not accept unrelated controls as owner-approved application flows.
+    mapping = network.get("application_flow_selections")
+    required_keys = {
+        digest({k: flow[k] for k in FLOW_KEYS})
+        for flow in intent["dependencies"]
+        if flow["kind"] == "communication" and flow["strength"] == "required"
+    }
+    if not isinstance(mapping, dict) or not required_keys <= set(mapping) or (
+        set(mapping) - {
+            digest({k: flow[k] for k in FLOW_KEYS})
+            for flow in intent["dependencies"] if flow["kind"] == "communication"
+        }
+    ):
+        checks.append((
+            "network.application_flow_coverage",
+            "unknown", "owner_approved_flow_catalogue_incomplete", True,
+        ))
     for dependency in intent["dependencies"]:
         if dependency["kind"] == "communication":
             selection = selected_native_flow(dependency, network, policy, now)
