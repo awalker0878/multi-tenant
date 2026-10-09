@@ -53,10 +53,6 @@
       "inventory",
       "console"
     ],
-    "contracts/openapi/planning-migration-v1.4.json": [
-      "planning",
-      "console"
-    ],
     "contracts/schemas/planning/migration-input-v4.json": [
       "inventory",
       "planning"
