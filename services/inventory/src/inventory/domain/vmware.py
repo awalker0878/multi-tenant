@@ -79,7 +79,8 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
     else:
         if not isinstance(enrollment, dict):
             raise Rejected("unsolicited_nsx_evidence", 403)
-        shape(nsx, {"domain_id", "api", "policies", "semantic_qualification",
+        shape(nsx, {"domain_id", "api", "policies", "groups", "services",
+                    "holds", "semantic_qualification",
                     "source_vm_attachment", "native_write_authorized"})
         if (nsx["domain_id"] != enrollment["domain_id"]
                 or nsx["api"] != "nsx-policy-v1"
@@ -89,10 +90,30 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
                 or not isinstance(nsx["policies"], list)
                 or len(nsx["policies"]) > 16):
             raise Rejected("unqualified_nsx_security_evidence")
+        if (not isinstance(nsx["holds"], list)
+                or "nsx_effective_membership_unverified" not in nsx["holds"]
+                or "nsx_service_expansion_unverified" not in nsx["holds"]
+                or any(not isinstance(v, str) or not v for v in nsx["holds"])):
+            raise Rejected("nsx_discovery_unqualified")
+        for name in ("groups", "services"):
+            rows = nsx[name]
+            if not isinstance(rows, list) or len(rows) > 100:
+                raise Rejected("invalid_nsx_reference_catalog")
+            seen: set[str] = set()
+            for row in rows:
+                shape(row, {"id", "native_sha256", "definition_sha256", "resolution"})
+                if (not isinstance(row["id"], str)
+                        or not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", row["id"])
+                        or row["id"] in seen or row["resolution"] != "unverified"
+                        or any(not isinstance(row[k], str)
+                               or re.fullmatch(r"[a-f0-9]{64}", row[k]) is None
+                               for k in ("native_sha256", "definition_sha256"))):
+                    raise Rejected("invalid_nsx_reference_catalog")
+                seen.add(row["id"])
         seen_policies: set[str] = set()
         for policy in nsx["policies"]:
-            shape(policy, {"id", "sequence_number", "scope_sha256",
-                           "native_sha256", "rules"})
+            shape(policy, {"id", "category", "stateful", "sequence_number",
+                           "scope", "scope_sha256", "native_sha256", "rules"})
             policy_id = policy["id"]
             if (
                 not isinstance(policy_id, str)
@@ -100,6 +121,14 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
                 or policy_id in seen_policies
                 or not isinstance(policy["rules"], list)
                 or len(policy["rules"]) > 100
+                or not isinstance(policy["scope"], list)
+                or len(policy["scope"]) > 100
+                or any(not isinstance(x, str) or not x.startswith("/infra/")
+                       for x in policy["scope"])
+                or policy["category"] not in {"Ethernet", "Emergency", "Infrastructure",
+                                                "Environment", "Application", None}
+                or policy["stateful"] not in {True, False, None}
+                or type(policy["sequence_number"]) not in {int, type(None)}
             ):
                 raise Rejected("invalid_nsx_policy_catalog")
             seen_policies.add(policy_id)
@@ -109,7 +138,8 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
             seen_rules: set[str] = set()
             for rule in policy["rules"]:
                 shape(rule, {"id", "action", "direction", "disabled",
-                             "native_sha256", "service_reference_status",
+                             "sequence_number", "source_groups", "destination_groups",
+                             "services", "native_sha256", "service_reference_status",
                              "group_reference_status"})
                 rid = rule["id"]
                 if (not isinstance(rid, str)
@@ -118,6 +148,11 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
                     or rule["action"] not in {"ALLOW", "DROP", "REJECT"}
                     or rule["direction"] not in {"IN", "OUT", "IN_OUT"}
                     or type(rule["disabled"]) is not bool
+                    or type(rule["sequence_number"]) not in {int, type(None)}
+                    or any(not isinstance(rule[k], list) or len(rule[k]) > 100
+                           or any(not isinstance(v, str) or not v.startswith("/infra/")
+                                  for v in rule[k])
+                           for k in ("source_groups", "destination_groups", "services"))
                     or rule["service_reference_status"] != "unresolved"
                     or rule["group_reference_status"] != "unresolved"
                     or not isinstance(rule["native_sha256"], str)
