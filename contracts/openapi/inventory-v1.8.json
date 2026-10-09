@@ -5926,6 +5926,102 @@
                     }
                   ]
                 },
+                "rules": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 240
+                          },
+                          "direction": {
+                            "enum": [
+                              "ingress",
+                              "egress"
+                            ]
+                          },
+                          "ethertype": {
+                            "enum": [
+                              "IPv4",
+                              "IPv6"
+                            ]
+                          },
+                          "protocol": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "integer"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "port_range_min": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 65535
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "port_range_max": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 65535
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "remote_ip_prefix": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "maxLength": 128
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "semantic_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "direction",
+                          "ethertype",
+                          "protocol",
+                          "port_range_min",
+                          "port_range_max",
+                          "remote_ip_prefix",
+                          "semantic_sha256"
+                        ]
+                      },
+                      "maxItems": 512
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
                 "native_sha256": {
                   "type": "string",
                   "pattern": "^[0-9a-f]{64}$"
@@ -5938,6 +6034,7 @@
                 "stateful",
                 "rules_sha256",
                 "semantics_sha256",
+                "rules",
                 "native_sha256"
               ]
             }
@@ -7950,6 +8047,37 @@
             },
             "minItems": 0,
             "maxItems": 64
+          },
+          "flow_mappings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_group_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "source_rule_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "destination_rule_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "source_group_id",
+                "source_rule_id",
+                "destination_rule_id"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 1024
           }
         },
         "required": [
