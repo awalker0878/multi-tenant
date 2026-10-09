@@ -165,12 +165,72 @@ final class MigrationQualificationController
                             }
                         }
                     }
+                    // Explicit datasetless disk attestations are accepted only
+                    // as independently qualified E4 receipts in the same
+                    // immutable signed flow evidence binding.
+                    $dispositionValid = true;
+                    $dispositionCases = $candidateFlows['disk_disposition_cases'] ?? null;
+                    if (array_key_exists('disk_disposition_cases', is_array($candidateFlows) ? $candidateFlows : [])) {
+                        $diskFields = [
+                            'workload_id', 'logical_device_id', 'native_key', 'disposition',
+                            'source_profile_sha256', 'target_profile_sha256',
+                            'owner_approval_sha256', 'impact_sha256', 'evidence_sha256',
+                            'observed_at', 'expires_at', 'level', 'decision', 'revoked',
+                        ];
+                        $dispositionValid = is_array($dispositionCases)
+                            && array_is_list($dispositionCases)
+                            && count($dispositionCases) <= 100;
+                        $seenDispositions = [];
+                        if ($dispositionValid) {
+                            foreach ($dispositionCases as $case) {
+                                if (! is_array($case) || count($case) !== count($diskFields)
+                                    || array_diff($diskFields, array_keys($case)) !== []
+                                    || ! is_string($case['workload_id'] ?? null)
+                                    || ! is_string($case['logical_device_id'] ?? null)
+                                    || ! is_int($case['native_key'] ?? null)
+                                    || $case['native_key'] < 0
+                                    || ($case['disposition'] ?? null) !== 'uncatalogued_attested'
+                                    || ($case['source_profile_sha256'] ?? null) !== ($candidateFlows['source_profile_sha256'] ?? null)
+                                    || ($case['target_profile_sha256'] ?? null) !== ($candidateFlows['target_profile_sha256'] ?? null)
+                                    || ($case['level'] ?? null) !== 'E4'
+                                    || ($case['decision'] ?? null) !== 'accepted'
+                                    || ($case['revoked'] ?? null) !== false
+                                    || ! is_int($case['observed_at'] ?? null)
+                                    || ! is_int($case['expires_at'] ?? null)
+                                    || ! (0 <= time() - $case['observed_at']
+                                          && time() - $case['observed_at'] <= 30)
+                                    || $case['expires_at'] <= time()
+                                    || $case['expires_at'] > ($candidateFlows['expires_at'] ?? 0)) {
+                                    $dispositionValid = false;
+                                    break;
+                                }
+                                foreach ([
+                                    'source_profile_sha256', 'target_profile_sha256',
+                                    'owner_approval_sha256', 'impact_sha256', 'evidence_sha256',
+                                ] as $shaField) {
+                                    if (! preg_match('/\\A[a-f0-9]{64}\\z/', (string) $case[$shaField])) {
+                                        $dispositionValid = false;
+                                        break;
+                                    }
+                                }
+                                $key = $case['workload_id'].':'.$case['logical_device_id'];
+                                if (isset($seenDispositions[$key])) {
+                                    $dispositionValid = false;
+                                }
+                                $seenDispositions[$key] = true;
+                                if (! $dispositionValid) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     if (is_array($candidateFlows)
                         && $interfaceValid
+                        && $dispositionValid
                         && count($candidateFlows) >= count($flowFields)
-                        && count($candidateFlows) <= count($flowFields) + 1
+                        && count($candidateFlows) <= count($flowFields) + 2
                         && array_diff($flowFields, array_keys($candidateFlows)) === []
-                        && array_diff(array_keys($candidateFlows), [...$flowFields, 'workload_interface_cases']) === []
+                        && array_diff(array_keys($candidateFlows), [...$flowFields, 'workload_interface_cases', 'disk_disposition_cases']) === []
                         && ($candidateFlows['schema_version'] ?? null) === 1
                         && ($candidateFlows['level'] ?? null) === 'E4'
                         && ($candidateFlows['decision'] ?? null) === 'accepted'
