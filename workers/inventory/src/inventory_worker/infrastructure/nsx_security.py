@@ -35,7 +35,8 @@ def _list(
 
 def _refs(value: Any) -> list[str]:
     if (not isinstance(value, list) or len(value) > MAX_REFS
-            or any(not isinstance(v, str) or not v.startswith("/infra/")
+            or any(not isinstance(v, str)
+                   or not (v == "ANY" or v.startswith("/infra/"))
                    or len(v) > 512 or ".." in v for v in value)):
         raise CollectionFailure("invalid_response")
     return sorted(set(value))
@@ -141,6 +142,8 @@ def collect_nsx_policy_rules(
         if set(item["scope"]) - known_groups:
             holds.append("nsx_native_policy_scope_unresolved")
         for rule in item["rules"]:
+            if "ANY" in (rule["source_groups"] + rule["destination_groups"] + rule["services"]):
+                holds.append("nsx_wildcard_scope_requires_independent_qualification")
             if type(rule["sequence_number"]) is not int:
                 holds.append("nsx_rule_order_unresolved")
             if (set(rule["source_groups"] + rule["destination_groups"]) - known_groups
