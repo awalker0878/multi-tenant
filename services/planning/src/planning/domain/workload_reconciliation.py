@@ -278,6 +278,25 @@ def evaluate(
         intent, catalogue["intent_sha256"], connections, observations, now, flow
     )
     profile = inventory["source_observation"]
+    # An E4 field/probe receipt becomes unusable at its observation-age
+    # deadline, even when the signer's explicit expires_at is later. The
+    # operator preview and Lifecycle must advertise that *earliest* time.
+    proof_deadlines: list[int] = []
+    if isinstance(flow, dict):
+        for kind in ("workload_interface_cases", "disk_disposition_cases",
+                     "workload_boot_cases", "workload_semantic_cases"):
+            cases = flow.get(kind)
+            if not isinstance(cases, list):
+                continue
+            for item in cases:
+                if not isinstance(item, dict):
+                    continue
+                observed_at = item.get("observed_at")
+                expires_at = item.get("expires_at")
+                if type(observed_at) is int:
+                    proof_deadlines.append(observed_at + 30)
+                if type(expires_at) is int:
+                    proof_deadlines.append(expires_at)
     record = {
         "schema_version": 1,
         "catalogue_revision_id": catalogue["revision_id"],
@@ -302,10 +321,7 @@ def evaluate(
                 if isinstance(case, dict) and type(case.get("expires_at")) is int]
                if isinstance(flow, dict)
                and isinstance(flow.get("disk_disposition_cases"), list) else [])
-            + ([case["expires_at"] for case in flow.get("workload_boot_cases", [])
-                if isinstance(case, dict) and type(case.get("expires_at")) is int]
-               if isinstance(flow, dict)
-               and isinstance(flow.get("workload_boot_cases"), list) else [])
+            + proof_deadlines
         ),
         "native_write_authorized": False,
     }
