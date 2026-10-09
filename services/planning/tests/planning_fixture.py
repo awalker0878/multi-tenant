@@ -350,6 +350,19 @@ def snapshot_fixture(
         "topology_sha256": digest(topology),
         "topology": topology,
         "default_action": "deny",
+        "writer_principal": "fixture-writer",
+        "application_flow_selections": {
+            digest({k: d[k] for k in ("from", "to", "protocol", "port")}): {
+                "rule_native_ref": "fixture://native-firewall-rule",
+                "route_native_ref": "fixture://route",
+                "observer_principal": "fixture-independent-observer",
+                "observed_at": NOW,
+                "expires_at": NOW + 120,
+                "policy_sha256": policy_sha,
+                "topology_sha256": digest(topology),
+            }
+            for d in communication
+        },
         "firewall_rules": [
             {k: d[k] for k in ("from", "to", "protocol", "port")}
             | {
