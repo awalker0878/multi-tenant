@@ -306,3 +306,12 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
     )["routes"][0]
     assert upgraded["api_compatibility"]["status"] == "eligible"
     support.require(actor, site, binding)
+
+
+def test_operator_reported_api_versions_cannot_substitute_live_installation_probe() -> None:
+    row = selected()
+    evidence = owner_input(row)
+    evidence["environments"]["target"]["source"] = "operator"
+    result = evaluate(row, evidence, 100)
+    assert result["status"] == "blocked"
+    assert result["cases"][1]["reason"] == "installed_api_namespace_live_probe_required"
