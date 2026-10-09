@@ -87,6 +87,10 @@
     "contracts/openapi/planning-migration-v1.6.json": [
       "planning",
       "console"
+    ],
+    "contracts/openapi/catalogue-v1.0.1.json": [
+      "catalogue",
+      "console"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied."
