@@ -1,6 +1,6 @@
 """Field publication is limited to real native GET witnesses and signed scope."""
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+import base64
+import hashlib
 
 from inventory_worker.infrastructure.migration_collection_writer import (
     build_signed_envelope, canonical, capture_field, digest, publish,
@@ -45,10 +45,13 @@ def test_native_get_only_signed_field_and_installed_namespace() -> None:
 
 
 def test_signed_envelope_provides_exact_authority_custody_and_send() -> None:
-    secret = Ed25519PrivateKey.generate()
-    private = secret.private_bytes(serialization.Encoding.Raw,
-                                   serialization.PrivateFormat.Raw,
-                                   serialization.NoEncryption())
+    signed_messages: list[bytes] = []
+
+    def sign(message: bytes) -> bytes:
+        signed_messages.append(message)
+        # A deterministic fake of an external signer; actual Ed25519
+        # verification is tested inside Inventory's owning boundary.
+        return hashlib.sha512(message).digest()
     manifest = {
         "schema_version": 1, "platforms": {
             "ahv": {"attributes": [requirement()]},
@@ -67,14 +70,12 @@ def test_signed_envelope_provides_exact_authority_custody_and_send() -> None:
         manifest, {"tenant_id": "tenant", "site_id": "site",
                    "source_profile_sha256": digest("source"),
                    "target_profile_sha256": digest("target")},
-        signed_scopes, 160, private,
+        signed_scopes, 160, sign,
     )
-    import base64
-    secret.public_key().verify(
-        base64.b64decode(envelope["signature"]),
-        b"multi-tenant/migration-collection-evidence/v1\x00"
-        + canonical(envelope["payload"]),
-    )
+    expected = (b"multi-tenant/migration-collection-evidence/v1\x00"
+                + canonical(envelope["payload"]))
+    assert signed_messages == [expected]
+    assert base64.b64decode(envelope["signature"]) == hashlib.sha512(expected).digest()
     assert publish(envelope, "tenant", "site", "src", "tgt",
                    lambda path, body: (path, body["envelope"])) == (
         "/internal/collections/receipts", envelope,
