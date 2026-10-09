@@ -5,7 +5,7 @@ from typing import Any
 from uuid import UUID
 
 from inventory.domain.discovery import Rejected, number, shape, text
-from inventory.domain.destination_security import select_security_mappings, source_security_ids
+from inventory.domain.destination_security import source_security_ids
 
 AHV_FIELDS = {
     "schema_version",
@@ -132,20 +132,17 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
     ) or not set(d["category_ids"]) <= inventories["categories"].keys():
         raise Rejected("unobserved_source_or_destination_category")
     source_ids = source_security_ids(source)
-    verified = {
-        key for key, policy in inventories["policies"].items()
-        if policy.get("state") == "ENFORCE"
-    }
-    if source_ids is None:
-        # An unknown source policy set is not an empty one. Allow a draft,
-        # but reject synthetic selections and hold review confirmation.
-        if d["security_mappings"] != [] or d["policy_ids"] != []:
-            raise Rejected("source_security_policy_observation_required")
-        selected = []
-    else:
-        selected = select_security_mappings(d["security_mappings"], source_ids, verified)
-    if d["policy_ids"] != selected:
-        raise Rejected("security_policy_mapping_changed")
+    # Prism ENFORCE is only a deployment state. Neither group membership
+    # nor raw policy identity proves cross-platform rule semantics. Owners
+    # must not select a potentially unsafe policy merely because it exists.
+    # Preserve an empty draft; a mandatory review hold is set in WorkloadProfiles.
+    if d["security_mappings"] != [] or d["policy_ids"] != []:
+        raise Rejected("destination_security_rule_qualification_required")
+    if source_ids:
+        # The source policy requirement exists, but no qualified AHV rule
+        # crosswalk currently authorizes a destination policy choice.
+        pass
+
     for field in ("disks", "nics"):
         rows = d[field]
         if not isinstance(rows, list) or len(rows) != len(source[field]) or len(rows) > 32:
