@@ -1686,9 +1686,16 @@
                       "maxLength": 512
                     },
                     "port": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 65535
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "required": [
