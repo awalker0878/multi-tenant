@@ -55,13 +55,38 @@ def verify(write: bool = False):
     checked = 0
     for manifest_path in manifests:
         manifest, rendered = assemble(manifest_path)
-        for target in [manifest["target"], *manifest.get("copies", [])]:
-            destination = ROOT / target
+        target = manifest["target"]
+        if not isinstance(target, str) or not target.startswith("contracts/"):
+            raise ValueError(f"Invalid canonical contract destination: {target}")
+        canonical = ROOT / target
+        if canonical.is_file():
+            # A changed authoring fragment must publish a NEW contract version.
+            # Never reorder or overwrite historical canonical JSON as a side
+            # effect of rebuilding its semantically equivalent source parts.
+            if read(canonical) != rendered:
+                raise ValueError(f"Published contract requires a new version: {target}")
+        elif write:
+            canonical.parent.mkdir(parents=True, exist_ok=True)
+            canonical.write_text(
+                json.dumps(rendered, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+        else:
+            raise ValueError(f"Missing canonical contract bundle: {target}")
+        checked += 1
+        canonical_bytes = canonical.read_bytes()
+        for path in manifest.get("copies", []):
+            destination = ROOT / path
+            if not isinstance(path, str) or not path.startswith(
+                ("apps/", "services/", "workers/")
+            ):
+                raise ValueError(f"Invalid installed contract destination: {path}")
             if write:
                 destination.parent.mkdir(parents=True, exist_ok=True)
-                destination.write_text(json.dumps(rendered, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-            elif not destination.is_file() or read(destination) != rendered:
-                raise ValueError(f"Contract source and published bundle drift: {target}")
+                # Preserve the exact published canonical representation.
+                destination.write_bytes(canonical_bytes)
+            elif not destination.is_file() or destination.read_bytes() != canonical_bytes:
+                raise ValueError(f"Packaged contract byte drift: {path}")
             checked += 1
     return len(manifests), checked
 
