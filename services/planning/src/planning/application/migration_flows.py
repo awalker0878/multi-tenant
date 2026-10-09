@@ -184,10 +184,17 @@ class MigrationFlows:
         return digest(sorted(controls, key=lambda row: row["flow_id"]))
 
     @staticmethod
-    def evaluate(current: dict[str, Any], selections: Any, now: int) -> list[str]:
+    def evaluate(
+        current: dict[str, Any], selections: Any, now: int,
+        omissions: Any = None,
+    ) -> list[str]:
         choices, data = current["choices"], deepcopy(current["data"])
         if not isinstance(selections, list) or len(selections) > 512:
             raise Rejected("invalid_application_flow_selection")
+        if omissions is None:
+            omissions = []
+        if not isinstance(omissions, list) or len(omissions) > 512:
+            raise Rejected("invalid_application_flow_omission")
         allowed = {row["source_flow_id"]: row for row in choices}
         if len(allowed) != len(choices):
             raise Rejected("ambiguous_application_flow_intent")
@@ -229,12 +236,34 @@ class MigrationFlows:
                    and row["source_flow_id"] not in seen]
         if missing:
             return ["application_flow_required_selection_missing"]
-        # Optional source-defined dependencies cannot be silently discarded.
-        # A future approved omission must be an independently authorized
-        # decision, not a missing mapping or browser-entered free text.
-        if any(not row["required"] and row["source_flow_id"] not in seen
-               for row in choices):
-            return ["application_flow_optional_omission_approval_required"]
+        # Optional omissions are typed owner requests, never self-approval.
+        # A separate, current E4 Assurance decision must approve exactly
+        # these omitted source dependency IDs before native admission.
+        reason_codes = {
+            "retired_dependency", "not_required_at_destination",
+            "replaced_by_native_service", "accepted_service_limitation",
+        }
+        requested: set[str] = set()
+        for omission in omissions:
+            if (
+                not isinstance(omission, dict)
+                or set(omission) != {"source_flow_id", "reason_code"}
+                or not isinstance(omission["source_flow_id"], str)
+                or omission["source_flow_id"] in requested
+                or omission["source_flow_id"] in seen
+                or omission["reason_code"] not in reason_codes
+                or omission["source_flow_id"] not in allowed
+                or allowed[omission["source_flow_id"]]["required"]
+            ):
+                raise Rejected("invalid_application_flow_omission")
+            requested.add(omission["source_flow_id"])
+        missing_optional = {
+            row["source_flow_id"] for row in choices
+            if not row["required"] and row["source_flow_id"] not in seen
+        }
+        if not missing_optional <= requested:
+            return ["application_flow_optional_omission_declaration_required"]
+        omission_hold = bool(requested)
         # Application-owner selection is an overlay for assessment, never an
         # alteration to the native observed snapshot's asserted reality.
         network["application_flow_selections"] = bound
@@ -248,17 +277,21 @@ class MigrationFlows:
             )
         except (KeyError, ValueError, TypeError, IndexError):
             return ["application_flow_independent_evidence_incomplete"]
-        return sorted({
+        holds = {
             reason for _, status, reason, mandatory in checks
             if mandatory and status != "eligible"
-        })
+        }
+        if omission_hold:
+            holds.add("application_flow_optional_omission_approval_required")
+        return sorted(holds)
 
     def read(self, actor: Actor, site: str, delegation: str) -> dict[str, Any]:
         current = self.current(actor, site, delegation)
         saved = self._read_saved(actor, site, current["assessment_id"])
         changed = saved is not None and saved["context_sha256"] != current["context_sha256"]
         selections = saved["payload"]["selections"] if saved and not changed else []
-        holds = self.evaluate(current, selections, self.planning.clock())
+        omissions = saved["payload"].get("omissions", []) if saved and not changed else []
+        holds = self.evaluate(current, selections, self.planning.clock(), omissions)
         if saved and not changed:
             try:
                 if saved["payload"].get("native_controls_sha256") != self.native_control_digest(current, selections):
@@ -275,6 +308,7 @@ class MigrationFlows:
             "expires_at": current["expires_at"],
             "choices": current["choices"],
             "selections": selections,
+            "omissions": omissions,
             "holds": list(dict.fromkeys(holds)),
             "status": ("invalidated" if changed else
                        "held" if holds else "eligible"),
@@ -284,7 +318,7 @@ class MigrationFlows:
     def save(
         self, actor: Actor, site: str, delegation: str, body: dict[str, Any], key: str
     ) -> dict[str, Any]:
-        shape(body, {"site_id", "revision", "context_sha256", "selections"})
+        shape(body, {"site_id", "revision", "context_sha256", "selections", "omissions"})
         if body["site_id"] != site:
             raise Rejected("application_flow_site_mismatch", 403)
         revision = integer(body["revision"], 0, 1000000)
@@ -292,7 +326,9 @@ class MigrationFlows:
         current = self.current(actor, site, delegation)
         if body["context_sha256"] != current["context_sha256"]:
             raise Rejected("application_flow_evidence_changed", 412)
-        holds = self.evaluate(current, body["selections"], self.planning.clock())
+        holds = self.evaluate(
+            current, body["selections"], self.planning.clock(), body["omissions"],
+        )
         canonical(body)
         if len(canonical(body).encode()) > 32768:
             raise Rejected("application_flow_payload_bound", 413)
@@ -330,7 +366,8 @@ class MigrationFlows:
                 "payload=excluded.payload,updated_at=excluded.updated_at",
                 (*self.scope(actor, site), current["assessment_id"], actor.actor,
                  revision + 1, current["context_sha256"],
-                 canonical({"selections": body["selections"], "holds": holds,
+                 canonical({"selections": body["selections"],
+                            "omissions": body["omissions"], "holds": holds,
                             "assessment_id": current["assessment_id"],
                             "native_controls_sha256": self.native_control_digest(
                                 current, body["selections"]),
@@ -370,7 +407,9 @@ class MigrationFlows:
         # Owner choices outlive native telemetry. A reviewed selection is not
         # execution evidence: the independent service-only verifier below
         # must obtain fresh current source identity and runtime probes.
-        if saved["payload"].get("holds"):
+        remaining = set(saved["payload"].get("holds", []))
+        remaining.discard("application_flow_optional_omission_approval_required")
+        if remaining:
             raise Rejected("application_flow_not_eligible", 423)
         # A more recent application migration assessment for this actor/site
         # supersedes the earlier reviewed source and destination flow choice,
