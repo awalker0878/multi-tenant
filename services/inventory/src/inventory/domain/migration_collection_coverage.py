@@ -6,6 +6,7 @@ conditional fields remain held unless explicitly resolved. This reports data
 completeness, not Assurance E3/E4 qualification or native permission.
 """
 
+import re
 from typing import Any
 
 from inventory.domain.discovery import Rejected, digest
@@ -27,6 +28,9 @@ def evaluate(
         raise Rejected("migration_collection_receipt_bound")
     expected = {"installation_id": installation_id, "generation_id": generation_id,
                 "installed_tuple_sha256": installed_tuple_sha256, "scope": scope}
+    allowed_ids = {row["id"] for row in rows if row["scope"] == scope}
+    if len(allowed_ids) != sum(row["scope"] == scope for row in rows):
+        raise Rejected("migration_collection_manifest_duplicate")
     for collection in (observations, applicability):
         keys: set[str] = set()
         for item in collection:
@@ -35,6 +39,8 @@ def evaluate(
             identity = item.get("attribute_id")
             if not isinstance(identity, str) or identity in keys:
                 raise Rejected("migration_collection_ambiguous_receipt")
+            if identity not in allowed_ids:
+                raise Rejected("migration_collection_undeclared_attribute", 423)
             keys.add(identity)
     facts = {row["attribute_id"]: row for row in observations}
     predicates = {row["attribute_id"]: row for row in applicability}
@@ -53,6 +59,7 @@ def evaluate(
                 reason = "applicability_not_independently_resolved"
             elif (type(predicate.get("applicable")) is not bool
                   or not isinstance(predicate.get("evidence_sha256"), str)
+                  or not re.fullmatch(r"[a-f0-9]{64}", predicate["evidence_sha256"])
                   or type(predicate.get("observed_at")) is not int
                   or not 0 <= now - predicate["observed_at"] < requirement["max_age_seconds"]):
                 reason = "applicability_evidence_stale_or_invalid"
@@ -77,7 +84,7 @@ def evaluate(
                 reason = "collection_provenance_mismatch"
             elif (evidence.get("value_present") is not True
                   or not isinstance(evidence.get("evidence_sha256"), str)
-                  or len(evidence["evidence_sha256"]) != 64):
+                  or not re.fullmatch(r"[a-f0-9]{64}", evidence["evidence_sha256"])):
                 reason = "collection_evidence_missing"
             elif (type(evidence.get("observed_at")) is not int
                   or not 0 <= now - evidence["observed_at"] < requirement["max_age_seconds"]):
@@ -85,8 +92,9 @@ def evaluate(
             elif requirement["collection_status"] == "external_evidence_required" and (
                     evidence.get("independent_review") is not True):
                 reason = "independent_owner_evidence_required"
-            elif requirement["api_family"] is not None and not isinstance(
-                    evidence.get("api_version"), str):
+            elif requirement["api_family"] is not None and (
+                    not isinstance(evidence.get("api_version"), str)
+                    or not evidence["api_version"]):
                 reason = "installed_api_version_unresolved"
             else:
                 status, reason = "observed", "scoped_fresh_observation"
