@@ -267,9 +267,10 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
         "expires_at": 180,
         "evidence_sha256": "f" * 64,
     }
+    operating = {**qualification, "level": "E4", "evidence_sha256": "1" * 64}
     support = MigrationSupport(
         lambda *_: selected_tranche,
-        lambda *_: [qualification],
+        lambda *_: [qualification, operating],
         lambda: 100,
         lambda *_: owner,
     )
