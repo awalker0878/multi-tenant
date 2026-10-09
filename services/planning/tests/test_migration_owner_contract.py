@@ -46,7 +46,9 @@ def native_producer_case(scope: str) -> dict:
         "attribute_id": "identity.native", "collection_method": "native_get",
         "api_family": "vmm", "api_version": "v4.3",
         "native_operation": "GET /api/vmm/v4.3/ahv/config/vms/id",
-        "value_sha256": digest("native-value"), "value_present": True,
+        "value_sha256": digest("native-value"),
+        "source_response_sha256": digest("native-response"),
+        "value_present": True,
         "evidence_sha256": digest("read-receipt"), "observed_at": 100,
     }
     return evaluate(
