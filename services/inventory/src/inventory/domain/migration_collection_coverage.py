@@ -16,6 +16,8 @@ def evaluate(
     manifest: dict[str, Any], platform: str, scope: str,
     installation_id: str, generation_id: str, installed_tuple_sha256: str,
     observations: list[dict[str, Any]], applicability: list[dict[str, Any]], now: int,
+    installed_namespaces: dict[str, list[str]] | None = None,
+    receipt_expires_at: int | None = None,
 ) -> dict[str, Any]:
     if (manifest.get("schema_version") != 1 or platform not in manifest.get("platforms", {})
             or scope not in {"source", "target", "owner"} or type(now) is not int):
@@ -45,6 +47,7 @@ def evaluate(
     facts = {row["attribute_id"]: row for row in observations}
     predicates = {row["attribute_id"]: row for row in applicability}
     results: list[dict[str, Any]] = []
+    deadlines: list[int] = []
     for requirement in rows:
         if requirement["scope"] != scope:
             continue
@@ -54,6 +57,7 @@ def evaluate(
         status, reason = "held", "field_unobserved"
         conditional = requirement["condition"] != "always"
         predicate = predicates.get(key)
+        predicate_deadline: int | None = None
         applicable = not conditional
         if conditional:
             if predicate is None or predicate.get("condition") != requirement["condition"]:
@@ -66,9 +70,13 @@ def evaluate(
                 reason = "applicability_evidence_stale_or_invalid"
             elif predicate["applicable"] is False:
                 status, reason = "not_applicable", "independently_observed_absent"
+                predicate_deadline = predicate["observed_at"] + requirement["max_age_seconds"]
             else:
                 applicable = True
+                predicate_deadline = predicate["observed_at"] + requirement["max_age_seconds"]
         if status == "not_applicable":
+            if predicate_deadline is not None:
+                deadlines.append(predicate_deadline)
             results.append({"attribute_id": key, "status": status, "reason": reason,
                             "severity": requirement["severity"]})
             continue
@@ -93,19 +101,34 @@ def evaluate(
                 reason = "independent_owner_evidence_required"
             elif requirement["api_family"] is not None and (
                     not isinstance(evidence.get("api_version"), str)
-                    or not evidence["api_version"]):
-                reason = "installed_api_version_unresolved"
+                    or installed_namespaces is None
+                    or evidence["api_version"] not in
+                       installed_namespaces.get(requirement["api_family"], [])):
+                # A string alone is not an installed namespace witness.
+                reason = "installed_api_version_not_observed"
             else:
                 status, reason = "observed", "scoped_fresh_observation"
+                deadline = evidence["observed_at"] + requirement["max_age_seconds"]
+                if predicate_deadline is not None:
+                    deadline = min(deadline, predicate_deadline)
+                deadlines.append(deadline)
         results.append({"attribute_id": key, "status": status,
                         "reason": reason, "severity": requirement["severity"]})
     holds = sorted(row["attribute_id"] + ":" + row["reason"] for row in results
                    if row["status"] == "held")
+    expiry = min(deadlines) if len(deadlines) == len(results) else now
+    if receipt_expires_at is not None:
+        if type(receipt_expires_at) is not int:
+            raise Rejected("migration_collection_receipt_expiry_invalid")
+        expiry = min(expiry, receipt_expires_at)
+    if expiry <= now and not holds:
+        holds.append("migration_collection_evidence_expired")
     result = {
         "schema_version": 1, "platform": platform, "scope": scope,
         "installation_id": installation_id, "generation_id": generation_id,
         "installed_tuple_sha256": installed_tuple_sha256,
         "manifest_sha256": digest(manifest), "evaluated_at": now,
+        "expires_at": expiry,
         "status": "complete" if not holds else "held",
         "attributes": results, "holds": holds,
         "independent_e3_e4_qualification": False,
