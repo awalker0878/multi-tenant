@@ -1,0 +1,15 @@
+[
+  {
+    "id": "placement.native_reserved_capacity",
+    "scope": "owner",
+    "api_family": null,
+    "api_field": null,
+    "owner_evidence_field": "native_owner_available_capacity_and_exclusive_reservation",
+    "collection_method": "independent",
+    "max_age_seconds": 15,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "services/inventory/src/inventory/domain/source_profile.py",
+    "collection_status": "external_evidence_required"
+  }
+]

@@ -1,0 +1,41 @@
+[
+  {
+    "id": "compute.gpu_passthrough",
+    "scope": "source",
+    "api_family": "vmm",
+    "api_field": "data.gpus[*] + data.pcieDevices[*]",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 120,
+    "severity": "critical",
+    "condition": "when:present",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_workload.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "compute.cdrom",
+    "scope": "source",
+    "api_family": "vmm",
+    "api_field": "data.cdRoms[*]",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 300,
+    "severity": "optional",
+    "condition": "when:nonessential_removable_media",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_workload.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "identity.categories",
+    "scope": "source",
+    "api_family": "vmm",
+    "api_field": "data.categories",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 3600,
+    "severity": "optional",
+    "condition": "when:present",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_workload.py",
+    "collection_status": "native_field_candidate"
+  }
+]

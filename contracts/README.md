@@ -31,3 +31,9 @@ The `planning/qualification-v2.1.json` validation profile tightens the externall
 ## Archived duplicate schema identities
 
 The published Inventory collection-page v1.1, v1.2 and v1.3 specifications historically declared the same `$id`. Their original bytes are preserved and pinned to Git blob identities; **do not register these three files together by `$id`**. The new `schemas/inventory/collection-page-v1.4.json` has its own identifier and represents the current schema definition. CI allows only those exact archived duplicates and rejects all new collisions or mutations to those historical artifacts.
+
+## Collection-manifest source partitions
+
+The Inventory collection manifest is authored in platform headers and ordered scope-specific arrays under `contracts/source/capabilities/migration-collection-manifest-v1/platforms/<provider>/`. Numeric prefixes preserve the published attribute sequence, including interleaved source/target/owner groups. Do not reorder these files or aggregate by scope: the resulting contract must continue matching the canonical bundle via `scripts/contracts/build.py --check`.
+
+The archived Inventory and Planning API releases remain immutable. Unused Console copies of Inventory v1.7/v1.8 and Planning Migration v1.4 were pruned; the current consumers use Inventory v1.9 and Planning Migration v1.6. Older copies explicitly exercised by historical compatibility scripts remain in place.
