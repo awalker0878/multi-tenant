@@ -92,6 +92,7 @@ def resolve(
 def resolve_workload(
     route: dict[str, Any], reconciliation: dict[str, Any],
     collection_coverages: list[dict[str, Any]] | None, now: int,
+    collection_manifest: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Upgrade an E3/E4 route preview to the effect-facing workload contract.
 
@@ -109,6 +110,18 @@ def resolve_workload(
             or type(reconciliation.get("expires_at")) is not int
             or reconciliation["expires_at"] <= now):
         holds.append("catalogue_native_workload_reconciliation_required")
+    # A coverage summary cannot define its own required attribute universe.
+    # Deployment release custody independently pins the full manifest and
+    # exact platform/scope IDs; any unbound release is held.
+    manifest_valid = (
+        isinstance(collection_manifest, dict)
+        and collection_manifest.get("release_sha256") == route.get("release_sha256")
+        and isinstance(collection_manifest.get("manifest_sha256"), str)
+        and len(collection_manifest["manifest_sha256"]) == 64
+        and isinstance(collection_manifest.get("platforms"), dict)
+    )
+    if not manifest_valid:
+        holds.append("collection_manifest_release_binding_required")
     expected_scopes = {"source", "target", "owner"}
     if (not isinstance(collection_coverages, list)
             or len(collection_coverages) != 3
@@ -138,6 +151,18 @@ def resolve_workload(
                 })
             ):
                 holds.append("migration_field_collection_stale_or_incomplete")
+            if manifest_valid:
+                side = entry.get("scope")
+                platform = route["target"]["platform"] if side == "target" else route["source"]["platform"]
+                declared = collection_manifest["platforms"].get(platform, {})
+                expected = declared.get(side) if isinstance(declared, dict) else None
+                seen = {a.get("attribute_id") for a in entry.get("attributes", [])
+                        if isinstance(a, dict)}
+                if (not isinstance(expected, list) or not expected
+                        or len(expected) != len(set(expected))
+                        or set(expected) != seen
+                        or entry.get("manifest_sha256") != collection_manifest["manifest_sha256"]):
+                    holds.append("migration_collection_manifest_attributes_changed")
             if entry.get("scope") in {"source", "target"} and (
                 entry.get("installation_id")
                 != route[entry["scope"]]["installation_id"]
