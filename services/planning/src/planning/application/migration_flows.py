@@ -291,16 +291,24 @@ class MigrationFlows:
         changed = saved is not None and saved["context_sha256"] != current["context_sha256"]
         selections = saved["payload"]["selections"] if saved and not changed else []
         omissions = saved["payload"].get("omissions", []) if saved and not changed else []
-        holds = self.evaluate(current, selections, self.planning.clock(), omissions)
+        try:
+            holds = self.evaluate(current, selections, self.planning.clock(), omissions)
+        except (Rejected, KeyError, TypeError, ValueError):
+            holds = ["application_flow_native_control_changed"]
+            changed = True
         if saved and not changed:
             try:
                 if saved["payload"].get("native_controls_sha256") != self.native_control_digest(current, selections):
                     changed = True
                     holds = ["application_flow_native_control_changed", *holds]
-            except (Rejected, KeyError, TypeError):
+            except (Rejected, KeyError, TypeError, ValueError):
                 changed = True
                 holds = ["application_flow_native_control_changed", *holds]
         if changed:
+            # Never offer an old native rule/route as a preselected default
+            # after a scope, content or independent evidence change.
+            selections = []
+            omissions = []
             holds = ["application_flow_evidence_changed", *holds]
         return {
             "context_sha256": current["context_sha256"],
