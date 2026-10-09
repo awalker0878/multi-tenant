@@ -15,8 +15,8 @@ def values() -> tuple[dict, list, list]:
         "id": "workload",
         "compute": {"vcpus": 2, "memory_mib": 4096},
         "guest": {"firmware": "uefi", "secure_boot": True},
-        "disks": [{"order": 0, "size_gib": 10}],
-        "nics": [{"order": 0}],
+        "disks": [{"id": "disk-0", "order": 0, "size_gib": 10}],
+        "nics": [{"id": "nic-0", "order": 0}],
     }
     intent = {"workloads": [workload], "dependencies": []}
     link = {"workload_id": "workload", "catalogue_digest": digest(intent),
@@ -24,7 +24,9 @@ def values() -> tuple[dict, list, list]:
             "owner_confirmed": True, "native_generation_id": "generation",
             "native_profile_sha256": digest("profile"),
             "installation_id": "installation", "native_scope": "project",
-            "evidence_sha256": digest("link"), "expires_at": 200}
+            "evidence_sha256": digest("link"), "expires_at": 200,
+            "disk_mappings": [{"logical_device_id": "disk-0", "native_key": 0}],
+            "nic_mappings": [{"logical_device_id": "nic-0", "native_key": 0}]}
     profile = {"source_identity_sha256": digest("native"),
                "generation_id": "generation", "profile_sha256": digest("profile"),
                "installation_id": "installation", "native_scope": "project",
@@ -102,3 +104,26 @@ def test_unicode_catalogue_canonicalization_matches_published_digest() -> None:
     ).encode()).hexdigest()
     links[0]["catalogue_digest"] = catalogue_sha
     assert reconcile(intent, catalogue_sha, links, profiles, 100)["status"] == "matched"
+
+
+def test_native_keys_need_not_equal_catalogue_display_order() -> None:
+    intent, links, profiles = values()
+    links[0]["disk_mappings"][0]["native_key"] = 2000
+    links[0]["nic_mappings"][0]["native_key"] = 4000
+    profiles[0]["facts"]["disks"][0]["key"] = 2000
+    profiles[0]["facts"]["nics"][0]["key"] = 4000
+    assert reconcile(intent, digest(intent), links, profiles, 100)["status"] == "matched"
+    links[0]["disk_mappings"][0]["native_key"] = 9999
+    assert "source_disk_identity_ambiguous" in reconcile(
+        intent, digest(intent), links, profiles, 100
+    )["holds"][0]
+
+
+def test_missing_or_reused_device_mapping_never_reconciles() -> None:
+    intent, links, profiles = values()
+    links[0]["disk_mappings"] = []
+    assert reconcile(intent, digest(intent), links, profiles, 100)["status"] == "held"
+    links[0]["disk_mappings"] = [
+        {"logical_device_id": "unknown", "native_key": 0}
+    ]
+    assert reconcile(intent, digest(intent), links, profiles, 100)["status"] == "held"
