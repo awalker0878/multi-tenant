@@ -48,6 +48,12 @@ jobs:
           python -m unittest discover -s tests/contracts -p 'test_route_conformance.py' -v
       - name: Install bounded owner contract test dependencies
         run: python -m pip install --disable-pip-version-check -e services/planning -e services/lifecycle -e services/inventory pytest==9.1.1
+      - name: Probe Inventory and Planning migration operations against real ASGI routers
+        env:
+          PYTHONPATH: services/inventory/src:services/planning/src
+        run: |
+          python scripts/contracts/route_conformance.py --app inventory
+          python scripts/contracts/route_conformance.py --app planning-migration
       - name: Validate real Planning and Lifecycle readiness producers and consumers
         env:
           PYTHONPATH: services/planning/src:services/lifecycle/src:services/inventory/src:services/planning/tests
