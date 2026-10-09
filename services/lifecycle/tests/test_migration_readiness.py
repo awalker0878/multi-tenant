@@ -237,3 +237,14 @@ def test_catalogue_owner_must_supply_all_approved_workloads() -> None:
         verify_catalogue_membership(value, {
             **published, "revision_id": "10000000-0000-4000-8000-000000000002",
         }, environment)
+    with pytest.raises(Rejected, match="migration_catalogue_field_set_incomplete"):
+        verify_catalogue_membership(value, {
+            **published,
+            "intent": {
+                **published["intent"],
+                "workloads": [{
+                    **published["intent"]["workloads"][0],
+                    "guest": {"os": "windows"},
+                }],
+            },
+        }, environment)

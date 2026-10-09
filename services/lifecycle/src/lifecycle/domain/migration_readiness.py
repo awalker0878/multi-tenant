@@ -94,6 +94,43 @@ def verify_catalogue_membership(
             or len(set(actual_ids)) != len(actual_ids)
             or set(actual_ids) != set(expected_ids)):
         raise Rejected("migration_catalogue_workload_set_incomplete", 423)
+    for desired_workload in desired:
+        matched = next(row for row in actual
+                       if row["workload_id"] == desired_workload["id"])
+        fields = {
+            row.get("field"): row for row in matched.get("field_dispositions", [])
+            if isinstance(row, dict)
+        }
+        # Independently derive the disposition universe from the current
+        # Catalogue document, not Planning's user-supplied required flags.
+        expected_fields: dict[str, bool] = {}
+        if "architecture" in desired_workload.get("compute", {}):
+            expected_fields["compute.architecture"] = True
+        guest = desired_workload.get("guest", {})
+        for key in ("os", "image", "hardening_profile"):
+            if key in guest:
+                expected_fields["guest." + key] = True
+        if "failure_domain" in desired_workload:
+            placement = desired_workload["failure_domain"]
+            expected_fields["failure_domain"] = (
+                not isinstance(placement, dict)
+                or placement.get("strength") == "required"
+            )
+        for disk in desired_workload.get("disks", []):
+            if not isinstance(disk, dict) or not isinstance(disk.get("id"), str):
+                raise Rejected("migration_catalogue_field_set_incomplete", 423)
+            for key in ("boot", "storage_class", "encryption"):
+                if key in disk:
+                    expected_fields["disks." + disk["id"] + "." + key] = True
+        for requirement in desired_workload.get("requirements", []):
+            if isinstance(requirement, dict):
+                expected_fields["requirements." + str(requirement.get("key"))] = (
+                    requirement.get("strength") == "required"
+                )
+        if any(name not in fields or fields[name].get("required") is not required
+               for name, required in expected_fields.items()):
+            raise Rejected("migration_catalogue_field_set_incomplete", 423)
+
 
 
 REQUIRED = {
