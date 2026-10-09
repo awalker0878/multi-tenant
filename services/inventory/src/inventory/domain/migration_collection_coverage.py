@@ -12,11 +12,38 @@ from typing import Any
 from inventory.domain.discovery import Rejected, digest
 
 
+def installed_version_supported(
+    api_version: Any, family: Any,
+    installed: dict[str, list[str] | dict[str, str]] | None,
+) -> bool:
+    """Exact namespace or bounded, native-discovered microversion range only."""
+    if not isinstance(api_version, str) or not isinstance(family, str) or installed is None:
+        return False
+    candidate = installed.get(family)
+    if isinstance(candidate, list):
+        return api_version in candidate
+    if not isinstance(candidate, dict) or set(candidate) != {"min_version", "max_version"}:
+        return False
+    def number(value: Any) -> tuple[int, ...] | None:
+        if not isinstance(value, str) or not re.fullmatch(r"v?[0-9]+(?:\\.[0-9]+){1,3}", value):
+            return None
+        return tuple(int(part) for part in value.removeprefix("v").split("."))
+    actual = number(api_version)
+    lower = number(candidate["min_version"])
+    upper = number(candidate["max_version"])
+    return bool(
+        actual is not None and lower is not None and upper is not None
+        and len(actual) == len(lower) == len(upper)
+        and actual[0] == lower[0] == upper[0]
+        and lower <= actual <= upper
+    )
+
+
 def evaluate(
     manifest: dict[str, Any], platform: str, scope: str,
     installation_id: str, generation_id: str, installed_tuple_sha256: str,
     observations: list[dict[str, Any]], applicability: list[dict[str, Any]], now: int,
-    installed_namespaces: dict[str, list[str]] | None = None,
+    installed_namespaces: dict[str, list[str] | dict[str, str]] | None = None,
     receipt_expires_at: int | None = None,
 ) -> dict[str, Any]:
     if (manifest.get("schema_version") != 1 or platform not in manifest.get("platforms", {})
@@ -107,11 +134,10 @@ def evaluate(
             elif requirement["collection_status"] == "external_evidence_required" and (
                     evidence.get("independent_review") is not True):
                 reason = "independent_owner_evidence_required"
-            elif requirement["api_family"] is not None and (
-                    not isinstance(evidence.get("api_version"), str)
-                    or installed_namespaces is None
-                    or evidence["api_version"] not in
-                       installed_namespaces.get(requirement["api_family"], [])):
+            elif requirement["api_family"] is not None and not installed_version_supported(
+                    evidence.get("api_version"), requirement["api_family"],
+                    installed_namespaces,
+            ):
                 # A string alone is not an installed namespace witness.
                 reason = "installed_api_version_not_observed"
             else:
