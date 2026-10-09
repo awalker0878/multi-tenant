@@ -46,6 +46,7 @@ FIELDS = {
         "scopeReferences",
         "vpcReferences",
         "securedGroups",
+        "rules",
     ),
 }
 
@@ -161,6 +162,27 @@ def collect_ahv(
             if r.get("projectExtId") == policy["native_scope"]
             or r["extId"] in stream["shared_resource_ids"]
         ]
+    # Prism's policy list may include native rule bodies; absence is UNKNOWN.
+    # Never infer rules from policy names, ENFORCE state or category memberships.
+    # Referenced service/address/category groups need independent resolution.
+    for policy_row in inventory["policies"]:
+        rules = policy_row.get("rules")
+        if rules is None:
+            continue
+        if not isinstance(rules, list) or len(rules) > 512:
+            raise CollectionFailure("invalid_response")
+        seen_rule_ids: set[str] = set()
+        for rule in rules:
+            if (
+                not isinstance(rule, dict)
+                or not isinstance(rule.get("extId"), str)
+                or not rule["extId"]
+                or rule["extId"] in seen_rule_ids
+                or not isinstance(rule.get("type"), str)
+                or not isinstance(rule.get("spec"), dict)
+            ):
+                raise CollectionFailure("invalid_response")
+            seen_rule_ids.add(rule["extId"])
     projected = {
         k: [{f: r.get(f) for f in fields} | {"native_sha256": fingerprint(r)} for r in inventory[k]]
         for k, fields in FIELDS.items()
@@ -180,6 +202,11 @@ def collect_ahv(
         holds.append("ahv_installed_versions_incomplete")
     if not projected["storage_containers"] or not projected["subnets"]:
         holds.append("ahv_destination_resources_incomplete")
+    if any(row.get("state") == "ENFORCE" and row.get("rules") is None
+           for row in projected["policies"]):
+        holds.append("ahv_security_rule_catalog_incomplete")
+    # Even complete native rule bodies are discovery evidence, not independent
+    # end-to-end flow or isolation qualification.
     return {
         "schema_version": 2,
         "profile_type": "TargetCapabilityProfile",
