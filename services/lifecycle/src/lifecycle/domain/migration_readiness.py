@@ -56,6 +56,43 @@ def eligible_field_dispositions(workloads: Any) -> bool:
     return True
 
 
+
+def verify_catalogue_membership(
+    readiness: dict[str, Any], published: Any, expected_environment: str,
+) -> None:
+    """Independently confirm the entire, *current* Catalogue workload set.
+
+    Planning's returned workload count or digest is not trusted as the
+    reference set. The caller must obtain published from the authenticated
+    Catalogue owner, separately from Planning's readiness projection.
+    """
+    recon = readiness["workload_reconciliation"]
+    if not isinstance(published, dict):
+        raise Rejected("migration_catalogue_reference_unavailable", 423)
+    intent = published.get("intent")
+    if not isinstance(intent, dict):
+        raise Rejected("migration_catalogue_reference_unavailable", 423)
+    environment = intent.get("environment")
+    if (not isinstance(environment, dict)
+            or environment.get("id") != expected_environment
+            or published.get("revision_id") != recon.get("catalogue_revision_id")
+            or published.get("intent_sha256") != recon.get("catalogue_sha256")):
+        raise Rejected("migration_catalogue_revision_changed", 423)
+    desired = intent.get("workloads")
+    actual = recon.get("workloads")
+    if (not isinstance(desired, list) or not 1 <= len(desired) <= 100
+            or not isinstance(actual, list)
+            or not all(isinstance(w, dict) for w in desired + actual)):
+        raise Rejected("migration_catalogue_workload_set_incomplete", 423)
+    expected_ids = [w.get("id") for w in desired]
+    actual_ids = [w.get("workload_id") for w in actual]
+    if (any(not isinstance(w, str) or not w for w in expected_ids + actual_ids)
+            or len(set(expected_ids)) != len(expected_ids)
+            or len(set(actual_ids)) != len(actual_ids)
+            or set(actual_ids) != set(expected_ids)):
+        raise Rejected("migration_catalogue_workload_set_incomplete", 423)
+
+
 REQUIRED = {
     "schema_version", "kind", "scope", "route_sha256", "tranche_sha256",
     "release_sha256", "source", "target", "method", "api_compatibility",

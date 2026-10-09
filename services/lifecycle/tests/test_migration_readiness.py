@@ -205,3 +205,35 @@ def test_recomputed_digests_cannot_hide_required_field_drift() -> None:
     })
     with pytest.raises(Rejected, match="migration_nested_workload_reconciliation_held"):
         verify(value, content, "10000000-0000-4000-8000-000000000001", 101)
+
+def test_catalogue_owner_must_supply_all_approved_workloads() -> None:
+    from lifecycle.domain.migration_readiness import verify_catalogue_membership
+
+    value, content = specimen()
+    reconciliation = value["workload_reconciliation"]
+    environment = content["scope"]["environment"]
+    published = {
+        "revision_id": reconciliation["catalogue_revision_id"],
+        "intent_sha256": reconciliation["catalogue_sha256"],
+        "intent": {
+            "environment": {"id": environment},
+            "workloads": [{
+                "id": reconciliation["workloads"][0]["workload_id"],
+            }],
+        },
+    }
+    verify_catalogue_membership(value, published, environment)
+    with pytest.raises(Rejected, match="migration_catalogue_workload_set_incomplete"):
+        verify_catalogue_membership(value, {
+            **published,
+            "intent": {
+                **published["intent"],
+                "workloads": published["intent"]["workloads"] + [
+                    {"id": "10000000-0000-4000-8000-000000000002"},
+                ],
+            },
+        }, environment)
+    with pytest.raises(Rejected, match="migration_catalogue_revision_changed"):
+        verify_catalogue_membership(value, {
+            **published, "revision_id": "10000000-0000-4000-8000-000000000002",
+        }, environment)

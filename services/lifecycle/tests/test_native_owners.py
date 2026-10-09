@@ -211,7 +211,7 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
     }
     peers = {}
     for index, name in enumerate(
-        ("planning", "governance", "inventory", "custody", "observer", "worker", "caller")
+        ("planning", "governance", "inventory", "custody", "observer", "catalogue", "worker", "caller")
     ):
         token = tmp_path / (name + ".token")
         token.write_text(chr(97 + index) * 64)
@@ -253,6 +253,31 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
     def request(owner: str, method: str, route: str, body: Any = None) -> dict[str, Any]:
         if owner == "planning":
             return deepcopy(state["record"])
+        if owner == "catalogue":
+            readiness = state["record"]["migration_readiness"]
+            reconciliation = readiness["workload_reconciliation"]
+            current_ids = [
+                {"id": w["workload_id"]} for w in reconciliation["workloads"]
+            ]
+            if state["fault"] == "catalogue_missing_workload":
+                current_ids.append({"id": str(uuid4())})
+            if state["fault"] == "catalogue_revision":
+                return {
+                    "revision_id": str(uuid4()),
+                    "intent_sha256": reconciliation["catalogue_sha256"],
+                    "intent": {
+                        "environment": {"id": scope["environment"]},
+                        "workloads": current_ids,
+                    },
+                }
+            return {
+                "revision_id": reconciliation["catalogue_revision_id"],
+                "intent_sha256": reconciliation["catalogue_sha256"],
+                "intent": {
+                    "environment": {"id": scope["environment"]},
+                    "workloads": current_ids,
+                },
+            }
         if owner == "governance":
             return deepcopy(state["approval"])
         if owner == "inventory":
@@ -461,3 +486,12 @@ def test_bootstrap_does_not_expose_simulation_and_uses_native_binding_scope(
     with pytest.raises(Rejected):
         control.execute(grant)
     assert configuration(service)["schema_version"] == 1
+
+def test_catalogue_current_membership_is_checked_independently(tmp_path: Path) -> None:
+    owners, ref, state, _ = fixture(tmp_path)
+    state["fault"] = "catalogue_missing_workload"
+    with pytest.raises(Rejected, match="migration_catalogue_workload_set_incomplete"):
+        owners.resolve(ref["tenant_id"], ref)
+    state["fault"] = "catalogue_revision"
+    with pytest.raises(Rejected, match="migration_catalogue_revision_changed"):
+        owners.resolve(ref["tenant_id"], ref)
