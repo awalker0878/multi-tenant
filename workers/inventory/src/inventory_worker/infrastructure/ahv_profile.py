@@ -103,6 +103,24 @@ def collect_list(
     raise CollectionFailure("invalid_response")
 
 
+def resolved_namespace_versions(stream: dict[str, Any]) -> dict[str, str]:
+    """Use only the exact namespace versions enrolled for this native scope."""
+    versions = dict(VERSIONS)
+    installed = stream.get("api_versions")
+    if installed is None and stream.get("api_versions_verified") is not True:
+        if stream.get("api_version") not in {None, "v4.3"}:
+            raise CollectionFailure("installed_api_namespace_versions_unqualified")
+        return versions
+    if (
+        stream.get("api_versions_verified") is not True
+        or not isinstance(installed, dict)
+        or set(installed) != set(versions)
+        or any(v not in {"v4.2", "v4.3"} for v in installed.values())
+    ):
+        raise CollectionFailure("installed_api_namespace_versions_unqualified")
+    return dict(installed)
+
+
 def collect_ahv(
     policy: dict[str, Any],
     stream: dict[str, Any],
@@ -110,15 +128,7 @@ def collect_ahv(
     before_request: Callable[[], None],
 ) -> dict[str, Any]:
     records: dict[str, Any] = {}
-    versions = dict(VERSIONS)
-    installed_versions = stream.get("api_versions")
-    if stream.get("api_versions_verified") is True:
-        if (not isinstance(installed_versions, dict)
-                or set(installed_versions) != set(versions)
-                or any(value not in {"v4.2", "v4.3"}
-                       for value in installed_versions.values())):
-            raise CollectionFailure("installed_api_namespace_versions_unqualified")
-        versions = dict(installed_versions)
+    versions = resolved_namespace_versions(stream)
     # Each namespace has a distinct version. Never infer the Microseg
     # feature namespace from Prism Central or AOS release string.
     routes = {
