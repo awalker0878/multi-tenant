@@ -58,6 +58,8 @@ def specimen():
             "api_version": "2.104" if family == "nova" else "v4.3" if family else None,
             "observed_at": 90, "evidence_sha256": digest(attribute),
             "value_present": True,
+            "native_operation": "GET /api/vmm/v4.3/config/resource" if family else None,
+            "value_sha256": digest(attribute) if family else None,
             "independent_review": True,
         }
     scopes = []
