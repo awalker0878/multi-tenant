@@ -35,6 +35,63 @@
 5. **CI and deployed E3/E4 (unverified).** Dedicated tests were added, but this PR requires real PostgreSQL, Laravel, TS/Playwright and live-read commissioning, positive and negative producer→Inventory→Planning→Console→Lifecycle gates, expiry/revocation and cross-tenant tests. Queued CI is not a passing gate.
 
 
+## 2026-10-09 contract-integration corrective audit (latest)
+
+**Code changes applied**
+
+1. Inventory's strict migration input schema is now packaged byte-for-byte
+   from the canonical `migration-input-v3.json` including per-scope
+   `expires_at` and optional typed source observation timestamps. Run
+   `python scripts/p05/sync_migration_inputs.py --check`; P05 CI also runs
+   `test_migration_owner_contract.py` on actual Inventory coverage evaluation
+   and the `WorkloadProfiles.planning` response against the *installed* schema.
+2. Console's PlanningClient recognizes `migration-workload-readiness` with
+   `plan.read` delegation and typed response. Readiness requires a current
+   Catalogue logical workload selection. The server resolves matching
+   confirmed Inventory native review by application/environment/workload
+   instead of using the unrelated site-latest review, and holds if a bounded
+   lookup is incomplete or ambiguous. Planning preview and native admission
+   both query the same independent E4 verification path.
+3. Required native semantic comparisons expose desired value, observed value,
+   source/independent-E4 provenance, evidence age, disposition and next action.
+   Unknown OS, hardening, image or storage encryption/key semantics cannot
+   be promoted from guest labels: an exact independent E4
+   `verified_observation` carrying a signed source-profile and field
+   digest is required to assert equivalence.
+4. AHV qualified version selection intersects installed, entitled, E3/E4
+   accepted and **actually executable** releases before choosing a version.
+   The immutable Planning migration content includes a pinned
+   `api_selection` (capability, side, family, version, qualification evidence
+   digest, expiry, source/target profile and release); both validation and
+   execution re-resolve and compare the tuple. AHV transport still permits
+   only fixed qualified v4.3 routes. Non-v4.3 is held rather than substituted.
+   OpenStack native-discovered min/max compute and volume microversion ranges
+   are retained and matched numerically without implying missing services.
+5. Workers now capture successful TLS native GET-response digests inside the
+   lease and atomically publish `native_read_receipts` with Inventory pages.
+   Inventory validates the bounded GET outbox and requires each later signed
+   native field receipt to reference its same-generation operation, response
+   SHA and observed time. Signed receipts have monotonic generation sequences;
+   delayed older generations, duplicate sequence conflicts and timestamp
+   regression are held. Failed/partial discovery appends source/target
+   generation invalidations so old receipts do not survive negative evidence.
+6. Resolved workload expiry is bounded by both declared E4 expiration and
+   the *exclusive* observed_at + 30 seconds freshness deadline. Coverage
+   completeness matches each release-bound manifest's exact attribute set,
+   not the count of summary records.
+
+**Not yet proven/commissioned**
+
+- The independent Ed25519 signer, all platform-native field extraction
+  adapters and complete manifest coverage, especially VMware NSX/AHV policy,
+  guest attestation and encryption/key ownership, still require connected
+  producer and external E3/E4 runtime proof.
+- An effective security policy or syntactically valid signed receipt does not
+  itself constitute equivalence. Missing/invalid measurements remain held.
+- Full PostgreSQL and browser/Console→Planning→Lifecycle integration and
+  native observer commissioning are release gates. CI success is not implied
+  by these commits; see PR #64 checks.
+
 ## Release gate
 
 Do not mark PR #64 ready, merge, or enable native effects until relevant CI is green, the collector and Console APIs are integrated end to end, runtime version enforcement is exact, independent qualifications are valid, and the outstanding evidence ledger is reconciled. All failed or unobserved conditions remain `held`.
