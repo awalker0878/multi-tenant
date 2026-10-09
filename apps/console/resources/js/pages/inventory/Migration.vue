@@ -53,6 +53,64 @@ const sourceSecurityIds = computed<string[] | null>(() => {
   }
   return set.size <= 64 ? [...set].sort() : null;
 });
+type ObservedNeutronRule = {
+  source_group_id: string; source_rule_id: string; semantic_sha256: string;
+  direction: string; ethertype: string; protocol: string | number | null;
+  port_range_min: number | null; port_range_max: number | null; remote_ip_prefix: string | null;
+};
+/** Only explicit API-observed native ACL rules; never infer application flows. */
+const sourceNativeRules = computed<ObservedNeutronRule[] | null>(() => {
+  const ids = sourceSecurityIds.value;
+  if (ids === null) return null;
+  if (!ids.length) return [];
+  const facts = source.value?.facts;
+  if (!facts || facts.platform !== 'openstack' || facts.schema_version !== 3) return null;
+  const groups = facts.native.metadata.security_groups;
+  if (!Array.isArray(groups)) return null;
+  const result: ObservedNeutronRule[] = [];
+  for (const groupId of ids) {
+    const group = groups.find(g => typeof g === 'object' && g !== null
+      && (g as Record<string, unknown>).id === groupId) as Record<string, unknown> | undefined;
+    if (!group || group.project_id !== facts.native_scope || !Array.isArray(group.rules)) return null;
+    const seen = new Set<string>();
+    for (const raw of group.rules) {
+      if (typeof raw !== 'object' || raw === null) return null;
+      const rule = raw as Record<string, unknown>;
+      if (typeof rule.id !== 'string' || !rule.id || seen.has(rule.id)
+          || typeof rule.semantic_sha256 !== 'string'
+          || !/^[a-f0-9]{64}$/.test(rule.semantic_sha256)) return null;
+      seen.add(rule.id);
+      result.push({
+        source_group_id: groupId, source_rule_id: rule.id,
+        semantic_sha256: rule.semantic_sha256,
+        direction: String(rule.direction ?? ''),
+        ethertype: String(rule.ethertype ?? ''),
+        protocol: (rule.protocol ?? null) as string | number | null,
+        port_range_min: (rule.port_range_min ?? null) as number | null,
+        port_range_max: (rule.port_range_max ?? null) as number | null,
+        remote_ip_prefix: (rule.remote_ip_prefix ?? null) as string | null,
+      });
+      if (result.length > 1024) return null;
+    }
+  }
+  return result;
+});
+function sourceRuleLabel(groupId: string, ruleId: string): string {
+  const rule = sourceNativeRules.value?.find(r =>
+    r.source_group_id === groupId && r.source_rule_id === ruleId);
+  return rule ? `${rule.direction} · ${rule.ethertype} · ${rule.protocol ?? 'any'} · ${rule.port_range_min ?? '*'}–${rule.port_range_max ?? '*'} · ${rule.remote_ip_prefix ?? 'any CIDR'}` : 'Unobserved source rule';
+}
+function matchingOpenstackRules(groupId: string, ruleId: string) {
+  const desired = sourceNativeRules.value?.find(r =>
+    r.source_group_id === groupId && r.source_rule_id === ruleId);
+  const targetGroupId = form.review.destination?.platform === 'openstack'
+    ? form.review.destination.security_mappings.find(m => m.source_id === groupId)?.destination_id
+    : null;
+  if (!desired || !targetGroupId || !openstack.value) return [];
+  const group = openstack.value.security_groups.find(g =>
+    g.id === targetGroupId && g.project_id === openstack.value?.project_id);
+  return group?.rules?.filter(r => r.semantic_sha256 === desired.semantic_sha256) ?? [];
+}
 function matchingOpenstackGroups(sourceId: string) {
   const facts = source.value?.facts;
   if (!facts || facts.profile_type !== 'SourceWorkloadProfile'
@@ -82,6 +140,10 @@ function syncOpenstackPolicies() {
       mapping.destination_id = '';
     }
   }
+  for (const flow of form.review.destination.flow_mappings ?? []) {
+    if (!matchingOpenstackRules(flow.source_group_id, flow.source_rule_id)
+        .some(r => r.id === flow.destination_rule_id)) flow.destination_rule_id = '';
+  }
 }
 
 watch(() => [form.review.source_profile_id, form.review.target_profile_id], (_, previous) => {
@@ -99,7 +161,12 @@ watch(() => [form.review.source_profile_id, form.review.target_profile_id], (_, 
   }
   if (openstack.value) {
     form.review.destination = sourceSecurityIds.value?.length
-      ? { platform: 'openstack', project_id: openstack.value.project_id, security_mappings: sourceSecurityIds.value.map(source_id => ({ source_id, destination_id: '' })) }
+      ? { platform: 'openstack', project_id: openstack.value.project_id,
+          security_mappings: sourceSecurityIds.value.map(source_id => ({ source_id, destination_id: '' })),
+          flow_mappings: (sourceNativeRules.value ?? []).map(rule => ({
+            source_group_id: rule.source_group_id,
+            source_rule_id: rule.source_rule_id, destination_rule_id: '',
+          })) }
       : undefined;
     form.review.method = '';
     return;
@@ -290,6 +357,20 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
             </select>
           </label>
         </div>
+        <div v-if="sourceNativeRules?.length && form.review.destination.flow_mappings?.length" class="mt-4 space-y-3">
+          <h4 class="font-medium">Observed source Neutron rules → existing destination Neutron rules</h4>
+          <p class="text-sm">Choose the existing destination API rule for each observed source ACL. These are not independently discovered application dependencies; required application flows must still be confirmed through owner-approved dependencies and measured receiving-network evidence.</p>
+          <div v-for="mapping in form.review.destination.flow_mappings" :key="`${mapping.source_group_id}:${mapping.source_rule_id}`">
+            <label>Source security group {{ mapping.source_group_id }} · rule {{ mapping.source_rule_id }} · {{ sourceRuleLabel(mapping.source_group_id, mapping.source_rule_id) }}
+              <select v-model="mapping.destination_rule_id" required>
+                <option value="">Select a destination API-observed rule</option>
+                <option v-for="rule in matchingOpenstackRules(mapping.source_group_id, mapping.source_rule_id)" :key="rule.id" :value="rule.id">{{ rule.direction }} · {{ rule.ethertype }} · {{ rule.protocol ?? 'any' }} · {{ rule.port_range_min ?? '*' }}–{{ rule.port_range_max ?? '*' }} · {{ rule.remote_ip_prefix ?? 'any CIDR' }} ({{ rule.id }})</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <p v-if="sourceNativeRules === null" role="alert">Source firewall rule details were not fully observed. Destination rule dropdowns are unavailable; restore Neutron policy discovery. This review cannot be confirmed.</p>
+        <p v-if="form.review.destination.flow_mappings?.some(m => matchingOpenstackRules(m.source_group_id, m.source_rule_id).length === 0)" role="alert">One or more required source ACL rules has no existing equivalent in the selected destination group. Do not create or invent destination rules through migration review.</p>
         <p v-if="!openstack.security_groups.length" role="alert">No destination security groups were discovered for the target project. No manual destination value is accepted.</p>
         <p v-if="form.review.destination.security_mappings.some(m => matchingOpenstackGroups(m.source_id).length === 0)" role="alert">Only project-scoped destination groups with identical observed policy-rule semantics appear. No matching native group means the migration is held; application-required traffic and deny paths still need separate receiving-environment verification.</p>
       </section>
