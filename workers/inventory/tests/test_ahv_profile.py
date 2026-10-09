@@ -212,8 +212,8 @@ def test_malformed_ahv_installation_objects_are_rejected(fault: str) -> None:
         collect_ahv({"native_scope": uid()}, stream, 100, lambda: None)
 
 
-@pytest.mark.parametrize("mode", ["observed", "unobserved", "duplicate"])
-def test_ahv_enforced_policy_rule_ids_are_observed_but_never_qualified(mode: str) -> None:
+@pytest.mark.parametrize("mode", ["observed", "empty", "duplicate"])
+def test_ahv_policy_rule_lists_use_bounded_native_policy_rule_get(mode: str) -> None:
     project, cluster, pc, storage, subnet, policy_id, rule_id = [uid() for _ in range(7)]
     stream = {
         "kind": "target_profile", "cluster_id": cluster,
@@ -221,6 +221,11 @@ def test_ahv_enforced_policy_rule_ids_are_observed_but_never_qualified(mode: str
         "credential_file": "/fixture",
     }
     approvals: list[str] = []
+    native_rule = {
+        "extId": rule_id, "type": "APPLICATION",
+        "spec": {"srcCategoryReferences": [uid()],
+                 "secretNativeDetail": "not for console"},
+    }
 
     def exchange(connection: dict[str, Any], route: str, headers: dict[str, str]) -> dict[str, Any]:
         approvals.append(route)
@@ -238,15 +243,14 @@ def test_ahv_enforced_policy_rule_ids_are_observed_but_never_qualified(mode: str
                      "isMarkedForRemoval": False, "isInternal": False}]
         elif "/subnets" in route:
             rows = [{"extId": subnet, "projectExtId": project}]
+        elif f"/policies/{policy_id}/rules" in route:
+            rows = [] if mode == "empty" else [native_rule]
         elif "/policies" in route:
             row: dict[str, Any] = {
                 "extId": policy_id, "projectExtId": project, "state": "ENFORCE",
             }
-            if mode != "unobserved":
-                native_rule = {"extId": rule_id, "type": "APPLICATION",
-                               "spec": {"srcCategoryReferences": [uid()],
-                                        "secretNativeDetail": "not for console"}}
-                row["rules"] = [native_rule, native_rule] if mode == "duplicate" else [native_rule]
+            if mode == "duplicate":
+                row["rules"] = [native_rule, native_rule]
             rows = [row]
         return {"data": rows, "metadata": {"totalAvailableResults": len(rows)}}
 
@@ -260,13 +264,14 @@ def test_ahv_enforced_policy_rule_ids_are_observed_but_never_qualified(mode: str
             return
         result = collect_ahv({"native_scope": project}, stream, 100, lambda: None)
     observed = result["policies"][0]["rules"]
-    assert len(approvals) == 7
+    assert len(approvals) == 8
+    assert approvals[-1].startswith(f"/api/microseg/v4.3/config/policies/{policy_id}/rules?")
     assert result["native_qualification"] == "not_established"
-    if mode == "unobserved":
-        assert observed is None
-        assert "ahv_security_rule_catalog_incomplete" in result["holds"]
+    if mode == "empty":
+        assert observed == []
     else:
         assert observed[0]["extId"] == rule_id
+        assert observed[0]["reference_resolution"] == "unresolved"
         assert len(observed[0]["spec_sha256"]) == 64
         assert "secretNativeDetail" not in str(result)
         assert "ahv_security_rule_catalog_incomplete" not in result["holds"]
