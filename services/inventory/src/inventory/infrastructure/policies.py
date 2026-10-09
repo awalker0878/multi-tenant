@@ -139,8 +139,43 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
                 {"cluster_id", "prism_central_id", "shared_resource_ids"}
                 if p["platform"] == "ahv"
                 else set()
-            ),
+            )
+            | ({"nsx_policy"} if p["platform"] == "vmware"
+               and s["kind"] == "target_profile" and "nsx_policy" in s else set()),
         )
+        if s["kind"] == "target_profile" and "nsx_policy" in s:
+            if p["platform"] != "vmware":
+                raise Rejected("nsx_enrollment_requires_vmware")
+            nsx = shape(s["nsx_policy"], {
+                "kind", "base_url", "addresses", "ca_file",
+                "credential_file", "api_version", "domain_id",
+            })
+            if (
+                nsx["kind"] != "nsx_policy"
+                or nsx["api_version"] != "policy-v1"
+                or not isinstance(nsx["domain_id"], str)
+                or re.fullmatch(r"[A-Za-z0-9_-]{1,100}", nsx["domain_id"]) is None
+                or nsx["base_url"] == s["base_url"]
+                or nsx["credential_file"] == s["credential_file"]
+            ):
+                raise Rejected("unqualified_nsx_enrollment")
+            nu = urlsplit(text(nsx["base_url"], 512))
+            if (
+                nu.scheme != "https" or not nu.hostname or nu.username or nu.password
+                or nu.query or nu.fragment or nu.path not in {"", "/"}
+                or "\\\\" in nsx["base_url"]
+                or (nu.port is not None and not 1 <= nu.port <= 65535)
+            ):
+                raise Rejected("invalid_nsx_origin")
+            if not isinstance(nsx["addresses"], list) or not 1 <= len(nsx["addresses"]) <= 16:
+                raise Rejected("invalid_nsx_addresses")
+            for value in nsx["addresses"]:
+                ip = ipaddress.ip_address(value)
+                if ip.is_unspecified or ip.is_multicast or ip.is_link_local:
+                    raise Rejected("invalid_nsx_addresses")
+            for field in ("ca_file", "credential_file"):
+                if not os.path.isabs(text(nsx[field], 512)):
+                    raise Rejected("invalid_nsx_secret_reference")
         if s["kind"] == "source_profile":
             vms = s["vm_ids"]
             if (
