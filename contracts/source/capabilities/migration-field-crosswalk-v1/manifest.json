@@ -6,10 +6,15 @@
     "fields": {
       "kind": "array",
       "files": [
-        "fields/source-01.json",
+        "fields/source-01-identity-and-installed-version.json",
+        "fields/source-01-state-and-guest.json",
+        "fields/source-01-disk-and-encryption.json",
         "fields/source-02.json",
         "fields/target-01.json",
-        "fields/owner-01.json",
+        "fields/owner-01-application-consistency.json",
+        "fields/owner-01-guest-storage-recovery.json",
+        "fields/owner-01-network-and-security.json",
+        "fields/owner-01-operations.json",
         "fields/owner-02.json",
         "fields/source-03.json",
         "fields/target-02.json",

@@ -30,7 +30,9 @@
         "components-schemas/workloads-03.json",
         "components-schemas/migration-01.json",
         "components-schemas/operator-01.json",
-        "components-schemas/platforms-02.json",
+        "components-schemas/openstack-target-capability-profile.json",
+        "components-schemas/ahv-target-capability-profile.json",
+        "components-schemas/ahv-destination-selection.json",
         "components-schemas/readiness-01.json",
         "components-schemas/workloads-04.json",
         "components-schemas/platforms-03.json"

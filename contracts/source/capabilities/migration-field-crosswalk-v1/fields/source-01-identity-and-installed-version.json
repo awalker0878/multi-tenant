@@ -1,0 +1,506 @@
+[
+  {
+    "canonical_id": "source.vm.id",
+    "scope": "source",
+    "relationship": "normalize",
+    "normalization": "installation_scoped_identifier",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "identity.vm_ref"
+        ],
+        "api_fields": [
+          "VirtualMachine.moId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.vm_ext_id"
+        ],
+        "api_fields": [
+          "data.extId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "identity.server_id"
+        ],
+        "api_fields": [
+          "server.id"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Identifiers are source-local, never reused at target.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vm.incarnation",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "independent_incarnation_review",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "identity.instance_uuid"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.instanceUuid"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.generation_uuid"
+        ],
+        "api_fields": [
+          "data.generationUuid"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "identity.instance_created"
+        ],
+        "api_fields": [
+          "server.created"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "OpenStack created timestamp is weaker evidence than VMware instance UUID or AHV generation UUID.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vm.bios_uuid",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "identity_not_portable",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "identity.bios_uuid"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.uuid"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.bios_uuid"
+        ],
+        "api_fields": [
+          "data.biosUuid"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No OpenStack BIOS UUID in the source manifest; never synthesize.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.scope.project",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "owner_authorization",
+    "platforms": {
+      "vmware": null,
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.project"
+        ],
+        "api_fields": [
+          "data.project.extId / projectExtId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "identity.project"
+        ],
+        "api_fields": [
+          "server.tenant_id"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Projects are environment-scoped and cannot be copied.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vm.host",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "source_host_identity",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "identity.host"
+        ],
+        "api_fields": [
+          "VirtualMachine.runtime.host"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.host"
+        ],
+        "api_fields": [
+          "data.host.extId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "when:host_placement"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "OpenStack tenant APIs may not expose host identity.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.platform.release",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "component_release_set",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "identity.vcenter_version",
+          "identity.vcenter_build"
+        ],
+        "api_fields": [
+          "ServiceInstance.content.about.version",
+          "ServiceInstance.content.about.build"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.prism_version",
+          "identity.aos_version"
+        ],
+        "api_fields": [
+          "config.buildInfo",
+          "config.buildInfo + clusterSoftwareMap"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "identity.installed_product"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "distribution_and_backend_release"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "Platform release names are not comparable; version-bind per installed service.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.api.releases",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "api_family_release_set",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "identity.api_release"
+        ],
+        "api_fields": [
+          "ServiceInstance.content.about.apiVersion + enrolled VI/JSON release"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.namespace_version"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "v4_namespace_entitlements_and_installed_bounds"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "identity.compute_microversion",
+          "identity.volume_microversion",
+          "identity.network_api"
+        ],
+        "api_fields": [
+          "GET versions + OpenStack-API-Version compute 2.1",
+          "GET versions + OpenStack-API-Version volume 3.0",
+          "GET /extensions + Networking API 2.0"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get",
+          "native_list"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "OpenStack microversions and AHV namespaces evolve independently.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vm.revision",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "opaque_update_revision",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "identity.config_change_version"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.changeVersion"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.update_time"
+        ],
+        "api_fields": [
+          "data.updateTime"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "vSphere revision and Prism update timestamp have distinct meanings.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  }
+]

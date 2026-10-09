@@ -1,0 +1,154 @@
+{
+  "AhvDestinationSelection": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "platform": {
+        "const": "ahv"
+      },
+      "project_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "prism_central_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "cluster_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "vpc_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "storage_container_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "category_ids": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "minItems": 0,
+        "maxItems": 32
+      },
+      "policy_ids": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "minItems": 0,
+        "maxItems": 32
+      },
+      "security_mappings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "destination_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            }
+          },
+          "required": [
+            "source_id",
+            "destination_id"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 64
+      },
+      "firmware": {
+        "enum": [
+          "bios",
+          "efi",
+          ""
+        ]
+      },
+      "disks": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_key": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 31
+            }
+          },
+          "required": [
+            "source_key",
+            "index"
+          ]
+        },
+        "minItems": 1,
+        "maxItems": 32
+      },
+      "nics": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_key": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "quarantine_subnet_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "production_subnet_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "source_key",
+            "quarantine_subnet_id",
+            "production_subnet_id"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 32
+      }
+    },
+    "required": [
+      "platform",
+      "project_id",
+      "prism_central_id",
+      "cluster_id",
+      "vpc_id",
+      "storage_container_id",
+      "category_ids",
+      "policy_ids",
+      "security_mappings",
+      "firmware",
+      "disks",
+      "nics"
+    ]
+  }
+}

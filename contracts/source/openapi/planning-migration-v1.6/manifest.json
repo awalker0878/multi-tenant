@@ -6,7 +6,10 @@
     "paths": {
       "kind": "object",
       "files": [
-        "paths/migration-01.json"
+        "paths/prepare-and-compose-migration.json",
+        "paths/options-and-support.json",
+        "paths/flow-choices-and-selections.json",
+        "paths/workload-readiness.json"
       ]
     },
     "components.schemas": {

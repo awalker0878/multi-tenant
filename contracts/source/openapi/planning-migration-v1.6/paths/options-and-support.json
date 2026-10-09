@@ -1,0 +1,346 @@
+{
+  "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plan-options": {
+    "post": {
+      "operationId": "migrationPlanOptions",
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "application",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "environment",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "X-Actor-Delegation",
+          "in": "header",
+          "required": true,
+          "description": "Current plan.create actor delegation for the exact tenant/application/environment/site; independently checked by Planning and Inventory.",
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PrepareMigration"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Exact current review binding. This preparation is not a persisted, approved or executable MigrationPlan. Cache-Control: no-store, private.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationOptions"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "413": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "415": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "423": {
+          "description": "Current commissioning, qualified base plan or migration inputs are held",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        }
+      },
+      "summary": "Find currently composable migration recipes for a reviewed VM"
+    }
+  },
+  "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-support": {
+    "post": {
+      "operationId": "readMigrationSupport",
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "application",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "environment",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "X-Actor-Delegation",
+          "in": "header",
+          "required": true,
+          "description": "Current plan.create actor delegation for the exact tenant/application/environment/site; independently checked by Planning and Inventory.",
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "site_id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "site_id"
+              ]
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Exact current review binding. This preparation is not a persisted, approved or executable MigrationPlan. Cache-Control: no-store, private.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationSupport"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "413": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "415": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "423": {
+          "description": "Current commissioning, qualified base plan or migration inputs are held",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Problem"
+              }
+            }
+          }
+        }
+      },
+      "summary": "Read all nine directed support states for this scope"
+    }
+  }
+}
