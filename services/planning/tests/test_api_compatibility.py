@@ -334,3 +334,23 @@ def test_selected_ahv_version_must_be_implemented_by_native_executor() -> None:
     accepted = evaluate(row, evidence, 100)
     assert accepted["cases"][1]["status"] == "eligible"
     assert accepted["cases"][1]["selected_api_version"] == "v4.3"
+
+
+def test_ahv_selects_executable_qualified_v43_even_when_v42_is_also_qualified() -> None:
+    row = selected()
+    row["target"]["platform"] = "ahv"
+    evidence = owner_input(row)
+    target = evidence["environments"]["target"]
+    target["apis"] = {"ahv.vmm": ["v4.2", "v4.3"]}
+    newer = evidence["observations"][1]
+    newer["api_family"] = "ahv.vmm"
+    newer["api_version"] = "v4.3"
+    older = deepcopy(newer)
+    older["api_version"] = "v4.2"
+    older["evidence_sha256"] = "e" * 64
+    older["qualification_sha256"] = "f" * 64
+    evidence["observations"].append(older)
+    result = evaluate(row, evidence, 100)
+    assert result["cases"][1]["selected_api_version"] == "v4.3"
+    assert result["cases"][1]["status"] == "eligible"
+    assert result["cases"][1]["evidence_sha256"] == newer["evidence_sha256"]
