@@ -597,6 +597,12 @@ class Discovery:
                     (status, error, failures, now + min(60, 2**failures), now, job_id),
                 )
                 if status == "partial":
+                    tx.execute(
+                        "INSERT INTO inventory.migration_collection_invalidations "
+                        "(tenant,site,endpoint,generation,reason,observed_at) "
+                        "VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING",
+                        (p.tenant, p.site, str(e["id"]), job_id, error, now),
+                    )
                     self.record(
                         tx,
                         p.tenant,
@@ -738,6 +744,14 @@ class Discovery:
                     job_id,
                 ),
             )
+            if status == "partial":
+                tx.execute(
+                    "INSERT INTO inventory.migration_collection_invalidations "
+                    "(tenant,site,endpoint,generation,reason,observed_at) "
+                    "VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING",
+                    (p.tenant, p.site, str(e["id"]), job_id,
+                     reason or "native_collection_incomplete", now),
+                )
             if status in {"complete", "partial"}:
                 self.record(
                     tx,
