@@ -309,17 +309,190 @@
                     }
                   },
                   "document": {
-                    "type": "object"
+                    "type": "object",
+                    "required": [
+                      "schema_version",
+                      "platform",
+                      "native_api_qualified",
+                      "workloads",
+                      "paths",
+                      "path_probes",
+                      "boundary_scope",
+                      "boundary_probes"
+                    ],
+                    "properties": {
+                      "schema_version": {
+                        "const": 2
+                      },
+                      "platform": {
+                        "enum": [
+                          "vmware",
+                          "ahv",
+                          "openstack"
+                        ]
+                      },
+                      "native_api_qualified": {
+                        "const": true
+                      },
+                      "workloads": {
+                        "type": "object"
+                      },
+                      "paths": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 16
+                      },
+                      "path_probes": {
+                        "type": "object"
+                      },
+                      "boundary_scope": {
+                        "type": "object"
+                      },
+                      "boundary_probes": {
+                        "type": "object"
+                      }
+                    }
                   },
                   "source_document": {
-                    "type": "object"
+                    "type": "object",
+                    "required": [
+                      "schema_version",
+                      "platform",
+                      "native_api_qualified",
+                      "workloads",
+                      "paths",
+                      "path_probes",
+                      "boundary_scope",
+                      "boundary_probes"
+                    ],
+                    "properties": {
+                      "schema_version": {
+                        "const": 2
+                      },
+                      "platform": {
+                        "enum": [
+                          "vmware",
+                          "ahv",
+                          "openstack"
+                        ]
+                      },
+                      "native_api_qualified": {
+                        "const": true
+                      },
+                      "workloads": {
+                        "type": "object"
+                      },
+                      "paths": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 16
+                      },
+                      "path_probes": {
+                        "type": "object"
+                      },
+                      "boundary_scope": {
+                        "type": "object"
+                      },
+                      "boundary_probes": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "boundary": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "schema_version",
+                      "complete",
+                      "workload_set_sha256",
+                      "classes"
+                    ],
+                    "properties": {
+                      "schema_version": {
+                        "const": 1
+                      },
+                      "complete": {
+                        "const": true
+                      },
+                      "workload_set_sha256": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      "classes": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 1024,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "flow",
+                            "requirement"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            },
+                            "flow": {
+                              "type": "object",
+                              "required": [
+                                "from",
+                                "to",
+                                "protocol",
+                                "port"
+                              ],
+                              "properties": {
+                                "from": {
+                                  "type": "string"
+                                },
+                                "to": {
+                                  "type": "string"
+                                },
+                                "protocol": {
+                                  "enum": [
+                                    "tcp",
+                                    "udp",
+                                    "icmp"
+                                  ]
+                                },
+                                "port": {
+                                  "type": [
+                                    "integer",
+                                    "null"
+                                  ],
+                                  "minimum": 0,
+                                  "maximum": 65535
+                                },
+                                "address_family": {
+                                  "enum": [
+                                    "ipv4",
+                                    "ipv6"
+                                  ]
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "requirement": {
+                              "enum": [
+                                "required",
+                                "forbidden",
+                                "observed"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 },
                 "required": [
                   "source_flow_id",
                   "flow",
                   "document",
-                  "source_document"
+                  "source_document",
+                  "boundary"
                 ]
               }
             },
