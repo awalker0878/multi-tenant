@@ -10,8 +10,8 @@ from lifecycle.domain.migration_readiness import verify
 
 
 def specimen() -> tuple[dict, dict]:
-    scope = {"tenant_id": "tenant", "resource_id": "app",
-             "environment": "environment", "site_id": "site"}
+    scope = {"tenant_id": "10000000-0000-4000-8000-000000000001", "resource_id": "10000000-0000-4000-8000-000000000001",
+             "environment": "10000000-0000-4000-8000-000000000001", "site_id": "10000000-0000-4000-8000-000000000001"}
     src, tgt, route = digest("source"), digest("target"), digest("route")
     content = {
         "scope": scope, "migration_campaign": {"route_sha256": route},
@@ -25,42 +25,56 @@ def specimen() -> tuple[dict, dict]:
     }
     data = {
         "schema_version": 2, "kind": "migration_workload_readiness",
-        "scope": {"tenant_id": "tenant", "application_id": "app",
-                  "environment_id": "environment", "site_id": "site"},
+        "scope": {"tenant_id": "10000000-0000-4000-8000-000000000001", "application_id": "10000000-0000-4000-8000-000000000001",
+                  "environment_id": "10000000-0000-4000-8000-000000000001", "site_id": "10000000-0000-4000-8000-000000000001"},
         "route_sha256": route, "tranche_sha256": digest("tranche"),
         "release_sha256": digest("release"),
-        "source": {"profile_sha256": src, "installation_id": "src",
+        "source": {"platform": "vmware", "profile_sha256": src, "installation_id": "src",
                    "versions": {"vmm": "v4.2"}},
-        "target": {"profile_sha256": tgt, "installation_id": "dst",
+        "target": {"platform": "ahv", "profile_sha256": tgt, "installation_id": "dst",
                    "versions": {"vmm": "v4.3"}},
         "method": "cold_export",
-        "api_compatibility": {"operationally_eligible": True,
-            "cases": [{"status": "eligible", "omission_accepted": False}]},
+        "api_compatibility": {
+            "status": "eligible", "operationally_eligible": True,
+            "administrator_alerts": [], "native_write_authorized": False,
+            "cases": [{
+                "capability_id": "vm.disk.read", "side": "source", "criticality": "critical",
+                "status": "eligible", "reason": "independent evidence",
+                "evidence_sha256": digest("api"), "selected_api_family": "vim",
+                "selected_api_version": "8.0", "omission_accepted": False, "expires_at": 200,
+            }],
+        },
         "native_e3_qualified": True, "receiving_e4_accepted": True,
         "status": "eligible", "holds": [], "expires_at": 200,
         "evaluated_at": 100, "workload_admission_authorized": False,
         "native_write_authorized": False,
     }
     reconciliation = {
-        "schema_version": 1, "catalogue_revision_id": "intent",
+        "schema_version": 1, "catalogue_revision_id": "10000000-0000-4000-8000-000000000001",
         "catalogue_sha256": digest("catalogue"),
         "source_identity_sha256": digest("identity"),
-        "source_generation_id": "generation",
+        "source_generation_id": "10000000-0000-4000-8000-000000000001",
         "source_profile_sha256": src,
         "source_observation_sha256": digest("source-observation"),
         "native_review_sha256": digest("review"),
         "status": "matched", "holds": [], "workloads": [
-            {"workload_id": "vm", "status": "matched", "holds": [],
-             "source_identity_sha256": digest("identity")}
+            {"workload_id": "10000000-0000-4000-8000-000000000001", "status": "matched", "holds": [],
+             "source_identity_sha256": digest("identity"),
+             "field_dispositions": [{
+                 "field": "cpu.count", "disposition": "matched", "required": True,
+                 "desired_value": "2", "observed_value": "2",
+                 "evidence_source": "inventory_native_profile",
+                 "evidence_age_seconds": 1, "next_action": "none",
+             }]}
         ],
         "expires_at": 200, "native_write_authorized": False,
     }
     reconciliation["reconciliation_sha256"] = digest(reconciliation)
     coverage = []
     for side, installation, tuple_sha, generation in (
-        ("source", "src", digest("source-installed"), "generation"),
-        ("target", "dst", digest("target-installed"), "target-generation"),
-        ("owner", "src", digest("source-installed"), "generation"),
+        ("source", "src", digest("source-installed"), "10000000-0000-4000-8000-000000000001"),
+        ("target", "dst", digest("target-installed"), "10000000-0000-4000-8000-000000000001"),
+        ("owner", "src", digest("source-installed"), "10000000-0000-4000-8000-000000000001"),
     ):
         row = {
             "schema_version": 1, "platform": "vmware", "scope": side,
@@ -84,7 +98,7 @@ def specimen() -> tuple[dict, dict]:
 
 def test_lifecycle_checks_current_scope_and_integrity() -> None:
     value, content = specimen()
-    verify(value, content, "tenant", 101)
+    verify(value, content, "10000000-0000-4000-8000-000000000001", 101)
     for edit in (
         lambda v: v.update(status="held"),
         lambda v: v.update(receiving_e4_accepted=False),
@@ -94,9 +108,9 @@ def test_lifecycle_checks_current_scope_and_integrity() -> None:
         bad = deepcopy(value)
         edit(bad)
         with pytest.raises(Rejected):
-            verify(bad, content, "tenant", 101)
+            verify(bad, content, "10000000-0000-4000-8000-000000000001", 101)
     with pytest.raises(Rejected, match="migration_readiness_not_current"):
-        verify(value, content, "tenant", 109)
+        verify(value, content, "10000000-0000-4000-8000-000000000001", 109)
 
 
 def test_even_integrity_preserving_route_or_source_swap_is_held() -> None:
@@ -108,7 +122,7 @@ def test_even_integrity_preserving_route_or_source_swap_is_held() -> None:
         bad["readiness_sha256"] = digest({k: v for k, v in bad.items()
                                            if k != "readiness_sha256"})
         with pytest.raises(Rejected):
-            verify(bad, content, "tenant", 101)
+            verify(bad, content, "10000000-0000-4000-8000-000000000001", 101)
 
 
 def test_route_only_v1_contract_is_never_effect_admissible() -> None:
@@ -121,7 +135,7 @@ def test_route_only_v1_contract_is_never_effect_admissible() -> None:
         k: v for k, v in value.items() if k != "readiness_sha256"
     })
     with pytest.raises(Rejected, match="migration_readiness_missing"):
-        verify(value, content, "tenant", 101)
+        verify(value, content, "10000000-0000-4000-8000-000000000001", 101)
 
 
 def test_empty_collection_cannot_be_attested_by_matching_checksums() -> None:
@@ -135,7 +149,7 @@ def test_empty_collection_cannot_be_attested_by_matching_checksums() -> None:
         k: v for k, v in value.items() if k != "readiness_sha256"
     })
     with pytest.raises(Rejected, match="coverage_not_current"):
-        verify(value, content, "tenant", 101)
+        verify(value, content, "10000000-0000-4000-8000-000000000001", 101)
 
 def test_nested_workload_status_and_coverage_expiry_are_independent_gates() -> None:
     value, content = specimen()
@@ -149,7 +163,7 @@ def test_nested_workload_status_and_coverage_expiry_are_independent_gates() -> N
         k: v for k, v in held.items() if k != "readiness_sha256"
     })
     with pytest.raises(Rejected, match="migration_nested_workload_reconciliation_held"):
-        verify(held, content, "tenant", 101)
+        verify(held, content, "10000000-0000-4000-8000-000000000001", 101)
 
     expired = deepcopy(value)
     expired["collection_coverages"][0]["expires_at"] = 101
@@ -161,4 +175,4 @@ def test_nested_workload_status_and_coverage_expiry_are_independent_gates() -> N
         k: v for k, v in expired.items() if k != "readiness_sha256"
     })
     with pytest.raises(Rejected, match="migration_collection_coverage_not_current"):
-        verify(expired, content, "tenant", 101)
+        verify(expired, content, "10000000-0000-4000-8000-000000000001", 101)
