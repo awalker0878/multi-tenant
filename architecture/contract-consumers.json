@@ -85,12 +85,12 @@
       "inventory-workers",
       "lifecycle-workers"
     ],
-    "contracts/openapi/planning-migration-v1.5.json": [
-      "planning",
-      "console"
-    ],
     "contracts/schemas/expansion/tranche-v1.1.json": [
       "planning"
+    ],
+    "contracts/openapi/planning-migration-v1.6.json": [
+      "planning",
+      "console"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied."
