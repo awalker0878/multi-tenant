@@ -25,6 +25,7 @@ class MigrationSupport:
         self.flow_require: Callable[[Actor, str, dict[str, Any]], dict[str, Any]] | None = None
         self.workload_current: Callable[[Actor, str, dict[str, Any], dict[str, Any] | None], dict[str, Any]] | None = None
         self.workload_review: Callable[[Actor, str, dict[str, Any]], dict[str, Any]] | None = None
+        self.collection_manifest: Callable[[str], dict[str, Any] | None] | None = None
 
     def api_status(
         self, actor: Actor, site: str, selected: dict[str, Any]
@@ -119,6 +120,8 @@ class MigrationSupport:
         proof = self.workload_current(actor, site, binding, None)
         result = resolve_workload(
             route, proof["reconciliation"], proof.get("collection_coverages"), now,
+            self.collection_manifest(selected["release_sha256"])
+            if self.collection_manifest is not None else None,
         )
         return {"schema_version": 1, "review": revision, "readiness": result,
                 "native_write_authorized": False, "workload_admission_authorized": False}
@@ -226,6 +229,8 @@ class MigrationSupport:
             readiness = resolve_workload(
                 readiness, evidence["reconciliation"],
                 evidence.get("collection_coverages"), self.clock(),
+                self.collection_manifest(selected["release_sha256"])
+                if self.collection_manifest is not None else None,
             )
             if readiness["status"] != "eligible":
                 raise Rejected("migration_workload_readiness_held", 423)
