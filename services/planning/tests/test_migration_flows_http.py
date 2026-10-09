@@ -1,7 +1,6 @@
 """Application-flow selectors are scoped delegated reads and revisioned writes."""
 import json
 from unittest.mock import Mock
-from uuid import uuid4
 
 from planning_fixture import ACTOR, APP, ENV, SITE, TENANT
 from test_planning_http import exchange
