@@ -41,28 +41,13 @@ claimed by these code changes.
 | Destination | Native catalogue status | Safe Console behavior |
 | --- | --- | --- |
 | OpenStack | Project-scoped Neutron security group/rule IDs and literal rule fingerprints are API discovered. | Source-observed ACLs can map only to matching existing Neutron native IDs. These are **ACL mappings**, not an owner-approved application-flow dependency inventory. |
-| AHV | Prism v4 microseg policy list now projects rule extIds, types and native rule-spec SHA-256 **when policy list responses contain complete rule bodies**. Missing bodies produce `ahv_security_rule_catalog_incomplete`. Referenced categories/address and service groups and policy order still need resolution. | Unqualified policy mappings are suppressed in the Console and rejected by Inventory; an empty draft is retained with a hold. |
-| VMware | vCenter inventory alone is not NSX evidence. A separate, read-only `nsx_security.collect_nsx_policy_rules` adapter now validates an explicitly commissioned NSX domain, bounded policy/rule lists, identities, read authority and incomplete pagination. This adapter is **not yet wired to a separately enrolled NSX credential/stream**. | No NSX DFW security-policy dropdown or equivalence assertion is allowed from vCenter network inventory. |
+| AHV | Prism v4 microseg policy list now projects rule extIds, types, native rule-spec SHA-256 and explicit category/address-group/service-group reference IDs **when policy list responses contain complete rule bodies**. Only category IDs actually returned by the same observed catalogue can be provisionally resolved as catalogue identities, never policy equivalence. Missing bodies produce `ahv_security_rule_catalog_incomplete`. Referenced categories/address and service groups and policy order still need resolution. | Unqualified policy mappings are suppressed in the Console and rejected by Inventory; an empty draft is retained with a hold. |
+| VMware | vCenter inventory alone is not NSX evidence. A separate, read-only `nsx_security.collect_nsx_policy_rules` adapter uses an explicitly commissioned, independent `target_profile.nsx_policy` HTTPS origin, pinned addresses, mounted BasicAuth credential and domain. Collection is bounded and emits only IDs and fingerprints. Service/group references and VM-to-DFW effective membership remain unqualified. | No NSX DFW security-policy dropdown or equivalence assertion is allowed from vCenter network inventory. |
 
 ## Required integration to complete the boundary
 
-- Expose the approved Planning intent and current independently observed network
-  snapshot together through a scoped, read-only API for the owning application
-  and migration, returning `native_application_flow_choices`. The existing
-  `migration-support` endpoint currently reports route qualification only.
-- Render a dedicated **application-flow** mapping section in the Console: for
-  each required source dependency, select existing destination firewall and
-  route IDs from read-only API choices. Persist the digest-bound, typed owner
-  selections in a reviewed record, never free text or a native write request.
-- On save and confirmation, verify that this record's source intent hash,
-  destination observation digest, tenant/site/project, expiry and ownership
-  still match. On refresh/revocation, clear selections and confirmation. Deny
-  incomplete mappings before execution.
-- Wire a separately commissioned NSX Policy API origin and least-privilege
-  credentials to the approved vCenter installation; prove the VM's actual NSX
-  group membership, effective DFW policy ordering, resolved service and group
-  objects and default-action semantics. Never use the vCenter credential or
-  API origin to call NSX.
+- Planning now exposes `migration-flow-choices` and `migration-flow-selections` through authenticated site-scoped, application/environment delegated APIs. The Console `MigrationSupport` screen renders native firewall and route selections for *source-approved* communication dependencies. `app.planning_application_flow_reviews` persists revisioned choices, context digests and expiry, and a runtime flow gate blocks absent/stale/held selections. This implementation still needs integration validation against a live Catalogue/Inventory/Assurance deployment and a current E3/E4 qualified native evidence producer. No runbook should label these selections a successful migration.
+- The vCenter target profile can now enroll a separate `nsx_policy` object with a pinned HTTPS origin, pinned addresses, mounted credential and commissioned domain. The worker performs bounded read-only calls. **Remaining qualification:** prove the VM's actual NSX group membership, effective DFW policy ordering, resolved service and group objects, default-action semantics and version-to-API feature support.
 - Extend AHV collector to the version-qualified rule-list endpoint if the
   selected Prism release does not include rules in the policy response.
   Authorize every extra API GET, bound all paging/request budgets, resolve
@@ -84,6 +69,4 @@ claimed by these code changes.
   https://developers.nutanix.com/api/v1/sdk/namespaces/main/microseg/versions/v4.2/languages/python/ntnx_microseg_py_client.api.network_security_policies_api.html
   (the actual installation's microseg API version must be separately qualified).
 
-**Note:** The new read-only choice builder and independently assessed
-`application_flow_selections` are **not yet wired into the Console as a
-complete workflow**. Do not claim this feature shipped end-to-end.
+**Note:** The new workflow is wired in source code but is not operationally qualified or deployed. If owner inputs, live API discovery, independent native measurements, policy resolution, or current permissions are missing, the selections remain held. Do not claim NSX/AHV security policy portability or E3/E4 completion.
