@@ -102,6 +102,36 @@ def test_qualified_single_vm_reconciles_all_owned_devices_and_datasets() -> None
     })
 
 
+def test_dataset_accountability_is_not_an_implicit_workload_join() -> None:
+    scope, catalogue, inventory, selected, flow, _ = specimen()
+    # Catalogue owns the accountable person, while disk.dataset_id owns
+    # membership. Different identifiers must not silently fail the join.
+    catalogue["intent"]["datasets"][0]["owner_id"] = "accountable-person"
+    catalogue["intent_sha256"] = digest(catalogue["intent"])
+    inventory["catalogue_binding"]["intent_sha256"] = catalogue["intent_sha256"]
+    flow["intent_sha256"] = catalogue["intent_sha256"]
+    assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "matched"
+
+
+def test_datasetless_disk_requires_explicit_disposition_not_owner_inference() -> None:
+    scope, catalogue, inventory, selected, flow, _ = specimen()
+    catalogue["intent"]["workloads"][0]["disks"][0]["dataset_id"] = None
+    catalogue["intent_sha256"] = digest(catalogue["intent"])
+    inventory["catalogue_binding"]["intent_sha256"] = catalogue["intent_sha256"]
+    flow["intent_sha256"] = catalogue["intent_sha256"]
+    result = evaluate(scope, catalogue, inventory, selected, flow, 100)
+    assert result["status"] == "held"
+    assert any("dataset_mapping" in hold for hold in result["holds"])
+
+
+def test_application_readiness_expires_with_earliest_interface_probe() -> None:
+    scope, catalogue, inventory, selected, flow, _ = specimen()
+    result = evaluate(scope, catalogue, inventory, selected, flow, 100)
+    assert result["status"] == "matched"
+    assert result["expires_at"] == 150
+    assert evaluate(scope, catalogue, inventory, selected, flow, 150)["status"] == "held"
+
+
 def test_unmapped_second_vm_never_inherits_first_vms_assurance() -> None:
     scope, catalogue, inventory, selected, flow, _ = specimen()
     extra = deepcopy(catalogue["intent"]["workloads"][0])
