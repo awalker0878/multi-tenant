@@ -4586,6 +4586,9 @@
                 "$ref": "#/components/schemas/VmwareDestinationSelection"
               },
               {
+                "$ref": "#/components/schemas/OpenstackSecurityDestinationSelection"
+              },
+              {
                 "type": "null"
               }
             ]
@@ -5881,6 +5884,64 @@
             },
             "maxItems": 100
           },
+          "security_groups": {
+            "type": "array",
+            "maxItems": 99,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "project_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "stateful": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "rules_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "semantics_sha256": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "project_id",
+                "stateful",
+                "rules_sha256",
+                "semantics_sha256",
+                "native_sha256"
+              ]
+            }
+          },
           "compute_version": {
             "type": "object",
             "additionalProperties": false,
@@ -5979,6 +6040,7 @@
           "flavors",
           "volume_types",
           "network_extensions",
+          "security_groups",
           "compute_version",
           "volume_version",
           "required_capability_evidence",
@@ -6546,7 +6608,7 @@
               "type": "string",
               "format": "uuid"
             },
-            "minItems": 1,
+            "minItems": 0,
             "maxItems": 32
           },
           "policy_ids": {
@@ -6555,13 +6617,39 @@
               "type": "string",
               "format": "uuid"
             },
-            "minItems": 1,
+            "minItems": 0,
             "maxItems": 32
+          },
+          "security_mappings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "destination_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "source_id",
+                "destination_id"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 64
           },
           "firmware": {
             "enum": [
               "bios",
-              "efi"
+              "efi",
+              ""
             ]
           },
           "disks": {
@@ -6626,6 +6714,7 @@
           "storage_container_id",
           "category_ids",
           "policy_ids",
+          "security_mappings",
           "firmware",
           "disks",
           "nics"
@@ -7754,6 +7843,51 @@
             },
             "minItems": 0,
             "maxItems": 100
+          },
+          "guest_options_by_host": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "guest_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 240
+                  },
+                  "minItems": 1,
+                  "maxItems": 128
+                },
+                "hardware_versions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 240
+                  },
+                  "minItems": 1,
+                  "maxItems": 32
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "host",
+                "guest_ids",
+                "hardware_versions",
+                "native_sha256"
+              ]
+            }
           }
         },
         "required": [
@@ -7776,7 +7910,52 @@
           "resource_pools",
           "hosts",
           "datastores",
-          "networks"
+          "networks",
+          "guest_options_by_host"
+        ]
+      },
+      "OpenstackSecurityDestinationSelection": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "platform": {
+            "const": "openstack"
+          },
+          "project_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "security_mappings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "destination_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "source_id",
+                "destination_id"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 64
+          }
+        },
+        "required": [
+          "platform",
+          "project_id",
+          "security_mappings"
         ]
       },
       "VmwareDestinationSelection": {
@@ -7823,7 +8002,8 @@
           "firmware": {
             "enum": [
               "bios",
-              "efi"
+              "efi",
+              ""
             ]
           },
           "disks": {
