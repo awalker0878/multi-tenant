@@ -16,7 +16,8 @@ def fixture() -> tuple[dict, dict, dict]:
     }
     native = {"blockers": [], "route_sha256": digest(route),
               "native_qualified": True, "operationally_accepted": True}
-    api = {"cases": [{"status": "eligible", "omission_accepted": False}],
+    api = {"cases": [{"status": "eligible", "omission_accepted": False,
+                      "expires_at": 200}],
            "operationally_eligible": True}
     return route, native, api
 
@@ -30,6 +31,7 @@ def test_exact_independent_e3_e4_and_api_evidence_required() -> None:
     route, native, api = fixture()
     good = assess(route, native, api)
     assert good["status"] == "eligible"
+    assert good["expires_at"] == 200
     assert good["native_write_authorized"] is False
     assert good["workload_admission_authorized"] is False
     assert good["readiness_sha256"] == digest({
@@ -56,3 +58,13 @@ def test_legacy_route_and_stale_or_unqualified_api_are_held() -> None:
     api["cases"][0]["status"] = "unknown"
     assert "api_feature_unresolved" in assess(route, native, api)["holds"]
     assert "migration_tranche_expired" in assess(route, native, api, 201)["holds"]
+
+
+def test_earliest_per_operation_qualification_expiry_controls_route() -> None:
+    route, native, api = fixture()
+    api["cases"][0]["expires_at"] = 130
+    assert assess(route, native, api)["expires_at"] == 130
+    api["cases"][0]["expires_at"] = 100
+    preview = assess(route, native, api)
+    assert preview["status"] == "held"
+    assert "api_capability_evidence_expired_or_unbounded" in preview["holds"]
