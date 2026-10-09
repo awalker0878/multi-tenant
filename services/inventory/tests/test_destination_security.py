@@ -164,3 +164,18 @@ def test_same_rule_id_on_wrong_destination_group_cannot_be_selected():
     })
     with pytest.raises(Rejected, match="destination_security_rule_choice_unproven"):
         destination_input(review(), source(), target)
+
+
+def test_missing_destination_is_validation_error_not_internal_type_error():
+    with pytest.raises(Rejected):
+        destination_input({"destination": None}, source(), destination())
+
+
+def test_truly_empty_native_acl_does_not_require_fabricated_flow():
+    src = source()
+    src["native"]["metadata"]["security_groups"][0]["rules"] = []
+    tgt = destination()
+    tgt["security_groups"][0]["rules"] = []
+    body = review()
+    body["destination"].pop("flow_mappings")
+    destination_input(body, src, tgt)
