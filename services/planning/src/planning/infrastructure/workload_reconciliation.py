@@ -43,4 +43,7 @@ def current_workload_reconciliation(
     )
     if published["intent"]["environment"]["id"] != scope["environment_id"]:
         raise Rejected("catalogue_native_current_intent_scope_changed", 423)
-    return evaluate(scope, published, records, binding, flow_e4, int(time.time()))
+    return {
+        "reconciliation": evaluate(scope, published, records, binding, flow_e4, int(time.time())),
+        "collection_coverages": records.get("collection_coverages", []),
+    }
