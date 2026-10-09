@@ -211,7 +211,8 @@ class PlacementReservations:
             with self.database.transaction() as tx:
                 tx.execute("SELECT pg_advisory_xact_lock(7503016)")
                 tx.execute(
-                    "UPDATE app.placement_reservations SET state='expired_held',revision=revision+1 "
+                    "UPDATE app.placement_reservations "
+                    "SET state='expired_held',revision=revision+1 "
                     "WHERE id=%s AND state IN ('reserved','confirmed') AND expires_at<=%s",
                     (row["id"], self.clock()),
                 )

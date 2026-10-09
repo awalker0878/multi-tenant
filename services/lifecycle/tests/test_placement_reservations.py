@@ -212,7 +212,10 @@ def test_unused_class_limit_does_not_require_an_allocation_in_that_class(
     selected["placement_sha256"] = digest(selected["allocations"])
     receipt = service.reserve(selected["scope"]["tenant_id"], selected)
     assert receipt["state"] == "reserved"
-    assert service.check(selected["scope"]["tenant_id"], selected["plan_digest"])["state"] == "reserved"
+    assert (
+        service.check(selected["scope"]["tenant_id"], selected["plan_digest"])["state"]
+        == "reserved"
+    )
 
 
 @pytest.mark.parametrize(
