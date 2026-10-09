@@ -28,6 +28,8 @@ def extended_intent_fields(
     fields: list[dict[str, Any]] = []
 
     def compare(path: str, required: Any, actual: Any, mandatory: bool = True) -> None:
+        proof_age: int | None = None
+        evidence_source = "inventory_native_profile" if actual is not None else "unobserved"
         if actual is None:
             status = "unobserved"
         elif type(actual) is type(required) and actual == required:
@@ -63,7 +65,29 @@ def extended_intent_fields(
                     and case["expires_at"] > now
                 ):
                     status = case["disposition"]
-        fields.append({"field": path, "disposition": status, "required": mandatory})
+                    proof_age = now - case["observed_at"]
+                    evidence_source = "independent_e4"
+        next_action = (
+            "none" if status == "matched"
+            else "review_independently_qualified_transformation"
+            if status in {"qualified_transformation", "approved_omission"}
+            else "collect_native_or_independent_guest_and_key_evidence"
+            if status == "unobserved"
+            else "resolve_native_drift_with_owner_and_independent_e4_assurance"
+        )
+        def display(value: Any) -> str | None:
+            if value is None:
+                return None
+            rendered = json.dumps(value, sort_keys=True, ensure_ascii=False,
+                                  separators=(",", ":"), default=str)
+            return rendered[:500]
+        fields.append({
+            "field": path, "disposition": status, "required": mandatory,
+            "desired_value": display(required), "observed_value": display(actual),
+            "evidence_source": evidence_source,
+            "evidence_age_seconds": proof_age,
+            "next_action": next_action,
+        })
 
     compute = workload.get("compute", {})
     if "architecture" in compute:
