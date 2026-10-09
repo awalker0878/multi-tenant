@@ -7,7 +7,7 @@ import json
 import pytest
 
 from planning.domain.model import Rejected, digest
-from planning.domain.source_intent_reconciliation import reconcile
+from planning.domain.source_intent_reconciliation import reconcile, extended_intent_fields
 
 
 def values() -> tuple[dict, list, list]:
@@ -168,3 +168,50 @@ def test_optional_placement_does_not_falsely_block_required_sizing() -> None:
     result = reconcile(intent, digest(intent), links, profiles, 100)
     assert result["status"] == "matched"
     assert result["workloads"][0]["field_dispositions"][0]["disposition"] == "unobserved"
+
+
+def test_independent_guest_and_encryption_measurements_allow_exact_e4_matching() -> None:
+    desired = {
+        "id": "workload", "compute": {}, "guest": {"os": "linux-9"},
+        "disks": [{"id": "disk", "encryption": {"encrypted": True, "key_transfer": "approved"}}],
+        "requirements": [],
+    }
+    cases = []
+    for field, value in (
+        ("guest.os", "linux-9"),
+        ("disks.disk.encryption", {"encrypted": True, "key_transfer": "approved"}),
+    ):
+        cases.append({
+            "workload_id": "workload", "field": field,
+            "source_profile_sha256": digest("source"),
+            "intent_field_sha256": digest(value),
+            "observed_field_sha256": digest(value),
+            "observed_value": value,
+            "transformation_plan_sha256": digest("plan"),
+            "independent_acceptance_sha256": digest("e4"),
+            "evidence_sha256": digest("evidence"),
+            "observed_at": 100, "expires_at": 150,
+            "level": "E4", "decision": "accepted", "revoked": False,
+            "disposition": "verified_observation",
+        })
+    unqualified = extended_intent_fields(
+        desired, {"disks": [{"key": 1}]}, [{"logical_device_id": "disk", "native_key": 1}]
+    )
+    assert [row["disposition"] for row in unqualified] == ["unobserved", "unobserved"]
+    qualified = extended_intent_fields(
+        desired, {"disks": [{"key": 1}]}, [{"logical_device_id": "disk", "native_key": 1}],
+        cases, digest("source"), 101,
+    )
+    assert [row["disposition"] for row in qualified] == ["matched", "matched"]
+    assert all(row["evidence_source"] == "independent_e4" for row in qualified)
+    assert all(row["evidence_age_seconds"] == 1 for row in qualified)
+    cases[0]["observed_value"] = "unrelated-os"
+    assert extended_intent_fields(
+        desired, {"disks": [{"key": 1}]}, [{"logical_device_id": "disk", "native_key": 1}],
+        cases, digest("source"), 101,
+    )[0]["disposition"] == "unobserved"
+    cases[0]["observed_value"] = "linux-9"
+    assert extended_intent_fields(
+        desired, {"disks": [{"key": 1}]}, [{"logical_device_id": "disk", "native_key": 1}],
+        cases, digest("source"), 130,
+    )[0]["disposition"] == "unobserved"
