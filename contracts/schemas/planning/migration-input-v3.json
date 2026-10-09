@@ -1546,7 +1546,8 @@
           "holds",
           "independent_e3_e4_qualification",
           "native_write_authorized",
-          "coverage_sha256"
+          "coverage_sha256",
+          "expires_at"
         ],
         "properties": {
           "schema_version": {
@@ -1637,6 +1638,10 @@
           "coverage_sha256": {
             "type": "string",
             "pattern": "^[a-f0-9]{64}$"
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0
           }
         }
       }
