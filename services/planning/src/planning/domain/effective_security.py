@@ -149,7 +149,9 @@ def path_evidence(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str |
     if not isinstance(nodes, list) or not 2 <= len(nodes) <= MAX_HOPS + 1:
         return None, "native_network_path_unobserved"
     if (not isinstance(hops, list) or len(hops) != len(nodes) - 1
-            or len(hops) > MAX_HOPS or len(set(nodes)) != len(nodes)
+            or len(hops) > MAX_HOPS
+            or any(not text(node) for node in nodes)
+            or len(set(nodes)) != len(nodes)
             or nodes[0] != flow.get("from") or nodes[-1] != flow.get("to")
             or not text(path.get("scope"))
             or path.get("multipath_resolved") is not True
@@ -160,19 +162,24 @@ def path_evidence(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str |
             or not addresses_match(path["source_address"], path["destination_address"])):
         return None, "native_path_addresses_unverified"
     src, dst = path["source_address"], path["destination_address"]
+    port = flow.get("port")
+    if type(port) not in {int, type(None)}:
+        return None, "native_path_port_unverified"
+    current_scope = path["scope"]
     used_refs: set[str] = set()
     for index, hop in enumerate(hops):
         if not isinstance(hop, dict) or (
             hop.get("from") != nodes[index] or hop.get("to") != nodes[index + 1]
             or not text(hop.get("native_ref"))
             or hop["native_ref"] in used_refs
-            or hop.get("scope") != path["scope"]
+            or hop.get("scope") != current_scope
             or hop.get("forward_observed") is not True
             or hop.get("reverse_observed") is not True
         ):
             return None, "native_route_hop_unqualified"
         used_refs.add(hop["native_ref"])
         translation = hop.get("nat")
+        next_scope = hop.get("next_scope", current_scope)
         if translation is not None:
             if (not isinstance(translation, dict)
                     or translation.get("kind") not in {"snat", "dnat", "twice_nat"}
@@ -180,12 +187,25 @@ def path_evidence(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str |
                     or translation.get("stateful_return_observed") is not True
                     or translation.get("before_source") != src
                     or translation.get("before_destination") != dst
+                    or translation.get("before_port") != port
+                    or type(translation.get("after_port")) not in {int, type(None)}
                     or not addresses_match(src, translation.get("after_source"))
                     or not addresses_match(dst, translation.get("after_destination"))):
                 return None, "native_nat_translation_unqualified"
+            if (next_scope != current_scope
+                    and translation.get("cross_scope_authorized") is not True):
+                return None, "native_nat_cross_scope_unqualified"
             src, dst = translation["after_source"], translation["after_destination"]
+            port = translation["after_port"]
+        elif next_scope != current_scope:
+            return None, "native_untranslated_scope_crossing"
+        if not text(next_scope):
+            return None, "native_route_scope_unverified"
+        current_scope = next_scope
     if (src != path.get("observed_egress_source")
             or dst != path.get("observed_egress_destination")
+            or port != path.get("observed_egress_port", flow.get("port"))
+            or current_scope != path.get("destination_scope", path["scope"])
             or path.get("reverse_path_measured") is not True):
         return None, "native_return_path_unqualified"
     return digest(path), None
@@ -256,6 +276,12 @@ def qualify(document: Any, flow: dict[str, Any], now: int) -> dict[str, Any]:
     # First matching rule wins. Never skip a higher-priority deny.
     if relevant[0]["action"] != "allow":
         return hold("higher_priority_native_deny")
+    if (relevant[0].get("direction") != "both"
+            or relevant[0].get("stateful") is not True):
+        return hold("native_security_return_state_unqualified")
+    if (document["platform"] == "vmware"
+            and relevant[0].get("category") == "Ethernet"):
+        return hold("nsx_l2_rule_cannot_qualify_ip_flow")
     if not rules or document.get("default_action") != "deny":
         return hold("native_default_deny_unverified")
     error = measured(document, flow, path_sha, now)
