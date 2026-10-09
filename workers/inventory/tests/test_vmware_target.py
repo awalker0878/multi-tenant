@@ -85,3 +85,60 @@ def test_destination_read_revocation_stops_before_first_get(
 
     with pytest.raises(CollectionFailure, match="permission_denied"):
         vmware_profile.collect_vmware({}, {"credential_file": "/fixture"}, 1, revoked)
+
+
+def test_nsx_policy_read_is_separately_budgeted_and_unqualified(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from inventory_worker.infrastructure import nsx_security
+
+    permits: list[bool] = []
+    vcenter_reads: list[str] = []
+    nsx_stream = {
+        "kind": "nsx_policy", "domain_id": "app-domain",
+        "base_url": "https://nsx-controller.example",
+        "credential_file": "/mounted/nsx-observer",
+    }
+
+    def vcenter_read(stream: Any, path: str, headers: Any, **kwargs: Any) -> Any:
+        vcenter_reads.append(path)
+        assert len(vcenter_reads) <= len(permits)
+        assert stream["base_url"] == "https://vcenter.example"
+        if path.endswith("/content"):
+            return {"about": {
+                "instanceUuid": "vcenter-id", "version": "9.1",
+                "apiVersion": "9.1", "build": "123",
+            }}
+        return []
+
+    def nsx_read(stream: dict[str, Any], domain: str, permit: Any) -> dict[str, Any]:
+        assert stream is nsx_stream and domain == "app-domain"
+        assert stream["base_url"] != "https://vcenter.example"
+        assert stream["credential_file"] != "/mounted/vcenter-observer"
+        permit()
+        return {
+            "domain_id": domain, "api": "nsx-policy-v1", "policies": [],
+            "semantic_qualification": "unresolved",
+            "source_vm_attachment": "unverified",
+            "native_write_authorized": False,
+        }
+
+    monkeypatch.setattr(vmware_profile, "exchange", vcenter_read)
+    monkeypatch.setattr(vmware_profile, "secret", lambda _: "fixture-session")
+    monkeypatch.setattr(nsx_security, "collect_nsx_policy_rules", nsx_read)
+
+    result = collect_profile(
+        {"platform": "vmware", "native_scope": "datacenter-1",
+         "coverage_reference": "synthetic"},
+        {
+            "kind": "target_profile", "api_version": "9.1.1.0",
+            "base_url": "https://vcenter.example",
+            "credential_file": "/mounted/vcenter-observer",
+            "nsx_policy": nsx_stream,
+        },
+        None, lambda: permits.append(True),
+    )
+    assert len(vcenter_reads) == 6 and len(permits) == 7
+    profile = result["profile"]
+    assert profile["nsx_policy_observation"]["semantic_qualification"] == "unresolved"
+    assert profile["nsx_policy_observation"]["native_write_authorized"] is False
