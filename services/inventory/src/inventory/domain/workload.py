@@ -211,7 +211,24 @@ def review_input(body: dict[str, Any], source: dict[str, Any]) -> None:
         link = shape(body["catalogue_binding"], {
             "application_id", "environment_id", "revision_id",
             "intent_sha256", "workload_id", "disk_mappings", "nic_mappings",
-        })
+        } | ({"disk_dispositions"} if "disk_dispositions" in body["catalogue_binding"] else set()))
+        # Datasetless Catalogue disks are not implicitly unimportant or
+        # removable. An owner can attest their uncatalogued identity only;
+        # separate E4 evidence must still bind migration readiness.
+        dispositions = link.get("disk_dispositions", [])
+        if not isinstance(dispositions, list) or len(dispositions) > 32:
+            raise Rejected("catalogue_native_disk_dispositions_invalid")
+        seen_dispositions: set[str] = set()
+        for row in dispositions:
+            shape(row, {"logical_device_id", "native_key", "disposition",
+                        "owner_approval_sha256", "impact_sha256"})
+            logical_id = identifier(row["logical_device_id"])
+            if logical_id in seen_dispositions or row["disposition"] != "uncatalogued_attested":
+                raise Rejected("catalogue_native_disk_disposition_ambiguous", 423)
+            seen_dispositions.add(logical_id)
+            number(row["native_key"], 0, 2147483647)
+            checksum(row["owner_approval_sha256"])
+            checksum(row["impact_sha256"])
         for field in ("application_id", "environment_id", "revision_id", "workload_id"):
             identifier(link[field])
         checksum(link["intent_sha256"])
@@ -233,6 +250,11 @@ def review_input(body: dict[str, Any], source: dict[str, Any]) -> None:
                 keys.add(native_key)
             if keys != expected:
                 raise Rejected("catalogue_native_device_coverage_required", 423)
+        valid_disks = {row["logical_device_id"]: row["native_key"]
+                       for row in link["disk_mappings"]}
+        if any(valid_disks.get(row["logical_device_id"]) != row["native_key"]
+               for row in dispositions):
+            raise Rejected("catalogue_native_disk_disposition_unmapped", 423)
     identifier(body["source_profile_id"])
     identifier(body["target_profile_id"])
     if body["method"] not in METHODS:
