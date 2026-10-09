@@ -15,6 +15,12 @@ from ipaddress import ip_address
 from typing import Any
 
 from planning.domain.model import digest
+from planning.domain.policy_resolvers import (
+    Unqualified as NativePolicyUnqualified, decision as native_decision,
+)
+from planning.domain.packet_paths import (
+    PathUnqualified, qualify as qualify_packet_paths,
+)
 
 MAX_RULES = 512
 MAX_NODES = 512
@@ -249,8 +255,43 @@ def measured(document: dict[str, Any], flow: dict[str, Any], path_sha: str, now:
     return None
 
 
+def qualify_v2(document: dict[str, Any], flow: dict[str, Any], now: int) -> dict[str, Any]:
+    """Provider-specific rule and full observed path; old v1 guesses are refused."""
+    if (document.get("source") != "independent_native_observer"
+            or not text(document.get("observer_principal"))
+            or not text(document.get("writer_principal"))
+            or document["observer_principal"] == document["writer_principal"]
+            or not fresh(document, now)
+            or not text(document.get("topology_sha256"))):
+        return hold("independent_native_security_evidence_missing")
+    try:
+        verdict, native_ref = native_decision(document, flow)
+        if verdict != "allow" or not native_ref:
+            return hold("native_effective_policy_denies_required_flow")
+        paths = qualify_packet_paths(document, flow, now)
+    except (NativePolicyUnqualified, PathUnqualified, TypeError, KeyError, ValueError) as exc:
+        return hold(str(exc) if str(exc) else "native_effective_policy_unqualified")
+    return {
+        "status": "qualified", "reason": None,
+        "native_write_authorized": False,
+        "effective_rule_native_ref": native_ref,
+        "path_sha256": paths["path_sha256"],
+        "native_route_refs": paths["native_route_refs"],
+        "evidence_sha256": digest(document),
+    }
+
+
 def qualify(document: Any, flow: dict[str, Any], now: int) -> dict[str, Any]:
     """Fail-closed E4 *evidence inspection*, not an authorization or signature."""
+    if isinstance(document, dict) and document.get("schema_version") == 2:
+        return qualify_v2(document, flow, now)
+    # Legacy generic first-match policy semantics cannot certify NSX, AHV,
+    # or Neutron. Do not silently accept previously serialized v1 E4 cases.
+    return hold("effective_security_contract_v2_required")
+
+
+def _deprecated_generic_qualify(document: Any, flow: dict[str, Any], now: int) -> dict[str, Any]:
+    """Retained only for comparison during removal of legacy tests."""
     if (not isinstance(document, dict) or document.get("schema_version") != 1
             or document.get("source") != "independent_native_observer"
             or not text(document.get("observer_principal"))
