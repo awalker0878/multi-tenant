@@ -39,8 +39,9 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
     }
     now = 1000
     binding = {
-        "source": {"platform": "vmware"},
-        "target": {"platform": "openstack"},
+        "source": {"platform": "vmware", "profile_sha256": "1" * 64},
+        "target": {"platform": "openstack", "profile_sha256": "2" * 64},
+        "method": "cold_export",
     }
     scope = {
         "tenant_id": current_actor.tenant, "site_id": site,
@@ -58,6 +59,9 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
         "omissions_sha256": digest([]),
         "omissions_approved": False, "omission_approver_id": None,
         "platform": "openstack", "source_platform": "vmware",
+        "source_profile_sha256": "1" * 64,
+        "target_profile_sha256": "2" * 64,
+        "migration_method": "cold_export",
         "security_cases": [],
         "level": "E4",
         "decision": "accepted", "native_write_authorized": False,
@@ -131,5 +135,6 @@ def test_unavailable_or_superseded_source_requires_new_assessment(
         migration_support.current_application_flow_proof(a, str(uuid4()), {
             "payload": {"source_revision_id": str(uuid4()),
                         "source_intent_sha256": "b" * 64},
-        }, 1000, {"source": {"platform": "vmware"},
-                    "target": {"platform": "openstack"}})
+        }, 1000, {"source": {"platform": "vmware", "profile_sha256": "1" * 64},
+                    "target": {"platform": "openstack", "profile_sha256": "2" * 64},
+                    "method": "cold_export"})
