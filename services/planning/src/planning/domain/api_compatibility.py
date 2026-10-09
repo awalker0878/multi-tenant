@@ -185,6 +185,11 @@ def evaluate(
                 reason = "api_environment_discovery_stale"
             api_family: str | None = None
             api_version: str | None = None
+            if env is not None and env["source"] != "live_probe":
+                # Operator/configured version listings are not independent
+                # discovery and must never promote a qualified API operation.
+                reason = "installed_api_namespace_live_probe_required"
+                env = None
             if env is not None:
                 entitlement = env["entitlements"].get(cap, "unknown")
                 candidates = [
