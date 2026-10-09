@@ -19,6 +19,8 @@ def test_nsx_group_member_and_service_apis_are_scoped_and_read_only():
         "native_api_qualified": True,
         "group_effective_member_types_verified": True,
         "group_effective_member_types": {"web": ["VirtualMachine"]},
+        "enforcement_point_qualified": True,
+        "enforcement_point_path": "/infra/sites/default/enforcement-points/ep-1",
     }
     urls = []
     def exchange(conn, url, headers):
@@ -40,6 +42,7 @@ def test_nsx_group_member_and_service_apis_are_scoped_and_read_only():
                 return_value="observer")):
         result = nsx_collect(stream, "d1", ["web"], ["postgres"], lambda: None)
     assert len(urls) == 2
+    assert "enforcement_point_path=%2Finfra%2Fsites%2Fdefault%2Fenforcement-points%2Fep-1" in urls[0]
     assert result["groups"]["/infra/domains/d1/groups/web"]["members"] == ["vm-1"]
     assert result["services"]["/infra/services/postgres"]["ports"] == [443, 444, 445, 5432]
     assert result["qualification_level"] == "E3_observation_only"
@@ -54,6 +57,8 @@ def test_nsx_effective_group_truncated_response_holds():
         "native_api_qualified": True,
         "group_effective_member_types_verified": True,
         "group_effective_member_types": {"group": ["VirtualMachine"]},
+        "enforcement_point_qualified": True,
+        "enforcement_point_path": "/infra/sites/default/enforcement-points/ep-1",
     }
     with (patch("inventory_worker.infrastructure.nsx_effective_observer.exchange",
                 return_value={"results": [], "cursor": "more"}),
@@ -70,6 +75,8 @@ def test_nsx_non_vm_group_must_not_look_like_an_empty_vm_group():
         "separate_observer_credential_verified": True,
         "group_effective_member_types_verified": True,
         "group_effective_member_types": {"group": ["IPAddress"]},
+        "enforcement_point_qualified": True,
+        "enforcement_point_path": "/infra/sites/default/enforcement-points/ep-1",
     }
     with patch("inventory_worker.infrastructure.nsx_effective_observer.secret",
                return_value="observer"):
