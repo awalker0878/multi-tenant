@@ -54,6 +54,7 @@ def evaluate(
         status, reason = "held", "field_unobserved"
         conditional = requirement["condition"] != "always"
         predicate = predicates.get(key)
+        applicable = not conditional
         if conditional:
             if predicate is None or predicate.get("condition") != requirement["condition"]:
                 reason = "applicability_not_independently_resolved"
@@ -65,15 +66,13 @@ def evaluate(
                 reason = "applicability_evidence_stale_or_invalid"
             elif predicate["applicable"] is False:
                 status, reason = "not_applicable", "independently_observed_absent"
+            else:
+                applicable = True
         if status == "not_applicable":
             results.append({"attribute_id": key, "status": status, "reason": reason,
                             "severity": requirement["severity"]})
             continue
-        if conditional and (predicate is None or predicate.get("applicable") is not True
-                            or predicate.get("condition") != requirement["condition"]
-                            or type(predicate.get("observed_at")) is not int
-                            or not 0 <= now - predicate["observed_at"]
-                            < requirement["max_age_seconds"]):
+        if not applicable:
             results.append({"attribute_id": key, "status": status,
                             "reason": reason, "severity": requirement["severity"]})
             continue
