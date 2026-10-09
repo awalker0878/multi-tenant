@@ -110,6 +110,14 @@ def resolve_workload(
             or type(reconciliation.get("expires_at")) is not int
             or reconciliation["expires_at"] <= now):
         holds.append("catalogue_native_workload_reconciliation_required")
+    # A matched parent cannot override held children, regardless of recomputed digests.
+    workloads = reconciliation.get("workloads")
+    if (not isinstance(workloads, list) or not workloads
+            or any(not isinstance(row, dict)
+                   or row.get("status") != "matched"
+                   or row.get("holds") != []
+                   for row in workloads)):
+        holds.append("catalogue_native_nested_workload_reconciliation_required")
     # A coverage summary cannot define its own required attribute universe.
     # Deployment release custody independently pins the full manifest and
     # exact platform/scope IDs; any unbound release is held.

@@ -100,6 +100,11 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
                 if k != "reconciliation_sha256"
             })):
         raise Rejected("migration_workload_reconciliation_not_current", 423)
+    workloads = reconciliation.get("workloads")
+    if (not isinstance(workloads, list) or not workloads
+            or any(not isinstance(row, dict) or row.get("status") != "matched"
+                   or row.get("holds") != [] for row in workloads)):
+        raise Rejected("migration_nested_workload_reconciliation_held", 423)
     coverage = value["collection_coverages"]
     if (not isinstance(coverage, list) or len(coverage) != 3
             or {c.get("scope") for c in coverage if isinstance(c, dict)}
@@ -116,6 +121,9 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
             or any(not isinstance(a, dict)
                    or a.get("status") not in {"observed", "not_applicable"}
                    for a in item["attributes"])
+            or type(item.get("expires_at")) is not int
+            or item["expires_at"] <= now
+            or item["expires_at"] < value["expires_at"]
             or item.get("native_write_authorized") is not False
             or item.get("independent_e3_e4_qualification") is not False
             or type(item.get("evaluated_at")) is not int

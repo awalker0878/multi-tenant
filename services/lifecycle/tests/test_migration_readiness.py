@@ -135,3 +135,29 @@ def test_empty_collection_cannot_be_attested_by_matching_checksums() -> None:
     })
     with pytest.raises(Rejected, match="coverage_not_current"):
         verify(value, content, "tenant", 101)
+
+def test_nested_workload_status_and_coverage_expiry_are_independent_gates() -> None:
+    value, content = specimen()
+    held = deepcopy(value)
+    held["workload_reconciliation"]["workloads"][0]["status"] = "held"
+    held["workload_reconciliation"]["reconciliation_sha256"] = digest({
+        k: v for k, v in held["workload_reconciliation"].items()
+        if k != "reconciliation_sha256"
+    })
+    held["readiness_sha256"] = digest({
+        k: v for k, v in held.items() if k != "readiness_sha256"
+    })
+    with pytest.raises(Rejected, match="migration_nested_workload_reconciliation_held"):
+        verify(held, content, "tenant", 101)
+
+    expired = deepcopy(value)
+    expired["collection_coverages"][0]["expires_at"] = 101
+    cover = expired["collection_coverages"][0]
+    cover["coverage_sha256"] = digest({
+        k: v for k, v in cover.items() if k != "coverage_sha256"
+    })
+    expired["readiness_sha256"] = digest({
+        k: v for k, v in expired.items() if k != "readiness_sha256"
+    })
+    with pytest.raises(Rejected, match="migration_collection_coverage_not_current"):
+        verify(expired, content, "tenant", 101)

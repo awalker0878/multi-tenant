@@ -81,6 +81,7 @@ def test_workload_coverage_requires_release_pinned_full_attribute_set() -> None:
         "status": "matched", "holds": [], "expires_at": 180,
         "native_write_authorized": False,
     }
+    reconciliation.setdefault("workloads", [{"status": "matched", "holds": []}])
     reconciliation["reconciliation_sha256"] = digest(reconciliation)
     manifest = {
         "release_sha256": route_result["release_sha256"],
@@ -129,6 +130,7 @@ def test_incomplete_eligible_readiness_must_not_leave_planning() -> None:
         "status": "matched", "holds": [], "expires_at": 180,
         "native_write_authorized": False,
     }
+    reconciliation.setdefault("workloads", [{"status": "matched", "holds": []}])
     reconciliation["reconciliation_sha256"] = digest(reconciliation)
     manifest = {
         "release_sha256": route_result["release_sha256"],
@@ -255,3 +257,24 @@ def test_complete_workload_readiness_contract_is_accepted_and_nested_drift_denie
     duplicate_scope["collection_coverages"][2]["scope"] = "source"
     with pytest.raises(Rejected, match="migration_workload_contract_invalid"):
         validate_workload_contract(duplicate_scope)
+
+def test_held_child_workload_cannot_be_masked_by_matched_parent() -> None:
+    route, native, api = fixture()
+    readiness = assess(route, native, api)
+    reconciliation = {
+        "status": "matched", "holds": [], "expires_at": 180,
+        "workloads": [{"status": "held", "holds": ["disk_not_observed"]}],
+        "native_write_authorized": False,
+    }
+    reconciliation["reconciliation_sha256"] = digest(reconciliation)
+    result = resolve_workload(readiness, reconciliation, None, 100, None)
+    assert result["status"] == "held"
+    assert "catalogue_native_nested_workload_reconciliation_required" in result["holds"]
+
+
+def test_missing_admission_wiring_cannot_publish_route_only_eligibility() -> None:
+    from planning.application.migration_support import MigrationSupport
+
+    service = MigrationSupport(lambda *_: {}, lambda *_: [], lambda: 100)
+    with pytest.raises(Rejected, match="migration_workload_admission_not_commissioned"):
+        service.require(None, "site", {})

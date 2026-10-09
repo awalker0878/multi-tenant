@@ -165,6 +165,9 @@ class MigrationSupport:
                 "native_write_authorized": False, "workload_admission_authorized": False}
 
     def require(self, actor: Actor, site: str, binding: dict[str, Any]) -> dict[str, Any]:
+        if (self.workload_current is None or self.collection_manifest is None
+                or self.flow_require is None):
+            raise Rejected("migration_workload_admission_not_commissioned", 503)
         # A native route is not ready merely because a hypervisor capability
         # matrix passed: owner-approved application paths and negative tests
         # have an independent, expiring approval gate.
@@ -262,15 +265,13 @@ class MigrationSupport:
         )
         if readiness["status"] != "eligible":
             raise Rejected("migration_readiness_held", 423)
-        if self.workload_current is not None:
-            evidence = self.workload_current(actor, site, binding, flow_proof)
-            readiness = resolve_workload(
-                readiness, evidence["reconciliation"],
-                evidence.get("collection_coverages"), self.clock(),
-                self.collection_manifest(selected["release_sha256"])
-                if self.collection_manifest is not None else None,
-            )
-            if readiness["status"] != "eligible":
-                raise Rejected("migration_workload_readiness_held", 423)
-            validate_workload_contract(readiness)
+        evidence = self.workload_current(actor, site, binding, flow_proof)
+        readiness = resolve_workload(
+            readiness, evidence["reconciliation"],
+            evidence.get("collection_coverages"), self.clock(),
+            self.collection_manifest(selected["release_sha256"]),
+        )
+        if readiness["status"] != "eligible":
+            raise Rejected("migration_workload_readiness_held", 423)
+        validate_workload_contract(readiness)
         return readiness
