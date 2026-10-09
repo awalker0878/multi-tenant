@@ -12,8 +12,8 @@ from planning.domain.network_evidence import (
     FLOW_KEYS, isolation_checks, native_application_flow_choices,
     network_checks,
 )
-from planning.domain.operational_evidence import snapshot
-from planning.domain.qualification import verified
+from planning.domain.operational_evidence import inventory_digest, snapshot
+from planning.domain.qualification import binding_digest, verified
 
 SCOPE_SQL = (
     "tenant=%s AND actor=%s AND application=%s AND environment=%s AND site=%s"
@@ -95,8 +95,8 @@ class MigrationFlows:
         context_sha = digest({
             "assessment": retained["id"],
             "intent": current_intent["digest"],
-            "destination": digest(dest),
-            "qualification": digest(qualification),
+            "destination": inventory_digest(dest),
+            "qualification": binding_digest(qualification),
             "policy": digest(policy),
             "network": digest(observed["network"]),
         })
