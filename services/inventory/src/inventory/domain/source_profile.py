@@ -265,6 +265,8 @@ def source_observation(profile: dict[str, Any], binding: dict[str, Any]) -> dict
         observed = config.get("isSecureBootEnabled") if isinstance(config, dict) else None
         secure_boot = observed if type(observed) is bool else None
     if platform == "vmware":
+        value = facts.get("secure_boot")
+        secure_boot = value if type(value) is bool else None
         identity = {
             "vm_id": facts["vm_id"],
             "instance_uuid": facts.get("instance_uuid"),
