@@ -36,16 +36,22 @@ const sourceSecurityIds = computed<string[] | null>(() => {
   if (!facts.nics.length) return [];
   if (facts.platform !== 'openstack' || facts.schema_version !== 3) return null;
   const ports = facts.native.metadata.ports;
-  if (!Array.isArray(ports) || ports.length !== facts.nics.length) return null;
+  if (!Array.isArray(ports) || ports.length !== facts.nics.length || !facts.native_scope) return null;
   const set = new Set<string>();
+  const portIds = new Set<string>();
   for (const row of ports) {
     if (typeof row !== 'object' || row === null) return null;
     const port = row as Record<string, unknown>;
-    if (port.port_security_enabled !== true || !Array.isArray(port.security_groups)
-        || !port.security_groups.every(v => typeof v === 'string' && v.length > 0)) return null;
+    if (typeof port.id !== 'string' || !port.id || portIds.has(port.id)
+        || (port.project_id ?? port.tenant_id) !== facts.native_scope
+        || port.port_security_enabled !== true || !Array.isArray(port.security_groups)
+        || port.security_groups.length > 64
+        || !port.security_groups.every(v => typeof v === 'string' && v.length > 0)
+        || new Set(port.security_groups).size !== port.security_groups.length) return null;
+    portIds.add(port.id);
     for (const id of port.security_groups as string[]) set.add(id);
   }
-  return [...set].sort();
+  return set.size <= 64 ? [...set].sort() : null;
 });
 function matchingOpenstackGroups(sourceId: string) {
   const facts = source.value?.facts;
@@ -54,8 +60,13 @@ function matchingOpenstackGroups(sourceId: string) {
   const records = facts.native.metadata.security_groups;
   if (!Array.isArray(records)) return [];
   const sourceRule = records.find(item => typeof item === 'object' && item !== null && (item as Record<string, unknown>).id === sourceId) as Record<string, unknown> | undefined;
-  if (!sourceRule || typeof sourceRule.semantics_sha256 !== 'string' || !sourceRule.semantics_sha256) return [];
-  return openstack.value?.security_groups?.filter(item => item.semantics_sha256 === sourceRule.semantics_sha256) ?? [];
+  if (!sourceRule || sourceRule.project_id !== facts.native_scope
+      || typeof sourceRule.semantics_sha256 !== 'string'
+      || !/^[a-f0-9]{64}$/.test(sourceRule.semantics_sha256)) return [];
+  return openstack.value?.security_groups?.filter(item =>
+    item.project_id === openstack.value?.project_id
+    && item.stateful !== null
+    && item.semantics_sha256 === sourceRule.semantics_sha256) ?? [];
 }
 const sourceCategoryPresent = computed(() => {
   const facts = source.value?.facts;
@@ -66,9 +77,10 @@ const sourceCategoryPresent = computed(() => {
 function syncOpenstackPolicies() {
   // Selection remains a source-key -> observed-target-ID reference, not a rule edit.
   if (form.review.destination?.platform !== 'openstack') return;
-  const observed = new Set(openstack.value?.security_groups?.map(item => item.id) ?? []);
   for (const mapping of form.review.destination.security_mappings) {
-    if (!observed.has(mapping.destination_id)) mapping.destination_id = '';
+    if (!matchingOpenstackGroups(mapping.source_id).some(g => g.id === mapping.destination_id)) {
+      mapping.destination_id = '';
+    }
   }
 }
 
@@ -109,18 +121,31 @@ const migrationFeatures = computed(() => featurePolicy.features.map(feature => (
   ...feature,
   proposal: featureDirection.value?.features.find(item => item.feature_id === feature.id),
 })));
+// Source observation controls feature *visibility*, not a claim of portability.
+// Owner obligations are displayed in their own section even without native facts.
+const mandatoryNativeFacts = new Set([
+  'platform.api', 'vm.identity', 'vm.power', 'vm.compute',
+  'guest.firmware', 'storage.disks',
+]);
 function sourceFeatureDefined(id: string): boolean {
   const facts = source.value?.facts;
   if (!facts || facts.profile_type !== 'SourceWorkloadProfile') return false;
-  const nics = facts.nics.length;
-  const disks = facts.disks.length;
+  const disks = facts.disks;
   const metadata = facts.schema_version === 3 ? facts.native.metadata : null;
   const vm = metadata && typeof metadata.vm === 'object' && metadata.vm !== null
     ? metadata.vm as Record<string, unknown> : null;
   const ports = metadata && Array.isArray(metadata.ports) ? metadata.ports as Array<Record<string, unknown>> : [];
+  const records = facts.schema_version === 3 ? facts.native.disk_records : [];
+  const sourceGroups = metadata && Array.isArray(metadata.security_groups)
+    ? metadata.security_groups as Array<Record<string, unknown>> : [];
   switch (id) {
+    case 'platform.api': return typeof facts.api_version === 'string' && facts.api_version.length > 0;
+    case 'vm.identity': return typeof facts.vm_id === 'string' && facts.vm_id.length > 0;
+    case 'vm.power': return typeof facts.power_state === 'string' && facts.power_state.length > 0;
+    case 'vm.compute': return facts.cpu !== null && facts.memory_mb !== null;
+    case 'vm.placement': return false; // Native VM identity is not evidence of placement equivalence.
     case 'guest.firmware': return facts.firmware === 'bios' || facts.firmware === 'efi';
-    case 'guest.drivers': return typeof facts.guest_id === 'string' && facts.guest_id.length > 0;
+    case 'guest.drivers': return false; // Guest IDs do not prove the installed drivers will boot.
     case 'guest.devices': return Boolean(
       vm && (Array.isArray(vm.gpus) && vm.gpus.length
       || Array.isArray(vm.pcieDevices) && vm.pcieDevices.length
@@ -128,29 +153,44 @@ function sourceFeatureDefined(id: string): boolean {
       || vm.vtpmConfig)
     );
     case 'storage.disks':
-    case 'storage.controller':
-    case 'storage.sharing':
-    case 'storage.encryption':
     case 'storage.target':
-    case 'storage.transfer': return disks > 0;
-    case 'network.nics':
-    case 'network.routing':
-    case 'network.flows': return nics > 0;
-    case 'network.security': return Boolean(sourceSecurityIds.value?.length);
+    case 'storage.transfer': return disks.length > 0;
+    case 'storage.controller': return facts.controllers.length > 0
+      || disks.some(d => d.controller_key !== null);
+    case 'storage.sharing': return disks.some(d => d.backing_chain.some(b => b.sharing))
+      || records.some(r => r.metadata?.multiattach === true);
+    case 'storage.encryption': return disks.some(d => d.backing_chain.some(b => b.encrypted))
+      || records.some(r => r.metadata?.encrypted === true);
+    case 'network.nics': return facts.nics.length > 0;
+    case 'network.routing': return Boolean(
+      metadata && Array.isArray(metadata.routes) && metadata.routes.length > 0
+    ); // A port's network ID or fixed IP does not prove routing.
+    case 'network.flows': return Boolean(
+      metadata && Array.isArray(metadata.application_flows) && metadata.application_flows.length > 0
+    ); // A NIC or Neutron policy alone does not establish required application flows.
+    case 'network.security': return Boolean(sourceSecurityIds.value?.length)
+      && sourceSecurityIds.value!.every(id => sourceGroups.some(g =>
+        g.id === id && g.project_id === (facts.schema_version === 3 ? facts.native_scope : null)
+        && typeof g.semantics_sha256 === 'string' && /^[a-f0-9]{64}$/.test(g.semantics_sha256)));
     case 'network.qos': return ports.some(p => typeof p.qos_policy_id === 'string' && p.qos_policy_id.length > 0);
+    case 'security.scope': return facts.schema_version === 3
+      ? typeof facts.native_scope === 'string' && facts.native_scope.length > 0
+      : typeof facts.vcenter_uuid === 'string' && facts.vcenter_uuid.length > 0;
     case 'metadata.optional': return Boolean(
       (vm && Array.isArray(vm.categories) && vm.categories.length)
       || (metadata && typeof metadata.server === 'object' && metadata.server !== null
           && typeof (metadata.server as Record<string, unknown>).name === 'string')
     );
-    case 'vm.compute': return facts.cpu !== null && facts.memory_mb !== null;
-    case 'vm.power': return facts.power_state !== null;
-    default: return true;  // Required owner and operational obligations remain visible.
+    default: return false; // Application / cutover / recovery inputs are not invented native API facts.
   }
 }
 const displayedMigrationFeatures = computed(() => migrationFeatures.value.filter(feature => sourceFeatureDefined(feature.id)));
 const missingSourceFacts = computed(() => migrationFeatures.value.filter(
-  feature => feature.criticality === 'critical' && !sourceFeatureDefined(feature.id)
+  feature => feature.criticality === 'critical'
+    && (mandatoryNativeFacts.has(feature.id)
+      || (feature.id.startsWith('network.') && source.value?.facts.profile_type === 'SourceWorkloadProfile'
+        && source.value.facts.nics.length > 0))
+    && !sourceFeatureDefined(feature.id)
 ));
 
 const operatorObligations = computed(() => featurePolicy.operator_requirements.filter(item =>
@@ -251,7 +291,7 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
           </label>
         </div>
         <p v-if="!openstack.security_groups.length" role="alert">No destination security groups were discovered for the target project. No manual destination value is accepted.</p>
-        <p v-if="form.review.destination.security_mappings.some(m => matchingOpenstackGroups(m.source_id).length === 0)" role="alert">Some source rules have no exact semantic equivalent in this destination inventory. No arbitrary security-group selection is offered. An independently qualified translation is required.</p>
+        <p v-if="form.review.destination.security_mappings.some(m => matchingOpenstackGroups(m.source_id).length === 0)" role="alert">Only project-scoped destination groups with identical observed policy-rule semantics appear. No matching native group means the migration is held; application-required traffic and deny paths still need separate receiving-environment verification.</p>
       </section>
       <p v-if="sourceSecurityIds === null && source?.facts.profile_type === 'SourceWorkloadProfile' && source.facts.nics.length" role="alert">Source security intent is not discoverable from this profile. Destination policy choices are unavailable until source security evidence is collected.</p>
       <VmwareDestination v-if="vmware && form.review.destination?.platform === 'vmware'" v-model="form.review.destination" :profile="vmware" :source-guest-id="source?.facts.profile_type === 'SourceWorkloadProfile' ? source.facts.guest_id : null" :source-firmware="source?.facts.profile_type === 'SourceWorkloadProfile' ? source.facts.firmware : null" />
