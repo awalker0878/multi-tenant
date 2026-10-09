@@ -24,6 +24,11 @@ def test_ten_budgeted_reads_include_native_microseg_reference_catalogue() -> Non
         "shared_resource_ids": [shared],
         "credential_file": "/secret",
         "base_url": "https://pc.invalid",
+        "microseg_reference_endpoint_qualified": True,
+        "microseg_reference_endpoints": {
+            kind: "/api/microseg/v4.3/config/" + kind.replace("_", "-")
+            for kind in ("entity_groups", "address_groups", "service_groups")
+        },
     }
     policy = {"platform": "ahv", "native_scope": project, "coverage_reference": "q08"}
     calls: list[str] = []
@@ -85,6 +90,42 @@ def test_ten_budgeted_reads_include_native_microseg_reference_catalogue() -> Non
     assert profile["inventory_complete"] is True and not profile["holds"]
     assert "never exposed" not in str(profile)
     assert profile["observations_sha256"] and result["terminal"] is True
+
+
+@pytest.mark.parametrize("count", [0, 1, 100, 101, 200, 1000])
+def test_unqualified_optional_microseg_group_endpoints_never_trigger_speculative_requests():
+    from inventory_worker.infrastructure.ahv_profile import collect_ahv
+    project, cluster, pc, storage, subnet = [uid() for _ in range(5)]
+    routes = []
+    stream = {
+        "kind": "target_profile", "cluster_id": cluster,
+        "prism_central_id": pc, "shared_resource_ids": [],
+        "credential_file": "/fixture",
+    }
+    def exchange(conn, path, headers):
+        routes.append(path)
+        if "/clusters/" in path:
+            return {"data": {"extId": cluster, "config": {
+                "isAvailable": True, "hypervisorTypes": ["AHV"],
+                "buildInfo": {"version": "7.6"},
+                "clusterSoftwareMap": [{"softwareType": "AHV", "version": "11.2"}]}}}
+        if "/domain-managers/" in path:
+            return {"data": {"extId": pc, "config": {"buildInfo": {"version": "7.6"}}}}
+        rows = []
+        if "/storage-containers" in path:
+            rows = [{"extId": storage, "clusterExtId": cluster,
+                     "isMarkedForRemoval": False, "isInternal": False}]
+        if "/subnets" in path:
+            rows = [{"extId": subnet, "projectExtId": project}]
+        return {"metadata": {"totalAvailableResults": len(rows)}, "data": rows}
+    with (patch("inventory_worker.infrastructure.ahv_profile.exchange", side_effect=exchange),
+          patch("inventory_worker.infrastructure.ahv_profile.secret", return_value="fixture")):
+        profile = collect_ahv({"native_scope": project}, stream, 100, lambda: None)
+    assert len(routes) == 7
+    assert not any("entity-groups" in path or "address-groups" in path
+                   or "service-groups" in path for path in routes)
+    assert "ahv_entity_groups_api_unqualified" in profile["holds"]
+    assert profile["inventory_complete"] is True
 
 
 @pytest.mark.parametrize("count", [0, 1, 100, 101, 200, 1000])
@@ -219,6 +260,11 @@ def test_ahv_policy_rule_lists_use_bounded_native_policy_rule_get(mode: str) -> 
         "kind": "target_profile", "cluster_id": cluster,
         "prism_central_id": pc, "shared_resource_ids": [],
         "credential_file": "/fixture",
+        "microseg_reference_endpoint_qualified": True,
+        "microseg_reference_endpoints": {
+            kind: "/api/microseg/v4.3/config/" + kind.replace("_", "-")
+            for kind in ("entity_groups", "address_groups", "service_groups")
+        },
     }
     approvals: list[str] = []
     native_rule = {
