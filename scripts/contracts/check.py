@@ -108,6 +108,17 @@ def check_copies():
             if (ROOT / destination).read_bytes() != canonical:
                 raise ValueError(f"Packaged contract byte drift: {destination}")
 
+    # Historical canonical releases remain frozen, but these Console bundles
+    # have no current runtime/generator/compatibility-script consumer.
+    # Guard against accidentally reintroducing a stale duplicate copy.
+    for retired in (
+        "apps/console/resources/contracts/inventory-v1.7.json",
+        "apps/console/resources/contracts/inventory-v1.8.json",
+        "apps/console/resources/contracts/planning-migration-v1.4.json",
+    ):
+        if (ROOT / retired).exists():
+            raise ValueError(f"Retired consumer contract copy reintroduced: {retired}")
+
 def check_native_candidates():
     registry = load("contracts/capabilities/native-security-api-registry-v1.json")
     if registry["status"] != "candidate_paths_require_installed_qualification":
