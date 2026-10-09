@@ -6643,12 +6643,52 @@
                           "spec_sha256": {
                             "type": "string",
                             "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "category_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 160
+                            },
+                            "maxItems": 64,
+                            "uniqueItems": true
+                          },
+                          "address_group_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 160
+                            },
+                            "maxItems": 64,
+                            "uniqueItems": true
+                          },
+                          "service_group_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 160
+                            },
+                            "maxItems": 64,
+                            "uniqueItems": true
+                          },
+                          "reference_resolution": {
+                            "enum": [
+                              "catalogue_ids_only",
+                              "unresolved"
+                            ]
                           }
                         },
                         "required": [
                           "extId",
                           "type",
-                          "spec_sha256"
+                          "spec_sha256",
+                          "category_ids",
+                          "address_group_ids",
+                          "service_group_ids",
+                          "reference_resolution"
                         ]
                       }
                     },
