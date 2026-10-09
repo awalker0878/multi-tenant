@@ -77,6 +77,15 @@ def specimen() -> tuple[dict, dict, dict, dict, dict, dict]:
         "intent_sha256": digest(intent), "source_profile_sha256": source,
         "target_profile_sha256": dest, "expires_at": 160,
         "evidence_sha256": digest("E4"),
+        "workload_interface_cases": [{
+            "workload_id": workload, "source_profile_sha256": source,
+            "target_profile_sha256": dest, "logical_nics_sha256": digest(intent["workloads"][0]["nics"]),
+            "native_path_set_sha256": digest("paths"),
+            "allowed_probe_sha256": digest("allowed"), "denied_probe_sha256": digest("denied"),
+            "return_probe_sha256": digest("return"), "isolation_probe_sha256": digest("isolation"),
+            "evidence_sha256": digest("nic-e4"), "observed_at": 99, "expires_at": 150,
+            "level": "E4", "decision": "accepted", "revoked": False,
+        }],
     }
     return scope, catalogue, inventory, selected, flow, native
 
@@ -128,3 +137,17 @@ def test_changed_profile_review_and_untrusted_observation_are_rejected() -> None
     altered["digest"] = digest("changed")
     with pytest.raises(Rejected, match="review_not_current"):
         evaluate(scope, catalogue, altered, selected, flow, 100)
+
+
+
+def test_application_flow_receipt_without_per_vm_interface_probes_never_passes() -> None:
+    scope, catalogue, inventory, selected, flow, _ = specimen()
+    flow["workload_interface_cases"] = []
+    result = evaluate(scope, catalogue, inventory, selected, flow, 100)
+    assert result["status"] == "held"
+    assert any("source_network_semantics_not_verified" in hold for hold in result["holds"])
+    flow["workload_interface_cases"] = [{
+        "workload_id": catalogue["intent"]["workloads"][0]["id"],
+        "source_profile_sha256": digest("wrong-source"),
+    }]
+    assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
