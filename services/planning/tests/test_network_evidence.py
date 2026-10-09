@@ -6,7 +6,7 @@ import pytest
 
 from planning_fixture import NOW, inputs
 
-from planning.domain.network_evidence import isolation_checks, network_checks, selected_native_flow, traffic
+from planning.domain.network_evidence import isolation_checks, native_application_flow_choices, network_checks, selected_native_flow, traffic
 
 
 def test_missing_route_and_failed_negative_control_block() -> None:
@@ -163,3 +163,23 @@ def test_native_application_selection_cannot_replace_independent_traffic_measure
     assert traffic(flow, network, policy, NOW) == "unknown"
     checks = network_checks(intent, {"network": network}, policy, NOW)
     assert any(n == "network.reachability" and status == "unknown" for n, status, _, _ in checks)
+
+
+def test_application_flow_dropdown_choices_are_existing_native_controls_only() -> None:
+    intent, destination, _, policy, _ = inputs()
+    network = deepcopy(destination["capability_snapshot"]["data"]["network"])
+    choices = native_application_flow_choices(intent, network, policy)
+    flow = next(d for d in intent["dependencies"] if d["kind"] == "communication")
+    item = next(row for row in choices if row["source"]["from"] == flow["from"]
+                and row["source"]["to"] == flow["to"])
+    assert item["status"] == "choices_observed"
+    assert item["destination_firewall_rule_ids"] == ["fixture://native-firewall-rule"]
+    assert item["destination_route_ids"] == ["fixture://route"]
+    assert item["native_write_authorized"] is False
+    network["firewall_rules"][0]["action"] = "deny"
+    damaged = native_application_flow_choices(intent, network, policy)
+    assert all("fixture://native-firewall-rule" not in row["destination_firewall_rule_ids"]
+               for row in damaged)
+    network["topology"]["routes"] = []
+    assert all(row["status"] == "held_unobserved"
+               for row in native_application_flow_choices(intent, network, policy))
