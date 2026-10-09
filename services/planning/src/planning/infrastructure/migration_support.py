@@ -299,6 +299,7 @@ def current_application_flow_proof(
         "target_profile_sha256": binding["target"]["profile_sha256"],
         "evidence_sha256": digest(receipt),
         "workload_interface_cases": receipt.get("workload_interface_cases", []),
+        "disk_disposition_cases": receipt.get("disk_disposition_cases", []),
         "expires_at": receipt["expires_at"],
         "native_write_authorized": False,
     }
