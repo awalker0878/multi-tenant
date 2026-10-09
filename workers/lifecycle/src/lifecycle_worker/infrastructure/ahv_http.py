@@ -42,7 +42,7 @@ class AhvHttp:
             or set(api_versions) != {"vmm", "prism", "clustermgmt",
                                      "networking", "microseg", "iam"}
             or any(not isinstance(v, str)
-                   or re.fullmatch(r"v[0-9]+\\.[0-9]+", v) is None
+                   or re.fullmatch(r"v[0-9]+\.[0-9]+", v) is None
                    for v in api_versions.values())
         ):
             raise NativeHeld("ahv_qualified_namespace_manifest_invalid")
@@ -58,7 +58,7 @@ class AhvHttp:
         if self.api_versions is not None:
             match = re.fullmatch(
                 r"/api/(vmm|prism|clustermgmt|networking|microseg|iam)/"
-                r"(v[0-9]+\\.[0-9]+)/.*", path,
+                r"(v[0-9]+\.[0-9]+)/.*", path,
             )
             if match is None or self.api_versions[match[1]] != match[2]:
                 raise NativeHeld("ahv_native_request_version_unqualified")
