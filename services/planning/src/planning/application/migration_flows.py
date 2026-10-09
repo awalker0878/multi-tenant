@@ -108,25 +108,30 @@ class MigrationFlows:
         if not isinstance(observed, dict) or not isinstance(observed.get("network"), dict):
             raise Rejected("application_flow_current_native_evidence_required", 423)
         intent = current_intent["intent"]
-        if dest.get("platform") in {"vmware", "ahv"}:
-            cases = observed.get("effective_security_cases")
-            accepted = qualification.get("capabilities", {}).get(
-                "migration.effective_security", {}
-            )
-            if (
-                qualification.get("evidence_level") != "E4"
-                or not isinstance(accepted, dict)
-                or accepted.get("status") != "supported"
-                or not isinstance(cases, list)
-                or len(cases) > 512
-                or digest(cases) not in accepted.get("values", [])
-            ):
-                raise Rejected("native_security_rule_equivalence_unqualified", 423)
+        cases = observed.get("effective_security_cases")
+        accepted = qualification.get("capabilities", {}).get(
+            "migration.effective_security", {}
+        )
+        qualified = (
+            qualification.get("evidence_level") == "E4"
+            and isinstance(accepted, dict)
+            and accepted.get("status") == "supported"
+            and isinstance(cases, list)
+            and len(cases) <= 512
+            and digest(cases) in accepted.get("values", [])
+        )
+        if qualified:
             choices = self.qualified_native_choices(
                 intent, dest["platform"], cases, now, policy,
             )
+        elif dest["platform"] == "openstack":
+            # E2 choices are visible for review only. No E4 admission can
+            # consume them without a separately qualified native case set.
+            choices = native_application_flow_choices(
+                intent, observed["network"], policy,
+            )
         else:
-            choices = native_application_flow_choices(intent, observed["network"], policy)
+            raise Rejected("native_security_rule_equivalence_unqualified", 423)
         context_sha = digest({
             "assessment": retained["id"],
             "intent": current_intent["digest"],
@@ -150,6 +155,7 @@ class MigrationFlows:
             "source_intent_sha256": current_intent["digest"],
             "destination_generation_id": candidate["generation_id"],
             "data": observed, "choices": choices,
+            "effective_cases_qualified": bool(qualified),
             "context_sha256": context_sha, "expires_at": expires,
         }
 
@@ -257,7 +263,7 @@ class MigrationFlows:
         net = current["data"]["network"]
         choices = {row["source_flow_id"]: row for row in current["choices"]}
         controls = []
-        if current["destination"].get("platform") in {"vmware", "ahv"}:
+        if current.get("effective_cases_qualified") is True:
             cases = {
                 item["source_flow_id"]: item
                 for item in current["data"]["effective_security_cases"]
@@ -329,7 +335,7 @@ class MigrationFlows:
         seen: set[str] = set()
         bound: dict[str, Any] = {}
         network = data["network"]
-        vendor = current["destination"].get("platform") in {"vmware", "ahv"}
+        vendor = current.get("effective_cases_qualified") is True
         observer = network.get("observer_principal")
         writer = network.get("writer_principal")
         if current["expires_at"] <= now:
