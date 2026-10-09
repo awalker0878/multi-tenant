@@ -38,6 +38,10 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
         },
     }
     now = 1000
+    binding = {
+        "source": {"platform": "vmware"},
+        "target": {"platform": "openstack"},
+    }
     scope = {
         "tenant_id": current_actor.tenant, "site_id": site,
         "resource_id": current_actor.application,
@@ -53,7 +57,8 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
         "destination_generation_id": generation,
         "omissions_sha256": digest([]),
         "omissions_approved": False, "omission_approver_id": None,
-        "platform": "openstack", "security_cases": [],
+        "platform": "openstack", "source_platform": "vmware",
+        "security_cases": [],
         "level": "E4",
         "decision": "accepted", "native_write_authorized": False,
         "observed_at": now, "expires_at": now + 30,
@@ -82,7 +87,7 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
         raise AssertionError(owner)
     monkeypatch.setattr(migration_support, "request", request)
 
-    migration_support.current_application_flow_proof(current_actor, site, saved, now)
+    migration_support.current_application_flow_proof(current_actor, site, saved, now, binding)
     for field, value in (
         ("selections_sha256", "9" * 64),
         ("native_controls_sha256", "9" * 64),
@@ -97,7 +102,7 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
             changed if owner == "ASSURANCE" else
             {"revision_id": source_revision, "intent_sha256": "b" * 64})
         with pytest.raises(Rejected):
-            migration_support.current_application_flow_proof(current_actor, site, saved, now)
+            migration_support.current_application_flow_proof(current_actor, site, saved, now, binding)
 
     # An owner can request an optional omission, but their own signature
     # cannot double as the independent receiving approval.
@@ -109,9 +114,9 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
     proof["omission_approver_id"] = saved["reviewed_by_actor"]
     monkeypatch.setattr(migration_support, "request", request)
     with pytest.raises(Rejected, match="independent_optional_flow_approval_required"):
-        migration_support.current_application_flow_proof(current_actor, site, saved, now)
+        migration_support.current_application_flow_proof(current_actor, site, saved, now, binding)
     proof["omission_approver_id"] = str(uuid4())
-    migration_support.current_application_flow_proof(current_actor, site, saved, now)
+    migration_support.current_application_flow_proof(current_actor, site, saved, now, binding)
 
 
 def test_unavailable_or_superseded_source_requires_new_assessment(
@@ -126,4 +131,5 @@ def test_unavailable_or_superseded_source_requires_new_assessment(
         migration_support.current_application_flow_proof(a, str(uuid4()), {
             "payload": {"source_revision_id": str(uuid4()),
                         "source_intent_sha256": "b" * 64},
-        }, 1000)
+        }, 1000, {"source": {"platform": "vmware"},
+                    "target": {"platform": "openstack"}})
