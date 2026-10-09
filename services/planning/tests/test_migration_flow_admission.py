@@ -118,6 +118,19 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
         with pytest.raises(Rejected):
             migration_support.current_application_flow_proof(current_actor, site, saved, now, binding)
 
+    altered = deepcopy(response)
+    altered["flow_evidence"] = deepcopy(proof)
+    altered["flow_evidence"]["security_cases"][0]["document"]["api_profile"]["profile_sha256"] = "9" * 64
+    monkeypatch.setattr(migration_support, "request",
+        lambda owner, method, path, *args, **kwargs:
+        altered if owner == "ASSURANCE" else
+        {"revision_id": source_revision, "intent_sha256": "b" * 64})
+    with pytest.raises(Rejected, match="native_security_e4_case_mismatch"):
+        migration_support.current_application_flow_proof(
+            current_actor, site, saved, now, binding,
+        )
+    monkeypatch.setattr(migration_support, "request", request)
+
     # An owner can request an optional omission, but their own signature
     # cannot double as the independent receiving approval.
     omission = [{"source_flow_id": "f" * 64,
