@@ -118,12 +118,15 @@ function matchingOpenstackGroups(sourceId: string) {
   const records = facts.native.metadata.security_groups;
   if (!Array.isArray(records)) return [];
   const sourceRule = records.find(item => typeof item === 'object' && item !== null && (item as Record<string, unknown>).id === sourceId) as Record<string, unknown> | undefined;
-  if (!sourceRule || sourceRule.project_id !== facts.native_scope
+  if (!sourceRule || sourceNativeRules.value === null
+      || sourceRule.project_id !== facts.native_scope
+      || !Array.isArray(sourceRule.rules)
       || typeof sourceRule.semantics_sha256 !== 'string'
       || !/^[a-f0-9]{64}$/.test(sourceRule.semantics_sha256)) return [];
   return openstack.value?.security_groups?.filter(item =>
     item.project_id === openstack.value?.project_id
     && item.stateful !== null
+    && Array.isArray(item.rules)
     && item.semantics_sha256 === sourceRule.semantics_sha256) ?? [];
 }
 const sourceCategoryPresent = computed(() => {
@@ -235,7 +238,8 @@ function sourceFeatureDefined(id: string): boolean {
     case 'network.flows': return Boolean(
       metadata && Array.isArray(metadata.application_flows) && metadata.application_flows.length > 0
     ); // A NIC or Neutron policy alone does not establish required application flows.
-    case 'network.security': return Boolean(sourceSecurityIds.value?.length)
+    case 'network.security': return sourceNativeRules.value !== null
+      && Boolean(sourceSecurityIds.value?.length)
       && sourceSecurityIds.value!.every(id => sourceGroups.some(g =>
         g.id === id && g.project_id === (facts.schema_version === 3 ? facts.native_scope : null)
         && typeof g.semantics_sha256 === 'string' && /^[a-f0-9]{64}$/.test(g.semantics_sha256)));
