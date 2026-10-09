@@ -237,3 +237,15 @@ def test_uncatalogued_disk_requires_matching_owner_impact_and_independent_e4() -
     assert matched["expires_at"] == 125
     flow["disk_disposition_cases"][0]["impact_sha256"] = digest("changed-impact")
     assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
+
+
+def test_e4_observation_age_caps_advertised_expiry_at_thirty_seconds() -> None:
+    scope, catalogue, inventory, selected, flow, _ = specimen()
+    case = flow["workload_interface_cases"][0]
+    case["observed_at"] = 100
+    case["expires_at"] = 150
+    receipt = evaluate(scope, catalogue, inventory, selected, flow, 100)
+    assert receipt["status"] == "matched"
+    assert receipt["expires_at"] == 130
+    assert evaluate(scope, catalogue, inventory, selected, flow, 129)["status"] == "matched"
+    assert evaluate(scope, catalogue, inventory, selected, flow, 130)["status"] == "held"
