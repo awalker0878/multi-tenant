@@ -287,9 +287,30 @@ def source_observation(profile: dict[str, Any], binding: dict[str, Any]) -> dict
             "memory_mb": facts["memory_mb"],
             "firmware": facts["firmware"],
             "secure_boot": secure_boot,
-            "disks": [{"key": d["key"], "capacity_bytes": d["capacity_bytes"]}
-                      for d in facts["disks"]],
+            # Guest identifiers are raw platform classifications, not
+            # automatically equivalent to Catalogue's OS or hardening.
+            "guest_id": facts.get("guest_id"),
+            "architecture": facts.get("architecture"),
+            "disks": [
+                {
+                    "key": d["key"], "capacity_bytes": d["capacity_bytes"],
+                    "controller_key": d.get("controller_key"),
+                    "unit_number": d.get("unit_number"),
+                    "native_role": next(
+                        (record.get("role") for record in
+                         native.get("disk_records", []) if record.get("key") == d["key"]),
+                        None,
+                    ) if isinstance(native, dict)
+                    and isinstance(native.get("disk_records"), list) else None,
+                }
+                for d in facts["disks"]
+            ],
             "nics": [{"key": n["key"]} for n in facts["nics"]],
+            "controllers": [
+                {"key": c["key"], "model": c.get("model"),
+                 "bus": c.get("bus"), "sharing": c.get("sharing")}
+                for c in facts.get("controllers", [])
+            ],
             "native": {"identity": identity},
         },
         "owner_dataset_coverage_current": False,
