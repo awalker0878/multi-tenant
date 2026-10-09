@@ -15,25 +15,55 @@ from planning.domain.model import Rejected, digest
 def extended_intent_fields(
     workload: dict[str, Any], observed: dict[str, Any],
     disk_mappings: list[dict[str, Any]] | None,
+    semantic_cases: list[dict[str, Any]] | None = None,
+    source_profile_sha256: str | None = None,
+    now: int = 0,
 ) -> list[dict[str, Any]]:
-    """Explicitly account for requested semantics not covered by basic VM sizing.
+    """Explicit source semantic dispositions; only independent E4 may translate.
 
-    Native guest identifiers and disk roles are observations, not portable
-    guarantees of OS/image/hardening, encryption or placement equivalence.
-    A missing value is unknown, never a positive comparison.
+    A platform guest label, inferred boot order or owner note is *not* a
+    qualified equivalence. Required differences stay held unless an exact
+    source/intent-bound E4 transformation receipt is independently signed.
     """
     fields: list[dict[str, Any]] = []
 
     def compare(path: str, required: Any, actual: Any, mandatory: bool = True) -> None:
         if actual is None:
-            status = "unknown"
-        elif actual == required and type(actual) is type(required):
+            status = "unobserved"
+        elif type(actual) is type(required) and actual == required:
             status = "matched"
         else:
-            status = "transformation_required"
-        fields.append({
-            "field": path, "disposition": status, "required": mandatory,
-        })
+            status = "drifted"
+        if status != "matched" and isinstance(semantic_cases, list):
+            matches = [
+                case for case in semantic_cases
+                if isinstance(case, dict)
+                and case.get("workload_id") == workload["id"]
+                and case.get("field") == path
+            ]
+            if len(matches) == 1:
+                case = matches[0]
+                if (
+                    case.get("source_profile_sha256") == source_profile_sha256
+                    and case.get("intent_field_sha256") == digest(required)
+                    and case.get("observed_field_sha256") == digest(actual)
+                    and case.get("level") == "E4"
+                    and case.get("decision") == "accepted"
+                    and case.get("revoked") is False
+                    and case.get("disposition") in
+                    ({"qualified_transformation"} if mandatory
+                     else {"qualified_transformation", "approved_omission"})
+                    and all(isinstance(case.get(k), str)
+                            and len(case[k]) == 64
+                            for k in ("evidence_sha256", "transformation_plan_sha256",
+                                      "independent_acceptance_sha256"))
+                    and type(case.get("observed_at")) is int
+                    and 0 <= now - case["observed_at"] <= 30
+                    and type(case.get("expires_at")) is int
+                    and case["expires_at"] > now
+                ):
+                    status = case["disposition"]
+        fields.append({"field": path, "disposition": status, "required": mandatory})
 
     compute = workload.get("compute", {})
     if "architecture" in compute:
@@ -58,10 +88,12 @@ def extended_intent_fields(
                 compare("disks." + disk["id"] + "." + key,
                         disk[key], actual.get(key))
     for requirement in workload.get("requirements", []):
-        if isinstance(requirement, dict) and requirement.get("strength") == "required":
+        if isinstance(requirement, dict):
             compare("requirements." + str(requirement.get("key")),
-                    requirement.get("value"), None)
+                    requirement.get("value"), None,
+                    requirement.get("strength") == "required")
     return fields
+
 
 
 def reconcile(
@@ -192,11 +224,25 @@ def reconcile(
             # Every required declared semantic must have a disposition.
             # Basic sizing matches cannot conceal unknown OS, architecture,
             # boot roles, encryption, storage or failure-domain obligations.
-            dispositions = extended_intent_fields(workload, facts, link.get("disk_mappings"))
+            semantic_cases = (
+                flow_e4.get("workload_semantic_cases")
+                if isinstance(flow_e4, dict)
+                and flow_e4.get("level") == "E4"
+                and flow_e4.get("decision") == "accepted"
+                and flow_e4.get("revoked") is False
+                and flow_e4.get("intent_sha256") == catalogue_digest
+                and type(flow_e4.get("expires_at")) is int
+                and flow_e4["expires_at"] > now
+                else None
+            )
+            dispositions = extended_intent_fields(
+                workload, facts, link.get("disk_mappings"), semantic_cases,
+                p.get("profile_sha256"), now,
+            )
             holds.extend(
                 "source_intent_field_" + field["disposition"] + ":" + field["field"]
                 for field in dispositions
-                if field["required"] and field["disposition"] != "matched"
+                if field["required"] and field["disposition"] not in {"matched", "qualified_transformation"}
             )
             native = facts.get("native")
             identity = native.get("identity") if isinstance(native, dict) else None
