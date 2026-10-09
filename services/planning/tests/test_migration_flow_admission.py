@@ -27,6 +27,7 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
             "source_intent_sha256": "b" * 64,
             "destination_generation_id": generation,
             "native_controls_sha256": "c" * 64,
+            "omissions": [],
             "selections": [{
                 "source_flow_id": "d" * 64,
                 "rule_native_ref": "neutron-rule-1",
@@ -48,6 +49,8 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
         "selections_sha256": digest(saved["payload"]["selections"]),
         "native_controls_sha256": "c" * 64,
         "destination_generation_id": generation,
+        "omissions_sha256": digest([]),
+        "omissions_approved": False, "omission_approver_id": None,
         "platform": "openstack", "level": "E4",
         "decision": "accepted", "native_write_authorized": False,
         "observed_at": now, "expires_at": now + 30,
