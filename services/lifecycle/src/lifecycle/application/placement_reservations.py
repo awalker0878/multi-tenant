@@ -70,6 +70,16 @@ class PlacementReservations:
             ):
                 raise Held("placement_physical_identity_unverified")
             values = vector(allocation["vector"])
+            # When a request declares class-specific usage, the entire
+            # corresponding aggregate must be accounted for. Otherwise a
+            # caller could omit a storage class or IPv6 address debit.
+            for aggregate, prefix in (
+                ("storage_gib", "storage_gib:"),
+                ("addresses", "addresses:"),
+            ):
+                classified = [v for k, v in values.items() if k.startswith(prefix)]
+                if classified and sum(classified) != values[aggregate]:
+                    raise Held("placement_vector_class_totals_inconsistent")
             total = demand.setdefault(identity, {k: 0 for k in values})
             for kind, value in values.items():
                 total[kind] = total.get(kind, 0) + value

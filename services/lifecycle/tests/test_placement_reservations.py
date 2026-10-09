@@ -209,3 +209,22 @@ def test_unused_class_limit_does_not_require_an_allocation_in_that_class(
     receipt = service.reserve(selected["scope"]["tenant_id"], selected)
     assert receipt["state"] == "reserved"
     assert service.check(selected["scope"]["tenant_id"], selected["plan_digest"])["state"] == "reserved"
+
+
+@pytest.mark.parametrize(
+    "class_key,amount",
+    [("addresses:private:ipv6", 2), ("storage_gib:standard", 41)],
+)
+def test_classified_allocation_must_reconcile_with_aggregate(
+    database: Postgres, class_key: str, amount: int,
+) -> None:
+    """A forged subclass vector cannot consume less aggregate headroom."""
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    selected["allocations"][0]["vector"][class_key] = amount
+    selected["placement_sha256"] = digest(selected["allocations"])
+    with pytest.raises(Held, match="placement_vector_class_totals_inconsistent"):
+        service.reserve(selected["scope"]["tenant_id"], selected)
+    with database.transaction() as tx:
+        assert tx.one("SELECT count(*) AS n FROM app.placement_reservations")["n"] == 0
