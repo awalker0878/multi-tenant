@@ -153,6 +153,30 @@
       "inventory-workers",
       "lifecycle-workers"
     ],
+    "contracts/schemas/capabilities/definitions-v1.json": [
+      "inventory",
+      "planning",
+      "lifecycle"
+    ],
+    "contracts/schemas/capabilities/migration-collection-manifest-v1.json": [
+      "inventory",
+      "planning",
+      "lifecycle"
+    ],
+    "contracts/schemas/capabilities/migration-feature-policy-v1.json": [
+      "inventory",
+      "planning",
+      "console"
+    ],
+    "contracts/schemas/capabilities/migration-field-crosswalk-v1.json": [
+      "inventory",
+      "planning",
+      "lifecycle"
+    ],
+    "contracts/schemas/capabilities/native-security-api-registry-v1.json": [
+      "inventory",
+      "planning"
+    ],
     "contracts/schemas/catalogue/intent-v1.json": [
       "catalogue",
       "planning"
@@ -195,6 +219,16 @@
     "contracts/schemas/planning/migration-support-v2.json": [
       "assurance",
       "planning"
+    ],
+    "contracts/schemas/planning/qualification-v2.1.json": [
+      "assurance",
+      "planning",
+      "lifecycle"
+    ],
+    "contracts/schemas/platforms/source-profile-v1.json": [
+      "inventory",
+      "inventory-workers",
+      "lifecycle-workers"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -535,6 +569,60 @@
       "depends_on": []
     },
     {
+      "path": "contracts/schemas/capabilities/definitions-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/capabilities/migration-collection-manifest-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/capabilities/migration-feature-policy-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning",
+        "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/capabilities/migration-field-crosswalk-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/capabilities/native-security-api-registry-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
       "path": "contracts/schemas/catalogue/intent-v1.json",
       "owner": "catalogue",
       "consumers": [
@@ -659,6 +747,28 @@
       "copies": [
         "services/planning/src/planning/infrastructure/inputs/migration-support-v2.json"
       ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/qualification-v2.1.json",
+      "owner": "assurance",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/platforms/source-profile-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "inventory-workers",
+        "lifecycle-workers"
+      ],
+      "copies": [],
       "source_manifest": null,
       "depends_on": []
     }
