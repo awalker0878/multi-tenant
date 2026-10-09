@@ -115,3 +115,36 @@ discovery exist; NSX/AHV effective security equivalence remains unqualified.
   records. Before releasing the branch, run unit, API contract, database,
   frontend and policy-effect regression tests against current vendor API
   fixtures and real pinned TLS installations.
+
+
+## Qualified cross-platform security and routed path extension
+
+The additional implementation contract is
+[Native security effective qualification](native-security-effective-qualification.md).
+A vendor-specific NSX or AHV dropdown is **never** populated solely from
+read-only E2 policy or Microseg group discovery. It is populated only from
+the current installed-destination snapshot when the signed independent
+`migration.effective_security` E4 capability binds the exact complete
+source/destination case set. Each case must prove the approved source
+application dependency against **both** independently observed native
+effective rule sets, dynamic group memberships, service expansions,
+deterministic category/priority order, all directed route hops, native NAT
+translations including port/VRF changes, reverse-path statefulness, allowed
+traffic and a separate forbidden-flow deny receipt. Any missing proof is a
+hold rather than a guessed firewall match.
+
+A composite `path:<sha256>` dropdown selector denotes an **observed and
+qualified path** across existing native route/NAT IDs; it is not a
+provisionable destination object or an instruction to create a route.
+At migration admission the source and target installed profile digests,
+source/target platform identities, migration method, signed E4 outcome and
+current published Catalogue revision must still match exactly. Lifecycle
+rereads Planning's execution-plan authority before native stage effects.
+The authority is not permanent: every native stage and cutover requires a
+fresh security check.
+
+**Commissioning is still required.** No native test agent, externally
+signed E4 probe campaign, or vendor-specific deployment has been tested in
+this branch. Unverified group expressions, wildcard references and AHV
+category/service definitions remain E2 only, with native write authority
+false. Do not merge until CI and deployed conformance gates pass.
