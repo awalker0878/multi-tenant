@@ -237,6 +237,16 @@ class MigrationFlows:
                 "required": dependency["strength"] == "required",
                 "destination_firewall_rule_ids": [verdict["effective_rule_native_ref"]],
                 "destination_route_ids": ["path:" + verdict["path_sha256"]],
+                "destination_path_details": [{
+                    "selector": "path:" + verdict["path_sha256"],
+                    "route_native_refs": verdict["native_route_refs"],
+                    "nat_native_refs": sorted({
+                        hop["nat"]["native_ref"]
+                        for path in case["document"]["paths"]
+                        for hop in path["hops"]
+                        if isinstance(hop.get("nat"), dict)
+                    }),
+                }],
                 "status": "choices_observed",
                 "native_write_authorized": False,
             })
