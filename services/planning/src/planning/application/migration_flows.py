@@ -14,6 +14,7 @@ from planning.domain.network_evidence import (
     network_checks,
 )
 from planning.domain.effective_security import qualify as qualify_effective_security
+from planning.domain.security_boundary import compare as compare_policy_boundary
 from planning.domain.operational_evidence import inventory_digest, snapshot
 from planning.domain.qualification import binding_digest, verified
 
@@ -161,7 +162,7 @@ class MigrationFlows:
         case_map: dict[str, dict[str, Any]] = {}
         for case in cases:
             if (not isinstance(case, dict)
-                    or set(case) != {"source_flow_id", "flow", "source_document", "document"}
+                    or set(case) != {"source_flow_id", "flow", "source_document", "document", "boundary"}
                     or not isinstance(case["document"], dict)):
                 raise Rejected("native_security_case_incomplete", 423)
             flow_id = case["source_flow_id"]
@@ -176,12 +177,27 @@ class MigrationFlows:
             source = {k: dependency[k] for k in ("from", "to", "protocol", "port")}
             flow_id = digest(source)
             case = case_map.get(flow_id)
+            if case is None and dependency["strength"] != "required":
+                # Optional intent can be omitted, but only through the
+                # independent reason-coded receiving-owner waiver workflow.
+                choices.append({
+                    "source_flow_id": flow_id, "source": source,
+                    "required": False, "destination_firewall_rule_ids": [],
+                    "destination_route_ids": [], "status": "held_optional",
+                    "native_write_authorized": False,
+                })
+                continue
             if (case is None or case["flow"] != source
                     or case["document"].get("platform") != platform
                     or not isinstance(case["source_document"], dict)
                     or case["source_document"].get("platform")
                        not in {"vmware", "ahv", "openstack"}):
                 raise Rejected("native_security_application_coverage_incomplete", 423)
+            boundary = compare_policy_boundary(
+                case["source_document"], case["document"], case["boundary"], now,
+            )
+            if boundary["status"] != "qualified":
+                raise Rejected("native_security_" + boundary["reason"], 423)
             source_verdict = qualify_effective_security(
                 case["source_document"], source, now,
             )
@@ -242,7 +258,10 @@ class MigrationFlows:
                     "groups": document["groups"],
                     "services": document["services"],
                     "rules": document["rules"],
-                    "path": document["path"],
+                    "paths": document["paths"],
+                    "path_set_sha256": document["path_set_sha256"],
+                    "workloads": document["workloads"],
+                    "boundary_scope": document["boundary_scope"],
                     "default_action": document["default_action"],
                     "topology_sha256": document["topology_sha256"],
                 })
