@@ -46,11 +46,11 @@ def authorize_read(d: Discovery, worker: Worker, body: dict[str, Any]) -> dict[s
         limit = (
             {"vmware": 8, "openstack": 101, "ahv": 4}[p.platform]
             if stream["kind"] == "source_profile"
-            2 + 5 * min(p.max_pages, 10) + 11
+            else 2 + 5 * min(p.max_pages, 10) + 11
             if p.platform == "ahv"
             else (50 if "nsx_policy" in stream else 51)
             if p.platform == "vmware"
-            else 7
+            else 8
         )
         if (
             stream["kind"] not in {"source_profile", "target_profile"}
