@@ -83,6 +83,16 @@ class PlacementReservations:
             total = demand.setdefault(identity, {k: 0 for k in values})
             for kind, value in values.items():
                 total[kind] = total.get(kind, 0) + value
+        # Reconcile again after aggregation; one unclassified workload must
+        # not piggyback on a different workload's correctly classified debit.
+        for requested in demand.values():
+            for aggregate, prefix in (
+                ("storage_gib", "storage_gib:"),
+                ("addresses", "addresses:"),
+            ):
+                classified = [v for k, v in requested.items() if k.startswith(prefix)]
+                if classified and sum(classified) != requested[aggregate]:
+                    raise Held("placement_vector_class_totals_inconsistent")
         with self.database.transaction() as tx:
             # One authority for physical pool identities; tenant IDs never partition this lock.
             tx.execute("SELECT pg_advisory_xact_lock(7503016)")

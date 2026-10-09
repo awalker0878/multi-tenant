@@ -249,3 +249,21 @@ def test_class_limit_owner_rejects_unclassified_demand(database: Postgres) -> No
     selected = request(source, 4)
     with pytest.raises(Held, match="placement_pool_class_dimension_missing"):
         service.reserve(selected["scope"]["tenant_id"], selected)
+
+
+def test_aggregated_vector_rejects_mixed_classified_and_unclassified_allocations(
+    database: Postgres,
+) -> None:
+    """One correctly classified VM cannot hide another VM's missing address class."""
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    first = selected["allocations"][0]
+    first["vector"]["addresses:private:ipv4"] = 1
+    second = deepcopy(first)
+    second["workload_id"] = str(uuid4())
+    del second["vector"]["addresses:private:ipv4"]
+    selected["allocations"].append(second)
+    selected["placement_sha256"] = digest(selected["allocations"])
+    with pytest.raises(Held, match="placement_vector_class_totals_inconsistent"):
+        service.reserve(selected["scope"]["tenant_id"], selected)
