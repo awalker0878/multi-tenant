@@ -37,7 +37,8 @@ def test_exact_independent_e3_e4_and_api_evidence_required() -> None:
     })
     for changed, expected in [
         ({**native, "native_qualified": False}, "independent_e3_route_qualification_required"),
-        ({**native, "operationally_accepted": False}, "independent_e4_receiving_acceptance_required"),
+        ({**native, "operationally_accepted": False},
+         "independent_e4_receiving_acceptance_required"),
         ({**native, "route_sha256": "other"}, "route_qualification_binding_changed"),
     ]:
         result = assess(route, changed, api)
