@@ -94,22 +94,24 @@ final class MigrationQualificationController
                         'denied_traffic', 'return_path', 'tenant_isolation',
                         'application_validation',
                     ];
+                    $flowFields = [
+                        'schema_version', 'assessment_id', 'source_revision_id',
+                        'source_intent_sha256', 'context_sha256', 'selections_sha256',
+                        'native_controls_sha256', 'destination_generation_id',
+                        'platform', 'observed_at', 'expires_at', 'level', 'decision',
+                        'checks', 'native_write_authorized',
+                    ];
                     if (is_array($candidateFlows)
-                        && array_keys($candidateFlows) === [
-                            'schema_version', 'assessment_id', 'source_revision_id',
-                            'source_intent_sha256', 'context_sha256', 'selections_sha256',
-                            'native_controls_sha256',
-                            'destination_generation_id', 'platform', 'observed_at',
-                            'expires_at', 'level', 'decision', 'checks',
-                            'native_write_authorized',
-                        ]
+                        && count($candidateFlows) === count($flowFields)
+                        && array_diff($flowFields, array_keys($candidateFlows)) === []
                         && ($candidateFlows['schema_version'] ?? null) === 1
                         && ($candidateFlows['level'] ?? null) === 'E4'
                         && ($candidateFlows['decision'] ?? null) === 'accepted'
                         && ($candidateFlows['native_write_authorized'] ?? null) === false
                         && ($candidateFlows['platform'] ?? null) === 'openstack'
                         && is_array($candidateFlows['checks'] ?? null)
-                        && array_keys($candidateFlows['checks']) === $requiredChecks
+                        && count($candidateFlows['checks']) === count($requiredChecks)
+                        && array_diff($requiredChecks, array_keys($candidateFlows['checks'])) === []
                         && count(array_filter($candidateFlows['checks'],
                             fn ($result): bool => $result !== 'passed')) === 0
                         && is_int($candidateFlows['observed_at'] ?? null)
