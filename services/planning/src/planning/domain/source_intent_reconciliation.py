@@ -5,6 +5,8 @@ from their respective authenticated owners. A browser-selected VM name is never
 an identity join. This read-only comparison cannot alter Catalogue or Inventory.
 """
 
+import hashlib
+import json
 from typing import Any
 
 from planning.domain.model import Rejected, digest
@@ -22,7 +24,9 @@ def reconcile(
         raise Rejected("source_intent_reconciliation_invalid", 422)
     # The digest must identify the exact immutable Catalogue document rather
     # than a caller-supplied label that merely matches the mapping receipts.
-    if digest(intent) != catalogue_digest:
+    if hashlib.sha256(json.dumps(
+        intent, sort_keys=True, ensure_ascii=False, separators=(",", ":")
+    ).replace("\u2028", "\\u2028").replace("\u2029", "\\u2029").encode()).hexdigest() != catalogue_digest:
         raise Rejected("source_intent_catalogue_document_changed", 423)
     desired = intent["workloads"]
     by_id = {w["id"]: w for w in desired}
