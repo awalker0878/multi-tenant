@@ -6,7 +6,7 @@ from inventory.application.discovery import Discovery
 from inventory.application.ports import Transaction
 from inventory.domain.discovery import Actor, Rejected, canonical, digest, identifier, shape
 from inventory.domain.migration import destination_input
-from inventory.domain.destination_security import source_security_ids
+from inventory.domain.destination_security import source_rule_choices, source_security_ids
 from inventory.domain.source_profile import source_identity
 from inventory.domain.workload import METHODS, OWNER_FIELDS, review_input
 
@@ -135,6 +135,8 @@ class WorkloadProfiles:
         required_security = source_security_ids(source["facts"])
         if required_security is None:
             holds.append("source_security_policy_observation_required")
+        elif required_security and source_rule_choices(source["facts"]) is None:
+            holds.append("source_security_rule_observation_required")
         elif required_security and target["facts"]["platform"] == "vmware":
             holds.append("destination_security_policy_catalog_required")
         elif required_security and target["facts"]["platform"] == "ahv":
