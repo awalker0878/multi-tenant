@@ -15,7 +15,7 @@ def uid() -> str:
     return str(uuid4())
 
 
-def test_seven_budgeted_reads_use_pinned_origin_and_scope() -> None:
+def test_ten_budgeted_reads_include_native_microseg_reference_catalogue() -> None:
     project, cluster, pc, storage, subnet, foreign, shared = [uid() for _ in range(7)]
     stream = {
         "kind": "target_profile",
@@ -78,7 +78,7 @@ def test_seven_budgeted_reads_use_pinned_origin_and_scope() -> None:
     ):
         result = collect_profile(policy, stream, None, lambda: budget.append(True))
     profile = result["profile"]
-    assert len(calls) == len(budget) == 7
+    assert len(calls) == len(budget) == 10
     assert profile["platform"] == "ahv" and profile["schema_version"] == 2
     assert {s["extId"] for s in profile["subnets"]} == {subnet, shared}
     assert profile["native_qualification"] == "not_established"
@@ -264,8 +264,8 @@ def test_ahv_policy_rule_lists_use_bounded_native_policy_rule_get(mode: str) -> 
             return
         result = collect_ahv({"native_scope": project}, stream, 100, lambda: None)
     observed = result["policies"][0]["rules"]
-    assert len(approvals) == 8
-    assert approvals[-1].startswith(f"/api/microseg/v4.3/config/policies/{policy_id}/rules?")
+    assert len(approvals) == 11
+    assert any(row.startswith(f"/api/microseg/v4.3/config/policies/{policy_id}/rules?") for row in approvals)
     assert result["native_qualification"] == "not_established"
     if mode == "empty":
         assert observed == []
