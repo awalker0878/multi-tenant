@@ -20,7 +20,7 @@ class MigrationSupport:
     ) -> None:
         self.scope, self.observations, self.clock = scope, observations, clock
         self.api_observations = api_observations
-        self.flow_require: Callable[[Actor, str], None] | None = None
+        self.flow_require: Callable[[Actor, str, dict[str, Any]], None] | None = None
 
     def api_status(
         self, actor: Actor, site: str, selected: dict[str, Any]
@@ -73,7 +73,7 @@ class MigrationSupport:
         # matrix passed: owner-approved application paths and negative tests
         # have an independent, expiring approval gate.
         if self.flow_require is not None:
-            self.flow_require(actor, site)
+            self.flow_require(actor, site, binding)
         selected = tranche(self.scope(actor, site))
         candidates = [
             row
