@@ -27,10 +27,25 @@ class AhvTransport(Protocol):
 
 
 class AhvHttp:
-    def __init__(self, endpoint: NativeEndpoint, read_only: bool = False) -> None:
+    def __init__(
+        self, endpoint: NativeEndpoint, read_only: bool = False,
+        api_versions: dict[str, str] | None = None,
+    ) -> None:
         if urlsplit(endpoint.base_url).path not in {"", "/"}:
             raise NativeHeld("invalid_ahv_origin")
         self.endpoint, self.read_only = endpoint, read_only
+        # Enrolled standalone account probes are read-only by default. Native
+        # plan execution passes an exact namespace inventory to this transport.
+        self.api_versions = api_versions
+        if api_versions is not None and (
+            not isinstance(api_versions, dict)
+            or set(api_versions) != {"vmm", "prism", "clustermgmt",
+                                     "networking", "microseg", "iam"}
+            or any(not isinstance(v, str)
+                   or re.fullmatch(r"v[0-9]+\\.[0-9]+", v) is None
+                   for v in api_versions.values())
+        ):
+            raise NativeHeld("ahv_qualified_namespace_manifest_invalid")
 
     def call(
         self,
@@ -40,6 +55,13 @@ class AhvHttp:
         headers: dict[str, str],
         boundary: Callable[[], None],
     ) -> dict[str, Any]:
+        if self.api_versions is not None:
+            match = re.fullmatch(
+                r"/api/(vmm|prism|clustermgmt|networking|microseg|iam)/"
+                r"(v[0-9]+\\.[0-9]+)/.*", path,
+            )
+            if match is None or self.api_versions[match[1]] != match[2]:
+                raise NativeHeld("ahv_native_request_version_unqualified")
         create = method == "POST" and path in COLLECTIONS.values()
         objects = any(re.fullmatch(re.escape(p) + "/" + UUID, path) for p in COLLECTIONS.values())
         reads = objects or re.fullmatch(
