@@ -206,7 +206,12 @@ def current_application_flow_proof(
         from planning.domain.security_boundary import compare as compare_policy_boundary
 
         selected = {row["source_flow_id"]: row for row in selected_bindings}
-        if len(selected) != len(selected_bindings):
+        omitted_ids = {
+            row["source_flow_id"] for row in payload.get("omissions", [])
+        }
+        if len(omitted_ids) != len(payload.get("omissions", [])):
+            raise Rejected("native_security_optional_omission_ambiguous", 423)
+        if len(selected) != len(selected_bindings) or set(selected) & omitted_ids:
             raise Rejected("native_security_flow_selection_ambiguous", 423)
         checked: set[str] = set()
         for case in security_cases:
@@ -217,7 +222,8 @@ def current_application_flow_proof(
             flow_id = case["source_flow_id"]
             source = case["flow"]
             if (
-                flow_id not in selected or flow_id in checked
+                (flow_id not in selected and flow_id not in omitted_ids)
+                or flow_id in checked
                 or not isinstance(source, dict)
                 or set(source) != {"from", "to", "protocol", "port"}
                 or digest(source) != flow_id
@@ -231,6 +237,13 @@ def current_application_flow_proof(
                     != binding["target"]["profile_sha256"]
             ):
                 raise Rejected("native_security_e4_case_mismatch", 423)
+            if flow_id in omitted_ids:
+                # Even when the E4 producer enumerates a source optional
+                # dependency, its native mapping is not authorized if the
+                # receiving owner explicitly omitted it. A distinct
+                # omission-approval receipt is checked below.
+                checked.add(flow_id)
+                continue
             boundary = compare_policy_boundary(
                 case["source_document"], case["document"], case["boundary"], now,
             )
@@ -251,7 +264,7 @@ def current_application_flow_proof(
             ):
                 raise Rejected("native_security_e4_effective_behavior_unqualified", 423)
             checked.add(flow_id)
-        if checked != set(selected):
+        if not set(selected) <= checked or checked - set(selected) - omitted_ids:
             raise Rejected("native_security_e4_flow_coverage_incomplete", 423)
     else:
         raise Rejected("unsupported_native_security_platform", 423)
