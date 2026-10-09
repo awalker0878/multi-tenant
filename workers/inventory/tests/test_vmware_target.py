@@ -118,6 +118,10 @@ def test_nsx_policy_read_is_separately_budgeted_and_unqualified(
         permit()
         return {
             "domain_id": domain, "api": "nsx-policy-v1", "policies": [],
+            "groups": [], "services": [],
+            "holds": ["nsx_effective_membership_unverified",
+                      "nsx_service_expansion_unverified",
+                      "nsx_policy_precedence_unqualified"],
             "semantic_qualification": "unresolved",
             "source_vm_attachment": "unverified",
             "native_write_authorized": False,
