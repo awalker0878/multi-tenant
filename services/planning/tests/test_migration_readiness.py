@@ -1,6 +1,6 @@
 """Resolved migration-readiness contract is fail-closed and deterministic."""
 
-from planning.domain.migration_readiness import resolve
+from planning.domain.migration_readiness import resolve, resolve_workload
 from planning.domain.model import digest
 
 
@@ -68,3 +68,51 @@ def test_earliest_per_operation_qualification_expiry_controls_route() -> None:
     preview = assess(route, native, api)
     assert preview["status"] == "held"
     assert "api_capability_evidence_expired_or_unbounded" in preview["holds"]
+
+
+def test_workload_coverage_requires_release_pinned_full_attribute_set() -> None:
+    route, native, api = fixture()
+    route_result = assess(route, native, api)
+    now = 100
+    reconciliation = {
+        "status": "matched", "holds": [], "expires_at": 180,
+        "native_write_authorized": False,
+    }
+    reconciliation["reconciliation_sha256"] = digest(reconciliation)
+    manifest = {
+        "release_sha256": route_result["release_sha256"],
+        "manifest_sha256": digest("manifest"),
+        "platforms": {
+            "vmware": {"source": ["src.vm"], "owner": ["owner.intent"]},
+            "ahv": {"target": ["tgt.vm"]},
+        },
+    }
+    scopes = []
+    for side, platform, installation, attribute in (
+        ("source", "vmware", "one", "src.vm"),
+        ("target", "ahv", "two", "tgt.vm"),
+        ("owner", "vmware", "one", "owner.intent"),
+    ):
+        coverage = {
+            "scope": side, "status": "complete", "holds": [],
+            "attributes": [{"attribute_id": attribute, "status": "observed"}],
+            "installation_id": installation,
+            "manifest_sha256": manifest["manifest_sha256"],
+            "expires_at": 160,
+            "evaluated_at": now,
+            "independent_e3_e4_qualification": False,
+            "native_write_authorized": False,
+        }
+        coverage["coverage_sha256"] = digest(coverage)
+        scopes.append(coverage)
+    assert resolve_workload(route_result, reconciliation, scopes, now,
+                            manifest)["status"] == "eligible"
+    assert resolve_workload(route_result, reconciliation, scopes, now,
+                            None)["status"] == "held"
+    altered = [dict(row) for row in scopes]
+    altered[0]["manifest_sha256"] = digest("other")
+    altered[0]["coverage_sha256"] = digest({
+        k: v for k, v in altered[0].items() if k != "coverage_sha256"
+    })
+    result = resolve_workload(route_result, reconciliation, altered, now, manifest)
+    assert "migration_collection_manifest_attributes_changed" in result["holds"]
