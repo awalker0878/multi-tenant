@@ -355,6 +355,19 @@ def check_consumer_registry():
         raise ValueError("Active contract registry does not cover every declared consumer")
     if len(names) != len(set(names)):
         raise ValueError("Duplicate active contract release")
+    # The deployed broker definitions are all implemented products, not optional
+    # self-declared inventory entries. Their schema dependencies must be active.
+    # This detects removal of an event spec from both editable registry maps.
+    for event_api in sorted((ROOT / "contracts/asyncapi").glob("*.yaml")):
+        api_path = str(event_api.relative_to(ROOT))
+        if api_path not in names:
+            raise ValueError(f"Deployed AsyncAPI missing from active releases: {api_path}")
+        doc = yaml.safe_load(event_api.read_text(encoding="utf-8"))
+        for message in doc.get("components", {}).get("messages", {}).values():
+            reference = message["payload"]["schema"]["$ref"]
+            schema_path = str((event_api.parent / reference).resolve().relative_to(ROOT.resolve()))
+            if schema_path not in names:
+                raise ValueError(f"Event payload schema missing from active releases: {schema_path}")
     for entry in releases:
         path = entry["path"]
         owner = entry["owner"]
