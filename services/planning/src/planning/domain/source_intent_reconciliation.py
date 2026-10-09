@@ -36,7 +36,10 @@ def extended_intent_fields(
             status = "matched"
         else:
             status = "drifted"
-        if status != "matched" and isinstance(semantic_cases, list):
+        # An exact independently measured E4 observation can prove an
+        # otherwise unobservable guest OS, image, key or hardening property.
+        # Raw hypervisor guest labels can never promote this comparison.
+        if isinstance(semantic_cases, list):
             matches = [
                 case for case in semantic_cases
                 if isinstance(case, dict)
@@ -45,28 +48,39 @@ def extended_intent_fields(
             ]
             if len(matches) == 1:
                 case = matches[0]
-                if (
+                base_valid = (
                     case.get("source_profile_sha256") == source_profile_sha256
                     and case.get("intent_field_sha256") == digest(required)
-                    and case.get("observed_field_sha256") == digest(actual)
                     and case.get("level") == "E4"
                     and case.get("decision") == "accepted"
                     and case.get("revoked") is False
-                    and case.get("disposition") in
-                    ({"qualified_transformation"} if mandatory
-                     else {"qualified_transformation", "approved_omission"})
-                    and all(isinstance(case.get(k), str)
-                            and len(case[k]) == 64
+                    and all(isinstance(case.get(k), str) and len(case[k]) == 64
                             for k in ("evidence_sha256", "transformation_plan_sha256",
                                       "independent_acceptance_sha256"))
                     and type(case.get("observed_at")) is int
-                    and 0 <= now - case["observed_at"] <= 30
+                    and 0 <= now - case["observed_at"] < 30
                     and type(case.get("expires_at")) is int
                     and case["expires_at"] > now
-                ):
-                    status = case["disposition"]
-                    proof_age = now - case["observed_at"]
-                    evidence_source = "independent_e4"
+                )
+                if base_valid:
+                    if case.get("disposition") == "verified_observation":
+                        value = case.get("observed_value")
+                        if (value is not None
+                                and case.get("observed_field_sha256") == digest(value)):
+                            actual = value
+                            status = (
+                                "matched" if type(actual) is type(required)
+                                and actual == required else "drifted"
+                            )
+                            evidence_source = "independent_e4"
+                            proof_age = now - case["observed_at"]
+                    elif (case.get("observed_field_sha256") == digest(actual)
+                          and case.get("disposition") in
+                          ({"qualified_transformation"} if mandatory
+                           else {"qualified_transformation", "approved_omission"})):
+                        status = case["disposition"]
+                        proof_age = now - case["observed_at"]
+                        evidence_source = "independent_e4"
         next_action = (
             "none" if status == "matched"
             else "review_independently_qualified_transformation"
