@@ -239,6 +239,24 @@
             "native_controls_sha256": {
               "type": "string",
               "pattern": "^[a-f0-9]{64}$"
+            },
+            "omissions_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "omissions_approved": {
+              "type": "boolean"
+            },
+            "omission_approver_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           "required": [
@@ -256,7 +274,10 @@
             "decision",
             "checks",
             "native_write_authorized",
-            "native_controls_sha256"
+            "native_controls_sha256",
+            "omissions_sha256",
+            "omissions_approved",
+            "omission_approver_id"
           ]
         },
         {
