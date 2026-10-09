@@ -311,6 +311,7 @@ class WorkloadProfiles:
         if len(records) > 100:
             raise Rejected("source_association_workspace_bound", 423)
         result: list[dict[str, Any]] = []
+        seen_logical: set[str] = set()
         authority_cache: dict[str, bool] = {}
         for record in records:
             body = record["payload"]
@@ -319,6 +320,14 @@ class WorkloadProfiles:
                     or link.get("application_id") != application
                     or link.get("environment_id") != environment):
                 continue
+            logical_id = link.get("workload_id")
+            if not isinstance(logical_id, str):
+                raise Rejected("source_association_logical_identity_required", 423)
+            if logical_id in seen_logical:
+                # Latest confirmed review supersedes historical generations;
+                # never reconcile the same Catalogue VM twice.
+                continue
+            seen_logical.add(logical_id)
             source = self.profile(tx, actor, body["source_profile_id"], authority_cache)
             selected = self.review(tx, actor, body["source_profile_id"], authority_cache)
             current = bool(
