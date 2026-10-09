@@ -433,28 +433,66 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
       </div>
       <section class="rounded border border-slate-300 p-4" aria-labelledby="catalogue-link-title">
         <h2 id="catalogue-link-title" class="text-lg font-semibold">Catalogue intent ↔ native VM association</h2>
-        <p class="my-2 text-sm">Enter the existing, published Catalogue application, environment, revision and logical workload identifiers. The native disk/NIC keys below come from Inventory; only their logical device IDs are entered. Planning independently checks the current Catalogue document, source generation, one-to-one mapping and E4 application dependencies. Saving identifiers alone never establishes readiness.</p>
-        <button v-if="!form.review.catalogue_binding" type="button" class="secondary" :disabled="!source" @click="beginCatalogueAssociation">Associate with published Catalogue workload</button>
-        <template v-else>
-          <div class="grid gap-3 md:grid-cols-2">
-            <label>Application UUID<input v-model.trim="form.review.catalogue_binding.application_id" required /></label>
-            <label>Environment UUID<input v-model.trim="form.review.catalogue_binding.environment_id" required /></label>
-            <label>Current Catalogue revision UUID<input v-model.trim="form.review.catalogue_binding.revision_id" required /></label>
-            <label>Canonical intent SHA-256<input v-model.trim="form.review.catalogue_binding.intent_sha256" required pattern="[a-f0-9]{64}" /></label>
-            <label>Logical workload UUID<input v-model.trim="form.review.catalogue_binding.workload_id" required /></label>
-          </div>
-          <h3 class="mt-3 font-medium">Map each Catalogue disk to its observed native key</h3>
+        <p class="my-2 text-sm">Choose only the current Catalogue application, deployment environment and logical workload. Revisions, hashes, workload and device IDs come from the authorized Catalogue response; native device keys come from Inventory. Any change invalidates the draft association.</p>
+        <p v-if="catalogueError" role="alert">{{ catalogueError }}</p>
+        <p v-if="catalogueBusy" role="status">Refreshing authorized Catalogue inventory…</p>
+        <div class="grid gap-3 md:grid-cols-3">
+          <label>Application
+            <select :value="catalogueApplication" :disabled="blocked || catalogueBusy" @change="chooseCatalogueApplication(($event.target as HTMLSelectElement).value)">
+              <option value="">Select authorized application</option>
+              <option v-for="a in catalogueApplications" :key="a.id" :value="a.id">{{ a.name }} · {{ a.id }}</option>
+            </select>
+          </label>
+          <label>Current deployment environment
+            <select :value="catalogueEnvironment" :disabled="blocked || catalogueBusy || !catalogueApplication" @change="chooseCatalogueEnvironment(($event.target as HTMLSelectElement).value)">
+              <option value="">Select current environment</option>
+              <option v-for="e in catalogueEnvironments" :key="e.id" :value="e.id">{{ e.id }}</option>
+            </select>
+          </label>
+          <label>Logical Catalogue workload
+            <select :value="form.review.catalogue_binding?.workload_id ?? ''" :disabled="blocked || catalogueBusy || !catalogueCurrent || !source" @change="chooseCatalogueWorkload(($event.target as HTMLSelectElement).value)">
+              <option value="">Select published workload</option>
+              <option v-for="w in catalogueCurrent?.workloads ?? []" :key="w.id" :value="w.id">{{ w.name }}</option>
+            </select>
+          </label>
+        </div>
+        <template v-if="form.review.catalogue_binding && catalogueSelectedWorkload">
+          <p class="mt-2 text-xs break-all">Current revision {{ form.review.catalogue_binding.revision_id }} · Intent {{ form.review.catalogue_binding.intent_sha256 }}</p>
+          <h3 class="mt-3 font-medium">Match each observed native disk to its Catalogue logical disk</h3>
           <div v-for="(m, index) in form.review.catalogue_binding.disk_mappings" :key="'disk:'+m.native_key" class="my-2 flex flex-wrap items-center gap-3">
             <span>Native disk {{ m.native_key }}</span>
-            <label>Catalogue disk UUID<input v-model.trim="form.review.catalogue_binding.disk_mappings[index].logical_device_id" required /></label>
+            <label>Catalogue disk
+              <select v-model="form.review.catalogue_binding.disk_mappings[index].logical_device_id" :disabled="blocked">
+                <option value="">Select published logical disk</option>
+                <option v-for="d in catalogueSelectedWorkload.disks" :key="d.id" :value="d.id">Disk {{ d.order }} · {{ d.dataset_id === null ? 'Uncatalogued dataset (E4 attestation required)' : 'Dataset '+d.dataset_id }}</option>
+              </select>
+            </label>
           </div>
-          <h3 class="mt-3 font-medium">Map each Catalogue NIC to its observed native key</h3>
+          <h3 class="mt-3 font-medium">Match each observed native NIC to its Catalogue logical NIC</h3>
           <div v-for="(m, index) in form.review.catalogue_binding.nic_mappings" :key="'nic:'+m.native_key" class="my-2 flex flex-wrap items-center gap-3">
             <span>Native NIC {{ m.native_key }}</span>
-            <label>Catalogue NIC UUID<input v-model.trim="form.review.catalogue_binding.nic_mappings[index].logical_device_id" required /></label>
+            <label>Catalogue NIC
+              <select v-model="form.review.catalogue_binding.nic_mappings[index].logical_device_id" :disabled="blocked">
+                <option value="">Select published logical NIC</option>
+                <option v-for="n in catalogueSelectedWorkload.nics" :key="n.id" :value="n.id">NIC {{ n.order }}</option>
+              </select>
+            </label>
           </div>
-          <p v-if="!catalogueAssociationComplete" role="alert" class="text-amber-800">Complete every scoped UUID and the one-to-one device maps before saving.</p>
-          <button type="button" class="secondary" @click="delete form.review.catalogue_binding">Unlink this draft (migration admission will remain held)</button>
+          <div v-for="disk in catalogueSelectedWorkload.disks.filter(d => d.dataset_id === null)" :key="'disposition:'+disk.id" class="mt-3 border-t pt-2">
+            <strong>Uncatalogued disk {{ disk.order }}</strong>
+            <p class="text-sm">A null Catalogue dataset ID does not permit deleting or excluding this disk. Preserve the disk and provide exact owner-impact references for independent E4 verification.</p>
+            <button type="button" class="secondary" :disabled="blocked || !form.review.catalogue_binding.disk_mappings.some(m => m.logical_device_id === disk.id)" @click="attestUncataloguedDisk(disk.id)">Add owner attestation</button>
+            <div v-if="form.review.catalogue_binding.disk_dispositions?.some(d => d.logical_device_id === disk.id)" class="mt-2 grid gap-3 md:grid-cols-2">
+              <label>Owner approval evidence SHA-256
+                <input v-model.trim="form.review.catalogue_binding.disk_dispositions![form.review.catalogue_binding.disk_dispositions!.findIndex(d => d.logical_device_id === disk.id)].owner_approval_sha256" pattern="[a-f0-9]{64}" required />
+              </label>
+              <label>Measured migration impact SHA-256
+                <input v-model.trim="form.review.catalogue_binding.disk_dispositions![form.review.catalogue_binding.disk_dispositions!.findIndex(d => d.logical_device_id === disk.id)].impact_sha256" pattern="[a-f0-9]{64}" required />
+              </label>
+            </div>
+          </div>
+          <p v-if="!catalogueAssociationComplete" role="alert" class="text-amber-800">Every current logical disk and NIC must be mapped one-to-one; uncatalogued disks also require independently verified E4 evidence.</p>
+          <button type="button" class="secondary" :disabled="blocked" @click="delete form.review.catalogue_binding">Clear draft association</button>
         </template>
       </section>
       <label>Explicit migration method<select v-model="form.review.method" required><option value="">Select a method</option><option v-for="method in (ahv || vmware ? ['VM_COLD_EXPORT'] : workspace.methods)" :key="method" :value="method">{{ method.replaceAll('_', ' ') }}</option></select></label>
