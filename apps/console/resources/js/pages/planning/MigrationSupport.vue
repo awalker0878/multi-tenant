@@ -161,7 +161,7 @@ onMounted(() => { void refreshFlowChoices(); });
       <p v-if="!flowState" class="mt-2">An approved application migration assessment and fresh native network observations are required before mapping.</p>
       <template v-else>
         <p class="mt-2" :role="flowState.status === 'eligible' ? 'status' : 'alert'">
-          {{ flowState.status === 'eligible' ? 'Current flow selections passed the independent evidence gate.' :
+          {{ flowState.status === 'eligible' ? 'Current flow selections passed review-time checks. Fresh independent E4 proof is still required before admission and at cutover.' :
              flowState.status === 'invalidated' ? 'Previously saved flow selections are invalidated by changed source intent or destination observations.' :
              'Application flow selections or independent network/isolation evidence remain held.' }}
         </p>
