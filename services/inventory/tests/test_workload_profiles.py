@@ -292,6 +292,8 @@ def test_confirmed_review_can_pin_exact_catalogue_logical_workload() -> None:
     binding = {
         "application_id": uid(), "environment_id": uid(),
         "revision_id": uid(), "workload_id": uid(), "intent_sha256": "1" * 64,
+        "disk_mappings": [{"logical_device_id": uid(), "native_key": 2000}],
+        "nic_mappings": [],
     }
     body["catalogue_binding"] = binding
     review_input(body, profile(1000))
@@ -301,3 +303,20 @@ def test_confirmed_review_can_pin_exact_catalogue_logical_workload() -> None:
     body["catalogue_binding"] = {**binding, "untrusted": True}
     with pytest.raises(Rejected, match="invalid_shape"):
         review_input(body, profile(1000))
+
+
+def test_catalogue_mapping_cannot_skip_or_duplicate_native_devices() -> None:
+    body = review(uid(), uid())
+    binding = {
+        "application_id": uid(), "environment_id": uid(),
+        "revision_id": uid(), "workload_id": uid(), "intent_sha256": "2" * 64,
+        "disk_mappings": [{"logical_device_id": uid(), "native_key": 2000}],
+        "nic_mappings": [],
+    }
+    body["catalogue_binding"] = binding
+    review_input(body, profile(1000))
+    for bad in ([], [{"logical_device_id": uid(), "native_key": 2001}],
+                binding["disk_mappings"] * 2):
+        body["catalogue_binding"] = {**binding, "disk_mappings": bad}
+        with pytest.raises(Rejected, match="catalogue_native_device"):
+            review_input(body, profile(1000))
