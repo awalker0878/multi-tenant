@@ -8,6 +8,7 @@ import uvicorn
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from planning.application.migration_plans import MigrationPlans
+from planning.application.migration_flows import MigrationFlows
 from planning.application.migration_support import MigrationSupport
 from planning.application.native_plans import NativePlans
 from planning.application.planning import Planning
@@ -53,11 +54,13 @@ class PlanningRouter:
         self.planning = PlanningApp(
             Planning(Postgres(), OwnerSources(), clock, validation), GovernanceAuthority()
         )
+        self.flows = MigrationFlows(self.planning.planning)
+        self.support.flow_require = self.flows.require
         self.foundation = FoundationApp(database_ready)
         self.invalidations = QualificationInvalidationApp(QualificationInvalidations(Postgres()))
         migrations = MigrationPlans(self.planning.planning, validation.migration, visible_recipes)
         self.migration = MigrationPreparationApp(
-            self.planning.authority, prepare_migration, migrations, self.support
+            self.planning.authority, prepare_migration, migrations, self.support, self.flows
         )
         native = NativePlans(self.planning.planning, validation.native)
         self.native = NativePlansApp(self.planning.authority, native)
@@ -75,6 +78,8 @@ class PlanningRouter:
                 "/migration-plans",
                 "/migration-plan-options",
                 "/migration-support",
+                "/migration-flow-choices",
+                "/migration-flow-selections",
             )
         ):
             await self.migration(scope, receive, send)
