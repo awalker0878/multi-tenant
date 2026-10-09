@@ -12,7 +12,7 @@ def values() -> tuple[dict, list, list]:
     workload = {
         "id": "workload",
         "compute": {"vcpus": 2, "memory_mib": 4096},
-        "guest": {"firmware": "uefi"},
+        "guest": {"firmware": "uefi", "secure_boot": True},
         "disks": [{"order": 0, "size_gib": 10}],
         "nics": [{"order": 0}],
     }
@@ -27,7 +27,10 @@ def values() -> tuple[dict, list, list]:
                "generation_id": "generation", "profile_sha256": digest("profile"),
                "installation_id": "installation", "native_scope": "project",
                "current": True, "expires_at": 200, "holds": [],
+               "owner_dataset_coverage_sha256": digest([]),
+               "owner_dataset_coverage_current": True,
                "facts": {"cpu": 2, "memory_mb": 4096, "firmware": "efi",
+                         "secure_boot": True,
                          "disks": [{"key": 0, "capacity_bytes": 10 * 1024**3}],
                          "nics": [{"key": 0}], "native": {"identity": {}}}}
     return intent, [link], [profile]
@@ -46,13 +49,15 @@ def test_exact_current_catalogue_to_native_join() -> None:
 def test_mutation_missing_link_and_storage_or_nic_drift_are_held() -> None:
     intent, links, profiles = values()
     assert reconcile(intent, digest(intent), [], [], 100)["status"] == "held"
-    for changed in ("generation", "disk", "nic", "compute", "firmware", "expired"):
+    for changed in ("generation", "disk", "nic", "compute", "firmware", "secure_boot", "datasets", "expired"):
         one, two = deepcopy(links), deepcopy(profiles)
         if changed == "generation": two[0]["generation_id"] = "new"
         if changed == "disk": two[0]["facts"]["disks"][0]["capacity_bytes"] -= 1024
         if changed == "nic": two[0]["facts"]["nics"] = []
         if changed == "compute": two[0]["facts"]["cpu"] = 4
         if changed == "firmware": two[0]["facts"]["firmware"] = None
+        if changed == "secure_boot": two[0]["facts"]["secure_boot"] = False
+        if changed == "datasets": two[0]["owner_dataset_coverage_current"] = False
         if changed == "expired": one[0]["expires_at"] = 90
         assert reconcile(intent, digest(intent), one, two, 100)["status"] == "held"
 
