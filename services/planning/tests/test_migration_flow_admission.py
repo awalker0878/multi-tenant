@@ -6,6 +6,7 @@ import pytest
 
 from planning.domain.model import Actor, Rejected, digest
 from planning.infrastructure import migration_support
+from test_effective_security import document, boundary, REQUIRED
 
 
 def actor():
@@ -19,6 +20,11 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
     current_actor = actor()
     site = str(uuid4())
     source_revision, assessment, generation = [str(uuid4()) for _ in range(3)]
+    source_document = document("vmware", "source")
+    target_document = document("openstack", "destination")
+    rule_ref = "neutron-ingress"
+    route_ref = "path:" + target_document["path_set_sha256"]
+    flow_id = digest(REQUIRED)
     saved = {
         "reviewed_by_actor": str(uuid4()),
         "context_sha256": "a" * 64,
@@ -31,9 +37,9 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
             "native_controls_sha256": "c" * 64,
             "omissions": [],
             "selections": [{
-                "source_flow_id": "d" * 64,
-                "rule_native_ref": "neutron-rule-1",
-                "route_native_ref": "neutron-route-1",
+                "source_flow_id": flow_id,
+                "rule_native_ref": rule_ref,
+                "route_native_ref": route_ref,
             }],
         },
     }
@@ -62,7 +68,11 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
         "source_profile_sha256": "1" * 64,
         "target_profile_sha256": "2" * 64,
         "migration_method": "cold_export",
-        "security_cases": [],
+        "security_cases": [{
+            "source_flow_id": flow_id, "flow": REQUIRED,
+            "source_document": source_document,
+            "document": target_document, "boundary": boundary(),
+        }],
         "level": "E4",
         "decision": "accepted", "native_write_authorized": False,
         "observed_at": now, "expires_at": now + 30,
