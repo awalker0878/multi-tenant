@@ -98,7 +98,7 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
     # Synthetic E2 fixture only: production reads this from Planning after
     # current Catalogue, Inventory and independent Assurance checks.
     receipt = {
-        "schema_version": 1, "kind": "migration_route_readiness",
+        "schema_version": 2, "kind": "migration_workload_readiness",
         "scope": {
             "tenant_id": scope["tenant_id"],
             "application_id": scope["resource_id"],
@@ -127,6 +127,44 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
         "expires_at": 1800, "workload_admission_authorized": False,
         "native_write_authorized": False,
     }
+    source_generation = str(uuid4())
+    source_tuple = p["migration"]["source"]["tuple_sha256"]
+    target_tuple = p["migration"]["target"]["tuple_sha256"]
+    reconciliation = {
+        "schema_version": 1, "catalogue_revision_id": str(uuid4()),
+        "catalogue_sha256": digest("intent"),
+        "source_identity_sha256": digest("native-identity"),
+        "source_generation_id": source_generation,
+        "source_profile_sha256": p["migration"]["source"]["profile_sha256"],
+        "source_observation_sha256": digest("source-observation"),
+        "native_review_sha256": p["migration"]["review"]["digest"],
+        "status": "matched", "holds": [], "workloads": [{
+            "workload_id": str(uuid4()), "status": "matched", "holds": [],
+            "source_identity_sha256": digest("native-identity"),
+        }], "expires_at": 1800, "native_write_authorized": False,
+    }
+    reconciliation["reconciliation_sha256"] = digest(reconciliation)
+    coverages = []
+    for side, installation, tuple_sha, generation in (
+        ("source", "source-installation", source_tuple, source_generation),
+        ("target", "target-installation", target_tuple, str(uuid4())),
+        ("owner", "source-installation", source_tuple, source_generation),
+    ):
+        coverage = {
+            "schema_version": 1, "platform": "vmware", "scope": side,
+            "installation_id": installation, "generation_id": generation,
+            "installed_tuple_sha256": tuple_sha,
+            "manifest_sha256": digest("field-manifest"),
+            "evaluated_at": 1000, "status": "complete", "holds": [],
+            "attributes": [{"attribute_id": "identity", "status": "observed",
+                            "reason": "native", "severity": "critical"}],
+            "independent_e3_e4_qualification": False,
+            "native_write_authorized": False,
+        }
+        coverage["coverage_sha256"] = digest(coverage)
+        coverages.append(coverage)
+    receipt["workload_reconciliation"] = reconciliation
+    receipt["collection_coverages"] = coverages
     receipt["readiness_sha256"] = digest(receipt)
     record = {
         "binding": binding, "content": content, "invalidated": False,
