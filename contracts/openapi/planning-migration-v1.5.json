@@ -229,6 +229,16 @@
           }
         },
         "responses": {
+          "201": {
+            "description": "Immutable complete plan proposal. Independent approval and native admission remain required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Denied, stale or unavailable. No execution authority and no cached result.",
             "content": {
@@ -309,8 +319,8 @@
               }
             }
           },
-          "503": {
-            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "423": {
+            "description": "Current commissioning, qualified base plan or migration inputs are held",
             "content": {
               "application/json": {
                 "schema": {
@@ -319,18 +329,8 @@
               }
             }
           },
-          "201": {
-            "description": "Immutable complete plan proposal. Independent approval and native admission remain required.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Receipt"
-                }
-              }
-            }
-          },
-          "423": {
-            "description": "Current commissioning, qualified base plan or migration inputs are held",
+          "503": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
             "content": {
               "application/json": {
                 "schema": {
@@ -485,8 +485,8 @@
               }
             }
           },
-          "503": {
-            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "423": {
+            "description": "Current commissioning, qualified base plan or migration inputs are held",
             "content": {
               "application/json": {
                 "schema": {
@@ -495,8 +495,8 @@
               }
             }
           },
-          "423": {
-            "description": "Current commissioning, qualified base plan or migration inputs are held",
+          "503": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
             "content": {
               "application/json": {
                 "schema": {
@@ -662,8 +662,8 @@
               }
             }
           },
-          "503": {
-            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
+          "423": {
+            "description": "Current commissioning, qualified base plan or migration inputs are held",
             "content": {
               "application/json": {
                 "schema": {
@@ -672,8 +672,8 @@
               }
             }
           },
-          "423": {
-            "description": "Current commissioning, qualified base plan or migration inputs are held",
+          "503": {
+            "description": "Denied, stale or unavailable. No execution authority and no cached result.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1636,6 +1636,201 @@
           "tranche_sha256",
           "release_sha256",
           "directions",
+          "native_write_authorized"
+        ]
+      },
+      "MigrationFlowChoices": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "context_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "choices": {
+            "type": "array",
+            "maxItems": 512,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_flow_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "source": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "from": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "to": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "protocol": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "port": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 65535
+                    }
+                  },
+                  "required": [
+                    "from",
+                    "to",
+                    "protocol",
+                    "port"
+                  ]
+                },
+                "required": {
+                  "type": "boolean"
+                },
+                "destination_firewall_rule_ids": {
+                  "type": "array",
+                  "maxItems": 512,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "destination_route_ids": {
+                  "type": "array",
+                  "maxItems": 512,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "status": {
+                  "enum": [
+                    "choices_observed",
+                    "held_unobserved"
+                  ]
+                },
+                "native_write_authorized": {
+                  "const": false
+                }
+              },
+              "required": [
+                "source_flow_id",
+                "source",
+                "required",
+                "destination_firewall_rule_ids",
+                "destination_route_ids",
+                "status",
+                "native_write_authorized"
+              ]
+            }
+          },
+          "selections": {
+            "type": "array",
+            "maxItems": 512,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_flow_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "rule_native_ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "route_native_ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "source_flow_id",
+                "rule_native_ref",
+                "route_native_ref"
+              ]
+            }
+          },
+          "holds": {
+            "type": "array",
+            "maxItems": 512,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "status": {
+            "enum": [
+              "eligible",
+              "held",
+              "invalidated"
+            ]
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        },
+        "required": [
+          "context_sha256",
+          "revision",
+          "expires_at",
+          "choices",
+          "selections",
+          "holds",
+          "status",
+          "native_write_authorized"
+        ]
+      },
+      "MigrationFlowReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "enum": [
+              "eligible",
+              "held"
+            ]
+          },
+          "holds": {
+            "type": "array",
+            "maxItems": 512,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "native_write_authorized": {
+            "const": false
+          }
+        },
+        "required": [
+          "revision",
+          "status",
+          "holds",
           "native_write_authorized"
         ]
       }
