@@ -154,7 +154,7 @@ def test_full_catalogue_requires_semantic_dispositions_beyond_vm_sizing() -> Non
         result = reconcile(intent, digest(intent), links, profiles, 100)
         assert result["status"] == "held"
         row = result["workloads"][0]
-        assert any(d["field"] == path and d["disposition"] == "unknown"
+        assert any(d["field"] == path and d["disposition"] == "unobserved"
                    for d in row["field_dispositions"])
         assert any(path in hold for hold in row["holds"])
 
@@ -167,4 +167,4 @@ def test_optional_placement_does_not_falsely_block_required_sizing() -> None:
     links[0]["catalogue_digest"] = digest(intent)
     result = reconcile(intent, digest(intent), links, profiles, 100)
     assert result["status"] == "matched"
-    assert result["workloads"][0]["field_dispositions"][0]["disposition"] == "unknown"
+    assert result["workloads"][0]["field_dispositions"][0]["disposition"] == "unobserved"
