@@ -95,7 +95,43 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
     }
     binding["digest"] = digest(binding)
     assignment["plan_digest"] = binding["digest"]
-    record = {"binding": binding, "content": content, "invalidated": False}
+    # Synthetic E2 fixture only: production reads this from Planning after
+    # current Catalogue, Inventory and independent Assurance checks.
+    receipt = {
+        "schema_version": 1, "kind": "migration_route_readiness",
+        "scope": {
+            "tenant_id": scope["tenant_id"],
+            "application_id": scope["resource_id"],
+            "environment_id": scope["environment"],
+            "site_id": scope["site_id"],
+        },
+        "route_sha256": content["migration_campaign"]["route_sha256"],
+        "tranche_sha256": digest("tranche"), "release_sha256": digest("release"),
+        "source": {
+            "platform": "vmware", "installation_id": "source-installation",
+            "profile_sha256": p["migration"]["source"]["profile_sha256"],
+            "versions": {"api": "8.0"},
+        },
+        "target": {
+            "platform": "openstack", "installation_id": "target-installation",
+            "profile_sha256": p["migration"]["target"]["profile_sha256"],
+            "versions": {"api": "2.1"},
+        },
+        "method": "cold_export",
+        "api_compatibility": {
+            "status": "eligible", "operationally_eligible": True,
+            "cases": [{"status": "eligible", "omission_accepted": False}],
+        },
+        "native_e3_qualified": True, "receiving_e4_accepted": True,
+        "status": "eligible", "holds": [], "evaluated_at": 1000,
+        "expires_at": 1800, "workload_admission_authorized": False,
+        "native_write_authorized": False,
+    }
+    receipt["readiness_sha256"] = digest(receipt)
+    record = {
+        "binding": binding, "content": content, "invalidated": False,
+        "migration_readiness": receipt,
+    }
     approval = {
         "allowed": True,
         "tenant_id": scope["tenant_id"],
