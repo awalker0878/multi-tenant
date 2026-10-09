@@ -112,15 +112,40 @@ def evaluate(
         mapped["owner_dataset_coverage_sha256"] = (
             digest(intent["datasets"]) if mapped["owner_dataset_coverage_current"] else None
         )
+        # A passed allowed/denied traffic test for the selected route is NOT
+        # proof of every VM's NIC placement. The independent E4 producer must
+        # supply one current native-interface/path receipt per logical VM.
+        cases = flow.get("workload_interface_cases") if isinstance(flow, dict) else None
+        match = (
+            [case for case in cases if isinstance(case, dict)
+             and case.get("workload_id") == wid]
+            if isinstance(cases, list) and len(cases) <= 100 else []
+        )
+        case = match[0] if len(match) == 1 else {}
         qualified_security = (
             isinstance(flow, dict)
             and flow.get("level") == "E4"
             and flow.get("decision") == "accepted"
             and flow.get("revoked") is False
             and flow.get("intent_sha256") == catalogue["intent_sha256"]
-            and flow.get("source_profile_sha256") == observed["profile_sha256"]
             and flow.get("target_profile_sha256") == selected["target"]["profile_sha256"]
             and type(flow.get("expires_at")) is int and flow["expires_at"] > now
+            and len(match) == 1
+            and case.get("source_profile_sha256") == observed["profile_sha256"]
+            and case.get("target_profile_sha256") == selected["target"]["profile_sha256"]
+            and case.get("logical_nics_sha256") == digest(workload["nics"])
+            and case.get("level") == "E4"
+            and case.get("decision") == "accepted"
+            and case.get("revoked") is False
+            and type(case.get("observed_at")) is int
+            and 0 <= now - case["observed_at"] <= 30
+            and type(case.get("expires_at")) is int
+            and now < case["expires_at"] <= flow["expires_at"]
+            and all(isinstance(case.get(key), str)
+                    and len(case[key]) == 64
+                    for key in ("native_path_set_sha256", "allowed_probe_sha256",
+                                "denied_probe_sha256", "return_probe_sha256",
+                                "isolation_probe_sha256", "evidence_sha256"))
         )
         mapped["network_semantics_independently_verified"] = qualified_security
         mapped["network_semantics_sha256"] = (
