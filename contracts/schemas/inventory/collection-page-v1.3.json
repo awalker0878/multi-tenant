@@ -188,7 +188,7 @@
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://multi-tenant.invalid/contracts/inventory/collection-page-v1.1",
+  "$id": "https://multi-tenant.invalid/contracts/inventory/collection-page-v1.3",
   "$defs": {
     "Observation": {
       "type": "object",

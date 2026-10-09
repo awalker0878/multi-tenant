@@ -87,7 +87,7 @@ def request(
                     if (owner, schema_name) not in {
                         ("CATALOGUE", "catalogue-current-v1"),
                         ("INVENTORY", "migration-input-v3"),
-                        ("ASSURANCE", "migration-support-v1"),
+                        ("ASSURANCE", "migration-support-v2"),
                         ("ASSURANCE", "qualification-v2"),
                     }:
                         raise ValueError

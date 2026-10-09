@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://contracts.example.invalid/planning/migration-readiness-v1",
+  "$id": "https://contracts.example.invalid/planning/migration-readiness-v2",
   "title": "Resolved exact-route migration readiness: Planning source, Console and Lifecycle consumers",
   "type": "object",
   "additionalProperties": false,
