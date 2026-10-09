@@ -124,7 +124,10 @@ def evaluate(
                   or not 0 <= now - evidence["observed_at"] < requirement["max_age_seconds"]):
                 reason = "collection_evidence_stale"
             elif requirement["collection_method"] == "native_get" and (
-                    not isinstance(evidence.get("native_operation"), str)
+                    not isinstance(evidence.get("source_response_sha256"), str)
+                    or not re.fullmatch(r"[a-f0-9]{64}",
+                                        evidence["source_response_sha256"])
+                    or not isinstance(evidence.get("native_operation"), str)
                     or not re.fullmatch(
                         r"GET /[A-Za-z0-9_./:%?=&-]{1,400}",
                         evidence["native_operation"])
