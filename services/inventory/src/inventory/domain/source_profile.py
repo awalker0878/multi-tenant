@@ -199,3 +199,40 @@ def source_identity(p: dict[str, Any]) -> tuple[Any, Any]:
             )
         ],
     )
+
+
+def source_profile_read_count(profile: dict[str, Any]) -> int:
+    """Count the native GETs required for this exact OpenStack workload.
+
+    The collector independently fetches each unique attached security group;
+    source profile completion must not use an older fixed read count.
+    """
+    if profile.get("platform") != "openstack" or profile.get("schema_version") != 3:
+        raise Rejected("source_profile_read_count_unsupported")
+    native = profile.get("native")
+    metadata = native.get("metadata") if isinstance(native, dict) else None
+    records = native.get("disk_records") if isinstance(native, dict) else None
+    if not isinstance(metadata, dict) or not isinstance(records, list):
+        raise Rejected("source_profile_read_count_unavailable")
+    groups, ports = metadata.get("security_groups"), metadata.get("ports")
+    if not isinstance(groups, list) or not isinstance(ports, list):
+        raise Rejected("source_profile_security_collection_incomplete")
+    group_ids = [g.get("id") for g in groups if isinstance(g, dict)]
+    if (len(group_ids) != len(groups) or len(set(group_ids)) != len(groups)
+            or any(not isinstance(g, str) or not g for g in group_ids)):
+        raise Rejected("source_profile_security_collection_incomplete")
+    attached: set[str] = set()
+    for port in ports:
+        if not isinstance(port, dict):
+            raise Rejected("source_profile_security_collection_incomplete")
+        identities = port.get("security_groups")
+        if identities is None:
+            continue  # Unobserved membership remains an independent hold.
+        if not isinstance(identities, list) or any(not isinstance(i, str) for i in identities):
+            raise Rejected("source_profile_security_collection_incomplete")
+        attached.update(identities)
+    if attached != set(group_ids):
+        raise Rejected("source_profile_security_collection_incomplete")
+    # Server, flavor, attachments, ports, server re-read, all volumes and SGs.
+    volume_count = sum(r.get("role") in {"bootable_volume", "data_volume"} for r in records)
+    return 5 + volume_count + len(group_ids)
