@@ -39,9 +39,21 @@ CREATE TABLE IF NOT EXISTS inventory.migration_collection_fields (
 );
 CREATE INDEX IF NOT EXISTS migration_collection_fields_history
   ON inventory.migration_collection_fields (tenant,site,scope,attribute_id,observed_at DESC);
+-- A failed/partial generation is never silently reclassified by a late
+-- signed receipt. Negative discovery records a monotonic tombstone.
+CREATE TABLE IF NOT EXISTS inventory.migration_collection_invalidations (
+  tenant uuid NOT NULL,
+  site uuid NOT NULL,
+  endpoint uuid NOT NULL,
+  generation uuid NOT NULL,
+  reason text NOT NULL CHECK (length(reason) BETWEEN 1 AND 200),
+  observed_at double precision NOT NULL,
+  PRIMARY KEY (tenant,site,endpoint,generation)
+);
 -- Runtime can append observations but cannot retroactively change or erase them.
 GRANT SELECT,INSERT ON inventory.migration_collection_receipts,
-  inventory.migration_collection_fields TO inventory_runtime;
+  inventory.migration_collection_fields,
+  inventory.migration_collection_invalidations TO inventory_runtime;
 COMMIT;
 ),
   source_response_sha256 char(64) CHECK (
