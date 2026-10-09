@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "target": "contracts/capabilities/migration-collection-manifest-v1.json",
+  "base": "base.json",
+  "parts": {
+    "platforms": {
+      "kind": "object",
+      "files": [
+        "platforms/platform-vmware.json",
+        "platforms/platform-ahv.json",
+        "platforms/platform-openstack.json"
+      ]
+    }
+  },
+  "copies": []
+}

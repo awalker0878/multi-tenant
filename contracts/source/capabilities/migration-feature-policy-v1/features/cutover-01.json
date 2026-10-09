@@ -1,0 +1,18 @@
+[
+  {
+    "id": "cutover.writer",
+    "label": "Final synchronization and writer fencing",
+    "mapping": "operator_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "owner.application.writer_fencing",
+      "owner.application.final_delta"
+    ],
+    "operator_attributes": [
+      "application.writer_fencing",
+      "application.final_delta"
+    ],
+    "qualification": "unqualified",
+    "notes": "Ensure one authoritative writer, qualified delta and exact cutover."
+  }
+]

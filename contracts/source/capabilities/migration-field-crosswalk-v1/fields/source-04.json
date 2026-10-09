@@ -1,0 +1,138 @@
+[
+  {
+    "canonical_id": "source.ahv.identity.cluster",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.cluster"
+        ],
+        "api_fields": [
+          "data.cluster.extId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.ahv.network.nic_subnet",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": {
+        "manifest_attribute_ids": [
+          "network.nic_subnet"
+        ],
+        "api_fields": [
+          "data.nics[*].networkInfo.subnet.extId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.ahv.compute.cdrom",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": {
+        "manifest_attribute_ids": [
+          "compute.cdrom"
+        ],
+        "api_fields": [
+          "data.cdRoms[*]"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 300,
+        "severity": "optional",
+        "conditions": [
+          "when:nonessential_removable_media"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "optional",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.ahv.identity.categories",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.categories"
+        ],
+        "api_fields": [
+          "data.categories"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "optional",
+        "conditions": [
+          "when:present"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "optional",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  }
+]

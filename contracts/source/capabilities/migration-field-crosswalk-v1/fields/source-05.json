@@ -1,0 +1,376 @@
+[
+  {
+    "canonical_id": "source.openstack.compute.flavor_id",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "compute.flavor_id"
+        ],
+        "api_fields": [
+          "server.flavor.id"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.openstack.compute.swap_and_ephemeral",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "compute.swap_and_ephemeral"
+        ],
+        "api_fields": [
+          "flavor.swap + OS-FLV-EXT-DATA:ephemeral"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.openstack.compute.availability_zone",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "compute.availability_zone"
+        ],
+        "api_fields": [
+          "server.OS-EXT-AZ:availability_zone"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:placement_boundary"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.openstack.guest.image_id",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "guest.image_id"
+        ],
+        "api_fields": [
+          "server.image.id"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:image_backed"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.openstack.guest.config_drive",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "guest.config_drive"
+        ],
+        "api_fields": [
+          "server.config_drive"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:guest_init"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.openstack.guest.user_key",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "guest.user_key"
+        ],
+        "api_fields": [
+          "server.key_name"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 300,
+        "severity": "optional",
+        "conditions": [
+          "when:replacement_key_managed"
+        ]
+      }
+    },
+    "criticality": "optional",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.openstack.storage.bootable",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "storage.bootable"
+        ],
+        "api_fields": [
+          "volume.bootable"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:volume_backed"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.openstack.storage.volume_metadata",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "storage.volume_metadata"
+        ],
+        "api_fields": [
+          "volume.metadata"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "optional",
+        "conditions": [
+          "when:nonfunctional_tags"
+        ]
+      }
+    },
+    "criticality": "optional",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.openstack.network.port_project",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "network.port_project"
+        ],
+        "api_fields": [
+          "ports[*].project_id"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.openstack.network.nic_binding",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "network.nic_binding"
+        ],
+        "api_fields": [
+          "ports[*].binding:vif_type"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.openstack.network.qos_policy",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "network.qos_policy"
+        ],
+        "api_fields": [
+          "ports[*].qos_policy_id"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 300,
+        "severity": "optional",
+        "conditions": [
+          "when:nonfunctional_qos"
+        ]
+      }
+    },
+    "criticality": "optional",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  }
+]

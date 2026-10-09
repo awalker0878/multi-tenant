@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "target": "contracts/capabilities/migration-field-crosswalk-v1.json",
+  "base": "base.json",
+  "parts": {
+    "fields": {
+      "kind": "array",
+      "files": [
+        "fields/source-01.json",
+        "fields/source-02.json",
+        "fields/target-01.json",
+        "fields/owner-01.json",
+        "fields/owner-02.json",
+        "fields/source-03.json",
+        "fields/target-02.json",
+        "fields/source-04.json",
+        "fields/target-03.json",
+        "fields/source-05.json",
+        "fields/target-04.json",
+        "fields/source-06.json",
+        "fields/target-05.json"
+      ]
+    }
+  },
+  "copies": []
+}
