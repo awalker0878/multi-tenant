@@ -39,7 +39,7 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
             return
         if not source_ids and selected is None:
             return
-        d = shape(selected, {"platform", "project_id", "security_mappings", "flow_mappings"} if "flow_mappings" in selected else {"platform", "project_id", "security_mappings"})
+        d = shape(selected, {"platform", "project_id", "security_mappings", "flow_mappings"} if isinstance(selected, dict) and "flow_mappings" in selected else {"platform", "project_id", "security_mappings"})
         if d["platform"] != "openstack" or d["project_id"] != target["project_id"]:
             raise Rejected("foreign_openstack_destination", 403)
         select_security_mappings(
