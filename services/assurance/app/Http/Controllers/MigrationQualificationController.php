@@ -246,13 +246,21 @@ final class MigrationQualificationController
                         $seenSemantics = [];
                         if ($semanticValid) {
                             foreach ($semanticCases as $case) {
-                                if (! is_array($case) || count($case) !== count($semanticFields)
-                                    || array_diff($semanticFields, array_keys($case)) !== []
+                                $verifiedObserved = is_array($case)
+                                    && ($case['disposition'] ?? null) === 'verified_observation';
+                                $requiredFields = $verifiedObserved
+                                    ? [...$semanticFields, 'observed_value'] : $semanticFields;
+                                if (! is_array($case) || count($case) !== count($requiredFields)
+                                    || array_diff($requiredFields, array_keys($case)) !== []
+                                    || array_diff(array_keys($case), $requiredFields) !== []
+                                    || ($verifiedObserved
+                                        && ($case['observed_value'] === null
+                                            || strlen((string) json_encode($case['observed_value'])) > 2048))
                                     || ! is_string($case['workload_id'] ?? null)
                                     || ! is_string($case['field'] ?? null)
                                     || strlen($case['field']) > 240
                                     || ! in_array($case['disposition'] ?? null,
-                                        ['qualified_transformation', 'approved_omission'], true)
+                                        ['qualified_transformation', 'approved_omission', 'verified_observation'], true)
                                     || ($case['level'] ?? null) !== 'E4'
                                     || ($case['decision'] ?? null) !== 'accepted'
                                     || ($case['revoked'] ?? null) !== false
