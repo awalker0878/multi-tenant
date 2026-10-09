@@ -111,46 +111,6 @@
     },
     "native_write_authorized": {
       "const": false
-    },
-    "api_evidence": {
-      "type": "object",
-      "maxProperties": 512,
-      "propertyNames": {
-        "pattern": "^[a-f0-9]{64}$"
-      },
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "route_sha256",
-          "environments",
-          "observations",
-          "omissions"
-        ],
-        "properties": {
-          "route_sha256": {
-            "type": "string",
-            "pattern": "^[a-f0-9]{64}$"
-          },
-          "environments": {
-            "type": "object"
-          },
-          "observations": {
-            "type": "array",
-            "maxItems": 512
-          },
-          "omissions": {
-            "type": "array",
-            "maxItems": 64
-          }
-        }
-      }
-    },
-    "flow_evidence": {
-      "type": [
-        "object",
-        "null"
-      ]
     }
   }
 }
