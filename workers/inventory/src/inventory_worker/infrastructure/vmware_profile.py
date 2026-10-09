@@ -137,6 +137,16 @@ def collect_vmware(
                 # Explicitly missing method/unsupported data is not an
                 # operator-definable value: this host offers no selection.
                 continue
+    # NSX is an explicitly enrolled second TLS origin and credential, never
+    # inferred from vCenter or queried through the vCenter session.
+    nsx_observation = None
+    if "nsx_policy" in stream:
+        from inventory_worker.infrastructure.nsx_security import collect_nsx_policy_rules
+
+        nsx = stream["nsx_policy"]
+        nsx_observation = collect_nsx_policy_rules(
+            nsx, nsx["domain_id"], before_request
+        )
     return {
         "schema_version": 3,
         "profile_type": "TargetCapabilityProfile",
@@ -146,9 +156,10 @@ def collect_vmware(
         "api_version": stream["api_version"],
         "installed": about,
         "observed_at": observed_at,
-        "observations_sha256": fingerprint([about, records]),
+        "observations_sha256": fingerprint([about, records, nsx_observation]),
         "inventory_complete": True,
         "guest_options_by_host": guest_options_by_host,
+        "nsx_policy_observation": nsx_observation,
         "disk_formats": ["vmdk"],
         "image_import_methods": ["vi-json-nfc"],
         **records,
