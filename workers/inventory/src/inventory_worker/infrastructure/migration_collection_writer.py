@@ -78,6 +78,7 @@ def build_signed_envelope(
     scope: dict[str, str],
     signed_scopes: list[dict[str, Any]],
     expires_at: int, sign: Callable[[bytes], bytes],
+    generation_sequence: int = 1,
 ) -> dict[str, Any]:
     """Signer must be an independently administered attestation authority.
 
@@ -89,6 +90,7 @@ def build_signed_envelope(
             or len(signed_scopes) != 3
             or {r.get("scope") for r in signed_scopes} !=
                {"source", "target", "owner"}
+            or type(generation_sequence) is not int or generation_sequence < 1
             or type(expires_at) is not int
             or not callable(sign)
             or set(scope) != {"tenant_id", "site_id",
@@ -110,7 +112,8 @@ def build_signed_envelope(
                               for row in items)
                        for items in (item["observations"], item["applicability"]))):
             raise ValueError("unsigned_or_out_of_scope_collection_fields")
-    payload = {"schema_version": 1, **scope, "expires_at": expires_at,
+    payload = {"schema_version": 1, **scope,
+               "generation_sequence": generation_sequence, "expires_at": expires_at,
                "scopes": signed_scopes}
     message = b"multi-tenant/migration-collection-evidence/v1\x00" + canonical(payload)
     # No private signing key crosses into the Inventory collection worker.
