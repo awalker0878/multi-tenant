@@ -38,8 +38,7 @@
       "console"
     ],
     "contracts/asyncapi/support.yaml": [
-      "governance",
-      "console"
+      "governance"
     ],
     "contracts/capabilities/definitions-v1.json": [
       "inventory",
@@ -175,8 +174,7 @@
       "console"
     ],
     "contracts/schemas/events/support-change-v1.json": [
-      "governance",
-      "console"
+      "governance"
     ],
     "contracts/schemas/expansion/tranche-v1.1.json": [
       "planning"
@@ -244,9 +242,7 @@
     {
       "path": "contracts/asyncapi/support.yaml",
       "owner": "governance",
-      "consumers": [
-        "console"
-      ],
+      "consumers": [],
       "copies": [],
       "source_manifest": null,
       "depends_on": []
@@ -601,9 +597,7 @@
     {
       "path": "contracts/schemas/events/support-change-v1.json",
       "owner": "governance",
-      "consumers": [
-        "console"
-      ],
+      "consumers": [],
       "copies": [
         "services/governance/resources/contracts/support-change-v1.json"
       ],
