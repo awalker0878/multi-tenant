@@ -215,6 +215,30 @@ class MigrationFlows:
         net = current["data"]["network"]
         choices = {row["source_flow_id"]: row for row in current["choices"]}
         controls = []
+        if current["destination"].get("platform") in {"vmware", "ahv"}:
+            cases = {
+                item["source_flow_id"]: item["document"]
+                for item in current["data"]["effective_security_cases"]
+            }
+            for selection in selections:
+                flow_id = selection["source_flow_id"]
+                if flow_id not in choices or flow_id not in cases:
+                    raise Rejected("unapproved_application_flow")
+                option = choices[flow_id]
+                if (selection["rule_native_ref"] not in option["destination_firewall_rule_ids"]
+                        or selection["route_native_ref"] not in option["destination_route_ids"]):
+                    raise Rejected("application_flow_native_control_changed", 423)
+                document = cases[flow_id]
+                controls.append({
+                    "flow_id": flow_id,
+                    "groups": document["groups"],
+                    "services": document["services"],
+                    "rules": document["rules"],
+                    "path": document["path"],
+                    "default_action": document["default_action"],
+                    "topology_sha256": document["topology_sha256"],
+                })
+            return digest(sorted(controls, key=lambda row: row["flow_id"]))
         for selection in selections:
             source_id = selection.get("source_flow_id")
             option = choices.get(source_id)
@@ -257,14 +281,20 @@ class MigrationFlows:
         seen: set[str] = set()
         bound: dict[str, Any] = {}
         network = data["network"]
+        vendor = current["destination"].get("platform") in {"vmware", "ahv"}
         observer = network.get("observer_principal")
         writer = network.get("writer_principal")
-        if (
+        if current["expires_at"] <= now:
+            return ["independent_native_flow_observer_required"]
+        if not vendor and (
             not isinstance(observer, str) or not observer
             or not isinstance(writer, str) or not writer or observer == writer
-            or current["expires_at"] <= now
         ):
             return ["independent_native_flow_observer_required"]
+        cases = {
+            item["source_flow_id"]: item["document"]
+            for item in data.get("effective_security_cases", [])
+        } if vendor else {}
         for selection in selections:
             if not isinstance(selection, dict) or set(selection) != {
                 "source_flow_id", "rule_native_ref", "route_native_ref"
@@ -282,7 +312,9 @@ class MigrationFlows:
             bound[flow_id] = {
                 "rule_native_ref": selection["rule_native_ref"],
                 "route_native_ref": selection["route_native_ref"],
-                "observer_principal": observer,
+                "observer_principal": (
+                    cases[flow_id]["observer_principal"] if vendor else observer
+                ),
                 "observed_at": current["destination"]["capability_snapshot"]["observed_at"],
                 "expires_at": current["expires_at"],
                 "policy_sha256": digest(current["policy"]),
@@ -326,7 +358,21 @@ class MigrationFlows:
         check_data = dict(data)
         check_data["network"] = network
         try:
-            checks = network_checks(current["intent"], check_data, current["policy"], now)
+            checks = []
+            if vendor:
+                for selection in selections:
+                    source_id = selection["source_flow_id"]
+                    source = allowed[source_id]["source"]
+                    certificate = cases.get(source_id)
+                    if not isinstance(certificate, dict):
+                        return ["native_security_case_missing"]
+                    verdict = qualify_effective_security(certificate, source, now)
+                    if (verdict["status"] != "qualified"
+                            or verdict["effective_rule_native_ref"] != selection["rule_native_ref"]
+                            or "path:" + verdict["path_sha256"] != selection["route_native_ref"]):
+                        return ["native_security_effective_policy_changed"]
+            else:
+                checks = network_checks(current["intent"], check_data, current["policy"], now)
             checks += isolation_checks(
                 current["intent"], current["destination"], check_data,
                 current["policy"], now,
