@@ -43,7 +43,7 @@ class MigrationCollectionLedger:
                 raise Rejected("migration_collection_unenrolled_publisher", 403)
             left, right = self.profiles.binding(source), self.profiles.binding(target)
             coverage = read_collection_coverages(
-                tenant, site, source, target, left, right, self.d.clock(),
+                tenant, site, source, target, left, right, int(self.d.clock()),
                 signed_envelope=envelope,
             )
             if len(coverage) != 3:
@@ -136,6 +136,6 @@ class MigrationCollectionLedger:
                 or record["target_sha256"] != target_binding["profile_sha256"]):
             return []
         return read_collection_coverages(
-            tenant, site, source, target, source_binding, target_binding, now,
+            tenant, site, source, target, source_binding, target_binding, int(now),
             signed_envelope=record["envelope"],
         )
