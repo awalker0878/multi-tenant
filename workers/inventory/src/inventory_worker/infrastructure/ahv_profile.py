@@ -183,11 +183,48 @@ def collect_ahv(
             ):
                 raise CollectionFailure("invalid_response")
             seen_rule_ids.add(rule["extId"])
+    # Resolve only category IDs found in the same Prism observation.
+    # Address, service and nested selector semantics remain unknown unless a
+    # separately qualified native API collector observes their definitions.
+    categories_observed = {r["extId"] for r in inventory["categories"]}
+    def rule_refs(spec: dict[str, Any]) -> dict[str, Any]:
+        types = {
+            "srcCategoryReferences": "category",
+            "dstCategoryReferences": "category",
+            "sourceCategoryReferences": "category",
+            "destinationCategoryReferences": "category",
+            "addressGroupReferences": "address_group",
+            "serviceGroupReferences": "service_group",
+        }
+        refs: dict[str, list[str]] = {
+            "category": [], "address_group": [], "service_group": [],
+        }
+        unknown = False
+        for field, label in types.items():
+            values = spec.get(field)
+            if values is None:
+                continue
+            if (not isinstance(values, list) or len(values) > 64
+                    or any(not isinstance(item, str) or not item for item in values)):
+                raise CollectionFailure("invalid_response")
+            refs[label].extend(values)
+        if any(len(items) != len(set(items)) or len(items) > 64 for items in refs.values()):
+            raise CollectionFailure("invalid_response")
+        unknown = any(item not in categories_observed for item in refs["category"])
+        unresolved = bool(refs["address_group"] or refs["service_group"] or unknown)
+        # Even a complete category lookup is not a semantic policy proof.
+        return {
+            "category_ids": sorted(refs["category"]),
+            "address_group_ids": sorted(refs["address_group"]),
+            "service_group_ids": sorted(refs["service_group"]),
+            "reference_resolution": "unresolved" if unresolved else "catalogue_ids_only",
+        }
     projected = {
         k: [{f: r.get(f) for f in fields if f != "rules"}
             | ({"rules": [
                     {"extId": rule["extId"], "type": rule["type"],
-                     "spec_sha256": fingerprint(rule["spec"])}
+                     "spec_sha256": fingerprint(rule["spec"]),
+                     **rule_refs(rule["spec"])}
                     for rule in r["rules"]
                 ] if r.get("rules") is not None else None}
                if k == "policies" else {})
@@ -213,6 +250,12 @@ def collect_ahv(
     if any(row.get("state") == "ENFORCE" and row.get("rules") is None
            for row in projected["policies"]):
         holds.append("ahv_security_rule_catalog_incomplete")
+    if any(
+        rule["reference_resolution"] == "unresolved"
+        for row in projected["policies"] if row.get("rules") is not None
+        for rule in row["rules"]
+    ):
+        holds.append("ahv_security_referenced_objects_unresolved")
     # Even complete native rule bodies are discovery evidence, not independent
     # end-to-end flow or isolation qualification.
     return {
