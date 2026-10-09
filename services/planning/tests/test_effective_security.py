@@ -76,7 +76,7 @@ def document(platform="vmware", generation="source", nat=False, multipath=False)
     doc = {
         "schema_version": 2, "source": "independent_native_observer",
         "platform": platform, "native_api_qualified": True,
-        "native_scope": "tenant-prod",
+        "native_scope": "tenant-prod", "tenant_id": "tenant-1",
         "enforcement_layer": "dfw",
         "firewall_chain_complete": True, "effective_firewall_layers": ["dfw"],
         "microseg_policy_priority_qualified": True,
