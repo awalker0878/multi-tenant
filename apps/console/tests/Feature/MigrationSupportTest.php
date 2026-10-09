@@ -26,7 +26,7 @@ it('shows only current application-scoped native flow choices from Planning', fu
     $planning = Mockery::mock(PlanningGateway::class);
     $flow = [
         'context_sha256' => str_repeat('a', 64), 'revision' => 0,
-        'expires_at' => 2_000_000_120, 'choices' => [], 'selections' => [],
+        'expires_at' => 2_000_000_120, 'choices' => [], 'selections' => [], 'omissions' => [],
         'holds' => ['source_flow_required'], 'status' => 'held',
         'native_write_authorized' => false,
     ];
@@ -52,7 +52,7 @@ it('saves only owner-selected existing native resource IDs; refuses inline polic
     $data = [
         'command_key' => $id, 'revision' => 0,
         'context_sha256' => str_repeat('a', 64),
-        'selections' => [[
+        'omissions' => [], 'selections' => [[
             'source_flow_id' => str_repeat('b', 64),
             'rule_native_ref' => 'native-rule-123', 'route_native_ref' => 'native-route-456',
         ]],
@@ -61,7 +61,7 @@ it('saves only owner-selected existing native resource IDs; refuses inline polic
     $planning->shouldReceive('call')->once()->with(
         str_repeat('a', 64), $id, $id, $id, 'POST', 'migration-flow-selections',
         [$id], ['site_id' => $id, 'revision' => 0, 'context_sha256' => str_repeat('a', 64),
-            'selections' => $data['selections']], $id
+            'selections' => $data['selections'], 'omissions' => []], $id
     )->andReturn(['status' => 'held', 'revision' => 1, 'holds' => ['isolation_missing'],
         'native_write_authorized' => false]);
     $this->withSession(['identity.token' => str_repeat('a', 64)])
