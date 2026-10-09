@@ -24,6 +24,7 @@ FIELDS = {
     "datastores",
     "networks",
     "guest_options_by_host",
+    "nsx_policy_observation",
     "required_capability_evidence",
     "holds",
     "native_qualification",
@@ -69,6 +70,60 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
             if field == "folders" and row.get("type") != "VIRTUAL_MACHINE":
                 raise Rejected("vmware_vm_folder_required")
             ids.add(row[key])
+
+    nsx = p["nsx_policy_observation"]
+    enrollment = stream.get("nsx_policy")
+    if nsx is None:
+        if enrollment is not None:
+            raise Rejected("enrolled_nsx_observation_missing")
+    else:
+        if not isinstance(enrollment, dict):
+            raise Rejected("unsolicited_nsx_evidence", 403)
+        shape(nsx, {"domain_id", "api", "policies", "semantic_qualification",
+                    "source_vm_attachment", "native_write_authorized"})
+        if (nsx["domain_id"] != enrollment["domain_id"]
+                or nsx["api"] != "nsx-policy-v1"
+                or nsx["semantic_qualification"] != "unresolved"
+                or nsx["source_vm_attachment"] != "unverified"
+                or nsx["native_write_authorized"] is not False
+                or not isinstance(nsx["policies"], list)
+                or len(nsx["policies"]) > 16):
+            raise Rejected("unqualified_nsx_security_evidence")
+        seen_policies: set[str] = set()
+        for policy in nsx["policies"]:
+            shape(policy, {"id", "sequence_number", "scope_sha256",
+                           "native_sha256", "rules"})
+            policy_id = policy["id"]
+            if (
+                not isinstance(policy_id, str)
+                or not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", policy_id)
+                or policy_id in seen_policies
+                or not isinstance(policy["rules"], list)
+                or len(policy["rules"]) > 100
+            ):
+                raise Rejected("invalid_nsx_policy_catalog")
+            seen_policies.add(policy_id)
+            for key in ("scope_sha256", "native_sha256"):
+                if not isinstance(policy[key], str) or re.fullmatch(r"[a-f0-9]{64}", policy[key]) is None:
+                    raise Rejected("invalid_nsx_policy_catalog")
+            seen_rules: set[str] = set()
+            for rule in policy["rules"]:
+                shape(rule, {"id", "action", "direction", "disabled",
+                             "native_sha256", "service_reference_status",
+                             "group_reference_status"})
+                rid = rule["id"]
+                if (not isinstance(rid, str)
+                    or not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", rid)
+                    or rid in seen_rules
+                    or rule["action"] not in {"ALLOW", "DROP", "REJECT"}
+                    or rule["direction"] not in {"IN", "OUT", "IN_OUT"}
+                    or type(rule["disabled"]) is not bool
+                    or rule["service_reference_status"] != "unresolved"
+                    or rule["group_reference_status"] != "unresolved"
+                    or not isinstance(rule["native_sha256"], str)
+                    or re.fullmatch(r"[a-f0-9]{64}", rule["native_sha256"]) is None):
+                    raise Rejected("invalid_nsx_rule_catalog")
+                seen_rules.add(rid)
 
     options = p["guest_options_by_host"]
     if not isinstance(options, list) or len(options) > 16:
