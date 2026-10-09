@@ -44,8 +44,9 @@ def mapping() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
             "firmware": "bios",
             "vpc_id": None,
             "storage_container_id": storage,
-            "category_ids": [category],
-            "policy_ids": [policy],
+            "category_ids": [],
+            "policy_ids": [],
+            "security_mappings": [],
             "disks": [{"source_key": 2000, "index": 0}, {"source_key": 2001, "index": 1}],
             "nics": [
                 {
@@ -115,4 +116,26 @@ def test_ahv_mapping_rejects_gaps_or_unobserved_resources(fault: str) -> None:
     if fault == "uefi":
         source["firmware"] = "efi"
     with pytest.raises(Rejected):
+        destination_input(body, source, target)
+
+
+def test_unqualified_ahv_enforce_policy_cannot_be_selected_from_source_security_intent() -> None:
+    body, source, target = mapping()
+    source.update({
+        "platform": "openstack", "schema_version": 3,
+        "native_scope": "source-project",
+        "native": {"metadata": {"ports": [{
+            "id": "port-1", "project_id": "source-project",
+            "port_security_enabled": True, "security_groups": ["source-group"],
+        }]}},
+    })
+    # An enforced destination policy exists, but its native rule body,
+    # referenced services and measured traffic remain unqualified.
+    destination_input(body, source, target)  # empty draft is retained
+    policy_id = target["policies"][0]["extId"]
+    body["destination"]["security_mappings"] = [{
+        "source_id": "source-group", "destination_id": policy_id,
+    }]
+    body["destination"]["policy_ids"] = [policy_id]
+    with pytest.raises(Rejected, match="destination_security_rule_qualification_required"):
         destination_input(body, source, target)
