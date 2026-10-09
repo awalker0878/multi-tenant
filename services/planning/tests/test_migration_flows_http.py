@@ -46,7 +46,7 @@ def test_app_flow_save_has_idempotency_key_and_does_not_accept_untrusted_evidenc
     app = MigrationPreparationApp(authority, Mock(), flows=flows)
     body = {
         "site_id": SITE, "revision": 0, "context_sha256": "a" * 64,
-        "selections": [{
+        "omissions": [], "selections": [{
             "source_flow_id": "b" * 64,
             "rule_native_ref": "existing-native-rule",
             "route_native_ref": "existing-native-route",
