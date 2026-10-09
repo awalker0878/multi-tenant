@@ -43,7 +43,7 @@ onUnmounted(() => { active = false; controller?.abort(); clearTimeout(timer); do
 const versions = (platform: Platform) => Object.entries(platform.versions).map(([key, value]) => `${key}: ${value}`).join('; ');
 
 type NativeChoice = {
-  source_flow_id: string; source: { from: string; to: string; protocol: string; port: number };
+  source_flow_id: string; source: { from: string; to: string; protocol: string; port: number | null };
   required: boolean; destination_firewall_rule_ids: string[]; destination_route_ids: string[];
   status: 'choices_observed' | 'held_unobserved'; native_write_authorized: false;
 };
@@ -155,7 +155,7 @@ onMounted(() => { void refreshFlowChoices(); });
         <p v-if="flowState.holds.length" role="alert">Holds: {{ flowState.holds.join(', ').replaceAll('_', ' ') }}</p>
         <p v-if="missingChoices.length" role="alert">No matching existing destination rule or route was observed for {{ missingChoices.length }} required application flows. There is no manual resource creation option.</p>
         <div v-for="choice in flowState.choices" :key="choice.source_flow_id" class="mt-3 border-t pt-3">
-          <p><strong>{{ choice.source.from }} → {{ choice.source.to }}</strong> · {{ choice.source.protocol }}:{{ choice.source.port }} · {{ choice.required ? 'Critical / required' : 'Optional' }}</p>
+          <p><strong>{{ choice.source.from }} → {{ choice.source.to }}</strong> · {{ choice.source.protocol }}{{ choice.source.port === null ? '' : ':' + choice.source.port }} · {{ choice.required ? 'Critical / required' : 'Optional' }}</p>
           <div v-if="choice.status === 'choices_observed'" class="mt-1 grid gap-3 md:grid-cols-2">
             <label>Existing destination firewall rule
               <select :value="flowSelection(choice.source_flow_id, 'rule_native_ref')" :disabled="flowForm.processing" @change="selectFlow(choice.source_flow_id, 'rule_native_ref', ($event.target as HTMLSelectElement).value)">
