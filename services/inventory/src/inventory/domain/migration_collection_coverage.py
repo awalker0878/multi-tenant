@@ -25,7 +25,7 @@ def installed_version_supported(
     if not isinstance(candidate, dict) or set(candidate) != {"min_version", "max_version"}:
         return False
     def number(value: Any) -> tuple[int, ...] | None:
-        if not isinstance(value, str) or not re.fullmatch(r"v?[0-9]+(?:\\.[0-9]+){1,3}", value):
+        if not isinstance(value, str) or not re.fullmatch(r"v?[0-9]+(?:\.[0-9]+){1,3}", value):
             return None
         return tuple(int(part) for part in value.removeprefix("v").split("."))
     actual = number(api_version)
