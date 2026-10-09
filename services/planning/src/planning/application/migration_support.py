@@ -5,6 +5,7 @@ from typing import Any
 
 from planning.domain.api_compatibility import evaluate as evaluate_api
 from planning.domain.migration_readiness import resolve as resolve_readiness
+from planning.domain.migration_readiness import resolve_workload
 from planning.domain.capability_definitions import METHOD_ALIASES as METHODS
 from planning.domain.expansion import matrix, tranche
 from planning.domain.model import Actor, Rejected, digest
@@ -21,7 +22,8 @@ class MigrationSupport:
     ) -> None:
         self.scope, self.observations, self.clock = scope, observations, clock
         self.api_observations = api_observations
-        self.flow_require: Callable[[Actor, str, dict[str, Any]], None] | None = None
+        self.flow_require: Callable[[Actor, str, dict[str, Any]], dict[str, Any]] | None = None
+        self.workload_current: Callable[[Actor, str, dict[str, Any], dict[str, Any] | None], dict[str, Any]] | None = None
 
     def api_status(
         self, actor: Actor, site: str, selected: dict[str, Any]
@@ -79,8 +81,10 @@ class MigrationSupport:
         # A native route is not ready merely because a hypervisor capability
         # matrix passed: owner-approved application paths and negative tests
         # have an independent, expiring approval gate.
-        if self.flow_require is not None:
+        flow_proof = (
             self.flow_require(actor, site, binding)
+            if self.flow_require is not None else None
+        )
         selected = tranche(self.scope(actor, site))
         candidates = [
             row
@@ -171,4 +175,12 @@ class MigrationSupport:
         )
         if readiness["status"] != "eligible":
             raise Rejected("migration_readiness_held", 423)
+        if self.workload_current is not None:
+            evidence = self.workload_current(actor, site, binding, flow_proof)
+            readiness = resolve_workload(
+                readiness, evidence["reconciliation"],
+                evidence.get("collection_coverages"), self.clock(),
+            )
+            if readiness["status"] != "eligible":
+                raise Rejected("migration_workload_readiness_held", 423)
         return readiness
