@@ -280,14 +280,53 @@ final class MigrationQualificationController
                             }
                         }
                     }
+                    $bootValid = true;
+                    $bootCases = $candidateFlows['workload_boot_cases'] ?? null;
+                    if (array_key_exists('workload_boot_cases', is_array($candidateFlows) ? $candidateFlows : [])) {
+                        $bootFields = [
+                            'workload_id', 'source_profile_sha256', 'firmware',
+                            'secure_boot', 'observed_at', 'expires_at',
+                            'evidence_sha256', 'level', 'decision', 'revoked',
+                        ];
+                        $bootValid = is_array($bootCases)
+                            && array_is_list($bootCases) && count($bootCases) <= 100;
+                        $seenBoot = [];
+                        if ($bootValid) {
+                            foreach ($bootCases as $case) {
+                                if (! is_array($case)
+                                    || count($case) !== count($bootFields)
+                                    || array_diff($bootFields, array_keys($case)) !== []
+                                    || ! is_string($case['workload_id'] ?? null)
+                                    || $case['workload_id'] === ''
+                                    || isset($seenBoot[$case['workload_id']])
+                                    || ! preg_match('/\\A[a-f0-9]{64}\\z/', (string) ($case['source_profile_sha256'] ?? ''))
+                                    || ! preg_match('/\\A[a-f0-9]{64}\\z/', (string) ($case['evidence_sha256'] ?? ''))
+                                    || ! in_array($case['firmware'] ?? null, ['efi', 'bios'], true)
+                                    || ! is_bool($case['secure_boot'] ?? null)
+                                    || ($case['level'] ?? null) !== 'E4'
+                                    || ($case['decision'] ?? null) !== 'accepted'
+                                    || ($case['revoked'] ?? null) !== false
+                                    || ! is_int($case['observed_at'] ?? null)
+                                    || ! is_int($case['expires_at'] ?? null)
+                                    || ! (0 <= time() - $case['observed_at'] && time() - $case['observed_at'] <= 30)
+                                    || $case['expires_at'] <= time()
+                                    || $case['expires_at'] > ($candidateFlows['expires_at'] ?? 0)) {
+                                    $bootValid = false;
+                                    break;
+                                }
+                                $seenBoot[$case['workload_id']] = true;
+                            }
+                        }
+                    }
                     if (is_array($candidateFlows)
                         && $interfaceValid
                         && $dispositionValid
                         && $semanticValid
+                        && $bootValid
                         && count($candidateFlows) >= count($flowFields)
-                        && count($candidateFlows) <= count($flowFields) + 3
+                        && count($candidateFlows) <= count($flowFields) + 4
                         && array_diff($flowFields, array_keys($candidateFlows)) === []
-                        && array_diff(array_keys($candidateFlows), [...$flowFields, 'workload_interface_cases', 'disk_disposition_cases', 'workload_semantic_cases']) === []
+                        && array_diff(array_keys($candidateFlows), [...$flowFields, 'workload_interface_cases', 'disk_disposition_cases', 'workload_semantic_cases', 'workload_boot_cases']) === []
                         && ($candidateFlows['schema_version'] ?? null) === 1
                         && ($candidateFlows['level'] ?? null) === 'E4'
                         && ($candidateFlows['decision'] ?? null) === 'accepted'
