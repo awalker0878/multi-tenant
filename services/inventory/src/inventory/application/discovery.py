@@ -22,7 +22,7 @@ from inventory.domain.discovery import (
     text,
 )
 from inventory.domain.workload import profile_payload
-from inventory.domain.source_profile import source_profile_read_count
+from inventory.domain.profile_read_manifest import bounds as profile_read_bounds
 
 
 def uid() -> str:
@@ -628,28 +628,9 @@ class Discovery:
                 profile = profile_payload(
                     body.get("profile"), stream_spec, p.native_scope, p.platform
                 )
-                minimum_reads = maximum_reads = 8 if kind == "source_profile" else 7
-                if kind == "source_profile" and p.platform == "openstack":
-                    minimum_reads = maximum_reads = source_profile_read_count(profile)
-                if kind == "source_profile" and p.platform == "ahv":
-                    minimum_reads = maximum_reads = 4
-                if kind == "target_profile" and p.platform == "vmware":
-                    if "nsx_policy" in stream_spec:
-                        minimum_reads, maximum_reads = 7, 50
-                    else:
-                        minimum_reads, maximum_reads = 6, 51
-                if kind == "target_profile" and p.platform == "ahv":
-                    minimum_reads = 2 + sum(
-                        max(1, (len(profile[field]) + 99) // 100)
-                        for field in (
-                            "storage_containers",
-                            "subnets",
-                            "vpcs",
-                            "categories",
-                            "policies",
-                        )
-                    )
-                    maximum_reads = 2 + 5 * min(p.max_pages, 10) + 11
+                minimum_reads, maximum_reads = profile_read_bounds(
+                    p.platform, kind, p.max_pages, stream_spec, profile
+                )
                 if (
                     body["observations"]
                     or "configuration" in body
