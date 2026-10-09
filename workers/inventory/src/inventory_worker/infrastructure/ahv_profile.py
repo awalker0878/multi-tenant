@@ -190,6 +190,23 @@ def collect_ahv(
         for policy_row in inventory["policies"]:
             policy_row["rules"] = None
 
+    # The Microseg API exposes separate address/entity/service group
+    # collections. Observe all three within independently accounted budgets.
+    # Configuration definitions do not prove effective VM membership,
+    # exceptions, or fully expanded service behavior.
+    references: dict[str, list[dict[str, Any]]] = {}
+    for group_kind in ("entity_groups", "address_groups", "service_groups"):
+        rows, documents = collect_list(
+            stream, "/api/microseg/v4.3/config/" +
+            group_kind.replace("_", "-"), 1, before_request,
+        )
+        references[group_kind] = [
+            {"extId": row["extId"], "native_sha256": fingerprint(row),
+             "resolution": "definition_only"}
+            for row in rows
+        ]
+        records["native:" + group_kind] = documents
+
     # Prism's policy list may include native rule bodies; absence is UNKNOWN.
     # Never infer rules from policy names, ENFORCE state or category memberships.
     # Referenced service/address/category groups need independent resolution.
@@ -280,6 +297,9 @@ def collect_ahv(
     if any(row.get("state") == "ENFORCE" and row.get("rules") is None
            for row in projected["policies"]):
         holds.append("ahv_security_rule_catalog_incomplete")
+    if any(references[k] for k in references):
+        holds.append("ahv_effective_group_membership_unqualified")
+        holds.append("ahv_service_expansion_unqualified")
     if any(
         rule["reference_resolution"] == "unresolved"
         for row in projected["policies"] if row.get("rules") is not None
@@ -316,5 +336,6 @@ def collect_ahv(
             "recovery_and_cleanup",
         ],
         "holds": holds,
+        "security_references": references,
         "native_qualification": "not_established",
     }
