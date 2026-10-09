@@ -235,4 +235,7 @@ def source_profile_read_count(profile: dict[str, Any]) -> int:
         raise Rejected("source_profile_security_collection_incomplete")
     # Server, flavor, attachments, ports, server re-read, all volumes and SGs.
     volume_count = sum(r.get("role") in {"bootable_volume", "data_volume"} for r in records)
-    return 5 + volume_count + len(group_ids)
+    count = 5 + volume_count + len(group_ids)
+    if volume_count > 32 or len(group_ids) > 64 or count > 101:
+        raise Rejected("source_profile_collection_bound_exceeded")
+    return count
