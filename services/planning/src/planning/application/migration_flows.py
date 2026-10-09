@@ -161,7 +161,7 @@ class MigrationFlows:
         case_map: dict[str, dict[str, Any]] = {}
         for case in cases:
             if (not isinstance(case, dict)
-                    or set(case) != {"source_flow_id", "flow", "document"}
+                    or set(case) != {"source_flow_id", "flow", "source_document", "document"}
                     or not isinstance(case["document"], dict)):
                 raise Rejected("native_security_case_incomplete", 423)
             flow_id = case["source_flow_id"]
@@ -177,8 +177,16 @@ class MigrationFlows:
             flow_id = digest(source)
             case = case_map.get(flow_id)
             if (case is None or case["flow"] != source
-                    or case["document"].get("platform") != platform):
+                    or case["document"].get("platform") != platform
+                    or not isinstance(case["source_document"], dict)
+                    or case["source_document"].get("platform")
+                       not in {"vmware", "ahv", "openstack"}):
                 raise Rejected("native_security_application_coverage_incomplete", 423)
+            source_verdict = qualify_effective_security(
+                case["source_document"], source, now,
+            )
+            if source_verdict["status"] != "qualified":
+                raise Rejected("native_source_security_" + source_verdict["reason"], 423)
             verdict = qualify_effective_security(case["document"], source, now)
             if verdict["status"] != "qualified":
                 raise Rejected("native_security_" + verdict["reason"], 423)
