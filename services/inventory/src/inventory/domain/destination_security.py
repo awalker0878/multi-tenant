@@ -169,6 +169,10 @@ def validate_security_flow_choices(
         if selected not in (None, []):
             raise Rejected("source_security_rule_observation_required")
         return False
+    # A verified empty source rule inventory must not require invented rules
+    # or manufacture a destination feature solely to satisfy the form.
+    if not requirements and selected is None:
+        return True
     if not isinstance(selected, list) or len(selected) != len(requirements):
         raise Rejected("required_security_flow_mappings_incomplete")
     binding = {row["source_id"]: row["destination_id"] for row in groups}
