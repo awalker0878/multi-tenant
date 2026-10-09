@@ -16,7 +16,7 @@ from planning.domain.operational_evidence import inventory_digest, snapshot
 from planning.domain.qualification import binding_digest, verified
 
 SCOPE_SQL = (
-    "tenant=%s AND actor=%s AND application=%s AND environment=%s AND site=%s"
+    "tenant=%s AND application=%s AND environment=%s AND site=%s AND assessment_id=%s"
 )
 
 
@@ -25,10 +25,9 @@ class MigrationFlows:
         self.planning = planning
 
     @staticmethod
-    def scope(actor: Actor, site: str) -> tuple[str, str, str, str, str]:
-        return (identifier(actor.tenant), identifier(actor.actor),
-                identifier(actor.application), identifier(actor.environment),
-                identifier(site))
+    def scope(actor: Actor, site: str) -> tuple[str, str, str, str]:
+        return (identifier(actor.tenant), identifier(actor.application),
+                identifier(actor.environment), identifier(site))
 
     def current(self, actor: Actor, site: str, delegation: str) -> dict[str, Any]:
         """Re-read independently authorized current Catalogue, Inventory and Assurance.
@@ -43,11 +42,11 @@ class MigrationFlows:
         with self.planning.database.transaction() as tx:
             rows = tx.all(
                 "SELECT payload FROM app.planning_records WHERE tenant=%s AND "
-                "actor=%s AND application=%s AND environment=%s AND "
+                "application=%s AND environment=%s AND "
                 "kind='assessment' AND payload->>'action'='application.migrate' "
                 "AND payload->'candidates' @> %s::jsonb "
                 "ORDER BY created_at DESC,id DESC LIMIT 1",
-                (*scoped[:4], canonical([{"site_id": site}])),
+                (*scoped[:3], canonical([{"site_id": site}])),
             )
         if len(rows) != 1:
             raise Rejected("application_migration_assessment_required", 423)
@@ -67,10 +66,15 @@ class MigrationFlows:
                 or not isinstance(current_inputs, list) or len(current_inputs) != 1):
             raise Rejected("application_flow_source_intent_changed", 423)
         facts = current_inputs[0]
-        if any(digest(facts[k]) != digest(original[k]) for k in ("destination", "policy", "profile")):
-            # New destination observations require re-assessment before owner
-            # choices can be offered, rather than copying the previous result.
-            raise Rejected("application_flow_destination_assessment_stale", 423)
+        # Fresh observation generations are expected. Preserve reviewed native
+        # selections across telemetry refreshes, but never accept changes to
+        # the commissioned platform, native scope or profile/policy definition.
+        if (digest(facts["policy"]) != digest(original["policy"])
+                or digest(facts["profile"]) != digest(original["profile"])
+                or any(facts["destination"].get(k) != original["destination"].get(k)
+                       for k in ("tenant_id", "site_id", "endpoint_id", "native_scope",
+                                 "platform", "installed_tuple"))):
+            raise Rejected("application_flow_destination_identity_changed", 423)
         dest, qualification, policy = (
             facts["destination"], facts["qualification"], facts["policy"]
         )
@@ -98,10 +102,13 @@ class MigrationFlows:
         context_sha = digest({
             "assessment": retained["id"],
             "intent": current_intent["digest"],
-            "destination": inventory_digest(dest),
-            "qualification": binding_digest(qualification),
+            "destination": {
+                k: dest[k] for k in
+                ("tenant_id", "site_id", "endpoint_id", "native_scope",
+                 "platform", "installed_tuple")
+            },
+            "profile": facts["profile"]["digest"],
             "policy": digest(policy),
-            "network": digest(observed["network"]),
         })
         expires = min(
             dest["capability_snapshot"]["expires_at"],
@@ -115,12 +122,12 @@ class MigrationFlows:
             "context_sha256": context_sha, "expires_at": expires,
         }
 
-    def _read_saved(self, actor: Actor, site: str) -> dict[str, Any] | None:
+    def _read_saved(self, actor: Actor, site: str, assessment_id: str) -> dict[str, Any] | None:
         with self.planning.database.transaction() as tx:
             row = tx.one(
-                "SELECT revision,context_sha256,payload,updated_at "
+                "SELECT revision,context_sha256,payload,updated_at,reviewed_by_actor "
                 "FROM app.planning_application_flow_reviews WHERE " + SCOPE_SQL,
-                self.scope(actor, site),
+                (*self.scope(actor, site), identifier(assessment_id)),
             )
         return row
 
@@ -196,7 +203,7 @@ class MigrationFlows:
 
     def read(self, actor: Actor, site: str, delegation: str) -> dict[str, Any]:
         current = self.current(actor, site, delegation)
-        saved = self._read_saved(actor, site)
+        saved = self._read_saved(actor, site, current["assessment_id"])
         changed = saved is not None and saved["context_sha256"] != current["context_sha256"]
         selections = saved["payload"]["selections"] if saved and not changed else []
         holds = self.evaluate(current, selections, self.planning.clock())
@@ -229,7 +236,10 @@ class MigrationFlows:
         canonical(body)
         if len(canonical(body).encode()) > 32768:
             raise Rejected("application_flow_payload_bound", 413)
-        fingerprint = digest({"operation": "migration_flow_save", "site": site, "body": body})
+        fingerprint = digest({
+            "operation": "migration_flow_save", "scope": self.scope(actor, site),
+            "assessment_id": current["assessment_id"], "body": body,
+        })
         with self.planning.database.transaction() as tx:
             tx.execute("SELECT pg_advisory_xact_lock(7504001)")
             prior = self.planning.retry(tx, actor, key, fingerprint)
@@ -237,7 +247,8 @@ class MigrationFlows:
                 return prior
             old = tx.one(
                 "SELECT revision FROM app.planning_application_flow_reviews "
-                "WHERE " + SCOPE_SQL, self.scope(actor, site),
+                "WHERE " + SCOPE_SQL,
+                (*self.scope(actor, site), current["assessment_id"]),
             )
             if (old["revision"] if old else 0) != revision:
                 raise Rejected("application_flow_revision_changed", 412)
@@ -249,13 +260,16 @@ class MigrationFlows:
             }
             tx.execute(
                 "INSERT INTO app.planning_application_flow_reviews "
-                "(tenant,actor,application,environment,site,revision,context_sha256,payload,updated_at) "
-                "VALUES(%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s) "
-                "ON CONFLICT (tenant,actor,application,environment,site) "
+                "(tenant,application,environment,site,assessment_id,reviewed_by_actor,"
+                "revision,context_sha256,payload,updated_at) "
+                "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s) "
+                "ON CONFLICT (tenant,application,environment,site,assessment_id) "
                 "DO UPDATE SET revision=excluded.revision,"
+                "reviewed_by_actor=excluded.reviewed_by_actor,"
                 "context_sha256=excluded.context_sha256,"
                 "payload=excluded.payload,updated_at=excluded.updated_at",
-                (*self.scope(actor, site), revision + 1, current["context_sha256"],
+                (*self.scope(actor, site), current["assessment_id"], actor.actor,
+                 revision + 1, current["context_sha256"],
                  canonical({"selections": body["selections"], "holds": holds,
                             "assessment_id": current["assessment_id"],
                             "expires_at": current["expires_at"]}), self.planning.clock()),
@@ -271,7 +285,7 @@ class MigrationFlows:
 
     def require(self, actor: Actor, site: str) -> None:
         """Execution-side fail-closed gate; no owner delegation is minted here."""
-        saved = self._read_saved(actor, site)
+        saved = self._read_saved(actor, site, self._latest_assessment_id(actor, site))
         if saved is None or saved["payload"].get("selections") is None:
             raise Rejected("approved_application_flow_selection_required", 423)
         # A site-bound approval cannot be enough without a fresh native proof.
@@ -286,11 +300,11 @@ class MigrationFlows:
         with self.planning.database.transaction() as tx:
             latest = tx.one(
                 "SELECT id FROM app.planning_records WHERE tenant=%s AND "
-                "actor=%s AND application=%s AND environment=%s AND "
+                "application=%s AND environment=%s AND "
                 "kind='assessment' AND payload->>'action'='application.migrate' "
                 "AND payload->'candidates' @> %s::jsonb "
                 "ORDER BY created_at DESC,id DESC LIMIT 1",
-                (*self.scope(actor, site)[:4],
+                (*self.scope(actor, site)[:3],
                  canonical([{"site_id": site}])),
             )
         if (
