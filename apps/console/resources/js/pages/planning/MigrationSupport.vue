@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { Link, router, useForm } from '@inertiajs/vue3';
 import { capabilityDefinitions } from '../../features/planning/capabilityDefinitions';
 import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 
@@ -32,6 +32,7 @@ async function refresh() {
     if (!active || request.signal.aborted) return;
     if (!data.available || data.support.directions.length !== capabilityDefinitions.platforms.length ** 2) throw new Error();
     current.value = data.support; unavailable.value = false;
+    void refreshFlowChoices();
   } catch { if (active) unavailable.value = true; }
   finally { clearTimeout(deadline); running = false; if (active) timer = setTimeout(refresh, 15_000); }
 }
@@ -40,11 +41,128 @@ function hide() { unavailable.value = true; controller?.abort(); }
 onMounted(() => { timer = setTimeout(refresh, 15_000); document.addEventListener('visibilitychange', visible); window.addEventListener('pagehide', hide); window.addEventListener('pageshow', visible); });
 onUnmounted(() => { active = false; controller?.abort(); clearTimeout(timer); document.removeEventListener('visibilitychange', visible); window.removeEventListener('pagehide', hide); window.removeEventListener('pageshow', visible); });
 const versions = (platform: Platform) => Object.entries(platform.versions).map(([key, value]) => `${key}: ${value}`).join('; ');
+
+type NativeChoice = {
+  source_flow_id: string; source: { from: string; to: string; protocol: string; port: number };
+  required: boolean; destination_firewall_rule_ids: string[]; destination_route_ids: string[];
+  status: 'choices_observed' | 'held_unobserved'; native_write_authorized: false;
+};
+type NativeBinding = { source_flow_id: string; rule_native_ref: string; route_native_ref: string };
+type FlowChoices = {
+  context_sha256: string; revision: number; expires_at: number; choices: NativeChoice[];
+  selections: NativeBinding[]; holds: string[]; status: 'eligible' | 'held' | 'invalidated';
+  native_write_authorized: false;
+};
+const flowBase = url + '/flow-choices';
+const flowSave = url + '/flow-selections';
+const flowState = ref<FlowChoices | null>(null);
+const flowFailure = ref('');
+const flowBusy = ref(false);
+const flowForm = useForm({
+  command_key: crypto.randomUUID(), revision: 0, context_sha256: '',
+  selections: [] as NativeBinding[],
+});
+const missingChoices = computed(() => flowState.value?.choices.filter(c =>
+  c.required && (!c.destination_firewall_rule_ids.length || !c.destination_route_ids.length)) ?? []);
+const selectionsComplete = computed(() => Boolean(flowState.value) && flowState.value!.choices.every(c => {
+  const selected = flowForm.selections.find(s => s.source_flow_id === c.source_flow_id);
+  return !c.required || (selected
+    && c.destination_firewall_rule_ids.includes(selected.rule_native_ref)
+    && c.destination_route_ids.includes(selected.route_native_ref));
+}));
+function flowBinding(id: string): NativeBinding {
+  const current = flowForm.selections.find(s => s.source_flow_id === id);
+  if (current) return current;
+  const created = { source_flow_id: id, rule_native_ref: '', route_native_ref: '' };
+  flowForm.selections.push(created);
+  return created;
+}
+function flowSelection(id: string, side: 'rule_native_ref' | 'route_native_ref'): string {
+  return flowForm.selections.find(s => s.source_flow_id === id)?.[side] ?? '';
+}
+function selectFlow(id: string, side: 'rule_native_ref' | 'route_native_ref', value: string) {
+  flowBinding(id)[side] = value;
+}
+async function refreshFlowChoices(): Promise<void> {
+  if (!active || flowBusy.value) return;
+  flowBusy.value = true;
+  try {
+    const response = await fetch(flowBase, { credentials: 'same-origin', cache: 'no-store',
+      redirect: 'manual', headers: { Accept: 'application/json' } });
+    if (!active) return;
+    if ([401, 403, 404].includes(response.status) || response.type === 'opaqueredirect') {
+      flowState.value = null; flowFailure.value = 'Application flow access is no longer authorized.';
+      return;
+    }
+    if (!response.ok || !response.headers.get('Content-Type')?.includes('application/json')) throw new Error();
+    const payload = await response.json() as { available: boolean; flow_choices: FlowChoices };
+    const updated = payload.flow_choices;
+    if (!payload.available || !updated || updated.native_write_authorized !== false) throw new Error();
+    if (flowForm.context_sha256 !== updated.context_sha256 || flowForm.revision !== updated.revision) {
+      flowForm.context_sha256 = updated.context_sha256;
+      flowForm.revision = updated.revision;
+      flowForm.selections = updated.selections.map(s => ({ ...s }));
+      flowForm.command_key = crypto.randomUUID();
+      flowForm.clearErrors();
+    }
+    flowState.value = updated;
+    flowFailure.value = '';
+  } catch {
+    if (active) { flowState.value = null; flowFailure.value = 'Source application intent or independent destination evidence could not be refreshed. Choices are blocked.'; }
+  } finally { flowBusy.value = false; }
+}
+function saveFlowChoices() {
+  if (!selectionsComplete.value || flowForm.processing || flowFailure.value || !flowState.value) return;
+  flowForm.command_key = crypto.randomUUID();
+  flowForm.post(flowSave, {
+    preserveScroll: true,
+    onSuccess: () => { void refreshFlowChoices(); },
+    onError: () => { void refreshFlowChoices(); },
+  });
+}
+onMounted(() => { void refreshFlowChoices(); });
+
 </script>
 
 <template>
   <CatalogueLayout title="Directional migration support" :tenant-id="tenantId">
     <Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}/migration-fleet`" class="text-teal-800 underline">Migration fleet</Link>
+    <section class="mt-5 rounded border border-slate-300 p-4" aria-label="Source-approved application flow mapping">
+      <h2 class="text-lg font-semibold">Required application flows → existing destination controls</h2>
+      <p class="mt-2">These dependencies come from the verified application owner's Planning intent—not from VM NICs or generic firewall ACLs. Select only API-discovered destination firewall rules and routes. Save records the choices, but does not authorize migration or replace independent allow/deny, return-path, and tenant-isolation tests.</p>
+      <p v-if="flowFailure" role="alert" class="mt-2 text-red-800">{{ flowFailure }}</p>
+      <p v-if="!flowState" class="mt-2">An approved application migration assessment and fresh native network observations are required before mapping.</p>
+      <template v-else>
+        <p class="mt-2" :role="flowState.status === 'eligible' ? 'status' : 'alert'">
+          {{ flowState.status === 'eligible' ? 'Current flow selections passed the independent evidence gate.' :
+             flowState.status === 'invalidated' ? 'Previously saved flow selections are invalidated by changed source intent or destination observations.' :
+             'Application flow selections or independent network/isolation evidence remain held.' }}
+        </p>
+        <p v-if="flowState.holds.length" role="alert">Holds: {{ flowState.holds.join(', ').replaceAll('_', ' ') }}</p>
+        <p v-if="missingChoices.length" role="alert">No matching existing destination rule or route was observed for {{ missingChoices.length }} required application flows. There is no manual resource creation option.</p>
+        <div v-for="choice in flowState.choices" :key="choice.source_flow_id" class="mt-3 border-t pt-3">
+          <p><strong>{{ choice.source.from }} → {{ choice.source.to }}</strong> · {{ choice.source.protocol }}:{{ choice.source.port }} · {{ choice.required ? 'Critical / required' : 'Optional' }}</p>
+          <div v-if="choice.status === 'choices_observed'" class="mt-1 grid gap-3 md:grid-cols-2">
+            <label>Existing destination firewall rule
+              <select :value="flowSelection(choice.source_flow_id, 'rule_native_ref')" :disabled="flowForm.processing" @change="selectFlow(choice.source_flow_id, 'rule_native_ref', ($event.target as HTMLSelectElement).value)">
+                <option value="">Select observed native rule ID</option>
+                <option v-for="id in choice.destination_firewall_rule_ids" :key="id" :value="id">{{ id }}</option>
+              </select>
+            </label>
+            <label>Existing destination network route
+              <select :value="flowSelection(choice.source_flow_id, 'route_native_ref')" :disabled="flowForm.processing" @change="selectFlow(choice.source_flow_id, 'route_native_ref', ($event.target as HTMLSelectElement).value)">
+                <option value="">Select observed native route ID</option>
+                <option v-for="id in choice.destination_route_ids" :key="id" :value="id">{{ id }}</option>
+              </select>
+            </label>
+          </div>
+          <p v-else role="alert">No qualified native controls match this source-defined flow; migration must remain held.</p>
+        </div>
+        <p v-if="flowForm.errors.flow_mapping" role="alert" class="mt-2">{{ flowForm.errors.flow_mapping }}</p>
+        <button type="button" class="mt-4 rounded border px-4 py-2" :disabled="!selectionsComplete || flowForm.processing || !!flowFailure || flowState.expires_at <= Math.floor(Date.now() / 1000)" @click="saveFlowChoices">Save reviewed application flow selections</button>
+        <button type="button" class="ml-3 mt-4 underline" :disabled="flowBusy" @click="refreshFlowChoices">Refresh native options</button>
+      </template>
+    </section>
     <p class="mt-4">Each direction is assessed independently. The versions, guest profile, method and constraints below must all match. A selected route is a delivery commitment; qualification and receiving acceptance are separate gates.</p>
     <p v-if="unavailable" role="alert" class="mt-4 text-red-800">Current support could not be verified. Displayed results are stale; restore the Planning and Assurance connections before proceeding.</p>
     <table class="mt-4 w-full text-left text-sm">
