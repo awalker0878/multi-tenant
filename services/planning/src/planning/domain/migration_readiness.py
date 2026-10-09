@@ -30,6 +30,23 @@ def resolve(
         blockers.append("independent_e4_receiving_acceptance_required")
     if expires_at <= now:
         blockers.append("migration_tranche_expired")
+    # Each admitted operation is bound to the earlier of its installed
+    # namespace/entitlement discovery and exact-version qualification.
+    # Native qualification expiry is authoritative when present.
+    deadlines = [expires_at]
+    native_deadline = native.get("expires_at")
+    if type(native_deadline) is int:
+        deadlines.append(native_deadline)
+    for case in api.get("cases", []) if isinstance(api.get("cases"), list) else []:
+        if case.get("status") == "eligible" or case.get("omission_accepted") is True:
+            deadline = case.get("expires_at")
+            if type(deadline) is not int or deadline <= now:
+                blockers.append("api_capability_evidence_expired_or_unbounded")
+            else:
+                deadlines.append(deadline)
+    expires_at = min(deadlines)
+    if expires_at <= now:
+        blockers.append("migration_readiness_evidence_expired")
     if route["source"]["installation_id"] == route["target"]["installation_id"]:
         blockers.append("distinct_migration_environments_required")
     if native.get("route_sha256") != digest(route):
@@ -112,6 +129,8 @@ def resolve_workload(
                        for a in entry["attributes"])
                 or entry.get("native_write_authorized") is not False
                 or entry.get("independent_e3_e4_qualification") is not False
+                or type(entry.get("expires_at")) is not int
+                or entry["expires_at"] <= now
                 or type(entry.get("evaluated_at")) is not int
                 or not 0 <= now - entry["evaluated_at"] <= 5
                 or entry.get("coverage_sha256") != digest({
@@ -136,9 +155,14 @@ def resolve_workload(
         "workload_admission_authorized": False,
     }
     nested_expiry = reconciliation.get("expires_at")
+    coverage_expiries = [
+        entry["expires_at"] for entry in collection_coverages or []
+        if isinstance(entry, dict) and type(entry.get("expires_at")) is int
+    ]
     upgraded["expires_at"] = min(
-        route["expires_at"], nested_expiry if type(nested_expiry) is int
-        else route["expires_at"]
+        [route["expires_at"],
+         nested_expiry if type(nested_expiry) is int else route["expires_at"]]
+        + coverage_expiries
     )
     upgraded["readiness_sha256"] = digest(upgraded)
     return upgraded
