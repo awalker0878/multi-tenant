@@ -1,6 +1,9 @@
 """Resolved migration-readiness contract is fail-closed and deterministic."""
 
 from planning.domain.migration_readiness import resolve, resolve_workload
+from planning.application.migration_support import validate_workload_contract
+from planning.domain.model import Rejected
+import pytest
 from planning.domain.model import digest
 
 
@@ -116,3 +119,41 @@ def test_workload_coverage_requires_release_pinned_full_attribute_set() -> None:
     })
     result = resolve_workload(route_result, reconciliation, altered, now, manifest)
     assert "migration_collection_manifest_attributes_changed" in result["holds"]
+
+
+def test_incomplete_eligible_readiness_must_not_leave_planning() -> None:
+    """The resolver's hold logic alone is not the published schema."""
+    route, native, api = fixture()
+    route_result = assess(route, native, api)
+    reconciliation = {
+        "status": "matched", "holds": [], "expires_at": 180,
+        "native_write_authorized": False,
+    }
+    reconciliation["reconciliation_sha256"] = digest(reconciliation)
+    manifest = {
+        "release_sha256": route_result["release_sha256"],
+        "manifest_sha256": digest("manifest"),
+        "platforms": {
+            "vmware": {"source": ["src.vm"], "owner": ["owner.intent"]},
+            "ahv": {"target": ["tgt.vm"]},
+        },
+    }
+    rows = []
+    for scope, platform, installation, attribute in (
+        ("source", "vmware", "one", "src.vm"),
+        ("target", "ahv", "two", "tgt.vm"),
+        ("owner", "vmware", "one", "owner.intent"),
+    ):
+        item = {
+            "scope": scope, "platform": platform, "status": "complete",
+            "holds": [], "attributes": [{"attribute_id": attribute, "status": "observed"}],
+            "installation_id": installation, "manifest_sha256": manifest["manifest_sha256"],
+            "expires_at": 160, "evaluated_at": 100,
+            "independent_e3_e4_qualification": False, "native_write_authorized": False,
+        }
+        item["coverage_sha256"] = digest(item)
+        rows.append(item)
+    result = resolve_workload(route_result, reconciliation, rows, 100, manifest)
+    assert result["status"] == "eligible"
+    with pytest.raises(Rejected, match="migration_workload_contract_invalid"):
+        validate_workload_contract(result)

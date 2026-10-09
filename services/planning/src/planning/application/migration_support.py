@@ -1,6 +1,11 @@
 """Directional eligibility from commissioned scope and authenticated Assurance reads."""
 
 from collections.abc import Callable
+from functools import lru_cache
+from importlib.resources import files
+import json
+
+from jsonschema import Draft202012Validator, FormatChecker
 from typing import Any
 
 from planning.domain.api_compatibility import evaluate as evaluate_api
@@ -9,6 +14,26 @@ from planning.domain.migration_readiness import resolve_workload
 from planning.domain.capability_definitions import METHOD_ALIASES as METHODS
 from planning.domain.expansion import matrix, tranche
 from planning.domain.model import Actor, Rejected, digest
+
+
+@lru_cache(maxsize=1)
+def _workload_validator() -> Draft202012Validator:
+    schema = json.loads(
+        files("planning.infrastructure.inputs")
+        .joinpath("migration-readiness-v2.json")
+        .read_text(encoding="utf-8")
+    )
+    Draft202012Validator.check_schema(schema)
+    return Draft202012Validator(schema, format_checker=FormatChecker())
+
+
+def validate_workload_contract(result: dict[str, Any]) -> None:
+    """Fail closed on invalid or partially produced migration readiness.
+
+    This is a transport contract check, not independent E3/E4 qualification.
+    """
+    if not _workload_validator().is_valid(result):
+        raise Rejected("migration_workload_contract_invalid", 423)
 
 
 class MigrationSupport:
@@ -135,6 +160,7 @@ class MigrationSupport:
             self.collection_manifest(selected["release_sha256"])
             if self.collection_manifest is not None else None,
         )
+        validate_workload_contract(result)
         return {"schema_version": 1, "review": revision, "readiness": result,
                 "native_write_authorized": False, "workload_admission_authorized": False}
 
@@ -246,4 +272,5 @@ class MigrationSupport:
             )
             if readiness["status"] != "eligible":
                 raise Rejected("migration_workload_readiness_held", 423)
+            validate_workload_contract(readiness)
         return readiness

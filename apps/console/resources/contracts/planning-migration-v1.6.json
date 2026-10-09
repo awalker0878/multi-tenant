@@ -2897,7 +2897,7 @@
           },
           "collection_coverages": {
             "type": "array",
-            "minItems": 3,
+            "minItems": 0,
             "maxItems": 3,
             "items": {
               "type": "object",
@@ -3066,6 +3066,83 @@
                       "const": true
                     }
                   }
+                },
+                "workload_reconciliation": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "const": "matched"
+                    },
+                    "holds": {
+                      "maxItems": 0
+                    },
+                    "native_write_authorized": {
+                      "const": false
+                    }
+                  }
+                },
+                "collection_coverages": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "const": "complete"
+                      },
+                      "holds": {
+                        "maxItems": 0
+                      }
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "contains": {
+                        "type": "object",
+                        "properties": {
+                          "scope": {
+                            "const": "source"
+                          }
+                        },
+                        "required": [
+                          "scope"
+                        ]
+                      },
+                      "minContains": 1,
+                      "maxContains": 1
+                    },
+                    {
+                      "contains": {
+                        "type": "object",
+                        "properties": {
+                          "scope": {
+                            "const": "target"
+                          }
+                        },
+                        "required": [
+                          "scope"
+                        ]
+                      },
+                      "minContains": 1,
+                      "maxContains": 1
+                    },
+                    {
+                      "contains": {
+                        "type": "object",
+                        "properties": {
+                          "scope": {
+                            "const": "owner"
+                          }
+                        },
+                        "required": [
+                          "scope"
+                        ]
+                      },
+                      "minContains": 1,
+                      "maxContains": 1
+                    }
+                  ]
                 }
               }
             }
