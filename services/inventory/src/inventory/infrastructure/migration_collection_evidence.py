@@ -125,7 +125,7 @@ def read_collection_coverages(
             "schema_version", "tenant_id", "site_id",
             "source_profile_sha256", "target_profile_sha256",
             "expires_at", "scopes",
-        })
+        } | ({"generation_sequence"} if "generation_sequence" in payload else set()))
         left = _profile_environment(source, source_binding)
         right = _profile_environment(target, target_binding)
         if (
@@ -133,6 +133,9 @@ def read_collection_coverages(
             or payload["tenant_id"] != tenant or payload["site_id"] != site
             or payload["source_profile_sha256"] != left["profile_sha256"]
             or payload["target_profile_sha256"] != right["profile_sha256"]
+            or (payload.get("generation_sequence") is not None
+                and (type(payload["generation_sequence"]) is not int
+                     or payload["generation_sequence"] < 1))
             or type(payload["expires_at"]) is not int or payload["expires_at"] <= now
             or source.get("current") is not True
             or target.get("current") is not True
