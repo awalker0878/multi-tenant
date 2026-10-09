@@ -120,7 +120,15 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
         "method": "cold_export",
         "api_compatibility": {
             "status": "eligible", "operationally_eligible": True,
-            "cases": [{"status": "eligible", "omission_accepted": False}],
+            "administrator_alerts": [], "native_write_authorized": False,
+            "cases": [{
+                "capability_id": "vm.disk.transfer", "side": "source",
+                "criticality": "critical", "status": "eligible",
+                "reason": "synthetic independent evidence",
+                "evidence_sha256": digest("api-qualified"),
+                "selected_api_family": "vim", "selected_api_version": "8.0",
+                "omission_accepted": False, "expires_at": 1800,
+            }],
         },
         "native_e3_qualified": True, "receiving_e4_accepted": True,
         "status": "eligible", "holds": [], "evaluated_at": 1000,
@@ -141,6 +149,12 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
         "status": "matched", "holds": [], "workloads": [{
             "workload_id": str(uuid4()), "status": "matched", "holds": [],
             "source_identity_sha256": digest("native-identity"),
+            "field_dispositions": [{
+                "field": "cpu.count", "disposition": "matched", "required": True,
+                "desired_value": "2", "observed_value": "2",
+                "evidence_source": "inventory_native_profile",
+                "evidence_age_seconds": 1, "next_action": "none",
+            }],
         }], "expires_at": 1800, "native_write_authorized": False,
     }
     reconciliation["reconciliation_sha256"] = digest(reconciliation)
@@ -155,7 +169,8 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
             "installation_id": installation, "generation_id": generation,
             "installed_tuple_sha256": tuple_sha,
             "manifest_sha256": digest("field-manifest"),
-            "evaluated_at": 1000, "status": "complete", "holds": [],
+            "evaluated_at": 1000, "expires_at": 1800,
+            "status": "complete", "holds": [],
             "attributes": [{"attribute_id": "identity", "status": "observed",
                             "reason": "native", "severity": "critical"}],
             "independent_e3_e4_qualification": False,
