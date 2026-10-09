@@ -82,6 +82,33 @@ def check_copies():
             if load(destination) != canonical:
                 raise ValueError(f"Packaged contract drift: {destination}")
 
+def check_native_candidates():
+    registry = load("contracts/capabilities/native-security-api-registry-v1.json")
+    if registry["status"] != "candidate_paths_require_installed_qualification":
+        raise ValueError("Native security API registry must never claim qualification")
+    if set(registry["providers"]) != {"vmware", "ahv", "openstack"}:
+        raise ValueError("Native security registry platform drift")
+    for platform, provider in registry["providers"].items():
+        if not provider["namespace"] or not provider["versions"]:
+            raise ValueError(f"Missing candidate namespace or versions: {platform}")
+        for version, record in provider["versions"].items():
+            for name in ("required_features", "candidate_endpoints"):
+                values = record[name]
+                if not values or len(values) != len(set(values)):
+                    raise ValueError(f"Invalid native candidate feature/endpoints: {platform}/{version}")
+            if any(not endpoint.startswith("/") for endpoint in record["candidate_endpoints"]):
+                raise ValueError(f"Invalid native endpoint path: {platform}/{version}")
+    for platform in ("ahv", "openstack"):
+        projection = load(f"contracts/platforms/{platform}/source-profile-v1.json")
+        fields = ["vm"] if platform == "ahv" else ["server", "volume"]
+        if projection["schema_version"] != 1:
+            raise ValueError(f"Invalid {platform} source profile")
+        for field in fields:
+            values = projection[field]
+            if not values or len(set(values)) != len(values):
+                raise ValueError(f"Duplicate/missing native profile field: {platform}/{field}")
+
+
 def main():
     sources, bundles = verify()
     id_count = unique_schema_ids()
@@ -92,6 +119,7 @@ def main():
         ops += b
     check_routes()
     check_copies()
+    check_native_candidates()
     print(json.dumps(dict(status="PASS", sources=sources, bundles=bundles, unique_ids=id_count, paths=paths, operations=ops)))
 
 if __name__ == "__main__":

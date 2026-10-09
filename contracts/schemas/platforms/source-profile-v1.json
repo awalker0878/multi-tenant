@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:multi-tenant:platform-source-profile:v1",
+  "title": "Read-only source collection field projection; not evidence of qualified semantics",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "vm": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "server": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "volume": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "vm"
+      ],
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "server"
+            ]
+          },
+          {
+            "required": [
+              "volume"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "required": [
+        "server",
+        "volume"
+      ],
+      "not": {
+        "required": [
+          "vm"
+        ]
+      }
+    }
+  ]
+}
