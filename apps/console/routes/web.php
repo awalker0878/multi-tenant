@@ -92,6 +92,8 @@ Route::prefix('/tenants/{tenant}/applications/{application}/environments/{enviro
     $c = PlanningController::class;
     Route::get('/migration-support/{site}', [MigrationSupportController::class, 'show'])->whereUuid('site');
     Route::get('/migration-support/{site}/status', [MigrationSupportController::class, 'status'])->whereUuid('site');
+    Route::get('/migration-support/{site}/flow-choices', [MigrationSupportController::class, 'flowChoices'])->whereUuid('site');
+    Route::post('/migration-support/{site}/flow-selections', [MigrationSupportController::class, 'saveFlows'])->whereUuid('site');
     Route::get('/', [$c, 'index']);
     Route::get('/destinations/{site}', [$c, 'destinations'])->whereUuid('site');
     Route::get('/{kind}/{record}', [$c, 'show'])->whereIn('kind', ['assessments', 'plans'])->whereUuid('record');
