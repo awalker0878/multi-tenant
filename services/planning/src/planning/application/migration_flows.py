@@ -283,6 +283,20 @@ class MigrationFlows:
             )
         return outcome
 
+    def _latest_assessment_id(self, actor: Actor, site: str) -> str:
+        with self.planning.database.transaction() as tx:
+            row = tx.one(
+                "SELECT id FROM app.planning_records WHERE tenant=%s AND "
+                "application=%s AND environment=%s AND "
+                "kind='assessment' AND payload->>'action'='application.migrate' "
+                "AND payload->'candidates' @> %s::jsonb "
+                "ORDER BY created_at DESC,id DESC LIMIT 1",
+                (*self.scope(actor, site)[:3], canonical([{"site_id": site}])),
+            )
+        if row is None:
+            raise Rejected("application_migration_assessment_required", 423)
+        return str(row["id"])
+
     def require(self, actor: Actor, site: str) -> None:
         """Execution-side fail-closed gate; no owner delegation is minted here."""
         saved = self._read_saved(actor, site, self._latest_assessment_id(actor, site))
