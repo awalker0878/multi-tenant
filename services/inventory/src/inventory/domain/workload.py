@@ -208,11 +208,29 @@ def review_input(body: dict[str, Any], source: dict[str, Any]) -> None:
     if "catalogue_binding" in body:
         link = shape(body["catalogue_binding"], {
             "application_id", "environment_id", "revision_id",
-            "intent_sha256", "workload_id",
+            "intent_sha256", "workload_id", "disk_mappings", "nic_mappings",
         })
         for field in ("application_id", "environment_id", "revision_id", "workload_id"):
             identifier(link[field])
         checksum(link["intent_sha256"])
+        for kind, items in (("disks", link["disk_mappings"]),
+                            ("nics", link["nic_mappings"])):
+            expected = {device["key"] for device in source[kind]}
+            if (not isinstance(items, list) or len(items) != len(expected)
+                    or len(items) > 64):
+                raise Rejected("catalogue_native_device_coverage_required", 423)
+            keys: set[int] = set()
+            logical: set[str] = set()
+            for item in items:
+                shape(item, {"logical_device_id", "native_key"})
+                logical_id = identifier(item["logical_device_id"])
+                native_key = number(item["native_key"], 0, 2147483647)
+                if logical_id in logical or native_key in keys:
+                    raise Rejected("catalogue_native_device_mapping_ambiguous", 423)
+                logical.add(logical_id)
+                keys.add(native_key)
+            if keys != expected:
+                raise Rejected("catalogue_native_device_coverage_required", 423)
     identifier(body["source_profile_id"])
     identifier(body["target_profile_id"])
     if body["method"] not in METHODS:
