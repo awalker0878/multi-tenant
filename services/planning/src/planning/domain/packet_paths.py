@@ -70,8 +70,15 @@ def qualify(document: dict[str, Any], flow: dict[str, Any], now: int) -> dict[st
                "native_path_incomplete")
         seen_path_ids.add(path["id"])
         state = packet(path.get("ingress_packet"))
+        from planning.domain.policy_resolvers import identity
+        src, dst = identity(document, flow["from"]), identity(document, flow["to"])
         insist(state["protocol"] == flow["protocol"]
-               and state["destination_port"] == flow["port"],
+               and state["destination_port"] == flow["port"]
+               and state["source_ip"] in src["ips"]
+               and state["destination_ip"] in dst["ips"]
+               and state["scope"] == document.get("native_scope")
+               and (not flow.get("address_family")
+                    or state["address_family"] == flow["address_family"]),
                "path_application_packet_mismatch")
         used_refs = set()
         for index, hop in enumerate(path["hops"]):
