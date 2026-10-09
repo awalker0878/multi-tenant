@@ -23,8 +23,10 @@ class PlanningInputApp:
         native_authority: Callable[[str, str, str, str, str, int, str], None] | None = None,
         observations: CapabilityObservations | None = None,
         capability_authority: Callable[[str, str, str, str, str, str, str], None] | None = None,
+        collection_read=None,
     ) -> None:
         self.capability_authority = capability_authority
+        self.collection_read = collection_read
         self.observations = observations
         self.discovery, self.authority = discovery, authority
         self.native_authority = native_authority
@@ -97,7 +99,7 @@ class PlanningInputApp:
                 )
             if migration:
                 payload = await asyncio.to_thread(
-                    WorkloadProfiles(self.discovery).planning,
+                    WorkloadProfiles(self.discovery, self.collection_read).planning,
                     tenant,
                     site,
                     int(endpoint),
