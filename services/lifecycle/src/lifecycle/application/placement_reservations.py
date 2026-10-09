@@ -111,6 +111,20 @@ class PlacementReservations:
                 limits, used = vector(pool["limits"]), vector(pool["provider_used"])
                 if set(used) != set(limits) or not set(requested) <= set(limits):
                     raise Held("placement_pool_class_limit_missing")
+                # If the owner enforces class-specific limits, a positive
+                # aggregate demand must identify its exact physical classes.
+                # Otherwise an unclassified allocation could evade a full
+                # IPv4/IPv6 or storage-class pool.
+                for aggregate, prefix in (
+                    ("storage_gib", "storage_gib:"),
+                    ("addresses", "addresses:"),
+                ):
+                    if (
+                        requested[aggregate] > 0
+                        and any(k.startswith(prefix) for k in limits)
+                        and not any(k.startswith(prefix) for k in requested)
+                    ):
+                        raise Held("placement_pool_class_dimension_missing")
                 debits = tx.all(
                     "SELECT d.native_ref,d.vector,r.id,r.state FROM app.placement_debits d "
                     "JOIN app.placement_reservations r ON r.id=d.reservation "

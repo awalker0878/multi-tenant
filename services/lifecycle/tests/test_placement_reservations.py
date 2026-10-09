@@ -199,13 +199,17 @@ def test_unused_class_limit_does_not_require_an_allocation_in_that_class(
     class PoolWithExtraClass(Snapshots):
         def pools(self, request: dict[str, Any]) -> list[dict[str, Any]]:
             observed = super().pools(request)
-            observed[0]["limits"]["addresses:private:ipv6"] = 2
-            observed[0]["provider_used"]["addresses:private:ipv6"] = 0
+            for family in ("ipv4", "ipv6"):
+                kind = "addresses:private:" + family
+                observed[0]["limits"][kind] = 2
+                observed[0]["provider_used"][kind] = 0
             return observed
 
     source = PoolWithExtraClass()
     service = PlacementReservations(database, source, lambda: source.now)
     selected = request(source, 4)
+    selected["allocations"][0]["vector"]["addresses:private:ipv4"] = 1
+    selected["placement_sha256"] = digest(selected["allocations"])
     receipt = service.reserve(selected["scope"]["tenant_id"], selected)
     assert receipt["state"] == "reserved"
     assert service.check(selected["scope"]["tenant_id"], selected["plan_digest"])["state"] == "reserved"
@@ -228,3 +232,20 @@ def test_classified_allocation_must_reconcile_with_aggregate(
         service.reserve(selected["scope"]["tenant_id"], selected)
     with database.transaction() as tx:
         assert tx.one("SELECT count(*) AS n FROM app.placement_reservations")["n"] == 0
+
+
+def test_class_limit_owner_rejects_unclassified_demand(database: Postgres) -> None:
+    """An unknown network class must never consume a classified address pool."""
+
+    class ClassifiedPool(Snapshots):
+        def pools(self, request: dict[str, Any]) -> list[dict[str, Any]]:
+            observed = super().pools(request)
+            observed[0]["limits"]["addresses:private:ipv4"] = 2
+            observed[0]["provider_used"]["addresses:private:ipv4"] = 0
+            return observed
+
+    source = ClassifiedPool()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    with pytest.raises(Held, match="placement_pool_class_dimension_missing"):
+        service.reserve(selected["scope"]["tenant_id"], selected)
