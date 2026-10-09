@@ -58,3 +58,10 @@ def test_target_profile_cannot_masquerade_as_source() -> None:
     value["facts"]["profile_type"] = "TargetCapabilityProfile"
     with pytest.raises(Rejected, match="source_observation_profile_required"):
         source_observation(value, BINDING)
+
+
+def test_vmware_native_boot_option_is_retained_when_observed() -> None:
+    value = profile("vmware")
+    value["facts"]["secure_boot"] = False
+    result = source_observation(value, BINDING)
+    assert result["facts"]["secure_boot"] is False
