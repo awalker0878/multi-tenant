@@ -6620,6 +6620,42 @@
                       "type": "null"
                     }
                   ]
+                },
+                "rules": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "maxItems": 512,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "extId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 240
+                          },
+                          "type": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 160
+                          },
+                          "spec_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          }
+                        },
+                        "required": [
+                          "extId",
+                          "type",
+                          "spec_sha256"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "required": [
