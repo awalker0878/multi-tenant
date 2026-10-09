@@ -6,7 +6,7 @@ import pytest
 
 from planning_fixture import NOW, inputs
 
-from planning.domain.network_evidence import isolation_checks, network_checks, traffic
+from planning.domain.network_evidence import isolation_checks, network_checks, selected_native_flow, traffic
 
 
 def test_missing_route_and_failed_negative_control_block() -> None:
@@ -108,3 +108,58 @@ def test_native_isolation_controls_distinguish_missing_from_failed(
         isolation["negative_flows"] = []
     results = isolation_checks(intent, destination, data, policy, NOW)
     assert next(status for name, status, _, _ in results if name == key) == expected
+
+
+@pytest.mark.parametrize(("change", "expected"), [
+    ("missing_mapping", "unknown"),
+    ("made_up_rule", "blocked"),
+    ("made_up_route", "blocked"),
+    ("changed_rule", "blocked"),
+    ("stale_mapping", "unknown"),
+    ("wrong_policy", "unknown"),
+    ("same_writer", "blocked"),
+    ("wrong_network_context", "blocked"),
+])
+def test_source_approved_application_flow_must_select_current_existing_native_controls(
+    change: str, expected: str
+) -> None:
+    intent, destination, _, policy, _ = inputs()
+    network = deepcopy(destination["capability_snapshot"]["data"]["network"])
+    flow = next(d for d in intent["dependencies"] if d["kind"] == "communication")
+    from planning.domain.model import digest
+
+    key = digest({k: flow[k] for k in ("from", "to", "protocol", "port")})
+    selection = network["application_flow_selections"][key]
+    if change == "missing_mapping":
+        del network["application_flow_selections"][key]
+    elif change == "made_up_rule":
+        selection["rule_native_ref"] = "fixture://not-an-api-id"
+    elif change == "made_up_route":
+        selection["route_native_ref"] = "fixture://not-an-api-route"
+    elif change == "changed_rule":
+        network["firewall_rules"][0]["ingress_action"] = "deny"
+    elif change == "stale_mapping":
+        selection["expires_at"] = NOW
+    elif change == "wrong_policy":
+        selection["policy_sha256"] = "b" * 64
+    elif change == "same_writer":
+        selection["observer_principal"] = "fixture-writer"
+    elif change == "wrong_network_context":
+        network["firewall_rules"][0]["context"]["vrf_id"] = "unexpected"
+    assert selected_native_flow(flow, network, policy, NOW) == expected
+    results = network_checks(intent, {"network": network}, policy, NOW)
+    assert any(
+        name == "network.application_flow_selection" and state == expected and required
+        for name, state, _, required in results
+    )
+
+
+def test_native_application_selection_cannot_replace_independent_traffic_measurement() -> None:
+    intent, destination, _, policy, _ = inputs()
+    network = deepcopy(destination["capability_snapshot"]["data"]["network"])
+    flow = next(d for d in intent["dependencies"] if d["kind"] == "communication")
+    assert selected_native_flow(flow, network, policy, NOW) == "eligible"
+    network["measurements"] = []
+    assert traffic(flow, network, policy, NOW) == "unknown"
+    checks = network_checks(intent, {"network": network}, policy, NOW)
+    assert any(n == "network.reachability" and status == "unknown" for n, status, _, _ in checks)
