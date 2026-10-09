@@ -16,6 +16,31 @@ Check the updated `git rev-parse HEAD` and the
 [PR checks](https://github.com/awalker0878/multi-tenant/pull/64/checks)
 at every checkpoint.
 
+## CT-R01 — Resolved migration-readiness contract (2026-10-09 checkpoint)
+
+**Current branch work committed, not yet end-to-end verified.** See
+[resolved migration-readiness commissioning ledger](docs/implementation/resolved-migration-readiness-rollout.md)
+and the closed contract at `contracts/schemas/planning/migration-readiness-v1.json`.
+This work deliberately preserves Catalogue desired intent, Inventory native facts,
+Assurance qualification/receiving decisions, Planning composition and Lifecycle
+native authority. **Do not merge or promote PR #64 on these changes alone.**
+
+| Phase | Engineering result | Required exit evidence / remaining work |
+| --- | --- | --- |
+| 0. Native reads | Inventory OpenStack profile completion counts independently retrieved Neutron security groups; AHV workload reads select namespace-specific configured v4.2/v4.3 | Manifest-derived read ledger and safe SG-heavy budget handling; versioned readback and negative native probes |
+| 1. Catalogue↔Inventory source | Pure `source_intent_reconciliation.reconcile` compares owner-confirmed logical/native IDs, generation, CPU/RAM, disk/NIC, firmware, Secure Boot, dataset map, dependencies | Authenticated current Catalogue+Inventory owner ports, immutable confirmed links, persisted diff and Planning/Lifecycle effect wiring |
+| 2. Collection field coverage | Pure Inventory `migration_collection_coverage.evaluate` evaluates all scoped manifest rows, freshness, applicability and external owner receipts | Durable raw/field observation ledger, worker binding to native requests, service-only Inventory projection, UI holds and native effect recheck |
+| 3. Installed API/version | Planning per-operation Assurance evidence required; selects lowest qualified installed version; AHV source VMM/Prism/ClusterMgmt API calls no longer hard-code all v4.3 | Native operation-to-adapter code manifest for **all** routes; runtime endpoint/entitlement probes and every version/method negative case, E3 reviewer/E4 receiving records |
+| 4. Single resolved contract | Planning `MigrationSupport.read/require` resolves route readiness; protected Planning execution-plan includes same fresh receipt; Console displays status/holds; Lifecycle verifies scope/digest/route/version/method/E3/E4/API on each current owner read | Bind per-workload reconciliation and field collection into exact service-only receipt; cross-service TLS/revocation/failure matrix, complete CI |
+| 5. Qualification/rollout | Added Inventory/Planning/Lifecycle unit regressions and a closed JSON schema | **NOT complete**: required head CI queued; foundation package/bootstrap workflows early failure; independent real E3/E4 trials and authorization absent |
+
+The v1 contract is **route-level only**, explicitly `workload_admission_authorized=false`
+and `native_write_authorized=false`. It must not be cited as proof a specific
+workload meets Catalogue intent or that all manifest fields were collected.
+Actual deployment requires separate live workload admission and installed
+operation evidence, with independent Assurance decisions. Existing native
+custody, Governance and confirmed Inventory checks remain mandatory.
+
 ## Follow-up capacity correctness (current branch)
 
 Five additional source-bound corrections were committed after the original PR #64
