@@ -760,7 +760,10 @@
                 "additionalProperties": false,
                 "required": [
                   "key",
-                  "capacity_bytes"
+                  "capacity_bytes",
+                  "controller_key",
+                  "unit_number",
+                  "native_role"
                 ],
                 "properties": {
                   "key": {
@@ -774,6 +777,25 @@
                       "null"
                     ],
                     "minimum": 0
+                  },
+                  "controller_key": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "unit_number": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "native_role": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 200
                   }
                 }
               }
@@ -809,6 +831,59 @@
                     "null"
                   ]
                 }
+              }
+            },
+            "guest_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 200
+            },
+            "architecture": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 200
+            },
+            "controllers": {
+              "type": "array",
+              "maxItems": 128,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "integer"
+                  },
+                  "model": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 200
+                  },
+                  "bus": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "sharing": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 200
+                  }
+                },
+                "required": [
+                  "key",
+                  "model",
+                  "bus",
+                  "sharing"
+                ],
+                "additionalProperties": false
               }
             }
           }
@@ -908,6 +983,42 @@
                 "maximum": 2147483647
               }
             }
+          }
+        },
+        "disk_dispositions": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "logical_device_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "native_key": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "disposition": {
+                "const": "uncatalogued_attested"
+              },
+              "owner_approval_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "impact_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "logical_device_id",
+              "native_key",
+              "disposition",
+              "owner_approval_sha256",
+              "impact_sha256"
+            ]
           }
         }
       }
@@ -1009,6 +1120,42 @@
                       "maximum": 2147483647
                     }
                   }
+                }
+              },
+              "disk_dispositions": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "logical_device_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "native_key": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "disposition": {
+                      "const": "uncatalogued_attested"
+                    },
+                    "owner_approval_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "impact_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  },
+                  "required": [
+                    "logical_device_id",
+                    "native_key",
+                    "disposition",
+                    "owner_approval_sha256",
+                    "impact_sha256"
+                  ]
                 }
               }
             }
@@ -1123,7 +1270,10 @@
                       "additionalProperties": false,
                       "required": [
                         "key",
-                        "capacity_bytes"
+                        "capacity_bytes",
+                        "controller_key",
+                        "unit_number",
+                        "native_role"
                       ],
                       "properties": {
                         "key": {
@@ -1137,6 +1287,25 @@
                             "null"
                           ],
                           "minimum": 0
+                        },
+                        "controller_key": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "unit_number": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "native_role": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 200
                         }
                       }
                     }
@@ -1172,6 +1341,59 @@
                           "null"
                         ]
                       }
+                    }
+                  },
+                  "guest_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 200
+                  },
+                  "architecture": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 200
+                  },
+                  "controllers": {
+                    "type": "array",
+                    "maxItems": 128,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "integer"
+                        },
+                        "model": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 200
+                        },
+                        "bus": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "sharing": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 200
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "model",
+                        "bus",
+                        "sharing"
+                      ],
+                      "additionalProperties": false
                     }
                   }
                 }
@@ -1299,6 +1521,127 @@
           },
           "current": {
             "type": "boolean"
+          }
+        }
+      }
+    },
+    "collection_coverages": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "platform",
+          "scope",
+          "installation_id",
+          "generation_id",
+          "installed_tuple_sha256",
+          "manifest_sha256",
+          "evaluated_at",
+          "status",
+          "attributes",
+          "holds",
+          "independent_e3_e4_qualification",
+          "native_write_authorized",
+          "coverage_sha256",
+          "expires_at"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": 1
+          },
+          "platform": {
+            "enum": [
+              "vmware",
+              "ahv",
+              "openstack"
+            ]
+          },
+          "scope": {
+            "enum": [
+              "source",
+              "target",
+              "owner"
+            ]
+          },
+          "installation_id": {
+            "type": "string"
+          },
+          "generation_id": {
+            "type": "string"
+          },
+          "installed_tuple_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "manifest_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "evaluated_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "enum": [
+              "complete",
+              "held"
+            ]
+          },
+          "attributes": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "attribute_id",
+                "status",
+                "reason",
+                "severity"
+              ],
+              "properties": {
+                "attribute_id": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "observed",
+                    "not_applicable",
+                    "held"
+                  ]
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "independent_e3_e4_qualification": {
+            "const": false
+          },
+          "native_write_authorized": {
+            "const": false
+          },
+          "coverage_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0
           }
         }
       }
