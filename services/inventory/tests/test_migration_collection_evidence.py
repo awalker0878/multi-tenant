@@ -40,10 +40,12 @@ def specimen():
     source = {"generation_id": "src-gen", "current": True, "facts": {
         "platform": "ahv", "profile_type": "SourceWorkloadProfile",
         "installation_id": "src-install",
+        "versions": {"vmm": "v4.3"},
     }}
     target = {"generation_id": "tgt-gen", "current": True, "facts": {
         "platform": "openstack", "profile_type": "TargetCapabilityProfile",
         "project_id": "tgt-install",
+        "api_versions": {"nova": ["2.104"]},
     }}
     left = {"profile_sha256": digest("src"), "tuple_sha256": digest("src-tuple")}
     right = {"profile_sha256": digest("tgt"), "tuple_sha256": digest("tgt-tuple")}
@@ -53,7 +55,7 @@ def specimen():
             "installation_id": installation, "generation_id": generation,
             "installed_tuple_sha256": tuple_sha,
             "collection_method": method, "api_family": family,
-            "api_version": "v4.3" if family else None,
+            "api_version": "2.104" if family == "nova" else "v4.3" if family else None,
             "observed_at": 90, "evidence_sha256": digest(attribute),
             "value_present": True,
             "independent_review": True,
