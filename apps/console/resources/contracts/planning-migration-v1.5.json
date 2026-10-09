@@ -1903,6 +1903,266 @@
           "holds",
           "native_write_authorized"
         ]
+      },
+      "MigrationWorkloadReadiness": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "review",
+          "readiness",
+          "native_write_authorized",
+          "workload_admission_authorized"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": 1
+          },
+          "review": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "revision",
+              "digest"
+            ],
+            "properties": {
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          },
+          "native_write_authorized": {
+            "const": false
+          },
+          "workload_admission_authorized": {
+            "const": false
+          },
+          "readiness": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "schema_version",
+              "kind",
+              "status",
+              "holds",
+              "expires_at",
+              "readiness_sha256",
+              "workload_reconciliation",
+              "collection_coverages",
+              "native_write_authorized",
+              "workload_admission_authorized"
+            ],
+            "properties": {
+              "schema_version": {
+                "const": 2
+              },
+              "kind": {
+                "const": "migration_workload_readiness"
+              },
+              "status": {
+                "enum": [
+                  "held",
+                  "eligible"
+                ]
+              },
+              "holds": {
+                "type": "array",
+                "maxItems": 256,
+                "items": {
+                  "type": "string",
+                  "maxLength": 200
+                }
+              },
+              "expires_at": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "readiness_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "native_write_authorized": {
+                "const": false
+              },
+              "workload_admission_authorized": {
+                "const": false
+              },
+              "workload_reconciliation": {
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "status",
+                  "holds",
+                  "workloads",
+                  "reconciliation_sha256"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "held",
+                      "matched"
+                    ]
+                  },
+                  "holds": {
+                    "type": "array",
+                    "maxItems": 256,
+                    "items": {
+                      "type": "string",
+                      "maxLength": 200
+                    }
+                  },
+                  "workloads": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "required": [
+                        "workload_id",
+                        "status",
+                        "holds",
+                        "field_dispositions"
+                      ],
+                      "properties": {
+                        "workload_id": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "held",
+                            "matched"
+                          ]
+                        },
+                        "holds": {
+                          "type": "array",
+                          "maxItems": 256,
+                          "items": {
+                            "type": "string",
+                            "maxLength": 200
+                          }
+                        },
+                        "field_dispositions": {
+                          "type": "array",
+                          "maxItems": 256,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "field",
+                              "disposition",
+                              "required"
+                            ],
+                            "properties": {
+                              "field": {
+                                "type": "string"
+                              },
+                              "disposition": {
+                                "enum": [
+                                  "unobserved",
+                                  "drifted",
+                                  "matched",
+                                  "qualified_transformation",
+                                  "approved_omission"
+                                ]
+                              },
+                              "required": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "reconciliation_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "collection_coverages": {
+                "type": "array",
+                "maxItems": 3,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "required": [
+                    "scope",
+                    "status",
+                    "holds",
+                    "attributes",
+                    "coverage_sha256",
+                    "expires_at"
+                  ],
+                  "properties": {
+                    "scope": {
+                      "enum": [
+                        "source",
+                        "target",
+                        "owner"
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "complete",
+                        "held"
+                      ]
+                    },
+                    "holds": {
+                      "type": "array",
+                      "maxItems": 256,
+                      "items": {
+                        "type": "string",
+                        "maxLength": 200
+                      }
+                    },
+                    "coverage_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "expires_at": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "attributes": {
+                      "type": "array",
+                      "maxItems": 256,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "required": [
+                          "attribute_id",
+                          "status",
+                          "reason"
+                        ],
+                        "properties": {
+                          "attribute_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "observed",
+                              "held",
+                              "not_applicable"
+                            ]
+                          },
+                          "reason": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
