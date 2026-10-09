@@ -18,6 +18,20 @@ class MigrationCollectionLedger:
         self.d = discovery
         self.profiles = WorkloadProfiles(discovery)
 
+    @staticmethod
+    def require_unrevoked_generation(
+        tx: Any, tenant: str, site: str,
+        source: dict[str, Any], target: dict[str, Any],
+    ) -> None:
+        for profile in (source, target):
+            revoked = tx.one(
+                "SELECT reason FROM inventory.migration_collection_invalidations "
+                "WHERE tenant=%s AND site=%s AND endpoint=%s AND generation=%s",
+                (tenant, site, profile["endpoint_id"], profile["generation_id"]),
+            )
+            if revoked is not None:
+                raise Rejected("migration_collection_generation_invalidated", 423)
+
     def publish(self, worker: Worker, body: dict[str, Any]) -> dict[str, Any]:
         shape(body, {
             "tenant_id", "site_id", "source_profile_id", "target_profile_id", "envelope",
@@ -41,6 +55,7 @@ class MigrationCollectionLedger:
             if (policy.worker, policy.worker_fingerprint) != (
                     worker.identity, worker.fingerprint):
                 raise Rejected("migration_collection_unenrolled_publisher", 403)
+            self.require_unrevoked_generation(tx, tenant, site, source, target)
             left, right = self.profiles.binding(source), self.profiles.binding(target)
             coverage = read_collection_coverages(
                 tenant, site, source, target, left, right, int(self.d.clock()),
@@ -188,6 +203,10 @@ class MigrationCollectionLedger:
         if not source.get("current") or not target.get("current"):
             return []
         with self.d.database.transaction() as tx:
+            try:
+                self.require_unrevoked_generation(tx, tenant, site, source, target)
+            except Rejected:
+                return []
             records = tx.all(
                 "SELECT envelope,source_sha256,target_sha256 FROM "
                 "inventory.migration_collection_receipts "
