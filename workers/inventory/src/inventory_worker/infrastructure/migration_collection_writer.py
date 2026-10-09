@@ -9,7 +9,6 @@ import hashlib
 import json
 import re
 from collections.abc import Callable
-from pathlib import Path
 from typing import Any
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -39,6 +38,7 @@ def capture_field(
     if (requirement.get("collection_method") != "native_get"
             or requirement.get("collection_status") == "external_evidence_required"
             or witness.get("attribute_id") != requirement.get("id")
+            or witness.get("scope") != requirement.get("scope")
             or witness.get("api_field") != requirement.get("api_field")
             or witness.get("api_family") != requirement.get("api_family")
             or not isinstance(witness.get("api_version"), str)
