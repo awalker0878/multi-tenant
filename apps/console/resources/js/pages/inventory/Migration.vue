@@ -158,9 +158,9 @@ function sourceFeatureDefined(id: string): boolean {
     case 'storage.controller': return facts.controllers.length > 0
       || disks.some(d => d.controller_key !== null);
     case 'storage.sharing': return disks.some(d => d.backing_chain.some(b => b.sharing))
-      || records.some(r => r.metadata?.multiattach === true);
+      || records.some(r => (r.metadata as Record<string, unknown> | undefined)?.multiattach === true);
     case 'storage.encryption': return disks.some(d => d.backing_chain.some(b => b.encrypted))
-      || records.some(r => r.metadata?.encrypted === true);
+      || records.some(r => (r.metadata as Record<string, unknown> | undefined)?.encrypted === true);
     case 'network.nics': return facts.nics.length > 0;
     case 'network.routing': return Boolean(
       metadata && Array.isArray(metadata.routes) && metadata.routes.length > 0
