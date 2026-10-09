@@ -13,13 +13,14 @@ CREATE TABLE IF NOT EXISTS inventory.migration_collection_receipts (
   publisher text NOT NULL,
   received_at double precision NOT NULL,
   observed_at double precision NOT NULL,
+  generation_sequence bigint NOT NULL CHECK (generation_sequence >= 1),
   expires_at double precision NOT NULL,
   revoked_at double precision,
   UNIQUE (tenant,site,source_profile,target_profile,envelope_sha256)
 );
 CREATE INDEX IF NOT EXISTS migration_collection_receipts_current
   ON inventory.migration_collection_receipts (
-    tenant,site,source_profile,target_profile,observed_at DESC,id DESC
+    tenant,site,source_profile,target_profile,generation_sequence DESC,observed_at DESC,id DESC
   );
 CREATE TABLE IF NOT EXISTS inventory.migration_collection_fields (
   envelope_id uuid NOT NULL REFERENCES inventory.migration_collection_receipts(id),
