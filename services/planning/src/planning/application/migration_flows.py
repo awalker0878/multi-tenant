@@ -85,6 +85,16 @@ class MigrationFlows:
         )
         now = self.planning.clock()
         if (
+            dest.get("current") is not True
+            or dest.get("completion") != "complete"
+            or dest.get("holds")
+            or dest.get("installed_provenance") != "observed"
+            or type(dest.get("expires_at")) is not int
+            or dest["expires_at"] <= now
+            or dest.get("generation_id") != candidate["generation_id"]
+        ):
+            raise Rejected("application_flow_destination_generation_not_current", 423)
+        if (
             not verified(qualification, now)
             or qualification.get("status") != "qualified"
             or qualification.get("revoked") is not False
