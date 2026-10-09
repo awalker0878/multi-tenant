@@ -13,6 +13,7 @@ from planning.domain.network_evidence import (
     isolation_checks, native_application_flow_choices,
     network_checks,
 )
+from planning.domain.effective_security import qualify as qualify_effective_security
 from planning.domain.operational_evidence import inventory_digest, snapshot
 from planning.domain.qualification import binding_digest, verified
 
@@ -102,18 +103,29 @@ class MigrationFlows:
             or dest["site_id"] != site
         ):
             raise Rejected("application_flow_independent_qualification_required", 423)
-        # NSX and Prism native security rules are still unresolved security
-        # catalogues; neither platform may show a selectable equivalent from
-        # an E2 inventory record. An E3/E4 qualified provider-specific
-        # resolver must replace this hold explicitly after effective-policy
-        # ordering, reference and positive/negative witness coverage.
-        if dest.get("platform") in {"vmware", "ahv"}:
-            raise Rejected("native_security_rule_equivalence_unqualified", 423)
         observed = snapshot(dest, qualification, now)
         if not isinstance(observed, dict) or not isinstance(observed.get("network"), dict):
             raise Rejected("application_flow_current_native_evidence_required", 423)
         intent = current_intent["intent"]
-        choices = native_application_flow_choices(intent, observed["network"], policy)
+        if dest.get("platform") in {"vmware", "ahv"}:
+            cases = observed.get("effective_security_cases")
+            accepted = qualification.get("capabilities", {}).get(
+                "migration.effective_security", {}
+            )
+            if (
+                qualification.get("evidence_level") != "E4"
+                or not isinstance(accepted, dict)
+                or accepted.get("status") != "supported"
+                or not isinstance(cases, list)
+                or len(cases) > 512
+                or digest(cases) not in accepted.get("values", [])
+            ):
+                raise Rejected("native_security_rule_equivalence_unqualified", 423)
+            choices = self.qualified_native_choices(
+                intent, dest["platform"], cases, now,
+            )
+        else:
+            choices = native_application_flow_choices(intent, observed["network"], policy)
         context_sha = digest({
             "assessment": retained["id"],
             "intent": current_intent["digest"],
@@ -139,6 +151,50 @@ class MigrationFlows:
             "data": observed, "choices": choices,
             "context_sha256": context_sha, "expires_at": expires,
         }
+
+    @staticmethod
+    def qualified_native_choices(
+        intent: dict[str, Any], platform: str,
+        cases: list[dict[str, Any]], now: int,
+    ) -> list[dict[str, Any]]:
+        """Only independently E4-qualified existing NSX/Prism controls enter a dropdown."""
+        case_map: dict[str, dict[str, Any]] = {}
+        for case in cases:
+            if (not isinstance(case, dict)
+                    or set(case) != {"source_flow_id", "flow", "document"}
+                    or not isinstance(case["document"], dict)):
+                raise Rejected("native_security_case_incomplete", 423)
+            flow_id = case["source_flow_id"]
+            if not isinstance(flow_id, str) or flow_id in case_map:
+                raise Rejected("native_security_case_ambiguous", 423)
+            case_map[flow_id] = case
+        choices = []
+        used = set()
+        for dependency in intent["dependencies"]:
+            if dependency["kind"] != "communication":
+                continue
+            source = {k: dependency[k] for k in ("from", "to", "protocol", "port")}
+            flow_id = digest(source)
+            case = case_map.get(flow_id)
+            if (case is None or case["flow"] != source
+                    or case["document"].get("platform") != platform):
+                raise Rejected("native_security_application_coverage_incomplete", 423)
+            verdict = qualify_effective_security(case["document"], source, now)
+            if verdict["status"] != "qualified":
+                raise Rejected("native_security_" + verdict["reason"], 423)
+            used.add(flow_id)
+            choices.append({
+                "source_flow_id": flow_id,
+                "source": source,
+                "required": dependency["strength"] == "required",
+                "destination_firewall_rule_ids": [verdict["effective_rule_native_ref"]],
+                "destination_route_ids": ["path:" + verdict["path_sha256"]],
+                "status": "choices_observed",
+                "native_write_authorized": False,
+            })
+        if set(case_map) != used:
+            raise Rejected("native_security_unrelated_case", 423)
+        return choices
 
     def _read_saved(self, actor: Actor, site: str, assessment_id: str) -> dict[str, Any] | None:
         with self.planning.database.transaction() as tx:
@@ -382,6 +438,7 @@ class MigrationFlows:
                             "source_revision_id": current["source_revision_id"],
                             "source_intent_sha256": current["source_intent_sha256"],
                             "destination_generation_id": current["destination_generation_id"],
+                            "destination_platform": current["destination"]["platform"],
                             "expires_at": current["expires_at"]}), self.planning.clock()),
             )
             tx.execute(
