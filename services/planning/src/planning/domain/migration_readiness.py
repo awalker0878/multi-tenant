@@ -11,6 +11,45 @@ from typing import Any
 from planning.domain.model import digest
 
 
+def eligible_field_dispositions(workloads: Any) -> bool:
+    """Fail closed on aggregate 'matched' claims with unresolved required fields.
+
+    Wire v2 does not carry an independently reusable E4 transformation receipt.
+    Until a new signed provenance contract is commissioned, a required
+    qualified_transformation cannot independently establish admission.
+    """
+    if not isinstance(workloads, list) or not workloads or len(workloads) > 100:
+        return False
+    ids: set[str] = set()
+    for row in workloads:
+        if not isinstance(row, dict) or row.get("status") != "matched" or row.get("holds") != []:
+            return False
+        workload_id = row.get("workload_id")
+        if not isinstance(workload_id, str) or not workload_id or workload_id in ids:
+            return False
+        ids.add(workload_id)
+        fields = row.get("field_dispositions")
+        if not isinstance(fields, list) or len(fields) > 256:
+            return False
+        seen: set[str] = set()
+        for field in fields:
+            if not isinstance(field, dict) or not isinstance(field.get("field"), str):
+                return False
+            name = field["field"]
+            if not name or name in seen:
+                return False
+            seen.add(name)
+            if field.get("required") is True and (
+                field.get("disposition") != "matched"
+                or field.get("evidence_source") not in {
+                    "inventory_native_profile", "independent_e4",
+                }
+                or field.get("evidence_age_seconds") is None
+            ):
+                return False
+    return True
+
+
 def resolve(
     route: dict[str, Any], native: dict[str, Any], api: dict[str, Any],
     scope: dict[str, str], tranche_sha256: str, release_sha256: str,
@@ -112,11 +151,7 @@ def resolve_workload(
         holds.append("catalogue_native_workload_reconciliation_required")
     # A matched parent cannot override held children, regardless of recomputed digests.
     workloads = reconciliation.get("workloads")
-    if (not isinstance(workloads, list) or not workloads
-            or any(not isinstance(row, dict)
-                   or row.get("status") != "matched"
-                   or row.get("holds") != []
-                   for row in workloads)):
+    if not eligible_field_dispositions(workloads):
         holds.append("catalogue_native_nested_workload_reconciliation_required")
     # A coverage summary cannot define its own required attribute universe.
     # Deployment release custody independently pins the full manifest and

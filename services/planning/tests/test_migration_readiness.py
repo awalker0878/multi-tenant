@@ -278,3 +278,34 @@ def test_missing_admission_wiring_cannot_publish_route_only_eligibility() -> Non
     service = MigrationSupport(lambda *_: {}, lambda *_: [], lambda: 100)
     with pytest.raises(Rejected, match="migration_workload_admission_not_commissioned"):
         service.require(None, "site", {})
+
+def test_eligible_parent_cannot_override_unobserved_required_field() -> None:
+    route, native, api = fixture()
+    readiness = assess(route, native, api)
+    recon = {
+        "status": "matched", "holds": [], "expires_at": 180,
+        "native_write_authorized": False,
+        "workloads": [{
+            "workload_id": "10000000-0000-4000-8000-000000000001",
+            "status": "matched", "holds": [],
+            "field_dispositions": [{
+                "field": "guest.firmware", "required": True,
+                "disposition": "unobserved", "evidence_source": "unobserved",
+                "evidence_age_seconds": None,
+            }],
+        }],
+    }
+    recon["reconciliation_sha256"] = digest(recon)
+    result = resolve_workload(readiness, recon, None, 100, None)
+    assert "catalogue_native_nested_workload_reconciliation_required" in result["holds"]
+
+
+def test_duplicate_workload_ids_hold_even_with_matched_rows() -> None:
+    from planning.domain.migration_readiness import eligible_field_dispositions
+
+    row = {
+        "workload_id": "10000000-0000-4000-8000-000000000001",
+        "status": "matched", "holds": [], "field_dispositions": [],
+    }
+    assert not eligible_field_dispositions([row, dict(row)])
+    assert eligible_field_dispositions([row])

@@ -190,3 +190,18 @@ def test_coverage_platform_mismatch_is_rejected_with_valid_digests() -> None:
     })
     with pytest.raises(Rejected, match="migration_collection_identity_changed"):
         verify(value, content, "10000000-0000-4000-8000-000000000001", 101)
+
+def test_recomputed_digests_cannot_hide_required_field_drift() -> None:
+    value, content = specimen()
+    field = value["workload_reconciliation"]["workloads"][0]["field_dispositions"][0]
+    field.update(disposition="unobserved", evidence_source="unobserved",
+                 evidence_age_seconds=None)
+    reconciliation = value["workload_reconciliation"]
+    reconciliation["reconciliation_sha256"] = digest({
+        k: v for k, v in reconciliation.items() if k != "reconciliation_sha256"
+    })
+    value["readiness_sha256"] = digest({
+        k: v for k, v in value.items() if k != "readiness_sha256"
+    })
+    with pytest.raises(Rejected, match="migration_nested_workload_reconciliation_held"):
+        verify(value, content, "10000000-0000-4000-8000-000000000001", 101)
