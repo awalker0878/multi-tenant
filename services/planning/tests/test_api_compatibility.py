@@ -316,3 +316,21 @@ def test_operator_reported_api_versions_cannot_substitute_live_installation_prob
     result = evaluate(row, evidence, 100)
     assert result["status"] == "blocked"
     assert result["cases"][1]["reason"] == "installed_api_namespace_live_probe_required"
+
+
+def test_selected_ahv_version_must_be_implemented_by_native_executor() -> None:
+    row = selected()
+    row["target"]["platform"] = "ahv"
+    evidence = owner_input(row)
+    evidence["environments"]["target"]["apis"] = {"ahv.vmm": ["v4.2"]}
+    evidence["observations"][1]["api_family"] = "ahv.vmm"
+    evidence["observations"][1]["api_version"] = "v4.2"
+    assessment = evaluate(row, evidence, 100)
+    assert assessment["cases"][1]["reason"] == "selected_api_version_not_executable"
+    assert assessment["cases"][1]["status"] == "blocked"
+    assert assessment["operationally_eligible"] is False
+    evidence["environments"]["target"]["apis"] = {"ahv.vmm": ["v4.3"]}
+    evidence["observations"][1]["api_version"] = "v4.3"
+    accepted = evaluate(row, evidence, 100)
+    assert accepted["cases"][1]["status"] == "eligible"
+    assert accepted["cases"][1]["selected_api_version"] == "v4.3"
