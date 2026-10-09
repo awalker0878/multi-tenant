@@ -75,6 +75,26 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
                 and row["extId"] not in stream["shared_resource_ids"]
             ):
                 raise Rejected("foreign_ahv_inventory", 403)
+            if field == "policies":
+                # Project-scoped policy list is not a rule-equivalence guarantee.
+                # Rule bodies may be present, but any unsupported reference
+                # semantics remain unqualified by this profile.
+                rules = row.get("rules")
+                if rules is not None:
+                    if not isinstance(rules, list) or len(rules) > 512:
+                        raise Rejected("invalid_ahv_policy_rules")
+                    seen_rule_ids = set()
+                    for rule in rules:
+                        if (
+                            not isinstance(rule, dict)
+                            or not isinstance(rule.get("extId"), str)
+                            or not rule["extId"]
+                            or rule["extId"] in seen_rule_ids
+                            or not isinstance(rule.get("type"), str)
+                            or not isinstance(rule.get("spec"), dict)
+                        ):
+                            raise Rejected("invalid_ahv_policy_rules")
+                        seen_rule_ids.add(rule["extId"])
         if len(ids) != len(set(ids)):
             raise Rejected("invalid_ahv_inventory")
 
