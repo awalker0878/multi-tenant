@@ -126,6 +126,7 @@ def read_collection_coverages(
         output = []
         for side in ("source", "target", "owner"):
             record = scopes[side]
+            expectation = right if side == "target" else left
             result = evaluate(
                 manifest, record["platform"], side,
                 record["installation_id"], record["generation_id"],
