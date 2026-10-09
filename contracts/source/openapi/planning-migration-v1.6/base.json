@@ -1,0 +1,21 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Planning migration preparation and immutable composition",
+    "version": "1.6.0",
+    "description": "Current Inventory bindings and separately commissioned immutable migration recipes. Composition creates a new plan for independent approval; it does not grant native execution. Maximum request 32768 bytes. Version 1.2 explicitly reports deterministic commissioning holds (423).\nVersion 1.6 publishes owner network choices, scoped selection and resolved workload readiness; none grant execution."
+  },
+  "security": [
+    {
+      "Workload": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "Workload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

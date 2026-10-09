@@ -1,0 +1,434 @@
+{
+  "OperatorValues": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "source_writer_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "source_observer_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "target_writer_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "target_observer_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "image_writer_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "image_observer_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "account_scope_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "trust_bundle_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "custody_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "worker_fencing_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "reservation_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "guest_recipe_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "service_protocol_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "measurement_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "consistency_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "delta_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "writer_fencing_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "traffic_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "restore_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "recovery_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "retention_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "objectives_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "campaign_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "artifact_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "security_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "alert_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "receiving_team_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "support_ref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,239}$"
+      },
+      "max_outage_seconds": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 604800
+      },
+      "max_data_loss_bytes": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "recovery_time_seconds": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 2592000
+      },
+      "max_active_migrations": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000
+      }
+    },
+    "required": []
+  },
+  "OperatorInput": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "values": {
+        "$ref": "#/components/schemas/OperatorValues"
+      },
+      "configuration_digest": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "values",
+      "configuration_digest"
+    ]
+  },
+  "OperatorField": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "group": {
+        "type": "string"
+      },
+      "label": {
+        "type": "string"
+      },
+      "help": {
+        "type": "string"
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "reference",
+          "integer"
+        ]
+      },
+      "minimum": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "maximum": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "group",
+      "label",
+      "help",
+      "kind",
+      "minimum",
+      "maximum"
+    ]
+  },
+  "OperatorGroup": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "label": {
+        "type": "string"
+      },
+      "owner": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "label",
+      "owner",
+      "scope"
+    ]
+  },
+  "OperatorRecord": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "revision": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "digest": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "values": {
+        "$ref": "#/components/schemas/OperatorValues"
+      },
+      "configuration_digest": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "saved_at": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "revision",
+      "digest",
+      "values",
+      "configuration_digest",
+      "saved_at"
+    ]
+  },
+  "OperatorConfiguration": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "revision": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "digest": {
+        "type": "string"
+      },
+      "source_endpoint": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "target_endpoint": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "confirmation_current": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "revision",
+      "digest",
+      "source_endpoint",
+      "target_endpoint",
+      "confirmation_current"
+    ]
+  },
+  "OperatorWorkspace": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "tenant_id": {
+        "type": "string"
+      },
+      "site_id": {
+        "type": "string"
+      },
+      "groups": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/OperatorGroup"
+        }
+      },
+      "fields": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/OperatorField"
+        }
+      },
+      "record": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/OperatorRecord"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "configuration": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/OperatorConfiguration"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "missing_fields": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "holds": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "collection_complete": {
+        "type": "boolean"
+      },
+      "native_write_authorized": {
+        "type": "boolean",
+        "const": false
+      }
+    },
+    "required": [
+      "tenant_id",
+      "site_id",
+      "groups",
+      "fields",
+      "record",
+      "configuration",
+      "missing_fields",
+      "holds",
+      "collection_complete",
+      "native_write_authorized"
+    ]
+  }
+}

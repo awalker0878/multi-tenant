@@ -1,0 +1,27 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Inventory read-only commissioning and observations",
+    "version": "1.8.0",
+    "description": "Inventory observations and API-first porting configuration review. Administrator interpretation never grants native authority. Adds immutable site-scoped operator input packets without changing existing contracts."
+  },
+  "components": {
+    "securitySchemes": {
+      "Workload": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "ActorDelegation": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Actor-Delegation"
+      }
+    }
+  },
+  "security": [
+    {
+      "Workload": [],
+      "ActorDelegation": []
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "/v1/tenants/{tenant}/sites": {
+    "get": {
+      "operationId": "listSites",
+      "x-inventory-action": "inventory.read",
+      "x-response-schema": "SiteList",
+      "x-status": 200,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteList"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/v1/tenants/{tenant}/sites/{site}/policies": {
+    "get": {
+      "operationId": "listPolicies",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "PolicyList",
+      "x-status": 200,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyList"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

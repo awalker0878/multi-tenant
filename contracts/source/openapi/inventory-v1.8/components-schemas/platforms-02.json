@@ -1,0 +1,1286 @@
+{
+  "OpenStackTargetCapabilityProfile": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "schema_version": {
+        "const": 1
+      },
+      "profile_type": {
+        "const": "TargetCapabilityProfile"
+      },
+      "platform": {
+        "const": "openstack"
+      },
+      "project_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      },
+      "observed_at": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "observations_sha256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "disk_formats": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "maxItems": 30
+      },
+      "image_import_methods": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "maxItems": 30
+      },
+      "flavors": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vcpus": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ram": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "disk": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "OS-FLV-EXT-DATA:ephemeral": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "vcpus",
+            "ram",
+            "disk",
+            "OS-FLV-EXT-DATA:ephemeral"
+          ]
+        },
+        "maxItems": 100
+      },
+      "volume_types": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "is_public": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "constraints_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "id",
+            "is_public",
+            "constraints_sha256"
+          ]
+        },
+        "maxItems": 100
+      },
+      "network_extensions": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "maxItems": 100
+      },
+      "security_groups": {
+        "type": "array",
+        "maxItems": 99,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "name": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "project_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "stateful": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "rules_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "semantics_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "rules": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 240
+                      },
+                      "direction": {
+                        "enum": [
+                          "ingress",
+                          "egress"
+                        ]
+                      },
+                      "ethertype": {
+                        "enum": [
+                          "IPv4",
+                          "IPv6"
+                        ]
+                      },
+                      "protocol": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "port_range_min": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "port_range_max": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "remote_ip_prefix": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 128
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "semantic_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "direction",
+                      "ethertype",
+                      "protocol",
+                      "port_range_min",
+                      "port_range_max",
+                      "remote_ip_prefix",
+                      "semantic_sha256"
+                    ]
+                  },
+                  "maxItems": 512
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "native_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "project_id",
+            "stateful",
+            "rules_sha256",
+            "semantics_sha256",
+            "rules",
+            "native_sha256"
+          ]
+        }
+      },
+      "compute_version": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "min_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "min_version",
+          "version"
+        ]
+      },
+      "volume_version": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "min_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "min_version",
+          "version"
+        ]
+      },
+      "required_capability_evidence": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "maxItems": 20
+      },
+      "holds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "maxItems": 64
+      },
+      "native_qualification": {
+        "const": "not_established"
+      }
+    },
+    "required": [
+      "schema_version",
+      "profile_type",
+      "platform",
+      "project_id",
+      "observed_at",
+      "observations_sha256",
+      "disk_formats",
+      "image_import_methods",
+      "flavors",
+      "volume_types",
+      "network_extensions",
+      "security_groups",
+      "compute_version",
+      "volume_version",
+      "required_capability_evidence",
+      "holds",
+      "native_qualification"
+    ]
+  },
+  "AhvTargetCapabilityProfile": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "schema_version": {
+        "const": 2
+      },
+      "profile_type": {
+        "const": "TargetCapabilityProfile"
+      },
+      "platform": {
+        "const": "ahv"
+      },
+      "project_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "prism_central_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "cluster_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "cluster_name": {
+        "type": "string",
+        "maxLength": 512
+      },
+      "api_versions": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "vmm": {
+            "enum": [
+              "v4.2",
+              "v4.3"
+            ]
+          },
+          "prism": {
+            "enum": [
+              "v4.2",
+              "v4.3"
+            ]
+          },
+          "clustermgmt": {
+            "enum": [
+              "v4.2",
+              "v4.3"
+            ]
+          },
+          "networking": {
+            "enum": [
+              "v4.2",
+              "v4.3"
+            ]
+          },
+          "microseg": {
+            "enum": [
+              "v4.2",
+              "v4.3"
+            ]
+          }
+        },
+        "required": [
+          "vmm",
+          "prism",
+          "clustermgmt",
+          "networking",
+          "microseg"
+        ]
+      },
+      "installed": {
+        "type": "object"
+      },
+      "observed_at": {
+        "type": "integer"
+      },
+      "observations_sha256": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "inventory_complete": {
+        "const": true
+      },
+      "disk_formats": {
+        "const": [
+          "raw"
+        ]
+      },
+      "image_import_methods": {
+        "const": [
+          "prism-image-url"
+        ]
+      },
+      "required_capability_evidence": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "minItems": 0,
+        "maxItems": 32
+      },
+      "holds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "minItems": 0,
+        "maxItems": 64
+      },
+      "native_qualification": {
+        "const": "not_established"
+      },
+      "storage_containers": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "native_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "name": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "clusterExtId": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "isMarkedForRemoval": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "isInternal": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "maxCapacityBytes": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "isEncrypted": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "replicationFactor": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "extId",
+            "native_sha256",
+            "name",
+            "clusterExtId",
+            "isMarkedForRemoval",
+            "isInternal",
+            "maxCapacityBytes",
+            "isEncrypted",
+            "replicationFactor"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 1000
+      },
+      "subnets": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "native_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "name": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "subnetType": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "clusterReference": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "clusterReferenceList": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 0,
+                  "maxItems": 100
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vpcReference": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "projectExtId": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "sharedWithProjects": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 0,
+                  "maxItems": 100
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "isExternal": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "ipConfig": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  },
+                  "minItems": 0,
+                  "maxItems": 100
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "extId",
+            "native_sha256",
+            "name",
+            "subnetType",
+            "clusterReference",
+            "clusterReferenceList",
+            "vpcReference",
+            "projectExtId",
+            "sharedWithProjects",
+            "isExternal",
+            "ipConfig"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 1000
+      },
+      "vpcs": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "native_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "name": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "projectExtId": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "extId",
+            "native_sha256",
+            "name",
+            "projectExtId"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 1000
+      },
+      "categories": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "native_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "key": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "value": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "extId",
+            "native_sha256",
+            "key",
+            "value"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 1000
+      },
+      "policies": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "native_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "name": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "state": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "type": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "projectExtId": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "isSharedWithAllProjects": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "scope": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            },
+            "scopeReferences": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 512
+                  },
+                  "minItems": 0,
+                  "maxItems": 100
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vpcReferences": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 512
+                  },
+                  "minItems": 0,
+                  "maxItems": 100
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "securedGroups": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 512
+                  },
+                  "minItems": 0,
+                  "maxItems": 100
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "rules": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "maxItems": 512,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "extId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 240
+                      },
+                      "type": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 160
+                      },
+                      "spec_sha256": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      "category_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 160
+                        },
+                        "maxItems": 64,
+                        "uniqueItems": true
+                      },
+                      "address_group_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 160
+                        },
+                        "maxItems": 64,
+                        "uniqueItems": true
+                      },
+                      "service_group_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 160
+                        },
+                        "maxItems": 64,
+                        "uniqueItems": true
+                      },
+                      "reference_resolution": {
+                        "enum": [
+                          "catalogue_ids_only",
+                          "unresolved"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "extId",
+                      "type",
+                      "spec_sha256",
+                      "category_ids",
+                      "address_group_ids",
+                      "service_group_ids",
+                      "reference_resolution"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "extId",
+            "native_sha256",
+            "name",
+            "state",
+            "type",
+            "projectExtId",
+            "isSharedWithAllProjects",
+            "scope",
+            "scopeReferences",
+            "vpcReferences",
+            "securedGroups"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 1000
+      },
+      "security_references": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "entity_groups": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "extId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "resolution": {
+                  "const": "definition_only"
+                }
+              },
+              "required": [
+                "extId",
+                "native_sha256",
+                "resolution"
+              ]
+            }
+          },
+          "address_groups": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "extId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "resolution": {
+                  "const": "definition_only"
+                }
+              },
+              "required": [
+                "extId",
+                "native_sha256",
+                "resolution"
+              ]
+            }
+          },
+          "service_groups": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "extId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "native_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "resolution": {
+                  "const": "definition_only"
+                }
+              },
+              "required": [
+                "extId",
+                "native_sha256",
+                "resolution"
+              ]
+            }
+          }
+        },
+        "required": [
+          "entity_groups",
+          "address_groups",
+          "service_groups"
+        ]
+      }
+    },
+    "required": [
+      "schema_version",
+      "profile_type",
+      "platform",
+      "project_id",
+      "prism_central_id",
+      "cluster_id",
+      "cluster_name",
+      "api_versions",
+      "installed",
+      "observed_at",
+      "observations_sha256",
+      "inventory_complete",
+      "disk_formats",
+      "image_import_methods",
+      "required_capability_evidence",
+      "holds",
+      "native_qualification",
+      "storage_containers",
+      "subnets",
+      "vpcs",
+      "categories",
+      "policies",
+      "security_references"
+    ]
+  },
+  "AhvDestinationSelection": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "platform": {
+        "const": "ahv"
+      },
+      "project_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "prism_central_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "cluster_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "vpc_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "storage_container_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "category_ids": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "minItems": 0,
+        "maxItems": 32
+      },
+      "policy_ids": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "minItems": 0,
+        "maxItems": 32
+      },
+      "security_mappings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "destination_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            }
+          },
+          "required": [
+            "source_id",
+            "destination_id"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 64
+      },
+      "firmware": {
+        "enum": [
+          "bios",
+          "efi",
+          ""
+        ]
+      },
+      "disks": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_key": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 31
+            }
+          },
+          "required": [
+            "source_key",
+            "index"
+          ]
+        },
+        "minItems": 1,
+        "maxItems": 32
+      },
+      "nics": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_key": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "quarantine_subnet_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "production_subnet_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "source_key",
+            "quarantine_subnet_id",
+            "production_subnet_id"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 32
+      }
+    },
+    "required": [
+      "platform",
+      "project_id",
+      "prism_central_id",
+      "cluster_id",
+      "vpc_id",
+      "storage_container_id",
+      "category_ids",
+      "policy_ids",
+      "security_mappings",
+      "firmware",
+      "disks",
+      "nics"
+    ]
+  }
+}

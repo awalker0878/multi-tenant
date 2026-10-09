@@ -1,0 +1,254 @@
+{
+  "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/renewals": {
+    "post": {
+      "operationId": "renewEndpoint",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "EndpointCommand",
+      "x-status": 201,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "endpoint",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^\"[1-9][0-9]{0,8}\"$"
+          }
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EndpointCommand"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Empty"
+            }
+          }
+        }
+      }
+    }
+  },
+  "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/revocation": {
+    "post": {
+      "operationId": "revokeEndpoint",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "EndpointCommand",
+      "x-status": 201,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "endpoint",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^\"[1-9][0-9]{0,8}\"$"
+          }
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EndpointCommand"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Empty"
+            }
+          }
+        }
+      }
+    }
+  },
+  "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/matches": {
+    "post": {
+      "operationId": "proposeMatch",
+      "x-inventory-action": "inventory.match",
+      "x-response-schema": "MatchCommand",
+      "x-status": 201,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "endpoint",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchCommand"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Match"
+            }
+          }
+        }
+      }
+    }
+  }
+}

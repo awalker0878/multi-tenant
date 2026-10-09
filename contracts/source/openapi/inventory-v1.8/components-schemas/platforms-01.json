@@ -1,0 +1,15 @@
+{
+  "TargetCapabilityProfile": {
+    "oneOf": [
+      {
+        "$ref": "#/components/schemas/OpenStackTargetCapabilityProfile"
+      },
+      {
+        "$ref": "#/components/schemas/AhvTargetCapabilityProfile"
+      },
+      {
+        "$ref": "#/components/schemas/VmwareTargetCapabilityProfile"
+      }
+    ]
+  }
+}

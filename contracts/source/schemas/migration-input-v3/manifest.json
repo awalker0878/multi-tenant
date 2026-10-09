@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "target": "contracts/schemas/planning/migration-input-v3.json",
+  "base": "base.json",
+  "parts": {
+    "properties": {
+      "kind": "object",
+      "files": [
+        "properties/scope-01.json",
+        "properties/source-evidence-01.json",
+        "properties/destination-01.json",
+        "properties/owner-01.json",
+        "properties/scope-02.json",
+        "properties/destination-02.json",
+        "properties/source-evidence-02.json"
+      ]
+    }
+  },
+  "copies": [
+    "services/planning/src/planning/infrastructure/inputs/migration-input-v3.json"
+  ]
+}

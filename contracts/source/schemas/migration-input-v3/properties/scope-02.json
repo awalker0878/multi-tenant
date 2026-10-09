@@ -1,0 +1,8 @@
+{
+  "current": {
+    "const": true
+  },
+  "native_write_authorized": {
+    "const": false
+  }
+}

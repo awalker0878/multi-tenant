@@ -1,0 +1,734 @@
+{
+  "/v1/tenants/{tenant}/sites/{site}/migration-review": {
+    "get": {
+      "operationId": "getMigrationReview",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "MigrationWorkspace",
+      "x-status": 200,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationWorkspace"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "summary": "getMigrationReview"
+    },
+    "post": {
+      "operationId": "saveMigrationReview",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "PortingResult",
+      "x-status": 201,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "maxLength": 11
+          },
+          "description": "Quoted current revision; required when a saved configuration exists."
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortingResult"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/MigrationReviewInput"
+            }
+          }
+        }
+      },
+      "summary": "saveMigrationReview"
+    }
+  },
+  "/v1/tenants/{tenant}/sites/{site}/migration-review/confirmations": {
+    "post": {
+      "operationId": "confirmMigrationReview",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "PortingResult",
+      "x-status": 201,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "maxLength": 11
+          },
+          "description": "Quoted current revision; required when a saved configuration exists."
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortingResult"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PortingConfirm"
+            }
+          }
+        }
+      },
+      "summary": "confirmMigrationReview"
+    }
+  },
+  "/v1/tenants/{tenant}/sites/{site}/migration-inventory": {
+    "get": {
+      "operationId": "getMigrationFleet",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "MigrationFleet",
+      "x-status": 200,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationFleet"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "summary": "getMigrationReview"
+    }
+  },
+  "/v1/tenants/{tenant}/sites/{site}/migration-groups": {
+    "post": {
+      "operationId": "createMigrationGroup",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "MigrationGroupResult",
+      "x-status": 201,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "maxLength": 11
+          },
+          "description": "Quoted current revision; required when a saved configuration exists."
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationGroupResult"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/MigrationGroupInput"
+            }
+          }
+        }
+      },
+      "summary": "saveMigrationReview"
+    }
+  },
+  "/v1/tenants/{tenant}/sites/{site}/migration-groups/{group}": {
+    "post": {
+      "operationId": "updateMigrationGroup",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "MigrationGroupResult",
+      "x-status": 201,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "maxLength": 11
+          },
+          "description": "Quoted current revision; required when a saved configuration exists."
+        },
+        {
+          "name": "group",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationGroupResult"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/MigrationGroupInput"
+            }
+          }
+        }
+      },
+      "summary": "saveMigrationReview"
+    },
+    "get": {
+      "operationId": "getMigrationGroup",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "MigrationGroupDetail",
+      "x-status": 200,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "group",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationGroupDetail"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "summary": "getMigrationReview"
+    }
+  },
+  "/v1/tenants/{tenant}/sites/{site}/migration-reviews/{profile}": {
+    "get": {
+      "operationId": "getVmMigrationReview",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "MigrationWorkspace",
+      "x-status": 200,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "profile",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrationWorkspace"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "summary": "getMigrationReview"
+    },
+    "post": {
+      "operationId": "saveVmMigrationReview",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "PortingResult",
+      "x-status": 201,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "maxLength": 11
+          },
+          "description": "Quoted current revision; required when a saved configuration exists."
+        },
+        {
+          "name": "profile",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortingResult"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/MigrationReviewInput"
+            }
+          }
+        }
+      },
+      "summary": "saveMigrationReview"
+    }
+  },
+  "/v1/tenants/{tenant}/sites/{site}/migration-reviews/{profile}/confirmations": {
+    "post": {
+      "operationId": "confirmVmMigrationReview",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "PortingResult",
+      "x-status": 201,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "maxLength": 11
+          },
+          "description": "Quoted current revision; required when a saved configuration exists."
+        },
+        {
+          "name": "profile",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortingResult"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PortingConfirm"
+            }
+          }
+        }
+      },
+      "summary": "confirmMigrationReview"
+    }
+  }
+}

@@ -1,0 +1,416 @@
+{
+  "ReadinessContext": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": [
+          "discover",
+          "provision",
+          "migrate",
+          "adopt",
+          "operate",
+          "retire"
+        ]
+      },
+      "method": {
+        "enum": [
+          "APPLICATION_REBUILD_RESTORE",
+          "VM_SNAPSHOT_BASELINE_APP_DELTA",
+          "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+          "VM_COLD_EXPORT",
+          "EXTERNAL_BLOCK_REPLICATION",
+          null
+        ]
+      }
+    },
+    "required": [
+      "operation",
+      "method"
+    ],
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "operation": {
+              "const": "migrate"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "method": {
+              "type": "string"
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "method": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ReadinessInput": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "values": {
+        "$ref": "#/components/schemas/OperatorValues"
+      },
+      "configuration_digest": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "context": {
+        "$ref": "#/components/schemas/ReadinessContext"
+      }
+    },
+    "required": [
+      "values",
+      "configuration_digest",
+      "context"
+    ]
+  },
+  "ReadinessField": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "group": {
+        "type": "string"
+      },
+      "label": {
+        "type": "string"
+      },
+      "help": {
+        "type": "string"
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "reference",
+          "integer"
+        ]
+      },
+      "minimum": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "maximum": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "required": {
+        "type": "boolean"
+      },
+      "applicability": {
+        "type": "string"
+      },
+      "owner": {
+        "type": "string"
+      },
+      "example": {
+        "type": "string"
+      },
+      "format": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "group",
+      "label",
+      "help",
+      "kind",
+      "minimum",
+      "maximum",
+      "required",
+      "applicability",
+      "owner",
+      "example",
+      "format"
+    ]
+  },
+  "ReadinessCheck": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "field_id": {
+        "type": "string"
+      },
+      "state": {
+        "enum": [
+          "missing",
+          "unverified",
+          "verified",
+          "stale",
+          "failed",
+          "unavailable",
+          "not_applicable"
+        ]
+      },
+      "action": {
+        "type": "string"
+      },
+      "owner": {
+        "type": "string"
+      },
+      "observed_at": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "expires_at": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "evidence_sha256": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "required": [
+      "field_id",
+      "state",
+      "action",
+      "owner",
+      "observed_at",
+      "expires_at",
+      "evidence_sha256"
+    ]
+  },
+  "ReadinessWorkspace": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "tenant_id": {
+        "type": "string"
+      },
+      "site_id": {
+        "type": "string"
+      },
+      "groups": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/OperatorGroup"
+        }
+      },
+      "fields": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ReadinessField"
+        },
+        "maxItems": 32
+      },
+      "record": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/OperatorRecord"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "configuration": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/OperatorConfiguration"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "missing_fields": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "holds": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "collection_complete": {
+        "type": "boolean"
+      },
+      "native_write_authorized": {
+        "type": "boolean",
+        "const": false
+      },
+      "context": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ReadinessContext"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "operations": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "enum": [
+                "discover",
+                "provision",
+                "migrate",
+                "adopt",
+                "operate",
+                "retire"
+              ]
+            },
+            "label": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "label"
+          ]
+        },
+        "maxItems": 6
+      },
+      "methods": {
+        "type": "array",
+        "items": {
+          "enum": [
+            "APPLICATION_REBUILD_RESTORE",
+            "VM_SNAPSHOT_BASELINE_APP_DELTA",
+            "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+            "VM_COLD_EXPORT",
+            "EXTERNAL_BLOCK_REPLICATION"
+          ]
+        },
+        "maxItems": 5
+      },
+      "platforms": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "enum": [
+              "vmware",
+              "openstack",
+              "ahv",
+              null
+            ]
+          },
+          "target": {
+            "enum": [
+              "vmware",
+              "openstack",
+              "ahv",
+              null
+            ]
+          }
+        },
+        "required": [
+          "source",
+          "target"
+        ]
+      },
+      "checks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ReadinessCheck"
+        },
+        "maxItems": 32
+      },
+      "contexts": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation": {
+              "enum": [
+                "discover",
+                "provision",
+                "migrate",
+                "adopt",
+                "operate",
+                "retire"
+              ]
+            },
+            "method": {
+              "enum": [
+                "APPLICATION_REBUILD_RESTORE",
+                "VM_SNAPSHOT_BASELINE_APP_DELTA",
+                "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+                "VM_COLD_EXPORT",
+                "EXTERNAL_BLOCK_REPLICATION",
+                null
+              ]
+            },
+            "required_fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 32
+            }
+          },
+          "required": [
+            "operation",
+            "method",
+            "required_fields"
+          ]
+        },
+        "maxItems": 10
+      },
+      "evidence_current": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "tenant_id",
+      "site_id",
+      "groups",
+      "fields",
+      "record",
+      "configuration",
+      "missing_fields",
+      "holds",
+      "collection_complete",
+      "native_write_authorized",
+      "context",
+      "operations",
+      "methods",
+      "platforms",
+      "checks",
+      "contexts",
+      "evidence_current"
+    ]
+  }
+}

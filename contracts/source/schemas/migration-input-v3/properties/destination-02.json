@@ -1,0 +1,253 @@
+{
+  "target_disk_formats": {
+    "type": "array",
+    "items": {
+      "type": "string"
+    },
+    "maxItems": 30
+  },
+  "destination": {
+    "oneOf": [
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "platform": {
+            "const": "ahv"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "prism_central_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cluster_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "vpc_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "storage_container_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "category_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "maxItems": 32
+          },
+          "policy_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "maxItems": 32
+          },
+          "firmware": {
+            "enum": [
+              "bios",
+              "efi"
+            ]
+          },
+          "disks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_key": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "index": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
+                }
+              },
+              "required": [
+                "source_key",
+                "index"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 32
+          },
+          "nics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_key": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "quarantine_subnet_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "production_subnet_id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "source_key",
+                "quarantine_subnet_id",
+                "production_subnet_id"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 32
+          }
+        },
+        "required": [
+          "platform",
+          "project_id",
+          "prism_central_id",
+          "cluster_id",
+          "vpc_id",
+          "storage_container_id",
+          "category_ids",
+          "policy_ids",
+          "firmware",
+          "disks",
+          "nics"
+        ]
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "platform": {
+            "const": "vmware"
+          },
+          "project_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+          },
+          "vcenter_uuid": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "folder_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+          },
+          "resource_pool_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+          },
+          "host_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+          },
+          "datastore_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+          },
+          "guest_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 85
+          },
+          "hardware_version": {
+            "type": "string",
+            "pattern": "^vmx-[0-9]{2}$"
+          },
+          "firmware": {
+            "enum": [
+              "bios",
+              "efi"
+            ]
+          },
+          "disks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_key": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "index": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
+                }
+              },
+              "required": [
+                "source_key",
+                "index"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 32
+          },
+          "nics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "source_key": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "quarantine_network_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+                },
+                "production_network_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+                }
+              },
+              "required": [
+                "source_key",
+                "quarantine_network_id",
+                "production_network_id"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 32
+          }
+        },
+        "required": [
+          "platform",
+          "project_id",
+          "vcenter_uuid",
+          "folder_id",
+          "resource_pool_id",
+          "host_id",
+          "datastore_id",
+          "guest_id",
+          "hardware_version",
+          "firmware",
+          "disks",
+          "nics"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "target": "contracts/openapi/planning-migration-v1.6.json",
+  "base": "base.json",
+  "parts": {
+    "paths": {
+      "kind": "object",
+      "files": [
+        "paths/migration-01.json"
+      ]
+    },
+    "components.schemas": {
+      "kind": "object",
+      "files": [
+        "components-schemas/foundation-01.json",
+        "components-schemas/migration-01.json"
+      ]
+    }
+  },
+  "copies": [
+    "apps/console/resources/contracts/planning-migration-v1.6.json"
+  ]
+}
