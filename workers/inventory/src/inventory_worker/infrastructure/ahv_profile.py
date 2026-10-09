@@ -108,7 +108,13 @@ def resolved_namespace_versions(stream: dict[str, Any]) -> dict[str, str]:
     versions = dict(VERSIONS)
     installed = stream.get("api_versions")
     if installed is None and stream.get("api_versions_verified") is not True:
-        if stream.get("api_version") not in {None, "v4.3"}:
+        version = stream.get("api_version", "v4.3")
+        if stream.get("kind") == "server" and version in {"v4.2", "v4.3"}:
+            # A server listing invokes only VMM; other API namespaces remain
+            # unknown rather than inferred from a v4.2 server stream.
+            versions["vmm"] = version
+            return versions
+        if version != "v4.3":
             raise CollectionFailure("installed_api_namespace_versions_unqualified")
         return versions
     if (
@@ -117,6 +123,8 @@ def resolved_namespace_versions(stream: dict[str, Any]) -> dict[str, str]:
         or set(installed) != set(versions)
         or any(v not in {"v4.2", "v4.3"} for v in installed.values())
     ):
+        raise CollectionFailure("installed_api_namespace_versions_unqualified")
+    if stream.get("api_version", installed["vmm"]) != installed["vmm"]:
         raise CollectionFailure("installed_api_namespace_versions_unqualified")
     return dict(installed)
 
