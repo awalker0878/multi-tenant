@@ -16,6 +16,7 @@ def specimen() -> tuple[dict, dict]:
     content = {
         "scope": scope, "migration_campaign": {"route_sha256": route},
         "native_migration": {"migration": {
+            "method": "VM_COLD_EXPORT",
             "source": {"profile_sha256": src},
             "target": {"profile_sha256": tgt},
             "outcomes": {"route_sha256": route},
