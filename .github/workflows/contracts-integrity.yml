@@ -1,0 +1,26 @@
+name: Contract source and consumer integrity
+on:
+  pull_request:
+    paths: ['contracts/**', 'services/planning/**', 'apps/console/resources/contracts/**', 'scripts/contracts/**', 'scripts/p03/generate_clients.py', 'scripts/p08/check_any_to_any.py', '.github/workflows/contracts-integrity.yml']
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integrity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - name: Check assembled contract bundles
+        run: python scripts/contracts/build.py --check
+      - name: Check wire versions, schemas, route parity and consumer drift
+        run: python scripts/contracts/check.py
+      - name: Validate negative drift tests
+        run: python -m unittest discover -s tests/contracts -p 'test_integrity.py' -v
