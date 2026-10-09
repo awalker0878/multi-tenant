@@ -120,8 +120,8 @@ class MigrationSupport:
         result = resolve_workload(
             route, proof["reconciliation"], proof.get("collection_coverages"), now,
         )
-        return {**result, "review": revision, "native_write_authorized": False,
-                "workload_admission_authorized": False}
+        return {"schema_version": 1, "review": revision, "readiness": result,
+                "native_write_authorized": False, "workload_admission_authorized": False}
 
     def require(self, actor: Actor, site: str, binding: dict[str, Any]) -> dict[str, Any]:
         # A native route is not ready merely because a hypervisor capability
