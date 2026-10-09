@@ -34,6 +34,10 @@ def rule_choices(group: dict[str, Any]) -> list[dict[str, Any]] | None:
             raise CollectionFailure("invalid_response")
         if row.get("remote_group_id") or row.get("remote_address_group_id"):
             return None
+        # Vendor-specific action semantics (including explicit DENY) must not
+        # be treated as native Neutron's standard allow-list rule model.
+        if "action" in row:
+            return None
         identity = row.get("id")
         if not isinstance(identity, str) or not identity or identity in seen:
             raise CollectionFailure("invalid_response")
@@ -58,6 +62,14 @@ def rule_choices(group: dict[str, Any]) -> list[dict[str, Any]] | None:
                 obj["remote_ip_prefix"] = str(ip_network(obj["remote_ip_prefix"], strict=False))
             except ValueError:
                 raise CollectionFailure("invalid_response") from None
+        minimum, maximum = obj["port_range_min"], obj["port_range_max"]
+        if minimum is not None and maximum is not None and minimum > maximum:
+            raise CollectionFailure("invalid_response")
+        if obj["remote_ip_prefix"] is not None:
+            observed_family = ip_network(obj["remote_ip_prefix"]).version
+            expected_family = 4 if obj["ethertype"] == "IPv4" else 6
+            if observed_family != expected_family:
+                raise CollectionFailure("invalid_response")
         chosen.append({"id": identity, **obj, "semantic_sha256": fingerprint(obj)})
     return sorted(chosen, key=lambda r: r["id"])
 
