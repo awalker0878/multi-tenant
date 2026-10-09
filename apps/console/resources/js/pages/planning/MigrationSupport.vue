@@ -62,6 +62,7 @@ const flowForm = useForm({
   command_key: crypto.randomUUID(), revision: 0, context_sha256: '',
   selections: [] as NativeBinding[],
 });
+let submittedFlowFingerprint = '';
 const missingChoices = computed(() => flowState.value?.choices.filter(c =>
   c.required && (!c.destination_firewall_rule_ids.length || !c.destination_route_ids.length)) ?? []);
 const selectionsComplete = computed(() => Boolean(flowState.value) && flowState.value!.choices.every(c => {
@@ -103,6 +104,7 @@ async function refreshFlowChoices(): Promise<void> {
       flowForm.revision = updated.revision;
       flowForm.selections = updated.selections.map(s => ({ ...s }));
       flowForm.command_key = crypto.randomUUID();
+      submittedFlowFingerprint = '';
       flowForm.clearErrors();
     }
     flowState.value = updated;
@@ -112,12 +114,20 @@ async function refreshFlowChoices(): Promise<void> {
   } finally { flowBusy.value = false; }
 }
 function saveFlowChoices() {
-  if (!selectionsComplete.value || flowForm.processing || flowFailure.value || !flowState.value) return;
+  if (!selectionsComplete.value || flowForm.processing || flowBusy.value || unavailable.value || flowFailure.value || !flowState.value) return;
   // An optional application dependency may be left unmapped; an incomplete
   // optional selection is not an operator-created rule and is never posted.
   flowForm.selections = flowForm.selections.filter(s =>
     Boolean(s.rule_native_ref) && Boolean(s.route_native_ref));
-  flowForm.command_key = crypto.randomUUID();
+  const fingerprint = JSON.stringify({
+    revision: flowForm.revision,
+    context_sha256: flowForm.context_sha256,
+    selections: flowForm.selections,
+  });
+  if (fingerprint !== submittedFlowFingerprint) {
+    flowForm.command_key = crypto.randomUUID();
+    submittedFlowFingerprint = fingerprint;
+  }
   flowForm.post(flowSave, {
     preserveScroll: true,
     onSuccess: () => { void refreshFlowChoices(); },
@@ -163,7 +173,7 @@ onMounted(() => { void refreshFlowChoices(); });
           <p v-else role="alert">No qualified native controls match this source-defined flow; migration must remain held.</p>
         </div>
         <p v-if="flowForm.errors.flow_mapping" role="alert" class="mt-2">{{ flowForm.errors.flow_mapping }}</p>
-        <button type="button" class="mt-4 rounded border px-4 py-2" :disabled="!selectionsComplete || flowForm.processing || !!flowFailure || flowState.expires_at <= Math.floor(Date.now() / 1000)" @click="saveFlowChoices">Save reviewed application flow selections</button>
+        <button type="button" class="mt-4 rounded border px-4 py-2" :disabled="!selectionsComplete || flowForm.processing || flowBusy || unavailable || !!flowFailure || flowState.expires_at <= Math.floor(Date.now() / 1000)" @click="saveFlowChoices">Save reviewed application flow selections</button>
         <button type="button" class="ml-3 mt-4 underline" :disabled="flowBusy" @click="refreshFlowChoices">Refresh native options</button>
       </template>
     </section>
