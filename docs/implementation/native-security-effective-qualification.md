@@ -60,6 +60,38 @@ cutover is claimed. CI must pass before review/merge.
    only while the **native security semantics** are unchanged; an updated
    native group/rule/path/port or source boundary invalidates them.
 
+## Closed-world native policy partition
+
+**A finite set of allowed and denied probes alone cannot establish that a
+receiving platform introduces no additional effective access.** The common
+E4 contract therefore requires an independently attested
+`disjoint_effective_rule_partition` for **each** source and destination.
+
+- The partition must enumerate the exact same approved traffic-class
+  universe on both sides, with no uncovered classes or unbounded wildcards.
+  Its independently observed permitted-class set must agree with the
+  provider resolver for every member of that universe.
+- The attestation binds the exact native rule set, group membership,
+  service expansions, port attachments, workloads, API profile, native
+  observer, policy generation, and all observed positive/negative receipts.
+  Any rule or attachment change invalidates the partition.
+- The full native partition expansion must be supplied by a commissioned
+  and separately signed E4 provider observer. This branch implements the
+  **consumer and fail-closed validation**, not a claim that such an observer
+  has been installed or that finite test samples are exhaustive.
+- Until an installed NSX/Prism/Neutron provider can enumerate all relevant
+  effective rules (including wildcard, nested, identity and direction
+  semantics) without losing any permitted traffic space, partition
+  qualification remains held. No manual "complete" checkbox is acceptable
+  as standalone E4 proof.
+
+**NSX realized VM identity:** The observer reads independently qualified
+effective member types and `RealizedVirtualMachine.compute_ids` (including
+the native `externalId`). Groups containing IP/VIF/segment membership
+cannot be declared empty merely because the VM-member endpoint returns
+zero records. Group observations are pinned to an explicitly qualified
+`enforcement_point_path`; unqualified enforcement domains remain held.
+
 ## Installed API version policy
 
 The versioned data registry is
