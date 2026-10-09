@@ -1,18 +1,18 @@
 """Directional eligibility from commissioned scope and authenticated Assurance reads."""
 
+import json
 from collections.abc import Callable
 from functools import lru_cache
 from importlib.resources import files
-import json
-
-from jsonschema import Draft202012Validator, FormatChecker
 from typing import Any
 
+from jsonschema import Draft202012Validator, FormatChecker
+
 from planning.domain.api_compatibility import evaluate as evaluate_api
-from planning.domain.migration_readiness import resolve as resolve_readiness
-from planning.domain.migration_readiness import resolve_workload
 from planning.domain.capability_definitions import METHOD_ALIASES as METHODS
 from planning.domain.expansion import matrix, tranche
+from planning.domain.migration_readiness import resolve as resolve_readiness
+from planning.domain.migration_readiness import resolve_workload
 from planning.domain.model import Actor, Rejected, digest
 
 

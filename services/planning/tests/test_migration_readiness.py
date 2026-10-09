@@ -1,10 +1,10 @@
 """Resolved migration-readiness contract is fail-closed and deterministic."""
 
-from planning.domain.migration_readiness import resolve, resolve_workload
-from planning.application.migration_support import validate_workload_contract
-from planning.domain.model import Rejected
 import pytest
-from planning.domain.model import digest
+
+from planning.application.migration_support import validate_workload_contract
+from planning.domain.migration_readiness import resolve, resolve_workload
+from planning.domain.model import Rejected, digest
 
 
 def fixture() -> tuple[dict, dict, dict]:
