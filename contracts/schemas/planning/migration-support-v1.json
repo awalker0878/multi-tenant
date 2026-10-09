@@ -145,6 +145,12 @@
           }
         }
       }
+    },
+    "flow_evidence": {
+      "type": [
+        "object",
+        "null"
+      ]
     }
   }
 }
