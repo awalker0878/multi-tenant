@@ -51,6 +51,7 @@ class MigrationCollectionLedger:
             # Even an incomplete signed observation is retained for diagnostics;
             # no field status is promoted merely because ingestion succeeded.
             envelope_sha = digest(envelope)
+            envelope_id = str(uuid4())
             tx.execute(
                 "INSERT INTO inventory.migration_collection_receipts "
                 "(id,tenant,site,source_profile,target_profile,source_sha256,"
@@ -58,12 +59,46 @@ class MigrationCollectionLedger:
                 "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s) "
                 "ON CONFLICT DO NOTHING",
                 (
-                    str(uuid4()), tenant, site, source_id, target_id,
+                    envelope_id, tenant, site, source_id, target_id,
                     left["profile_sha256"], right["profile_sha256"],
                     envelope_sha, canonical(envelope), worker.identity,
                     self.d.clock(), envelope["payload"]["expires_at"],
                 ),
             )
+            # A duplicate envelope retains the original immutable row and
+            # never overwrites evidence. Insert field projections only when
+            # the parent receipt is known, using its canonical identity.
+            parent = tx.one(
+                "SELECT id FROM inventory.migration_collection_receipts "
+                "WHERE tenant=%s AND site=%s AND source_profile=%s "
+                "AND target_profile=%s AND envelope_sha256=%s",
+                (tenant, site, source_id, target_id, envelope_sha),
+            )
+            if parent is None:
+                raise Rejected("migration_collection_receipt_commit_failed", 503)
+            for part in envelope["payload"]["scopes"]:
+                for evidence_kind, field_name in (
+                    ("observation", "observations"), ("applicability", "applicability")
+                ):
+                    for entry in part[field_name]:
+                        evidence_sha = entry.get("evidence_sha256")
+                        if not isinstance(evidence_sha, str) or len(evidence_sha) != 64:
+                            raise Rejected("migration_collection_field_evidence_invalid", 423)
+                        tx.execute(
+                            "INSERT INTO inventory.migration_collection_fields "
+                            "(envelope_id,tenant,site,scope,attribute_id,evidence_kind,"
+                            "api_family,api_version,native_operation,value_sha256,"
+                            "evidence_sha256,observed_at) "
+                            "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
+                            "ON CONFLICT DO NOTHING",
+                            (
+                                str(parent["id"]), tenant, site, part["scope"],
+                                entry["attribute_id"], evidence_kind,
+                                entry.get("api_family"), entry.get("api_version"),
+                                entry.get("native_operation"), entry.get("value_sha256"),
+                                evidence_sha, entry["observed_at"],
+                            ),
+                        )
             self.d.record(
                 tx, tenant, worker.identity, "migration.collection.receipt",
                 source_id,
