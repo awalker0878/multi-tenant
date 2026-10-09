@@ -15,6 +15,7 @@ from inventory.application.fleet import MigrationFleet
 from inventory.application.operator_inputs import OperatorInputs
 from inventory.application.ports import Authority
 from inventory.application.profile_collection import authorize_read
+from inventory.application.migration_collection_ledger import MigrationCollectionLedger
 from inventory.application.views import InventoryViews
 from inventory.application.workload import WorkloadProfiles
 from inventory.domain.discovery import Rejected
@@ -220,6 +221,7 @@ class InventoryApp:
         self.configuration = PortingConfiguration(discovery)
         self.operator_inputs = OperatorInputs(discovery, evidence)
         self.workloads = WorkloadProfiles(discovery)
+        self.collection_ledger = MigrationCollectionLedger(discovery)
         self.fleet = MigrationFleet(discovery)
 
     async def __call__(
@@ -240,6 +242,7 @@ class InventoryApp:
                 "/internal/collections/claim",
                 "/internal/collections/pages",
                 "/internal/collections/profile-reads",
+                "/internal/collections/receipts",
             }
             selected = next(
                 (
@@ -281,7 +284,8 @@ class InventoryApp:
                             raise Rejected("request_interrupted", 400)
                         chunks.extend(event["body"])
                         maximum = (
-                            2097152 if scope["path"] == "/internal/collections/pages" else 262144
+                            2097152 if scope["path"] == "/internal/collections/pages" else
+                            524288 if scope["path"] == "/internal/collections/receipts" else 262144
                         )
                         if len(chunks) > maximum:
                             raise Rejected("request_bound", 413)
@@ -297,6 +301,8 @@ class InventoryApp:
                     payload = await asyncio.to_thread(self.discovery.claim, worker)
                 elif scope["path"].endswith("/profile-reads"):
                     payload = await asyncio.to_thread(authorize_read, self.discovery, worker, body)
+                elif scope["path"].endswith("/receipts"):
+                    payload = await asyncio.to_thread(self.collection_ledger.publish, worker, body)
                 else:
                     payload = await asyncio.to_thread(self.discovery.submit, worker, body)
             else:
