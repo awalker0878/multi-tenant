@@ -66,7 +66,7 @@ class MigrationPreparationApp:
             body = shape(
                 decode(bytes(chunks)),
                 ({"site_id"} if route[4] in {"migration-support", "migration-flow-choices"}
-                 else {"site_id", "revision", "context_sha256", "selections"} if flow_save
+                 else {"site_id", "revision", "context_sha256", "selections", "omissions"} if flow_save
                  else {"site_id", "review", "disks"})
                 | ({"base_plan_id", "recipe_id"} if complete else set()),
             )
