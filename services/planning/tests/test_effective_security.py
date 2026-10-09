@@ -76,6 +76,7 @@ def proof(platform="vmware", nat=False):
         "writer_principal": "native-writer",
         "observed_at": NOW, "expires_at": NOW + 45,
         "topology_sha256": "topo", "default_action": "deny",
+        "default_deny_native_ref": "default-deny-prod",
         "effective_membership_observed": True,
         "groups": groups, "services": services, "rules": [rule],
         "path": path, "forbidden_flow": DENIED,
@@ -86,7 +87,10 @@ def proof(platform="vmware", nat=False):
             **flow, "outcome": outcome, "observer": "observer",
             "native_receipt": "probe-" + outcome,
             "topology_sha256": "topo",
-            "path_sha256": path_sha, "observed_at": NOW,
+            "path_sha256": path_sha,
+            "denied_at_native_ref": "default-deny-prod" if outcome == "deny" else None,
+            "enforcement_scope": "scope-prod" if outcome == "deny" else None,
+            "observed_at": NOW,
             "expires_at": NOW + 45,
         }
         for flow, outcome in ((FLOW, "allow"), (DENIED, "deny"))
