@@ -9,7 +9,7 @@ from typing import Any
 from planning.application.planning import Planning
 from planning.domain.model import Actor, Rejected, canonical, digest, identifier, integer, shape
 from planning.domain.network_evidence import (
-    FLOW_KEYS, isolation_checks, native_application_flow_choices,
+    isolation_checks, native_application_flow_choices,
     network_checks,
 )
 from planning.domain.operational_evidence import inventory_digest, snapshot
