@@ -70,3 +70,66 @@ def resolve(
     }
     result["readiness_sha256"] = digest(result)
     return result
+
+
+def resolve_workload(
+    route: dict[str, Any], reconciliation: dict[str, Any],
+    collection_coverages: list[dict[str, Any]] | None, now: int,
+) -> dict[str, Any]:
+    """Upgrade an E3/E4 route preview to the effect-facing workload contract.
+
+    Inventory must independently provide full per-field coverage across source,
+    target and owner attributes. Missing records hold every effect.
+    """
+    holds = list(route["holds"])
+    if (reconciliation.get("status") != "matched"
+            or reconciliation.get("holds") != []
+            or reconciliation.get("native_write_authorized") is not False
+            or reconciliation.get("reconciliation_sha256") != digest({
+                k: v for k, v in reconciliation.items()
+                if k != "reconciliation_sha256"
+            })
+            or type(reconciliation.get("expires_at")) is not int
+            or reconciliation["expires_at"] <= now):
+        holds.append("catalogue_native_workload_reconciliation_required")
+    expected_scopes = {"source", "target", "owner"}
+    if (not isinstance(collection_coverages, list)
+            or len(collection_coverages) != 3
+            or {c.get("scope") for c in collection_coverages
+                if isinstance(c, dict)} != expected_scopes):
+        holds.append("migration_field_collection_evidence_required")
+    else:
+        for entry in collection_coverages:
+            if (
+                entry.get("status") != "complete"
+                or entry.get("holds") != []
+                or entry.get("native_write_authorized") is not False
+                or entry.get("independent_e3_e4_qualification") is not False
+                or type(entry.get("evaluated_at")) is not int
+                or not 0 <= now - entry["evaluated_at"] <= 5
+                or entry.get("coverage_sha256") != digest({
+                    k: v for k, v in entry.items() if k != "coverage_sha256"
+                })
+            ):
+                holds.append("migration_field_collection_stale_or_incomplete")
+            if entry.get("scope") in {"source", "target"} and (
+                entry.get("installation_id")
+                != route[entry["scope"]]["installation_id"]
+            ):
+                holds.append("migration_field_collection_installation_changed")
+    upgraded = {
+        **{k: v for k, v in route.items() if k != "readiness_sha256"},
+        "schema_version": 2,
+        "kind": "migration_workload_readiness",
+        "workload_reconciliation": reconciliation,
+        "collection_coverages": collection_coverages or [],
+        "status": "eligible" if not holds else "held",
+        "holds": sorted(set(holds)),
+        "native_write_authorized": False,
+        "workload_admission_authorized": False,
+    }
+    upgraded["expires_at"] = min(
+        route["expires_at"], reconciliation.get("expires_at", route["expires_at"])
+    )
+    upgraded["readiness_sha256"] = digest(upgraded)
+    return upgraded
