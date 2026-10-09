@@ -171,10 +171,11 @@ def resolve_workload(
                         or set(expected) != seen
                         or entry.get("manifest_sha256") != collection_manifest["manifest_sha256"]):
                     holds.append("migration_collection_manifest_attributes_changed")
-            if entry.get("scope") in {"source", "target"} and (
-                entry.get("installation_id")
-                != route[entry["scope"]]["installation_id"]
-            ):
+            side = entry.get("scope")
+            expected_side = "target" if side == "target" else "source"
+            if (entry.get("platform") != route[expected_side]["platform"]
+                    or entry.get("installation_id")
+                    != route[expected_side]["installation_id"]):
                 holds.append("migration_field_collection_installation_changed")
     upgraded = {
         **{k: v for k, v in route.items() if k != "readiness_sha256"},

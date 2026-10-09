@@ -77,7 +77,8 @@ def specimen() -> tuple[dict, dict]:
         ("owner", "src", digest("source-installed"), "10000000-0000-4000-8000-000000000001"),
     ):
         row = {
-            "schema_version": 1, "platform": "vmware", "scope": side,
+            "schema_version": 1,
+            "platform": "ahv" if side == "target" else "vmware", "scope": side,
             "installation_id": installation, "generation_id": generation,
             "installed_tuple_sha256": tuple_sha,
             "manifest_sha256": digest("manifest"),
@@ -176,3 +177,16 @@ def test_nested_workload_status_and_coverage_expiry_are_independent_gates() -> N
     })
     with pytest.raises(Rejected, match="migration_collection_coverage_not_current"):
         verify(expired, content, "10000000-0000-4000-8000-000000000001", 101)
+
+def test_coverage_platform_mismatch_is_rejected_with_valid_digests() -> None:
+    value, content = specimen()
+    value["collection_coverages"][1]["platform"] = "vmware"
+    changed = value["collection_coverages"][1]
+    changed["coverage_sha256"] = digest({
+        k: v for k, v in changed.items() if k != "coverage_sha256"
+    })
+    value["readiness_sha256"] = digest({
+        k: v for k, v in value.items() if k != "readiness_sha256"
+    })
+    with pytest.raises(Rejected, match="migration_collection_identity_changed"):
+        verify(value, content, "10000000-0000-4000-8000-000000000001", 101)

@@ -151,13 +151,15 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
         ):
             raise Rejected("migration_collection_coverage_not_current", 423)
         side = item["scope"]
-        if side in {"source", "target"} and (
-            item.get("installation_id") != value[side]["installation_id"]
+        expected_side = "target" if side == "target" else "source"
+        if (
+            item.get("platform") != value[expected_side]["platform"]
+            or item.get("installation_id") != value[expected_side]["installation_id"]
             or item.get("installed_tuple_sha256")
-                != native[side].get("tuple_sha256")
+                != native[expected_side].get("tuple_sha256")
         ):
             raise Rejected("migration_collection_identity_changed", 423)
-        if side == "source" and (
+        if side in {"source", "owner"} and (
             item.get("generation_id")
             != reconciliation.get("source_generation_id")
         ):

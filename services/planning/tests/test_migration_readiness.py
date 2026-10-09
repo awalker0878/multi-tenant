@@ -98,7 +98,7 @@ def test_workload_coverage_requires_release_pinned_full_attribute_set() -> None:
         ("owner", "vmware", "one", "owner.intent"),
     ):
         coverage = {
-            "scope": side, "status": "complete", "holds": [],
+            "scope": side, "platform": platform, "status": "complete", "holds": [],
             "attributes": [{"attribute_id": attribute, "status": "observed"}],
             "installation_id": installation,
             "manifest_sha256": manifest["manifest_sha256"],

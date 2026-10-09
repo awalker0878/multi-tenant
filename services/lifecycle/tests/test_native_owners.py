@@ -165,7 +165,8 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
         ("owner", "source-installation", source_tuple, source_generation),
     ):
         coverage = {
-            "schema_version": 1, "platform": "vmware", "scope": side,
+            "schema_version": 1,
+            "platform": "openstack" if side == "target" else "vmware", "scope": side,
             "installation_id": installation, "generation_id": generation,
             "installed_tuple_sha256": tuple_sha,
             "manifest_sha256": digest("field-manifest"),
