@@ -224,6 +224,10 @@
                 "null"
               ],
               "pattern": "^[a-f0-9]{64}$"
+            },
+            "authority_epoch": {
+              "type": "integer",
+              "minimum": 1
             }
           },
           "required": [
@@ -252,6 +256,35 @@
     "capabilities",
     "verification"
   ],
-  "$id": "urn:multi-tenant:qualification:v2",
-  "title": "Verified native qualification v2"
+  "$id": "urn:multi-tenant:qualification:v2.1",
+  "title": "Verified native qualification v2",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "qualified"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "revoked": {
+            "const": false
+          },
+          "verification": {
+            "type": "object",
+            "properties": {
+              "valid": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

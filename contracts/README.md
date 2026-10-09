@@ -25,3 +25,5 @@ The source manifests are an editing representation, not independently hosted ser
 ## Duplicate cleanup
 
 The byte-identical `contracts/fixtures/planning/synthetic-plan-v1.json` was removed. All fixture generation and live service test copies source `synthetic-plan-v1.1.json`. Fixture examples and partition source files are editable authoring inputs, not historically frozen published wire artifacts. Published API, event, schema and capability releases remain subject to the immutable-version gate.
+
+The `planning/qualification-v2.1.json` validation profile tightens the externally delivered v2 qualification payload; its wire `version` remains `2` and Assurance keeps the existing v2 endpoint. This is a schema contract revision, **not** a native evidence upgrade.

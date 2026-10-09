@@ -81,14 +81,14 @@ def request(
                 name = {
                     "CATALOGUE": "catalogue-input-v1",
                     "INVENTORY": "inventory-input-v2",
-                    "ASSURANCE": "qualification-v2",
+                    "ASSURANCE": "qualification-v2.1",
                 }[owner]
                 if schema_name is not None:
                     if (owner, schema_name) not in {
                         ("CATALOGUE", "catalogue-current-v1"),
                         ("INVENTORY", "migration-input-v4"),
                         ("ASSURANCE", "migration-support-v2"),
-                        ("ASSURANCE", "qualification-v2"),
+                        ("ASSURANCE", "qualification-v2.1"),
                     }:
                         raise ValueError
                     name = schema_name
@@ -318,7 +318,7 @@ def qualification_current(plan: dict[str, Any]) -> None:
         "POST",
         f"/internal/tenants/{scope['tenant_id']}/qualification-checks",
         {"qualification_scope": pinned["scope"]},
-        schema_name="qualification-v2",
+        schema_name="qualification-v2.1",
     )
     if (
         not verified(current, int(time.time()))
