@@ -57,6 +57,10 @@ def discover_runtime_copies(root: Path = ROOT) -> dict[str, list[str]]:
         names = set(FILENAME.findall(source.read_text(encoding="utf-8")))
         for name in names & by_name.keys():
             for artifact in by_name[name]:
+                # A different product's deployed package is not used merely
+                # because two products ship a same-named historical file.
+                if artifact.relative_to(root).parts[:2] != source.relative_to(root).parts[:2]:
+                    continue
                 path = str(artifact.relative_to(root))
                 usages.setdefault(path, set()).add(str(source.relative_to(root)))
     return {path: sorted(sources) for path, sources in sorted(usages.items())}
