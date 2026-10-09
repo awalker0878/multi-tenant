@@ -12,6 +12,58 @@ from typing import Any
 from planning.domain.model import Rejected, digest
 
 
+def extended_intent_fields(
+    workload: dict[str, Any], observed: dict[str, Any],
+    disk_mappings: list[dict[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    """Explicitly account for requested semantics not covered by basic VM sizing.
+
+    Native guest identifiers and disk roles are observations, not portable
+    guarantees of OS/image/hardening, encryption or placement equivalence.
+    A missing value is unknown, never a positive comparison.
+    """
+    fields: list[dict[str, Any]] = []
+
+    def compare(path: str, required: Any, actual: Any, mandatory: bool = True) -> None:
+        if actual is None:
+            status = "unknown"
+        elif actual == required and type(actual) is type(required):
+            status = "matched"
+        else:
+            status = "transformation_required"
+        fields.append({
+            "field": path, "disposition": status, "required": mandatory,
+        })
+
+    compute = workload.get("compute", {})
+    if "architecture" in compute:
+        compare("compute.architecture", compute["architecture"], observed.get("architecture"))
+    guest = workload.get("guest", {})
+    for key in ("os", "image", "hardening_profile"):
+        if key in guest:
+            compare("guest." + key, guest[key], observed.get(key))
+    if "failure_domain" in workload:
+        placement = workload["failure_domain"]
+        compare("failure_domain", placement, observed.get("failure_domain"),
+                not isinstance(placement, dict) or placement.get("strength") == "required")
+    declared_disks = workload.get("disks", [])
+    native_disks = observed.get("disks", [])
+    by_key = {d.get("key"): d for d in native_disks if isinstance(d, dict)}
+    mappings = {m.get("logical_device_id"): m.get("native_key")
+                for m in disk_mappings or [] if isinstance(m, dict)}
+    for disk in declared_disks:
+        actual = by_key.get(mappings.get(disk["id"]), {})
+        for key in ("boot", "storage_class", "encryption"):
+            if key in disk:
+                compare("disks." + disk["id"] + "." + key,
+                        disk[key], actual.get(key))
+    for requirement in workload.get("requirements", []):
+        if isinstance(requirement, dict) and requirement.get("strength") == "required":
+            compare("requirements." + str(requirement.get("key")),
+                    requirement.get("value"), None)
+    return fields
+
+
 def reconcile(
     intent: dict[str, Any], catalogue_digest: str, links: list[dict[str, Any]],
     profiles: list[dict[str, Any]], now: int,
@@ -137,6 +189,15 @@ def reconcile(
                   or {m.get("native_key") for m in mappings if isinstance(m, dict)}
                         != native_nics):
                 holds.append("source_nic_identity_ambiguous")
+            # Every required declared semantic must have a disposition.
+            # Basic sizing matches cannot conceal unknown OS, architecture,
+            # boot roles, encryption, storage or failure-domain obligations.
+            dispositions = extended_intent_fields(workload, facts, link.get("disk_mappings"))
+            holds.extend(
+                "source_intent_field_" + field["disposition"] + ":" + field["field"]
+                for field in dispositions
+                if field["required"] and field["disposition"] != "matched"
+            )
             native = facts.get("native")
             identity = native.get("identity") if isinstance(native, dict) else None
             if (
@@ -154,6 +215,7 @@ def reconcile(
                 holds.append("source_network_semantics_not_verified")
         status = "matched" if not holds else "held"
         result_rows.append({"workload_id": wid, "status": status, "holds": sorted(set(holds)),
+                            "field_dispositions": dispositions if link is not None and p is not None else [],
                             "source_identity_sha256":
                             link["source_identity_sha256"] if link else None})
         all_holds += [wid + ":" + reason for reason in holds]
