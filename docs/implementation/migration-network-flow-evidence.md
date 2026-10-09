@@ -69,4 +69,4 @@ claimed by these code changes.
   https://developers.nutanix.com/api/v1/sdk/namespaces/main/microseg/versions/v4.2/languages/python/ntnx_microseg_py_client.api.network_security_policies_api.html
   (the actual installation's microseg API version must be separately qualified).
 
-**Note:** The new workflow is wired in source code but is not operationally qualified or deployed. If owner inputs, live API discovery, independent native measurements, policy resolution, or current permissions are missing, the selections remain held. Do not claim NSX/AHV security policy portability or E3/E4 completion.
+**Note:** The application-scoped flow dropdown workflow is wired in source code but is not operationally qualified or deployed. Planning explicitly withholds NSX and AHV firewall-rule dropdowns until an E3/E4 provider-specific qualification path resolves effective policy semantics; Neutron and owner-dependency flows remain distinct. If owner inputs, live API discovery, independent native measurements, policy resolution, or current permissions are missing, the selections remain held. Do not claim NSX/AHV security policy portability or E3/E4 completion.
