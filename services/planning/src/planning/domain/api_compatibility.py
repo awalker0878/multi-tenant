@@ -185,6 +185,7 @@ def evaluate(
                 reason = "api_environment_discovery_stale"
             api_family: str | None = None
             api_version: str | None = None
+            evidence_expiry: int | None = None
             if env is not None and env["source"] != "live_probe":
                 # Operator/configured version listings are not independent
                 # discovery and must never promote a qualified API operation.
@@ -231,6 +232,7 @@ def evaluate(
                         ref = observation["evidence_sha256"]
                         api_family = observation["api_family"]
                         api_version = observation["api_version"]
+                        evidence_expiry = min(env["expires_at"], observation["expires_at"])
                     elif any(f["result"] == "degraded" for f in candidates):
                         status, reason = "conditional", "api_behavior_degraded"
                     elif candidates and all(f["result"] == "unsupported" for f in candidates):
@@ -265,6 +267,10 @@ def evaluate(
                             )
                         ):
                             omission_accepted = True
+                            deadline = item["expires_at"]
+                            evidence_expiry = min(
+                                evidence_expiry, deadline
+                            ) if evidence_expiry is not None else deadline
                     if not omission_accepted:
                         conditional = True
                 warning = {
@@ -288,6 +294,9 @@ def evaluate(
                 "selected_api_family": api_family,
                 "selected_api_version": api_version,
                 "omission_accepted": omission_accepted,
+                # The authority's native/entitlement and approved-omission
+                # receipts constrain runtime readiness, never tranche TTL.
+                "expires_at": evidence_expiry,
             })
     return {
         "status": "blocked" if blocking else "conditional" if conditional else "eligible",
