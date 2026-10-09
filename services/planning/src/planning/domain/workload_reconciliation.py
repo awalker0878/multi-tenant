@@ -103,7 +103,7 @@ def _dataset_coverage(
                 or receipt.get("decision") != "accepted"
                 or receipt.get("revoked") is not False
                 or type(receipt.get("observed_at")) is not int
-                or not 0 <= now - receipt["observed_at"] <= 30
+                or not 0 <= now - receipt["observed_at"] < 30
                 or type(receipt.get("expires_at")) is not int
                 or not now < receipt["expires_at"] <= flow["expires_at"]
                 or not isinstance(receipt.get("evidence_sha256"), str)
@@ -200,7 +200,7 @@ def evaluate(
                     and proof.get("firmware") in {"efi", "bios"}
                     and type(proof.get("secure_boot")) is bool
                     and type(proof.get("observed_at")) is int
-                    and 0 <= now - proof["observed_at"] <= 30
+                    and 0 <= now - proof["observed_at"] < 30
                     and type(proof.get("expires_at")) is int
                     and now < proof["expires_at"] <= flow["expires_at"]
                     and isinstance(proof.get("evidence_sha256"), str)
@@ -240,7 +240,7 @@ def evaluate(
             and case.get("decision") == "accepted"
             and case.get("revoked") is False
             and type(case.get("observed_at")) is int
-            and 0 <= now - case["observed_at"] <= 30
+            and 0 <= now - case["observed_at"] < 30
             and type(case.get("expires_at")) is int
             and now < case["expires_at"] <= flow["expires_at"]
             and all(isinstance(case.get(key), str)
