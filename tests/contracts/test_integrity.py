@@ -109,6 +109,52 @@ class ContractIntegrityTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "Schema identity required"):
                     check_schema_dialects()
 
+    def test_declared_active_contract_omission_is_detected(self):
+        registry = load("architecture/contract-consumers.json")
+        registry["active_releases"].pop()
+        original = load
+        with patch("check.load", side_effect=lambda name:
+                   registry if name == "architecture/contract-consumers.json"
+                   else original(name)):
+            with self.assertRaisesRegex(ValueError, "does not cover every declared"):
+                check_consumer_registry()
+
+    def test_asyncapi_operation_without_a_declared_channel_is_rejected(self):
+        from check import check_events
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            api = root / "contracts/asyncapi"
+            api.mkdir(parents=True)
+            (api / "broken.yaml").write_text("""
+asyncapi: 3.0.0
+info:
+  title: Synthetic broken operation
+  version: 1.0.0
+channels:
+  present:
+    address: present.event.v1
+    messages:
+      recorded:
+        $ref: '#/components/messages/Recorded'
+operations:
+  publish:
+    action: send
+    channel:
+      $ref: '#/channels/absent'
+components:
+  messages:
+    Recorded:
+      contentType: application/json
+      payload:
+        schemaFormat: application/schema+json;version=draft-2020-12
+        schema:
+          $ref: ../schemas/events/recorded.json
+""")
+            with patch("check.ROOT", root):
+                with self.assertRaisesRegex(ValueError, "Invalid"):
+                    check_events()
+
     def test_missing_reference_is_detected(self):
         with self.assertRaisesRegex(ValueError, "Invalid"):
             local_refs({"field":{"$ref":"#/definitions/missing"}}, "negative")
