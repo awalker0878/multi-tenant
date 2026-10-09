@@ -7,6 +7,7 @@ configuration collector must not be reused as the independent observer.
 import re
 from collections.abc import Callable
 from typing import Any
+from urllib.parse import quote
 
 from inventory_worker.infrastructure.native import CollectionFailure, exchange, secret
 from inventory_worker.infrastructure.profile_digest import fingerprint
@@ -17,9 +18,14 @@ MAX_SERVICE_PORTS = 256
 
 
 def _rows(stream: dict[str, Any], url: str, credential: str,
-          before_request: Callable[[], None]) -> list[dict[str, Any]]:
+          before_request: Callable[[], None], *, members: bool = False) -> list[dict[str, Any]]:
     before_request()
-    result = exchange(stream, url + "?page_size=100",
+    suffix = "?page_size=100"
+    if members:
+        suffix += "&enforcement_point_path=" + quote(
+            stream["enforcement_point_path"], safe=""
+        )
+    result = exchange(stream, url + suffix,
                       {"Authorization": "Basic " + credential})
     if (not isinstance(result, dict) or result.get("cursor")
             or not isinstance(result.get("results"), list)
@@ -63,6 +69,12 @@ def collect(
             or stream.get("native_api_qualified") is not True
             or stream.get("group_effective_member_types_verified") is not True
             or not isinstance(stream.get("group_effective_member_types"), dict)
+            or stream.get("enforcement_point_qualified") is not True
+            or not isinstance(stream.get("enforcement_point_path"), str)
+            or not stream["enforcement_point_path"].startswith("/infra/sites/")
+            or "/enforcement-points/" not in stream["enforcement_point_path"]
+            or "?" in stream["enforcement_point_path"]
+            or ".." in stream["enforcement_point_path"]
             or any(not isinstance(items, list) or len(items) > MAX_OBJECTS
                    or len(items) != len(set(items))
                    or any(not isinstance(s, str) or not ID.fullmatch(s)
@@ -83,6 +95,7 @@ def collect(
         rows = _rows(
             stream, root + "domains/" + domain + "/groups/" + gid +
             "/members/virtual-machines", credential, before_request,
+            members=True,
         )
         member_ids = []
         for item in rows:
