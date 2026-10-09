@@ -47,8 +47,14 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
     if (
         p["cluster_id"] != stream["cluster_id"]
         or p["prism_central_id"] != stream["prism_central_id"]
-        or p["api_versions"]
-        != dict.fromkeys(("vmm", "prism", "clustermgmt", "networking", "microseg"), "v4.3")
+        or not isinstance(p["api_versions"], dict)
+        or set(p["api_versions"]) != {"vmm", "prism", "clustermgmt", "networking", "microseg"}
+        or any(v not in {"v4.2", "v4.3"} for v in p["api_versions"].values())
+        or (stream.get("api_versions_verified") is True
+            and p["api_versions"] != stream.get("api_versions"))
+        or (stream.get("api_versions_verified") is not True
+            and p["api_versions"] != dict.fromkeys(
+                ("vmm", "prism", "clustermgmt", "networking", "microseg"), "v4.3"))
         or p["inventory_complete"] is not True
         or p["disk_formats"] != ["raw"]
         or p["image_import_methods"] != ["prism-image-url"]
