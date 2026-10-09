@@ -6714,6 +6714,95 @@
             },
             "minItems": 0,
             "maxItems": 1000
+          },
+          "security_references": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "entity_groups": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "extId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "native_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "resolution": {
+                      "const": "definition_only"
+                    }
+                  },
+                  "required": [
+                    "extId",
+                    "native_sha256",
+                    "resolution"
+                  ]
+                }
+              },
+              "address_groups": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "extId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "native_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "resolution": {
+                      "const": "definition_only"
+                    }
+                  },
+                  "required": [
+                    "extId",
+                    "native_sha256",
+                    "resolution"
+                  ]
+                }
+              },
+              "service_groups": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "extId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "native_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "resolution": {
+                      "const": "definition_only"
+                    }
+                  },
+                  "required": [
+                    "extId",
+                    "native_sha256",
+                    "resolution"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "entity_groups",
+              "address_groups",
+              "service_groups"
+            ]
           }
         },
         "required": [
@@ -6738,7 +6827,8 @@
           "subnets",
           "vpcs",
           "categories",
-          "policies"
+          "policies",
+          "security_references"
         ]
       },
       "AhvDestinationSelection": {
