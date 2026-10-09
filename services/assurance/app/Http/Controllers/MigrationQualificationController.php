@@ -97,7 +97,9 @@ final class MigrationQualificationController
                     $flowFields = [
                         'schema_version', 'assessment_id', 'source_revision_id',
                         'source_intent_sha256', 'context_sha256', 'selections_sha256',
-                        'native_controls_sha256', 'destination_generation_id',
+                        'native_controls_sha256', 'omissions_sha256',
+                        'omissions_approved', 'omission_approver_id',
+                        'destination_generation_id',
                         'platform', 'observed_at', 'expires_at', 'level', 'decision',
                         'checks', 'native_write_authorized',
                     ];
@@ -108,6 +110,10 @@ final class MigrationQualificationController
                         && ($candidateFlows['level'] ?? null) === 'E4'
                         && ($candidateFlows['decision'] ?? null) === 'accepted'
                         && ($candidateFlows['native_write_authorized'] ?? null) === false
+                        && is_bool($candidateFlows['omissions_approved'] ?? null)
+                        && (($candidateFlows['omission_approver_id'] ?? null) === null
+                            || (is_string($candidateFlows['omission_approver_id'])
+                                && preg_match('/\\A[0-9a-f-]{36}\\z/', $candidateFlows['omission_approver_id']) === 1))
                         && ($candidateFlows['platform'] ?? null) === 'openstack'
                         && is_array($candidateFlows['checks'] ?? null)
                         && count($candidateFlows['checks']) === count($requiredChecks)
