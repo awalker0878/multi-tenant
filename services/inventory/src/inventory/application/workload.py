@@ -303,10 +303,12 @@ class WorkloadProfiles:
             "ON c.tenant=r.tenant AND c.site=r.site "
             "AND c.revision=r.revision AND c.digest=r.digest "
             "WHERE r.tenant=%s AND r.site=%s "
-            "ORDER BY r.revision DESC LIMIT 201",
-            (actor.tenant, actor.site),
+            "AND r.payload->'catalogue_binding'->>'application_id'=%s "
+            "AND r.payload->'catalogue_binding'->>'environment_id'=%s "
+            "ORDER BY r.revision DESC LIMIT 101",
+            (actor.tenant, actor.site, application, environment),
         )
-        if len(records) > 200:
+        if len(records) > 100:
             raise Rejected("source_association_workspace_bound", 423)
         result: list[dict[str, Any]] = []
         authority_cache: dict[str, bool] = {}
