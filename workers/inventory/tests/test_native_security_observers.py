@@ -17,6 +17,8 @@ def test_nsx_group_member_and_service_apis_are_scoped_and_read_only():
         "credential_file": "/mounted/nsx-independent",
         "separate_observer_credential_verified": True,
         "native_api_qualified": True,
+        "group_effective_member_types_verified": True,
+        "group_effective_member_types": {"web": ["VirtualMachine"]},
     }
     urls = []
     def exchange(conn, url, headers):
@@ -24,7 +26,10 @@ def test_nsx_group_member_and_service_apis_are_scoped_and_read_only():
         assert headers == {"Authorization": "Basic observer"}
         urls.append(url)
         if "/members/virtual-machines" in url:
-            return {"results": [{"external_id": "vm-1"}]}
+            return {"results": [{
+                "id": "realized-vm-1", "state": "REALIZED",
+                "compute_ids": ["instanceUuid:some-uuid", "externalId:vm-1"],
+            }]}
         return {"results": [{
             "resource_type": "L4PortSetServiceEntry", "l4_protocol": "TCP",
             "destination_ports": ["5432", "443-445"],
@@ -47,12 +52,28 @@ def test_nsx_effective_group_truncated_response_holds():
         "credential_file": "/x",
         "separate_observer_credential_verified": True,
         "native_api_qualified": True,
+        "group_effective_member_types_verified": True,
+        "group_effective_member_types": {"group": ["VirtualMachine"]},
     }
     with (patch("inventory_worker.infrastructure.nsx_effective_observer.exchange",
                 return_value={"results": [], "cursor": "more"}),
           patch("inventory_worker.infrastructure.nsx_effective_observer.secret",
                 return_value="observer")):
         with pytest.raises(CollectionFailure, match="incomplete"):
+            nsx_collect(stream, "d1", ["group"], [], lambda: None)
+
+
+def test_nsx_non_vm_group_must_not_look_like_an_empty_vm_group():
+    stream = {
+        "kind": "nsx_effective_observer", "domain_id": "d1",
+        "credential_file": "/x", "native_api_qualified": True,
+        "separate_observer_credential_verified": True,
+        "group_effective_member_types_verified": True,
+        "group_effective_member_types": {"group": ["IPAddress"]},
+    }
+    with patch("inventory_worker.infrastructure.nsx_effective_observer.secret",
+               return_value="observer"):
+        with pytest.raises(CollectionFailure, match="member_types_unqualified"):
             nsx_collect(stream, "d1", ["group"], [], lambda: None)
 
 
