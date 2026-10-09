@@ -24,6 +24,7 @@ class MigrationSupport:
         self.api_observations = api_observations
         self.flow_require: Callable[[Actor, str, dict[str, Any]], dict[str, Any]] | None = None
         self.workload_current: Callable[[Actor, str, dict[str, Any], dict[str, Any] | None], dict[str, Any]] | None = None
+        self.workload_review: Callable[[Actor, str, dict[str, Any]], dict[str, Any]] | None = None
 
     def api_status(
         self, actor: Actor, site: str, selected: dict[str, Any]
@@ -76,6 +77,51 @@ class MigrationSupport:
             "directions": directions,
             "native_write_authorized": False,
         }
+
+    def preview(
+        self, actor: Actor, site: str, revision: dict[str, Any],
+    ) -> dict[str, Any]:
+        """One read-only workload readiness contract, never a browser approval.
+
+        Use the same Planning resolver as Lifecycle admission, but never
+        upgrade a missing application E4 proof to accepted. An operator can
+        inspect every concrete hold without passing an executable recipe.
+        """
+        if self.workload_current is None or self.workload_review is None:
+            raise Rejected("migration_workload_preview_not_commissioned", 503)
+        binding = self.workload_review(actor, site, revision)
+        selected = tranche(self.scope(actor, site))
+        candidates = [
+            route for route in selected["routes"]
+            if route["source"]["profile_sha256"] == binding["source"]["profile_sha256"]
+            and route["target"]["profile_sha256"] == binding["target"]["profile_sha256"]
+            and route["method"] == METHODS.get(binding["method"])
+        ]
+        if len(candidates) != 1:
+            raise Rejected("migration_preview_route_not_unique", 423)
+        candidate = candidates[0]
+        native = [
+            row for direction in matrix(
+                selected, self.observations(actor, site, selected), self.clock()
+            ) for row in direction["routes"] if row["route_id"] == candidate["id"]
+        ]
+        if len(native) != 1:
+            raise Rejected("migration_preview_qualification_ambiguous", 423)
+        now = self.clock()
+        route = resolve_readiness(
+            candidate, native[0], self.api_status(actor, site, candidate),
+            {"tenant_id": actor.tenant, "application_id": actor.application,
+             "environment_id": actor.environment, "site_id": site},
+            digest(selected), selected["release_sha256"], selected["expires_at"], now,
+        )
+        # The preview has no authority to invent independently measured E4
+        # application-interface proof; absent proof remains an explicit hold.
+        proof = self.workload_current(actor, site, binding, None)
+        result = resolve_workload(
+            route, proof["reconciliation"], proof.get("collection_coverages"), now,
+        )
+        return {**result, "review": revision, "native_write_authorized": False,
+                "workload_admission_authorized": False}
 
     def require(self, actor: Actor, site: str, binding: dict[str, Any]) -> dict[str, Any]:
         # A native route is not ready merely because a hypervisor capability
