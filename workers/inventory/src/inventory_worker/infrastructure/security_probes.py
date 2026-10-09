@@ -25,7 +25,10 @@ def collect(
         approved.get("schema_version") != 1
         or approved.get("independent_approval_verified") is not True
         or approved.get("native_write_authorized") is not False
-        or approved.get("authorized_scope") is None
+        or not isinstance(approved.get("authorized_scope"), str)
+        or not approved["authorized_scope"]
+        or not isinstance(approved.get("native_policy_generation"), str)
+        or not approved["native_policy_generation"]
         or not isinstance(items, list) or not 2 <= len(items) <= MAX_PROBES
         or approved.get("observer_principal") == approved.get("writer_principal")
         or not approved.get("observer_principal")
