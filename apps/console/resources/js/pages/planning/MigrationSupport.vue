@@ -161,7 +161,12 @@ function saveFlowChoices() {
 }
 onMounted(() => { void refreshFlowChoices(); void refreshCatalogueWorkloads(); });
 
-type WorkloadField = { field: string; disposition: string; required: boolean };
+type WorkloadField = {
+  field: string; disposition: string; required: boolean;
+  desired_value: string | null; observed_value: string | null;
+  evidence_source: string; evidence_age_seconds: number | null;
+  next_action: string;
+};
 type WorkloadDecision = {
   schema_version: 2; kind: 'migration_workload_readiness'; status: 'eligible' | 'held';
   holds: string[]; expires_at: number; readiness_sha256: string; native_write_authorized: false;
@@ -258,7 +263,15 @@ async function refreshWorkloadReadiness(): Promise<void> {
           <p v-for="hold in entry.holds" :key="hold" class="text-sm">{{ hold.replaceAll('_', ' ') }}</p>
           <details v-if="entry.field_dispositions.length"><summary>Required native semantics and dispositions</summary>
             <ul class="list-disc pl-5 text-sm">
-              <li v-for="field in entry.field_dispositions" :key="field.field">{{ field.field }}: {{ field.disposition.replaceAll('_', ' ') }}{{ field.required ? ' (required)' : ' (optional)' }}</li>
+              <li v-for="field in entry.field_dispositions" :key="field.field" class="my-3">
+                <strong>{{ field.field }} · {{ field.disposition.replaceAll('_', ' ') }}{{ field.required ? ' (required)' : ' (optional)' }}</strong>
+                <dl class="grid gap-x-4 md:grid-cols-2">
+                  <dt>Desired</dt><dd class="break-all">{{ field.desired_value ?? 'Not specified' }}</dd>
+                  <dt>Observed</dt><dd class="break-all">{{ field.observed_value ?? 'Unobserved' }}</dd>
+                  <dt>Evidence</dt><dd>{{ field.evidence_source.replaceAll('_', ' ') }} · {{ field.evidence_age_seconds === null ? 'Age unavailable' : field.evidence_age_seconds + ' seconds old' }}</dd>
+                  <dt>Next action</dt><dd>{{ field.next_action.replaceAll('_', ' ') }}</dd>
+                </dl>
+              </li>
             </ul>
           </details>
         </div>
