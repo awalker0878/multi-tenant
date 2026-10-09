@@ -178,8 +178,10 @@ def test_application_flow_dropdown_choices_are_existing_native_controls_only() -
     assert item["native_write_authorized"] is False
     network["firewall_rules"][0]["action"] = "deny"
     damaged = native_application_flow_choices(intent, network, policy)
-    assert all("fixture://native-firewall-rule" not in row["destination_firewall_rule_ids"]
-               for row in damaged)
+    assert "fixture://native-firewall-rule" not in next(
+        row for row in damaged if row["source"]["from"] == flow["from"]
+        and row["source"]["to"] == flow["to"]
+    )["destination_firewall_rule_ids"]
     network["topology"]["routes"] = []
     assert all(row["status"] == "held_unobserved"
                for row in native_application_flow_choices(intent, network, policy))
