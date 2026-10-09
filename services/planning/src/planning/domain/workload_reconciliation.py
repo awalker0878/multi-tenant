@@ -28,20 +28,25 @@ def _dataset_coverage(
     by_id = {d["id"]: d for d in review}
     if len(by_id) != len(review):
         return False
-    required = {d["id"] for d in intent["datasets"]
-                if d["owner_id"] == workload["id"]}
-    if set(by_id) != required:
+    # Catalogue.dataset.owner_id is the accountable person, never a VM ID.
+    # Dataset membership is expressed by each workload disk's dataset_id.
+    declared = {d["id"] for d in intent["datasets"]}
+    if len(declared) != len(intent["datasets"]):
         return False
-    # Check that the owner confirmed precisely one dataset for every mapped
-    # disk. A reused native disk in two datasets is not independent coverage.
+    required = {disk.get("dataset_id") for disk in workload["disks"]}
+    # A null dataset is not proof that a disk can be dropped. A separate
+    # owner-approved disposition is required before this can be a match.
+    if None in required or not required <= declared or set(by_id) != required:
+        return False
+    # Each physical key must belong to exactly the intended dataset, and
+    # every mapped native disk must be covered without overlap.
+    if len(set(native_keys.values())) != len(native_keys):
+        return False
     return all(
-        disk["dataset_id"] in by_id
-        and [d["id"] for d in review
-             if native_keys[disk["id"]] in d["disk_keys"]] == [disk["dataset_id"]]
+        [d["id"] for d in review
+         if native_keys[disk["id"]] in d["disk_keys"]] == [disk["dataset_id"]]
         for disk in workload["disks"]
-    ) and {
-        key for d in review for key in d["disk_keys"]
-    } == set(native_keys.values())
+    ) and sum(len(d["disk_keys"]) for d in review) == len(native_keys)
 
 
 def evaluate(
@@ -192,6 +197,10 @@ def evaluate(
             [row["expires_at"] for row in observations]
             + ([flow["expires_at"]] if isinstance(flow, dict)
                and type(flow.get("expires_at")) is int else [])
+            + ([case["expires_at"] for case in flow.get("workload_interface_cases", [])
+                if isinstance(case, dict) and type(case.get("expires_at")) is int]
+               if isinstance(flow, dict)
+               and isinstance(flow.get("workload_interface_cases"), list) else [])
         ),
         "native_write_authorized": False,
     }
