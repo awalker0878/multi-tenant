@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\CatalogueController;
+use App\Http\Controllers\CurrentPlanningIntentController;
 use App\Http\Controllers\DependencyHealthController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\PlanningInputController;
@@ -30,3 +31,5 @@ Route::prefix('/v1/tenants/{tenant}')->whereUuid('tenant')->group(function (): v
 });
 
 Route::get('/v1/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{revision}', PlanningInputController::class)->whereUuid(['tenant', 'application', 'environment', 'site', 'revision']);
+
+Route::get('/internal/tenants/{tenant}/applications/{application}/environments/{environment}/current-planning-intent', CurrentPlanningIntentController::class)->whereUuid(['tenant', 'application', 'environment']);
