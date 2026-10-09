@@ -179,3 +179,27 @@ def test_observer_must_report_a_distinct_negative_flow():
     d = proof()
     d["forbidden_flow"] = dict(FLOW)
     assert qualify(d, FLOW, NOW)["reason"] == "independent_negative_flow_missing"
+
+
+def test_vendor_native_dropdown_requires_effective_source_and_target_not_e2_references():
+    from planning.application.migration_flows import MigrationFlows
+    source, destination = proof("vmware"), proof("ahv", nat=True)
+    intent = {"dependencies": [{**FLOW, "kind": "communication", "strength": "required"}]}
+    case = {
+        "source_flow_id": digest(FLOW), "flow": FLOW,
+        "source_document": source, "document": destination,
+    }
+    choices = MigrationFlows.qualified_native_choices(
+        intent, "ahv", [case], NOW,
+    )
+    assert choices[0]["destination_firewall_rule_ids"] == [
+        destination["rules"][0]["native_ref"]
+    ]
+    assert choices[0]["destination_route_ids"] == [
+        "path:" + digest(destination["path"])
+    ]
+    assert choices[0]["native_write_authorized"] is False
+    case["source_document"]["groups"]["source"]["resolution"] = "expression_only"
+    from planning.domain.model import Rejected
+    with pytest.raises(Rejected, match="native_source_security_"):
+        MigrationFlows.qualified_native_choices(intent, "ahv", [case], NOW)
