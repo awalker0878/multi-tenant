@@ -55,7 +55,7 @@ def test_app_flow_save_has_idempotency_key_and_does_not_accept_untrusted_evidenc
     status, result = exchange(
         app, "/migration-flow-selections", json.dumps(body).encode(), HEADERS)
     assert status == 200 and result["status"] == "held"
-    assert authority.actor.call_args.args[3:7] == (
+    assert authority.actor.call_args.args[2:6] == (
         TENANT, "plan.create", APP, ENV)
     flows.save.assert_called_once_with(
         authority.actor.return_value, SITE, "b" * 64,
