@@ -138,6 +138,10 @@
       "planning",
       "console"
     ],
+    "contracts/openapi/planning-v1.2.json": [
+      "planning",
+      "console"
+    ],
     "contracts/openapi/worker-migration-effect-v2.1.json": [
       "lifecycle",
       "lifecycle-workers"
@@ -529,6 +533,18 @@
         "contracts/schemas/planning/migration-readiness-v2.json",
         "contracts/schemas/planning/migration-support-v2.json"
       ]
+    },
+    {
+      "path": "contracts/openapi/planning-v1.2.json",
+      "owner": "planning",
+      "consumers": [
+        "console"
+      ],
+      "copies": [
+        "apps/console/resources/contracts/planning-v1.2.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
     },
     {
       "path": "contracts/openapi/worker-migration-effect-v2.1.json",
