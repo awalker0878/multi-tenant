@@ -4,6 +4,7 @@ from collections.abc import Callable
 from typing import Any
 
 from inventory_worker.infrastructure.ahv_source_contract import configuration
+from inventory_worker.infrastructure.ahv_profile import resolved_namespace_versions
 from inventory_worker.infrastructure.native import CollectionFailure, exchange, secret
 from inventory_worker.infrastructure.native_identity import native_id
 from inventory_worker.infrastructure.profile_digest import fingerprint
@@ -40,7 +41,8 @@ VM_FIELDS = (
 def read_vm(stream: dict[str, Any], vm: str, scope: str) -> dict[str, Any]:
     document = exchange(
         stream,
-        "/api/vmm/v4.3/ahv/config/vms/" + native_id(vm),
+        "/api/vmm/" + resolved_namespace_versions(stream)["vmm"]
+        + "/ahv/config/vms/" + native_id(vm),
         {"X-Ntnx-Api-Key": secret(stream["credential_file"])},
     )
     result = document.get("data") if isinstance(document, dict) else None
@@ -67,9 +69,10 @@ def collect_ahv_source(
     before_request()
     row = read_vm(stream, vm, policy["native_scope"])
     installed = {}
+    versions = resolved_namespace_versions(stream)
     for kind, path, key in (
-        ("cluster", "/api/clustermgmt/v4.3/config/clusters/", "cluster_id"),
-        ("prism_central", "/api/prism/v4.3/config/domain-managers/", "prism_central_id"),
+        ("cluster", f"/api/clustermgmt/{versions['clustermgmt']}/config/clusters/", "cluster_id"),
+        ("prism_central", f"/api/prism/{versions['prism']}/config/domain-managers/", "prism_central_id"),
     ):
         before_request()
         document = exchange(
@@ -203,11 +206,11 @@ def collect_ahv_source(
         "vm_id": vm,
         "installation_id": stream["prism_central_id"],
         "native_scope": policy["native_scope"],
-        "api_version": "v4.3",
+        "api_version": versions["vmm"],
         "versions": {
-            "vmm": "v4.3",
-            "prism": "v4.3",
-            "clustermgmt": "v4.3",
+            "vmm": versions["vmm"],
+            "prism": versions["prism"],
+            "clustermgmt": versions["clustermgmt"],
             "product": policy["installed"]["product"],
         },
         "config_sha256": fingerprint(configuration("vm", row)),
