@@ -100,7 +100,7 @@ final class MigrationQualificationController
                         'native_controls_sha256', 'omissions_sha256',
                         'omissions_approved', 'omission_approver_id',
                         'destination_generation_id',
-                        'platform', 'observed_at', 'expires_at', 'level', 'decision',
+                        'platform', 'security_cases', 'observed_at', 'expires_at', 'level', 'decision',
                         'checks', 'native_write_authorized',
                     ];
                     if (is_array($candidateFlows)
@@ -114,7 +114,13 @@ final class MigrationQualificationController
                         && (($candidateFlows['omission_approver_id'] ?? null) === null
                             || (is_string($candidateFlows['omission_approver_id'])
                                 && preg_match('/\\A[0-9a-f-]{36}\\z/', $candidateFlows['omission_approver_id']) === 1))
-                        && ($candidateFlows['platform'] ?? null) === 'openstack'
+                        && in_array($candidateFlows['platform'] ?? null, ['openstack', 'vmware', 'ahv'], true)
+                        && is_array($candidateFlows['security_cases'] ?? null)
+                        && array_is_list($candidateFlows['security_cases'])
+                        && count($candidateFlows['security_cases']) <= 512
+                        && (($candidateFlows['platform'] === 'openstack')
+                            ? $candidateFlows['security_cases'] === []
+                            : count($candidateFlows['security_cases']) > 0)
                         && is_array($candidateFlows['checks'] ?? null)
                         && count($candidateFlows['checks']) === count($requiredChecks)
                         && array_diff($requiredChecks, array_keys($candidateFlows['checks'])) === []
