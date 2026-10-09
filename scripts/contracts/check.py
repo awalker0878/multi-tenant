@@ -101,7 +101,10 @@ def check_copies():
     for source, destinations in {
         "contracts/openapi/catalogue-v1.0.1.json": ["apps/console/resources/contracts/catalogue-v1.0.1.json"],
         "contracts/schemas/planning/migration-support-v2.json": ["services/planning/src/planning/infrastructure/inputs/migration-support-v2.json"],
-        "contracts/schemas/planning/migration-readiness-v2.json": ["services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.json"],
+        "contracts/schemas/planning/migration-readiness-v2.1.json": [
+            "services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.1.json",
+            "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.1.json",
+        ],
     }.items():
         canonical = (ROOT / source).read_bytes()
         for destination in destinations:

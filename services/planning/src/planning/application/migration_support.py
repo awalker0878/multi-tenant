@@ -20,7 +20,7 @@ from planning.domain.model import Actor, Rejected, digest
 def _workload_validator() -> Draft202012Validator:
     schema = json.loads(
         files("planning.infrastructure.inputs")
-        .joinpath("migration-readiness-v2.json")
+        .joinpath("migration-readiness-v2.1.json")
         .read_text(encoding="utf-8")
     )
     Draft202012Validator.check_schema(schema)
