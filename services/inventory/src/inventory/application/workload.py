@@ -297,7 +297,9 @@ class WorkloadProfiles:
         identifier(application)
         identifier(environment)
         records = tx.all(
-            "SELECT r.revision,r.digest,r.payload,c.actor AS confirming_actor "
+            "SELECT revision,digest,payload,confirming_actor FROM ("
+            "SELECT DISTINCT ON (r.payload->'catalogue_binding'->>'workload_id') "
+            "r.revision,r.digest,r.payload,c.actor AS confirming_actor "
             "FROM inventory.migration_reviews r "
             "JOIN inventory.migration_confirmations c "
             "ON c.tenant=r.tenant AND c.site=r.site "
@@ -305,7 +307,8 @@ class WorkloadProfiles:
             "WHERE r.tenant=%s AND r.site=%s "
             "AND r.payload->'catalogue_binding'->>'application_id'=%s "
             "AND r.payload->'catalogue_binding'->>'environment_id'=%s "
-            "ORDER BY r.revision DESC LIMIT 101",
+            "ORDER BY r.payload->'catalogue_binding'->>'workload_id',r.revision DESC"
+            ") AS latest ORDER BY revision DESC LIMIT 101",
             (actor.tenant, actor.site, application, environment),
         )
         if len(records) > 100:
