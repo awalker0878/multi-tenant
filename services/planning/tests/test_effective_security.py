@@ -99,6 +99,31 @@ def document(platform="vmware", generation="source", nat=False, multipath=False)
             for sg in ("sg-web", "sg-db", "sg-x")
         },
     }
+    from planning.domain.native_security_api import FEATURES
+    namespace, api_version = {
+        "vmware": ("nsx-policy", "v1"),
+        "ahv": ("microseg", "v4.3"),
+        "openstack": ("neutron", "v2.0"),
+    }[platform]
+    profile = {
+        "namespace": namespace, "api_version": api_version,
+        "installed": {"version": api_version, "build": generation + "-installed"},
+        "qualified_features": {
+            name: "qualified" for name in sorted(FEATURES[(platform, namespace, api_version)])
+        },
+        "observer": "security-observer", "environment_scope": "tenant-prod",
+        "profile_sha256": "1" * 64 if generation == "source" else "2" * 64,
+        "native_origin_id": "origin-" + generation, "verified": True,
+    }
+    profile["evidence_sha256"] = digest({
+        "platform": platform, "namespace": namespace, "api_version": api_version,
+        "installed": profile["installed"],
+        "features": profile["qualified_features"],
+        "environment_scope": profile["environment_scope"],
+        "profile_sha256": profile["profile_sha256"],
+        "native_origin_id": profile["native_origin_id"],
+    })
+    doc["api_profile"] = profile
     initial = {
         "source_ip": "192.0.2.10", "destination_ip": "192.0.2.20",
         "source_port": 50000, "destination_port": 5432,
