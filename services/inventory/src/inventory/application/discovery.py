@@ -22,6 +22,7 @@ from inventory.domain.discovery import (
     text,
 )
 from inventory.domain.workload import profile_payload
+from inventory.domain.source_profile import source_profile_read_count
 
 
 def uid() -> str:
@@ -629,10 +630,7 @@ class Discovery:
                 )
                 minimum_reads = maximum_reads = 8 if kind == "source_profile" else 7
                 if kind == "source_profile" and p.platform == "openstack":
-                    minimum_reads = maximum_reads = 5 + sum(
-                        r["role"] in {"bootable_volume", "data_volume"}
-                        for r in profile["native"]["disk_records"]
-                    )
+                    minimum_reads = maximum_reads = source_profile_read_count(profile)
                 if kind == "source_profile" and p.platform == "ahv":
                     minimum_reads = maximum_reads = 4
                 if kind == "target_profile" and p.platform == "vmware":
