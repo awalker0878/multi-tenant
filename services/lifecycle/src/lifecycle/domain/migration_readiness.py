@@ -8,6 +8,7 @@ independent Inventory, Governance and custody rechecks at every effect.
 from typing import Any
 
 from lifecycle.domain.admission import digest
+from lifecycle.domain.capability_definitions import METHOD_ALIASES
 from lifecycle.domain.execution import Rejected
 
 
@@ -38,11 +39,15 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
     route = campaign.get("route_sha256")
     if "outcomes" in native and native["outcomes"].get("route_sha256") != route:
         raise Rejected("migration_readiness_route_changed", 423)
+    api = value.get("api_compatibility")
+    if not isinstance(api, dict):
+        raise Rejected("migration_readiness_api_held", 423)
     if (
         value["schema_version"] != 1
         or value["kind"] != "migration_route_readiness"
         or value["scope"] != expected
         or value["route_sha256"] != route
+        or value["method"] != METHOD_ALIASES.get(native.get("method"))
         or value["native_e3_qualified"] is not True
         or value["receiving_e4_accepted"] is not True
         or value["status"] != "eligible"
@@ -53,7 +58,7 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
         or not 0 <= now - value["evaluated_at"] <= 5
         or type(value["expires_at"]) is not int
         or value["expires_at"] <= now
-        or value["api_compatibility"].get("operationally_eligible") is not True
+        or api.get("operationally_eligible") is not True
     ):
         raise Rejected("migration_readiness_not_current", 423)
     for side in ("source", "target"):
@@ -67,9 +72,10 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
             raise Rejected("migration_readiness_installation_changed", 423)
     if value["source"]["installation_id"] == value["target"]["installation_id"]:
         raise Rejected("migration_readiness_installation_changed", 423)
-    cases = value["api_compatibility"].get("cases")
+    cases = api.get("cases")
     if not isinstance(cases, list) or not cases or any(
-        case.get("status") != "eligible" and case.get("omission_accepted") is not True
+        not isinstance(case, dict)
+        or (case.get("status") != "eligible" and case.get("omission_accepted") is not True)
         for case in cases
     ):
         raise Rejected("migration_readiness_api_held", 423)
