@@ -171,6 +171,7 @@ def current_application_flow_proof(
             ("source_intent_sha256", payload.get("source_intent_sha256")),
             ("context_sha256", saved["context_sha256"]),
             ("selections_sha256", digest(payload["selections"])),
+            ("native_controls_sha256", payload.get("native_controls_sha256")),
             ("destination_generation_id", payload.get("destination_generation_id")),
             ("platform", "openstack"),
             ("level", "E4"),
