@@ -16,7 +16,7 @@ The contract root owns **wire contracts**, not provider eligibility or native ex
 | Planning migration | `openapi/planning-migration-v1.6.json` | `apps/console/resources/contracts/planning-migration-v1.6.json` |
 | Inventory | `openapi/inventory-v1.9.json` | `apps/console/resources/contracts/inventory-v1.9.json` |
 | Catalogue | `openapi/catalogue-v1.0.1.json` | `apps/console/resources/contracts/catalogue-v1.0.1.json` |
-| Native migration input | `schemas/planning/migration-input-v3.json` | `services/planning/src/planning/infrastructure/inputs/migration-input-v3.json` |
+| Native migration input | `schemas/planning/migration-input-v4.json` | `services/planning/src/planning/infrastructure/inputs/migration-input-v4.json` |
 | Migration support | `schemas/planning/migration-support-v2.json` | `services/planning/src/planning/infrastructure/inputs/migration-support-v2.json` |
 | Resolved workload readiness | `schemas/planning/migration-readiness-v2.json` | `services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.json` |
 

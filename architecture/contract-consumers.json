@@ -57,7 +57,7 @@
       "planning",
       "console"
     ],
-    "contracts/schemas/planning/migration-input-v3.json": [
+    "contracts/schemas/planning/migration-input-v4.json": [
       "inventory",
       "planning"
     ],

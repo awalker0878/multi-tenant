@@ -18,5 +18,6 @@
     "current",
     "native_write_authorized",
     "target_disk_formats"
-  ]
+  ],
+  "$id": "urn:multi-tenant:planning:migration-input:v4"
 }

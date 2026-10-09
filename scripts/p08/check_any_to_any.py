@@ -45,11 +45,11 @@ for name, value in [
         {"$ref": "#/components/schemas/" + name, "components": api["components"]},
         format_checker=FormatChecker(),
     ).validate(value)
-owner = ROOT / "contracts/schemas/planning/migration-input-v3.json"
+owner = ROOT / "contracts/schemas/planning/migration-input-v4.json"
 assert (
     owner.read_bytes()
     == (
-        ROOT / "services/planning/src/planning/infrastructure/inputs/migration-input-v3.json"
+        ROOT / "services/planning/src/planning/infrastructure/inputs/migration-input-v4.json"
     ).read_bytes()
 )
 validator = Draft202012Validator(
