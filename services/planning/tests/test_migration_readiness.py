@@ -357,3 +357,20 @@ def test_preview_and_admission_bind_coverage_to_independent_review_tuples() -> N
     held = resolve_workload(result, reconciliation, coverages, 100,
                             None, selected_review=selection)
     assert "migration_review_native_tuple_changed" in held["holds"]
+
+def test_required_qualified_transformation_held_until_independent_provenance() -> None:
+    from planning.domain.migration_readiness import eligible_field_dispositions
+
+    item = {
+        "workload_id": "10000000-0000-4000-8000-000000000001",
+        "status": "matched", "holds": [],
+        "field_dispositions": [{
+            "field": "guest.os", "required": True,
+            "disposition": "qualified_transformation",
+            "evidence_source": "independent_e4", "evidence_age_seconds": 1,
+        }],
+    }
+    assert not eligible_field_dispositions([item])
+    item["field_dispositions"][0]["disposition"] = "matched"
+    item["field_dispositions"][0]["evidence_age_seconds"] = 30
+    assert not eligible_field_dispositions([item])

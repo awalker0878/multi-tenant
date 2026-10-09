@@ -119,3 +119,27 @@ class ContractIntegrityTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_e4_field_provenance_requires_exact_independent_binding(self):
+        from jsonschema import Draft202012Validator, FormatChecker
+
+        schema = load("contracts/schemas/planning/independent-e4-field-provenance-v1.json")
+        validate = Draft202012Validator(schema, format_checker=FormatChecker())
+        uid = "10000000-0000-4000-8000-000000000001"
+        proof = {
+            "schema_version": 1, "kind": "independent_e4_field_provenance",
+            "tenant_id": uid, "application_id": uid, "environment_id": uid,
+            "catalogue_revision_id": uid, "catalogue_sha256": "a" * 64,
+            "workload_id": uid, "field": "guest.firmware",
+            "source_profile_sha256": "b" * 64,
+            "intent_field_sha256": "c" * 64, "observed_field_sha256": "d" * 64,
+            "disposition": "qualified_transformation", "level": "E4",
+            "decision": "accepted", "revoked": False, "evidence_sha256": "e" * 64,
+            "transformation_plan_sha256": "f" * 64,
+            "independent_acceptance_sha256": "0" * 64,
+            "observed_at": 100, "expires_at": 120,
+        }
+        self.assertTrue(validate.is_valid(proof))
+        self.assertFalse(validate.is_valid({**proof, "revoked": True}))
+        self.assertFalse(validate.is_valid({**proof, "level": "E2"}))
+        self.assertFalse(validate.is_valid({**proof, "transformation_plan_sha256": "bad"}))
