@@ -198,7 +198,39 @@ def document(platform="vmware", generation="source", nat=False, multipath=False)
             "native_revision": doc["boundary_scope"]["native_revision"],
             "observed_at": NOW, "expires_at": NOW + 45,
         }
+    refresh_partition(doc)
     return doc
+
+
+def refresh_partition(doc):
+    """Test-only simulated independent attestation of the entire finite universe."""
+    classes = sorted(digest(f) for f in FLOWS)
+    permitted = sorted(
+        digest(f) for f in FLOWS if decision(doc, f)[0] == "allow"
+    )
+    native = {
+        "rules": doc["rules"], "ports": doc.get("ports"),
+        "security_groups": doc.get("security_groups"),
+        "groups": doc["groups"], "services": doc["services"],
+        "workloads": doc["workloads"], "api_profile": doc["api_profile"],
+    }
+    d = digest(native)
+    universe = digest(classes)
+    doc["policy_partition"] = {
+        "schema_version": 1,
+        "mode": "disjoint_effective_rule_partition",
+        "complete": True,
+        "independently_verified": True,
+        "observer": doc["observer_principal"],
+        "universe_sha256": universe,
+        "native_rule_set_sha256": d,
+        "uncovered_classes": 0, "unbounded_wildcards": False,
+        "class_ids": classes, "permitted_class_ids": permitted,
+        "partition_sha256": digest({
+            "universe": universe, "native": d,
+            "classes": classes, "permitted": permitted,
+        }),
+    }
 
 
 def boundary():
@@ -268,6 +300,7 @@ def test_destination_must_not_add_access_not_permitted_by_source():
         "service_ref": "ssh",
     })
     dst["boundary_probes"][digest(EXTRA)]["outcome"] = "allow"
+    refresh_partition(dst)
     result = compare(src, dst, boundary(), NOW)
     assert result["reason"] == "destination_additional_access_detected"
 
