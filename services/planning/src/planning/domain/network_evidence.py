@@ -121,6 +121,67 @@ def traffic(flow: dict[str, Any], network: dict[str, Any], policy: dict[str, Any
     return "eligible"
 
 
+
+def selected_native_flow(flow: dict[str, Any], network: dict[str, Any],
+                         policy: dict[str, Any], now: int) -> str:
+    """Bind reviewed application intent to existing destination-native controls.
+
+    This is a *selection* check, not a traffic-measurement substitute.
+    Inventory/Assurance must supply API-observed controls, and traffic()
+    independently checks route reachability, both firewall directions,
+    return-path evidence, and positive or negative measurements.
+    """
+    mapping = network.get("application_flow_selections")
+    if not isinstance(mapping, dict) or len(mapping) > 512:
+        return "unknown"
+    flow_id = digest({k: flow[k] for k in FLOW_KEYS})
+    chosen = mapping.get(flow_id)
+    context = flow_context(flow, policy)
+    if context is None or not isinstance(chosen, dict) or set(chosen) != {
+        "rule_native_ref", "route_native_ref", "observer_principal",
+        "observed_at", "expires_at", "policy_sha256", "topology_sha256",
+    }:
+        return "unknown"
+    if (
+        any(not isinstance(chosen.get(k), str) or not chosen[k] for k in
+            ("rule_native_ref", "route_native_ref", "observer_principal",
+             "policy_sha256", "topology_sha256"))
+        or type(chosen.get("observed_at")) is not int
+        or type(chosen.get("expires_at")) is not int
+        or not 0 <= now - chosen["observed_at"] <= 60
+        or chosen["expires_at"] <= now
+        or chosen["policy_sha256"] != digest(policy)
+        or chosen["topology_sha256"] != digest(network.get("topology"))
+        or network.get("policy_sha256") != digest(policy)
+        or network.get("topology_sha256") != chosen["topology_sha256"]
+    ):
+        return "unknown"
+    rules = [
+        item for item in network.get("firewall_rules", [])
+        if isinstance(item, dict)
+        and item.get("native_ref") == chosen["rule_native_ref"]
+        and all(item.get(k) == flow[k] for k in FLOW_KEYS)
+        and item.get("context") == context
+    ]
+    routes = [
+        item for item in network.get("topology", {}).get("routes", [])
+        if isinstance(item, dict)
+        and item.get("native_ref") == chosen["route_native_ref"]
+        and item.get("from") == flow["from"]
+        and item.get("to") == flow["to"]
+        and item.get("context") == context
+    ]
+    if len(rules) != 1 or len(routes) != 1:
+        return "blocked"
+    if not all(rules[0].get(k) == "allow" for k in
+               ("action", "egress_action", "ingress_action")):
+        return "blocked"
+    if chosen["observer_principal"] == network.get("writer_principal"):
+        return "blocked"
+    return "eligible"
+
+
+
 def network_checks(
     intent: dict[str, Any], data: dict[str, Any], policy: dict[str, Any], now: int
 ) -> list[tuple[str, str, str, bool]]:
@@ -128,6 +189,13 @@ def network_checks(
     checks = []
     for dependency in intent["dependencies"]:
         if dependency["kind"] == "communication":
+            selection = selected_native_flow(dependency, network, policy, now)
+            checks.append((
+                "network.application_flow_selection",
+                selection,
+                "required_destination_native_controls_" + selection,
+                dependency["strength"] == "required",
+            ))
             status = traffic(dependency, network, policy, now)
             checks.append(
                 (
