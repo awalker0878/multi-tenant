@@ -255,7 +255,11 @@ def assess(
         "vcpus": sum(w["compute"]["vcpus"] for w in intent["workloads"]),
         "memory_mib": sum(w["compute"]["memory_mib"] for w in intent["workloads"]),
         "storage_gib": sum(d["size_gib"] for w in intent["workloads"] for d in w["disks"]),
-        "addresses": sum(len(w["nics"]) for w in intent["workloads"]),
+        "addresses": sum(
+            len(nic["address_families"])
+            for workload in intent["workloads"]
+            for nic in workload["nics"]
+        ),
     }
     for kind, amount in demand.items():
         capacity = destination["capacity"].get(kind)
