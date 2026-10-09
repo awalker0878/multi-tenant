@@ -19,6 +19,7 @@ from planning.infrastructure.migration import prepare_migration
 from planning.infrastructure.migration_recipes import recipe_for, visible_recipes
 from planning.infrastructure.migration_support import (
     api_capability_records,
+    current_application_flow_proof,
     qualification_records,
     selected_tranche,
 )
@@ -54,7 +55,7 @@ class PlanningRouter:
         self.planning = PlanningApp(
             Planning(Postgres(), OwnerSources(), clock, validation), GovernanceAuthority()
         )
-        self.flows = MigrationFlows(self.planning.planning)
+        self.flows = MigrationFlows(self.planning.planning, current_application_flow_proof)
         self.support.flow_require = self.flows.require
         self.foundation = FoundationApp(database_ready)
         self.invalidations = QualificationInvalidationApp(QualificationInvalidations(Postgres()))
