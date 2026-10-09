@@ -35,6 +35,18 @@ def _profile_environment(profile: dict[str, Any], bound: dict[str, Any]) -> dict
         "installation_id": installation,
         "generation_id": profile["generation_id"],
         "installed_tuple_sha256": bound["tuple_sha256"],
+        # Only independently captured installed namespace releases may
+        # authorize field receipts; an arbitrary receipt string never does.
+        "installed_namespaces": {
+            family: [version] if isinstance(version, str) else version
+            for family, version in (
+                facts.get("versions") or facts.get("api_versions") or {}
+            ).items()
+            if isinstance(family, str)
+            and (isinstance(version, str)
+                 or isinstance(version, list)
+                 and all(isinstance(v, str) for v in version))
+        },
     }
 
 
@@ -119,6 +131,8 @@ def read_collection_coverages(
                 record["installation_id"], record["generation_id"],
                 record["installed_tuple_sha256"],
                 record["observations"], record["applicability"], now,
+                installed_namespaces=expectation["installed_namespaces"],
+                receipt_expires_at=payload["expires_at"],
             )
             # Presence of a well-formed signed file does not prove coverage.
             # All manifest attributes must be represented by fresh, correctly
