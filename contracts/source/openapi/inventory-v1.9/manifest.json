@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "target": "contracts/openapi/inventory-v1.8.json",
+  "target": "contracts/openapi/inventory-v1.9.json",
   "base": "base.json",
   "parts": {
     "paths": {
@@ -38,6 +38,6 @@
     }
   },
   "copies": [
-    "apps/console/resources/contracts/inventory-v1.8.json"
+    "apps/console/resources/contracts/inventory-v1.9.json"
   ]
 }

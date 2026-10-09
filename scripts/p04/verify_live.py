@@ -103,7 +103,7 @@ def main():
                     (out/'browser.json').write_text(redact(browser_file.read_text()))
 
     try:
-        api_source = (root/'contracts/openapi/inventory-v1.8.json').read_bytes()
+        api_source = (root/'contracts/openapi/inventory-v1.9.json').read_bytes()
         check('validation-contract-matches-generated-client', hashlib.sha256(api_source).hexdigest() == SOURCE_SHA256)
         api = json.loads(api_source)
         validate_spec(api)

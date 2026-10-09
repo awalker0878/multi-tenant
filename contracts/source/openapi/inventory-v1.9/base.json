@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Inventory read-only commissioning and observations",
-    "version": "1.8.0",
-    "description": "Inventory observations and API-first porting configuration review. Administrator interpretation never grants native authority. Adds immutable site-scoped operator input packets without changing existing contracts."
+    "version": "1.9.0",
+    "description": "Inventory observations and API-first porting configuration review. Administrator interpretation never grants native authority. Adds immutable site-scoped operator input packets without changing existing contracts.\nVersion 1.9 preserves newly observed native readiness and collection inputs. The v1.8 artifact is immutable history."
   },
   "components": {
     "securitySchemes": {

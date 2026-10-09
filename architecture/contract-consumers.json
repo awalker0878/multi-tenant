@@ -49,7 +49,7 @@
       "governance",
       "console"
     ],
-    "contracts/openapi/inventory-v1.8.json": [
+    "contracts/openapi/inventory-v1.9.json": [
       "inventory",
       "console"
     ],

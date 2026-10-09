@@ -132,7 +132,7 @@ def main():
     sources, bundles = verify()
     id_count = unique_schema_ids()
     paths, ops = 0, 0
-    for name in ("catalogue-v1.0.1.json", "inventory-v1.8.json", "planning-migration-v1.6.json"):
+    for name in ("catalogue-v1.0.1.json", "inventory-v1.9.json", "planning-migration-v1.6.json"):
         a, b = current_api(name)
         paths += a
         ops += b

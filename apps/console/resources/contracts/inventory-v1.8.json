@@ -4586,9 +4586,6 @@
                 "$ref": "#/components/schemas/VmwareDestinationSelection"
               },
               {
-                "$ref": "#/components/schemas/OpenstackSecurityDestinationSelection"
-              },
-              {
                 "type": "null"
               }
             ]
@@ -5884,161 +5881,6 @@
             },
             "maxItems": 100
           },
-          "security_groups": {
-            "type": "array",
-            "maxItems": 99,
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 240
-                },
-                "name": {
-                  "type": "string",
-                  "maxLength": 240
-                },
-                "project_id": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 240
-                },
-                "stateful": {
-                  "type": [
-                    "boolean",
-                    "null"
-                  ]
-                },
-                "rules_sha256": {
-                  "type": "string",
-                  "pattern": "^[0-9a-f]{64}$"
-                },
-                "semantics_sha256": {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "pattern": "^[0-9a-f]{64}$"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "rules": {
-                  "anyOf": [
-                    {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 240
-                          },
-                          "direction": {
-                            "enum": [
-                              "ingress",
-                              "egress"
-                            ]
-                          },
-                          "ethertype": {
-                            "enum": [
-                              "IPv4",
-                              "IPv6"
-                            ]
-                          },
-                          "protocol": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "integer"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "port_range_min": {
-                            "anyOf": [
-                              {
-                                "type": "integer",
-                                "minimum": 0,
-                                "maximum": 65535
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "port_range_max": {
-                            "anyOf": [
-                              {
-                                "type": "integer",
-                                "minimum": 0,
-                                "maximum": 65535
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "remote_ip_prefix": {
-                            "anyOf": [
-                              {
-                                "type": "string",
-                                "maxLength": 128
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "semantic_sha256": {
-                            "type": "string",
-                            "pattern": "^[0-9a-f]{64}$"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "direction",
-                          "ethertype",
-                          "protocol",
-                          "port_range_min",
-                          "port_range_max",
-                          "remote_ip_prefix",
-                          "semantic_sha256"
-                        ]
-                      },
-                      "maxItems": 512
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "native_sha256": {
-                  "type": "string",
-                  "pattern": "^[0-9a-f]{64}$"
-                }
-              },
-              "required": [
-                "id",
-                "name",
-                "project_id",
-                "stateful",
-                "rules_sha256",
-                "semantics_sha256",
-                "rules",
-                "native_sha256"
-              ]
-            }
-          },
           "compute_version": {
             "type": "object",
             "additionalProperties": false,
@@ -6137,7 +5979,6 @@
           "flavors",
           "volume_types",
           "network_extensions",
-          "security_groups",
           "compute_version",
           "volume_version",
           "required_capability_evidence",
@@ -6179,34 +6020,19 @@
             "additionalProperties": false,
             "properties": {
               "vmm": {
-                "enum": [
-                  "v4.2",
-                  "v4.3"
-                ]
+                "const": "v4.3"
               },
               "prism": {
-                "enum": [
-                  "v4.2",
-                  "v4.3"
-                ]
+                "const": "v4.3"
               },
               "clustermgmt": {
-                "enum": [
-                  "v4.2",
-                  "v4.3"
-                ]
+                "const": "v4.3"
               },
               "networking": {
-                "enum": [
-                  "v4.2",
-                  "v4.3"
-                ]
+                "const": "v4.3"
               },
               "microseg": {
-                "enum": [
-                  "v4.2",
-                  "v4.3"
-                ]
+                "const": "v4.3"
               }
             },
             "required": [
@@ -6635,82 +6461,6 @@
                       "type": "null"
                     }
                   ]
-                },
-                "rules": {
-                  "anyOf": [
-                    {
-                      "type": "array",
-                      "maxItems": 512,
-                      "items": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                          "extId": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 240
-                          },
-                          "type": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 160
-                          },
-                          "spec_sha256": {
-                            "type": "string",
-                            "pattern": "^[a-f0-9]{64}$"
-                          },
-                          "category_ids": {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "minLength": 1,
-                              "maxLength": 160
-                            },
-                            "maxItems": 64,
-                            "uniqueItems": true
-                          },
-                          "address_group_ids": {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "minLength": 1,
-                              "maxLength": 160
-                            },
-                            "maxItems": 64,
-                            "uniqueItems": true
-                          },
-                          "service_group_ids": {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "minLength": 1,
-                              "maxLength": 160
-                            },
-                            "maxItems": 64,
-                            "uniqueItems": true
-                          },
-                          "reference_resolution": {
-                            "enum": [
-                              "catalogue_ids_only",
-                              "unresolved"
-                            ]
-                          }
-                        },
-                        "required": [
-                          "extId",
-                          "type",
-                          "spec_sha256",
-                          "category_ids",
-                          "address_group_ids",
-                          "service_group_ids",
-                          "reference_resolution"
-                        ]
-                      }
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
                 }
               },
               "required": [
@@ -6729,95 +6479,6 @@
             },
             "minItems": 0,
             "maxItems": 1000
-          },
-          "security_references": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "entity_groups": {
-                "type": "array",
-                "maxItems": 100,
-                "items": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "extId": {
-                      "type": "string",
-                      "format": "uuid"
-                    },
-                    "native_sha256": {
-                      "type": "string",
-                      "pattern": "^[0-9a-f]{64}$"
-                    },
-                    "resolution": {
-                      "const": "definition_only"
-                    }
-                  },
-                  "required": [
-                    "extId",
-                    "native_sha256",
-                    "resolution"
-                  ]
-                }
-              },
-              "address_groups": {
-                "type": "array",
-                "maxItems": 100,
-                "items": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "extId": {
-                      "type": "string",
-                      "format": "uuid"
-                    },
-                    "native_sha256": {
-                      "type": "string",
-                      "pattern": "^[0-9a-f]{64}$"
-                    },
-                    "resolution": {
-                      "const": "definition_only"
-                    }
-                  },
-                  "required": [
-                    "extId",
-                    "native_sha256",
-                    "resolution"
-                  ]
-                }
-              },
-              "service_groups": {
-                "type": "array",
-                "maxItems": 100,
-                "items": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "extId": {
-                      "type": "string",
-                      "format": "uuid"
-                    },
-                    "native_sha256": {
-                      "type": "string",
-                      "pattern": "^[0-9a-f]{64}$"
-                    },
-                    "resolution": {
-                      "const": "definition_only"
-                    }
-                  },
-                  "required": [
-                    "extId",
-                    "native_sha256",
-                    "resolution"
-                  ]
-                }
-              }
-            },
-            "required": [
-              "entity_groups",
-              "address_groups",
-              "service_groups"
-            ]
           }
         },
         "required": [
@@ -6842,8 +6503,7 @@
           "subnets",
           "vpcs",
           "categories",
-          "policies",
-          "security_references"
+          "policies"
         ]
       },
       "AhvDestinationSelection": {
@@ -6886,7 +6546,7 @@
               "type": "string",
               "format": "uuid"
             },
-            "minItems": 0,
+            "minItems": 1,
             "maxItems": 32
           },
           "policy_ids": {
@@ -6895,39 +6555,13 @@
               "type": "string",
               "format": "uuid"
             },
-            "minItems": 0,
+            "minItems": 1,
             "maxItems": 32
-          },
-          "security_mappings": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "source_id": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 240
-                },
-                "destination_id": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 240
-                }
-              },
-              "required": [
-                "source_id",
-                "destination_id"
-              ]
-            },
-            "minItems": 0,
-            "maxItems": 64
           },
           "firmware": {
             "enum": [
               "bios",
-              "efi",
-              ""
+              "efi"
             ]
           },
           "disks": {
@@ -6992,7 +6626,6 @@
           "storage_container_id",
           "category_ids",
           "policy_ids",
-          "security_mappings",
           "firmware",
           "disks",
           "nics"
@@ -8121,323 +7754,6 @@
             },
             "minItems": 0,
             "maxItems": 100
-          },
-          "guest_options_by_host": {
-            "type": "array",
-            "maxItems": 16,
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "host": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 240
-                },
-                "guest_ids": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 240
-                  },
-                  "minItems": 1,
-                  "maxItems": 128
-                },
-                "hardware_versions": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 240
-                  },
-                  "minItems": 1,
-                  "maxItems": 32
-                },
-                "native_sha256": {
-                  "type": "string",
-                  "pattern": "^[0-9a-f]{64}$"
-                }
-              },
-              "required": [
-                "host",
-                "guest_ids",
-                "hardware_versions",
-                "native_sha256"
-              ]
-            }
-          },
-          "nsx_policy_observation": {
-            "anyOf": [
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "domain_id": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 100
-                  },
-                  "api": {
-                    "const": "nsx-policy-v1"
-                  },
-                  "semantic_qualification": {
-                    "const": "unresolved"
-                  },
-                  "source_vm_attachment": {
-                    "const": "unverified"
-                  },
-                  "native_write_authorized": {
-                    "const": false
-                  },
-                  "policies": {
-                    "type": "array",
-                    "maxItems": 16,
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 100
-                        },
-                        "sequence_number": {
-                          "type": [
-                            "integer",
-                            "null"
-                          ]
-                        },
-                        "scope_sha256": {
-                          "type": "string",
-                          "pattern": "^[a-f0-9]{64}$"
-                        },
-                        "native_sha256": {
-                          "type": "string",
-                          "pattern": "^[a-f0-9]{64}$"
-                        },
-                        "rules": {
-                          "type": "array",
-                          "maxItems": 100,
-                          "items": {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "minLength": 1,
-                                "maxLength": 100
-                              },
-                              "action": {
-                                "enum": [
-                                  "ALLOW",
-                                  "DROP",
-                                  "REJECT"
-                                ]
-                              },
-                              "direction": {
-                                "enum": [
-                                  "IN",
-                                  "OUT",
-                                  "IN_OUT"
-                                ]
-                              },
-                              "disabled": {
-                                "type": "boolean"
-                              },
-                              "native_sha256": {
-                                "type": "string",
-                                "pattern": "^[a-f0-9]{64}$"
-                              },
-                              "service_reference_status": {
-                                "const": "unresolved"
-                              },
-                              "group_reference_status": {
-                                "const": "unresolved"
-                              },
-                              "sequence_number": {
-                                "type": [
-                                  "integer",
-                                  "null"
-                                ]
-                              },
-                              "source_groups": {
-                                "type": "array",
-                                "maxItems": 100,
-                                "items": {
-                                  "type": "string",
-                                  "minLength": 1,
-                                  "maxLength": 512
-                                }
-                              },
-                              "destination_groups": {
-                                "type": "array",
-                                "maxItems": 100,
-                                "items": {
-                                  "type": "string",
-                                  "minLength": 1,
-                                  "maxLength": 512
-                                }
-                              },
-                              "services": {
-                                "type": "array",
-                                "maxItems": 100,
-                                "items": {
-                                  "type": "string",
-                                  "minLength": 1,
-                                  "maxLength": 512
-                                }
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "action",
-                              "direction",
-                              "disabled",
-                              "native_sha256",
-                              "service_reference_status",
-                              "group_reference_status",
-                              "sequence_number",
-                              "source_groups",
-                              "destination_groups",
-                              "services"
-                            ]
-                          }
-                        },
-                        "category": {
-                          "anyOf": [
-                            {
-                              "enum": [
-                                "Ethernet",
-                                "Emergency",
-                                "Infrastructure",
-                                "Environment",
-                                "Application"
-                              ]
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "stateful": {
-                          "type": [
-                            "boolean",
-                            "null"
-                          ]
-                        },
-                        "scope": {
-                          "type": "array",
-                          "maxItems": 100,
-                          "items": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 512
-                          }
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "sequence_number",
-                        "scope_sha256",
-                        "native_sha256",
-                        "rules",
-                        "category",
-                        "stateful",
-                        "scope"
-                      ]
-                    }
-                  },
-                  "groups": {
-                    "type": "array",
-                    "maxItems": 100,
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 100
-                        },
-                        "native_sha256": {
-                          "type": "string",
-                          "pattern": "^[a-f0-9]{64}$"
-                        },
-                        "definition_sha256": {
-                          "type": "string",
-                          "pattern": "^[a-f0-9]{64}$"
-                        },
-                        "resolution": {
-                          "const": "unverified"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "native_sha256",
-                        "definition_sha256",
-                        "resolution"
-                      ]
-                    }
-                  },
-                  "services": {
-                    "type": "array",
-                    "maxItems": 100,
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 100
-                        },
-                        "native_sha256": {
-                          "type": "string",
-                          "pattern": "^[a-f0-9]{64}$"
-                        },
-                        "definition_sha256": {
-                          "type": "string",
-                          "pattern": "^[a-f0-9]{64}$"
-                        },
-                        "resolution": {
-                          "const": "unverified"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "native_sha256",
-                        "definition_sha256",
-                        "resolution"
-                      ]
-                    }
-                  },
-                  "holds": {
-                    "type": "array",
-                    "maxItems": 64,
-                    "items": {
-                      "type": "string",
-                      "minLength": 1,
-                      "maxLength": 128
-                    }
-                  }
-                },
-                "required": [
-                  "domain_id",
-                  "api",
-                  "policies",
-                  "semantic_qualification",
-                  "source_vm_attachment",
-                  "native_write_authorized",
-                  "groups",
-                  "services",
-                  "holds"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ]
           }
         },
         "required": [
@@ -8460,84 +7776,7 @@
           "resource_pools",
           "hosts",
           "datastores",
-          "networks",
-          "guest_options_by_host",
-          "nsx_policy_observation"
-        ]
-      },
-      "OpenstackSecurityDestinationSelection": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "platform": {
-            "const": "openstack"
-          },
-          "project_id": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 240
-          },
-          "security_mappings": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "source_id": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 240
-                },
-                "destination_id": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 240
-                }
-              },
-              "required": [
-                "source_id",
-                "destination_id"
-              ]
-            },
-            "minItems": 0,
-            "maxItems": 64
-          },
-          "flow_mappings": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "source_group_id": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 240
-                },
-                "source_rule_id": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 240
-                },
-                "destination_rule_id": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 240
-                }
-              },
-              "required": [
-                "source_group_id",
-                "source_rule_id",
-                "destination_rule_id"
-              ]
-            },
-            "minItems": 0,
-            "maxItems": 1024
-          }
-        },
-        "required": [
-          "platform",
-          "project_id",
-          "security_mappings"
+          "networks"
         ]
       },
       "VmwareDestinationSelection": {
@@ -8584,8 +7823,7 @@
           "firmware": {
             "enum": [
               "bios",
-              "efi",
-              ""
+              "efi"
             ]
           },
           "disks": {
