@@ -184,7 +184,15 @@ def collect_ahv(
                 raise CollectionFailure("invalid_response")
             seen_rule_ids.add(rule["extId"])
     projected = {
-        k: [{f: r.get(f) for f in fields} | {"native_sha256": fingerprint(r)} for r in inventory[k]]
+        k: [{f: r.get(f) for f in fields if f != "rules"}
+            | ({"rules": [
+                    {"extId": rule["extId"], "type": rule["type"],
+                     "spec_sha256": fingerprint(rule["spec"])}
+                    for rule in r["rules"]
+                ] if r.get("rules") is not None else None}
+               if k == "policies" else {})
+            | {"native_sha256": fingerprint(r)}
+            for r in inventory[k]]
         for k, fields in FIELDS.items()
     }
     installed = {
