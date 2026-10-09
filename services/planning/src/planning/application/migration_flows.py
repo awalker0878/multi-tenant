@@ -87,6 +87,13 @@ class MigrationFlows:
             or dest["site_id"] != site
         ):
             raise Rejected("application_flow_independent_qualification_required", 423)
+        # NSX and Prism native security rules are still unresolved security
+        # catalogues; neither platform may show a selectable equivalent from
+        # an E2 inventory record. An E3/E4 qualified provider-specific
+        # resolver must replace this hold explicitly after effective-policy
+        # ordering, reference and positive/negative witness coverage.
+        if dest.get("platform") in {"vmware", "ahv"}:
+            raise Rejected("native_security_rule_equivalence_unqualified", 423)
         observed = snapshot(dest, qualification, now)
         if not isinstance(observed, dict) or not isinstance(observed.get("network"), dict):
             raise Rejected("application_flow_current_native_evidence_required", 423)
