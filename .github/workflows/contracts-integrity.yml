@@ -1,7 +1,23 @@
 name: Contract source and consumer integrity
 on:
   pull_request:
-    paths: ['contracts/**', 'services/planning/**', 'services/lifecycle/**', 'services/inventory/**', 'apps/console/**', 'workers/**', 'tests/contracts/**', 'scripts/contracts/**', 'scripts/p03/generate_clients.py', 'scripts/p04/generate_clients.py', 'scripts/p05/generate_contracts.py', 'scripts/p06/generate_contracts.py', 'scripts/p08/check_any_to_any.py', '.github/workflows/contracts-integrity.yml']
+    paths:
+      - 'contracts/**'
+      - 'services/**'
+      - 'workers/**'
+      - 'apps/console/**'
+      - 'architecture/contract-consumers.json'
+      - 'scripts/contracts/**'
+      - 'scripts/p01/contracts/**'
+      - 'scripts/p03/**'
+      - 'scripts/p04/**'
+      - 'scripts/p05/**'
+      - 'scripts/p06/**'
+      - 'scripts/p07/**'
+      - 'scripts/p08/**'
+      - 'scripts/p09/**'
+      - 'tests/contracts/**'
+      - '.github/workflows/contracts-integrity.yml'
   push:
     branches: [main]
   workflow_dispatch:
