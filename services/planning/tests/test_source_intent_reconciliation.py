@@ -1,6 +1,8 @@
 """Desired source logical IDs cannot silently remap to other native VMs."""
 
 from copy import deepcopy
+import hashlib
+import json
 
 import pytest
 
@@ -90,3 +92,13 @@ def test_catalogue_document_cannot_be_substituted_behind_receipt_digest() -> Non
     intent["workloads"][0]["compute"]["vcpus"] = 8
     with pytest.raises(Rejected, match="catalogue_document_changed"):
         reconcile(intent, links[0]["catalogue_digest"], links, profiles, 100)
+
+
+def test_unicode_catalogue_canonicalization_matches_published_digest() -> None:
+    intent, links, profiles = values()
+    intent["workloads"][0]["name"] = "Café de Montréal"
+    catalogue_sha = hashlib.sha256(json.dumps(
+        intent, sort_keys=True, ensure_ascii=False, separators=(",", ":")
+    ).encode()).hexdigest()
+    links[0]["catalogue_digest"] = catalogue_sha
+    assert reconcile(intent, catalogue_sha, links, profiles, 100)["status"] == "matched"
