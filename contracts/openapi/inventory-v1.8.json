@@ -6179,19 +6179,34 @@
             "additionalProperties": false,
             "properties": {
               "vmm": {
-                "const": "v4.3"
+                "enum": [
+                  "v4.2",
+                  "v4.3"
+                ]
               },
               "prism": {
-                "const": "v4.3"
+                "enum": [
+                  "v4.2",
+                  "v4.3"
+                ]
               },
               "clustermgmt": {
-                "const": "v4.3"
+                "enum": [
+                  "v4.2",
+                  "v4.3"
+                ]
               },
               "networking": {
-                "const": "v4.3"
+                "enum": [
+                  "v4.2",
+                  "v4.3"
+                ]
               },
               "microseg": {
-                "const": "v4.3"
+                "enum": [
+                  "v4.2",
+                  "v4.3"
+                ]
               }
             },
             "required": [
