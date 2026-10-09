@@ -285,8 +285,61 @@ class WorkloadProfiles:
             )
             return result
 
+    def source_associations(
+        self, tx: Transaction, actor: Actor, application: str, environment: str
+    ) -> list[dict[str, Any]]:
+        """All site-local confirmed, current source links for one application.
+
+        Only the Inventory authority derives identities and native generations.
+        Old confirmations superseded by a newer review are not silently reused.
+        """
+        identifier(application)
+        identifier(environment)
+        records = tx.all(
+            "SELECT r.revision,r.digest,r.payload,c.actor AS confirming_actor "
+            "FROM inventory.migration_reviews r "
+            "JOIN inventory.migration_confirmations c "
+            "ON c.tenant=r.tenant AND c.site=r.site "
+            "AND c.revision=r.revision AND c.digest=r.digest "
+            "WHERE r.tenant=%s AND r.site=%s "
+            "ORDER BY r.revision DESC LIMIT 201",
+            (actor.tenant, actor.site),
+        )
+        if len(records) > 200:
+            raise Rejected("source_association_workspace_bound", 423)
+        result: list[dict[str, Any]] = []
+        authority_cache: dict[str, bool] = {}
+        for record in records:
+            body = record["payload"]
+            link = body.get("catalogue_binding")
+            if (not isinstance(link, dict)
+                    or link.get("application_id") != application
+                    or link.get("environment_id") != environment):
+                continue
+            source = self.profile(tx, actor, body["source_profile_id"], authority_cache)
+            selected = self.review(tx, actor, body["source_profile_id"], authority_cache)
+            current = bool(
+                selected and selected["revision"] == record["revision"]
+                and selected["digest"] == record["digest"]
+                and selected["confirmation_current"]
+            )
+            result.append({
+                "catalogue_binding": link,
+                "source_observation": source_observation(source, self.binding(source)),
+                "source_binding": self.binding(source),
+                "datasets": body["datasets"],
+                "revision": record["revision"],
+                "digest": record["digest"],
+                "confirmed_by": str(record["confirming_actor"]),
+                "current": current,
+            })
+            if len(result) > 100:
+                raise Rejected("source_association_workspace_bound", 423)
+        return result
+
     def planning(
-        self, tenant: str, site: str, expected: int, content_digest: str
+        self, tenant: str, site: str, expected: int, content_digest: str,
+        application: str | None = None, environment: str | None = None,
     ) -> dict[str, Any]:
         # Transport has already authenticated the Planning caller and its delegated actor.
         actor = Actor(identifier(tenant), "", "", "inventory.admin", identifier(site))
@@ -325,6 +378,8 @@ class WorkloadProfiles:
                 "target": self.binding(target),
                 "source_observation": source_observation(source, self.binding(source)),
                 "catalogue_binding": review["input"].get("catalogue_binding"),
+                "source_associations": self.source_associations(tx, actor, application, environment)
+                if application is not None and environment is not None else [],
                 "datasets": review["input"]["datasets"],
                 "disks": source["facts"]["disks"],
                 "owner_inputs": review["input"]["owner_inputs"],
