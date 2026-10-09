@@ -329,6 +329,19 @@
                 "ahv",
                 "openstack"
               ]
+            },
+            "source_profile_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "target_profile_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "migration_method": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
             }
           },
           "required": [
@@ -351,7 +364,10 @@
             "omissions_approved",
             "omission_approver_id",
             "security_cases",
-            "source_platform"
+            "source_platform",
+            "source_profile_sha256",
+            "target_profile_sha256",
+            "migration_method"
           ]
         },
         {
