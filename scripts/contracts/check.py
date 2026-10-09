@@ -5,6 +5,11 @@ import json
 import re
 import hashlib
 from pathlib import Path
+
+import yaml
+from jsonschema import Draft202012Validator, FormatChecker
+from openapi_spec_validator import validate_spec
+
 from build import verify
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -85,6 +90,7 @@ def current_api(name):
             if expected != actual or not op.get("responses"):
                 raise ValueError(f"Invalid operation parameters/responses: {name}:{path}")
     local_refs(doc, name)
+    validate_spec(doc)
     return len(doc["paths"]), len(ids)
 
 def check_routes():
@@ -124,6 +130,10 @@ def check_copies():
 
 def check_native_candidates():
     registry = load("contracts/capabilities/native-security-api-registry-v1.json")
+    Draft202012Validator(
+        load("contracts/schemas/capabilities/native-security-api-registry-v1.json"),
+        format_checker=FormatChecker(),
+    ).validate(registry)
     if registry["status"] != "candidate_paths_require_installed_qualification":
         raise ValueError("Native security API registry must never claim qualification")
     if set(registry["providers"]) != {"vmware", "ahv", "openstack"}:
@@ -140,6 +150,10 @@ def check_native_candidates():
                 raise ValueError(f"Invalid native endpoint path: {platform}/{version}")
     for platform in ("ahv", "openstack"):
         projection = load(f"contracts/platforms/{platform}/source-profile-v1.json")
+        Draft202012Validator(
+            load("contracts/schemas/platforms/source-profile-v1.json"),
+            format_checker=FormatChecker(),
+        ).validate(projection)
         fields = ["vm"] if platform == "ahv" else ["server", "volume"]
         if projection["schema_version"] != 1:
             raise ValueError(f"Invalid {platform} source profile")
@@ -150,27 +164,91 @@ def check_native_candidates():
 
 
 def check_events():
-    """All AsyncAPI event payloads must resolve to existing event schemas."""
+    """Parse complete AsyncAPI 3 contracts and resolve their event payloads."""
     base = ROOT / "contracts/asyncapi"
-    for file in sorted(base.glob("*.yaml")):
-        text = file.read_text(encoding="utf-8")
-        if "asyncapi: 3.0.0" not in text:
-            raise ValueError(f"Invalid AsyncAPI release: {file}")
-        links = re.findall(r"\$ref:\s+(\.\./schemas/events/[\w./-]+)", text)
-        if not links:
-            raise ValueError(f"Missing event payload schema references: {file}")
-        for link in links:
-            event = (file.parent / link).resolve()
-            if not event.is_file() or not event.is_relative_to(ROOT.resolve()):
-                raise ValueError(f"Unresolved AsyncAPI event schema: {file}:{link}")
-            payload = json.loads(event.read_text(encoding="utf-8"))
-            if payload.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
+    for path in sorted(base.glob("*.yaml")):
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(document, dict) or document.get("asyncapi") != "3.0.0":
+            raise ValueError(f"Invalid AsyncAPI release: {path}")
+        if not document.get("channels") or not document.get("operations"):
+            raise ValueError(f"Missing AsyncAPI channels or operations: {path}")
+        local_refs(document, str(path))
+        messages = document.get("components", {}).get("messages", {})
+        if not messages:
+            raise ValueError(f"Missing AsyncAPI message definitions: {path}")
+        for message_name, message in messages.items():
+            if message.get("contentType") != "application/json":
+                raise ValueError(f"Invalid event media type: {path}:{message_name}")
+            payload = message.get("payload", {})
+            if payload.get("schemaFormat") != (
+                "application/schema+json;version=draft-2020-12"
+            ):
+                raise ValueError(f"Invalid event schema format: {path}:{message_name}")
+            reference = payload.get("schema", {}).get("$ref")
+            if not isinstance(reference, str) or not reference.startswith(
+                "../schemas/events/"
+            ):
+                raise ValueError(f"Missing event schema reference: {path}:{message_name}")
+            event = (path.parent / reference).resolve()
+            if not event.is_relative_to((ROOT / "contracts/schemas/events").resolve()):
+                raise ValueError(f"Unsafe event schema reference: {path}:{reference}")
+            if not event.is_file():
+                raise ValueError(f"Unresolved AsyncAPI event schema: {path}:{reference}")
+            schema = json.loads(event.read_text(encoding="utf-8"))
+            if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
                 raise ValueError(f"Wrong event JSON Schema dialect: {event}")
+            Draft202012Validator.check_schema(schema)
+
+
+def check_schema_dialects():
+    """Fail on malformed published JSON Schemas, beyond duplicate-id checks."""
+    found = 0
+    for path in sorted((ROOT / "contracts/schemas").rglob("*.json")):
+        schema = json.loads(path.read_text(encoding="utf-8"))
+        if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
+            raise ValueError(f"Unsupported JSON Schema dialect: {path}")
+        Draft202012Validator.check_schema(schema)
+        found += 1
+    return found
+
+
+def check_readiness_projection():
+    """Wire v2 must be the authoritative embedded OpenAPI component.
+
+    The installed v2.1 validation profile may be stricter, without changing
+    the published wire v2 semantics or rewriting Planning v1.6 API bytes.
+    """
+    from generate_readiness import embedded_payload
+
+    expected = embedded_payload()
+    api = load("contracts/openapi/planning-migration-v1.6.json")
+    fragment = load(
+        "contracts/source/openapi/planning-migration-v1.6/"
+        "components-schemas/workload-readiness.json"
+    )
+    if (api["components"]["schemas"]["MigrationReadinessPayload"] != expected
+            or fragment["MigrationReadinessPayload"] != expected):
+        raise ValueError("Planning OpenAPI and canonical readiness-v2 projection drift")
+
+
+def check_consumer_registry():
+    inventory = load("architecture/contract-consumers.json")["contracts"]
+    for source, consumers in {
+        "contracts/openapi/catalogue-v1.0.1.json": {"catalogue", "console"},
+        "contracts/openapi/inventory-v1.9.json": {"inventory", "console"},
+        "contracts/openapi/planning-migration-v1.6.json": {"planning", "console"},
+        "contracts/schemas/planning/migration-input-v4.json": {"inventory", "planning"},
+    }.items():
+        if source not in inventory:
+            raise ValueError(f"Active contract missing from consumer registry: {source}")
+        if not consumers.issubset(set(inventory[source])):
+            raise ValueError(f"Incorrect active consumer registry: {source}")
 
 
 def main():
     sources, bundles = verify()
     id_count = unique_schema_ids()
+    schema_count = check_schema_dialects()
     paths, ops = 0, 0
     for name in ("catalogue-v1.0.1.json", "inventory-v1.9.json", "planning-migration-v1.6.json"):
         a, b = current_api(name)
@@ -180,7 +258,9 @@ def main():
     check_copies()
     check_native_candidates()
     check_events()
-    print(json.dumps(dict(status="PASS", sources=sources, bundles=bundles, unique_ids=id_count, paths=paths, operations=ops)))
+    check_readiness_projection()
+    check_consumer_registry()
+    print(json.dumps(dict(status="PASS", sources=sources, bundles=bundles, unique_ids=id_count, schema_count=schema_count, paths=paths, operations=ops)))
 
 if __name__ == "__main__":
     main()

@@ -7,7 +7,11 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from build import assemble, verify
-from check import check_copies, check_events, check_routes, current_api, load, local_refs, unique_schema_ids
+from check import (
+    check_consumer_registry, check_copies, check_events, check_readiness_projection,
+    check_routes, check_schema_dialects, current_api, load, local_refs,
+    unique_schema_ids,
+)
 
 class ContractIntegrityTests(unittest.TestCase):
     def test_sources_assemble_to_current_published_bundles(self):
@@ -46,6 +50,11 @@ class ContractIntegrityTests(unittest.TestCase):
 
     def test_asyncapi_event_schema_bindings(self):
         check_events()
+
+    def test_all_schema_dialects_and_active_projections(self):
+        self.assertGreaterEqual(check_schema_dialects(), 40)
+        check_readiness_projection()
+        check_consumer_registry()
 
     def test_missing_reference_is_detected(self):
         with self.assertRaisesRegex(ValueError, "Invalid"):

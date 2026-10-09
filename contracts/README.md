@@ -7,6 +7,7 @@ The contract root owns **wire contracts**, not provider eligibility or native ex
 - `scripts/contracts/build.py --check` reconstructs every split bundle and verifies its canonical and installed copies. Use `--write` only when intentionally assembling a reviewed unpublished version.
 - Consumers must load exact versioned artifact names. Do not give a new version an old filename or schema `$id`.
 - Previously published canonical versions are retained as historical references until a separately reviewed removal determines no external consumers or compatibility commitments remain. Unused *consumer copies* may be removed once all code generators, loaders and CI checks target the replacement.
+- Wire readiness `v2` is immutable; the `v2.1` validation profile strengthens conditional eligibility without changing the wire schema_version. Planning and Lifecycle both install the exact v2.1 profile. `scripts/contracts/generate_readiness.py` checks the embedded v2 OpenAPI projection.
 - `migration-workload-readiness` is a **read-only eligibility assessment**. It never grants native writes or workload admission. Runtime still independently verifies signed custody, exact scope, freshness and E3/E4 evidence.
 
 ## Current active packages
