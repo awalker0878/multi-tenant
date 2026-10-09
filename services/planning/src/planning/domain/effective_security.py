@@ -192,24 +192,37 @@ def path_evidence(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str |
 
 
 def measured(document: dict[str, Any], flow: dict[str, Any], path_sha: str, now: int) -> str | None:
-    probes = document.get("probes")
-    if not isinstance(probes, list) or not 2 <= len(probes) <= MAX_PROBES:
-        return "independent_security_probes_missing"
-    expected = {"allow", "deny"}
-    identities: set[str] = set()
-    for probe in probes:
+    """Allow a defined required flow and deny a *separate* forbidden flow.
+
+    Both checks must come from the independent native observer, be tied to
+    the same current topology, and have first-class native probe receipts.
+    A single flow cannot simultaneously succeed and be denied.
+    """
+    probes, forbidden = document.get("probes"), document.get("forbidden_flow")
+    if (not isinstance(probes, list) or len(probes) != 2
+            or not isinstance(forbidden, dict)
+            or set(forbidden) != {"from", "to", "protocol", "port"}
+            or any(not text(forbidden.get(k)) for k in ("from", "to", "protocol"))
+            or type(forbidden.get("port")) not in {int, type(None)}
+            or all(forbidden.get(k) == flow.get(k)
+                   for k in ("from", "to", "protocol", "port"))):
+        return "independent_negative_flow_missing"
+    expected = (("allow", flow), ("deny", forbidden))
+    for probe, (outcome, expected_flow) in zip(probes, expected):
         if (not isinstance(probe, dict) or not fresh(probe, now)
                 or probe.get("path_sha256") != path_sha
-                or any(probe.get(k) != flow.get(k)
+                or any(probe.get(k) != expected_flow.get(k)
                        for k in ("from", "to", "protocol", "port"))
-                or probe.get("outcome") not in expected
+                or probe.get("outcome") != outcome
                 or not text(probe.get("native_receipt"))
                 or not text(probe.get("observer"))
+                or probe.get("observer") != document.get("observer_principal")
                 or probe.get("observer") == document.get("writer_principal")
                 or probe.get("topology_sha256") != document.get("topology_sha256")):
             return "independent_security_probes_unverified"
-        identities.add(probe["outcome"])
-    return None if identities == expected else "independent_allow_deny_coverage_missing"
+    if probes[0]["native_receipt"] == probes[1]["native_receipt"]:
+        return "independent_negative_witness_reused"
+    return None
 
 
 def qualify(document: Any, flow: dict[str, Any], now: int) -> dict[str, Any]:
