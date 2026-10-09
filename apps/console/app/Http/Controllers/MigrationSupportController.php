@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Application\Planning\Contracts\PlanningGateway;
 use App\Application\Inventory\Contracts\InventoryGateway;
+use App\Domain\Inventory\InventoryFailure;
 use App\Domain\Planning\PlanningFailure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -34,24 +35,68 @@ final class MigrationSupportController
         string $site, PlanningGateway $planning, InventoryGateway $inventory
     ): JsonResponse {
         $token = $this->session($request);
-        // This is the authenticated Inventory review, not browser-supplied
-        // profile SHAs, Catalogue UUIDs, or an optimistic route-level result.
-        $current = $inventory->call($token, $tenant, 'getMigrationReview', ['site' => $site]);
-        $review = $current['review'] ?? null;
-        $input = is_array($review) ? ($review['input'] ?? null) : null;
-        $link = is_array($input) ? ($input['catalogue_binding'] ?? null) : null;
-        if (! is_array($link)
-            || ($link['application_id'] ?? null) !== $application
-            || ($link['environment_id'] ?? null) !== $environment
-            || ($review['confirmation_current'] ?? false) !== true
-            || ! is_int($review['revision'] ?? null)
-            || ! is_string($review['digest'] ?? null)) {
+        $chosen = $request->validate([
+            'workload' => ['required', 'uuid', 'lowercase'],
+        ]);
+        $workload = $chosen['workload'];
+        $cursor = null;
+        $matches = [];
+        $profiles = [];
+        // Fleet identities are authenticated Inventory observations. Historical
+        // site-latest reviews may belong to an unrelated application.
+        for ($page = 0; $page < 3; $page++) {
+            $fleet = $inventory->call($token, $tenant, 'getMigrationFleet',
+                ['site' => $site], cursor: $cursor);
+            foreach ($fleet['items'] ?? [] as $item) {
+                $profile = is_array($item) ? ($item['profile_id'] ?? null) : null;
+                if (! is_string($profile) || isset($profiles[$profile])) {
+                    continue;
+                }
+                $profiles[$profile] = true;
+                try {
+                    $current = $inventory->call($token, $tenant, 'getVmMigrationReview',
+                        ['site' => $site, 'profile' => $profile]);
+                } catch (InventoryFailure $error) {
+                    if ($error->status === 404) {
+                        continue;
+                    }
+                    throw $error;
+                }
+                $review = $current['review'] ?? null;
+                $input = is_array($review) ? ($review['input'] ?? null) : null;
+                $link = is_array($input) ? ($input['catalogue_binding'] ?? null) : null;
+                if (is_array($link)
+                    && ($link['application_id'] ?? null) === $application
+                    && ($link['environment_id'] ?? null) === $environment
+                    && ($link['workload_id'] ?? null) === $workload
+                    && ($review['confirmation_current'] ?? false) === true
+                    && is_int($review['revision'] ?? null)
+                    && is_string($review['digest'] ?? null)) {
+                    $matches[] = $review;
+                }
+            }
+            $cursor = $fleet['next_cursor'] ?? null;
+            if ($cursor === null) {
+                break;
+            }
+            if ($page === 2) {
+                return response()->json([
+                    'available' => true, 'status' => 'held',
+                    'holds' => ['current_inventory_review_search_incomplete'],
+                    'native_write_authorized' => false,
+                ])->header('Cache-Control', 'no-store, private');
+            }
+        }
+        if (count($matches) !== 1) {
             return response()->json([
                 'available' => true, 'status' => 'held',
-                'holds' => ['current_confirmed_application_review_required'],
+                'holds' => [count($matches) === 0
+                    ? 'confirmed_scoped_catalogue_workload_review_missing'
+                    : 'confirmed_scoped_catalogue_workload_review_ambiguous'],
                 'native_write_authorized' => false,
             ])->header('Cache-Control', 'no-store, private');
         }
+        $review = $matches[0];
         $result = $planning->call($token, $tenant, $application, $environment,
             'POST', 'migration-workload-readiness', [$site], [
                 'site_id' => $site,
