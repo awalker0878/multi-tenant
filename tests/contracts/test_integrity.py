@@ -159,6 +159,62 @@ components:
         with self.assertRaisesRegex(ValueError, "Invalid"):
             local_refs({"field":{"$ref":"#/definitions/missing"}}, "negative")
 
+    def test_runtime_copies_cannot_disappear_from_both_registries(self):
+        from runtime_inventory import verify_runtime_inventory
+        registry = load("architecture/contract-consumers.json")
+        source = "contracts/schemas/events/identity-change-v1.json"
+        registry["contracts"].pop(source)
+        registry["active_releases"] = [
+            entry for entry in registry["active_releases"] if entry["path"] != source
+        ]
+        with self.assertRaisesRegex(ValueError, "Runtime contract copies missing"):
+            verify_runtime_inventory(registry)
+
+    def test_runtime_discovery_is_bounded_to_own_product(self):
+        from runtime_inventory import discover_runtime_copies
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            src = root / "services/alpha/app/Infrastructure/EventEncoder.php"
+            src.parent.mkdir(parents=True)
+            src.write_text("<?php resource_path('contracts/example-v1.json');")
+            copy = root / "services/alpha/resources/contracts/example-v1.json"
+            copy.parent.mkdir(parents=True)
+            copy.write_text("{}")
+            other = root / "services/beta/resources/contracts/example-v1.json"
+            other.parent.mkdir(parents=True)
+            other.write_text("{}")
+            observed = discover_runtime_copies(root)
+            self.assertIn(str(copy.relative_to(root)), observed)
+            self.assertNotIn(str(other.relative_to(root)), observed)
+
+    def test_channel_specific_discriminator_rejects_other_valid_event_type(self):
+        from check import event_discriminator
+        from jsonschema import Draft202012Validator
+        schema = {
+            "type": "object",
+            "required": ["event_type"],
+            "properties": {
+                "event_type": {"enum": ["identity.login.denied", "identity.session.revoked"]}
+            },
+        }
+        profile = event_discriminator(schema, "identity.login.denied.v1", "identity.yaml")
+        validator = Draft202012Validator(profile)
+        self.assertTrue(validator.is_valid({"event_type": "identity.login.denied"}))
+        self.assertFalse(validator.is_valid({"event_type": "identity.session.revoked"}))
+        with self.assertRaisesRegex(ValueError, "no event_type binding"):
+            event_discriminator(schema, "identity.undeclared.v1", "identity.yaml")
+
+    def test_manifest_cannot_escape_source_or_deployment_roots(self):
+        from build import safe_destination, safe_source_file
+        with self.assertRaisesRegex(ValueError, "Unsafe contract source"):
+            safe_source_file(ROOT / "contracts/source", "../secret.json")
+        with self.assertRaisesRegex(ValueError, "Unsafe contract destination"):
+            safe_destination("contracts/schemas/../../secrets.json", canonical=True)
+        with self.assertRaisesRegex(ValueError, "Unapproved contract destination"):
+            safe_destination("services/planning/composer.json", canonical=False)
+        with self.assertRaisesRegex(ValueError, "Unapproved contract destination"):
+            safe_destination("contracts/source/manifest.json", canonical=True)
+
     def test_crosswalk_fragments_restore_all_canonical_fields(self):
         _, result = assemble(ROOT / "contracts/source/capabilities/migration-field-crosswalk-v1/manifest.json")
         self.assertEqual(len(result["fields"]), result["summary"]["groups"])
