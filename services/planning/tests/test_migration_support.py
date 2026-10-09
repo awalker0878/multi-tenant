@@ -296,3 +296,37 @@ def test_execution_support_binds_entire_qualified_artifact_set(fault: str) -> No
                 support.require(actor, SITE, review_only)
         else:
             support.require(actor, SITE, review_only)
+
+
+def test_workload_readiness_http_is_read_only_and_denies_browser_evidence() -> None:
+    authority, support = Mock(), Mock()
+    session = Actor(str(uuid4()), str(uuid4()), "plan.read", str(uuid4()), str(uuid4()))
+    authority.actor.return_value = session
+    support.preview.return_value = {
+        "schema_version": 1,
+        "review": {"revision": 1, "digest": "a" * 64},
+        "readiness": {"schema_version": 2, "kind": "migration_workload_readiness",
+                      "status": "held", "holds": ["missing_e4"],
+                      "native_write_authorized": False,
+                      "workload_admission_authorized": False},
+        "native_write_authorized": False, "workload_admission_authorized": False,
+    }
+    app = MigrationPreparationApp(authority, Mock(), support=support)
+    path = (f"/v1/tenants/{session.tenant}/applications/{session.application}"
+            f"/environments/{session.environment}/migration-workload-readiness")
+    headers = [
+        (b"authorization", b"Bearer " + b"a" * 64),
+        (b"content-type", b"application/json"),
+        (b"x-actor-delegation", b"b" * 64),
+    ]
+    locator = {"site_id": SITE, "review": {"revision": 1, "digest": "a" * 64}}
+    assert exchange(app, path, json.dumps(locator).encode(), headers)[0] == 200
+    assert authority.actor.call_args.args[4] == "plan.read"
+    support.preview.assert_called_once()
+    for injected in ({"native_write_authorized": True},
+                     {"readiness": {"status": "eligible"}},
+                     {"source_profile_sha256": "c" * 64}):
+        support.reset_mock()
+        status = exchange(app, path, json.dumps(locator | injected).encode(), headers)[0]
+        assert status == 422
+        support.preview.assert_not_called()
