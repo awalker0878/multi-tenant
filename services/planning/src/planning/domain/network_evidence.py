@@ -122,6 +122,58 @@ def traffic(flow: dict[str, Any], network: dict[str, Any], policy: dict[str, Any
 
 
 
+
+def native_application_flow_choices(
+    intent: dict[str, Any], network: dict[str, Any], policy: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Return source-defined flow selectors from trusted native snapshot only.
+
+    Consuming API may render these IDs as dropdown options; no caller may
+    accept a typed name or manufacture a missing network/security resource.
+    A choice is not migration qualification or independent proof of traffic.
+    """
+    valid_snapshot = (
+        network.get("policy_sha256") == digest(policy)
+        and isinstance(network.get("topology"), dict)
+        and network.get("topology_sha256") == digest(network.get("topology"))
+    )
+    rows = []
+    for flow in intent["dependencies"]:
+        if flow["kind"] != "communication":
+            continue
+        context = flow_context(flow, policy)
+        identity = digest({k: flow[k] for k in FLOW_KEYS})
+        rules, routes = [], []
+        if valid_snapshot and context is not None:
+            rules = sorted({
+                r["native_ref"] for r in network.get("firewall_rules", [])
+                if isinstance(r, dict) and isinstance(r.get("native_ref"), str)
+                and r["native_ref"]
+                and all(r.get(k) == flow[k] for k in FLOW_KEYS)
+                and r.get("context") == context
+                and all(r.get(k) == "allow" for k in
+                        ("action", "egress_action", "ingress_action"))
+            })
+            routes = sorted({
+                r["native_ref"] for r in network["topology"].get("routes", [])
+                if isinstance(r, dict) and isinstance(r.get("native_ref"), str)
+                and r["native_ref"]
+                and r.get("from") == flow["from"]
+                and r.get("to") == flow["to"]
+                and r.get("context") == context
+            })
+        rows.append({
+            "source_flow_id": identity,
+            "source": {k: flow[k] for k in FLOW_KEYS},
+            "required": flow["strength"] == "required",
+            "destination_firewall_rule_ids": rules,
+            "destination_route_ids": routes,
+            "status": "choices_observed" if rules and routes else "held_unobserved",
+            "native_write_authorized": False,
+        })
+    return rows
+
+
 def selected_native_flow(flow: dict[str, Any], network: dict[str, Any],
                          policy: dict[str, Any], now: int) -> str:
     """Bind reviewed application intent to existing destination-native controls.
