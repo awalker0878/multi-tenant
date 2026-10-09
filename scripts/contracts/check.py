@@ -109,6 +109,25 @@ def check_native_candidates():
                 raise ValueError(f"Duplicate/missing native profile field: {platform}/{field}")
 
 
+def check_events():
+    """All AsyncAPI event payloads must resolve to existing event schemas."""
+    base = ROOT / "contracts/asyncapi"
+    for file in sorted(base.glob("*.yaml")):
+        text = file.read_text(encoding="utf-8")
+        if "asyncapi: 3.0.0" not in text:
+            raise ValueError(f"Invalid AsyncAPI release: {file}")
+        links = re.findall(r"\\$ref:\\s+(\\.\\./schemas/events/[\\w.\\/-]+)", text)
+        if not links:
+            raise ValueError(f"Missing event payload schema references: {file}")
+        for link in links:
+            event = (file.parent / link).resolve()
+            if not event.is_file() or not event.is_relative_to(ROOT.resolve()):
+                raise ValueError(f"Unresolved AsyncAPI event schema: {file}:{link}")
+            payload = json.loads(event.read_text(encoding="utf-8"))
+            if payload.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
+                raise ValueError(f"Wrong event JSON Schema dialect: {event}")
+
+
 def main():
     sources, bundles = verify()
     id_count = unique_schema_ids()
@@ -120,6 +139,7 @@ def main():
     check_routes()
     check_copies()
     check_native_candidates()
+    check_events()
     print(json.dumps(dict(status="PASS", sources=sources, bundles=bundles, unique_ids=id_count, paths=paths, operations=ops)))
 
 if __name__ == "__main__":

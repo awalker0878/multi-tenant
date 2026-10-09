@@ -6,7 +6,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from build import assemble, verify
-from check import check_copies, check_routes, local_refs, unique_schema_ids
+from check import check_copies, check_events, check_routes, local_refs, unique_schema_ids
 
 class ContractIntegrityTests(unittest.TestCase):
     def test_sources_assemble_to_current_published_bundles(self):
@@ -18,6 +18,9 @@ class ContractIntegrityTests(unittest.TestCase):
         check_routes()
         check_copies()
         self.assertGreater(unique_schema_ids(), 10)
+
+    def test_asyncapi_event_schema_bindings(self):
+        check_events()
 
     def test_missing_reference_is_detected(self):
         with self.assertRaisesRegex(ValueError, "Invalid"):

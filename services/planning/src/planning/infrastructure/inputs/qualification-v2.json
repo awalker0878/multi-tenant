@@ -257,5 +257,34 @@
     "verification"
   ],
   "$id": "urn:multi-tenant:qualification:v2",
-  "title": "Verified native qualification v2"
+  "title": "Verified native qualification v2",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "qualified"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "revoked": {
+            "const": false
+          },
+          "verification": {
+            "type": "object",
+            "properties": {
+              "valid": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }
