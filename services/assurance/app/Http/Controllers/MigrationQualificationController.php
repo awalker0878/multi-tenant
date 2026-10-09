@@ -98,6 +98,7 @@ final class MigrationQualificationController
                         && array_keys($candidateFlows) === [
                             'schema_version', 'assessment_id', 'source_revision_id',
                             'source_intent_sha256', 'context_sha256', 'selections_sha256',
+                            'native_controls_sha256',
                             'destination_generation_id', 'platform', 'observed_at',
                             'expires_at', 'level', 'decision', 'checks',
                             'native_write_authorized',
