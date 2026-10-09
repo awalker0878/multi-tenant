@@ -239,3 +239,60 @@ def source_profile_read_count(profile: dict[str, Any]) -> int:
     if volume_count > 32 or len(group_ids) > 64 or count > 101:
         raise Rejected("source_profile_collection_bound_exceeded")
     return count
+
+
+def source_observation(profile: dict[str, Any], binding: dict[str, Any]) -> dict[str, Any]:
+    """Read-only native facts for later Catalogue reconciliation.
+
+    The source owner publishes facts, never a claimed intent match. Missing
+    secure-boot or VMware incarnation evidence stays unknown; externally
+    reviewed datasets and effective network semantics are not manufactured
+    from native device metadata.
+    """
+    facts = profile["facts"]
+    if facts["profile_type"] != "SourceWorkloadProfile":
+        raise Rejected("source_observation_profile_required")
+    platform = facts["platform"]
+    if platform not in {"vmware", "openstack", "ahv"}:
+        raise Rejected("source_observation_platform_invalid")
+    native = facts.get("native")
+    metadata = native.get("metadata") if isinstance(native, dict) else None
+    identity = native.get("identity") if isinstance(native, dict) else None
+    secure_boot: bool | None = None
+    if platform == "ahv" and isinstance(metadata, dict):
+        vm = metadata.get("vm")
+        config = vm.get("bootConfig") if isinstance(vm, dict) else None
+        observed = config.get("isSecureBootEnabled") if isinstance(config, dict) else None
+        secure_boot = observed if type(observed) is bool else None
+    if platform == "vmware":
+        identity = {
+            "vm_id": facts["vm_id"],
+            "instance_uuid": facts.get("instance_uuid"),
+            "bios_uuid": facts.get("bios_uuid"),
+        }
+    result = {
+        "source_identity_sha256": binding["native_identity_sha256"],
+        "generation_id": profile["generation_id"],
+        "profile_sha256": binding["profile_sha256"],
+        "installed_tuple_sha256": binding["tuple_sha256"],
+        "installation_id": facts.get("installation_id", facts.get("vcenter_uuid")),
+        "native_scope": facts.get("native_scope"),
+        "current": profile["current"],
+        "expires_at": profile["expires_at"],
+        "holds": facts["holds"],
+        "facts": {
+            "cpu": facts["cpu"],
+            "memory_mb": facts["memory_mb"],
+            "firmware": facts["firmware"],
+            "secure_boot": secure_boot,
+            "disks": [{"key": d["key"], "capacity_bytes": d["capacity_bytes"]}
+                      for d in facts["disks"]],
+            "nics": [{"key": n["key"]} for n in facts["nics"]],
+            "native": {"identity": identity},
+        },
+        "owner_dataset_coverage_current": False,
+        "network_semantics_independently_verified": False,
+        "native_write_authorized": False,
+    }
+    result["observation_sha256"] = digest(result)
+    return result
