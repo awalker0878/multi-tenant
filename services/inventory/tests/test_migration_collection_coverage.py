@@ -5,7 +5,7 @@ from copy import deepcopy
 import pytest
 
 from inventory.domain.discovery import Rejected, digest
-from inventory.domain.migration_collection_coverage import evaluate
+from inventory.domain.migration_collection_coverage import evaluate, installed_version_supported
 
 
 ROW = {
@@ -92,3 +92,16 @@ def test_invalid_applicability_digest_never_upgrades_to_observed() -> None:
     assert result["status"] == "held"
     assert result["attributes"][0]["status"] == "held"
     assert result["attributes"][0]["reason"] == "applicability_evidence_stale_or_invalid"
+
+
+def test_microversion_interval_is_probed_not_silently_reduced_to_maximum() -> None:
+    ranges = {"nova": {"min_version": "2.1", "max_version": "2.104"},
+              "cinder": {"min_version": "3.0", "max_version": "3.70"}}
+    assert installed_version_supported("2.50", "nova", ranges)
+    assert installed_version_supported("2.104", "nova", ranges)
+    assert installed_version_supported("3.1", "cinder", ranges)
+    for unsupported in ("2.105", "2.0", "3.70", "v1.30", "invalid"):
+        assert not installed_version_supported(unsupported, "nova", ranges)
+    assert not installed_version_supported("2.20", "glance", ranges)
+    assert not installed_version_supported("2.20", "nova",
+                                         {"nova": {"min_version": "2.30", "max_version": "2.1"}})
