@@ -33,6 +33,7 @@ def record(key: str = "identity.vm", when: int = 90) -> dict:
         "evidence_sha256": digest("native-get"), "value_present": True,
         "native_operation": "GET /api/vmm/v4.3/ahv/config/vms/native",
         "value_sha256": digest("native-value"),
+        "source_response_sha256": digest("native-response"),
     }
 
 
