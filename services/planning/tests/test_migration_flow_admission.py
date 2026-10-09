@@ -6,7 +6,7 @@ import pytest
 
 from planning.domain.model import Actor, Rejected, digest
 from planning.infrastructure import migration_support
-from test_effective_security import document, boundary, REQUIRED
+from test_effective_security import document, boundary, REQUIRED, EXTRA
 
 
 def actor():
@@ -143,6 +143,19 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
     with pytest.raises(Rejected, match="independent_optional_flow_approval_required"):
         migration_support.current_application_flow_proof(current_actor, site, saved, now, binding)
     proof["omission_approver_id"] = str(uuid4())
+    migration_support.current_application_flow_proof(current_actor, site, saved, now, binding)
+
+    # A qualifying producer may report an omitted optional dependency.
+    # The independent omission is still accepted; there is no requirement
+    # to map that optional flow to any native destination rule.
+    optional = {"source_flow_id": digest(EXTRA), "reason_code": "accepted_service_limitation"}
+    saved["payload"]["omissions"] = [optional]
+    proof["omissions_sha256"] = digest([optional])
+    proof["security_cases"].append({
+        "source_flow_id": digest(EXTRA), "flow": EXTRA,
+        "source_document": source_document,
+        "document": target_document, "boundary": boundary(),
+    })
     migration_support.current_application_flow_proof(current_actor, site, saved, now, binding)
 
 
