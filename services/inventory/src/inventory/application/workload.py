@@ -324,6 +324,7 @@ class WorkloadProfiles:
                 "source": self.binding(source),
                 "target": self.binding(target),
                 "source_observation": source_observation(source, self.binding(source)),
+                "catalogue_binding": review["input"].get("catalogue_binding"),
                 "datasets": review["input"]["datasets"],
                 "disks": source["facts"]["disks"],
                 "owner_inputs": review["input"]["owner_inputs"],
