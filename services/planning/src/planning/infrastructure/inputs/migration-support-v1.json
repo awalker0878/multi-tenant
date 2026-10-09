@@ -318,7 +318,15 @@
                       "paths",
                       "path_probes",
                       "boundary_scope",
-                      "boundary_probes"
+                      "boundary_probes",
+                      "api_profile",
+                      "policy_partition",
+                      "tenant_id",
+                      "native_scope",
+                      "rules_complete",
+                      "all_paths_observed",
+                      "path_set_sha256",
+                      "routing_generation_id"
                     ],
                     "properties": {
                       "schema_version": {
@@ -350,6 +358,145 @@
                       },
                       "boundary_probes": {
                         "type": "object"
+                      },
+                      "api_profile": {
+                        "type": "object",
+                        "required": [
+                          "namespace",
+                          "api_version",
+                          "qualified_features",
+                          "installed",
+                          "profile_sha256",
+                          "evidence_sha256",
+                          "verified"
+                        ],
+                        "properties": {
+                          "namespace": {
+                            "enum": [
+                              "nsx-policy",
+                              "microseg",
+                              "neutron"
+                            ]
+                          },
+                          "api_version": {
+                            "enum": [
+                              "v1",
+                              "v2.0",
+                              "v4.2",
+                              "v4.3"
+                            ]
+                          },
+                          "qualified_features": {
+                            "type": "object"
+                          },
+                          "installed": {
+                            "type": "object"
+                          },
+                          "profile_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "evidence_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "verified": {
+                            "const": true
+                          }
+                        }
+                      },
+                      "policy_partition": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "schema_version",
+                          "mode",
+                          "complete",
+                          "independently_verified",
+                          "observer",
+                          "universe_sha256",
+                          "native_rule_set_sha256",
+                          "uncovered_classes",
+                          "unbounded_wildcards",
+                          "class_ids",
+                          "permitted_class_ids",
+                          "partition_sha256"
+                        ],
+                        "properties": {
+                          "schema_version": {
+                            "const": 1
+                          },
+                          "mode": {
+                            "const": "disjoint_effective_rule_partition"
+                          },
+                          "complete": {
+                            "const": true
+                          },
+                          "independently_verified": {
+                            "const": true
+                          },
+                          "observer": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "universe_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "native_rule_set_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "uncovered_classes": {
+                            "const": 0
+                          },
+                          "unbounded_wildcards": {
+                            "const": false
+                          },
+                          "class_ids": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1024,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            }
+                          },
+                          "permitted_class_ids": {
+                            "type": "array",
+                            "maxItems": 1024,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            }
+                          },
+                          "partition_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          }
+                        }
+                      },
+                      "tenant_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "native_scope": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "rules_complete": {
+                        "const": true
+                      },
+                      "all_paths_observed": {
+                        "const": true
+                      },
+                      "path_set_sha256": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      "routing_generation_id": {
+                        "type": "string",
+                        "minLength": 1
                       }
                     }
                   },
@@ -363,7 +510,15 @@
                       "paths",
                       "path_probes",
                       "boundary_scope",
-                      "boundary_probes"
+                      "boundary_probes",
+                      "api_profile",
+                      "policy_partition",
+                      "tenant_id",
+                      "native_scope",
+                      "rules_complete",
+                      "all_paths_observed",
+                      "path_set_sha256",
+                      "routing_generation_id"
                     ],
                     "properties": {
                       "schema_version": {
@@ -395,6 +550,145 @@
                       },
                       "boundary_probes": {
                         "type": "object"
+                      },
+                      "api_profile": {
+                        "type": "object",
+                        "required": [
+                          "namespace",
+                          "api_version",
+                          "qualified_features",
+                          "installed",
+                          "profile_sha256",
+                          "evidence_sha256",
+                          "verified"
+                        ],
+                        "properties": {
+                          "namespace": {
+                            "enum": [
+                              "nsx-policy",
+                              "microseg",
+                              "neutron"
+                            ]
+                          },
+                          "api_version": {
+                            "enum": [
+                              "v1",
+                              "v2.0",
+                              "v4.2",
+                              "v4.3"
+                            ]
+                          },
+                          "qualified_features": {
+                            "type": "object"
+                          },
+                          "installed": {
+                            "type": "object"
+                          },
+                          "profile_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "evidence_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "verified": {
+                            "const": true
+                          }
+                        }
+                      },
+                      "policy_partition": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "schema_version",
+                          "mode",
+                          "complete",
+                          "independently_verified",
+                          "observer",
+                          "universe_sha256",
+                          "native_rule_set_sha256",
+                          "uncovered_classes",
+                          "unbounded_wildcards",
+                          "class_ids",
+                          "permitted_class_ids",
+                          "partition_sha256"
+                        ],
+                        "properties": {
+                          "schema_version": {
+                            "const": 1
+                          },
+                          "mode": {
+                            "const": "disjoint_effective_rule_partition"
+                          },
+                          "complete": {
+                            "const": true
+                          },
+                          "independently_verified": {
+                            "const": true
+                          },
+                          "observer": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "universe_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "native_rule_set_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "uncovered_classes": {
+                            "const": 0
+                          },
+                          "unbounded_wildcards": {
+                            "const": false
+                          },
+                          "class_ids": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1024,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            }
+                          },
+                          "permitted_class_ids": {
+                            "type": "array",
+                            "maxItems": 1024,
+                            "items": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            }
+                          },
+                          "partition_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          }
+                        }
+                      },
+                      "tenant_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "native_scope": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "rules_complete": {
+                        "const": true
+                      },
+                      "all_paths_observed": {
+                        "const": true
+                      },
+                      "path_set_sha256": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      "routing_generation_id": {
+                        "type": "string",
+                        "minLength": 1
                       }
                     }
                   },
