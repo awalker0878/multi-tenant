@@ -174,6 +174,40 @@ def evaluate(
         workload = workloads[wid]
         mapped = deepcopy(observed)
         mapped["current"] = observed["current"] is True and source["current"] is True
+        # Independently observed guest firmware / Secure Boot can resolve
+        # OpenStack's unverified server-metadata hints without promoting
+        # a tenant-controlled metadata declaration to native fact.
+        boot_cases = (
+            flow.get("workload_boot_cases") if isinstance(flow, dict)
+            and flow.get("level") == "E4"
+            and flow.get("decision") == "accepted"
+            and flow.get("revoked") is False
+            and flow.get("intent_sha256") == catalogue["intent_sha256"]
+            and flow.get("target_profile_sha256") == selected["target"]["profile_sha256"]
+            and type(flow.get("expires_at")) is int
+            and flow["expires_at"] > now else None
+        )
+        matching_boot = [
+            case for case in boot_cases
+            if isinstance(case, dict) and case.get("workload_id") == wid
+        ] if isinstance(boot_cases, list) and len(boot_cases) <= 100 else []
+        if len(matching_boot) == 1:
+            proof = matching_boot[0]
+            if (proof.get("source_profile_sha256") == observed["profile_sha256"]
+                    and proof.get("level") == "E4"
+                    and proof.get("decision") == "accepted"
+                    and proof.get("revoked") is False
+                    and proof.get("firmware") in {"efi", "bios"}
+                    and type(proof.get("secure_boot")) is bool
+                    and type(proof.get("observed_at")) is int
+                    and 0 <= now - proof["observed_at"] <= 30
+                    and type(proof.get("expires_at")) is int
+                    and now < proof["expires_at"] <= flow["expires_at"]
+                    and isinstance(proof.get("evidence_sha256"), str)
+                    and len(proof["evidence_sha256"]) == 64):
+                mapped["facts"] = deepcopy(mapped["facts"])
+                mapped["facts"]["firmware"] = proof["firmware"]
+                mapped["facts"]["secure_boot"] = proof["secure_boot"]
         mapped["owner_dataset_coverage_current"] = _dataset_coverage(
             intent, workload, source, flow, selected["target"]["profile_sha256"], now
         )
@@ -268,6 +302,10 @@ def evaluate(
                 if isinstance(case, dict) and type(case.get("expires_at")) is int]
                if isinstance(flow, dict)
                and isinstance(flow.get("disk_disposition_cases"), list) else [])
+            + ([case["expires_at"] for case in flow.get("workload_boot_cases", [])
+                if isinstance(case, dict) and type(case.get("expires_at")) is int]
+               if isinstance(flow, dict)
+               and isinstance(flow.get("workload_boot_cases"), list) else [])
         ),
         "native_write_authorized": False,
     }
