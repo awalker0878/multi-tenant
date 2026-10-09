@@ -72,7 +72,8 @@ def collect_ahv_source(
     versions = resolved_namespace_versions(stream)
     for kind, path, key in (
         ("cluster", f"/api/clustermgmt/{versions['clustermgmt']}/config/clusters/", "cluster_id"),
-        ("prism_central", f"/api/prism/{versions['prism']}/config/domain-managers/", "prism_central_id"),
+        ("prism_central", f"/api/prism/{versions['prism']}/config/domain-managers/",
+         "prism_central_id"),
     ):
         before_request()
         document = exchange(
