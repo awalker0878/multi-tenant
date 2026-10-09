@@ -110,14 +110,25 @@ def collect_ahv(
     before_request: Callable[[], None],
 ) -> dict[str, Any]:
     records: dict[str, Any] = {}
+    versions = dict(VERSIONS)
+    installed_versions = stream.get("api_versions")
+    if stream.get("api_versions_verified") is True:
+        if (not isinstance(installed_versions, dict)
+                or set(installed_versions) != set(versions)
+                or any(value not in {"v4.2", "v4.3"}
+                       for value in installed_versions.values())):
+            raise CollectionFailure("installed_api_namespace_versions_unqualified")
+        versions = dict(installed_versions)
+    # Each namespace has a distinct version. Never infer the Microseg
+    # feature namespace from Prism Central or AOS release string.
     routes = {
-        "cluster": "/api/clustermgmt/v4.3/config/clusters/" + stream["cluster_id"],
-        "prism_central": "/api/prism/v4.3/config/domain-managers/" + stream["prism_central_id"],
-        "storage_containers": "/api/clustermgmt/v4.3/config/storage-containers",
-        "subnets": "/api/networking/v4.3/config/subnets",
-        "vpcs": "/api/networking/v4.3/config/vpcs",
-        "categories": "/api/prism/v4.3/config/categories",
-        "policies": "/api/microseg/v4.3/config/policies",
+        "cluster": f"/api/clustermgmt/{versions['clustermgmt']}/config/clusters/" + stream["cluster_id"],
+        "prism_central": f"/api/prism/{versions['prism']}/config/domain-managers/" + stream["prism_central_id"],
+        "storage_containers": f"/api/clustermgmt/{versions['clustermgmt']}/config/storage-containers",
+        "subnets": f"/api/networking/{versions['networking']}/config/subnets",
+        "vpcs": f"/api/networking/{versions['networking']}/config/vpcs",
+        "categories": f"/api/prism/{versions['prism']}/config/categories",
+        "policies": f"/api/microseg/{versions['microseg']}/config/policies",
     }
     inventory: dict[str, list[dict[str, Any]]] = {}
     maximum = policy.get("max_pages", 1)
@@ -206,7 +217,7 @@ def collect_ahv(
     )
     for group_kind in ("entity_groups", "address_groups", "service_groups"):
         route = commissioned.get(group_kind) if authorized else None
-        expected_prefix = "/api/microseg/" + VERSIONS["microseg"] + "/config/"
+        expected_prefix = "/api/microseg/" + versions["microseg"] + "/config/"
         if (not isinstance(route, str)
                 or not route.startswith(expected_prefix)
                 or not route[len(expected_prefix):].replace("-", "").isalnum()
@@ -333,7 +344,7 @@ def collect_ahv(
         "prism_central_id": stream["prism_central_id"],
         "cluster_id": stream["cluster_id"],
         "cluster_name": cluster.get("name") or "",
-        "api_versions": VERSIONS,
+        "api_versions": versions,
         "installed": installed,
         "observed_at": observed_at,
         "observations_sha256": fingerprint(records),
