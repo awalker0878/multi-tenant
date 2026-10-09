@@ -40,6 +40,11 @@ export type CatalogueMigrationBinding = {
   intent_sha256: string; workload_id: string;
   disk_mappings: CatalogueDeviceMapping[];
   nic_mappings: CatalogueDeviceMapping[];
+  disk_dispositions?: {
+    logical_device_id: string; native_key: number;
+    disposition: 'uncatalogued_attested';
+    owner_approval_sha256: string; impact_sha256: string;
+  }[];
 };
 export type MigrationReviewInput = { "source_profile_id": string; "target_profile_id": string; "method": "APPLICATION_REBUILD_RESTORE" | "VM_SNAPSHOT_BASELINE_APP_DELTA" | "VM_SNAPSHOT_BASELINE_FILE_DELTA" | "VM_COLD_EXPORT" | "EXTERNAL_BLOCK_REPLICATION"; "datasets": Array<MigrationDataset>; "owner_inputs": { "application_consistency": string; "dependencies": string; "guest_transformation_profile": string; "delta_protocol": string; "recovery_protocol": string; "service_and_policy_validation": string; "writer_fencing": string; "retention_and_cleanup": string }; "objectives": MigrationObjectives; "overrides": Array<{ "field": "application_consistency" | "dependencies" | "guest_transformation_profile" | "delta_protocol" | "recovery_protocol" | "service_and_policy_validation" | "writer_fencing" | "retention_and_cleanup"; "interpretation": string; "reason": string }>; "catalogue_binding"?: CatalogueMigrationBinding; "destination"?: AhvDestinationSelection | VmwareDestinationSelection | OpenstackSecurityDestinationSelection | null };
 export type MigrationReview = { "revision": number; "digest": string; "input": MigrationReviewInput; "source": WorkloadProfile; "target": WorkloadProfile; "holds": Array<string>; "confirmed_by": string | null; "confirmed_at": number | null; "confirmation_current": boolean };
