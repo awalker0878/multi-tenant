@@ -52,3 +52,40 @@ Lifecycle migration admission now requires an independently credentialed `catalo
 ## E4 qualified-transformation provenance
 
 The newly published `schemas/planning/independent-e4-field-provenance-v1.json` defines an independently attestable E4 field proof: Catalogue revision/digest, workload and field, exact source profile and desired/observed field hashes, proof/plan/acceptance digests, level, decision, revocation and validity interval. **It is a prerequisite for a future versioned migration-readiness wire release, not a currently commissioned execution grant.** The active wire v2/v2.2 admission validator intentionally **holds required qualified transformations**, because v2 field dispositions do not carry an independently verifiable E4 reference. Do not relax that invariant by accepting `evidence_source=independent_e4` alone; activate these transformations only after an authenticated Assurance proof lookup and a complete versioned producer/consumer rollout with negative tests.
+
+## Executable consumer inventory and conformance
+
+The editable active-release registry is checked against a **separate observation
+of deployed code** in `scripts/contracts/runtime_inventory.py`. Executable
+PHP/Python/TypeScript/Vue references to packaged JSON inside each bounded
+product must resolve to exactly one registered byte-identical canonical
+release. A retired copy may remain in a package only while it is not referenced
+by deployed code. The checker also requires every shipped AsyncAPI release and
+its event payload schemas to appear in the active inventory; removing records
+from both editable registry maps is not sufficient to bypass this check.
+
+`scripts/contracts/check.py` validates broker-address uniqueness across event
+documents, all operation/channel/message bindings, complete event-type routing,
+and channel-specific event discriminators. Existing immutable v1 event payloads
+are **not** overwritten: channel-specific discriminator schemas are validation
+profiles. Catalogue intentionally multiplexes its four intent fact types over
+the single `catalogue.intent.changed.v1` exchange binding. Event delivery
+consumers must still verify publisher identity, routing key, event ID and the
+current authorization boundary independently.
+
+The dedicated CI job compares `php artisan route:list --json` for Governance
+and Catalogue with **every active OpenAPI operation owned by that service**,
+including verbs and full paths. This proves published operations have concrete
+runtime routes; it does not establish that all endpoints are documented or that
+response bodies match. Producer fixture/live HTTP tests and installed-consumer
+validation remain additional requirements, particularly for Planning, Inventory,
+Console and Lifecycle.
+
+All split-source file names and deployment destinations are confined to approved
+repository subtrees, with resolved-path traversal checks. CI calls the source
+assembler in `--check` mode, not `--write`. A changed published contract
+requires a new release; no previous wire version is silently rewritten.
+
+Do not equate these source-bound and synthetic conformance checks with live
+provider qualification, independent E3/E4 evidence or authority for native
+execution. Those gates remain separate and fail closed.
