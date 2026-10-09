@@ -35,7 +35,7 @@ class MigrationPreparationApp:
             return
         try:
             route = re.fullmatch(
-                rf"/v1/tenants/({UUID})/applications/({UUID})/environments/({UUID})/(migration-preparations|migration-plans|migration-plan-options|migration-support|migration-flow-choices|migration-flow-selections)",
+                rf"/v1/tenants/({UUID})/applications/({UUID})/environments/({UUID})/(migration-preparations|migration-plans|migration-plan-options|migration-support|migration-flow-choices|migration-flow-selections|migration-workload-readiness)",
                 scope["path"],
             )
             if route is None or scope["method"] != "POST" or scope["query_string"]:
@@ -65,7 +65,8 @@ class MigrationPreparationApp:
             flow_save = route[4] == "migration-flow-selections"
             body = shape(
                 decode(bytes(chunks)),
-                ({"site_id"} if route[4] in {"migration-support", "migration-flow-choices"}
+                ({"site_id", "review"} if route[4] == "migration-workload-readiness"
+                 else {"site_id"} if route[4] in {"migration-support", "migration-flow-choices"}
                  else {"site_id", "revision", "context_sha256", "selections", "omissions"} if flow_save
                  else {"site_id", "review", "disks"})
                 | ({"base_plan_id", "recipe_id"} if complete else set()),
@@ -79,7 +80,7 @@ class MigrationPreparationApp:
                 auth[7:],
                 delegation,
                 tenant,
-                "plan.read" if route[4] in {"migration-support", "migration-flow-choices"} else "plan.create",
+                "plan.read" if route[4] in {"migration-support", "migration-flow-choices", "migration-workload-readiness"} else "plan.create",
                 application,
                 environment,
                 site,
@@ -88,6 +89,12 @@ class MigrationPreparationApp:
                 if self.support is None:
                     raise Rejected("migration_support_unavailable", 503)
                 payload = await asyncio.to_thread(self.support.read, actor, site)
+                status = 200
+            elif route[4] == "migration-workload-readiness":
+                if self.support is None:
+                    raise Rejected("migration_support_unavailable", 503)
+                revision = shape(body["review"], {"revision", "digest"})
+                payload = await asyncio.to_thread(self.support.preview, actor, site, revision)
                 status = 200
             elif flow_read or flow_save:
                 if self.flows is None:
