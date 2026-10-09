@@ -105,9 +105,72 @@ final class MigrationQualificationController
                         'observed_at', 'expires_at', 'level', 'decision',
                         'checks', 'native_write_authorized',
                     ];
+                    // Workload-level E4 path cases are optional for route-flow
+                    // proof, but must be independently signed in the same
+                    // qualification digest before Planning may consume them.
+                    $interfaceCases = $candidateFlows['workload_interface_cases'] ?? null;
+                    $interfaceValid = true;
+                    if (array_key_exists('workload_interface_cases', is_array($candidateFlows) ? $candidateFlows : [])) {
+                        $caseFields = [
+                            'workload_id', 'source_profile_sha256', 'target_profile_sha256',
+                            'logical_nics_sha256', 'native_path_set_sha256',
+                            'allowed_probe_sha256', 'denied_probe_sha256',
+                            'return_probe_sha256', 'isolation_probe_sha256',
+                            'evidence_sha256', 'observed_at', 'expires_at',
+                            'level', 'decision', 'revoked',
+                        ];
+                        $interfaceValid = is_array($interfaceCases)
+                            && array_is_list($interfaceCases)
+                            && count($interfaceCases) > 0
+                            && count($interfaceCases) <= 100;
+                        if ($interfaceValid) {
+                            $seenWorkloads = [];
+                            foreach ($interfaceCases as $case) {
+                                if (! is_array($case)
+                                    || count($case) !== count($caseFields)
+                                    || array_diff($caseFields, array_keys($case)) !== []
+                                    || ! is_string($case['workload_id'] ?? null)
+                                    || $case['workload_id'] === ''
+                                    || isset($seenWorkloads[$case['workload_id']])
+                                    || ($case['source_profile_sha256'] ?? null) !== ($candidateFlows['source_profile_sha256'] ?? null)
+                                    || ($case['target_profile_sha256'] ?? null) !== ($candidateFlows['target_profile_sha256'] ?? null)
+                                    || ($case['level'] ?? null) !== 'E4'
+                                    || ($case['decision'] ?? null) !== 'accepted'
+                                    || ($case['revoked'] ?? null) !== false
+                                    || ! is_int($case['observed_at'] ?? null)
+                                    || ! is_int($case['expires_at'] ?? null)
+                                    || $case['observed_at'] > time()
+                                    || time() - $case['observed_at'] > 30
+                                    || $case['expires_at'] <= time()
+                                    || $case['expires_at'] > ($candidateFlows['expires_at'] ?? 0)) {
+                                    $interfaceValid = false;
+                                    break;
+                                }
+                                foreach ([
+                                    'source_profile_sha256', 'target_profile_sha256',
+                                    'logical_nics_sha256', 'native_path_set_sha256',
+                                    'allowed_probe_sha256', 'denied_probe_sha256',
+                                    'return_probe_sha256', 'isolation_probe_sha256',
+                                    'evidence_sha256',
+                                ] as $shaField) {
+                                    if (! preg_match('/\\A[a-f0-9]{64}\\z/', (string) $case[$shaField])) {
+                                        $interfaceValid = false;
+                                        break;
+                                    }
+                                }
+                                $seenWorkloads[$case['workload_id']] = true;
+                                if (! $interfaceValid) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     if (is_array($candidateFlows)
-                        && count($candidateFlows) === count($flowFields)
+                        && $interfaceValid
+                        && count($candidateFlows) >= count($flowFields)
+                        && count($candidateFlows) <= count($flowFields) + 1
                         && array_diff($flowFields, array_keys($candidateFlows)) === []
+                        && array_diff(array_keys($candidateFlows), [...$flowFields, 'workload_interface_cases']) === []
                         && ($candidateFlows['schema_version'] ?? null) === 1
                         && ($candidateFlows['level'] ?? null) === 'E4'
                         && ($candidateFlows['decision'] ?? null) === 'accepted'
