@@ -2,7 +2,7 @@
 import pytest
 
 from inventory_worker.infrastructure.native import CollectionFailure
-from inventory_worker.infrastructure.openstack_security import security_semantics
+from inventory_worker.infrastructure.openstack_security import rule_choices, security_semantics
 
 def rules(*, dest=False):
     return {
@@ -49,3 +49,25 @@ def test_invalid_natively_observed_rules_fail_closed():
             row["port_range_min"] = 99999
         with pytest.raises(CollectionFailure):
             security_semantics(changed)
+
+
+def test_source_and_destination_rule_choices_are_exact_api_ids_not_free_text():
+    source = rule_choices(rules())
+    destination = rule_choices(rules(dest=True))
+    assert source is not None and destination is not None
+    assert source[0]["id"] == "rule-source"
+    assert destination[0]["id"] == "rule-other"
+    assert source[0]["semantic_sha256"] == destination[0]["semantic_sha256"]
+    assert source[0]["remote_ip_prefix"] == "10.0.0.0/24"
+    differing = rules(dest=True)
+    differing["security_group_rules"][0]["port_range_max"] = 8443
+    assert rule_choices(differing)[0]["semantic_sha256"] != source[0]["semantic_sha256"]
+
+
+def test_unknown_group_references_do_not_generate_selectable_rules():
+    unsafe = rules()
+    unsafe["security_group_rules"][0]["remote_group_id"] = "other-group"
+    assert rule_choices(unsafe) is None
+    unknown = rules()
+    unknown.pop("stateful")
+    assert rule_choices(unknown) is None
