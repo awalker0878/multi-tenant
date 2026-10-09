@@ -41,7 +41,7 @@ class ContractIntegrityTests(unittest.TestCase):
             if parameter.get("name") != "tenant"
         ]
         with patch("check.load", return_value=spec):
-            with self.assertRaisesRegex(ValueError, "path parameters/responses"):
+            with self.assertRaisesRegex(ValueError, "operation parameters/responses"):
                 current_api(name)
 
     def test_asyncapi_event_schema_bindings(self):
