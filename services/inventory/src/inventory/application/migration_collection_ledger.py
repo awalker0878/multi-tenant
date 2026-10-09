@@ -51,18 +51,45 @@ class MigrationCollectionLedger:
             # Even an incomplete signed observation is retained for diagnostics;
             # no field status is promoted merely because ingestion succeeded.
             envelope_sha = digest(envelope)
+            sequence = envelope["payload"].get("generation_sequence")
+            if type(sequence) is not int or sequence < 1:
+                raise Rejected("migration_collection_signed_sequence_required", 423)
+            prior = tx.one(
+                "SELECT generation_sequence,envelope_sha256 FROM "
+                "inventory.migration_collection_receipts "
+                "WHERE tenant=%s AND site=%s AND source_profile=%s "
+                "AND target_profile=%s ORDER BY generation_sequence DESC,"
+                "observed_at DESC,id DESC LIMIT 1",
+                (tenant, site, source_id, target_id),
+            )
+            if prior is not None:
+                if prior["generation_sequence"] > sequence:
+                    raise Rejected("migration_collection_delayed_observation_superseded", 409)
+                if (prior["generation_sequence"] == sequence
+                        and prior["envelope_sha256"] != envelope_sha):
+                    raise Rejected("migration_collection_sequence_conflict", 409)
+            observed = [
+                record["observed_at"] for receipt in envelope["payload"]["scopes"]
+                for kind in ("observations", "applicability") for record in receipt[kind]
+            ]
+            if (not observed or any(type(t) is not int for t in observed)
+                    or min(observed) > int(self.d.clock())):
+                raise Rejected("migration_collection_observed_time_invalid", 423)
+            observed_at = min(observed)
             envelope_id = str(uuid4())
             tx.execute(
                 "INSERT INTO inventory.migration_collection_receipts "
                 "(id,tenant,site,source_profile,target_profile,source_sha256,"
-                "target_sha256,envelope_sha256,envelope,publisher,received_at,expires_at) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s) "
+                "target_sha256,envelope_sha256,envelope,publisher,received_at,observed_at,"
+                "generation_sequence,expires_at) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s,%s,%s) "
                 "ON CONFLICT DO NOTHING",
                 (
                     envelope_id, tenant, site, source_id, target_id,
                     left["profile_sha256"], right["profile_sha256"],
                     envelope_sha, canonical(envelope), worker.identity,
-                    self.d.clock(), envelope["payload"]["expires_at"],
+                    self.d.clock(), observed_at, sequence,
+                    envelope["payload"]["expires_at"],
                 ),
             )
             # A duplicate envelope retains the original immutable row and
@@ -126,7 +153,8 @@ class MigrationCollectionLedger:
                 "SELECT envelope,source_sha256,target_sha256 FROM "
                 "inventory.migration_collection_receipts "
                 "WHERE tenant=%s AND site=%s AND source_profile=%s "
-                "AND target_profile=%s ORDER BY received_at DESC,id DESC LIMIT 1",
+                "AND target_profile=%s ORDER BY generation_sequence DESC,"
+                "observed_at DESC,id DESC LIMIT 1",
                 (identifier(tenant), identifier(site), source["id"], target["id"]),
             )
         if len(records) != 1:
