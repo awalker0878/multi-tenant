@@ -19,7 +19,7 @@ The contract root owns **wire contracts**, not provider eligibility or native ex
 | Catalogue | `openapi/catalogue-v1.0.1.json` | `apps/console/resources/contracts/catalogue-v1.0.1.json` |
 | Native migration input | `schemas/planning/migration-input-v4.json` | `services/planning/src/planning/infrastructure/inputs/migration-input-v4.json` |
 | Migration support | `schemas/planning/migration-support-v2.json` | `services/planning/src/planning/infrastructure/inputs/migration-support-v2.json` |
-| Resolved workload readiness | `schemas/planning/migration-readiness-v2.json` | `services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.json` |
+| Workload-readiness validation (wire v2) | `schemas/planning/migration-readiness-v2.1.json` | Planning and Lifecycle exact packaged copies |
 
 The source manifests are an editing representation, not independently hosted service contracts. Do not create separate, unverifiable drift between source fragments and the immutable deployed bundles.
 
@@ -38,3 +38,7 @@ The published Inventory collection-page v1.1, v1.2 and v1.3 specifications histo
 The Inventory collection manifest is authored in platform headers and ordered scope-specific arrays under `contracts/source/capabilities/migration-collection-manifest-v1/platforms/<provider>/`. Numeric prefixes preserve the published attribute sequence, including interleaved source/target/owner groups. Do not reorder these files or aggregate by scope: the resulting contract must continue matching the canonical bundle via `scripts/contracts/build.py --check`.
 
 The archived Inventory and Planning API releases remain immutable. Unused Console copies of Inventory v1.7/v1.8 and Planning Migration v1.4 were pruned; the current consumers use Inventory v1.9 and Planning Migration v1.6. Older copies explicitly exercised by historical compatibility scripts remain in place.
+
+## Active producer and consumer ownership
+
+`architecture/contract-consumers.json` owns the **editable** active-release catalogue with per-contract producers, downstream consumers, installed artifact paths, source manifests, and explicit dependencies. `scripts/contracts/check.py` checks every declaration against real files and byte-identical installed copies. This is separate from immutable historical contract publications; replacing an active release updates the registry, never rewrites an older published API or schema.

@@ -232,7 +232,8 @@ def check_readiness_projection():
 
 
 def check_consumer_registry():
-    inventory = load("architecture/contract-consumers.json")["contracts"]
+    registry = load("architecture/contract-consumers.json")
+    inventory = registry["contracts"]
     for source, consumers in {
         "contracts/openapi/catalogue-v1.0.1.json": {"catalogue", "console"},
         "contracts/openapi/inventory-v1.9.json": {"inventory", "console"},
@@ -243,6 +244,34 @@ def check_consumer_registry():
             raise ValueError(f"Active contract missing from consumer registry: {source}")
         if not consumers.issubset(set(inventory[source])):
             raise ValueError(f"Incorrect active consumer registry: {source}")
+    releases = registry.get("active_releases")
+    if not isinstance(releases, list) or len(releases) < 6:
+        raise ValueError("Missing machine-readable active contract release catalogue")
+    names = [entry["path"] for entry in releases]
+    if len(names) != len(set(names)):
+        raise ValueError("Duplicate active contract release")
+    for entry in releases:
+        path = entry["path"]
+        owner = entry["owner"]
+        consumers = entry["consumers"]
+        if (not (ROOT / path).is_file()
+                or owner not in registry["dependencies"]
+                or not consumers
+                or set(consumers) - set(registry["dependencies"])):
+            raise ValueError(f"Invalid active release ownership or consumers: {path}")
+        if not {owner, *consumers}.issubset(set(inventory.get(path, []))):
+            raise ValueError(f"Undeclared active release consumer: {path}")
+        for dependency in entry.get("depends_on", []):
+            if not (ROOT / dependency).is_file():
+                raise ValueError(f"Unresolved active contract dependency: {dependency}")
+        manifest = entry.get("source_manifest")
+        if manifest:
+            source = load(manifest)
+            if source.get("target") != path:
+                raise ValueError(f"Active contract source manifest drift: {path}")
+        for installed in entry.get("copies", []):
+            if (ROOT / installed).read_bytes() != (ROOT / path).read_bytes():
+                raise ValueError(f"Active contract installed-copy drift: {installed}")
 
 
 def main():

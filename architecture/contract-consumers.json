@@ -91,7 +91,95 @@
     "contracts/openapi/catalogue-v1.0.1.json": [
       "catalogue",
       "console"
+    ],
+    "contracts/schemas/planning/migration-readiness-v2.1.json": [
+      "planning",
+      "lifecycle"
+    ],
+    "contracts/schemas/planning/migration-support-v2.json": [
+      "assurance",
+      "planning"
     ]
   },
-  "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied."
+  "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
+  "active_releases": [
+    {
+      "path": "contracts/openapi/catalogue-v1.0.1.json",
+      "owner": "catalogue",
+      "consumers": [
+        "console"
+      ],
+      "copies": [
+        "apps/console/resources/contracts/catalogue-v1.0.1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/inventory-v1.9.json",
+      "owner": "inventory",
+      "consumers": [
+        "console"
+      ],
+      "copies": [
+        "apps/console/resources/contracts/inventory-v1.9.json"
+      ],
+      "source_manifest": "contracts/source/openapi/inventory-v1.9/manifest.json",
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/planning-migration-v1.6.json",
+      "owner": "planning",
+      "consumers": [
+        "console"
+      ],
+      "copies": [
+        "apps/console/resources/contracts/planning-migration-v1.6.json"
+      ],
+      "source_manifest": "contracts/source/openapi/planning-migration-v1.6/manifest.json",
+      "depends_on": [
+        "contracts/schemas/planning/migration-readiness-v2.json",
+        "contracts/schemas/planning/migration-support-v2.json"
+      ]
+    },
+    {
+      "path": "contracts/schemas/planning/migration-input-v4.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/migration-input-v4.json"
+      ],
+      "source_manifest": "contracts/source/schemas/migration-input-v4/manifest.json",
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/migration-support-v2.json",
+      "owner": "assurance",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/migration-support-v2.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/migration-readiness-v2.1.json",
+      "owner": "planning",
+      "consumers": [
+        "lifecycle"
+      ],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.1.json",
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": [
+        "contracts/schemas/planning/migration-readiness-v2.json"
+      ]
+    }
+  ]
 }
