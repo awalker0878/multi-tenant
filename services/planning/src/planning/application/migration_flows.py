@@ -123,7 +123,7 @@ class MigrationFlows:
             ):
                 raise Rejected("native_security_rule_equivalence_unqualified", 423)
             choices = self.qualified_native_choices(
-                intent, dest["platform"], cases, now,
+                intent, dest["platform"], cases, now, policy,
             )
         else:
             choices = native_application_flow_choices(intent, observed["network"], policy)
@@ -156,7 +156,7 @@ class MigrationFlows:
     @staticmethod
     def qualified_native_choices(
         intent: dict[str, Any], platform: str,
-        cases: list[dict[str, Any]], now: int,
+        cases: list[dict[str, Any]], now: int, policy: dict[str, Any],
     ) -> list[dict[str, Any]]:
         """Only independently E4-qualified existing NSX/Prism controls enter a dropdown."""
         case_map: dict[str, dict[str, Any]] = {}
@@ -171,6 +171,17 @@ class MigrationFlows:
             case_map[flow_id] = case
         choices = []
         used = set()
+        required_ids = {
+            digest({k: dep[k] for k in ("from", "to", "protocol", "port")})
+            for dep in intent["dependencies"]
+            if dep["kind"] == "communication" and dep["strength"] == "required"
+        }
+        forbidden_ids = {
+            digest({k: dep[k] for k in ("from", "to", "protocol", "port")})
+            for dep in policy.get("forbidden_flows", [])
+        }
+        if not forbidden_ids:
+            raise Rejected("native_security_forbidden_policy_missing", 423)
         for dependency in intent["dependencies"]:
             if dependency["kind"] != "communication":
                 continue
@@ -193,6 +204,13 @@ class MigrationFlows:
                     or case["source_document"].get("platform")
                        not in {"vmware", "ahv", "openstack"}):
                 raise Rejected("native_security_application_coverage_incomplete", 423)
+            boundary_classes = {
+                row["id"]: row["requirement"]
+                for row in case["boundary"].get("classes", [])
+            }
+            if (any(boundary_classes.get(x) != "required" for x in required_ids)
+                    or any(boundary_classes.get(x) != "forbidden" for x in forbidden_ids)):
+                raise Rejected("native_security_policy_universe_incomplete", 423)
             boundary = compare_policy_boundary(
                 case["source_document"], case["document"], case["boundary"], now,
             )
@@ -241,7 +259,7 @@ class MigrationFlows:
         controls = []
         if current["destination"].get("platform") in {"vmware", "ahv"}:
             cases = {
-                item["source_flow_id"]: item["document"]
+                item["source_flow_id"]: item
                 for item in current["data"]["effective_security_cases"]
             }
             for selection in selections:
@@ -252,9 +270,12 @@ class MigrationFlows:
                 if (selection["rule_native_ref"] not in option["destination_firewall_rule_ids"]
                         or selection["route_native_ref"] not in option["destination_route_ids"]):
                     raise Rejected("application_flow_native_control_changed", 423)
-                document = cases[flow_id]
+                evidence_case = cases[flow_id]
+                document = evidence_case["document"]
                 controls.append({
                     "flow_id": flow_id,
+                    "source_security_sha256": digest(evidence_case["source_document"]),
+                    "boundary_sha256": digest(evidence_case["boundary"]),
                     "groups": document["groups"],
                     "services": document["services"],
                     "rules": document["rules"],
