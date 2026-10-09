@@ -85,6 +85,7 @@ def request(
                 }[owner]
                 if schema_name is not None:
                     if (owner, schema_name) not in {
+                        ("CATALOGUE", "catalogue-current-v1"),
                         ("INVENTORY", "migration-input-v3"),
                         ("ASSURANCE", "migration-support-v1"),
                         ("ASSURANCE", "qualification-v2"),
