@@ -4,6 +4,7 @@ No source ACL becomes an application dependency. No browser-supplied observation
 can establish policy equivalence or positive/negative traffic measurements.
 """
 from copy import deepcopy
+from collections.abc import Callable
 from typing import Any
 
 from planning.application.planning import Planning
@@ -21,8 +22,12 @@ SCOPE_SQL = (
 
 
 class MigrationFlows:
-    def __init__(self, planning: Planning) -> None:
+    def __init__(
+        self, planning: Planning,
+        execution_proof: Callable[[Actor, str, dict[str, Any], int], None] | None = None,
+    ) -> None:
         self.planning = planning
+        self.execution_proof = execution_proof
 
     @staticmethod
     def scope(actor: Actor, site: str) -> tuple[str, str, str, str]:
@@ -118,6 +123,9 @@ class MigrationFlows:
         return {
             "intent": intent, "destination": dest, "policy": policy,
             "assessment_id": retained["id"],
+            "source_revision_id": current_intent["id"],
+            "source_intent_sha256": current_intent["digest"],
+            "destination_generation_id": candidate["generation_id"],
             "data": observed, "choices": choices,
             "context_sha256": context_sha, "expires_at": expires,
         }
@@ -272,6 +280,9 @@ class MigrationFlows:
                  revision + 1, current["context_sha256"],
                  canonical({"selections": body["selections"], "holds": holds,
                             "assessment_id": current["assessment_id"],
+                            "source_revision_id": current["source_revision_id"],
+                            "source_intent_sha256": current["source_intent_sha256"],
+                            "destination_generation_id": current["destination_generation_id"],
                             "expires_at": current["expires_at"]}), self.planning.clock()),
             )
             tx.execute(
@@ -302,10 +313,9 @@ class MigrationFlows:
         saved = self._read_saved(actor, site, self._latest_assessment_id(actor, site))
         if saved is None or saved["payload"].get("selections") is None:
             raise Rejected("approved_application_flow_selection_required", 423)
-        # A site-bound approval cannot be enough without a fresh native proof.
-        if (self.planning.clock() - saved["updated_at"] > 60
-                or saved["payload"].get("expires_at", 0) <= self.planning.clock()):
-            raise Rejected("application_flow_evidence_expired", 423)
+        # Owner choices outlive native telemetry. A reviewed selection is not
+        # execution evidence: the independent service-only verifier below
+        # must obtain fresh current source identity and runtime probes.
         if saved["payload"].get("holds"):
             raise Rejected("application_flow_not_eligible", 423)
         # A more recent application migration assessment for this actor/site
@@ -326,3 +336,6 @@ class MigrationFlows:
             or str(latest["id"]) != saved["payload"].get("assessment_id")
         ):
             raise Rejected("application_flow_assessment_superseded", 423)
+        if self.execution_proof is None:
+            raise Rejected("independent_application_flow_e4_required", 423)
+        self.execution_proof(actor, site, saved, self.planning.clock())
