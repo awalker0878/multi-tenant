@@ -35,6 +35,7 @@ final class MigrationQualificationController
         $path = config('planning.migration_support_registry_file');
         $records = [];
         $apiEvidence = [];
+        $flowEvidence = null;
         if ($path !== null) {
             abort_unless(is_string($path) && str_starts_with($path, '/') && ! is_link($path) && is_file($path) && is_readable($path), 503);
             for ($parent = dirname($path); $parent !== '/'; $parent = dirname($parent)) {
@@ -83,6 +84,53 @@ final class MigrationQualificationController
                     if (($resolved['evidence_level'] ?? null) !== 'E4') {
                         $records = array_values(array_filter($records, fn (array $record): bool => ($record['level'] ?? null) !== 'E4'));
                     }
+                    // Application-specific traffic assurance must be an independently
+                    // resolved E4 capability, not a copied rule list or a
+                    // browser assertion. A registry entry without the signed
+                    // runtime-approved digest does not qualify a flow.
+                    $candidateFlows = $assignment['flow_evidence'] ?? null;
+                    $requiredChecks = [
+                        'native_controls', 'source_completeness', 'allowed_traffic',
+                        'denied_traffic', 'return_path', 'tenant_isolation',
+                        'application_validation',
+                    ];
+                    if (is_array($candidateFlows)
+                        && array_keys($candidateFlows) === [
+                            'schema_version', 'assessment_id', 'source_revision_id',
+                            'source_intent_sha256', 'context_sha256', 'selections_sha256',
+                            'destination_generation_id', 'platform', 'observed_at',
+                            'expires_at', 'level', 'decision', 'checks',
+                            'native_write_authorized',
+                        ]
+                        && ($candidateFlows['schema_version'] ?? null) === 1
+                        && ($candidateFlows['level'] ?? null) === 'E4'
+                        && ($candidateFlows['decision'] ?? null) === 'accepted'
+                        && ($candidateFlows['native_write_authorized'] ?? null) === false
+                        && ($candidateFlows['platform'] ?? null) === 'openstack'
+                        && is_array($candidateFlows['checks'] ?? null)
+                        && array_keys($candidateFlows['checks']) === $requiredChecks
+                        && count(array_filter($candidateFlows['checks'],
+                            fn ($result): bool => $result !== 'passed')) === 0
+                        && is_int($candidateFlows['observed_at'] ?? null)
+                        && is_int($candidateFlows['expires_at'] ?? null)
+                        && $candidateFlows['observed_at'] <= time()
+                        && time() - $candidateFlows['observed_at'] <= 30
+                        && $candidateFlows['expires_at'] > time()
+                        && $candidateFlows['expires_at'] <= $candidateFlows['observed_at'] + 60
+                        && ($resolved['verification']['valid'] ?? false) === true
+                        && ($resolved['evidence_level'] ?? null) === 'E4') {
+                        $binding = NativeQualification::digest([
+                            'scope' => $input['scope'],
+                            'tranche_sha256' => $input['tranche_sha256'],
+                            'release_sha256' => $input['release_sha256'],
+                            'flow_evidence' => $candidateFlows,
+                        ]);
+                        $flowCapability = $resolved['capabilities']['migration.application_flow_records'] ?? [];
+                        if (($flowCapability['status'] ?? null) === 'supported'
+                            && in_array($binding, $flowCapability['values'] ?? [], true)) {
+                            $flowEvidence = $candidateFlows;
+                        }
+                    }
                     // API feature observations are a separate Assurance capability.
                     // A registry entry alone cannot give Planning positive support:
                     // the independent signed native resolver must have reviewed
@@ -129,6 +177,7 @@ final class MigrationQualificationController
             ...$input,
             'records' => $records,
             'api_evidence' => (object) $apiEvidence,
+            'flow_evidence' => $flowEvidence,
             'native_write_authorized' => false,
         ])->header('Cache-Control', 'no-store, private');
     }
