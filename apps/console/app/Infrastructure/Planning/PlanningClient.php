@@ -19,7 +19,7 @@ final class PlanningClient implements PlanningGateway
 
     public function call(string $session, string $tenant, string $application, string $environment, string $method, string $tail, array $sites, array $body = [], ?string $key = null): array
     {
-        $migration = in_array($tail, ['migration-preparations', 'migration-plans', 'migration-plan-options', 'migration-support'], true);
+        $migration = in_array($tail, ['migration-preparations', 'migration-plans', 'migration-plan-options', 'migration-support', 'migration-flow-choices', 'migration-flow-selections'], true);
         if (($migration && ($method !== 'POST' || count($sites) !== 1)) || count($sites) < 1 || count($sites) > 3 || ! in_array($method, ['GET', 'POST'], true)
             || (! $migration && ! preg_match('/\A(?:assessments|plans)(?:\/[0-9a-f-]{36})?(?:\/(?:validity|diff))?\z/', $tail))) {
             throw new PlanningFailure(422, 'invalid_scope');
@@ -40,7 +40,7 @@ final class PlanningClient implements PlanningGateway
         }
         try {
             $tokens = [];
-            $action = $method === 'POST' && $tail !== 'migration-support' && ! str_ends_with($tail, '/validity') && ! str_ends_with($tail, '/diff') ? 'plan.create' : 'plan.read';
+            $action = $method === 'POST' && ! in_array($tail, ['migration-support', 'migration-flow-choices'], true) && ! str_ends_with($tail, '/validity') && ! str_ends_with($tail, '/diff') ? 'plan.create' : 'plan.read';
             foreach (array_unique($sites) as $site) {
                 $d = $this->governance->send('POST', '/v1/tenants/'.$tenant.'/actor-delegations', $session, ['audience' => 'planning', 'action' => $action,
                     'scope' => ['site_id' => $site, 'environment' => $environment, 'resource_id' => $application]]);
@@ -80,6 +80,8 @@ final class PlanningClient implements PlanningGateway
                 'migration-plans' => 'Receipt',
                 'migration-plan-options' => 'MigrationOptions',
                 'migration-support' => 'MigrationSupport',
+                'migration-flow-choices' => 'MigrationFlowChoices',
+                'migration-flow-selections' => 'MigrationFlowReceipt',
                 default => 'Preparation',
             } : ($response->status() === 201 ? 'Receipt' : (str_ends_with($tail, '/validity') ? 'Validity' : (str_ends_with($tail, '/diff') ? 'Diff' : (str_starts_with($tail, 'plans/') ? 'Plan' : 'Assessment'))));
             $schema = ['$ref' => '#/components/schemas/'.$schemaName, 'components' => $api['components']];
