@@ -172,6 +172,7 @@ def current_application_flow_proof(
             ("context_sha256", saved["context_sha256"]),
             ("selections_sha256", digest(payload["selections"])),
             ("native_controls_sha256", payload.get("native_controls_sha256")),
+            ("omissions_sha256", digest(payload.get("omissions", []))),
             ("destination_generation_id", payload.get("destination_generation_id")),
             ("platform", "openstack"),
             ("level", "E4"),
@@ -180,6 +181,13 @@ def current_application_flow_proof(
         )
     ):
         raise Rejected("independent_application_flow_e4_required", 423)
+    omissions = payload.get("omissions", [])
+    if omissions and (
+        receipt["omissions_approved"] is not True
+        or not isinstance(receipt["omission_approver_id"], str)
+        or receipt["omission_approver_id"] == str(saved["reviewed_by_actor"])
+    ):
+        raise Rejected("independent_optional_flow_approval_required", 423)
     if (
         type(receipt["observed_at"]) is not int
         or not 0 <= now - receipt["observed_at"] <= 30
