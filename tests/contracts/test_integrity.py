@@ -117,9 +117,6 @@ class ContractIntegrityTests(unittest.TestCase):
         _, result = assemble(ROOT / "contracts/source/capabilities/migration-field-crosswalk-v1/manifest.json")
         self.assertEqual(len(result["fields"]), result["summary"]["groups"])
 
-if __name__ == "__main__":
-    unittest.main()
-
     def test_e4_field_provenance_requires_exact_independent_binding(self):
         from jsonschema import Draft202012Validator, FormatChecker
 
@@ -143,3 +140,6 @@ if __name__ == "__main__":
         self.assertFalse(validate.is_valid({**proof, "revoked": True}))
         self.assertFalse(validate.is_valid({**proof, "level": "E2"}))
         self.assertFalse(validate.is_valid({**proof, "transformation_plan_sha256": "bad"}))
+
+if __name__ == "__main__":
+    unittest.main()
