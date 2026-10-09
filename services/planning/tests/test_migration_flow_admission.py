@@ -9,8 +9,8 @@ from planning.infrastructure import migration_support
 
 
 def actor():
-    return Actor(*(str(uuid4()) for _ in range(3)), "plan.read",
-                 str(uuid4()))
+    return Actor(str(uuid4()), str(uuid4()), "plan.read",
+                 str(uuid4()), str(uuid4()))
 
 
 def test_independent_qualification_must_bind_current_source_and_exact_controls(
