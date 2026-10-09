@@ -91,23 +91,51 @@ def reconcile(
                 holds.append("source_dataset_mapping_not_independently_confirmed")
             actual_disks = facts.get("disks")
             desired_disks = workload["disks"]
-            if not isinstance(actual_disks, list) or len(actual_disks) != len(desired_disks):
+            native_disks = {
+                row["key"]: row for row in actual_disks
+                if isinstance(row, dict) and type(row.get("key")) is int
+            } if isinstance(actual_disks, list) else {}
+            mappings = link.get("disk_mappings")
+            if (not isinstance(mappings, list)
+                    or len(mappings) != len(desired_disks)
+                    or not isinstance(actual_disks, list)
+                    or len(native_disks) != len(actual_disks)
+                    or len(actual_disks) != len(desired_disks)):
                 holds.append("source_disk_set_differs_from_intent")
             else:
-                by_key = {d.get("key"): d for d in actual_disks if isinstance(d, dict)}
-                if len(by_key) != len(actual_disks):
+                logical_to_native = {
+                    row.get("logical_device_id"): row.get("native_key")
+                    for row in mappings if isinstance(row, dict)
+                }
+                if (len(logical_to_native) != len(mappings)
+                        or set(logical_to_native) != {d["id"] for d in desired_disks}
+                        or set(logical_to_native.values()) != set(native_disks)):
                     holds.append("source_disk_identity_ambiguous")
-                for disk in desired_disks:
-                    actual = by_key.get(disk["order"])
-                    if (actual is None or actual.get("capacity_bytes") is None
-                            or actual["capacity_bytes"] != disk["size_gib"] * 1024**3):
-                        holds.append("source_disk_capacity_or_order_drift")
-                        break
+                else:
+                    for disk in desired_disks:
+                        actual = native_disks[logical_to_native[disk["id"]]]
+                        if (actual.get("capacity_bytes") is None
+                                or actual["capacity_bytes"] != disk["size_gib"] * 1024**3):
+                            holds.append("source_disk_capacity_or_order_drift")
+                            break
             nics = facts.get("nics")
-            if not isinstance(nics, list) or len(nics) != len(workload["nics"]):
+            native_nics = {
+                row["key"] for row in nics
+                if isinstance(row, dict) and type(row.get("key")) is int
+            } if isinstance(nics, list) else set()
+            mappings = link.get("nic_mappings")
+            if (not isinstance(nics, list)
+                    or not isinstance(mappings, list)
+                    or len(nics) != len(workload["nics"])
+                    or len(mappings) != len(workload["nics"])):
                 holds.append("source_nic_set_differs_from_intent")
-            elif set(n.get("key") for n in nics if isinstance(n, dict)) != set(
-                    n["order"] for n in workload["nics"]):
+            elif (len(native_nics) != len(nics)
+                  or len({m.get("logical_device_id") for m in mappings
+                          if isinstance(m, dict)}) != len(mappings)
+                  or {m.get("logical_device_id") for m in mappings
+                      if isinstance(m, dict)} != {n["id"] for n in workload["nics"]}
+                  or {m.get("native_key") for m in mappings if isinstance(m, dict)}
+                        != native_nics):
                 holds.append("source_nic_identity_ambiguous")
             native = facts.get("native")
             identity = native.get("identity") if isinstance(native, dict) else None
