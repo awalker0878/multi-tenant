@@ -70,7 +70,7 @@ def collect_vmware(
     # A host without a complete API response simply has no selectable values.
     # Bound the campaign: hosts beyond this limit require a smaller scope.
     guest_options_by_host: list[dict[str, Any]] = []
-    if len(records["hosts"]) <= 16:
+    if len(records["hosts"]) <= (9 if "nsx_policy" in stream else 15):
         for host in records["hosts"]:
             key = host["host"]
             if not re.fullmatch(r"host-[0-9]+", key):
