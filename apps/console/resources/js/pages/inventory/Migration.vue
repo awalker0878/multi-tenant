@@ -26,6 +26,35 @@ const blocked = computed(() => form.processing || unavailable.value || uncertain
 const source = computed(() => props.workspace.profiles.find(p => p.id === form.review.source_profile_id) ?? (saved?.source.id === form.review.source_profile_id ? saved.source : null));
 const target = computed(() => props.workspace.profiles.find(p => p.id === form.review.target_profile_id) ?? (saved?.target.id === form.review.target_profile_id ? saved.target : null));
 const disks = computed(() => source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.disks : []);
+function beginCatalogueAssociation() {
+  if (!source.value || source.value.facts.profile_type !== 'SourceWorkloadProfile') return;
+  form.review.catalogue_binding = {
+    application_id: '', environment_id: '', revision_id: '', intent_sha256: '', workload_id: '',
+    disk_mappings: source.value.facts.disks.map(d => ({ logical_device_id: '', native_key: d.key })),
+    nic_mappings: source.value.facts.nics.map(n => ({ logical_device_id: '', native_key: n.key })),
+  };
+}
+watch(() => form.review.source_profile_id, (next, previous) => {
+  if (next !== previous && form.review.catalogue_binding) delete form.review.catalogue_binding;
+});
+const catalogueAssociationComplete = computed(() => {
+  const binding = form.review.catalogue_binding;
+  if (!binding) return true; // Older reviews can be saved but cannot pass workload admission.
+  const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
+  if (![binding.application_id, binding.environment_id, binding.revision_id,
+         binding.workload_id].every(v => uuid.test(v))) return false;
+  if (!/^[a-f0-9]{64}$/.test(binding.intent_sha256)) return false;
+  const sourceDisks = source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.disks : [];
+  const sourceNics = source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.nics : [];
+  const valid = (items: { logical_device_id: string; native_key: number }[], keys: number[]) =>
+    items.length === keys.length
+    && new Set(items.map(i => i.logical_device_id)).size === items.length
+    && items.every(i => uuid.test(i.logical_device_id))
+    && new Set(items.map(i => i.native_key)).size === keys.length
+    && items.every(i => keys.includes(i.native_key));
+  return valid(binding.disk_mappings, sourceDisks.map(d => d.key))
+      && valid(binding.nic_mappings, sourceNics.map(n => n.key));
+});
 const ahv = computed(() => target.value?.facts.profile_type === 'TargetCapabilityProfile' && target.value.facts.platform === 'ahv' ? target.value.facts : null);
 const vmware = computed(() => target.value?.facts.profile_type === 'TargetCapabilityProfile' && target.value.facts.platform === 'vmware' ? target.value.facts : null);
 const openstack = computed(() => target.value?.facts.profile_type === 'TargetCapabilityProfile' && target.value.facts.platform === 'openstack' ? target.value.facts : null);
@@ -306,6 +335,32 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
         <label>Source VM profile<select v-model="form.review.source_profile_id" :disabled="!!profileId" required><option value="">Select observed source</option><option v-if="saved && !workspace.profiles.some(p => p.id === saved?.source.id)" :value="saved.source.id">{{ saved.source.native_id }} — refresh required</option><option v-for="p in workspace.profiles.filter(p => p.profile_type === 'SourceWorkloadProfile')" :key="p.id" :value="p.id">{{ p.facts.platform }} · {{ p.native_id }} · {{ observedTime(p.collected_at) }}{{ p.current ? '' : ' · stale' }}</option></select></label>
         <label>Destination profile<select v-model="form.review.target_profile_id" required><option value="">Select observed destination</option><option v-if="saved && !workspace.profiles.some(p => p.id === saved?.target.id)" :value="saved.target.id">{{ saved.target.native_id }} — refresh required</option><option v-for="p in workspace.profiles.filter(p => p.profile_type === 'TargetCapabilityProfile')" :key="p.id" :value="p.id">{{ p.facts.platform }} · {{ p.native_id }} · {{ observedTime(p.collected_at) }}{{ p.current ? '' : ' · stale' }}</option></select></label>
       </div>
+      <section class="rounded border border-slate-300 p-4" aria-labelledby="catalogue-link-title">
+        <h2 id="catalogue-link-title" class="text-lg font-semibold">Catalogue intent ↔ native VM association</h2>
+        <p class="my-2 text-sm">Enter the existing, published Catalogue application, environment, revision and logical workload identifiers. The native disk/NIC keys below come from Inventory; only their logical device IDs are entered. Planning independently checks the current Catalogue document, source generation, one-to-one mapping and E4 application dependencies. Saving identifiers alone never establishes readiness.</p>
+        <button v-if="!form.review.catalogue_binding" type="button" class="secondary" :disabled="!source" @click="beginCatalogueAssociation">Associate with published Catalogue workload</button>
+        <template v-else>
+          <div class="grid gap-3 md:grid-cols-2">
+            <label>Application UUID<input v-model.trim="form.review.catalogue_binding.application_id" required /></label>
+            <label>Environment UUID<input v-model.trim="form.review.catalogue_binding.environment_id" required /></label>
+            <label>Current Catalogue revision UUID<input v-model.trim="form.review.catalogue_binding.revision_id" required /></label>
+            <label>Canonical intent SHA-256<input v-model.trim="form.review.catalogue_binding.intent_sha256" required pattern="[a-f0-9]{64}" /></label>
+            <label>Logical workload UUID<input v-model.trim="form.review.catalogue_binding.workload_id" required /></label>
+          </div>
+          <h3 class="mt-3 font-medium">Map each Catalogue disk to its observed native key</h3>
+          <div v-for="(m, index) in form.review.catalogue_binding.disk_mappings" :key="'disk:'+m.native_key" class="my-2 flex flex-wrap items-center gap-3">
+            <span>Native disk {{ m.native_key }}</span>
+            <label>Catalogue disk UUID<input v-model.trim="form.review.catalogue_binding.disk_mappings[index].logical_device_id" required /></label>
+          </div>
+          <h3 class="mt-3 font-medium">Map each Catalogue NIC to its observed native key</h3>
+          <div v-for="(m, index) in form.review.catalogue_binding.nic_mappings" :key="'nic:'+m.native_key" class="my-2 flex flex-wrap items-center gap-3">
+            <span>Native NIC {{ m.native_key }}</span>
+            <label>Catalogue NIC UUID<input v-model.trim="form.review.catalogue_binding.nic_mappings[index].logical_device_id" required /></label>
+          </div>
+          <p v-if="!catalogueAssociationComplete" role="alert" class="text-amber-800">Complete every scoped UUID and the one-to-one device maps before saving.</p>
+          <button type="button" class="secondary" @click="delete form.review.catalogue_binding">Unlink this draft (migration admission will remain held)</button>
+        </template>
+      </section>
       <label>Explicit migration method<select v-model="form.review.method" required><option value="">Select a method</option><option v-for="method in (ahv || vmware ? ['VM_COLD_EXPORT'] : workspace.methods)" :key="method" :value="method">{{ method.replaceAll('_', ' ') }}</option></select></label>
       <p>Methods require their own qualification. A failed method never selects another method automatically. Cold export retains the source outage throughout movement; delta methods require a qualified final synchronization protocol.</p>
       <section class="rounded border border-slate-300 p-4" aria-labelledby="feature-map-title">
@@ -394,7 +449,7 @@ function addOverride() { form.review.overrides.push({ field: 'application_consis
       <h2 class="text-xl font-semibold">Owner objectives</h2><div class="grid gap-4 md:grid-cols-2"><label>Application owner ID<input v-model="form.review.objectives.owner_id" required /></label><label>Acceptance record SHA-256<input v-model="form.review.objectives.acceptance_sha256" required pattern="[0-9a-f]{64}" /></label><label>Maximum outage (seconds)<input v-model.number="form.review.objectives.max_outage_seconds" type="number" min="0" max="31536000" required /></label><label>Maximum data loss (bytes)<input v-model.number="form.review.objectives.max_data_loss_bytes" type="number" min="0" max="9007199254740991" required /></label></div>
       <h2 class="text-xl font-semibold">Reasoned application interpretations</h2><div v-for="(override, index) in form.review.overrides" :key="index" class="grid gap-3 rounded border p-4 md:grid-cols-3"><label>Application field<select v-model="override.field"><option v-for="field in workspace.owner_fields" :key="field" :value="field">{{ field.replaceAll('_', ' ') }}</option></select></label><label>Interpretation<input v-model="override.interpretation" required maxlength="240" /></label><label>Reason and evidence<input v-model="override.reason" required maxlength="240" /></label><button type="button" class="secondary" @click="form.review.overrides.splice(index, 1)">Remove interpretation</button></div>
       <button type="button" class="secondary" :disabled="form.review.overrides.length >= 8" @click="addOverride">Add reasoned interpretation</button>
-      <div><button type="submit" :disabled="!source || !target || !form.review.datasets.length || missing.length > 0 || requiredReviewMissing.length > 0">Save migration review</button></div>
+      <div><button type="submit" :disabled="!source || !target || !form.review.datasets.length || missing.length > 0 || requiredReviewMissing.length > 0 || !catalogueAssociationComplete">Save migration review</button></div>
     </fieldset></form>
     <section class="my-8 rounded border border-slate-300 p-5"><h2 class="text-xl font-semibold">Confirm the saved review</h2><p v-if="saved">Revision {{ saved.revision }} · {{ saved.confirmation_current && !expired ? 'Confirmed' : 'Review required' }}</p><p class="my-3">Confirmation binds the exact observations, complete disk and dataset map, method and owner inputs. It does not start a migration.</p><ul v-if="saved?.holds.length" class="my-3 list-disc pl-5"><li v-for="hold in saved.holds" :key="hold">{{ migrationHold(hold) }}</li></ul><button type="button" :disabled="blocked || dirty || !saved || expired || requiredReviewMissing.length > 0 || saved.holds.length > 0 || saved.confirmation_current" @click="act('confirm')">Confirm migration review</button></section>
     <section class="my-8"><h2 class="text-xl font-semibold">Original API observations</h2><details v-for="p in [source, target].filter(Boolean)" :key="p!.id" class="my-3 rounded border p-4"><summary>{{ p!.native_id }} · {{ p!.current && p!.expires_at > now ? 'Current' : 'Refresh required' }}</summary><p class="my-3 break-all">Profile {{ p!.digest }}</p><ul class="list-disc pl-5"><li v-for="hold in p!.facts.holds" :key="hold">{{ migrationHold(hold) }}</li></ul><pre class="mt-3 max-h-96 overflow-auto text-sm">{{ JSON.stringify(p!.facts, null, 2) }}</pre></details></section>
