@@ -48,7 +48,7 @@ class MigrationValidation:
         ):
             raise ValueError("required_migration_validation")
 
-    def execution_current(self, plan: dict[str, Any]) -> None:
+    def execution_current(self, plan: dict[str, Any]) -> dict[str, Any]:
         """Service-only read checks recipe revocation without borrowing a user delegation."""
         scope = plan["content"]["scope"]
         actor = Actor(
@@ -59,10 +59,14 @@ class MigrationValidation:
             scope["environment"],
         )
         composition = plan["content"]["native_migration"]
-        self.support(actor, scope["site_id"], composition["migration"])
+        readiness = self.support(actor, scope["site_id"], composition["migration"])
+        if (not isinstance(readiness, dict) or readiness.get("status") != "eligible"
+                or readiness.get("holds") != [] or readiness.get("native_write_authorized") is not False):
+            raise Rejected("migration_readiness_held", 423)
         recipe = self.recipes(actor, scope["site_id"], composition["recipe_id"])
         if digest(recipe) != composition["recipe_sha256"] or recipe["expires_at"] <= self.clock():
             raise Rejected("migration_recipe_changed", 423)
+        return readiness
 
     def current(self, actor: Actor, plan: dict[str, Any], delegations: dict[str, str]) -> None:
         content = plan["content"]
