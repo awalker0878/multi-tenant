@@ -159,7 +159,7 @@ function saveFlowChoices() {
     onError: () => { void refreshFlowChoices(); },
   });
 }
-onMounted(() => { void refreshFlowChoices(); void refreshWorkloadReadiness(); });
+onMounted(() => { void refreshFlowChoices(); void refreshCatalogueWorkloads(); });
 
 type WorkloadField = { field: string; disposition: string; required: boolean };
 type WorkloadDecision = {
@@ -168,14 +168,46 @@ type WorkloadDecision = {
   workload_reconciliation: { workloads: { workload_id: string; status: string; holds: string[]; field_dispositions: WorkloadField[] }[] };
   collection_coverages: { scope: string; status: string; holds: string[]; attributes: { attribute_id: string; status: string; reason: string }[] }[];
 };
+type CatalogueLogicalVm = { id: string; name: string };
+const catalogueWorkloads = ref<CatalogueLogicalVm[]>([]);
+const selectedWorkload = ref('');
+const workloadOptionsError = ref('');
+async function refreshCatalogueWorkloads(): Promise<void> {
+  try {
+    const query = new URLSearchParams({ application: props.applicationId, environment: props.environment });
+    const response = await fetch(
+      `/tenants/${props.tenantId}/inventory/sites/${props.siteId}/migration/catalogue-options?${query}`,
+      { credentials: 'same-origin', cache: 'no-store', redirect: 'manual', headers: { Accept: 'application/json' } },
+    );
+    if (!response.ok) throw new Error();
+    const data = await response.json() as { current?: { workloads: CatalogueLogicalVm[] } };
+    if (!active || !Array.isArray(data.current?.workloads)) throw new Error();
+    catalogueWorkloads.value = data.current.workloads;
+    if (!catalogueWorkloads.value.some(w => w.id === selectedWorkload.value)) {
+      selectedWorkload.value = '';
+      workload.value = null;
+      workloadUnavailable.value = true;
+    }
+    workloadOptionsError.value = '';
+  } catch { if (active) workloadOptionsError.value = 'Current authorized Catalogue workloads unavailable.'; }
+}
+function chooseWorkload(id: string): void {
+  selectedWorkload.value = id;
+  workload.value = null;
+  workloadHolds.value = [];
+  workloadUnavailable.value = true;
+  if (id) void refreshWorkloadReadiness();
+}
 const workload = ref<WorkloadDecision | null>(null);
 const workloadHolds = ref<string[]>([]);
 const workloadUnavailable = ref(true);
 const workloadExpired = ref(true);
 let workloadExpiryTimer: ReturnType<typeof setTimeout> | undefined;
 async function refreshWorkloadReadiness(): Promise<void> {
+  if (!selectedWorkload.value) return;
+  const requested = selectedWorkload.value;
   try {
-    const response = await fetch(url + '/workload-readiness', {
+    const response = await fetch(url + '/workload-readiness?workload=' + encodeURIComponent(requested), {
       credentials: 'same-origin', cache: 'no-store', redirect: 'manual',
       headers: { Accept: 'application/json' },
     });
@@ -184,7 +216,7 @@ async function refreshWorkloadReadiness(): Promise<void> {
     const result = await response.json() as {
       available: boolean; readiness?: WorkloadDecision; holds: string[]; status: string;
     };
-    if (!active || !result.available || !Array.isArray(result.holds)) throw new Error();
+    if (!active || selectedWorkload.value !== requested || !result.available || !Array.isArray(result.holds)) return;
     workload.value = result.readiness ?? null;
     workloadHolds.value = result.holds;
     workloadUnavailable.value = false;
@@ -205,8 +237,16 @@ async function refreshWorkloadReadiness(): Promise<void> {
     <Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}/migration-fleet`" class="text-teal-800 underline">Migration fleet</Link>
     <section class="mt-5 rounded border border-slate-300 p-4" aria-label="Current application workload admission preview">
       <h2 class="text-lg font-semibold">Complete workload migration readiness (Planning v2)</h2>
+      <label class="mt-3 block">Published Catalogue logical workload
+        <select :value="selectedWorkload" @change="chooseWorkload(($event.target as HTMLSelectElement).value)">
+          <option value="">Select current authorized workload</option>
+          <option v-for="item in catalogueWorkloads" :key="item.id" :value="item.id">{{ item.name }} · {{ item.id }}</option>
+        </select>
+      </label>
+      <p v-if="workloadOptionsError" role="alert">{{ workloadOptionsError }}</p>
       <p class="mt-2">This read-only decision is resolved from the confirmed Inventory review, current Catalogue intent, independent field receipts and Planning's admission resolver. It is not an operator-supplied claim or an authorization to execute.</p>
-      <p v-if="workloadUnavailable" role="alert" class="mt-2">Current workload decision is unavailable. Migration remains held.</p>
+      <p v-if="!selectedWorkload" role="status" class="mt-2">Select a current Catalogue VM to resolve its scoped Inventory review and application readiness.</p>
+      <p v-else-if="workloadUnavailable" role="alert" class="mt-2">Current workload decision is unavailable. Migration remains held.</p>
       <template v-else>
         <p :role="workload?.status === 'eligible' && !workloadExpired ? 'status' : 'alert'" class="mt-2 font-semibold">
           {{ workload?.status === 'eligible' && !workloadExpired ? 'Current workload evidence resolved — no native write granted' : 'Workload migration held' }}
@@ -230,7 +270,7 @@ async function refreshWorkloadReadiness(): Promise<void> {
           </div>
         </details>
       </template>
-      <button type="button" class="mt-3 underline" @click="refreshWorkloadReadiness">Refresh current workload evidence</button>
+      <button type="button" class="mt-3 underline" :disabled="!selectedWorkload" @click="refreshWorkloadReadiness">Refresh current workload evidence</button>
     </section>
     <section class="mt-5 rounded border border-slate-300 p-4" aria-label="Source-approved application flow mapping">
       <h2 class="text-lg font-semibold">Required application flows → existing destination controls</h2>
