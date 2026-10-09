@@ -72,7 +72,7 @@ def current_api(name):
         raise ValueError(f"Invalid OpenAPI dialect: {name}")
     ids = set()
     for path, item in doc["paths"].items():
-        expected = set(re.findall(r"\\{([^}]+)\\}", path))
+        expected = set(re.findall(r"\{([^}]+)\}", path))
         for verb, op in item.items():
             if verb not in {"get", "post", "put", "patch", "delete"}:
                 continue
@@ -89,7 +89,7 @@ def current_api(name):
 
 def check_routes():
     source = (ROOT / "services/planning/src/planning/interfaces/migration.py").read_text()
-    match = re.search(r"\\(migration-preparations\\|migration-plans\\|[^()]+\\)", source)
+    match = re.search(r"\(migration-preparations\|migration-plans\|[^()]+\)", source)
     if match is None:
         raise ValueError("Cannot enumerate runtime migration routes")
     runtime = set(match.group()[1:-1].split("|"))
@@ -103,10 +103,10 @@ def check_copies():
         "contracts/schemas/planning/migration-support-v2.json": ["services/planning/src/planning/infrastructure/inputs/migration-support-v2.json"],
         "contracts/schemas/planning/migration-readiness-v2.json": ["services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.json"],
     }.items():
-        canonical = load(source)
+        canonical = (ROOT / source).read_bytes()
         for destination in destinations:
-            if load(destination) != canonical:
-                raise ValueError(f"Packaged contract drift: {destination}")
+            if (ROOT / destination).read_bytes() != canonical:
+                raise ValueError(f"Packaged contract byte drift: {destination}")
 
 def check_native_candidates():
     registry = load("contracts/capabilities/native-security-api-registry-v1.json")
@@ -142,7 +142,7 @@ def check_events():
         text = file.read_text(encoding="utf-8")
         if "asyncapi: 3.0.0" not in text:
             raise ValueError(f"Invalid AsyncAPI release: {file}")
-        links = re.findall(r"\\$ref:\\s+(\\.\\./schemas/events/[\\w.\\/-]+)", text)
+        links = re.findall(r"\$ref:\s+(\.\./schemas/events/[\w./-]+)", text)
         if not links:
             raise ValueError(f"Missing event payload schema references: {file}")
         for link in links:
