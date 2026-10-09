@@ -72,7 +72,7 @@ def read_collection_coverages(
         payload = envelope["payload"]
         key.verify(
             signature,
-            b"multi-tenant/migration-collection-evidence/v1\\x00" + canonical(payload).encode(),
+            b"multi-tenant/migration-collection-evidence/v1\x00" + canonical(payload).encode(),
         )
         shape(payload, {
             "schema_version", "tenant_id", "site_id",
