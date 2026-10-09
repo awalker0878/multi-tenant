@@ -96,6 +96,14 @@ def evaluate(
             elif (type(evidence.get("observed_at")) is not int
                   or not 0 <= now - evidence["observed_at"] < requirement["max_age_seconds"]):
                 reason = "collection_evidence_stale"
+            elif requirement["collection_method"] == "native_get" and (
+                    not isinstance(evidence.get("native_operation"), str)
+                    or not re.fullmatch(
+                        r"GET /[A-Za-z0-9_./:%?=&-]{1,400}",
+                        evidence["native_operation"])
+                    or not isinstance(evidence.get("value_sha256"), str)
+                    or not re.fullmatch(r"[a-f0-9]{64}", evidence["value_sha256"])):
+                reason = "native_get_operation_or_value_digest_missing"
             elif requirement["collection_status"] == "external_evidence_required" and (
                     evidence.get("independent_review") is not True):
                 reason = "independent_owner_evidence_required"
