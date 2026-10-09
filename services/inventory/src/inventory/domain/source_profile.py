@@ -285,6 +285,9 @@ def source_observation(profile: dict[str, Any], binding: dict[str, Any]) -> dict
         "facts": {
             "cpu": facts["cpu"],
             "memory_mb": facts["memory_mb"],
+            "observed_at": int(profile["collected_at"]) if isinstance(
+                profile.get("collected_at"), (int, float)
+            ) else None,
             "firmware": facts["firmware"],
             "secure_boot": secure_boot,
             # Guest identifiers are raw platform classifications, not
