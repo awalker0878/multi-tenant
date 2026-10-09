@@ -157,3 +157,101 @@ def test_incomplete_eligible_readiness_must_not_leave_planning() -> None:
     assert result["status"] == "eligible"
     with pytest.raises(Rejected, match="migration_workload_contract_invalid"):
         validate_workload_contract(result)
+
+
+def test_complete_workload_readiness_contract_is_accepted_and_nested_drift_denied() -> None:
+    """Synthetic wire-conformance example, never native E3/E4 qualification."""
+    from copy import deepcopy
+
+    uid = "10000000-0000-4000-8000-000000000001"
+    def h(text: str) -> str:
+        return digest(text)
+
+    source = {"platform": "vmware", "installation_id": "source-installation",
+              "profile_sha256": h("source"), "versions": {"vcenter": "8.0"}}
+    target = {"platform": "ahv", "installation_id": "target-installation",
+              "profile_sha256": h("target"), "versions": {"prism": "v4.3"}}
+    reconciliation = {
+        "schema_version": 1,
+        "catalogue_revision_id": uid,
+        "catalogue_sha256": h("catalogue"),
+        "source_identity_sha256": h("identity"),
+        "source_generation_id": uid,
+        "source_profile_sha256": source["profile_sha256"],
+        "source_observation_sha256": h("source-observation"),
+        "native_review_sha256": h("native-review"),
+        "status": "matched",
+        "workloads": [{
+            "workload_id": uid, "status": "matched", "holds": [],
+            "source_identity_sha256": h("identity"),
+            "field_dispositions": [{
+                "field": "cpu.count", "disposition": "matched", "required": True,
+                "desired_value": "2", "observed_value": "2",
+                "evidence_source": "inventory_native_profile",
+                "evidence_age_seconds": 1, "next_action": "none",
+            }],
+        }],
+        "holds": [], "expires_at": 2000000000,
+        "native_write_authorized": False,
+    }
+    reconciliation["reconciliation_sha256"] = h(reconciliation)
+    coverage = []
+    for scope, platform, installation in (
+        ("source", "vmware", source["installation_id"]),
+        ("target", "ahv", target["installation_id"]),
+        ("owner", "vmware", source["installation_id"]),
+    ):
+        observation = {
+            "schema_version": 1, "platform": platform, "scope": scope,
+            "installation_id": installation, "generation_id": uid,
+            "installed_tuple_sha256": h(platform + "installed"),
+            "manifest_sha256": h("collection-manifest"),
+            "evaluated_at": 100, "status": "complete",
+            "attributes": [{
+                "attribute_id": scope + ".vm", "status": "observed",
+                "reason": "native", "severity": "critical",
+            }],
+            "holds": [], "independent_e3_e4_qualification": False,
+            "native_write_authorized": False, "expires_at": 2000000000,
+        }
+        observation["coverage_sha256"] = h(observation)
+        coverage.append(observation)
+    result = {
+        "schema_version": 2, "kind": "migration_workload_readiness",
+        "scope": {"tenant_id": uid, "application_id": uid,
+                  "environment_id": uid, "site_id": uid},
+        "route_sha256": h("route"), "tranche_sha256": h("tranche"),
+        "release_sha256": h("release"),
+        "source": source, "target": target, "method": "cold_export",
+        "api_compatibility": {
+            "status": "eligible", "operationally_eligible": True,
+            "cases": [{
+                "capability_id": "vm.disk.read", "side": "source",
+                "criticality": "critical", "status": "eligible",
+                "reason": "synthetic conformance example",
+                "evidence_sha256": h("api-evidence"),
+                "selected_api_family": "vcenter",
+                "selected_api_version": "8.0",
+                "omission_accepted": False, "expires_at": 2000000000,
+            }],
+            "administrator_alerts": [], "native_write_authorized": False,
+        },
+        "native_e3_qualified": True, "receiving_e4_accepted": True,
+        "status": "eligible", "holds": [], "expires_at": 2000000000,
+        "evaluated_at": 100, "workload_admission_authorized": False,
+        "native_write_authorized": False,
+        "workload_reconciliation": reconciliation,
+        "collection_coverages": coverage,
+    }
+    result["readiness_sha256"] = h(result)
+    validate_workload_contract(result)
+    invalid = deepcopy(result)
+    invalid["workload_reconciliation"]["workloads"][0]["field_dispositions"][0][
+        "evidence_source"
+    ] = "unrecognized"
+    with pytest.raises(Rejected, match="migration_workload_contract_invalid"):
+        validate_workload_contract(invalid)
+    duplicate_scope = deepcopy(result)
+    duplicate_scope["collection_coverages"][2]["scope"] = "source"
+    with pytest.raises(Rejected, match="migration_workload_contract_invalid"):
+        validate_workload_contract(duplicate_scope)
