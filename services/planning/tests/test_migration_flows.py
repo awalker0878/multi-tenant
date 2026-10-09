@@ -113,5 +113,10 @@ def test_optional_application_dependency_cannot_be_silently_discarded() -> None:
     optional["required"] = False
     current["choices"].append(optional)
     assert MigrationFlows.evaluate(current, required, NOW) == [
+        "application_flow_optional_omission_declaration_required"
+    ]
+    omission = [{"source_flow_id": optional["source_flow_id"],
+                 "reason_code": "replaced_by_native_service"}]
+    assert MigrationFlows.evaluate(current, required, NOW, omission) == [
         "application_flow_optional_omission_approval_required"
     ]
