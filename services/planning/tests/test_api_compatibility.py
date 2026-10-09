@@ -110,6 +110,7 @@ def test_different_api_releases_do_not_block_qualified_operations() -> None:
     assert [case["status"] for case in result["cases"]] == [
         "eligible", "eligible", "unknown",
     ]
+    assert [case["expires_at"] for case in result["cases"]] == [140, 140, None]
     assert result["administrator_alerts"] == [
         {
             "capability_id": "network.firewall.cosmetic_rule",
