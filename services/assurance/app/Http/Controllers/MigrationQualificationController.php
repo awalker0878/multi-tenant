@@ -132,7 +132,10 @@ final class MigrationQualificationController
                                     || ! is_string($case['workload_id'] ?? null)
                                     || $case['workload_id'] === ''
                                     || isset($seenWorkloads[$case['workload_id']])
-                                    || ($case['source_profile_sha256'] ?? null) !== ($candidateFlows['source_profile_sha256'] ?? null)
+                                    // Per-VM source identities may differ from
+                                    // the selected route source profile; Planning
+                                    // binds each one to that VM's current native
+                                    // observation. The root E4 digest signs all.
                                     || ($case['target_profile_sha256'] ?? null) !== ($candidateFlows['target_profile_sha256'] ?? null)
                                     || ($case['level'] ?? null) !== 'E4'
                                     || ($case['decision'] ?? null) !== 'accepted'
@@ -190,7 +193,10 @@ final class MigrationQualificationController
                                     || ! is_int($case['native_key'] ?? null)
                                     || $case['native_key'] < 0
                                     || ($case['disposition'] ?? null) !== 'uncatalogued_attested'
-                                    || ($case['source_profile_sha256'] ?? null) !== ($candidateFlows['source_profile_sha256'] ?? null)
+                                    // Per-VM source identities may differ from
+                                    // the selected route source profile; Planning
+                                    // binds each one to that VM's current native
+                                    // observation. The root E4 digest signs all.
                                     || ($case['target_profile_sha256'] ?? null) !== ($candidateFlows['target_profile_sha256'] ?? null)
                                     || ($case['level'] ?? null) !== 'E4'
                                     || ($case['decision'] ?? null) !== 'accepted'
