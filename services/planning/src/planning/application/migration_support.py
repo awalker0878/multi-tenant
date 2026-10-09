@@ -65,8 +65,8 @@ class MigrationSupport:
                 row["readiness"] = resolved
                 if resolved["status"] != "eligible":
                     row["blockers"] = sorted(set(row["blockers"] + resolved["holds"]))
-                    row["native_qualified"] = False
-                    row["operationally_accepted"] = False
+                    # Preserve independent E3/E4 decisions even when the composite
+                    # route is held for API usage, scope, time or another gate.
         return {
             "schema_version": 1,
             "tranche_sha256": digest(selected),
