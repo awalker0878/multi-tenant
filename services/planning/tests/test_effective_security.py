@@ -320,7 +320,7 @@ def test_optional_dependencies_can_be_offered_for_explicit_waiver():
         "source_document": src, "document": dst, "boundary": boundary(),
     }]
     choices = MigrationFlows.qualified_native_choices(
-        intent, "ahv", cases, NOW, {"forbidden_flows": [FORBIDDEN]},
+        intent, "ahv", cases, NOW, {"forbidden_flows": [FORBIDDEN]}, "tenant-prod",
     )
     assert choices[0]["status"] == "choices_observed"
     assert choices[1]["required"] is False
