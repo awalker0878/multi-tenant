@@ -65,7 +65,8 @@ def evaluate(
         if conditional and (predicate is None or predicate.get("applicable") is not True
                             or predicate.get("condition") != requirement["condition"]
                             or type(predicate.get("observed_at")) is not int
-                            or not 0 <= now - predicate["observed_at"] < requirement["max_age_seconds"]):
+                            or not 0 <= now - predicate["observed_at"]
+                            < requirement["max_age_seconds"]):
             results.append({"attribute_id": key, "status": status,
                             "reason": reason, "severity": requirement["severity"]})
             continue
