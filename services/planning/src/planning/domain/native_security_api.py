@@ -44,7 +44,11 @@ def qualify(document: dict[str, Any]) -> bool:
     if (needed is None or profile.get("verified") is not True
             or profile.get("observer") != document.get("observer_principal")
             or profile.get("environment_scope") != document.get("native_scope")
-            or profile.get("profile_sha256") is None
+            or not isinstance(profile.get("profile_sha256"), str)
+            or len(profile["profile_sha256"]) != 64
+            or any(c not in "0123456789abcdef" for c in profile["profile_sha256"])
+            or not isinstance(profile.get("native_origin_id"), str)
+            or not profile["native_origin_id"]
             or not isinstance(installed, dict)
             or not isinstance(installed.get("version"), str)
             or not installed["version"]
