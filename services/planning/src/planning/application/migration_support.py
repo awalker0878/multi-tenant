@@ -4,6 +4,7 @@ from collections.abc import Callable
 from typing import Any
 
 from planning.domain.api_compatibility import evaluate as evaluate_api
+from planning.domain.migration_readiness import resolve as resolve_readiness
 from planning.domain.capability_definitions import METHOD_ALIASES as METHODS
 from planning.domain.expansion import matrix, tranche
 from planning.domain.model import Actor, Rejected, digest
@@ -52,12 +53,18 @@ class MigrationSupport:
         for direction in directions:
             for row in direction["routes"]:
                 route = by_id[row["route_id"]]
-                if "api_usage" not in route:
-                    continue
                 api = self.api_status(actor, site, route)
                 row["api_compatibility"] = api
-                if not api["operationally_eligible"]:
-                    row["blockers"].append("api_capabilities_unresolved")
+                resolved = resolve_readiness(
+                    route, row, api,
+                    {"tenant_id": actor.tenant, "application_id": actor.application,
+                     "environment_id": actor.environment, "site_id": site},
+                    digest(selected), selected["release_sha256"], selected["expires_at"],
+                    self.clock(),
+                )
+                row["readiness"] = resolved
+                if resolved["status"] != "eligible":
+                    row["blockers"] = sorted(set(row["blockers"] + resolved["holds"]))
                     row["native_qualified"] = False
                     row["operationally_accepted"] = False
         return {
@@ -68,7 +75,7 @@ class MigrationSupport:
             "native_write_authorized": False,
         }
 
-    def require(self, actor: Actor, site: str, binding: dict[str, Any]) -> None:
+    def require(self, actor: Actor, site: str, binding: dict[str, Any]) -> dict[str, Any]:
         # A native route is not ready merely because a hypervisor capability
         # matrix passed: owner-approved application paths and negative tests
         # have an independent, expiring approval gate.
@@ -131,9 +138,7 @@ class MigrationSupport:
             ):
                 raise Rejected("migration_qualified_artifacts_or_requirements_changed", 423)
         for candidate in candidates:
-            if "api_usage" in candidate and not self.api_status(
-                actor, site, candidate
-            )["operationally_eligible"]:
+            if not self.api_status(actor, site, candidate)["operationally_eligible"]:
                 raise Rejected("migration_api_capabilities_unresolved", 423)
         records = self.observations(actor, site, selected)
         rows = matrix(selected, records, self.clock())
@@ -146,3 +151,24 @@ class MigrationSupport:
         ]
         if not qualified:
             raise Rejected("migration_direction_qualification_required", 423)
+        # Resolve the same contract presented to operators, but against the
+        # current route/evidence at every service-only native admission read.
+        if len(candidates) != 1:
+            raise Rejected("migration_readiness_route_ambiguous", 423)
+        candidate = candidates[0]
+        matching = [
+            row for direction in rows for row in direction["routes"]
+            if row["route_id"] == candidate["id"]
+        ]
+        if len(matching) != 1:
+            raise Rejected("migration_readiness_route_missing", 423)
+        readiness = resolve_readiness(
+            candidate, matching[0], self.api_status(actor, site, candidate),
+            {"tenant_id": actor.tenant, "application_id": actor.application,
+             "environment_id": actor.environment, "site_id": site},
+            digest(selected), selected["release_sha256"], selected["expires_at"],
+            self.clock(),
+        )
+        if readiness["status"] != "eligible":
+            raise Rejected("migration_readiness_held", 423)
+        return readiness
