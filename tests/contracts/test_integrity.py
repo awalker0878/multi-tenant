@@ -1,5 +1,7 @@
 """Intentional negative canaries for the cross-service contract gate."""
 from pathlib import Path
+import json
+import tempfile
 import sys
 import unittest
 from unittest.mock import patch
@@ -18,6 +20,36 @@ class ContractIntegrityTests(unittest.TestCase):
         sources, bundles = verify()
         self.assertGreaterEqual(sources, 6)
         self.assertGreaterEqual(bundles, 9)
+
+    def test_published_bundle_cannot_be_rewritten_by_source_builder(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "contracts/source/example-v1"
+            source.mkdir(parents=True)
+            (source / "base.json").write_text('{"title": "immutable"}')
+            (source / "properties.json").write_text('{"name": {"type": "string"}}')
+            (source / "manifest.json").write_text(json.dumps({
+                "schema_version": 1,
+                "target": "contracts/schemas/example-v1.json",
+                "base": "base.json",
+                "parts": {"properties": {
+                    "kind": "object", "files": ["properties.json"],
+                }},
+                "copies": ["apps/example/resources/contracts/example-v1.json"],
+            }))
+            target = root / "contracts/schemas/example-v1.json"
+            target.parent.mkdir(parents=True)
+            original = '{"title":"immutable","properties":{"name":{"type":"string"}}}\n'
+            target.write_text(original)
+            with patch("build.ROOT", root), patch("build.SOURCE", root / "contracts/source"):
+                verify(write=True)
+                consumer = root / "apps/example/resources/contracts/example-v1.json"
+                self.assertEqual(target.read_text(), original)
+                self.assertEqual(consumer.read_bytes(), target.read_bytes())
+                (source / "properties.json").write_text('{"name": {"type": "integer"}}')
+                with self.assertRaisesRegex(ValueError, "Published contract requires a new version"):
+                    verify(write=True)
+                self.assertEqual(target.read_text(), original)
 
     def test_active_routes_and_copies(self):
         check_routes()
