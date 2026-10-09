@@ -651,7 +651,7 @@ class Discovery:
                             "policies",
                         )
                     )
-                    maximum_reads = 2 + 5 * min(p.max_pages, 10) + 8
+                    maximum_reads = 2 + 5 * min(p.max_pages, 10) + 11
                 if (
                     body["observations"]
                     or "configuration" in body
