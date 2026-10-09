@@ -559,8 +559,8 @@ class MountedMigrationRuntime:
             ):
                 raise NativeHeld("ahv_observer_origin_changed")
             writer_api, reader_api = (
-                AhvHttp(writer_endpoint),
-                AhvHttp(reader_endpoint, read_only=True),
+                AhvHttp(writer_endpoint, api_versions=plan.get("api_versions")),
+                AhvHttp(reader_endpoint, read_only=True, api_versions=plan.get("api_versions")),
             )
 
             def ahv_identity_check() -> None:
