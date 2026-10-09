@@ -225,6 +225,10 @@ def current_application_flow_proof(
                 or case["document"].get("platform") != platform
                 or not isinstance(case["source_document"], dict)
                 or case["source_document"].get("platform") != source_platform
+                or case["source_document"].get("api_profile", {}).get("profile_sha256")
+                    != binding["source"]["profile_sha256"]
+                or case["document"].get("api_profile", {}).get("profile_sha256")
+                    != binding["target"]["profile_sha256"]
             ):
                 raise Rejected("native_security_e4_case_mismatch", 423)
             boundary = compare_policy_boundary(
