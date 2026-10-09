@@ -159,6 +159,20 @@ components:
         with self.assertRaisesRegex(ValueError, "Invalid"):
             local_refs({"field":{"$ref":"#/definitions/missing"}}, "negative")
 
+    def test_asyncapi_cannot_disappear_from_both_registries(self):
+        registry = load("architecture/contract-consumers.json")
+        missing = "contracts/asyncapi/identity.yaml"
+        registry["contracts"].pop(missing)
+        registry["active_releases"] = [
+            entry for entry in registry["active_releases"] if entry["path"] != missing
+        ]
+        original = load
+        with patch("check.load", side_effect=lambda name:
+                   registry if name == "architecture/contract-consumers.json"
+                   else original(name)):
+            with self.assertRaisesRegex(ValueError, "Deployed AsyncAPI missing"):
+                check_consumer_registry()
+
     def test_runtime_copies_cannot_disappear_from_both_registries(self):
         from runtime_inventory import verify_runtime_inventory
         registry = load("architecture/contract-consumers.json")
