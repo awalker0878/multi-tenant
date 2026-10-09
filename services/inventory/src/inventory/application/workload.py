@@ -7,7 +7,7 @@ from inventory.application.ports import Transaction
 from inventory.domain.discovery import Actor, Rejected, canonical, digest, identifier, shape
 from inventory.domain.migration import destination_input
 from inventory.domain.destination_security import source_rule_choices, source_security_ids
-from inventory.domain.source_profile import source_identity
+from inventory.domain.source_profile import source_identity, source_observation
 from inventory.domain.workload import METHODS, OWNER_FIELDS, review_input
 
 
@@ -323,6 +323,7 @@ class WorkloadProfiles:
                 "target_disk_formats": target["facts"]["disk_formats"],
                 "source": self.binding(source),
                 "target": self.binding(target),
+                "source_observation": source_observation(source, self.binding(source)),
                 "datasets": review["input"]["datasets"],
                 "disks": source["facts"]["disks"],
                 "owner_inputs": review["input"]["owner_inputs"],
