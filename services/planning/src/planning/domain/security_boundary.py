@@ -45,6 +45,55 @@ def _verified(document: dict[str, Any], key: str, flow: dict[str, Any],
             and now < p["expires_at"] <= p["observed_at"] + 60)
 
 
+def _partition(document: dict[str, Any], universe: str,
+               class_ids: set[str]) -> bool:
+    """External qualified closed-world partition bound to exact native rules.
+
+    A few independent packet probes do not prove absence of extra permits.
+    The native observer must separately attest a disjoint complete partition
+    of every workload pair/port/protocol/IP-family class in the requested
+    boundary. Wildcards or unenumerated ranges cannot be qualified.
+    """
+    proof = document.get("policy_partition")
+    if not isinstance(proof, dict):
+        return False
+    rules = document.get("rules")
+    native = {
+        "rules": rules,
+        "ports": document.get("ports"),
+        "security_groups": document.get("security_groups"),
+        "groups": document.get("groups"),
+        "services": document.get("services"),
+        "workloads": document.get("workloads"),
+        "api_profile": document.get("api_profile"),
+    }
+    allowed = proof.get("permitted_class_ids")
+    return (
+        proof.get("schema_version") == 1
+        and proof.get("mode") == "disjoint_effective_rule_partition"
+        and proof.get("complete") is True
+        and proof.get("independently_verified") is True
+        and proof.get("observer") == document.get("observer_principal")
+        and proof.get("observer") != document.get("writer_principal")
+        and proof.get("universe_sha256") == universe
+        and proof.get("native_rule_set_sha256") == digest(native)
+        and proof.get("uncovered_classes") == 0
+        and proof.get("unbounded_wildcards") is False
+        and isinstance(proof.get("class_ids"), list)
+        and len(proof["class_ids"]) == len(class_ids)
+        and set(proof["class_ids"]) == class_ids
+        and isinstance(allowed, list)
+        and len(allowed) == len(set(allowed))
+        and set(allowed) <= class_ids
+        and proof.get("partition_sha256") == digest({
+            "universe": universe,
+            "native": digest(native),
+            "classes": sorted(class_ids),
+            "permitted": sorted(allowed),
+        })
+    )
+
+
 def compare(source: dict[str, Any], target: dict[str, Any],
             boundary: dict[str, Any], now: int) -> dict[str, Any]:
     """Exact finite traffic universe: destination may not expand access.
@@ -63,6 +112,15 @@ def compare(source: dict[str, Any], target: dict[str, Any],
             or source["boundary_scope"].get("generation_id") ==
                target["boundary_scope"].get("generation_id")):
         return result | {"reason": "source_destination_boundary_not_complete"}
+    class_ids = {
+        row.get("id")
+        for row in boundary["classes"]
+        if isinstance(row, dict) and isinstance(row.get("id"), str)
+    }
+    universe = digest(sorted(class_ids))
+    if not (_partition(source, universe, class_ids)
+            and _partition(target, universe, class_ids)):
+        return result | {"reason": "closed_world_policy_partition_unqualified"}
     seen: set[str] = set()
     allowed = []
     denied = []
@@ -80,6 +138,15 @@ def compare(source: dict[str, Any], target: dict[str, Any],
             dst_verdict, _ = decision(target, f)
         except (Unqualified, KeyError, TypeError, ValueError):
             return result | {"reason": "provider_policy_boundary_unqualified"}
+        if (
+            (src_verdict == "allow") != (
+                case["id"] in source["policy_partition"]["permitted_class_ids"]
+            )
+            or (dst_verdict == "allow") != (
+                case["id"] in target["policy_partition"]["permitted_class_ids"]
+            )
+        ):
+            return result | {"reason": "attested_native_partition_verdict_mismatch"}
         if (not _verified(source, case["id"], f, src_verdict, now)
                 or not _verified(target, case["id"], f, dst_verdict, now)):
             return result | {"reason": "independent_policy_boundary_probe_missing"}
