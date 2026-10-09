@@ -367,12 +367,55 @@
                     },
                     "required": {
                       "type": "boolean"
+                    },
+                    "desired_value": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 500
+                    },
+                    "observed_value": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 500
+                    },
+                    "evidence_source": {
+                      "type": "string",
+                      "enum": [
+                        "inventory_native_profile",
+                        "unobserved",
+                        "independent_e4"
+                      ]
+                    },
+                    "evidence_age_seconds": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 0
+                    },
+                    "next_action": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "review_independently_qualified_transformation",
+                        "collect_native_or_independent_guest_and_key_evidence",
+                        "resolve_native_drift_with_owner_and_independent_e4_assurance"
+                      ]
                     }
                   },
                   "required": [
                     "field",
                     "disposition",
-                    "required"
+                    "required",
+                    "desired_value",
+                    "observed_value",
+                    "evidence_source",
+                    "evidence_age_seconds",
+                    "next_action"
                   ]
                 }
               }
