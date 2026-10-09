@@ -27,14 +27,15 @@ def evaluate(
         raise Rejected("migration_collection_receipt_bound")
     expected = {"installation_id": installation_id, "generation_id": generation_id,
                 "installed_tuple_sha256": installed_tuple_sha256, "scope": scope}
-    keys: set[str] = set()
-    for item in observations + applicability:
-        if not isinstance(item, dict) or any(item.get(k) != v for k, v in expected.items()):
-            raise Rejected("migration_collection_cross_scope_evidence", 403)
-        identity = item.get("attribute_id")
-        if not isinstance(identity, str) or identity in keys:
-            raise Rejected("migration_collection_ambiguous_receipt")
-        keys.add(identity)
+    for collection in (observations, applicability):
+        keys: set[str] = set()
+        for item in collection:
+            if not isinstance(item, dict) or any(item.get(k) != v for k, v in expected.items()):
+                raise Rejected("migration_collection_cross_scope_evidence", 403)
+            identity = item.get("attribute_id")
+            if not isinstance(identity, str) or identity in keys:
+                raise Rejected("migration_collection_ambiguous_receipt")
+            keys.add(identity)
     facts = {row["attribute_id"]: row for row in observations}
     predicates = {row["attribute_id"]: row for row in applicability}
     results: list[dict[str, Any]] = []
@@ -52,7 +53,8 @@ def evaluate(
                 reason = "applicability_not_independently_resolved"
             elif (type(predicate.get("applicable")) is not bool
                   or not isinstance(predicate.get("evidence_sha256"), str)
-                  or not 0 <= now - predicate.get("observed_at", -1) < requirement["max_age_seconds"]):
+                  or type(predicate.get("observed_at")) is not int
+                  or not 0 <= now - predicate["observed_at"] < requirement["max_age_seconds"]):
                 reason = "applicability_evidence_stale_or_invalid"
             elif predicate["applicable"] is False:
                 status, reason = "not_applicable", "independently_observed_absent"
@@ -61,7 +63,9 @@ def evaluate(
                             "severity": requirement["severity"]})
             continue
         if conditional and (predicate is None or predicate.get("applicable") is not True
-                            or predicate.get("condition") != requirement["condition"]):
+                            or predicate.get("condition") != requirement["condition"]
+                            or type(predicate.get("observed_at")) is not int
+                            or not 0 <= now - predicate["observed_at"] < requirement["max_age_seconds"]):
             results.append({"attribute_id": key, "status": status,
                             "reason": reason, "severity": requirement["severity"]})
             continue
