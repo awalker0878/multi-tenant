@@ -71,3 +71,22 @@ def test_unknown_group_references_do_not_generate_selectable_rules():
     unknown = rules()
     unknown.pop("stateful")
     assert rule_choices(unknown) is None
+
+
+def test_unqualified_vendor_deny_actions_not_mapped_as_allow_rules():
+    altered = rules()
+    altered["security_group_rules"][0]["action"] = "deny"
+    assert rule_choices(altered) is None
+    assert security_semantics(altered) is None
+
+
+def test_bad_address_family_and_inverted_port_range_do_not_supply_choices():
+    altered = rules()
+    altered["security_group_rules"][0]["ethertype"] = "IPv6"
+    with pytest.raises(CollectionFailure):
+        rule_choices(altered)
+    altered = rules()
+    altered["security_group_rules"][0]["port_range_min"] = 8443
+    altered["security_group_rules"][0]["port_range_max"] = 443
+    with pytest.raises(CollectionFailure):
+        rule_choices(altered)
