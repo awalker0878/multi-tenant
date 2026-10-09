@@ -21,7 +21,8 @@ def witness() -> dict:
         "api_field": "data.extId", "api_family": "vmm",
         "api_version": "v4.3", "status": "read_success",
         "native_operation": "GET /api/vmm/v4.3/ahv/config/vms/123",
-        "value": "native-vm", "observed_at": 100,
+        "value": "native-vm", "response_sha256": digest("native-response"),
+        "observed_at": 100,
         "installation_id": "installation", "generation_id": "generation",
         "installed_tuple_sha256": digest("installed"),
     }
