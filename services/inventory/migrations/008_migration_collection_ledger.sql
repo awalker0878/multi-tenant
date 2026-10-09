@@ -32,7 +32,32 @@ CREATE TABLE IF NOT EXISTS inventory.migration_collection_fields (
   api_family text,
   api_version text,
   native_operation text,
-  value_sha256 char(64) CHECK (value_sha256 IS NULL OR value_sha256 ~ '^[a-f0-9]{64}$'),
+  value_sha256 char(64) CHECK (value_sha256 IS NULL OR value_sha256 ~ '^[a-f0-9]{64}
+  evidence_sha256 char(64) NOT NULL CHECK (evidence_sha256 ~ '^[a-f0-9]{64}$'),
+  observed_at double precision NOT NULL,
+  PRIMARY KEY (envelope_id,scope,attribute_id,evidence_kind)
+);
+CREATE INDEX IF NOT EXISTS migration_collection_fields_history
+  ON inventory.migration_collection_fields (tenant,site,scope,attribute_id,observed_at DESC);
+-- Runtime can append observations but cannot retroactively change or erase them.
+GRANT SELECT,INSERT ON inventory.migration_collection_receipts,
+  inventory.migration_collection_fields TO inventory_runtime;
+COMMIT;
+),
+  source_response_sha256 char(64) CHECK (
+    source_response_sha256 IS NULL OR source_response_sha256 ~ '^[a-f0-9]{64}
+  evidence_sha256 char(64) NOT NULL CHECK (evidence_sha256 ~ '^[a-f0-9]{64}$'),
+  observed_at double precision NOT NULL,
+  PRIMARY KEY (envelope_id,scope,attribute_id,evidence_kind)
+);
+CREATE INDEX IF NOT EXISTS migration_collection_fields_history
+  ON inventory.migration_collection_fields (tenant,site,scope,attribute_id,observed_at DESC);
+-- Runtime can append observations but cannot retroactively change or erase them.
+GRANT SELECT,INSERT ON inventory.migration_collection_receipts,
+  inventory.migration_collection_fields TO inventory_runtime;
+COMMIT;
+
+  ),
   evidence_sha256 char(64) NOT NULL CHECK (evidence_sha256 ~ '^[a-f0-9]{64}$'),
   observed_at double precision NOT NULL,
   PRIMARY KEY (envelope_id,scope,attribute_id,evidence_kind)
