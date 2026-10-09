@@ -18,6 +18,7 @@ def synthetic_current():
         "intent": intent, "destination": destination, "policy": policy,
         "data": native, "choices": choices,
         "context_sha256": "a" * 64,
+        "assessment_id": "10000000-0000-4000-8000-000000000006",
         "expires_at": NOW + 120,
     }
 
