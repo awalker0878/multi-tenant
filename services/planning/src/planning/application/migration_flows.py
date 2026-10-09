@@ -440,3 +440,7 @@ class MigrationFlows:
         if self.execution_proof is None:
             raise Rejected("independent_application_flow_e4_required", 423)
         self.execution_proof(actor, site, saved, self.planning.clock())
+        # A new assessment published while the independent owner calls were
+        # in flight must not inherit the result of this older review.
+        if self._latest_assessment_id(actor, site) != saved["payload"]["assessment_id"]:
+            raise Rejected("application_flow_assessment_superseded", 423)
