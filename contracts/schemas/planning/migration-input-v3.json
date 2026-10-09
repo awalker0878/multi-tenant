@@ -827,6 +827,42 @@
           "pattern": "^[0-9a-f]{64}$"
         }
       }
+    },
+    "catalogue_binding": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "application_id",
+        "environment_id",
+        "revision_id",
+        "intent_sha256",
+        "workload_id"
+      ],
+      "properties": {
+        "application_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "environment_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "intent_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "workload_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
     }
   },
   "required": [
