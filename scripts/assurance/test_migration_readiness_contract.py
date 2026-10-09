@@ -10,7 +10,8 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SCHEMA = ROOT / "contracts/schemas/planning/migration-readiness-v1.json"
+SCHEMA = ROOT / "contracts/schemas/planning/migration-readiness-v2.json"
+ROUTE_SCHEMA = ROOT / "contracts/schemas/planning/migration-readiness-v1.json"
 PLANNING = ROOT / "services/planning/src/planning/domain/migration_readiness.py"
 LIFECYCLE = ROOT / "services/lifecycle/src/lifecycle/domain/migration_readiness.py"
 CONSOLE = ROOT / "apps/console/resources/js/pages/planning/MigrationSupport.vue"
@@ -34,14 +35,18 @@ def literal_keys(path: Path, name: str) -> set[str]:
 class ResolvedMigrationReadinessContractTests(unittest.TestCase):
     def test_planning_lifecycle_and_wire_schema_share_exact_keys(self) -> None:
         schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
-        produced = literal_keys(PLANNING, "result") | {"readiness_sha256"}
+        route_schema = json.loads(ROUTE_SCHEMA.read_text(encoding="utf-8"))
+        route_produced = literal_keys(PLANNING, "result") | {"readiness_sha256"}
+        produced = route_produced | {"workload_reconciliation", "collection_coverages"}
         consumed = literal_keys(LIFECYCLE, "REQUIRED")
+        self.assertEqual(set(route_schema["required"]), route_produced)
         self.assertEqual(set(schema["required"]), produced)
         self.assertEqual(consumed, produced)
         self.assertEqual(set(schema["properties"]), produced)
         self.assertFalse(schema["additionalProperties"])
-        self.assertEqual(schema["properties"]["schema_version"]["const"], 1)
-        self.assertEqual(schema["properties"]["kind"]["const"], "migration_route_readiness")
+        self.assertEqual(schema["properties"]["schema_version"]["const"], 2)
+        self.assertEqual(schema["properties"]["kind"]["const"], "migration_workload_readiness")
+        self.assertIn("def resolve_workload(", PLANNING.read_text(encoding="utf-8"))
 
     def test_execution_authority_is_not_created_by_readiness(self) -> None:
         schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
