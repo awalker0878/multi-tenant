@@ -88,6 +88,19 @@ class ContractIntegrityTests(unittest.TestCase):
         check_readiness_projection()
         check_consumer_registry()
 
+    def test_new_schema_without_unique_identifier_is_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            schema_dir = root / "contracts/schemas/new"
+            schema_dir.mkdir(parents=True)
+            (schema_dir / "readiness-v99.json").write_text(json.dumps({
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+            }))
+            with patch("check.ROOT", root):
+                with self.assertRaisesRegex(ValueError, "Schema identity required"):
+                    check_schema_dialects()
+
     def test_missing_reference_is_detected(self):
         with self.assertRaisesRegex(ValueError, "Invalid"):
             local_refs({"field":{"$ref":"#/definitions/missing"}}, "negative")
