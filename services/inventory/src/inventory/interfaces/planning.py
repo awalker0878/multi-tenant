@@ -102,6 +102,8 @@ class PlanningInputApp:
                     site,
                     int(endpoint),
                     generation,
+                    application,
+                    environment,
                 )
             elif "/planning-capability-inputs/" in scope["path"]:
                 payload = await asyncio.to_thread(
