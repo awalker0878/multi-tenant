@@ -92,7 +92,7 @@ def profile_payload(
                  "nsx_policy_observation": value.get("nsx_policy_observation")}
     p = shape(
         value,
-        SOURCE_FIELDS
+        SOURCE_FIELDS | ({"secure_boot"} if "secure_boot" in value else set())
         if source
         else AHV_FIELDS
         if ahv
@@ -117,6 +117,8 @@ def profile_payload(
     for hold in p["holds"]:
         text(hold, 100)
     if source:
+        if "secure_boot" in p and p["secure_boot"] is not None and type(p["secure_boot"]) is not bool:
+            raise Rejected("source_secure_boot_observation_invalid")
         if p["vm_id"] not in stream["vm_ids"] or p["api_version"] != stream["api_version"]:
             raise Rejected("foreign_profile_scope", 403)
         for field in ("config_sha256", "snapshot_tree_sha256", "key_custody_sha256"):
