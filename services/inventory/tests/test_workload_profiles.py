@@ -285,3 +285,19 @@ def test_profiles_reviews_and_confirmations_survive_restart_and_reject_stale_sco
     c.now += 400
     with pytest.raises(Rejected, match="current_migration_review_required"):
         restarted.planning(c.actor.tenant, c.actor.site or "", 1, saved["digest"])
+
+
+def test_confirmed_review_can_pin_exact_catalogue_logical_workload() -> None:
+    body = review(uid(), uid())
+    binding = {
+        "application_id": uid(), "environment_id": uid(),
+        "revision_id": uid(), "workload_id": uid(), "intent_sha256": "1" * 64,
+    }
+    body["catalogue_binding"] = binding
+    review_input(body, profile(1000))
+    body["catalogue_binding"] = {**binding, "intent_sha256": "not-a-digest"}
+    with pytest.raises(Rejected, match="invalid_profile_digest"):
+        review_input(body, profile(1000))
+    body["catalogue_binding"] = {**binding, "untrusted": True}
+    with pytest.raises(Rejected, match="invalid_shape"):
+        review_input(body, profile(1000))
