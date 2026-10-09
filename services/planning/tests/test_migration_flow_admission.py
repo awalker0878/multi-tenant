@@ -20,6 +20,7 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
     site = str(uuid4())
     source_revision, assessment, generation = [str(uuid4()) for _ in range(3)]
     saved = {
+        "reviewed_by_actor": str(uuid4()),
         "context_sha256": "a" * 64,
         "payload": {
             "assessment_id": assessment,
@@ -95,6 +96,20 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
             {"revision_id": source_revision, "intent_sha256": "b" * 64})
         with pytest.raises(Rejected):
             migration_support.current_application_flow_proof(current_actor, site, saved, now)
+
+    # An owner can request an optional omission, but their own signature
+    # cannot double as the independent receiving approval.
+    omission = [{"source_flow_id": "f" * 64,
+                 "reason_code": "replaced_by_native_service"}]
+    saved["payload"]["omissions"] = omission
+    proof["omissions_sha256"] = digest(omission)
+    proof["omissions_approved"] = True
+    proof["omission_approver_id"] = saved["reviewed_by_actor"]
+    monkeypatch.setattr(migration_support, "request", request)
+    with pytest.raises(Rejected, match="independent_optional_flow_approval_required"):
+        migration_support.current_application_flow_proof(current_actor, site, saved, now)
+    proof["omission_approver_id"] = str(uuid4())
+    migration_support.current_application_flow_proof(current_actor, site, saved, now)
 
 
 def test_unavailable_or_superseded_source_requires_new_assessment(
