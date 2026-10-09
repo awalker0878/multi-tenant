@@ -46,6 +46,10 @@ final class MigrationSupportController
             'selections.*.source_flow_id' => ['required', 'regex:/\\A[a-f0-9]{64}\\z/'],
             'selections.*.rule_native_ref' => ['required', 'string', 'max:512'],
             'selections.*.route_native_ref' => ['required', 'string', 'max:512'],
+            'omissions' => ['present', 'array', 'max:512'],
+            'omissions.*' => ['required', 'array:source_flow_id,reason_code'],
+            'omissions.*.source_flow_id' => ['required', 'regex:/\\A[a-f0-9]{64}\\z/'],
+            'omissions.*.reason_code' => ['required', 'in:retired_dependency,not_required_at_destination,replaced_by_native_service,accepted_service_limitation'],
         ]);
         try {
             $response = $planning->call(
@@ -55,6 +59,7 @@ final class MigrationSupportController
                     'revision' => (int) $input['revision'],
                     'context_sha256' => $input['context_sha256'],
                     'selections' => $input['selections'],
+                    'omissions' => $input['omissions'],
                 ], $input['command_key'],
             );
         } catch (PlanningFailure $error) {
