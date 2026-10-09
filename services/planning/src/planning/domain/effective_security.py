@@ -55,3 +55,24 @@ def qualify(document: Any, flow: dict[str, Any], now: int) -> dict[str, Any]:
         "native_route_refs": path["native_route_refs"],
         "evidence_sha256": digest(document),
     }
+
+
+def semantic_security_digest(document: dict[str, Any]) -> str:
+    """Fingerprint native effective behavior without short-lived probe metadata.
+
+    Current independent E4 probes remain mandatory at execution. Replacing an
+    expiring receipt for the same rules and installed path does not require
+    the application owner to reselect those native IDs.
+    """
+    return digest({
+        key: document.get(key) for key in (
+            "schema_version", "platform", "native_scope", "enforcement_layer",
+            "native_api_qualified", "api_profile", "default_action",
+            "default_deny_native_ref", "native_origin_id", "topology_sha256",
+            "effective_membership_observed", "workloads", "groups", "services",
+            "rules", "rules_complete", "ports", "security_groups",
+            "microseg_policy_priority_qualified", "policy_types_complete",
+            "paths", "path_set_sha256", "routing_generation_id",
+            "boundary_scope",
+        )
+    })
