@@ -63,6 +63,31 @@ it('forwards VMware destination mappings intact for authoritative inventory vali
         ->assertRedirect($this->base)->assertSessionHasNoErrors();
 });
 
+
+it('accepts only API-ID application ACL bindings, never inline firewall definitions', function (): void {
+    $review = [
+        'source_profile_id' => $this->key, 'target_profile_id' => $this->site,
+        'method' => 'VM_COLD_EXPORT', 'datasets' => [['id' => $this->key]],
+        'owner_inputs' => array_fill_keys(['application_consistency', 'quiesce', 'health', 'delta_protocol', 'cutover', 'rollback', 'backup', 'owner'], 'reviewed'),
+        'objectives' => ['max_outage_seconds' => 0], 'overrides' => [],
+        'destination' => [
+            'platform' => 'openstack', 'project_id' => 'project-1',
+            'security_mappings' => [['source_id' => 'sg-source', 'destination_id' => 'sg-existing']],
+            'flow_mappings' => [[
+                'source_group_id' => 'sg-source', 'source_rule_id' => 'rule-source',
+                'destination_rule_id' => 'rule-existing',
+            ]],
+        ],
+    ];
+    $this->inventory->shouldReceive('call')->once()->with(str_repeat('a', 64), $this->tenant,
+        'saveMigrationReview', ['site' => $this->site], $review, $this->key, null)->andReturn([]);
+    $this->post($this->base, ['operation' => 'save', 'command_key' => $this->key, 'review' => $review])
+        ->assertRedirect($this->base)->assertSessionHasNoErrors();
+    $review['destination']['flow_mappings'][0]['rule_definition'] = 'allow tcp 0.0.0.0/0';
+    $this->post($this->base, ['operation' => 'save', 'command_key' => $this->key, 'review' => $review])
+        ->assertSessionHasErrors('review.destination.flow_mappings.0');
+});
+
 it('rechecks access on polling and applies csrf to migration writes', function (): void {
     $this->inventory->shouldReceive('call')->once()->andThrow(new InventoryFailure(403));
     $this->get($this->base.'/status')->assertRedirect('/account');
