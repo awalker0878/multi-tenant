@@ -19,12 +19,49 @@ from planning.infrastructure.migration_support import selected_tranche
 from planning.interfaces.migration import MigrationPreparationApp
 
 
+
+
+def enroll_qualified_api(route: dict[str, Any]) -> None:
+    route["api_usage"] = [{
+        "capability_id": "vm.disk.transfer", "side": "both",
+        "criticality": "critical", "reason": "Transfer all source disk bytes.",
+    }]
+
+
+def api_owner(route: dict[str, Any]) -> dict[str, Any]:
+    envs, receipts = {}, []
+    for side in ("source", "target"):
+        platform = route[side]
+        envs[side] = {
+            "installation_id": platform["installation_id"],
+            "profile_sha256": platform["profile_sha256"],
+            "apis": {"native.migration": ["1.0"]},
+            "entitlements": {"vm.disk.transfer": "allowed"},
+            "source": "live_probe", "observed_at": 90, "expires_at": 180,
+            "evidence_sha256": digest([side, "api-inventory"]),
+        }
+        receipts.append({
+            "installation_id": platform["installation_id"],
+            "profile_sha256": platform["profile_sha256"],
+            "capability_id": "vm.disk.transfer",
+            "api_family": "native.migration", "api_version": "1.0",
+            "result": "supported", "source": "live_probe",
+            "observed_at": 90, "expires_at": 180,
+            "evidence_sha256": digest([side, "native-probe"]),
+            "qualification_level": "E3", "qualification_decision": "accepted",
+            "qualification_sha256": digest([side, "independent-assurance"]),
+        })
+    return {"route_sha256": digest(route), "environments": envs,
+            "observations": receipts, "omissions": []}
+
+
 def test_current_direction_binding_and_revocation_are_rechecked() -> None:
     selected = baseline()
     for index, row in enumerate(selected["routes"]):
         row["source"]["profile_sha256"] = digest([index, "source"])
         row["target"]["profile_sha256"] = digest([index, "target"])
     route = selected["routes"][0]
+    enroll_qualified_api(route)
     proof: dict[str, Any] = {
         "route_sha256": digest(route),
         "tranche_sha256": digest(selected),
@@ -36,7 +73,11 @@ def test_current_direction_binding_and_revocation_are_rechecked() -> None:
         "evidence_sha256": "a" * 64,
     }
     actor = Actor(str(uuid4()), str(uuid4()), "plan.read", str(uuid4()), str(uuid4()))
-    support = MigrationSupport(lambda *_: selected, lambda *_: [proof], lambda: 100)
+    operating = {**proof, "level": "E4", "evidence_sha256": "b" * 64}
+    support = MigrationSupport(
+        lambda *_: selected, lambda *_: [proof, operating], lambda: 100,
+        lambda _actor, _site, row: api_owner(row),
+    )
     binding = {
         "source": {"profile_sha256": route["source"]["profile_sha256"]},
         "target": {"profile_sha256": route["target"]["profile_sha256"]},
@@ -197,6 +238,7 @@ def test_execution_support_binds_entire_qualified_artifact_set(fault: str) -> No
         recovery_sha256=bound["artifacts"]["recovery"],
     )
     route["constraints"]["disk_format"] = bound["disks"][0]["format"]
+    enroll_qualified_api(route)
     if fault in {"loss_bytes", "accepted_byte_bound"}:
         route["constraints"]["maximum_data_loss_seconds"] = 60
         route["constraints"]["maximum_data_loss_bytes"] = 1024
@@ -220,7 +262,11 @@ def test_execution_support_binds_entire_qualified_artifact_set(fault: str) -> No
         "evidence_sha256": "a" * 64,
     }
     actor = Actor(str(uuid4()), str(uuid4()), "plan.read", str(uuid4()), str(uuid4()))
-    support = MigrationSupport(lambda *_: selected, lambda *_: [proof], lambda: 100)
+    operating = {**proof, "level": "E4", "evidence_sha256": "b" * 64}
+    support = MigrationSupport(
+        lambda *_: selected, lambda *_: [proof, operating], lambda: 100,
+        lambda _actor, _site, row: api_owner(row),
+    )
     if fault in {"services", "datasets"}:
         key = next(iter(o[fault]))
         o[fault][key] = digest("changed")
@@ -244,4 +290,9 @@ def test_execution_support_binds_entire_qualified_artifact_set(fault: str) -> No
     else:
         support.require(actor, SITE, bound)
         # Before recipe selection the review may match several qualified variants.
-        support.require(actor, SITE, {k: bound[k] for k in ("source", "target", "method")})
+        review_only = {k: bound[k] for k in ("source", "target", "method")}
+        if fault == "qualified_variant":
+            with pytest.raises(Rejected, match="route_ambiguous"):
+                support.require(actor, SITE, review_only)
+        else:
+            support.require(actor, SITE, review_only)
