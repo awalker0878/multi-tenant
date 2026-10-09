@@ -125,9 +125,7 @@ final class MigrationQualificationController
                         && is_array($candidateFlows['security_cases'] ?? null)
                         && array_is_list($candidateFlows['security_cases'])
                         && count($candidateFlows['security_cases']) <= 512
-                        && (($candidateFlows['platform'] === 'openstack')
-                            ? $candidateFlows['security_cases'] === []
-                            : count($candidateFlows['security_cases']) > 0)
+                        && count($candidateFlows['security_cases']) > 0
                         && is_array($candidateFlows['checks'] ?? null)
                         && count($candidateFlows['checks']) === count($requiredChecks)
                         && array_diff($requiredChecks, array_keys($candidateFlows['checks'])) === []
