@@ -11,7 +11,7 @@ from typing import Any
 
 from inventory_worker.infrastructure.native import CollectionFailure, exchange, secret
 from inventory_worker.infrastructure.native_identity import native_id
-from inventory_worker.infrastructure.openstack_security import security_semantics
+from inventory_worker.infrastructure.openstack_security import rule_choices, security_semantics
 from inventory_worker.infrastructure.openstack_source_contract import configuration
 from inventory_worker.infrastructure.profile_digest import fingerprint
 
@@ -94,6 +94,7 @@ def collect_openstack_source(
         source_security_groups.append({
             "id": group_id, "project_id": project,
             "semantics_sha256": security_semantics(group),
+            "rules": rule_choices(group),
             "native_sha256": fingerprint(group),
         })
     holds: list[str] = []
