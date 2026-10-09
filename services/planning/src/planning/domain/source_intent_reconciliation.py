@@ -76,6 +76,11 @@ def reconcile(
             expected_firmware = workload["guest"]["firmware"]
             if facts.get("firmware") != {"uefi": "efi", "bios": "bios"}[expected_firmware]:
                 holds.append("source_guest_firmware_drift_or_unobserved")
+            if facts.get("secure_boot") is not workload["guest"]["secure_boot"]:
+                holds.append("source_secure_boot_setting_unobserved_or_changed")
+            if (p.get("owner_dataset_coverage_sha256") != digest(intent.get("datasets", []))
+                    or p.get("owner_dataset_coverage_current") is not True):
+                holds.append("source_dataset_mapping_not_independently_confirmed")
             actual_disks = facts.get("disks")
             desired_disks = workload["disks"]
             if not isinstance(actual_disks, list) or len(actual_disks) != len(desired_disks):
