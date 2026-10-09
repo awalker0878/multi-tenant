@@ -224,13 +224,70 @@ final class MigrationQualificationController
                             }
                         }
                     }
+                    $semanticValid = true;
+                    $semanticCases = $candidateFlows['workload_semantic_cases'] ?? null;
+                    if (array_key_exists('workload_semantic_cases', is_array($candidateFlows) ? $candidateFlows : [])) {
+                        $semanticFields = [
+                            'workload_id', 'field', 'source_profile_sha256',
+                            'intent_field_sha256', 'observed_field_sha256',
+                            'transformation_plan_sha256', 'independent_acceptance_sha256',
+                            'evidence_sha256', 'observed_at', 'expires_at',
+                            'level', 'decision', 'revoked', 'disposition',
+                        ];
+                        $semanticValid = is_array($semanticCases)
+                            && array_is_list($semanticCases)
+                            && count($semanticCases) <= 256;
+                        $seenSemantics = [];
+                        if ($semanticValid) {
+                            foreach ($semanticCases as $case) {
+                                if (! is_array($case) || count($case) !== count($semanticFields)
+                                    || array_diff($semanticFields, array_keys($case)) !== []
+                                    || ! is_string($case['workload_id'] ?? null)
+                                    || ! is_string($case['field'] ?? null)
+                                    || strlen($case['field']) > 240
+                                    || ! in_array($case['disposition'] ?? null,
+                                        ['qualified_transformation', 'approved_omission'], true)
+                                    || ($case['level'] ?? null) !== 'E4'
+                                    || ($case['decision'] ?? null) !== 'accepted'
+                                    || ($case['revoked'] ?? null) !== false
+                                    || ! is_int($case['observed_at'] ?? null)
+                                    || ! is_int($case['expires_at'] ?? null)
+                                    || ! (0 <= time() - $case['observed_at']
+                                          && time() - $case['observed_at'] <= 30)
+                                    || $case['expires_at'] <= time()
+                                    || $case['expires_at'] > ($candidateFlows['expires_at'] ?? 0)) {
+                                    $semanticValid = false;
+                                    break;
+                                }
+                                foreach ([
+                                    'source_profile_sha256', 'intent_field_sha256',
+                                    'observed_field_sha256', 'transformation_plan_sha256',
+                                    'independent_acceptance_sha256', 'evidence_sha256',
+                                ] as $shaField) {
+                                    if (! preg_match('/\\A[a-f0-9]{64}\\z/', (string) $case[$shaField])) {
+                                        $semanticValid = false;
+                                        break;
+                                    }
+                                }
+                                $id = $case['workload_id'].':'.$case['field'];
+                                if (isset($seenSemantics[$id])) {
+                                    $semanticValid = false;
+                                }
+                                $seenSemantics[$id] = true;
+                                if (! $semanticValid) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     if (is_array($candidateFlows)
                         && $interfaceValid
                         && $dispositionValid
+                        && $semanticValid
                         && count($candidateFlows) >= count($flowFields)
-                        && count($candidateFlows) <= count($flowFields) + 2
+                        && count($candidateFlows) <= count($flowFields) + 3
                         && array_diff($flowFields, array_keys($candidateFlows)) === []
-                        && array_diff(array_keys($candidateFlows), [...$flowFields, 'workload_interface_cases', 'disk_disposition_cases']) === []
+                        && array_diff(array_keys($candidateFlows), [...$flowFields, 'workload_interface_cases', 'disk_disposition_cases', 'workload_semantic_cases']) === []
                         && ($candidateFlows['schema_version'] ?? null) === 1
                         && ($candidateFlows['level'] ?? null) === 'E4'
                         && ($candidateFlows['decision'] ?? null) === 'accepted'
