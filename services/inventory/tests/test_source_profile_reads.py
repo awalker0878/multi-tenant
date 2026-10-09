@@ -41,3 +41,10 @@ def test_unknown_port_group_membership_does_not_claim_empty_rules() -> None:
     value = profile([])
     value["native"]["metadata"]["ports"] = [{"security_groups": None}]
     assert source_profile_read_count(value) == 5
+
+
+def test_bounded_maximum_profile_reads_matches_native_collector() -> None:
+    # OpenStack collector caps attached volumes at 32 and unique SGs at 64.
+    assert source_profile_read_count(profile([f"sg-{i}" for i in range(64)], 32)) == 101
+    with pytest.raises(Rejected, match="collection_bound_exceeded"):
+        source_profile_read_count(profile([f"sg-{i}" for i in range(65)], 32))
