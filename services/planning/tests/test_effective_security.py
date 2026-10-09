@@ -405,3 +405,32 @@ def test_nutanix_installed_microseg_api_version_is_feature_qualified():
     p["qualified_features"]["effective-categories"] = "unknown"
     with pytest.raises(Unqualified, match="installed_native_api_features_unqualified"):
         decision(doc, REQUIRED)
+
+
+@pytest.mark.parametrize("platform", ["vmware", "ahv"])
+def test_rule_direction_does_not_convert_wrong_attachment_into_permission(platform):
+    d = document(platform)
+    rule = d["rules"][0]
+    rule["direction"] = "in"
+    if platform == "vmware":
+        rule["policy_applied_to"] = ["grp-web"]
+        rule["rule_applied_to"] = ["grp-db"]
+    else:
+        rule["attached_vm_ids"] = ["vm-web"]
+    assert decision(d, REQUIRED)[0] == "deny"
+    assert qualify(d, REQUIRED, NOW)["status"] == "held"
+
+
+def test_native_rule_change_requires_fresh_complete_partition_attestation():
+    src, dst = document("vmware", "source"), document("ahv", "destination")
+    assert compare(src, dst, boundary(), NOW)["status"] == "qualified"
+    dst["rules"][0]["native_revision"] = "changed-after-observation"
+    assert compare(src, dst, boundary(), NOW)["reason"] == "closed_world_policy_partition_unqualified"
+
+
+def test_sampled_flows_without_policy_partition_never_prove_equivalence():
+    src, dst = document("vmware", "source"), document("openstack", "destination")
+    dst.pop("policy_partition")
+    assert compare(src, dst, boundary(), NOW)["status"] == "held"
+    src["policy_partition"]["class_ids"] = [digest(REQUIRED)]
+    assert compare(src, document("ahv", "destination"), boundary(), NOW)["status"] == "held"
