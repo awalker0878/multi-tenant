@@ -191,6 +191,26 @@ workloads:**
 - Keep missing/incomplete evidence held. **No policy weakening, fabricated
   destination resource, or E2 fallback to E4 is permitted.**
 
+## Implementation ledger and uncompromised release gates
+
+| Phase | Engineering status | Release gate |
+| --- | --- | --- |
+| 1. Correct generic matching and forbidden-flow bypass | Implemented: native provider resolvers, source/destination complete forbidden-flow checks | P05 conformance and signed E4 |
+| 2. Versioned NSX, AHV and Neutron effective policy | Implemented: provider-specific policies; versioned feature registry and consistency CI; E3 native observers | Installed NSX/AHV/Neutron feature-by-feature provider certification |
+| 3. Native VM/NIC/group binding | Implemented: tenant/port/IP identities, NSX realized `compute_ids` and enforcement point; AHV categories/NICs | Independent live network attachment and effective default-rule witnesses |
+| 4. ECMP, PBR, NAT/PAT and return path | Implemented: complete finite directed path set, full packet tuple transitions and native refs | Positive/negative traffic and route-revision conformance under real equipment |
+| 5. Independent E4 qualification | Implemented: scoped observer interfaces, native trace/counter check, signed Assurance consumption, closed-world partition verification | **Not commissioned:** separate native trust identities, active probe infrastructure, exhaustive native partition producer and signed live receipts |
+| 6. Exact source/destination permission comparison | Implemented: native-rule-bound disjoint policy partitions, no destination access expansion, required and forbidden flow coverage | Independently demonstrated full IPv4/IPv6, wildcard, implicit, inter-tenant, ingress/egress coverage |
+| 7. Console and omitted optional flows | Implemented: evidence selectors with native route/NAT provenance and distinct receiving waiver approval | Browser integration/Playwright and real receiving approval |
+| 8. Regression and lifecycle | Added version/priority/attachment, NAT/path, partition, drift, source freshness, omission and revocation tests; lifecycle admission re-reads E4 | All applicable workflows green, E4 refresh/expiry and actual cutover/rollback/rehearsal tests |
+
+**No simulated success is promoted to production qualification.** A queued
+workflow, schema parity, unit fixture, E2 inventory record or single packet
+trace is not sufficient to satisfy the release gate. Keep draft until the
+commissioned native E4 producer has demonstrated that its complete rule
+partition (including unspecified address families and implicit built-in rules)
+is accurate for the installed versions and exact workload scope.
+
 ## Vendor reference points
 
 - Broadcom NSX policy category/scope documentation:
