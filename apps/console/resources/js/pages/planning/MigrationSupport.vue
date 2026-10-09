@@ -48,9 +48,10 @@ type NativeChoice = {
   status: 'choices_observed' | 'held_unobserved'; native_write_authorized: false;
 };
 type NativeBinding = { source_flow_id: string; rule_native_ref: string; route_native_ref: string };
+type NativeOmission = { source_flow_id: string; reason_code: string };
 type FlowChoices = {
   context_sha256: string; revision: number; expires_at: number; choices: NativeChoice[];
-  selections: NativeBinding[]; holds: string[]; status: 'eligible' | 'held' | 'invalidated';
+  selections: NativeBinding[]; omissions: NativeOmission[]; holds: string[]; status: 'eligible' | 'held' | 'invalidated';
   native_write_authorized: false;
 };
 const flowBase = url + '/flow-choices';
@@ -60,7 +61,7 @@ const flowFailure = ref('');
 const flowBusy = ref(false);
 const flowForm = useForm({
   command_key: crypto.randomUUID(), revision: 0, context_sha256: '',
-  selections: [] as NativeBinding[],
+  selections: [] as NativeBinding[], omissions: [] as NativeOmission[],
 });
 let submittedFlowFingerprint = '';
 const missingChoices = computed(() => flowState.value?.choices.filter(c =>
@@ -83,6 +84,17 @@ function flowSelection(id: string, side: 'rule_native_ref' | 'route_native_ref')
 }
 function selectFlow(id: string, side: 'rule_native_ref' | 'route_native_ref', value: string) {
   flowBinding(id)[side] = value;
+  if (value) flowForm.omissions = flowForm.omissions.filter(o => o.source_flow_id !== id);
+}
+function omissionFor(id: string): string {
+  return flowForm.omissions.find(o => o.source_flow_id === id)?.reason_code ?? '';
+}
+function requestOmission(id: string, reason: string) {
+  flowForm.omissions = flowForm.omissions.filter(o => o.source_flow_id !== id);
+  if (reason) {
+    flowForm.omissions.push({ source_flow_id: id, reason_code: reason });
+    flowForm.selections = flowForm.selections.filter(s => s.source_flow_id !== id);
+  }
 }
 async function refreshFlowChoices(): Promise<void> {
   if (!active || flowBusy.value) return;
@@ -103,6 +115,7 @@ async function refreshFlowChoices(): Promise<void> {
       flowForm.context_sha256 = updated.context_sha256;
       flowForm.revision = updated.revision;
       flowForm.selections = updated.selections.map(s => ({ ...s }));
+      flowForm.omissions = updated.omissions.map(o => ({ ...o }));
       flowForm.command_key = crypto.randomUUID();
       submittedFlowFingerprint = '';
       flowForm.clearErrors();
@@ -122,7 +135,7 @@ function saveFlowChoices() {
   const fingerprint = JSON.stringify({
     revision: flowForm.revision,
     context_sha256: flowForm.context_sha256,
-    selections: flowForm.selections,
+    selections: flowForm.selections, omissions: flowForm.omissions,
   });
   if (fingerprint !== submittedFlowFingerprint) {
     flowForm.command_key = crypto.randomUUID();
@@ -171,6 +184,16 @@ onMounted(() => { void refreshFlowChoices(); });
             </label>
           </div>
           <p v-else role="alert">No qualified native controls match this source-defined flow; migration must remain held.</p>
+          <label v-if="!choice.required" class="mt-2 block">Optional dependency disposition (separate approval required)
+            <select :value="omissionFor(choice.source_flow_id)" :disabled="flowForm.processing" @change="requestOmission(choice.source_flow_id, ($event.target as HTMLSelectElement).value)">
+              <option value="">Migrate using existing native controls</option>
+              <option value="retired_dependency">Dependency retired in destination</option>
+              <option value="not_required_at_destination">Not required at destination</option>
+              <option value="replaced_by_native_service">Replaced by approved native service</option>
+              <option value="accepted_service_limitation">Proposed service limitation</option>
+            </select>
+          </label>
+          <p v-if="omissionFor(choice.source_flow_id)" role="alert">This is a request only. A separate receiving approver and independent E4 Assurance proof are required before migration.</p>
         </div>
         <p v-if="flowForm.errors.flow_mapping" role="alert" class="mt-2">{{ flowForm.errors.flow_mapping }}</p>
         <button type="button" class="mt-4 rounded border px-4 py-2" :disabled="!selectionsComplete || flowForm.processing || flowBusy || unavailable || !!flowFailure || flowState.expires_at <= Math.floor(Date.now() / 1000)" @click="saveFlowChoices">Save reviewed application flow selections</button>
