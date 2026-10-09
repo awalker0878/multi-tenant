@@ -23,6 +23,8 @@ def _rows(stream: dict[str, Any], url: str, credential: str,
                       {"Authorization": "Basic " + credential})
     if (not isinstance(result, dict) or result.get("cursor")
             or not isinstance(result.get("results"), list)
+            or (type(result.get("result_count")) is int
+                and result["result_count"] != len(result["results"]))
             or len(result["results"]) > 100
             or any(not isinstance(v, dict) for v in result["results"])):
         raise CollectionFailure("incomplete_effective_security_api")
@@ -59,6 +61,8 @@ def collect(
             or not isinstance(domain, str) or not ID.fullmatch(domain)
             or stream.get("separate_observer_credential_verified") is not True
             or stream.get("native_api_qualified") is not True
+            or stream.get("group_effective_member_types_verified") is not True
+            or not isinstance(stream.get("group_effective_member_types"), dict)
             or any(not isinstance(items, list) or len(items) > MAX_OBJECTS
                    or len(items) != len(set(items))
                    or any(not isinstance(s, str) or not ID.fullmatch(s)
@@ -70,16 +74,36 @@ def collect(
     groups: dict[str, Any] = {}
     services: dict[str, Any] = {}
     for gid in group_ids:
+        # This API returns an empty VM list for groups whose realized
+        # membership is IPs, VIFs, ports or segments. A zero result is NOT
+        # proof that those groups are empty or irrelevant.
+        kinds = stream["group_effective_member_types"].get(gid)
+        if kinds != ["VirtualMachine"]:
+            raise CollectionFailure("nsx_effective_group_member_types_unqualified")
         rows = _rows(
             stream, root + "domains/" + domain + "/groups/" + gid +
             "/members/virtual-machines", credential, before_request,
         )
         member_ids = []
         for item in rows:
-            identity = item.get("external_id")
-            if not isinstance(identity, str) or not identity or identity in member_ids:
+            # NSX realized-VM records expose compute_ids, not necessarily
+            # a top-level external_id. Only accept an unambiguous externalId
+            # native identity from the independently realized observation.
+            compute_ids = item.get("compute_ids")
+            identifiers = (
+                [part.partition(":")[2] for part in compute_ids
+                 if isinstance(part, str) and part.startswith("externalId:")]
+                if isinstance(compute_ids, list) else []
+            )
+            if item.get("external_id"):
+                identifiers.append(item["external_id"])
+            identifiers = sorted(set(identifiers))
+            if (item.get("state") not in (None, "REALIZED")
+                    or len(identifiers) != 1
+                    or not identifiers[0]
+                    or identifiers[0] in member_ids):
                 raise CollectionFailure("nsx_vm_membership_identity_unresolved")
-            member_ids.append(identity)
+            member_ids.append(identifiers[0])
         groups["/infra/domains/" + domain + "/groups/" + gid] = {
             "resolution": "effective_native_members", "complete": True,
             "members": sorted(member_ids), "native_revision": fingerprint(rows),
