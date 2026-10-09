@@ -28,6 +28,7 @@ AHV_FIELDS = {
     "categories",
     "policies",
     "required_capability_evidence",
+    "security_references",
     "holds",
     "native_qualification",
 }
@@ -53,6 +54,24 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
         or p["image_import_methods"] != ["prism-image-url"]
     ):
         raise Rejected("invalid_ahv_profile")
+    references = p["security_references"]
+    if not isinstance(references, dict) or set(references) != {
+        "entity_groups", "address_groups", "service_groups"
+    }:
+        raise Rejected("invalid_ahv_microseg_reference_catalog")
+    for kind, rows in references.items():
+        if not isinstance(rows, list) or len(rows) > 100:
+            raise Rejected("invalid_ahv_microseg_reference_catalog")
+        seen_refs: set[str] = set()
+        for item in rows:
+            shape(item, {"extId", "native_sha256", "resolution"})
+            identifier = native_uuid(item["extId"])
+            if (identifier in seen_refs
+                    or item["resolution"] != "definition_only"
+                    or not isinstance(item["native_sha256"], str)
+                    or re.fullmatch(r"[a-f0-9]{64}", item["native_sha256"]) is None):
+                raise Rejected("invalid_ahv_microseg_reference_catalog")
+            seen_refs.add(identifier)
     for field in ("storage_containers", "subnets", "vpcs", "categories", "policies"):
         rows = p[field]
         if not isinstance(rows, list) or len(rows) > 1000:
