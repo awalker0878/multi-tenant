@@ -103,3 +103,15 @@ def test_source_intent_or_destination_changes_invalidate_saved_owner_selections(
     assert "application_flow_evidence_changed" in result["holds"]
     assert result["revision"] == 3
     assert result["native_write_authorized"] is False
+
+
+def test_optional_application_dependency_cannot_be_silently_discarded() -> None:
+    current = synthetic_current()
+    required = complete_selections(current)
+    optional = deepcopy(current["choices"][0])
+    optional["source_flow_id"] = "b" * 64
+    optional["required"] = False
+    current["choices"].append(optional)
+    assert MigrationFlows.evaluate(current, required, NOW) == [
+        "application_flow_optional_omission_approval_required"
+    ]
