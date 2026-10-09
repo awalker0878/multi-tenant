@@ -10,7 +10,7 @@ def authorize_read(d: Discovery, worker: Worker, body: dict[str, Any]) -> dict[s
     shape(body, {"discovery_id", "lease_token", "sequence", "request_number"})
     job_id, lease = identifier(body["discovery_id"]), identifier(body["lease_token"])
     sequence = number(body["sequence"], 0, 100)
-    request = number(body["request_number"], 1, 52)
+    request = number(body["request_number"], 1, 101)
     with d.database.transaction() as tx:
         tx.execute("SELECT pg_advisory_xact_lock(7404001)")
         j = tx.one("SELECT * FROM inventory.jobs WHERE id=%s", (job_id,))
@@ -40,8 +40,11 @@ def authorize_read(d: Discovery, worker: Worker, body: dict[str, Any]) -> dict[s
             else p.streams
         )
         stream = streams[j["stream"]]
+        # The OpenStack source collector permits 32 volumes and 64 unique Neutron
+        # security groups, plus five fixed GETs. Each is independently charged
+        # against the enrolled endpoint budget; completion checks the exact count.
         limit = (
-            {"vmware": 8, "openstack": 38, "ahv": 4}[p.platform]
+            {"vmware": 8, "openstack": 101, "ahv": 4}[p.platform]
             if stream["kind"] == "source_profile"
             2 + 5 * min(p.max_pages, 10) + 11
             if p.platform == "ahv"
