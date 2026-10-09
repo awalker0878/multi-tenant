@@ -150,7 +150,7 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
                     or type(rule["disabled"]) is not bool
                     or type(rule["sequence_number"]) not in {int, type(None)}
                     or any(not isinstance(rule[k], list) or len(rule[k]) > 100
-                           or any(not isinstance(v, str) or not v.startswith("/infra/")
+                           or any(not isinstance(v, str) or not (v == "ANY" or v.startswith("/infra/"))
                                   for v in rule[k])
                            for k in ("source_groups", "destination_groups", "services"))
                     or rule["service_reference_status"] != "unresolved"
