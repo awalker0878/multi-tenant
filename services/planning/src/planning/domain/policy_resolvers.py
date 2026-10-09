@@ -30,7 +30,15 @@ def identity(document: dict[str, Any], logical: str) -> dict[str, Any]:
     require(isinstance(bindings, dict) and logical in bindings,
             "native_workload_binding_missing")
     row = bindings[logical]
+    require(isinstance(document.get("tenant_id"), str)
+            and document["tenant_id"]
+            and len({v.get("native_vm_id") for v in bindings.values()
+                     if isinstance(v, dict)}) == len(bindings)
+            and len({v.get("port_id") for v in bindings.values()
+                     if isinstance(v, dict)}) == len(bindings),
+            "native_workload_identity_ambiguous")
     require(isinstance(row, dict) and row.get("complete") is True
+            and row.get("tenant_id") == document["tenant_id"]
             and row.get("observed_by") == document.get("observer_principal")
             and isinstance(row.get("native_vm_id"), str) and row["native_vm_id"]
             and isinstance(row.get("tenant_id"), str) and row["tenant_id"]
