@@ -885,6 +885,13 @@
                 ],
                 "additionalProperties": false
               }
+            },
+            "observed_at": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
             }
           }
         },
@@ -1395,6 +1402,13 @@
                       ],
                       "additionalProperties": false
                     }
+                  },
+                  "observed_at": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0
                   }
                 }
               },
