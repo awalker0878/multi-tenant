@@ -12,6 +12,52 @@ This defines **30 feature areas**, **27 operator/independent evidence obligation
 - **No established generic equivalent**: special hardware (GPU/PCI passthrough), unmatched source fields, provider-specific metadata and capabilities that a destination API/version does not expose. The correct decision is **unknown/blocked for critical requirements** until a qualified alternative is demonstrated; optional only if a reviewer proves it has no functional/security impact and the operation is suppressed.
 - **Optional classification is conditional**: labels/descriptions, genuinely nonessential categories and QoS settings and redundant policy rules may be omitted only with E4-reviewed effect suppression. A mandatory rate limit, security group rule, segmentation policy or application dependency is never downgraded just because the same API field is missing on the target.
 
+## Source-defined, API-backed destination security and flow selectors
+
+The migration Console shows a destination feature selector **only when an
+actual source-native fact proves that feature is present**. A VM having a NIC
+does **not** establish source routing or application flows; unsupported or
+unobserved facts are omitted from selectable destination features and are
+reported as explicit unknown/critical discovery holds when relevant. Owner
+requirements remain visible even when native values cannot be read.
+
+For OpenStack, source Neutron ports supply attached security-group IDs within
+the enrolled project. The worker reads each source security group and rule
+(including scope, direction, protocol, address family, port range and literal
+CIDR) and computes a normalized rule fingerprint. The destination worker reads
+project-scoped **existing** Neutron groups and their **existing** native rules.
+Only target groups with compatible complete group semantics appear in the
+security-group dropdown. Only rule IDs whose fingerprints match the selected
+group's exact source ACL rules appear in the per-rule dropdown. Names are
+labels; immutable native IDs are the selected values. The server rejects
+fabricated IDs, omissions, duplicate bindings, mismatched scope or changed
+semantics, including submissions bypassing the frontend. An explicitly observed
+empty source rule list creates **no** artificial destination rule requirement;
+unknown or incomplete source observations are a hold, not a zero count.
+Disappearing destination IDs require a fresh API observation and new review.
+
+**Native ACL rules are not an application-flow dependency inventory.** Native
+Neutron policy may permit traffic that an application does not need, and
+matching ACLs does not demonstrate routing, a matching peer address, return
+path, default deny, tenant isolation or connectivity in the receiving
+environment. Application-required flows are owner-approved requirements and
+must be corroborated against destination-native firewall/route evidence and
+independent allowed/forbidden measurements in Planning. Free-text owner
+references do not create a destination firewall flow. Missing required flows
+**block** readiness and cannot be waived as optional simply because a
+provider lacks equivalent policy primitives.
+
+**VMware / AHV:** vCenter standard inventory and Prism enforced policy lists
+are **not** an observed cross-platform rule-equivalence catalogue. Keep their
+source-policy/receiving-flow holds until a commissioned source policy observer,
+corresponding destination security APIs, normalized mapping and E4 behavior
+verification exist. Do not manufacture a selectable destination policy solely
+because the source has a NIC or the target exposes an unrelated enforced rule.
+
+A saved review references immutable source/destination profile digests; it is
+not migration authorization. Resource placement and measured path assurance
+must be satisfied independently before execution.
+
 ## Feature-level mapping contract
 
 Legend: **Normalize** = data-level conversion candidate with readback; **Adapter** = native operation needs qualified implementation; **Owner + native** = owner input and independent native validation; **Optional/E4** = may be omitted only under verified nonessential conditions.
