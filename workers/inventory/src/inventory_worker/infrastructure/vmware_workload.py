@@ -164,6 +164,7 @@ def normalize(vm: str, release: str, records: dict[str, Any], observed_at: int) 
         "tools_status": guest.get("toolsRunningStatus"),
         "tools_version": guest.get("toolsVersion"),
         "firmware": config.get("firmware"),
+        "secure_boot": boot.get("efiSecureBootEnabled") if type(boot.get("efiSecureBootEnabled")) is bool else None,
         "cpu": hardware.get("numCPU"),
         "memory_mb": hardware.get("memoryMB"),
         "disks": disks,
