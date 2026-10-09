@@ -43,7 +43,7 @@ class InventoryRouter:
             native_reader,
             MountedCapabilityObservations(),
             capability_reader,
-            read_collection_coverages,
+            self.inventory.collection_ledger.read,
         )
         self.foundation = FoundationApp(database_ready)
 
