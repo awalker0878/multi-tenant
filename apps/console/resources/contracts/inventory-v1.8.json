@@ -8149,6 +8149,39 @@
                               },
                               "group_reference_status": {
                                 "const": "unresolved"
+                              },
+                              "sequence_number": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ]
+                              },
+                              "source_groups": {
+                                "type": "array",
+                                "maxItems": 100,
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 512
+                                }
+                              },
+                              "destination_groups": {
+                                "type": "array",
+                                "maxItems": 100,
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 512
+                                }
+                              },
+                              "services": {
+                                "type": "array",
+                                "maxItems": 100,
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 512
+                                }
                               }
                             },
                             "required": [
@@ -8158,8 +8191,43 @@
                               "disabled",
                               "native_sha256",
                               "service_reference_status",
-                              "group_reference_status"
+                              "group_reference_status",
+                              "sequence_number",
+                              "source_groups",
+                              "destination_groups",
+                              "services"
                             ]
+                          }
+                        },
+                        "category": {
+                          "anyOf": [
+                            {
+                              "enum": [
+                                "Ethernet",
+                                "Emergency",
+                                "Infrastructure",
+                                "Environment",
+                                "Application"
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "stateful": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "scope": {
+                          "type": "array",
+                          "maxItems": 100,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512
                           }
                         }
                       },
@@ -8168,8 +8236,84 @@
                         "sequence_number",
                         "scope_sha256",
                         "native_sha256",
-                        "rules"
+                        "rules",
+                        "category",
+                        "stateful",
+                        "scope"
                       ]
+                    }
+                  },
+                  "groups": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100
+                        },
+                        "native_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "definition_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "resolution": {
+                          "const": "unverified"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "native_sha256",
+                        "definition_sha256",
+                        "resolution"
+                      ]
+                    }
+                  },
+                  "services": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100
+                        },
+                        "native_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "definition_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "resolution": {
+                          "const": "unverified"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "native_sha256",
+                        "definition_sha256",
+                        "resolution"
+                      ]
+                    }
+                  },
+                  "holds": {
+                    "type": "array",
+                    "maxItems": 64,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
                     }
                   }
                 },
@@ -8179,7 +8323,10 @@
                   "policies",
                   "semantic_qualification",
                   "source_vm_attachment",
-                  "native_write_authorized"
+                  "native_write_authorized",
+                  "groups",
+                  "services",
+                  "holds"
                 ]
               },
               {
