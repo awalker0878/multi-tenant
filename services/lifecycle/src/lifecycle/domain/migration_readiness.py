@@ -18,6 +18,7 @@ REQUIRED = {
     "native_e3_qualified", "receiving_e4_accepted", "status", "holds",
     "expires_at", "evaluated_at", "workload_admission_authorized",
     "native_write_authorized", "readiness_sha256",
+    "workload_reconciliation", "collection_coverages",
 }
 
 
@@ -43,8 +44,8 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
     if not isinstance(api, dict):
         raise Rejected("migration_readiness_api_held", 423)
     if (
-        value["schema_version"] != 1
-        or value["kind"] != "migration_route_readiness"
+        value["schema_version"] != 2
+        or value["kind"] != "migration_workload_readiness"
         or value["scope"] != expected
         or value["route_sha256"] != route
         or value["method"] != METHOD_ALIASES.get(native.get("method"))
@@ -79,3 +80,53 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
         for case in cases
     ):
         raise Rejected("migration_readiness_api_held", 423)
+
+
+    # Route eligibility cannot substitute for the one-to-one, full-application
+    # workload reconciliation or all independently scoped collection fields.
+    reconciliation = value["workload_reconciliation"]
+    if (not isinstance(reconciliation, dict)
+            or reconciliation.get("status") != "matched"
+            or reconciliation.get("holds") != []
+            or reconciliation.get("native_write_authorized") is not False
+            or reconciliation.get("source_profile_sha256")
+                != native["source"]["profile_sha256"]
+            or reconciliation.get("native_review_sha256")
+                != native.get("review", {}).get("digest")
+            or type(reconciliation.get("expires_at")) is not int
+            or reconciliation["expires_at"] <= now
+            or reconciliation.get("reconciliation_sha256") != digest({
+                k: v for k, v in reconciliation.items()
+                if k != "reconciliation_sha256"
+            })):
+        raise Rejected("migration_workload_reconciliation_not_current", 423)
+    coverage = value["collection_coverages"]
+    if (not isinstance(coverage, list) or len(coverage) != 3
+            or {c.get("scope") for c in coverage if isinstance(c, dict)}
+                != {"source", "target", "owner"}):
+        raise Rejected("migration_collection_coverage_required", 423)
+    for item in coverage:
+        if (
+            item.get("status") != "complete"
+            or item.get("holds") != []
+            or item.get("native_write_authorized") is not False
+            or item.get("independent_e3_e4_qualification") is not False
+            or type(item.get("evaluated_at")) is not int
+            or not 0 <= now - item["evaluated_at"] <= 5
+            or item.get("coverage_sha256") != digest({
+                k: v for k, v in item.items() if k != "coverage_sha256"
+            })
+        ):
+            raise Rejected("migration_collection_coverage_not_current", 423)
+        side = item["scope"]
+        if side in {"source", "target"} and (
+            item.get("installation_id") != value[side]["installation_id"]
+            or item.get("installed_tuple_sha256")
+                != native[side].get("tuple_sha256")
+        ):
+            raise Rejected("migration_collection_identity_changed", 423)
+        if side == "source" and (
+            item.get("generation_id")
+            != reconciliation.get("source_generation_id")
+        ):
+            raise Rejected("migration_collection_generation_changed", 423)
