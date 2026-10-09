@@ -1729,11 +1729,47 @@
                 "status": {
                   "enum": [
                     "choices_observed",
-                    "held_unobserved"
+                    "held_unobserved",
+                    "held_optional"
                   ]
                 },
                 "native_write_authorized": {
                   "const": false
+                },
+                "destination_path_details": {
+                  "type": "array",
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "selector",
+                      "route_native_refs",
+                      "nat_native_refs"
+                    ],
+                    "properties": {
+                      "selector": {
+                        "type": "string",
+                        "pattern": "^path:[a-f0-9]{64}$"
+                      },
+                      "route_native_refs": {
+                        "type": "array",
+                        "maxItems": 512,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "nat_native_refs": {
+                        "type": "array",
+                        "maxItems": 512,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  }
                 }
               },
               "required": [
