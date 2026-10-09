@@ -203,7 +203,7 @@ def test_recomputed_digests_cannot_hide_required_field_drift() -> None:
     value["readiness_sha256"] = digest({
         k: v for k, v in value.items() if k != "readiness_sha256"
     })
-    with pytest.raises(Rejected, match="migration_nested_workload_reconciliation_held"):
+    with pytest.raises(Rejected, match="migration_readiness_contract_invalid"):
         verify(value, content, "10000000-0000-4000-8000-000000000001", 101)
 
 def test_catalogue_owner_must_supply_all_approved_workloads() -> None:
