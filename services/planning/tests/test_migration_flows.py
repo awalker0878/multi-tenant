@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 from planning_fixture import NOW, inputs
 from planning.application.migration_flows import MigrationFlows
-from planning.domain.model import Rejected, digest
+from planning.domain.model import Rejected
 from planning.domain.network_evidence import native_application_flow_choices
 
 
