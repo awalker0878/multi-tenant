@@ -71,6 +71,7 @@ Route::prefix('/tenants/{tenant}/inventory')->whereUuid('tenant')->middleware(Re
     Route::get('/sites/{site}/migration/profiles/{profile}', [MigrationReviewController::class, 'show'])->whereUuid(['site', 'profile']);
     Route::get('/sites/{site}/migration/profiles/{profile}/status', [MigrationReviewController::class, 'status'])->whereUuid(['site', 'profile']);
     Route::post('/sites/{site}/migration/profiles/{profile}', [MigrationReviewController::class, 'command'])->whereUuid(['site', 'profile']);
+    Route::get('/sites/{site}/migration/catalogue-options', [MigrationReviewController::class, 'catalogueOptions'])->whereUuid('site');
     Route::get('/sites/{site}/migration', [MigrationReviewController::class, 'show'])->whereUuid('site');
     Route::get('/sites/{site}/migration/status', [MigrationReviewController::class, 'status'])->whereUuid('site');
     Route::post('/sites/{site}/migration', [MigrationReviewController::class, 'command'])->whereUuid('site');
