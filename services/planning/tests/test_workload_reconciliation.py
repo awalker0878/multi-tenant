@@ -181,3 +181,59 @@ def test_application_flow_receipt_without_per_vm_interface_probes_never_passes()
         "source_profile_sha256": digest("wrong-source"),
     }]
     assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
+
+
+def test_independent_e4_boot_case_can_reconcile_unobserved_openstack_secure_boot() -> None:
+    scope, catalogue, inventory, selected, flow, native = specimen()
+    native["facts"]["secure_boot"] = None
+    native["observation_sha256"] = digest({
+        k: v for k, v in native.items() if k != "observation_sha256"
+    })
+    assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
+    flow["workload_boot_cases"] = [{
+        "workload_id": catalogue["intent"]["workloads"][0]["id"],
+        "source_profile_sha256": native["profile_sha256"],
+        "firmware": "efi", "secure_boot": True,
+        "observed_at": 100, "expires_at": 125,
+        "evidence_sha256": digest("independent-guest-boot"),
+        "level": "E4", "decision": "accepted", "revoked": False,
+    }]
+    matched = evaluate(scope, catalogue, inventory, selected, flow, 100)
+    assert matched["status"] == "matched"
+    assert matched["expires_at"] == 125
+    flow["workload_boot_cases"][0]["source_profile_sha256"] = digest("foreign")
+    assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
+    flow["workload_boot_cases"][0]["source_profile_sha256"] = native["profile_sha256"]
+    assert evaluate(scope, catalogue, inventory, selected, flow, 125)["status"] == "held"
+
+
+def test_uncatalogued_disk_requires_matching_owner_impact_and_independent_e4() -> None:
+    scope, catalogue, inventory, selected, flow, native = specimen()
+    disk = catalogue["intent"]["workloads"][0]["disks"][0]
+    disk["dataset_id"] = None
+    catalogue["intent_sha256"] = digest(catalogue["intent"])
+    inventory["catalogue_binding"]["intent_sha256"] = catalogue["intent_sha256"]
+    flow["intent_sha256"] = catalogue["intent_sha256"]
+    proof = {
+        "logical_device_id": disk["id"], "native_key": 2000,
+        "disposition": "uncatalogued_attested",
+        "owner_approval_sha256": digest("owner"), "impact_sha256": digest("impact"),
+    }
+    inventory["catalogue_binding"]["disk_dispositions"] = [proof]
+    assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
+    flow["disk_disposition_cases"] = [{
+        **proof, "workload_id": catalogue["intent"]["workloads"][0]["id"],
+        "source_profile_sha256": native["profile_sha256"],
+        "target_profile_sha256": selected["target"]["profile_sha256"],
+        "observed_at": 100, "expires_at": 125,
+        "evidence_sha256": digest("independent-disk"),
+        "level": "E4", "decision": "accepted", "revoked": False,
+    }]
+    # Native dataset coverage must still account for every source disk.
+    assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
+    inventory["source_associations"][0]["datasets"][0]["id"] = "untracked-native-dataset"
+    matched = evaluate(scope, catalogue, inventory, selected, flow, 100)
+    assert matched["status"] == "matched"
+    assert matched["expires_at"] == 125
+    flow["disk_disposition_cases"][0]["impact_sha256"] = digest("changed-impact")
+    assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
