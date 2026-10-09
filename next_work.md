@@ -16,6 +16,25 @@ Check the updated `git rev-parse HEAD` and the
 [PR checks](https://github.com/awalker0878/multi-tenant/pull/64/checks)
 at every checkpoint.
 
+## Follow-up capacity correctness (current branch)
+
+Four additional source-bound corrections were committed after the original PR #64
+audit remediation. They remain **E2 code/tests, pending exact-head CI**:
+
+- `5beb911`: Planning counts each NIC's observed address families rather than
+  counting each NIC once; dual-stack now requests two addresses.
+- `c6d0386`: Lifecycle permits a physical pool to advertise additional
+  unused class limits without raising an indexing exception.
+- `7ca2c29`: Lifecycle rejects contradictory storage-class and
+  network/address-family subtotals in a requested placement vector.
+- `0c99268`: When a commissioned pool enforces class-specific capacity, a
+  positive allocation must identify the classes being consumed.
+
+Associated Planning and Lifecycle regressions are committed. **Do not mark
+CT-N01, CT-N08 or A04/A05 accepted** until hosted Python/PostgreSQL checks
+complete on the exact head and real exclusive capacity-owner evidence is
+independently accepted. No change grants native write authority.
+
 ## Active, prioritized work queue
 
 | ID | Priority | Owner / boundary | Status | Required next action and completion evidence |
