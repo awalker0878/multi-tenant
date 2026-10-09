@@ -114,11 +114,12 @@ def test_ahv_destination_enforced_policy_choices_follow_observed_source_groups()
                       "production_subnet_id": "00000000-0000-4000-8000-000000000006"}],
         },
     }
-    ahv_destination(review, source, target)
-    target["policies"][0]["state"] = "MONITOR"
-    with pytest.raises(Rejected):
+    # ENFORCE describes policy state; it is not rule-by-rule equivalence.
+    with pytest.raises(Rejected, match="destination_security_rule_qualification_required"):
         ahv_destination(review, source, target)
-    target["policies"][0]["state"] = "ENFORCE"
+    review["destination"]["security_mappings"] = []
+    review["destination"]["policy_ids"] = []
+    ahv_destination(review, source, target)  # incomplete security remains a hold
     review["destination"]["category_ids"] = [chosen_id]
     with pytest.raises(Rejected, match="unobserved_source_or_destination_category"):
         ahv_destination(review, source, target)
