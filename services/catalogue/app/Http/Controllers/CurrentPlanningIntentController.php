@@ -29,11 +29,12 @@ final class CurrentPlanningIntentController
                 'd.tenant_id' => $tenant, 'd.application_id' => $application,
                 'd.environment_id' => $environment, 'r.application_id' => $application,
             ])
-            ->first(['r.id', 'r.digest']);
+            ->first(['r.id', 'r.digest', 'r.canonical_intent']);
         abort_if($row === null, 404);
 
         return response()->json([
             'revision_id' => $row->id, 'intent_sha256' => $row->digest,
+            'intent' => json_decode($row->canonical_intent, true, 64, JSON_THROW_ON_ERROR),
         ])->header('Cache-Control', 'no-store, private');
     }
 }
