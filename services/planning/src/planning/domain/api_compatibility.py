@@ -215,7 +215,9 @@ def evaluate(
                         and f["qualification_sha256"] is not None
                     ]
                     if usable:
-                        observation = max(
+                        # Prefer the lowest exact qualified release for this
+                        # operation; never assume the newest API is supported.
+                        observation = min(
                             usable, key=lambda f: (
                                 f["api_family"], version_tuple(f["api_version"])
                             )
