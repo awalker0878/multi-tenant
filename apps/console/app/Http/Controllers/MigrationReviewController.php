@@ -33,13 +33,19 @@ final class MigrationReviewController
         $token = $this->session($request);
         $query = $request->validate([
             'application' => ['sometimes', 'uuid', 'lowercase'],
-            'environment' => ['required_with:application', 'uuid', 'lowercase'],
+            'environment' => ['sometimes', 'uuid', 'lowercase'],
         ]);
         $data = $catalogue->call($token, $tenant, 'listApplications');
         $out = ['applications' => $data['applications'] ?? [], 'current' => null];
         if (isset($query['application'])) {
             $application = $catalogue->call($token, $tenant, 'getApplication',
-                ['application' => $query['application']], environment: $query['environment']);
+                ['application' => $query['application']], environment: $query['environment'] ?? null);
+            $out['environments'] = array_values(array_map(static fn (array $d): array => [
+                'id' => $d['environment_id'], 'revision_id' => $d['current_revision_id'],
+            ], array_filter($application['deployments'] ?? [], 'is_array')));
+            if (! isset($query['environment'])) {
+                return response()->json($out)->header('Cache-Control', 'no-store, private');
+            }
             $matches = array_values(array_filter($application['deployments'] ?? [],
                 fn ($d): bool => is_array($d)
                     && ($d['environment_id'] ?? null) === $query['environment']));
