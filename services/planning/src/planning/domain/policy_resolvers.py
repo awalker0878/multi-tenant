@@ -9,6 +9,8 @@ from __future__ import annotations
 from ipaddress import ip_address, ip_network
 from typing import Any
 
+from planning.domain.native_security_api import qualify as api_qualified
+
 class Unqualified(ValueError):
     pass
 
@@ -253,8 +255,9 @@ RESOLVERS = {"vmware": nsx, "ahv": ahv, "openstack": neutron}
 def decision(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str, str | None]:
     require(isinstance(document, dict) and document.get("platform") in RESOLVERS
             and document.get("schema_version") == 2
-            and document.get("default_action") == "deny",
-            "effective_security_contract_v2_required")
+            and document.get("default_action") == "deny"
+            and api_qualified(document),
+            "installed_native_api_features_unqualified")
     for key in ("from", "to", "protocol", "port"):
         require(key in flow, "incomplete_application_flow")
     return RESOLVERS[document["platform"]](document, flow)
