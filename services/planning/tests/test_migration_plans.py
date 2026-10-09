@@ -15,6 +15,7 @@ from planning.application.migration_plans import MigrationPlans
 from planning.application.validation import MigrationValidation, PlanValidation
 from planning.domain.migration import bind_migration
 from planning.domain.migration_plan import DELTA, compose_migration, stage_order
+from planning.domain.migration_api_selection import pin as pin_api_selection
 from planning.domain.model import Actor, Rejected, digest
 from planning.infrastructure.migration_recipes import recipe_for
 from planning.interfaces.migration import MigrationPreparationApp
@@ -108,6 +109,28 @@ def values(
         },
     }
     return base, bound, recipe
+
+
+def qualified_api_readiness(now: int = 1000) -> dict[str, Any]:
+    return {
+        "schema_version": 2, "kind": "migration_workload_readiness",
+        "status": "eligible", "holds": [], "native_write_authorized": False,
+        "expires_at": now + 100,
+        "route_sha256": digest("route"), "release_sha256": digest("release"),
+        "source": {"platform": "vmware", "profile_sha256": digest("src")},
+        "target": {"platform": "openstack", "profile_sha256": digest("tgt")},
+        "api_compatibility": {
+            "operationally_eligible": True,
+            "cases": [{
+                "capability_id": "vm.disk.export", "side": "source",
+                "criticality": "critical", "status": "eligible",
+                "omission_accepted": False, "selected_api_family": "vmware.vi_json",
+                "selected_api_version": "9.0.0.0",
+                "evidence_sha256": digest("native-e3"),
+                "expires_at": now + 100,
+            }],
+        },
+    }
 
 
 @pytest.mark.parametrize(
@@ -243,7 +266,9 @@ def test_plan_revalidation_observes_recipe_revocation_and_inventory_changes() ->
     planner = Mock()
     planner.clock.return_value = 1000
     prepare, recipes = Mock(return_value=bound), Mock(return_value=recipe)
-    validation = MigrationValidation(prepare, recipes, Mock(), planner.clock)
+    validation = MigrationValidation(
+        prepare, recipes, Mock(return_value=qualified_api_readiness()), planner.clock
+    )
     planner.validation.migration = validation
     service = MigrationPlans(planner, validation)
     content = compose_migration(base, bound, recipe, 1000)
@@ -253,6 +278,9 @@ def test_plan_revalidation_observes_recipe_revocation_and_inventory_changes() ->
         "plan.read",
         recipe["scope"]["resource_id"],
         recipe["scope"]["environment"],
+    )
+    content["native_migration"]["api_selection"] = pin_api_selection(
+        qualified_api_readiness(), 1000
     )
     content["native_migration"]["recipe_id"] = str(uuid4())
     plan = {"content": content}
@@ -317,7 +345,9 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     recipes = Mock(return_value=recipe)
     from planning.application.planning import Planning
 
-    validation = MigrationValidation(prepare, recipes, Mock(), planner.clock)
+    validation = MigrationValidation(
+        prepare, recipes, Mock(return_value=qualified_api_readiness()), planner.clock
+    )
     planner = Planning(
         planner.database,
         planner.sources,
@@ -369,6 +399,9 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     base, bound, recipe = values()
     content = compose_migration(base, bound, recipe, 1000)
     content["native_migration"].update(recipe_id=str(uuid4()), base_plan_id=str(uuid4()))
+    content["native_migration"]["api_selection"] = pin_api_selection(
+        qualified_api_readiness(), 1000
+    )
     payload = {"content": content, "binding": {"requested_by": str(uuid4())}}
     database = MagicMock()
     tx = database.transaction.return_value.__enter__.return_value
@@ -382,9 +415,7 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     validation = PlanValidation(
         validation.native, MigrationValidation(
             Mock(), recipes,
-            Mock(return_value={
-                "status": "eligible", "holds": [], "native_write_authorized": False,
-            }), clock,
+            Mock(return_value=qualified_api_readiness()), clock,
         ), Mock()
     )
     planning = Planning(database, Mock(), clock, validation)
