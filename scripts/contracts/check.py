@@ -41,7 +41,7 @@ def unique_schema_ids():
             raise ValueError(f"Unexpected duplicate schema $id {identifier}: {paths}")
         for p in paths:
             content = p.read_bytes()
-            raw = b"blob " + str(len(content)).encode() + b"\\x00" + content
+            raw = b"blob " + str(len(content)).encode() + bytes([0]) + content
             digest = hashlib.sha1(raw).hexdigest()
             if digest != historical[str(p.relative_to(ROOT))]:
                 raise ValueError(f"Historical schema was rewritten instead of versioned: {p}")
