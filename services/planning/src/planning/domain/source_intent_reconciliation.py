@@ -20,6 +20,10 @@ def reconcile(
             or not isinstance(links, list) or len(links) > 50
             or not isinstance(profiles, list) or len(profiles) > 50):
         raise Rejected("source_intent_reconciliation_invalid", 422)
+    # The digest must identify the exact immutable Catalogue document rather
+    # than a caller-supplied label that merely matches the mapping receipts.
+    if digest(intent) != catalogue_digest:
+        raise Rejected("source_intent_catalogue_document_changed", 423)
     desired = intent["workloads"]
     by_id = {w["id"]: w for w in desired}
     if len(by_id) != len(desired):
