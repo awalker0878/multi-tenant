@@ -195,11 +195,28 @@ def collect_ahv(
     # Configuration definitions do not prove effective VM membership,
     # exceptions, or fully expanded service behavior.
     references: dict[str, list[dict[str, Any]]] = {}
+    ref_holds: list[str] = []
+    commissioned = stream.get("microseg_reference_endpoints")
+    authorized = (
+        stream.get("microseg_reference_endpoint_qualified") is True
+        and isinstance(commissioned, dict)
+        and set(commissioned) == {
+            "entity_groups", "address_groups", "service_groups"
+        }
+    )
     for group_kind in ("entity_groups", "address_groups", "service_groups"):
-        rows, documents = collect_list(
-            stream, "/api/microseg/v4.3/config/" +
-            group_kind.replace("_", "-"), 1, before_request,
-        )
+        route = commissioned.get(group_kind) if authorized else None
+        expected_prefix = "/api/microseg/" + VERSIONS["microseg"] + "/config/"
+        if (not isinstance(route, str)
+                or not route.startswith(expected_prefix)
+                or not route[len(expected_prefix):].replace("-", "").isalnum()
+                or "?" in route or ".." in route):
+            # A still-unqualified API endpoint is an E2 hold, not a reason
+            # to discard independently useful VM/storage/network inventory.
+            references[group_kind] = []
+            ref_holds.append("ahv_" + group_kind + "_api_unqualified")
+            continue
+        rows, documents = collect_list(stream, route, 1, before_request)
         references[group_kind] = [
             {"extId": row["extId"], "native_sha256": fingerprint(row),
              "resolution": "definition_only"}
@@ -283,7 +300,7 @@ def collect_ahv(
         "cluster_software": config.get("clusterSoftwareMap", []),
         "hypervisors": hypervisors,
     }
-    holds = []
+    holds = list(ref_holds)
     if rules_budget_exceeded:
         holds.append("ahv_security_policy_list_exceeds_rule_read_budget")
     if config.get("isAvailable") is not True:
