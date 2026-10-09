@@ -230,7 +230,11 @@ def measured(document: dict[str, Any], flow: dict[str, Any], path_sha: str, now:
     expected = (("allow", flow), ("deny", forbidden))
     for probe, (outcome, expected_flow) in zip(probes, expected):
         if (not isinstance(probe, dict) or not fresh(probe, now)
-                or probe.get("path_sha256") != path_sha
+                or (probe.get("path_sha256") != path_sha if outcome == "allow"
+                    else (probe.get("denied_at_native_ref")
+                          != document.get("default_deny_native_ref")
+                          or probe.get("enforcement_scope")
+                          != document.get("path", {}).get("scope")))
                 or any(probe.get(k) != expected_flow.get(k)
                        for k in ("from", "to", "protocol", "port"))
                 or probe.get("outcome") != outcome
@@ -253,7 +257,8 @@ def qualify(document: Any, flow: dict[str, Any], now: int) -> dict[str, Any]:
             or not text(document.get("writer_principal"))
             or document["observer_principal"] == document["writer_principal"]
             or not fresh(document, now)
-            or not text(document.get("topology_sha256"))):
+            or not text(document.get("topology_sha256"))
+            or not text(document.get("default_deny_native_ref"))):
         return hold("independent_native_security_evidence_missing")
     rules, error = effective_rules(document)
     if error:
