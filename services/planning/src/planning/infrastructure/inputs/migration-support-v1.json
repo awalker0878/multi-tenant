@@ -235,6 +235,10 @@
             },
             "native_write_authorized": {
               "const": false
+            },
+            "native_controls_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
             }
           },
           "required": [
@@ -251,7 +255,8 @@
             "level",
             "decision",
             "checks",
-            "native_write_authorized"
+            "native_write_authorized",
+            "native_controls_sha256"
           ]
         },
         {
