@@ -66,15 +66,78 @@ def verify_app(app: str, runtime: set[tuple[str, str]], root: Path = ROOT) -> in
     return len(releases)
 
 
+
+# This is deliberately a source-independent probe of the concrete router
+# object, rather than another regular-expression extraction from OpenAPI.
+SAMPLE_UUID = "10000000-0000-4000-8000-000000000001"
+
+
+def synthetic_path(path: str) -> str:
+    return PARAMETER.sub(SAMPLE_UUID, path)
+
+
+def verify_inventory(root: Path = ROOT) -> int:
+    from inventory.interfaces.discovery import ROUTES
+    spec = json.loads((root / "contracts/openapi/inventory-v1.9.json").read_text())
+    missing = []
+    for method, path in routes_in_openapi(spec):
+        concrete = synthetic_path(path)
+        if not any(m == method and re.fullmatch(pattern, concrete) for m, pattern, _, _ in ROUTES):
+            missing.append((method, path))
+    if missing:
+        raise ValueError(f"Inventory OpenAPI operations without executable route matches: {sorted(missing)}")
+    return len(routes_in_openapi(spec))
+
+
+async def _probe_migration(app, path: str, method: str) -> int:
+    captured = []
+    async def send(message):
+        if message["type"] == "http.response.start":
+            captured.append(message["status"])
+    async def receive():
+        return {"type": "http.request", "body": b"", "more_body": False}
+    await app({
+        "type": "http", "path": path, "method": method,
+        "query_string": b"", "headers": [],
+    }, receive, send)
+    if len(captured) != 1:
+        raise ValueError(f"Planning migration router did not return a response: {path}")
+    return captured[0]
+
+
+def verify_planning_migration(root: Path = ROOT) -> int:
+    import asyncio
+    from planning.interfaces.migration import MigrationPreparationApp
+    app = MigrationPreparationApp(authority=None, prepare=lambda *args: {})
+    spec = json.loads((root / "contracts/openapi/planning-migration-v1.6.json").read_text())
+    declared = routes_in_openapi(spec)
+    for method, path in declared:
+        status = asyncio.run(_probe_migration(app, synthetic_path(path), method))
+        # Missing Authorization is rejected after successful route matching.
+        # A 404 indicates no matching runtime route (or wrong HTTP method).
+        if status == 404:
+            raise ValueError(f"Planning migration OpenAPI lacks executable route: {method} {path}")
+    return len(declared)
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--app", choices=["governance", "catalogue"], required=True)
-    parser.add_argument("--routes", type=Path, required=True)
+    parser.add_argument("--app", choices=["governance", "catalogue", "inventory", "planning-migration"], required=True)
+    parser.add_argument("--routes", type=Path)
     args = parser.parse_args()
-    routes = routes_in_laravel(json.loads(args.routes.read_text(encoding="utf-8")))
-    count = verify_app(args.app, routes)
-    print(json.dumps({"status": "PASS", "app": args.app, "active_apis": count,
-                      "runtime_operations": len(routes)}))
+    if args.app == "inventory":
+        count = verify_inventory()
+        print(json.dumps({"status": "PASS", "app": args.app, "runtime_operations": count}))
+    elif args.app == "planning-migration":
+        count = verify_planning_migration()
+        print(json.dumps({"status": "PASS", "app": args.app, "runtime_operations": count}))
+    else:
+        if args.routes is None:
+            parser.error("--routes is required for Laravel services")
+        routes = routes_in_laravel(json.loads(args.routes.read_text(encoding="utf-8")))
+        count = verify_app(args.app, routes)
+        print(json.dumps({"status": "PASS", "app": args.app, "active_apis": count,
+                          "runtime_operations": len(routes)}))
 
 
 if __name__ == "__main__":
