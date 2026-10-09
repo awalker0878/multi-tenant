@@ -211,7 +211,7 @@ def neutron(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str, str | 
             require(group in groups and groups[group].get("stateful") is True
                     and groups[group].get("complete") is True,
                     "neutron_group_statefulness_unqualified")
-    family = flow.get("address_family")
+    family = flow.get("address_family", document.get("address_family"))
     require(family in ("ipv4", "ipv6"), "neutron_address_family_required")
 
     def permits(port_id: str, direction: str, remote: dict[str, Any]) -> str | None:
