@@ -202,8 +202,17 @@ def review_input(body: dict[str, Any], source: dict[str, Any]) -> None:
             "objectives",
             "overrides",
         }
-        | ({"destination"} if "destination" in body else set()),
+        | ({"destination"} if "destination" in body else set())
+        | ({"catalogue_binding"} if "catalogue_binding" in body else set()),
     )
+    if "catalogue_binding" in body:
+        link = shape(body["catalogue_binding"], {
+            "application_id", "environment_id", "revision_id",
+            "intent_sha256", "workload_id",
+        })
+        for field in ("application_id", "environment_id", "revision_id", "workload_id"):
+            identifier(link[field])
+        checksum(link["intent_sha256"])
     identifier(body["source_profile_id"])
     identifier(body["target_profile_id"])
     if body["method"] not in METHODS:
