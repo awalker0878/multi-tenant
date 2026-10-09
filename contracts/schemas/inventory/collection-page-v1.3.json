@@ -153,6 +153,38 @@
           "$ref": "#/$defs/SourceWorkloadProfileV3"
         }
       ]
+    },
+    "native_read_receipts": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "native_operation",
+          "api_version",
+          "response_sha256",
+          "observed_at"
+        ],
+        "properties": {
+          "native_operation": {
+            "type": "string",
+            "pattern": "^GET /[^\\r\\n]{1,400}$"
+          },
+          "api_version": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "response_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
