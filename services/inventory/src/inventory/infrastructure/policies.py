@@ -142,6 +142,11 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
             )
             | ({"nsx_policy"} if p["platform"] == "vmware"
                and s["kind"] == "target_profile" and "nsx_policy" in s else set()),
+            ({"api_versions_verified", "api_versions",
+              "microseg_reference_endpoint_qualified",
+              "microseg_reference_endpoints"}
+             if p["platform"] == "ahv" and s["kind"] == "target_profile"
+             else set()),
         )
         if s["kind"] == "target_profile" and "nsx_policy" in s:
             if p["platform"] != "vmware":
@@ -235,8 +240,32 @@ def parse_policy(value: Any) -> EnrollmentPolicy:
                 raise Rejected("invalid_ahv_shared_resources")
             for key in shared:
                 native_uuid(key)
-            if s["api_version"] != "v4.3" or urlsplit(s["base_url"]).path not in {"", "/"}:
-                raise Rejected("explicit_ahv_v43_required")
+            api_qualified = s.get("api_versions_verified") is True
+            namespaces = s.get("api_versions")
+            if api_qualified:
+                if (not isinstance(namespaces, dict)
+                        or set(namespaces) != {"vmm", "prism", "clustermgmt",
+                                             "networking", "microseg"}
+                        or any(v not in {"v4.2", "v4.3"} for v in namespaces.values())
+                        or s["api_version"] != namespaces["vmm"]):
+                    raise Rejected("installed_ahv_api_namespace_qualification_required")
+            elif (namespaces is not None or s.get("api_versions_verified") is not None
+                  or s["api_version"] != "v4.3"):
+                raise Rejected("unqualified_ahv_api_version_switch")
+            reference_paths = s.get("microseg_reference_endpoints")
+            reference_qualified = s.get("microseg_reference_endpoint_qualified")
+            if reference_paths is not None or reference_qualified is not None:
+                version = namespaces["microseg"] if api_qualified else "v4.3"
+                if (reference_qualified is not True
+                        or not isinstance(reference_paths, dict)
+                        or set(reference_paths) != {"entity_groups", "address_groups",
+                                                     "service_groups"}
+                        or any(reference_paths[k] !=
+                               "/api/microseg/" + version + "/config/" + k.replace("_", "-")
+                               for k in reference_paths)):
+                    raise Rejected("unqualified_microseg_reference_endpoints")
+            if urlsplit(s["base_url"]).path not in {"", "/"}:
+                raise Rejected("explicit_ahv_root_api_required")
         if (
             s["kind"] == "target_profile"
             and p["platform"] == "openstack"
