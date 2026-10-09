@@ -11,6 +11,7 @@ from typing import Any
 
 from inventory_worker.infrastructure.native import (
     CollectionFailure,
+    capture_native_reads,
     collect,
     exchange,
     secret,
@@ -94,15 +95,26 @@ def run_page(config: dict[str, Any]) -> bool:
                 time.sleep(delay)
             raise CollectionFailure("permission_denied")
 
-        body.update(
-            collect(
-                p,
-                job["stream"],
-                job["cursor"],
-                job.get("collect_configuration", False),
-                before_request,
+        native_get_receipts: list[dict[str, Any]] = []
+
+        def receipt(witness: dict[str, Any]) -> None:
+            if (len(native_get_receipts) >= 128
+                    or not isinstance(witness.get("native_operation"), str)
+                    or len(witness["native_operation"]) > 404):
+                raise CollectionFailure("invalid_response")
+            native_get_receipts.append(witness)
+
+        # The page and its GET witnesses are published in one lease-bound,
+        # idempotent Inventory transaction. The independently signed coverage
+        # record is assembled from these observed facts later, never invented.
+        with capture_native_reads(receipt):
+            page = collect(
+                p, job["stream"], job["cursor"],
+                job.get("collect_configuration", False), before_request,
             )
-        )
+        body.update(page)
+        if native_get_receipts:
+            body["native_read_receipts"] = native_get_receipts
     except CollectionFailure as error:
         body.update(
             observations=[],
