@@ -310,14 +310,25 @@
                   },
                   "document": {
                     "type": "object"
+                  },
+                  "source_document": {
+                    "type": "object"
                   }
                 },
                 "required": [
                   "source_flow_id",
                   "flow",
-                  "document"
+                  "document",
+                  "source_document"
                 ]
               }
+            },
+            "source_platform": {
+              "enum": [
+                "vmware",
+                "ahv",
+                "openstack"
+              ]
             }
           },
           "required": [
@@ -339,7 +350,8 @@
             "omissions_sha256",
             "omissions_approved",
             "omission_approver_id",
-            "security_cases"
+            "security_cases",
+            "source_platform"
           ]
         },
         {
