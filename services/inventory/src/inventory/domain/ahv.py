@@ -91,7 +91,9 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
                             or not rule["extId"]
                             or rule["extId"] in seen_rule_ids
                             or not isinstance(rule.get("type"), str)
-                            or not isinstance(rule.get("spec"), dict)
+                            or not isinstance(rule.get("spec_sha256"), str)
+                            or re.fullmatch(r"[a-f0-9]{64}", rule["spec_sha256"]) is None
+                            or set(rule) != {"extId", "type", "spec_sha256"}
                         ):
                             raise Rejected("invalid_ahv_policy_rules")
                         seen_rule_ids.add(rule["extId"])
