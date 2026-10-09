@@ -127,3 +127,44 @@ def test_missing_or_reused_device_mapping_never_reconciles() -> None:
         {"logical_device_id": "unknown", "native_key": 0}
     ]
     assert reconcile(intent, digest(intent), links, profiles, 100)["status"] == "held"
+
+
+def test_full_catalogue_requires_semantic_dispositions_beyond_vm_sizing() -> None:
+    for field, path in [
+        ("architecture", "compute.architecture"),
+        ("os", "guest.os"),
+        ("hardening_profile", "guest.hardening_profile"),
+        ("boot", "disks.disk-0.boot"),
+        ("encryption", "disks.disk-0.encryption"),
+        ("failure_domain", "failure_domain"),
+    ]:
+        intent, links, profiles = values()
+        workload = intent["workloads"][0]
+        if field == "architecture":
+            workload["compute"]["architecture"] = "x86_64"
+        elif field in {"os", "hardening_profile"}:
+            workload["guest"][field] = "RHEL-9"
+        elif field in {"boot", "encryption"}:
+            workload["disks"][0][field] = True if field == "boot" else "required"
+        else:
+            workload["failure_domain"] = {
+                "group": "zone-a", "mode": "anti_affinity", "strength": "required",
+            }
+        links[0]["catalogue_digest"] = digest(intent)
+        result = reconcile(intent, digest(intent), links, profiles, 100)
+        assert result["status"] == "held"
+        row = result["workloads"][0]
+        assert any(d["field"] == path and d["disposition"] == "unknown"
+                   for d in row["field_dispositions"])
+        assert any(path in hold for hold in row["holds"])
+
+
+def test_optional_placement_does_not_falsely_block_required_sizing() -> None:
+    intent, links, profiles = values()
+    intent["workloads"][0]["failure_domain"] = {
+        "group": "zone", "mode": "independent", "strength": "preferred",
+    }
+    links[0]["catalogue_digest"] = digest(intent)
+    result = reconcile(intent, digest(intent), links, profiles, 100)
+    assert result["status"] == "matched"
+    assert result["workloads"][0]["field_dispositions"][0]["disposition"] == "unknown"
