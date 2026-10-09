@@ -73,7 +73,7 @@ final class MigrationSupportController
             ]);
         }
         return redirect()->back()->with('flow_notice', ($response['status'] ?? '') === 'eligible'
-            ? 'Application flow choices saved; independent validation is current.'
+            ? 'Application flow choices saved for review. Execution still requires fresh independent E4 evidence.'
             : 'Application flow draft saved. Required connectivity or isolation evidence remains held.');
     }
 
