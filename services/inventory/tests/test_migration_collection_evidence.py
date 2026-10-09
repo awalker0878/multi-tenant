@@ -60,6 +60,7 @@ def specimen():
             "value_present": True,
             "native_operation": "GET /api/vmm/v4.3/config/resource" if family else None,
             "value_sha256": digest(attribute) if family else None,
+            "source_response_sha256": digest("native-response") if family else None,
             "independent_review": True,
         }
     scopes = []
