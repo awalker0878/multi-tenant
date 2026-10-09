@@ -266,6 +266,8 @@ class NativeOwners:
         content, binding = record["content"], record["binding"]
         migrating = content["action"] == "application.migrate"
         if migrating:
+            if "catalogue" not in self.configuration.load()["owners"]:
+                raise Rejected("migration_catalogue_owner_not_commissioned", 423)
             # Re-read through the authenticated Planning owner on initial
             # resolution and every subsequent Lifecycle current-authority check.
             verify_migration_readiness(

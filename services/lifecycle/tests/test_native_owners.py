@@ -495,3 +495,12 @@ def test_catalogue_current_membership_is_checked_independently(tmp_path: Path) -
     state["fault"] = "catalogue_revision"
     with pytest.raises(Rejected, match="migration_catalogue_revision_changed"):
         owners.resolve(ref["tenant_id"], ref)
+
+def test_catalogue_owner_is_mandatory_for_native_migration(tmp_path: Path) -> None:
+    owners, ref, state, config = fixture(tmp_path)
+    del config["owners"]["catalogue"]
+    state["path"].write_text(json.dumps(config))
+    with pytest.raises(Rejected, match="migration_catalogue_owner_not_commissioned"):
+        owners.resolve(ref["tenant_id"], ref)
+
+
