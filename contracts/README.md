@@ -21,3 +21,7 @@ The contract root owns **wire contracts**, not provider eligibility or native ex
 | Resolved workload readiness | `schemas/planning/migration-readiness-v2.json` | `services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.json` |
 
 The source manifests are an editing representation, not independently hosted service contracts. Do not create separate, unverifiable drift between source fragments and the immutable deployed bundles.
+
+## Duplicate cleanup
+
+The byte-identical `contracts/fixtures/planning/synthetic-plan-v1.json` was removed. All fixture generation and live service test copies source `synthetic-plan-v1.1.json`. Fixture examples and partition source files are editable authoring inputs, not historically frozen published wire artifacts. Published API, event, schema and capability releases remain subject to the immutable-version gate.

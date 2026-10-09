@@ -62,6 +62,14 @@ class PublishedHistoryTests(unittest.TestCase):
         self.assertEqual(result['published_revisions'][path], published)
         self.assertEqual(result['added'], ['contracts/example-v1.1.json'])
 
+    def test_source_fragments_and_duplicated_fixtures_are_not_frozen_releases(self):
+        self.write("contracts/fixtures/planning/old-example.json", '{"case":1}\\n')
+        self.write("contracts/source/example/base.json", '{"draft":true}\\n')
+        published = self.commit("Add editable contract inputs")
+        self.write("contracts/fixtures/planning/old-example.json", '{"case":2}\\n')
+        (self.root / "contracts/source/example/base.json").unlink()
+        self.assertEqual(check(self.root, published)["conflicts"], [])
+
     def test_merge_publishes_final_side_branch_bytes(self):
         self.git('checkout', '-b', 'draft')
         self.write('contracts/example-v1.json', '{"draft":true}\n')
