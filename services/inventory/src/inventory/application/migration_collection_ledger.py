@@ -90,7 +90,7 @@ class MigrationCollectionLedger:
             if type(sequence) is not int or sequence < 1:
                 raise Rejected("migration_collection_signed_sequence_required", 423)
             prior = tx.one(
-                "SELECT generation_sequence,envelope_sha256 FROM "
+                "SELECT generation_sequence,envelope_sha256,observed_at FROM "
                 "inventory.migration_collection_receipts "
                 "WHERE tenant=%s AND site=%s AND source_profile=%s "
                 "AND target_profile=%s ORDER BY generation_sequence DESC,"
@@ -111,6 +111,9 @@ class MigrationCollectionLedger:
                     or min(observed) > int(self.d.clock())):
                 raise Rejected("migration_collection_observed_time_invalid", 423)
             observed_at = min(observed)
+            if (prior is not None and prior["envelope_sha256"] != envelope_sha
+                    and observed_at <= prior["observed_at"]):
+                raise Rejected("migration_collection_observation_order_regressed", 409)
             envelope_id = str(uuid4())
             tx.execute(
                 "INSERT INTO inventory.migration_collection_receipts "
