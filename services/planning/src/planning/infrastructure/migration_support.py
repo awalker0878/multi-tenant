@@ -121,7 +121,7 @@ def api_capability_records(
 def current_application_flow_proof(
     actor: Actor, site: str, saved: dict[str, Any], now: int,
     binding: dict[str, Any],
-) -> None:
+) -> dict[str, Any]:
     """Service-only fresh E4 gate, independent of saved Console approval.
 
     Catalogue confirms the current published source revision. Assurance must
@@ -289,3 +289,15 @@ def current_application_flow_proof(
         }
     ):
         raise Rejected("independent_application_flow_evidence_expired", 423)
+
+    return {
+        "level": "E4",
+        "decision": "accepted",
+        "revoked": False,
+        "intent_sha256": current["intent_sha256"],
+        "source_profile_sha256": binding["source"]["profile_sha256"],
+        "target_profile_sha256": binding["target"]["profile_sha256"],
+        "evidence_sha256": digest(receipt),
+        "expires_at": receipt["expires_at"],
+        "native_write_authorized": False,
+    }
