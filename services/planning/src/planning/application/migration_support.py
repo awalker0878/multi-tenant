@@ -115,9 +115,21 @@ class MigrationSupport:
              "environment_id": actor.environment, "site_id": site},
             digest(selected), selected["release_sha256"], selected["expires_at"], now,
         )
-        # The preview has no authority to invent independently measured E4
-        # application-interface proof; absent proof remains an explicit hold.
-        proof = self.workload_current(actor, site, binding, None)
+        # Preview and Lifecycle use the same execution-side independent flow
+        # proof. Unavailable E4 is represented by null, never a fabricated pass.
+        flow_proof = None
+        if self.flow_require is not None:
+            try:
+                flow_proof = self.flow_require(actor, site, {
+                    **binding,
+                    "source": {**binding["source"],
+                               "platform": candidate["source"]["platform"]},
+                    "target": {**binding["target"],
+                               "platform": candidate["target"]["platform"]},
+                })
+            except Rejected:
+                pass
+        proof = self.workload_current(actor, site, binding, flow_proof)
         result = resolve_workload(
             route, proof["reconciliation"], proof.get("collection_coverages"), now,
             self.collection_manifest(selected["release_sha256"])
