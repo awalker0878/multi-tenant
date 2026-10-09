@@ -28,7 +28,7 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
             # Preserve an incomplete review as a draft, without accepting
             # any invented destination policy. Review holds confirmation.
             if selected is not None:
-                draft = shape(selected, {"platform", "project_id", "security_mappings", "flow_mappings"} if "flow_mappings" in selected else {"platform", "project_id", "security_mappings"})
+                draft = shape(selected, {"platform", "project_id", "security_mappings", "flow_mappings"} if isinstance(selected, dict) and "flow_mappings" in selected else {"platform", "project_id", "security_mappings"})
                 if (
                     draft["platform"] != "openstack"
                     or draft["project_id"] != target["project_id"]
