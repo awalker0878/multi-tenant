@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
 import VmwareDestination from '../../features/inventory/VmwareDestination.vue';
 import AhvDestination from '../../features/inventory/AhvDestination.vue';
@@ -26,14 +26,93 @@ const blocked = computed(() => form.processing || unavailable.value || uncertain
 const source = computed(() => props.workspace.profiles.find(p => p.id === form.review.source_profile_id) ?? (saved?.source.id === form.review.source_profile_id ? saved.source : null));
 const target = computed(() => props.workspace.profiles.find(p => p.id === form.review.target_profile_id) ?? (saved?.target.id === form.review.target_profile_id ? saved.target : null));
 const disks = computed(() => source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.disks : []);
-function beginCatalogueAssociation() {
-  if (!source.value || source.value.facts.profile_type !== 'SourceWorkloadProfile') return;
+type CatalogueWorkloadOption = {
+  id: string; name: string;
+  disks: { id: string; dataset_id: string | null; order: number }[];
+  nics: { id: string; order: number }[];
+};
+type CatalogueOptionResult = {
+  applications: { id: string; name: string }[];
+  environments?: { id: string; revision_id: string }[];
+  current?: {
+    application_id: string; environment_id: string; revision_id: string;
+    intent_sha256: string; workloads: CatalogueWorkloadOption[];
+  } | null;
+};
+const catalogueUrl = `/tenants/${props.tenantId}/inventory/sites/${props.siteId}/migration/catalogue-options`;
+const catalogueApplications = ref<CatalogueOptionResult['applications']>([]);
+const catalogueEnvironments = ref<NonNullable<CatalogueOptionResult['environments']>>([]);
+const catalogueCurrent = ref<NonNullable<CatalogueOptionResult['current']> | null>(null);
+const catalogueApplication = ref('');
+const catalogueEnvironment = ref('');
+const catalogueBusy = ref(false);
+const catalogueError = ref('');
+const catalogueSelectedWorkload = computed(() => catalogueCurrent.value?.workloads.find(
+  w => w.id === form.review.catalogue_binding?.workload_id,
+) ?? null);
+async function loadCatalogueChoices(application = '', environment = ''): Promise<void> {
+  catalogueBusy.value = true;
+  catalogueError.value = '';
+  try {
+    const qs = new URLSearchParams();
+    if (application) qs.set('application', application);
+    if (environment) qs.set('environment', environment);
+    const response = await fetch(catalogueUrl + (qs.size ? '?' + qs : ''), {
+      credentials: 'same-origin', redirect: 'manual', cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok || !response.headers.get('Content-Type')?.includes('application/json')) throw new Error();
+    const data = await response.json() as CatalogueOptionResult;
+    if (!Array.isArray(data.applications)) throw new Error();
+    catalogueApplications.value = data.applications;
+    catalogueEnvironments.value = data.environments ?? [];
+    catalogueCurrent.value = data.current ?? null;
+  } catch {
+    catalogueCurrent.value = null;
+    catalogueError.value = 'Current authorized Catalogue choices are unavailable. Association cannot be saved.';
+  } finally { catalogueBusy.value = false; }
+}
+function chooseCatalogueApplication(id: string): void {
+  catalogueApplication.value = id;
+  catalogueEnvironment.value = '';
+  catalogueCurrent.value = null;
+  if (form.review.catalogue_binding) delete form.review.catalogue_binding;
+  void loadCatalogueChoices(id);
+}
+function chooseCatalogueEnvironment(id: string): void {
+  catalogueEnvironment.value = id;
+  catalogueCurrent.value = null;
+  if (form.review.catalogue_binding) delete form.review.catalogue_binding;
+  if (id) void loadCatalogueChoices(catalogueApplication.value, id);
+}
+function chooseCatalogueWorkload(id: string): void {
+  const current = catalogueCurrent.value;
+  const workload = current?.workloads.find(w => w.id === id);
+  if (!source.value || !current || !workload) return;
   form.review.catalogue_binding = {
-    application_id: '', environment_id: '', revision_id: '', intent_sha256: '', workload_id: '',
+    application_id: current.application_id, environment_id: current.environment_id,
+    revision_id: current.revision_id, intent_sha256: current.intent_sha256,
+    workload_id: id, disk_dispositions: [],
     disk_mappings: source.value.facts.disks.map(d => ({ logical_device_id: '', native_key: d.key })),
     nic_mappings: source.value.facts.nics.map(n => ({ logical_device_id: '', native_key: n.key })),
   };
 }
+function attestUncataloguedDisk(id: string): void {
+  const binding = form.review.catalogue_binding;
+  if (!binding || !catalogueSelectedWorkload.value?.disks.some(d => d.id === id && d.dataset_id === null)) return;
+  const mapping = binding.disk_mappings.find(d => d.logical_device_id === id);
+  if (!mapping) return;
+  binding.disk_dispositions ??= [];
+  if (!binding.disk_dispositions.some(d => d.logical_device_id === id)) {
+    binding.disk_dispositions.push({ logical_device_id: id, native_key: mapping.native_key,
+      disposition: 'uncatalogued_attested', owner_approval_sha256: '', impact_sha256: '' });
+  }
+}
+function beginCatalogueAssociation(): void {
+  if (!source.value || source.value.facts.profile_type !== 'SourceWorkloadProfile') return;
+  void loadCatalogueChoices();
+}
+onMounted(() => { void loadCatalogueChoices(); });
 watch(() => form.review.source_profile_id, (next, previous) => {
   if (next !== previous && form.review.catalogue_binding) delete form.review.catalogue_binding;
 });
@@ -44,6 +123,12 @@ const catalogueAssociationComplete = computed(() => {
   if (![binding.application_id, binding.environment_id, binding.revision_id,
          binding.workload_id].every(v => uuid.test(v))) return false;
   if (!/^[a-f0-9]{64}$/.test(binding.intent_sha256)) return false;
+  const selected = catalogueSelectedWorkload.value;
+  if (!catalogueCurrent.value || !selected
+      || binding.intent_sha256 !== catalogueCurrent.value.intent_sha256
+      || binding.revision_id !== catalogueCurrent.value.revision_id
+      || binding.application_id !== catalogueCurrent.value.application_id
+      || binding.environment_id !== catalogueCurrent.value.environment_id) return false;
   const sourceDisks = source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.disks : [];
   const sourceNics = source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.nics : [];
   const valid = (items: { logical_device_id: string; native_key: number }[], keys: number[]) =>
@@ -52,8 +137,19 @@ const catalogueAssociationComplete = computed(() => {
     && items.every(i => uuid.test(i.logical_device_id))
     && new Set(items.map(i => i.native_key)).size === keys.length
     && items.every(i => keys.includes(i.native_key));
+  const missing = selected.disks.filter(d => d.dataset_id === null);
+  const approved = binding.disk_dispositions ?? [];
   return valid(binding.disk_mappings, sourceDisks.map(d => d.key))
-      && valid(binding.nic_mappings, sourceNics.map(n => n.key));
+      && valid(binding.nic_mappings, sourceNics.map(n => n.key))
+      && new Set(binding.disk_mappings.map(m => m.logical_device_id)).size === selected.disks.length
+      && selected.disks.every(d => binding.disk_mappings.some(m => m.logical_device_id === d.id))
+      && selected.nics.every(n => binding.nic_mappings.some(m => m.logical_device_id === n.id))
+      && approved.length === missing.length
+      && missing.every(d => approved.some(a =>
+        a.logical_device_id === d.id && a.disposition === 'uncatalogued_attested'
+        && a.native_key === binding.disk_mappings.find(m => m.logical_device_id === d.id)?.native_key
+        && /^[a-f0-9]{64}$/.test(a.owner_approval_sha256)
+        && /^[a-f0-9]{64}$/.test(a.impact_sha256)));
 });
 const ahv = computed(() => target.value?.facts.profile_type === 'TargetCapabilityProfile' && target.value.facts.platform === 'ahv' ? target.value.facts : null);
 const vmware = computed(() => target.value?.facts.profile_type === 'TargetCapabilityProfile' && target.value.facts.platform === 'vmware' ? target.value.facts : null);
