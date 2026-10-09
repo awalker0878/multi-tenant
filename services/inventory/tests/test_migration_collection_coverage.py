@@ -20,7 +20,8 @@ ROW = {
 def assess(manifest: dict, facts: list[dict], conditions: list[dict] | None = None,
            now: int = 100) -> dict:
     return evaluate(manifest, "ahv", "source", "installation", "generation",
-                    digest("installed"), facts, conditions or [], now)
+                    digest("installed"), facts, conditions or [], now,
+                    installed_namespaces={"vmm": ["v4.3"]})
 
 
 def record(key: str = "identity.vm", when: int = 90) -> dict:
@@ -41,6 +42,12 @@ def test_missing_expired_cross_scope_and_valid_records() -> None:
     model = manifest()
     assert assess(model, [])["status"] == "held"
     assert assess(model, [record()])["status"] == "complete"
+    assert assess(model, [record()])["expires_at"] == 150
+    uninstalled = record()
+    uninstalled["api_version"] = "v9.9"
+    evidence = assess(model, [uninstalled])
+    assert evidence["status"] == "held"
+    assert evidence["attributes"][0]["reason"] == "installed_api_version_not_observed"
     assert assess(model, [record()])["independent_e3_e4_qualification"] is False
     assert assess(model, [record()], now=151)["status"] == "held"
     alien = record()
