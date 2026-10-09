@@ -13,40 +13,103 @@ from planning.domain.source_intent_reconciliation import reconcile
 
 def _dataset_coverage(
     intent: dict[str, Any], workload: dict[str, Any],
-    source: dict[str, Any],
+    source: dict[str, Any], flow: dict[str, Any] | None,
+    target_sha256: str, now: int,
 ) -> bool:
+    """Keep every native disk while attesting Catalogue datasetless disks.
+
+    A null dataset ID is *not* an exclusion. Independently qualified E4
+    attestation permits treating a separately inventoried native dataset as
+    accounted for; native disk migration remains mandatory.
+    """
     link = source["catalogue_binding"]
-    mapping = link["disk_mappings"]
     expected = {d["id"]: d for d in workload["disks"]}
+    mapping = link.get("disk_mappings")
     if (not isinstance(mapping, list) or len(mapping) != len(expected)
-            or {d["logical_device_id"] for d in mapping} != set(expected)):
+            or any(not isinstance(d, dict) for d in mapping)
+            or {d.get("logical_device_id") for d in mapping} != set(expected)):
         return False
-    native_keys = {m["logical_device_id"]: m["native_key"] for m in mapping}
-    review = source["datasets"]
+    native_keys = {m["logical_device_id"]: m.get("native_key") for m in mapping}
+    if len(set(native_keys.values())) != len(native_keys):
+        return False
+    review = source.get("datasets")
     if not isinstance(review, list) or len(review) > 256:
         return False
     by_id = {d["id"]: d for d in review}
     if len(by_id) != len(review):
         return False
-    # Catalogue.dataset.owner_id is the accountable person, never a VM ID.
-    # Dataset membership is expressed by each workload disk's dataset_id.
     declared = {d["id"] for d in intent["datasets"]}
     if len(declared) != len(intent["datasets"]):
         return False
-    required = {disk.get("dataset_id") for disk in workload["disks"]}
-    # A null dataset is not proof that a disk can be dropped. A separate
-    # owner-approved disposition is required before this can be a match.
-    if None in required or not required <= declared or set(by_id) != required:
+    required = {disk.get("dataset_id") for disk in workload["disks"]
+                if disk.get("dataset_id") is not None}
+    if not required <= declared:
         return False
-    # Each physical key must belong to exactly the intended dataset, and
-    # every mapped native disk must be covered without overlap.
-    if len(set(native_keys.values())) != len(native_keys):
+    # Dataset groups must cover every source disk exactly once. A separately
+    # attested null-dataset disk may have a native reviewed group not declared
+    # as a durable Catalogue dataset; no disk can disappear.
+    keys = [key for item in review for key in item["disk_keys"]]
+    if len(keys) != len(set(keys)) or set(keys) != set(native_keys.values()):
         return False
-    return all(
-        [d["id"] for d in review
-         if native_keys[disk["id"]] in d["disk_keys"]] == [disk["dataset_id"]]
-        for disk in workload["disks"]
-    ) and sum(len(d["disk_keys"]) for d in review) == len(native_keys)
+    dispositions = link.get("disk_dispositions", [])
+    if not isinstance(dispositions, list):
+        return False
+    by_disk = {d.get("logical_device_id"): d for d in dispositions if isinstance(d, dict)}
+    if len(by_disk) != len(dispositions):
+        return False
+    missing = {d["id"] for d in workload["disks"] if d.get("dataset_id") is None}
+    if set(by_disk) != missing:
+        return False
+    qualified_cases = (
+        flow.get("disk_disposition_cases") if isinstance(flow, dict)
+        and flow.get("level") == "E4"
+        and flow.get("decision") == "accepted"
+        and flow.get("revoked") is False
+        and flow.get("intent_sha256") == digest(intent)
+        and type(flow.get("expires_at")) is int and flow["expires_at"] > now
+        else None
+    )
+    if missing and (not isinstance(qualified_cases, list)
+                    or len(qualified_cases) > 100):
+        return False
+    for disk in workload["disks"]:
+        assigned = [group["id"] for group in review
+                    if native_keys[disk["id"]] in group["disk_keys"]]
+        if len(assigned) != 1:
+            return False
+        if disk.get("dataset_id") is not None:
+            if assigned != [disk["dataset_id"]]:
+                return False
+            continue
+        owner = by_disk[disk["id"]]
+        case = [
+            item for item in qualified_cases
+            if isinstance(item, dict)
+            and item.get("logical_device_id") == disk["id"]
+            and item.get("workload_id") == workload["id"]
+        ]
+        if (len(case) != 1 or assigned[0] in declared
+                or owner.get("native_key") != native_keys[disk["id"]]
+                or owner.get("disposition") != "uncatalogued_attested"):
+            return False
+        receipt = case[0]
+        if any(receipt.get(field) != owner.get(field)
+               for field in ("disposition", "native_key",
+                             "owner_approval_sha256", "impact_sha256")):
+            return False
+        if (receipt.get("source_profile_sha256") != source["source_observation"]["profile_sha256"]
+                or receipt.get("target_profile_sha256") != target_sha256
+                or receipt.get("level") != "E4"
+                or receipt.get("decision") != "accepted"
+                or receipt.get("revoked") is not False
+                or type(receipt.get("observed_at")) is not int
+                or not 0 <= now - receipt["observed_at"] <= 30
+                or type(receipt.get("expires_at")) is not int
+                or not now < receipt["expires_at"] <= flow["expires_at"]
+                or not isinstance(receipt.get("evidence_sha256"), str)
+                or len(receipt["evidence_sha256"]) != 64):
+            return False
+    return True
 
 
 def evaluate(
@@ -112,7 +175,7 @@ def evaluate(
         mapped = deepcopy(observed)
         mapped["current"] = observed["current"] is True and source["current"] is True
         mapped["owner_dataset_coverage_current"] = _dataset_coverage(
-            intent, workload, source
+            intent, workload, source, flow, selected["target"]["profile_sha256"], now
         )
         mapped["owner_dataset_coverage_sha256"] = (
             digest(intent["datasets"]) if mapped["owner_dataset_coverage_current"] else None
@@ -201,6 +264,10 @@ def evaluate(
                 if isinstance(case, dict) and type(case.get("expires_at")) is int]
                if isinstance(flow, dict)
                and isinstance(flow.get("workload_interface_cases"), list) else [])
+            + ([case["expires_at"] for case in flow.get("disk_disposition_cases", [])
+                if isinstance(case, dict) and type(case.get("expires_at")) is int]
+               if isinstance(flow, dict)
+               and isinstance(flow.get("disk_disposition_cases"), list) else [])
         ),
         "native_write_authorized": False,
     }
