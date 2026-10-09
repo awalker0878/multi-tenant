@@ -257,9 +257,20 @@ class MountedMigrationRuntime:
                 source_read_endpoint.ca_file,
             ):
                 raise NativeHeld("ahv_observer_origin_changed")
+            # A native stage without an exact operation-version manifest
+            # cannot be executed even if a different API release was E3-rated.
+            pinned = plan.get("api_versions")
+            expected = dict.fromkeys(
+                ("vmm", "prism", "clustermgmt", "networking", "microseg", "iam"),
+                "v4.3",
+            )
+            if pinned != expected or (
+                kind == "ahv_capture" and plan.get("schema_version") != 3
+            ):
+                raise NativeHeld("ahv_source_selected_version_not_pinned")
             source_write_api, source_read_api = (
-                AhvHttp(source_write_endpoint),
-                AhvHttp(source_read_endpoint, read_only=True),
+                AhvHttp(source_write_endpoint, api_versions=pinned),
+                AhvHttp(source_read_endpoint, read_only=True, api_versions=pinned),
             )
 
             def ahv_source_current() -> None:
