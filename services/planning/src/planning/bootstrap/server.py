@@ -16,6 +16,7 @@ from planning.application.qualification_invalidations import QualificationInvali
 from planning.application.validation import MigrationValidation, NativeValidation, PlanValidation
 from planning.infrastructure.foundation import database_ready
 from planning.infrastructure.migration import prepare_migration
+from planning.infrastructure.workload_reconciliation import current_workload_reconciliation
 from planning.infrastructure.migration_recipes import recipe_for, visible_recipes
 from planning.infrastructure.migration_support import (
     api_capability_records,
@@ -57,6 +58,7 @@ class PlanningRouter:
         )
         self.flows = MigrationFlows(self.planning.planning, current_application_flow_proof)
         self.support.flow_require = self.flows.require
+        self.support.workload_current = current_workload_reconciliation
         self.foundation = FoundationApp(database_ready)
         self.invalidations = QualificationInvalidationApp(QualificationInvalidations(Postgres()))
         migrations = MigrationPlans(self.planning.planning, validation.migration, visible_recipes)
