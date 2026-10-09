@@ -233,6 +233,22 @@ def evaluate(
                         api_family = observation["api_family"]
                         api_version = observation["api_version"]
                         evidence_expiry = min(env["expires_at"], observation["expires_at"])
+                        # Lifecycle's currently commissioned AHV native operation
+                        # routes are fixed to v4.3. A qualified v4.2 observation
+                        # must never silently run against a v4.3 endpoint. A
+                        # version-aware executor manifest is needed to expand.
+                        if selected[side]["platform"] == "ahv" and (
+                            api_family.rsplit(".", 1)[-1]
+                            in {"vmm", "prism", "clustermgmt",
+                                "networking", "microseg", "iam"}
+                            and api_version != "v4.3"
+                        ):
+                            status, reason = (
+                                "blocked", "selected_api_version_not_executable"
+                            )
+                            ref, api_family, api_version, evidence_expiry = (
+                                None, None, None, None
+                            )
                     elif any(f["result"] == "degraded" for f in candidates):
                         status, reason = "conditional", "api_behavior_degraded"
                     elif candidates and all(f["result"] == "unsupported" for f in candidates):
