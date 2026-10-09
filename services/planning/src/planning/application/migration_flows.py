@@ -170,6 +170,12 @@ class MigrationFlows:
                    and row["source_flow_id"] not in seen]
         if missing:
             return ["application_flow_required_selection_missing"]
+        # Optional source-defined dependencies cannot be silently discarded.
+        # A future approved omission must be an independently authorized
+        # decision, not a missing mapping or browser-entered free text.
+        if any(not row["required"] and row["source_flow_id"] not in seen
+               for row in choices):
+            return ["application_flow_optional_omission_approval_required"]
         # Application-owner selection is an overlay for assessment, never an
         # alteration to the native observed snapshot's asserted reality.
         network["application_flow_selections"] = bound
