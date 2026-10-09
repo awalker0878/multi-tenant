@@ -13,7 +13,9 @@ from planning.domain.network_evidence import (
     isolation_checks, native_application_flow_choices,
     network_checks,
 )
-from planning.domain.effective_security import qualify as qualify_effective_security
+from planning.domain.effective_security import (
+    qualify as qualify_effective_security, semantic_security_digest,
+)
 from planning.domain.security_boundary import compare as compare_policy_boundary
 from planning.domain.operational_evidence import inventory_digest, snapshot
 from planning.domain.qualification import binding_digest, verified
@@ -290,7 +292,9 @@ class MigrationFlows:
                 document = evidence_case["document"]
                 controls.append({
                     "flow_id": flow_id,
-                    "source_security_sha256": digest(evidence_case["source_document"]),
+                    "source_security_sha256": semantic_security_digest(
+                        evidence_case["source_document"]),
+                    "destination_security_sha256": semantic_security_digest(document),
                     "boundary_sha256": digest(evidence_case["boundary"]),
                     "groups": document["groups"],
                     "services": document["services"],
