@@ -19,7 +19,7 @@ from inventory.domain.migration_collection_coverage import evaluate
 from inventory.infrastructure.native_readers import decode, protected
 
 
-def installed_namespaces(facts: dict[str, Any]) -> dict[str, list[str]]:
+def installed_namespaces(facts: dict[str, Any]) -> dict[str, list[str] | dict[str, str]]:
     """Only propagate releases discovered from this installed native profile.
 
     Product versions are not operation namespaces. OpenStack's source
@@ -34,7 +34,7 @@ def installed_namespaces(facts: dict[str, Any]) -> dict[str, list[str]]:
         "openstack": {"compute": "nova", "volume": "cinder",
                       "network": "neutron", "image": "glance"},
     }.get(platform, {})
-    result: dict[str, list[str]] = {}
+    result: dict[str, list[str] | dict[str, str]] = {}
     for family, value in raw.items():
         if family == "product" or not isinstance(family, str):
             continue
@@ -52,8 +52,13 @@ def installed_namespaces(facts: dict[str, Any]) -> dict[str, list[str]]:
     elif platform == "openstack" and facts.get("profile_type") == "TargetCapabilityProfile":
         for original, key in (("compute_version", "nova"), ("volume_version", "cinder")):
             version = facts.get(original)
-            if isinstance(version, dict) and isinstance(version.get("version"), str):
-                result[key] = [version["version"]]
+            if (isinstance(version, dict)
+                    and isinstance(version.get("min_version"), str)
+                    and isinstance(version.get("version"), str)):
+                result[key] = {
+                    "min_version": version["min_version"],
+                    "max_version": version["version"],
+                }
     return result
 
 
