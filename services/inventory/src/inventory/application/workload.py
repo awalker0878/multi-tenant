@@ -12,8 +12,9 @@ from inventory.domain.workload import METHODS, OWNER_FIELDS, review_input
 
 
 class WorkloadProfiles:
-    def __init__(self, discovery: Discovery) -> None:
+    def __init__(self, discovery: Discovery, collection_read=None) -> None:
         self.d = discovery
+        self.collection_read = collection_read
 
     def authorize(self, actor: Actor) -> None:
         if actor.action != "inventory.admin" or actor.site is None:
@@ -380,6 +381,11 @@ class WorkloadProfiles:
                 "catalogue_binding": review["input"].get("catalogue_binding"),
                 "source_associations": self.source_associations(tx, actor, application, environment)
                 if application is not None and environment is not None else [],
+                "collection_coverages": self.collection_read(
+                    tenant, site, source, target,
+                    self.binding(source), self.binding(target), self.d.clock()
+                ) if self.collection_read is not None and application is not None
+                and environment is not None else [],
                 "datasets": review["input"]["datasets"],
                 "disks": source["facts"]["disks"],
                 "owner_inputs": review["input"]["owner_inputs"],
