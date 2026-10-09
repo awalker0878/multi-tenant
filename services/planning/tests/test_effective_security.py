@@ -28,6 +28,7 @@ def proof(platform="vmware", nat=False):
                     "before_destination": "198.51.100.15",
                     "after_source": "203.0.113.14",
                     "after_destination": "198.51.100.15",
+                    "before_port": 5432, "after_port": 5432,
                     "stateful_return_observed": True,
                 } if nat else None),
             },
@@ -148,6 +149,30 @@ def test_policy_order_denies_even_when_lower_priority_allow_exists():
         "priority": 1, "action": "deny",
     })
     assert qualify(d, FLOW, NOW)["reason"] == "higher_priority_native_deny"
+
+
+def test_nat_port_translation_must_match_native_egress_port():
+    d = proof("vmware", True)
+    d["path"]["hops"][0]["nat"]["after_port"] = 15432
+    assert qualify(d, FLOW, NOW)["reason"] == "native_return_path_unqualified"
+    d["path"]["observed_egress_port"] = 15432
+    for row in d["probes"]:
+        row["path_sha256"] = digest(d["path"])
+    assert qualify(d, FLOW, NOW)["status"] == "qualified"
+
+
+def test_untested_vrf_crossing_or_stateful_direction_fails_closed():
+    d = proof("ahv", True)
+    d["path"]["hops"][0]["next_scope"] = "scope-shared"
+    assert qualify(d, FLOW, NOW)["reason"] == "native_nat_cross_scope_unqualified"
+    d["path"]["hops"][0]["nat"]["cross_scope_authorized"] = True
+    d["path"]["hops"][1]["scope"] = "scope-shared"
+    d["path"]["destination_scope"] = "scope-shared"
+    for row in d["probes"]:
+        row["path_sha256"] = digest(d["path"])
+    assert qualify(d, FLOW, NOW)["status"] == "qualified"
+    d["rules"][0]["stateful"] = False
+    assert qualify(d, FLOW, NOW)["reason"] == "native_security_return_state_unqualified"
 
 
 def test_observer_must_report_a_distinct_negative_flow():
