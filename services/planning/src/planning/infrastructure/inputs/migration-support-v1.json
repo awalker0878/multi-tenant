@@ -8,7 +8,8 @@
     "tranche_sha256",
     "release_sha256",
     "records",
-    "native_write_authorized"
+    "native_write_authorized",
+    "flow_evidence"
   ],
   "properties": {
     "schema_version": {
@@ -145,6 +146,118 @@
           }
         }
       }
+    },
+    "flow_evidence": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": 1
+            },
+            "assessment_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "source_revision_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "source_intent_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "context_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "selections_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "destination_generation_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "platform": {
+              "const": "openstack"
+            },
+            "observed_at": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "expires_at": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "level": {
+              "const": "E4"
+            },
+            "decision": {
+              "const": "accepted"
+            },
+            "checks": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "native_controls": {
+                  "const": "passed"
+                },
+                "source_completeness": {
+                  "const": "passed"
+                },
+                "allowed_traffic": {
+                  "const": "passed"
+                },
+                "denied_traffic": {
+                  "const": "passed"
+                },
+                "return_path": {
+                  "const": "passed"
+                },
+                "tenant_isolation": {
+                  "const": "passed"
+                },
+                "application_validation": {
+                  "const": "passed"
+                }
+              },
+              "required": [
+                "native_controls",
+                "source_completeness",
+                "allowed_traffic",
+                "denied_traffic",
+                "return_path",
+                "tenant_isolation",
+                "application_validation"
+              ]
+            },
+            "native_write_authorized": {
+              "const": false
+            }
+          },
+          "required": [
+            "schema_version",
+            "assessment_id",
+            "source_revision_id",
+            "source_intent_sha256",
+            "context_sha256",
+            "selections_sha256",
+            "destination_generation_id",
+            "platform",
+            "observed_at",
+            "expires_at",
+            "level",
+            "decision",
+            "checks",
+            "native_write_authorized"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   }
 }
