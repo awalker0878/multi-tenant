@@ -45,7 +45,9 @@ const versions = (platform: Platform) => Object.entries(platform.versions).map((
 type NativeChoice = {
   source_flow_id: string; source: { from: string; to: string; protocol: string; port: number | null };
   required: boolean; destination_firewall_rule_ids: string[]; destination_route_ids: string[];
-  status: 'choices_observed' | 'held_unobserved'; native_write_authorized: false;
+  status: 'choices_observed' | 'held_unobserved' | 'held_optional';
+  destination_path_details?: { selector: string; route_native_refs: string[]; nat_native_refs: string[] }[];
+  native_write_authorized: false;
 };
 type NativeBinding = { source_flow_id: string; rule_native_ref: string; route_native_ref: string };
 type NativeOmission = { source_flow_id: string; reason_code: string };
@@ -85,6 +87,14 @@ function flowSelection(id: string, side: 'rule_native_ref' | 'route_native_ref')
 function selectFlow(id: string, side: 'rule_native_ref' | 'route_native_ref', value: string) {
   flowBinding(id)[side] = value;
   if (value) flowForm.omissions = flowForm.omissions.filter(o => o.source_flow_id !== id);
+}
+function pathLabel(choice: NativeChoice, selector: string): string {
+  if (!selector.startsWith('path:')) return selector;
+  const detail = choice.destination_path_details?.find(p => p.selector === selector);
+  if (!detail) return 'Qualified native path (provenance unavailable — held)';
+  const routeCount = detail.route_native_refs.length;
+  const natCount = detail.nat_native_refs.length;
+  return `Qualified observed path · ${routeCount} native route hops, ${natCount} NAT rules`;
 }
 function omissionFor(id: string): string {
   return flowForm.omissions.find(o => o.source_flow_id === id)?.reason_code ?? '';
@@ -179,11 +189,13 @@ onMounted(() => { void refreshFlowChoices(); });
             <label>Existing destination network route
               <select :value="flowSelection(choice.source_flow_id, 'route_native_ref')" :disabled="flowForm.processing" @change="selectFlow(choice.source_flow_id, 'route_native_ref', ($event.target as HTMLSelectElement).value)">
                 <option value="">Select observed native route ID</option>
-                <option v-for="id in choice.destination_route_ids" :key="id" :value="id">{{ id }}</option>
+                <option v-for="id in choice.destination_route_ids" :key="id" :value="id">{{ pathLabel(choice, id) }}</option>
               </select>
             </label>
           </div>
-          <p v-else role="alert">No qualified native controls match this source-defined flow; migration must remain held.</p>
+          <p v-else :role="choice.required ? 'alert' : 'status'">{{ choice.required
+             ? 'No qualified existing native controls match this required source flow. Migration remains held.'
+             : 'No qualified native equivalent was found for this optional dependency. Request a separately approved omission below.' }}</p>
           <label v-if="!choice.required" class="mt-2 block">Optional dependency disposition (separate approval required)
             <select :value="omissionFor(choice.source_flow_id)" :disabled="flowForm.processing" @change="requestOmission(choice.source_flow_id, ($event.target as HTMLSelectElement).value)">
               <option value="">Migrate using existing native controls</option>
