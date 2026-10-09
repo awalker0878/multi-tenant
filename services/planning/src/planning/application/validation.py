@@ -39,7 +39,7 @@ class NativeValidation:
 class MigrationValidation:
     prepare: Callable[..., dict[str, Any]]
     recipes: Callable[[Actor, str, str], dict[str, Any]]
-    support: Callable[[Actor, str, dict[str, Any]], None]
+    support: Callable[[Actor, str, dict[str, Any]], dict[str, Any]]
     clock: Callable[[], int]
 
     def __post_init__(self) -> None:
