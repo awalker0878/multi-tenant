@@ -157,7 +157,7 @@ class MigrationFlows:
                 "rule_native_ref": selection["rule_native_ref"],
                 "route_native_ref": selection["route_native_ref"],
                 "observer_principal": observer,
-                "observed_at": now,
+                "observed_at": current["destination"]["capability_snapshot"]["observed_at"],
                 "expires_at": current["expires_at"],
                 "policy_sha256": digest(current["policy"]),
                 "topology_sha256": network["topology_sha256"],
@@ -246,7 +246,8 @@ class MigrationFlows:
                 "context_sha256=excluded.context_sha256,"
                 "payload=excluded.payload,updated_at=excluded.updated_at",
                 (*self.scope(actor, site), revision + 1, current["context_sha256"],
-                 canonical({"selections": body["selections"]}), self.planning.clock()),
+                 canonical({"selections": body["selections"], "holds": holds,
+                            "expires_at": current["expires_at"]}), self.planning.clock()),
             )
             tx.execute(
                 "INSERT INTO app.planning_commands "
@@ -263,7 +264,8 @@ class MigrationFlows:
         if saved is None or saved["payload"].get("selections") is None:
             raise Rejected("approved_application_flow_selection_required", 423)
         # A site-bound approval cannot be enough without a fresh native proof.
-        if self.planning.clock() - saved["updated_at"] > 60:
+        if (self.planning.clock() - saved["updated_at"] > 60
+                or saved["payload"].get("expires_at", 0) <= self.planning.clock()):
             raise Rejected("application_flow_evidence_expired", 423)
         if saved["payload"].get("holds"):
             raise Rejected("application_flow_not_eligible", 423)
