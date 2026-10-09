@@ -201,7 +201,7 @@ def current_application_flow_proof(
     platform = payload.get("destination_platform")
     if not isinstance(security_cases, list) or len(security_cases) > 512:
         raise Rejected("native_security_e4_cases_missing", 423)
-    if platform in {"vmware", "ahv"}:
+    if platform in {"vmware", "ahv", "openstack"}:
         from planning.domain.effective_security import qualify as qualify_effective_security
         from planning.domain.security_boundary import compare as compare_policy_boundary
 
@@ -249,9 +249,6 @@ def current_application_flow_proof(
             checked.add(flow_id)
         if checked != set(selected):
             raise Rejected("native_security_e4_flow_coverage_incomplete", 423)
-    elif platform == "openstack":
-        if security_cases:
-            raise Rejected("unrelated_security_e4_cases", 423)
     else:
         raise Rejected("unsupported_native_security_platform", 423)
     omissions = payload.get("omissions", [])
