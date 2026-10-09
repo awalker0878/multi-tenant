@@ -235,10 +235,25 @@ it('denies superseded Planning intent while service-only reads return current pu
         file_put_contents($outgoing, str_repeat('z', 64));
         config(['planning.credential_file' => $incoming,
             'planning.governance_credential_file' => $outgoing]);
-        $this->getJson('/internal/tenants/'.$this->tenant.'/applications/'.$app.
-            '/environments/'.$environment.'/current-planning-intent')
+        $path = '/internal/tenants/'.$this->tenant.'/applications/'.$app.
+            '/environments/'.$environment.'/current-planning-intent';
+        $this->getJson($path)
             ->assertOk()->assertJsonPath('revision_id', $second['revision_id'])
             ->assertJsonPath('intent_sha256', $second['digest']);
+        $lifecycle = tempnam(sys_get_temp_dir(), 'catalogue_lifecycle_in_');
+        try {
+            file_put_contents($lifecycle, str_repeat('c', 64));
+            config(['planning.lifecycle_credential_file' => $lifecycle]);
+            $this->withToken(str_repeat('c', 64))->getJson($path)
+                ->assertOk()->assertJsonPath('revision_id', $second['revision_id']);
+            $this->withToken(str_repeat('z', 64))->getJson($path)->assertForbidden();
+            $this->withToken(str_repeat('b', 64))->getJson($path)->assertForbidden();
+            // Reusing Planning's token is a commissioning error, not a grant.
+            file_put_contents($lifecycle, str_repeat('a', 64));
+            $this->withToken(str_repeat('a', 64))->getJson($path)->assertServiceUnavailable();
+        } finally {
+            @unlink($lifecycle);
+        }
     } finally {
         @unlink($incoming);
         @unlink($outgoing);

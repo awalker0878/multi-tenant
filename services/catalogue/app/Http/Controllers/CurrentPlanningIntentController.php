@@ -14,12 +14,19 @@ final class CurrentPlanningIntentController
 {
     public function __invoke(Request $request, string $tenant, string $application, string $environment, MountedSecret $secrets): JsonResponse
     {
-        $expected = $secrets->read(config('planning.credential_file'));
+        $planning = $secrets->read(config('planning.credential_file'));
+        $lifecycle = $secrets->read(config('planning.lifecycle_credential_file'));
         $outgoing = $secrets->read(config('planning.governance_credential_file'));
-        abort_if($expected === null || $outgoing === null || $expected === $outgoing, 503);
+        // Legacy Planning reads remain available before Lifecycle enrolment.
+        // When commissioned, the read-only Lifecycle credential is distinct
+        // from Planning and Governance; no shared secret grants both audiences.
+        abort_if($planning === null || $outgoing === null || $planning === $outgoing
+            || ($lifecycle !== null && ($lifecycle === $planning || $lifecycle === $outgoing)), 503);
         $headers = $request->headers->all('authorization');
-        abort_unless(count($headers) === 1 && is_string($headers[0])
-            && hash_equals('Bearer '.$expected, $headers[0]), 403);
+        $authorized = count($headers) === 1 && is_string($headers[0])
+            && (hash_equals('Bearer '.$planning, $headers[0])
+                || ($lifecycle !== null && hash_equals('Bearer '.$lifecycle, $headers[0])));
+        abort_unless($authorized, 403);
         $row = DB::table('app.catalogue_deployments as d')
             ->join('app.catalogue_revisions as r', function ($j): void {
                 $j->on('d.tenant_id', '=', 'r.tenant_id')
