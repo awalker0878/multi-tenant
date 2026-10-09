@@ -158,13 +158,19 @@ def nsx(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str, str | None
         effective_scope = policy_scope if policy_scope else rule_scope
         require(effective_scope and set(effective_scope).issubset(document["groups"]),
                 "nsx_applied_to_unverified")
-        if source["native_vm_id"] not in {
+        applied_members = {
             member for group in effective_scope
             for member in document["groups"][group]["members"]
-        } and target["native_vm_id"] not in {
-            member for group in effective_scope
-            for member in document["groups"][group]["members"]
-        }:
+        }
+        # NSX direction refers to the effective attachment direction. Never
+        # let an ingress-only rule qualify egress traffic (or vice versa).
+        in_scope = target["native_vm_id"] in applied_members
+        out_scope = source["native_vm_id"] in applied_members
+        if not (
+            (rule["direction"] == "in" and in_scope)
+            or (rule["direction"] == "out" and out_scope)
+            or (rule["direction"] == "both" and (in_scope or out_scope))
+        ):
             continue
         rows.append((key, rule))
     for _, rule in sorted(rows, key=lambda item: item[0]):
@@ -193,7 +199,14 @@ def ahv(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str, str | None
         require(priority not in seen_priority, "ahv_effective_order_ambiguous")
         seen_priority.add(priority)
         source, target = identity(document, flow["from"]), identity(document, flow["to"])
-        if source["native_vm_id"] not in rule["attached_vm_ids"] and target["native_vm_id"] not in rule["attached_vm_ids"]:
+        attached = set(rule["attached_vm_ids"])
+        in_scope = target["native_vm_id"] in attached
+        out_scope = source["native_vm_id"] in attached
+        if not (
+            (rule["direction"] == "in" and in_scope)
+            or (rule["direction"] == "out" and out_scope)
+            or (rule["direction"] == "both" and (in_scope or out_scope))
+        ):
             continue
         rows.append((priority, rule))
     for _, rule in sorted(rows, key=lambda item: item[0]):
