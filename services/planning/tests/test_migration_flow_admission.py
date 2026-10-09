@@ -27,6 +27,7 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
             "source_revision_id": source_revision,
             "source_intent_sha256": "b" * 64,
             "destination_generation_id": generation,
+            "destination_platform": "openstack",
             "native_controls_sha256": "c" * 64,
             "omissions": [],
             "selections": [{
@@ -52,7 +53,8 @@ def test_independent_qualification_must_bind_current_source_and_exact_controls(
         "destination_generation_id": generation,
         "omissions_sha256": digest([]),
         "omissions_approved": False, "omission_approver_id": None,
-        "platform": "openstack", "level": "E4",
+        "platform": "openstack", "security_cases": [],
+        "level": "E4",
         "decision": "accepted", "native_write_authorized": False,
         "observed_at": now, "expires_at": now + 30,
         "checks": {
