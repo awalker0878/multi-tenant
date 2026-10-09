@@ -8,6 +8,39 @@ from planning.domain.workload_reconciliation import evaluate
 from planning.infrastructure.owners import request
 
 
+def current_review_binding(
+    actor: Actor, site: str, review: dict[str, Any],
+) -> dict[str, Any]:
+    """Resolve selected migration review from authenticated Inventory custody.
+
+    The browser supplies only an immutable revision/digest locator. Native
+    identities, platforms, profile SHA and method are never user declarations.
+    """
+    if not isinstance(review, dict) or set(review) != {"revision", "digest"}:
+        raise Rejected("migration_review_locator_required", 422)
+    revision = integer(review["revision"], 1)
+    review_sha = sha(review["digest"])
+    records = request(
+        "INVENTORY", "GET",
+        f"/internal/tenants/{identifier(actor.tenant)}/migration-inputs/"
+        f"{identifier(actor.application)}/{identifier(actor.environment)}/"
+        f"{identifier(site)}/{revision}/{review_sha}",
+        schema_name="migration-input-v3",
+    )
+    if (records.get("tenant_id") != actor.tenant
+            or records.get("site_id") != site
+            or records.get("revision") != revision
+            or records.get("digest") != review_sha
+            or records.get("current") is not True
+            or not isinstance(records.get("source"), dict)
+            or not isinstance(records.get("target"), dict)):
+        raise Rejected("migration_current_review_unavailable", 423)
+    return {
+        "source": records["source"], "target": records["target"],
+        "method": records["method"], "review": review,
+    }
+
+
 def current_workload_reconciliation(
     actor: Actor, site: str, binding: dict[str, Any],
     flow_e4: dict[str, Any] | None,
