@@ -181,7 +181,11 @@
               "format": "uuid"
             },
             "platform": {
-              "const": "openstack"
+              "enum": [
+                "openstack",
+                "vmware",
+                "ahv"
+              ]
             },
             "observed_at": {
               "type": "integer",
@@ -257,6 +261,63 @@
                   "type": "null"
                 }
               ]
+            },
+            "security_cases": {
+              "type": "array",
+              "maxItems": 512,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "source_flow_id": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "flow": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "from",
+                      "to",
+                      "protocol",
+                      "port"
+                    ],
+                    "properties": {
+                      "from": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "to": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "protocol": {
+                        "enum": [
+                          "tcp",
+                          "udp",
+                          "icmp"
+                        ]
+                      },
+                      "port": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "minimum": 0,
+                        "maximum": 65535
+                      }
+                    }
+                  },
+                  "document": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "source_flow_id",
+                  "flow",
+                  "document"
+                ]
+              }
             }
           },
           "required": [
@@ -277,7 +338,8 @@
             "native_controls_sha256",
             "omissions_sha256",
             "omissions_approved",
-            "omission_approver_id"
+            "omission_approver_id",
+            "security_cases"
           ]
         },
         {
