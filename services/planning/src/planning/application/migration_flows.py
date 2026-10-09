@@ -124,7 +124,7 @@ class MigrationFlows:
         )
         if qualified:
             choices = self.qualified_native_choices(
-                intent, dest["platform"], cases, now, policy,
+                intent, dest["platform"], cases, now, policy, dest["native_scope"],
             )
         elif dest["platform"] == "openstack":
             # E2 choices are visible for review only. No E4 admission can
@@ -165,6 +165,7 @@ class MigrationFlows:
     def qualified_native_choices(
         intent: dict[str, Any], platform: str,
         cases: list[dict[str, Any]], now: int, policy: dict[str, Any],
+        destination_scope: str,
     ) -> list[dict[str, Any]]:
         """Only independently E4-qualified existing NSX/Prism controls enter a dropdown."""
         case_map: dict[str, dict[str, Any]] = {}
@@ -208,6 +209,7 @@ class MigrationFlows:
                 continue
             if (case is None or case["flow"] != source
                     or case["document"].get("platform") != platform
+                    or case["document"].get("native_scope") != destination_scope
                     or not isinstance(case["source_document"], dict)
                     or case["source_document"].get("platform")
                        not in {"vmware", "ahv", "openstack"}):
