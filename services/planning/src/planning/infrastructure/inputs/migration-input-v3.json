@@ -839,7 +839,9 @@
         "environment_id",
         "revision_id",
         "intent_sha256",
-        "workload_id"
+        "workload_id",
+        "disk_mappings",
+        "nic_mappings"
       ],
       "properties": {
         "application_id": {
@@ -861,6 +863,52 @@
         "workload_id": {
           "type": "string",
           "format": "uuid"
+        },
+        "disk_mappings": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "logical_device_id",
+              "native_key"
+            ],
+            "properties": {
+              "logical_device_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "native_key": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              }
+            }
+          }
+        },
+        "nic_mappings": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "logical_device_id",
+              "native_key"
+            ],
+            "properties": {
+              "logical_device_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "native_key": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              }
+            }
+          }
         }
       }
     }
