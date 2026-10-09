@@ -67,3 +67,19 @@ def test_conditional_field_needs_independent_applicability_and_native_receipt() 
     assert assess(model, [], [condition])["attributes"][0]["status"] == "not_applicable"
     condition["observed_at"] = None
     assert assess(model, [], [condition])["status"] == "held"
+
+
+def test_invalid_applicability_digest_never_upgrades_to_observed() -> None:
+    model = manifest()
+    model["platforms"]["ahv"]["attributes"][0]["condition"] = "when:present"
+    receipt = record()
+    decision = {
+        **{k: receipt[k] for k in ("attribute_id", "scope", "installation_id",
+                                    "generation_id", "installed_tuple_sha256", "observed_at")},
+        "condition": "when:present", "applicable": True,
+        "evidence_sha256": "invalid-not-a-digest",
+    }
+    result = assess(model, [receipt], [decision])
+    assert result["status"] == "held"
+    assert result["attributes"][0]["status"] == "held"
+    assert result["attributes"][0]["reason"] == "applicability_evidence_stale_or_invalid"
