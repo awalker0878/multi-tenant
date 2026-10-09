@@ -21,13 +21,53 @@
     "contract-platform": []
   },
   "contracts": {
-    "contracts/schemas/events/catalogue-foundation-recorded-v1.json": [
+    "contracts/asyncapi/catalogue-intent.yaml": [
       "catalogue",
       "planning"
     ],
     "contracts/asyncapi/catalogue.yaml": [
       "catalogue",
       "planning"
+    ],
+    "contracts/asyncapi/governance.yaml": [
+      "governance",
+      "console"
+    ],
+    "contracts/asyncapi/identity.yaml": [
+      "governance",
+      "console"
+    ],
+    "contracts/asyncapi/support.yaml": [
+      "governance",
+      "console"
+    ],
+    "contracts/capabilities/definitions-v1.json": [
+      "inventory",
+      "planning",
+      "lifecycle"
+    ],
+    "contracts/capabilities/migration-collection-manifest-v1.json": [
+      "inventory",
+      "planning",
+      "lifecycle"
+    ],
+    "contracts/capabilities/migration-feature-policy-v1.json": [
+      "inventory",
+      "planning",
+      "console"
+    ],
+    "contracts/capabilities/migration-field-crosswalk-v1.json": [
+      "inventory",
+      "planning",
+      "lifecycle"
+    ],
+    "contracts/capabilities/native-security-api-registry-v1.json": [
+      "inventory",
+      "planning"
+    ],
+    "contracts/openapi/catalogue-v1.0.1.json": [
+      "catalogue",
+      "console"
     ],
     "contracts/openapi/foundation-health-v1.json": [
       "contract-platform",
@@ -39,15 +79,43 @@
       "assurance",
       "console"
     ],
+    "contracts/openapi/governance-approvals-v1.json": [
+      "governance",
+      "console"
+    ],
+    "contracts/openapi/governance-catalogue-owners-v1.json": [
+      "governance",
+      "catalogue"
+    ],
+    "contracts/openapi/governance-delegation-v1.1.json": [
+      "governance",
+      "console"
+    ],
+    "contracts/openapi/governance-directory-v1.json": [
+      "governance",
+      "console"
+    ],
+    "contracts/openapi/governance-federation-v1.json": [
+      "governance",
+      "console"
+    ],
+    "contracts/openapi/governance-inventory-collection-v1.json": [
+      "governance",
+      "inventory"
+    ],
     "contracts/openapi/governance-local-identity-v1.json": [
       "governance",
       "console"
     ],
-    "contracts/schemas/events/governance-change-v1.json": [
+    "contracts/openapi/governance-native-approval-v1.json": [
+      "governance",
+      "lifecycle"
+    ],
+    "contracts/openapi/governance-support-v1.json": [
       "governance",
       "console"
     ],
-    "contracts/asyncapi/governance.yaml": [
+    "contracts/openapi/governance-tenancy-v1.json": [
       "governance",
       "console"
     ],
@@ -55,17 +123,20 @@
       "inventory",
       "console"
     ],
-    "contracts/schemas/planning/migration-input-v4.json": [
-      "inventory",
-      "planning"
-    ],
-    "contracts/schemas/planning/migration-outcomes-v1.json": [
-      "planning",
+    "contracts/openapi/lifecycle-migration-campaigns-v1.json": [
       "lifecycle",
-      "lifecycle-workers"
+      "console"
     ],
     "contracts/openapi/lifecycle-native-jobs-v1.1.json": [
       "lifecycle",
+      "console"
+    ],
+    "contracts/openapi/lifecycle-v1.json": [
+      "lifecycle",
+      "console"
+    ],
+    "contracts/openapi/planning-migration-v1.6.json": [
+      "planning",
       "console"
     ],
     "contracts/openapi/worker-migration-effect-v2.1.json": [
@@ -83,28 +154,63 @@
       "inventory-workers",
       "lifecycle-workers"
     ],
+    "contracts/schemas/catalogue/intent-v1.json": [
+      "catalogue",
+      "planning"
+    ],
+    "contracts/schemas/events/catalogue-foundation-recorded-v1.json": [
+      "catalogue",
+      "planning"
+    ],
+    "contracts/schemas/events/catalogue-intent-v1.json": [
+      "catalogue",
+      "planning"
+    ],
+    "contracts/schemas/events/governance-change-v1.json": [
+      "governance",
+      "console"
+    ],
+    "contracts/schemas/events/identity-change-v1.json": [
+      "governance",
+      "console"
+    ],
+    "contracts/schemas/events/support-change-v1.json": [
+      "governance",
+      "console"
+    ],
     "contracts/schemas/expansion/tranche-v1.1.json": [
       "planning"
     ],
-    "contracts/openapi/planning-migration-v1.6.json": [
-      "planning",
-      "console"
-    ],
-    "contracts/openapi/catalogue-v1.0.1.json": [
-      "catalogue",
-      "console"
-    ],
-    "contracts/schemas/planning/migration-support-v2.json": [
-      "assurance",
+    "contracts/schemas/planning/migration-input-v4.json": [
+      "inventory",
       "planning"
+    ],
+    "contracts/schemas/planning/migration-outcomes-v1.json": [
+      "planning",
+      "lifecycle",
+      "lifecycle-workers"
     ],
     "contracts/schemas/planning/migration-readiness-v2.2.json": [
       "planning",
       "lifecycle"
+    ],
+    "contracts/schemas/planning/migration-support-v2.json": [
+      "assurance",
+      "planning"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
   "active_releases": [
+    {
+      "path": "contracts/asyncapi/catalogue-intent.yaml",
+      "owner": "catalogue",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
     {
       "path": "contracts/asyncapi/catalogue.yaml",
       "owner": "catalogue",
@@ -120,6 +226,82 @@
       "owner": "governance",
       "consumers": [
         "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/asyncapi/identity.yaml",
+      "owner": "governance",
+      "consumers": [
+        "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/asyncapi/support.yaml",
+      "owner": "governance",
+      "consumers": [
+        "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/capabilities/definitions-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/capabilities/migration-collection-manifest-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/capabilities/migration-feature-policy-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning",
+        "console"
+      ],
+      "copies": [
+        "apps/console/resources/contracts/migration-feature-policy-v1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/capabilities/migration-field-crosswalk-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/capabilities/native-security-api-registry-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning"
       ],
       "copies": [],
       "source_manifest": null,
@@ -154,7 +336,99 @@
       "depends_on": []
     },
     {
+      "path": "contracts/openapi/governance-approvals-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/governance-catalogue-owners-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "catalogue"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/governance-delegation-v1.1.json",
+      "owner": "governance",
+      "consumers": [
+        "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/governance-directory-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/governance-federation-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/governance-inventory-collection-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "inventory"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
       "path": "contracts/openapi/governance-local-identity-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/governance-native-approval-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/governance-support-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "console"
+      ],
+      "copies": [
+        "services/governance/resources/contracts/governance-support-v1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/governance-tenancy-v1.json",
       "owner": "governance",
       "consumers": [
         "console"
@@ -176,12 +450,38 @@
       "depends_on": []
     },
     {
+      "path": "contracts/openapi/lifecycle-migration-campaigns-v1.json",
+      "owner": "lifecycle",
+      "consumers": [
+        "console"
+      ],
+      "copies": [
+        "apps/console/resources/contracts/lifecycle-migration-campaigns-v1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
       "path": "contracts/openapi/lifecycle-native-jobs-v1.1.json",
       "owner": "lifecycle",
       "consumers": [
         "console"
       ],
-      "copies": [],
+      "copies": [
+        "apps/console/resources/contracts/lifecycle-native-jobs-v1.1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/lifecycle-v1.json",
+      "owner": "lifecycle",
+      "consumers": [
+        "console"
+      ],
+      "copies": [
+        "apps/console/resources/contracts/lifecycle-v1.json"
+      ],
       "source_manifest": null,
       "depends_on": []
     },
@@ -239,7 +539,31 @@
       "depends_on": []
     },
     {
+      "path": "contracts/schemas/catalogue/intent-v1.json",
+      "owner": "catalogue",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/catalogue/resources/contracts/intent-v1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
       "path": "contracts/schemas/events/catalogue-foundation-recorded-v1.json",
+      "owner": "catalogue",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/catalogue/resources/contracts/foundation-event.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/events/catalogue-intent-v1.json",
       "owner": "catalogue",
       "consumers": [
         "planning"
@@ -254,7 +578,35 @@
       "consumers": [
         "console"
       ],
-      "copies": [],
+      "copies": [
+        "services/governance/resources/contracts/governance-change-v1.json",
+        "apps/console/resources/contracts/governance-change-v1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/events/identity-change-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "console"
+      ],
+      "copies": [
+        "services/governance/resources/contracts/identity-change-v1.json",
+        "apps/console/resources/contracts/identity-change-v1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/events/support-change-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "console"
+      ],
+      "copies": [
+        "services/governance/resources/contracts/support-change-v1.json"
+      ],
       "source_manifest": null,
       "depends_on": []
     },
