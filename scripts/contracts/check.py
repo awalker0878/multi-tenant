@@ -73,7 +73,7 @@ def local_refs(doc, label):
 
 def current_api(name):
     doc = load(f"contracts/openapi/{name}")
-    if doc.get("openapi") != "3.1.0":
+    if doc.get("openapi") not in {"3.1.0", "3.0.4"}:
         raise ValueError(f"Invalid OpenAPI dialect: {name}")
     ids = set()
     for path, item in doc["paths"].items():
@@ -173,6 +173,27 @@ def check_events():
         if not document.get("channels") or not document.get("operations"):
             raise ValueError(f"Missing AsyncAPI channels or operations: {path}")
         local_refs(document, str(path))
+        channels = document["channels"]
+        operations = document["operations"]
+        if not isinstance(channels, dict) or not isinstance(operations, dict):
+            raise ValueError(f"Invalid AsyncAPI channel/operation maps: {path}")
+        addresses: set[str] = set()
+        for key, channel in channels.items():
+            if not isinstance(channel, dict):
+                raise ValueError(f"Invalid AsyncAPI channel: {path}:{key}")
+            address = channel.get("address")
+            if (not isinstance(address, str) or not address
+                    or address in addresses or not channel.get("messages")):
+                raise ValueError(f"Invalid/duplicate AsyncAPI address: {path}:{key}")
+            addresses.add(address)
+        for name, operation in operations.items():
+            if (not isinstance(operation, dict)
+                    or operation.get("action") not in {"send", "receive"}
+                    or not isinstance(operation.get("channel"), dict)
+                    or operation["channel"].get("$ref") not in {
+                        "#/channels/" + key for key in channels
+                    }):
+                raise ValueError(f"Unbound AsyncAPI operation: {path}:{name}")
         messages = document.get("components", {}).get("messages", {})
         if not messages:
             raise ValueError(f"Missing AsyncAPI message definitions: {path}")
@@ -243,7 +264,7 @@ def check_schema_dialects():
 def check_readiness_projection():
     """Wire v2 must be the authoritative embedded OpenAPI component.
 
-    The installed v2.1 validation profile may be stricter, without changing
+    The installed v2.2 validation profile may be stricter, without changing
     the published wire v2 semantics or rewriting Planning v1.6 API bytes.
     """
     from generate_readiness import embedded_payload
@@ -276,6 +297,8 @@ def check_consumer_registry():
     if not isinstance(releases, list) or len(releases) < 6:
         raise ValueError("Missing machine-readable active contract release catalogue")
     names = [entry["path"] for entry in releases]
+    if set(names) != set(inventory):
+        raise ValueError("Active contract registry does not cover every declared consumer")
     if len(names) != len(set(names)):
         raise ValueError("Duplicate active contract release")
     for entry in releases:
@@ -284,7 +307,6 @@ def check_consumer_registry():
         consumers = entry["consumers"]
         if (not (ROOT / path).is_file()
                 or owner not in registry["dependencies"]
-                or not consumers
                 or set(consumers) - set(registry["dependencies"])):
             raise ValueError(f"Invalid active release ownership or consumers: {path}")
         if not {owner, *consumers}.issubset(set(inventory.get(path, []))):
@@ -307,7 +329,10 @@ def main():
     id_count = unique_schema_ids()
     schema_count = check_schema_dialects()
     paths, ops = 0, 0
-    for name in ("catalogue-v1.0.1.json", "inventory-v1.9.json", "planning-migration-v1.6.json"):
+    active = load("architecture/contract-consumers.json")["active_releases"]
+    apis = sorted(entry["path"].rsplit("/", 1)[-1] for entry in active
+                  if entry["path"].startswith("contracts/openapi/"))
+    for name in apis:
         a, b = current_api(name)
         paths += a
         ops += b

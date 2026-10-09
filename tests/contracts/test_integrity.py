@@ -56,6 +56,14 @@ class ContractIntegrityTests(unittest.TestCase):
         check_copies()
         self.assertGreater(unique_schema_ids(), 10)
 
+    def test_all_declared_active_openapi_versions(self):
+        from check import current_api
+        releases = load("architecture/contract-consumers.json")["active_releases"]
+        for entry in releases:
+            if entry["path"].startswith("contracts/openapi/"):
+                with self.subTest(contract=entry["path"]):
+                    self.assertGreater(current_api(entry["path"].split("/")[-1])[1], 0)
+
     def test_current_openapi_operations_and_path_parameters(self):
         for name, count in (
             ("catalogue-v1.0.1.json", 18),

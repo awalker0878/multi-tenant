@@ -42,3 +42,5 @@ The archived Inventory and Planning API releases remain immutable. Unused Consol
 ## Active producer and consumer ownership
 
 `architecture/contract-consumers.json` owns the **editable** active-release catalogue with per-contract producers, downstream consumers, installed artifact paths, source manifests, and explicit dependencies. `scripts/contracts/check.py` checks every declaration against real files and byte-identical installed copies. This is separate from immutable historical contract publications; replacing an active release updates the registry, never rewrites an older published API or schema.
+
+All contracts with a declared implemented consumer are now represented by an active-release record. The registry validates source manifests, installed byte parity and the active OpenAPI specifications, including OpenAPI 3.0 foundation health. Asynchronous events are checked for channel/address uniqueness, valid operation bindings and referenced JSON Schema payloads; this is not a substitute for measured broker-event conformance.
