@@ -320,3 +320,43 @@ def test_ahv_policy_rule_lists_use_bounded_native_policy_rule_get(mode: str) -> 
         assert len(observed[0]["spec_sha256"]) == 64
         assert "secretNativeDetail" not in str(result)
         assert "ahv_security_rule_catalog_incomplete" not in result["holds"]
+
+
+def test_prism_microseg_namespace_can_use_installed_v42_while_other_apis_are_v43():
+    from inventory_worker.infrastructure.ahv_profile import collect_ahv
+    project, cluster, pc, storage, subnet = [uid() for _ in range(5)]
+    versions = {k: "v4.3" for k in
+                ("vmm", "prism", "clustermgmt", "networking", "microseg")}
+    versions["microseg"] = "v4.2"
+    stream = {
+        "kind": "target_profile", "cluster_id": cluster,
+        "prism_central_id": pc, "shared_resource_ids": [],
+        "credential_file": "/fixture",
+        "api_versions_verified": True, "api_versions": versions,
+    }
+    observed_paths = []
+    def exchange(conn, path, headers):
+        observed_paths.append(path)
+        if "/clusters/" in path:
+            return {"data": {"extId": cluster, "config": {
+                "isAvailable": True, "hypervisorTypes": ["AHV"],
+                "buildInfo": {"version": "7.6"},
+                "clusterSoftwareMap": [{"softwareType": "AHV", "version": "11.2"}]}}}
+        if "/domain-managers/" in path:
+            return {"data": {"extId": pc, "config": {"buildInfo": {"version": "7.6"}}}}
+        rows = []
+        if "storage-containers" in path:
+            rows = [{"extId": storage, "clusterExtId": cluster,
+                     "isMarkedForRemoval": False, "isInternal": False}]
+        if "/subnets" in path:
+            rows = [{"extId": subnet, "projectExtId": project}]
+        return {"data": rows, "metadata": {"totalAvailableResults": len(rows)}}
+    with (patch("inventory_worker.infrastructure.ahv_profile.exchange", side_effect=exchange),
+          patch("inventory_worker.infrastructure.ahv_profile.secret", return_value="fixture")):
+        result = collect_ahv({"native_scope": project}, stream, 100, lambda: None)
+    assert result["api_versions"] == versions
+    assert any(path.startswith("/api/microseg/v4.2/config/policies?") for path in observed_paths)
+    assert any(path.startswith("/api/prism/v4.3/config/categories?") for path in observed_paths)
+    assert not any(path.startswith("/api/microseg/v4.3/") for path in observed_paths)
+    assert "ahv_service_groups_api_unqualified" in result["holds"]
+    assert result["native_qualification"] == "not_established"
