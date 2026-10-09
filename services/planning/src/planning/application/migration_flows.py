@@ -150,6 +150,40 @@ class MigrationFlows:
         return row
 
     @staticmethod
+    def native_control_digest(current: dict[str, Any], selections: list[dict[str, Any]]) -> str:
+        """Hash selected native semantics, not volatile observer timestamps.
+
+        This is only a drift detector. Positive equivalence still requires
+        current independent E4 tests and the signed admission receipt.
+        """
+        net = current["data"]["network"]
+        choices = {row["source_flow_id"]: row for row in current["choices"]}
+        controls = []
+        for selection in selections:
+            source_id = selection.get("source_flow_id")
+            option = choices.get(source_id)
+            if option is None:
+                raise Rejected("unapproved_application_flow")
+            flows = option["source"]
+            rule = [r for r in net.get("firewall_rules", []) if isinstance(r, dict)
+                    and r.get("native_ref") == selection.get("rule_native_ref")
+                    and all(r.get(k) == flows[k] for k in
+                            ("from", "to", "protocol", "port"))]
+            route = [r for r in net.get("topology", {}).get("routes", [])
+                     if isinstance(r, dict)
+                     and r.get("native_ref") == selection.get("route_native_ref")
+                     and r.get("from") == flows["from"] and r.get("to") == flows["to"]]
+            if len(rule) != 1 or len(route) != 1:
+                raise Rejected("application_flow_native_control_changed", 423)
+            transient = {"observed_at", "expires_at", "last_seen_at", "sequence"}
+            controls.append({
+                "flow_id": source_id,
+                "firewall": {k: v for k, v in rule[0].items() if k not in transient},
+                "route": {k: v for k, v in route[0].items() if k not in transient},
+            })
+        return digest(sorted(controls, key=lambda row: row["flow_id"]))
+
+    @staticmethod
     def evaluate(current: dict[str, Any], selections: Any, now: int) -> list[str]:
         choices, data = current["choices"], deepcopy(current["data"])
         if not isinstance(selections, list) or len(selections) > 512:
@@ -225,6 +259,14 @@ class MigrationFlows:
         changed = saved is not None and saved["context_sha256"] != current["context_sha256"]
         selections = saved["payload"]["selections"] if saved and not changed else []
         holds = self.evaluate(current, selections, self.planning.clock())
+        if saved and not changed:
+            try:
+                if saved["payload"].get("native_controls_sha256") != self.native_control_digest(current, selections):
+                    changed = True
+                    holds = ["application_flow_native_control_changed", *holds]
+            except (Rejected, KeyError, TypeError):
+                changed = True
+                holds = ["application_flow_native_control_changed", *holds]
         if changed:
             holds = ["application_flow_evidence_changed", *holds]
         return {
@@ -290,6 +332,8 @@ class MigrationFlows:
                  revision + 1, current["context_sha256"],
                  canonical({"selections": body["selections"], "holds": holds,
                             "assessment_id": current["assessment_id"],
+                            "native_controls_sha256": self.native_control_digest(
+                                current, body["selections"]),
                             "source_revision_id": current["source_revision_id"],
                             "source_intent_sha256": current["source_intent_sha256"],
                             "destination_generation_id": current["destination_generation_id"],
