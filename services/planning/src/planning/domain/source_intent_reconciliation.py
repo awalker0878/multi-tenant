@@ -18,9 +18,9 @@ def reconcile(
     flow_e4: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if (not isinstance(intent, dict) or not isinstance(intent.get("workloads"), list)
-            or not 1 <= len(intent["workloads"]) <= 50
-            or not isinstance(links, list) or len(links) > 50
-            or not isinstance(profiles, list) or len(profiles) > 50):
+            or not 1 <= len(intent["workloads"]) <= 100
+            or not isinstance(links, list) or len(links) > 100
+            or not isinstance(profiles, list) or len(profiles) > 100):
         raise Rejected("source_intent_reconciliation_invalid", 422)
     # The digest must identify the exact immutable Catalogue document rather
     # than a caller-supplied label that merely matches the mapping receipts.
