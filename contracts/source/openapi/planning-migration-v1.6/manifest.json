@@ -13,7 +13,11 @@
       "kind": "object",
       "files": [
         "components-schemas/foundation-01.json",
-        "components-schemas/migration-01.json"
+        "components-schemas/migration-options-and-support.json",
+        "components-schemas/flow-choices-and-receipts.json",
+        "components-schemas/workload-readiness.json",
+        "components-schemas/flow-selection-requests.json",
+        "components-schemas/workload-readiness-request.json"
       ]
     }
   },
