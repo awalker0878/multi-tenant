@@ -92,7 +92,6 @@ def test_ten_budgeted_reads_include_native_microseg_reference_catalogue() -> Non
     assert profile["observations_sha256"] and result["terminal"] is True
 
 
-@pytest.mark.parametrize("count", [0, 1, 100, 101, 200, 1000])
 def test_unqualified_optional_microseg_group_endpoints_never_trigger_speculative_requests():
     from inventory_worker.infrastructure.ahv_profile import collect_ahv
     project, cluster, pc, storage, subnet = [uid() for _ in range(5)]
