@@ -100,7 +100,8 @@ final class MigrationQualificationController
                         'native_controls_sha256', 'omissions_sha256',
                         'omissions_approved', 'omission_approver_id',
                         'destination_generation_id',
-                        'platform', 'security_cases', 'observed_at', 'expires_at', 'level', 'decision',
+                        'platform', 'source_platform', 'security_cases',
+                        'observed_at', 'expires_at', 'level', 'decision',
                         'checks', 'native_write_authorized',
                     ];
                     if (is_array($candidateFlows)
@@ -115,6 +116,7 @@ final class MigrationQualificationController
                             || (is_string($candidateFlows['omission_approver_id'])
                                 && preg_match('/\\A[0-9a-f-]{36}\\z/', $candidateFlows['omission_approver_id']) === 1))
                         && in_array($candidateFlows['platform'] ?? null, ['openstack', 'vmware', 'ahv'], true)
+                        && in_array($candidateFlows['source_platform'] ?? null, ['openstack', 'vmware', 'ahv'], true)
                         && is_array($candidateFlows['security_cases'] ?? null)
                         && array_is_list($candidateFlows['security_cases'])
                         && count($candidateFlows['security_cases']) <= 512
