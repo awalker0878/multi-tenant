@@ -47,6 +47,8 @@ def capture_field(
             or not isinstance(witness.get("native_operation"), str)
             or not re.fullmatch(r"GET /[A-Za-z0-9_./:%?=&-]{1,400}",
                                 witness["native_operation"])
+            or not isinstance(witness.get("response_sha256"), str)
+            or not HEX.fullmatch(witness["response_sha256"])
             or "value" not in witness or witness["value"] is None
             or type(witness.get("observed_at")) is not int):
         return None
@@ -66,6 +68,7 @@ def capture_field(
         "api_version": witness["api_version"],
         "native_operation": witness["native_operation"],
         "value_sha256": value_sha,
+        "source_response_sha256": witness["response_sha256"],
         "observed_at": witness["observed_at"],
         "value_present": True,
     }
