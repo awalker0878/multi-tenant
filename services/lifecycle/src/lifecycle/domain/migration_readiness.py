@@ -50,7 +50,10 @@ def eligible_field_dispositions(workloads: Any) -> bool:
                 or field.get("evidence_source") not in {
                     "inventory_native_profile", "independent_e4",
                 }
-                or field.get("evidence_age_seconds") is None
+                or type(field.get("evidence_age_seconds")) is not int
+                or field["evidence_age_seconds"] < 0
+                or (field["evidence_source"] == "independent_e4"
+                    and field["evidence_age_seconds"] >= 30)
             ):
                 return False
     return True

@@ -159,6 +159,7 @@ class MigrationSupport:
             route, proof["reconciliation"], proof.get("collection_coverages"), now,
             self.collection_manifest(selected["release_sha256"])
             if self.collection_manifest is not None else None,
+            selected_review=binding,
         )
         validate_workload_contract(result)
         return {"schema_version": 1, "review": revision, "readiness": result,
@@ -270,6 +271,7 @@ class MigrationSupport:
             readiness, evidence["reconciliation"],
             evidence.get("collection_coverages"), self.clock(),
             self.collection_manifest(selected["release_sha256"]),
+            selected_review=binding,
         )
         if readiness["status"] != "eligible":
             raise Rejected("migration_workload_readiness_held", 423)

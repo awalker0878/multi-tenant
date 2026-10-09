@@ -44,7 +44,10 @@ def eligible_field_dispositions(workloads: Any) -> bool:
                 or field.get("evidence_source") not in {
                     "inventory_native_profile", "independent_e4",
                 }
-                or field.get("evidence_age_seconds") is None
+                or type(field.get("evidence_age_seconds")) is not int
+                or field["evidence_age_seconds"] < 0
+                or (field["evidence_source"] == "independent_e4"
+                    and field["evidence_age_seconds"] >= 30)
             ):
                 return False
     return True
@@ -132,6 +135,7 @@ def resolve_workload(
     route: dict[str, Any], reconciliation: dict[str, Any],
     collection_coverages: list[dict[str, Any]] | None, now: int,
     collection_manifest: dict[str, Any] | None = None,
+    selected_review: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Upgrade an E3/E4 route preview to the effect-facing workload contract.
 
@@ -212,6 +216,36 @@ def resolve_workload(
                     or entry.get("installation_id")
                     != route[expected_side]["installation_id"]):
                 holds.append("migration_field_collection_installation_changed")
+    # The reviewed Inventory selection is a separate owner assertion from
+    # Inventory's coverage summaries. The latter cannot attest their own
+    # installation or tuple identity merely by recomputing their checksum.
+    if selected_review is not None:
+        selection = selected_review
+        for side in ("source", "target"):
+            native_side = selection.get(side)
+            current = next((row for row in collection_coverages or []
+                            if isinstance(row, dict) and row.get("scope") == side), None)
+            if (not isinstance(native_side, dict)
+                    or not isinstance(current, dict)
+                    or not isinstance(native_side.get("tuple_sha256"), str)
+                    or len(native_side["tuple_sha256"]) != 64
+                    or current.get("installed_tuple_sha256")
+                       != native_side["tuple_sha256"]
+                    or native_side.get("profile_sha256")
+                       != route[side]["profile_sha256"]):
+                holds.append("migration_review_native_tuple_changed")
+        source = next((row for row in collection_coverages or []
+                       if isinstance(row, dict) and row.get("scope") == "source"), None)
+        owner = next((row for row in collection_coverages or []
+                      if isinstance(row, dict) and row.get("scope") == "owner"), None)
+        if (not isinstance(source, dict) or not isinstance(owner, dict)
+                or not isinstance(reconciliation.get("source_generation_id"), str)
+                or any(row.get("generation_id") != reconciliation["source_generation_id"]
+                       for row in (source, owner))
+                or not isinstance(selection.get("review"), dict)
+                or reconciliation.get("native_review_sha256") !=
+                    selection["review"].get("digest")):
+            holds.append("migration_review_generation_or_digest_changed")
     upgraded = {
         **{k: v for k, v in route.items() if k != "readiness_sha256"},
         "schema_version": 2,

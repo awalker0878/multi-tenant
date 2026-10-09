@@ -309,3 +309,51 @@ def test_duplicate_workload_ids_hold_even_with_matched_rows() -> None:
     }
     assert not eligible_field_dispositions([row, dict(row)])
     assert eligible_field_dispositions([row])
+
+def test_preview_and_admission_bind_coverage_to_independent_review_tuples() -> None:
+    route, native, api = fixture()
+    result = assess(route, native, api)
+    reconciliation = {
+        "status": "matched", "holds": [], "expires_at": 180,
+        "native_write_authorized": False,
+        "source_generation_id": "generation-1", "native_review_sha256": digest("review"),
+        "workloads": [{
+            "workload_id": "10000000-0000-4000-8000-000000000001",
+            "status": "matched", "holds": [], "field_dispositions": [],
+        }],
+    }
+    reconciliation["reconciliation_sha256"] = digest(reconciliation)
+    selection = {
+        "source": {"profile_sha256": result["source"]["profile_sha256"],
+                   "tuple_sha256": digest("source-installed")},
+        "target": {"profile_sha256": result["target"]["profile_sha256"],
+                   "tuple_sha256": digest("target-installed")},
+        "review": {"digest": digest("review")},
+    }
+    coverages = []
+    for side, installation, platform, tuple_hash in (
+        ("source", "one", "vmware", digest("source-installed")),
+        ("target", "two", "ahv", digest("target-installed")),
+        ("owner", "one", "vmware", digest("source-installed")),
+    ):
+        row = {
+            "scope": side, "platform": platform, "installation_id": installation,
+            "generation_id": "generation-1", "installed_tuple_sha256": tuple_hash,
+            "status": "complete", "holds": [],
+            "attributes": [{"attribute_id": side, "status": "observed"}],
+            "evaluated_at": 100, "expires_at": 160,
+            "independent_e3_e4_qualification": False, "native_write_authorized": False,
+        }
+        row["coverage_sha256"] = digest(row)
+        coverages.append(row)
+    held = resolve_workload(result, reconciliation, coverages, 100,
+                            None, selected_review=selection)
+    assert "collection_manifest_release_binding_required" in held["holds"]
+    assert "migration_review_native_tuple_changed" not in held["holds"]
+    coverages[1]["installed_tuple_sha256"] = digest("different")
+    coverages[1]["coverage_sha256"] = digest({
+        k: v for k, v in coverages[1].items() if k != "coverage_sha256"
+    })
+    held = resolve_workload(result, reconciliation, coverages, 100,
+                            None, selected_review=selection)
+    assert "migration_review_native_tuple_changed" in held["holds"]
