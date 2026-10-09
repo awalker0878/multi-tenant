@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Application\Inventory\Contracts\InventoryGateway;
+use App\Application\Catalogue\Contracts\CatalogueGateway;
 use App\Domain\Inventory\InventoryFailure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -21,6 +22,62 @@ final class MigrationReviewController
         Inertia::clearHistory();
 
         return Inertia::render('inventory/Migration', ['tenantId' => $tenant, 'siteId' => $site, 'profileId' => $profile, 'workspace' => $workspace, 'notice' => $request->session()->get('inventory_notice')]);
+    }
+
+    public function catalogueOptions(
+        Request $request, string $tenant, string $site, CatalogueGateway $catalogue
+    ): JsonResponse {
+        // No arbitrary revision, digest, workload name or native identity
+        // enters this response. Fetch the CURRENT revision through Catalogue's
+        // own authenticated, scope-authorized gateway.
+        $token = $this->session($request);
+        $query = $request->validate([
+            'application' => ['sometimes', 'uuid', 'lowercase'],
+            'environment' => ['required_with:application', 'uuid', 'lowercase'],
+        ]);
+        $data = $catalogue->call($token, $tenant, 'listApplications');
+        $out = ['applications' => $data['applications'] ?? [], 'current' => null];
+        if (isset($query['application'])) {
+            $application = $catalogue->call($token, $tenant, 'getApplication',
+                ['application' => $query['application']], environment: $query['environment']);
+            $matches = array_values(array_filter($application['deployments'] ?? [],
+                fn ($d): bool => is_array($d)
+                    && ($d['environment_id'] ?? null) === $query['environment']));
+            if (count($matches) !== 1) {
+                return response()->json(['error' => 'catalogue_environment_not_current'], 423)
+                    ->header('Cache-Control', 'no-store, private');
+            }
+            $revision = $catalogue->call($token, $tenant, 'getRevision', [
+                'application' => $query['application'],
+                'revision' => $matches[0]['current_revision_id'],
+            ], environment: $query['environment']);
+            $intent = $revision['intent'] ?? null;
+            if (! is_array($intent)
+                || ($intent['environment']['id'] ?? null) !== $query['environment']
+                || ! is_array($intent['workloads'] ?? null)
+                || count($intent['workloads']) > 100
+                || ! preg_match('/\A[a-f0-9]{64}\z/', (string) ($revision['digest'] ?? ''))) {
+                return response()->json(['error' => 'catalogue_revision_invalid'], 423)
+                    ->header('Cache-Control', 'no-store, private');
+            }
+            $out['current'] = [
+                'application_id' => $query['application'],
+                'environment_id' => $query['environment'],
+                'revision_id' => $revision['id'],
+                'intent_sha256' => $revision['digest'],
+                'workloads' => array_map(static fn (array $row): array => [
+                    'id' => $row['id'], 'name' => $row['name'] ?? $row['id'],
+                    'disks' => array_map(static fn (array $disk): array => [
+                        'id' => $disk['id'], 'dataset_id' => $disk['dataset_id'],
+                        'order' => $disk['order'],
+                    ], $row['disks']),
+                    'nics' => array_map(static fn (array $nic): array => [
+                        'id' => $nic['id'], 'order' => $nic['order'],
+                    ], $row['nics']),
+                ], $intent['workloads']),
+            ];
+        }
+        return response()->json($out)->header('Cache-Control', 'no-store, private');
     }
 
     public function status(Request $request, string $tenant, string $site, InventoryGateway $inventory, ?string $profile = null): JsonResponse
