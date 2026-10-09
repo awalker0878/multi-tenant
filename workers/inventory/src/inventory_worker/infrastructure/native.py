@@ -173,7 +173,7 @@ def collect(
         raise CollectionFailure("unsafe_destination")
     token = secret(stream["credential_file"])
     if platform == "ahv" and kind == "server":
-        if stream["api_version"] != "v4.3":
+        if stream["api_version"] not in {"v4.2", "v4.3"}:
             raise CollectionFailure("unsupported_api")
         from inventory_worker.infrastructure.ahv_workload import read_vm
 
