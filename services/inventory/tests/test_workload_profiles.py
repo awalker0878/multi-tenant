@@ -301,7 +301,7 @@ def test_confirmed_review_can_pin_exact_catalogue_logical_workload() -> None:
     with pytest.raises(Rejected, match="invalid_profile_digest"):
         review_input(body, profile(1000))
     body["catalogue_binding"] = {**binding, "untrusted": True}
-    with pytest.raises(Rejected, match="invalid_shape"):
+    with pytest.raises(Rejected, match="unknown_field"):
         review_input(body, profile(1000))
 
 
