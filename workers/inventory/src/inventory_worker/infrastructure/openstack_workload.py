@@ -91,6 +91,18 @@ def collect_openstack_source(
             or not isinstance(group.get("security_group_rules"), list)
         ):
             raise CollectionFailure("permission_denied")
+        rule_ids: set[str] = set()
+        for rule in group["security_group_rules"]:
+            if (
+                not isinstance(rule, dict)
+                or not isinstance(rule.get("id"), str)
+                or not rule["id"]
+                or rule.get("security_group_id") != group_id
+                or rule.get("project_id", rule.get("tenant_id")) != project
+                or rule["id"] in rule_ids
+            ):
+                raise CollectionFailure("permission_denied")
+            rule_ids.add(rule["id"])
         source_security_groups.append({
             "id": group_id, "project_id": project,
             "semantics_sha256": security_semantics(group),
