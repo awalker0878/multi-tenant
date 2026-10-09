@@ -103,6 +103,13 @@ def resolve_workload(
             if (
                 entry.get("status") != "complete"
                 or entry.get("holds") != []
+                or not isinstance(entry.get("attributes"), list)
+                or not entry["attributes"]
+                or len({a.get("attribute_id") for a in entry["attributes"]
+                        if isinstance(a, dict)}) != len(entry["attributes"])
+                or any(not isinstance(a, dict)
+                       or a.get("status") not in {"observed", "not_applicable"}
+                       for a in entry["attributes"])
                 or entry.get("native_write_authorized") is not False
                 or entry.get("independent_e3_e4_qualification") is not False
                 or type(entry.get("evaluated_at")) is not int
@@ -128,8 +135,10 @@ def resolve_workload(
         "native_write_authorized": False,
         "workload_admission_authorized": False,
     }
+    nested_expiry = reconciliation.get("expires_at")
     upgraded["expires_at"] = min(
-        route["expires_at"], reconciliation.get("expires_at", route["expires_at"])
+        route["expires_at"], nested_expiry if type(nested_expiry) is int
+        else route["expires_at"]
     )
     upgraded["readiness_sha256"] = digest(upgraded)
     return upgraded
