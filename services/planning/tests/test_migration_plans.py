@@ -346,7 +346,7 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     from planning.application.planning import Planning
 
     validation = MigrationValidation(
-        prepare, recipes, Mock(return_value=qualified_api_readiness()), planner.clock
+        prepare, recipes, Mock(return_value=qualified_api_readiness(NOW)), planner.clock
     )
     planner = Planning(
         planner.database,
