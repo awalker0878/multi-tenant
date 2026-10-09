@@ -44,18 +44,14 @@ class MigrationFlows:
             rows = tx.all(
                 "SELECT payload FROM app.planning_records WHERE tenant=%s AND "
                 "actor=%s AND application=%s AND environment=%s AND "
-                "kind='assessment' ORDER BY created_at DESC,id DESC LIMIT 10",
-                scoped[:4],
+                "kind='assessment' AND payload->>'action'='application.migrate' "
+                "AND payload->'candidates' @> %s::jsonb "
+                "ORDER BY created_at DESC,id DESC LIMIT 1",
+                (*scoped[:4], canonical([{"site_id": site}])),
             )
-        candidates = [
-            row["payload"] for row in rows
-            if row["payload"].get("action") == "application.migrate"
-            and any(item.get("site_id") == site
-                    for item in row["payload"].get("candidates", []))
-        ]
-        if not candidates:
+        if len(rows) != 1:
             raise Rejected("application_migration_assessment_required", 423)
-        retained = candidates[0]
+        retained = rows[0]["payload"]
         matches = [i for i, item in enumerate(retained["candidates"])
                    if item.get("site_id") == site]
         if len(matches) != 1 or len(retained.get("inputs", [])) != len(retained["candidates"]):
@@ -114,6 +110,7 @@ class MigrationFlows:
         )
         return {
             "intent": intent, "destination": dest, "policy": policy,
+            "assessment_id": retained["id"],
             "data": observed, "choices": choices,
             "context_sha256": context_sha, "expires_at": expires,
         }
@@ -254,6 +251,7 @@ class MigrationFlows:
                 "payload=excluded.payload,updated_at=excluded.updated_at",
                 (*self.scope(actor, site), revision + 1, current["context_sha256"],
                  canonical({"selections": body["selections"], "holds": holds,
+                            "assessment_id": current["assessment_id"],
                             "expires_at": current["expires_at"]}), self.planning.clock()),
             )
             tx.execute(
@@ -276,3 +274,21 @@ class MigrationFlows:
             raise Rejected("application_flow_evidence_expired", 423)
         if saved["payload"].get("holds"):
             raise Rejected("application_flow_not_eligible", 423)
+        # A more recent application migration assessment for this actor/site
+        # supersedes the earlier reviewed source and destination flow choice,
+        # even before its normal short expiry has elapsed.
+        with self.planning.database.transaction() as tx:
+            latest = tx.one(
+                "SELECT id FROM app.planning_records WHERE tenant=%s AND "
+                "actor=%s AND application=%s AND environment=%s AND "
+                "kind='assessment' AND payload->>'action'='application.migrate' "
+                "AND payload->'candidates' @> %s::jsonb "
+                "ORDER BY created_at DESC,id DESC LIMIT 1",
+                (*self.scope(actor, site)[:4],
+                 canonical([{"site_id": site}])),
+            )
+        if (
+            latest is None
+            or str(latest["id"]) != saved["payload"].get("assessment_id")
+        ):
+            raise Rejected("application_flow_assessment_superseded", 423)
