@@ -18,7 +18,7 @@ at every checkpoint.
 
 ## Follow-up capacity correctness (current branch)
 
-Four additional source-bound corrections were committed after the original PR #64
+Five additional source-bound corrections were committed after the original PR #64
 audit remediation. They remain **E2 code/tests, pending exact-head CI**:
 
 - `5beb911`: Planning counts each NIC's observed address families rather than
@@ -29,6 +29,9 @@ audit remediation. They remain **E2 code/tests, pending exact-head CI**:
   network/address-family subtotals in a requested placement vector.
 - `0c99268`: When a commissioned pool enforces class-specific capacity, a
   positive allocation must identify the classes being consumed.
+- `7f0253a`: Reconcile class-specific subtotals again after all workload
+  allocations are aggregated, so a partially unclassified multi-VM request
+  cannot evade the physical resource limits.
 
 Associated Planning and Lifecycle regressions are committed. **Do not mark
 CT-N01, CT-N08 or A04/A05 accepted** until hosted Python/PostgreSQL checks
