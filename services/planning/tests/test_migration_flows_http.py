@@ -29,7 +29,7 @@ def test_app_flow_choices_require_current_site_authorization():
     status, result = exchange(
         app, "/migration-flow-choices", json.dumps({"site_id": SITE}).encode(), HEADERS)
     assert status == 200 and result["native_write_authorized"] is False
-    assert authority.actor.call_args.args[3:7] == (
+    assert authority.actor.call_args.args[2:6] == (
         TENANT, "plan.read", APP, ENV)
     flows.read.assert_called_once_with(authority.actor.return_value, SITE, "b" * 64)
     bad = json.dumps({"site_id": SITE, "unobserved_native_rule": "manual"}).encode()
