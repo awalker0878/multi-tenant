@@ -210,3 +210,63 @@ def test_malformed_ahv_installation_objects_are_rejected(fault: str) -> None:
         pytest.raises(CollectionFailure, match="invalid_response"),
     ):
         collect_ahv({"native_scope": uid()}, stream, 100, lambda: None)
+
+
+@pytest.mark.parametrize("mode", ["observed", "unobserved", "duplicate"])
+def test_ahv_enforced_policy_rule_ids_are_observed_but_never_qualified(mode: str) -> None:
+    project, cluster, pc, storage, subnet, policy_id, rule_id = [uid() for _ in range(7)]
+    stream = {
+        "kind": "target_profile", "cluster_id": cluster,
+        "prism_central_id": pc, "shared_resource_ids": [],
+        "credential_file": "/fixture",
+    }
+    approvals: list[str] = []
+
+    def exchange(connection: dict[str, Any], route: str, headers: dict[str, str]) -> dict[str, Any]:
+        approvals.append(route)
+        if "/clusters/" in route:
+            return {"data": {"extId": cluster, "config": {
+                "isAvailable": True, "hypervisorTypes": ["AHV"],
+                "buildInfo": {"version": "7.6"},
+                "clusterSoftwareMap": [{"softwareType": "AHV", "version": "11.2"}],
+            }}}
+        if "/domain-managers/" in route:
+            return {"data": {"extId": pc, "config": {"buildInfo": {"version": "7.6"}}}}
+        rows = []
+        if "storage-containers" in route:
+            rows = [{"extId": storage, "clusterExtId": cluster,
+                     "isMarkedForRemoval": False, "isInternal": False}]
+        elif "/subnets" in route:
+            rows = [{"extId": subnet, "projectExtId": project}]
+        elif "/policies" in route:
+            row: dict[str, Any] = {
+                "extId": policy_id, "projectExtId": project, "state": "ENFORCE",
+            }
+            if mode != "unobserved":
+                native_rule = {"extId": rule_id, "type": "APPLICATION",
+                               "spec": {"srcCategoryReferences": [uid()],
+                                        "secretNativeDetail": "not for console"}}
+                row["rules"] = [native_rule, native_rule] if mode == "duplicate" else [native_rule]
+            rows = [row]
+        return {"data": rows, "metadata": {"totalAvailableResults": len(rows)}}
+
+    with (
+        patch("inventory_worker.infrastructure.ahv_profile.exchange", side_effect=exchange),
+        patch("inventory_worker.infrastructure.ahv_profile.secret", return_value="fixture"),
+    ):
+        if mode == "duplicate":
+            with pytest.raises(CollectionFailure):
+                collect_ahv({"native_scope": project}, stream, 100, lambda: None)
+            return
+        result = collect_ahv({"native_scope": project}, stream, 100, lambda: None)
+    observed = result["policies"][0]["rules"]
+    assert len(approvals) == 7
+    assert result["native_qualification"] == "not_established"
+    if mode == "unobserved":
+        assert observed is None
+        assert "ahv_security_rule_catalog_incomplete" in result["holds"]
+    else:
+        assert observed[0]["extId"] == rule_id
+        assert len(observed[0]["spec_sha256"]) == 64
+        assert "secretNativeDetail" not in str(result)
+        assert "ahv_security_rule_catalog_incomplete" not in result["holds"]
