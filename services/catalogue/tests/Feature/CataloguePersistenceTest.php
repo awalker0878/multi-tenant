@@ -211,3 +211,36 @@ it('replays controlled migrations without altering published history or receipts
     $this->admin->exec(preg_replace('/^\\\\set.*$/m', '', $migration));
     expect(DB::table('app.catalogue_revisions')->value('digest'))->toBe($first['digest'])->and(DB::table('app.catalogue_commands')->count())->toBe(1);
 });
+
+
+it('denies superseded Planning intent while service-only reads return current published revision', function (): void {
+    $first = publishCatalogue($this)->assertCreated()->json();
+    $second = publishCatalogue($this, $first['application_id'], $first['etag'])
+        ->assertCreated()->json();
+    $authority = Mockery::mock(\App\Application\Planning\Contracts\PlanningInputAuthority::class);
+    $authority->shouldReceive('check')->twice()->andReturn([]);
+    $this->app->instance(\App\Application\Planning\Contracts\PlanningInputAuthority::class, $authority);
+    $app = $first['application_id'];
+    $environment = $this->intent['environment']['id'];
+    $site = '00000000-0000-4000-8000-000000000009';
+    $base = '/v1/tenants/'.$this->tenant.'/planning-inputs/'.$app.'/'.$environment.'/'.$site;
+    $this->getJson($base.'/'.$first['revision_id'])->assertNotFound();
+    $this->getJson($base.'/'.$second['revision_id'])
+        ->assertOk()->assertJsonPath('id', $second['revision_id']);
+
+    $incoming = tempnam(sys_get_temp_dir(), 'catalogue_planning_in_');
+    $outgoing = tempnam(sys_get_temp_dir(), 'catalogue_planning_out_');
+    try {
+        file_put_contents($incoming, str_repeat('a', 64));
+        file_put_contents($outgoing, str_repeat('z', 64));
+        config(['planning.credential_file' => $incoming,
+            'planning.governance_credential_file' => $outgoing]);
+        $this->getJson('/internal/tenants/'.$this->tenant.'/applications/'.$app.
+            '/environments/'.$environment.'/current-planning-intent')
+            ->assertOk()->assertJsonPath('revision_id', $second['revision_id'])
+            ->assertJsonPath('intent_sha256', $second['digest']);
+    } finally {
+        @unlink($incoming);
+        @unlink($outgoing);
+    }
+});
