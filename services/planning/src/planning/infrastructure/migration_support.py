@@ -174,13 +174,61 @@ def current_application_flow_proof(
             ("native_controls_sha256", payload.get("native_controls_sha256")),
             ("omissions_sha256", digest(payload.get("omissions", []))),
             ("destination_generation_id", payload.get("destination_generation_id")),
-            ("platform", "openstack"),
+            ("platform", payload.get("destination_platform")),
             ("level", "E4"),
             ("decision", "accepted"),
             ("native_write_authorized", False),
         )
     ):
         raise Rejected("independent_application_flow_e4_required", 423)
+    # Vendor-neutral E4 effective-security proof is checked again at native
+    # admission. A collected group expression or firewall-rule ID alone
+    # cannot make an NSX or Prism mapping eligible.
+    security_cases = receipt.get("security_cases")
+    selected_bindings = payload["selections"]
+    platform = payload.get("destination_platform")
+    if not isinstance(security_cases, list) or len(security_cases) > 512:
+        raise Rejected("native_security_e4_cases_missing", 423)
+    if platform in {"vmware", "ahv"}:
+        from planning.domain.effective_security import qualify as qualify_effective_security
+
+        selected = {row["source_flow_id"]: row for row in selected_bindings}
+        if len(selected) != len(selected_bindings):
+            raise Rejected("native_security_flow_selection_ambiguous", 423)
+        checked: set[str] = set()
+        for case in security_cases:
+            if not isinstance(case, dict) or set(case) != {
+                "source_flow_id", "flow", "document"
+            }:
+                raise Rejected("native_security_e4_case_invalid", 423)
+            flow_id = case["source_flow_id"]
+            source = case["flow"]
+            if (
+                flow_id not in selected or flow_id in checked
+                or not isinstance(source, dict)
+                or set(source) != {"from", "to", "protocol", "port"}
+                or digest(source) != flow_id
+                or not isinstance(case["document"], dict)
+                or case["document"].get("platform") != platform
+            ):
+                raise Rejected("native_security_e4_case_mismatch", 423)
+            result = qualify_effective_security(case["document"], source, now)
+            if (
+                result["status"] != "qualified"
+                or result["effective_rule_native_ref"]
+                    != selected[flow_id]["rule_native_ref"]
+                or "path:" + result["path_sha256"]
+                    != selected[flow_id]["route_native_ref"]
+            ):
+                raise Rejected("native_security_e4_effective_behavior_unqualified", 423)
+            checked.add(flow_id)
+        if checked != set(selected):
+            raise Rejected("native_security_e4_flow_coverage_incomplete", 423)
+    elif platform == "openstack":
+        if security_cases:
+            raise Rejected("unrelated_security_e4_cases", 423)
+    else:
+        raise Rejected("unsupported_native_security_platform", 423)
     omissions = payload.get("omissions", [])
     if omissions and (
         receipt["omissions_approved"] is not True
