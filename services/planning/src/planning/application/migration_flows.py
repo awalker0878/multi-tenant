@@ -518,7 +518,7 @@ class MigrationFlows:
             raise Rejected("application_migration_assessment_required", 423)
         return str(row["id"])
 
-    def require(self, actor: Actor, site: str) -> None:
+    def require(self, actor: Actor, site: str, binding: dict[str, Any]) -> None:
         """Execution-side fail-closed gate; no owner delegation is minted here."""
         saved = self._read_saved(actor, site, self._latest_assessment_id(actor, site))
         if saved is None or saved["payload"].get("selections") is None:
@@ -550,7 +550,7 @@ class MigrationFlows:
             raise Rejected("application_flow_assessment_superseded", 423)
         if self.execution_proof is None:
             raise Rejected("independent_application_flow_e4_required", 423)
-        self.execution_proof(actor, site, saved, self.planning.clock())
+        self.execution_proof(actor, site, saved, self.planning.clock(), binding)
         # A new assessment published while the independent owner calls were
         # in flight must not inherit the result of this older review.
         if self._latest_assessment_id(actor, site) != saved["payload"]["assessment_id"]:
