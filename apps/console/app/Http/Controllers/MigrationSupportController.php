@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Application\Planning\Contracts\PlanningGateway;
 use App\Domain\Planning\PlanningFailure;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -34,7 +35,7 @@ final class MigrationSupportController
         return response()->json(['available' => true, 'flow_choices' => $choices])->header('Cache-Control', 'no-store, private');
     }
 
-    public function saveFlows(Request $request, string $tenant, string $application, string $environment, string $site, PlanningGateway $planning): JsonResponse
+    public function saveFlows(Request $request, string $tenant, string $application, string $environment, string $site, PlanningGateway $planning): RedirectResponse
     {
         $input = $request->validate([
             'command_key' => ['required', 'uuid', 'lowercase'],
@@ -66,7 +67,9 @@ final class MigrationSupportController
                     : 'Application flow validation unavailable. No approval was recorded.',
             ]);
         }
-        return response()->json(['available' => true, 'receipt' => $response])->header('Cache-Control', 'no-store, private');
+        return redirect()->back()->with('flow_notice', ($response['status'] ?? '') === 'eligible'
+            ? 'Application flow choices saved; independent validation is current.'
+            : 'Application flow draft saved. Required connectivity or isolation evidence remains held.');
     }
 
     private function session(Request $request): string
