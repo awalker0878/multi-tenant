@@ -146,7 +146,7 @@ def collected(c: Campaign, source: bool) -> str:
     install(c, source)
     lease = pending(c)
     observed = c.now
-    for request in range(1, 9 if source else 8):
+    for request in range(1, 9):
         assert authorize_read(c.service, c.worker, read_request(lease, request))["allowed"]
         c.now += 1
     body = c.page(lease, [])
