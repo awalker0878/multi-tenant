@@ -177,7 +177,7 @@ watch(() => [form.review.source_profile_id, form.review.target_profile_id], (_, 
   if (!ahv.value) { delete form.review.destination; return; }
   form.review.destination = {
     platform: 'ahv', project_id: ahv.value.project_id, prism_central_id: ahv.value.prism_central_id,
-    cluster_id: ahv.value.cluster_id, vpc_id: null, storage_container_id: '', category_ids: [], policy_ids: [], security_mappings: (sourceSecurityIds.value ?? []).map(source_id => ({ source_id, destination_id: '' })), firmware: source.value?.facts.profile_type === 'SourceWorkloadProfile' && ['efi', 'bios'].includes(source.value.facts.firmware ?? '') ? source.value.facts.firmware as 'efi' | 'bios' : '',
+    cluster_id: ahv.value.cluster_id, vpc_id: null, storage_container_id: '', category_ids: [], policy_ids: [], security_mappings: [], firmware: source.value?.facts.profile_type === 'SourceWorkloadProfile' && ['efi', 'bios'].includes(source.value.facts.firmware ?? '') ? source.value.facts.firmware as 'efi' | 'bios' : '',
     disks: disks.value.map((d, index) => ({ source_key: d.key, index })),
     nics: (source.value?.facts.profile_type === 'SourceWorkloadProfile' ? source.value.facts.nics : []).map(n => ({ source_key: n.key, quarantine_subnet_id: '', production_subnet_id: '' })),
   };
