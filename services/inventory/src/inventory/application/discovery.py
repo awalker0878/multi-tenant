@@ -537,7 +537,7 @@ class Discovery:
                 "collected_at",
                 "error",
             },
-            {"configuration", "profile"},
+            {"configuration", "profile", "native_read_receipts"},
         )
         job_id, lease = identifier(body["discovery_id"]), identifier(body["lease_token"])
         number(body["sequence"], 0, 100)
@@ -611,6 +611,24 @@ class Discovery:
                         },
                     )
                 return {"accepted": True, "discovery_id": job_id, "status": status}
+            receipts = body.get("native_read_receipts", [])
+            if not isinstance(receipts, list) or len(receipts) > 128:
+                raise Rejected("native_read_witnesses_invalid")
+            for witness in receipts:
+                if (not isinstance(witness, dict)
+                        or set(witness) != {
+                            "native_operation", "api_version",
+                            "response_sha256", "observed_at"}
+                        or not isinstance(witness["native_operation"], str)
+                        or not re.fullmatch(r"GET /[^\\r\\n]{1,400}",
+                                            witness["native_operation"])
+                        or not isinstance(witness["api_version"], str)
+                        or len(witness["api_version"]) > 160
+                        or not isinstance(witness["response_sha256"], str)
+                        or not re.fullmatch(r"[a-f0-9]{64}", witness["response_sha256"])
+                        or type(witness["observed_at"]) is not int
+                        or not j["updated_at"] - 2 <= witness["observed_at"] <= now + 2):
+                    raise Rejected("native_read_witness_invalid")
             collected = body["collected_at"]
             if (
                 type(collected) not in {int, float}
