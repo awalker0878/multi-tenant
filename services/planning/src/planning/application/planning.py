@@ -356,7 +356,8 @@ class Planning:
             "native_write_authorized": False,
         }
 
-    def check_native_recipe(self, record: dict[str, Any]) -> None:
+    def check_native_recipe(self, record: dict[str, Any]) -> dict[str, Any] | None:
+        readiness = None
         if record["content"]["lane"] == "operational" and (
             "native_provisioning" in record["content"] or "native_migration" in record["content"]
         ):
@@ -364,12 +365,13 @@ class Planning:
         if "native_provisioning" in record["content"]:
             self.validation.native.current(record)
         if "native_migration" in record["content"]:
-            self.validation.migration.execution_current(record)
+            readiness = self.validation.migration.execution_current(record)
             if (
                 min(record["content"]["valid_until"], record["content"]["input_fresh_until"])
                 <= self.clock()
             ):
                 raise Rejected("migration_plan_expired", 423)
+        return readiness
 
     def placement_proposal(self, tenant: str, identity: str, revision: int) -> dict[str, Any]:
         """Expose a deterministic witness; a proposal is never an owner receipt."""
@@ -462,12 +464,17 @@ class Planning:
             # advisory only. A positive hint never cancels a historical hold.
             if hold is not None:
                 raise Rejected(hold, 423)
-            self.check_native_recipe(row["payload"])
-            return {
+            readiness = self.check_native_recipe(row["payload"])
+            result = {
                 "content": row["payload"]["content"],
                 "binding": row["payload"]["binding"],
                 "invalidated": False,
             }
+            if "native_migration" in row["payload"]["content"]:
+                if readiness is None or readiness.get("status") != "eligible":
+                    raise Rejected("migration_readiness_held", 423)
+                result["migration_readiness"] = readiness
+            return result
 
     def invalidate(self, event: dict[str, Any]) -> bool:
         """Broker hints invalidate only; direct owner reads still decide current validity."""
