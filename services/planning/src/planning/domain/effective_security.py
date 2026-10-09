@@ -274,7 +274,10 @@ def qualify(document: Any, flow: dict[str, Any], now: int) -> dict[str, Any]:
         if (flow.get("from") in group_src
                 and flow.get("to") in group_dst
                 and service["protocol"] == flow.get("protocol")
-                and (flow.get("port") in service["ports"])):
+                and (flow.get("port") in service["ports"]
+                     or (service["protocol"] == "icmp"
+                         and flow.get("port") is None
+                         and service["ports"] == []))):
             relevant.append(rule)
     if not relevant:
         return hold("effective_native_allow_rule_missing")
