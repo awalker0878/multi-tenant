@@ -7,7 +7,7 @@ The contract root owns **wire contracts**, not provider eligibility or native ex
 - `scripts/contracts/build.py --check` reconstructs every split bundle and verifies its canonical and installed copies. Use `--write` only when intentionally assembling a reviewed unpublished version.
 - Consumers must load exact versioned artifact names. Do not give a new version an old filename or schema `$id`.
 - Previously published canonical versions are retained as historical references until a separately reviewed removal determines no external consumers or compatibility commitments remain. Unused *consumer copies* may be removed once all code generators, loaders and CI checks target the replacement.
-- Wire readiness `v2` is immutable; the `v2.1` validation profile strengthens conditional eligibility without changing the wire schema_version. Planning and Lifecycle both install the exact v2.1 profile. `scripts/contracts/generate_readiness.py` checks the embedded v2 OpenAPI projection.
+- Wire readiness `v2` is immutable; the `v2.2` validation profile strengthens conditional eligibility and rejects unresolved required fields without changing the wire schema_version. Planning and Lifecycle both install the exact v2.2 profile. `scripts/contracts/generate_readiness.py` checks the embedded v2 OpenAPI projection.
 - `migration-workload-readiness` is a **read-only eligibility assessment**. It never grants native writes or workload admission. Runtime still independently verifies signed custody, exact scope, freshness and E3/E4 evidence.
 
 ## Current active packages
@@ -19,7 +19,7 @@ The contract root owns **wire contracts**, not provider eligibility or native ex
 | Catalogue | `openapi/catalogue-v1.0.1.json` | `apps/console/resources/contracts/catalogue-v1.0.1.json` |
 | Native migration input | `schemas/planning/migration-input-v4.json` | `services/planning/src/planning/infrastructure/inputs/migration-input-v4.json` |
 | Migration support | `schemas/planning/migration-support-v2.json` | `services/planning/src/planning/infrastructure/inputs/migration-support-v2.json` |
-| Workload-readiness validation (wire v2) | `schemas/planning/migration-readiness-v2.1.json` | Planning and Lifecycle exact packaged copies |
+| Workload-readiness validation (wire v2) | `schemas/planning/migration-readiness-v2.2.json` | Planning and Lifecycle exact packaged copies |
 
 The source manifests are an editing representation, not independently hosted service contracts. Do not create separate, unverifiable drift between source fragments and the immutable deployed bundles.
 

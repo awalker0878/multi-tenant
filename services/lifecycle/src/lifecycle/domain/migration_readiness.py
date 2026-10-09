@@ -70,7 +70,7 @@ REQUIRED = {
 def _readiness_validator() -> Draft202012Validator:
     schema = json.loads(
         files("lifecycle.infrastructure.contracts")
-        .joinpath("migration-readiness-v2.1.json").read_text(encoding="utf-8")
+        .joinpath("migration-readiness-v2.2.json").read_text(encoding="utf-8")
     )
     Draft202012Validator.check_schema(schema)
     return Draft202012Validator(schema, format_checker=FormatChecker())

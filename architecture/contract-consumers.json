@@ -92,13 +92,13 @@
       "catalogue",
       "console"
     ],
-    "contracts/schemas/planning/migration-readiness-v2.1.json": [
-      "planning",
-      "lifecycle"
-    ],
     "contracts/schemas/planning/migration-support-v2.json": [
       "assurance",
       "planning"
+    ],
+    "contracts/schemas/planning/migration-readiness-v2.2.json": [
+      "planning",
+      "lifecycle"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -167,14 +167,14 @@
       "depends_on": []
     },
     {
-      "path": "contracts/schemas/planning/migration-readiness-v2.1.json",
+      "path": "contracts/schemas/planning/migration-readiness-v2.2.json",
       "owner": "planning",
       "consumers": [
         "lifecycle"
       ],
       "copies": [
-        "services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.1.json",
-        "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.1.json"
+        "services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.2.json",
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.2.json"
       ],
       "source_manifest": null,
       "depends_on": [
