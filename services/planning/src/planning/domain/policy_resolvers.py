@@ -119,7 +119,11 @@ def _common_rules(document: dict[str, Any]) -> list[dict[str, Any]]:
 
 def nsx(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str, str | None]:
     require(document.get("native_api_qualified") is True
-            and document.get("enforcement_layer") in ("dfw", "gateway"),
+            and document.get("enforcement_layer") in ("dfw", "gateway")
+            and document.get("firewall_chain_complete") is True
+            and document.get("effective_firewall_layers") == [
+                document.get("enforcement_layer")
+            ],
             "nsx_installed_api_or_firewall_layer_unqualified")
     layer = document["enforcement_layer"]
     categories = DFW_CATEGORIES if layer == "dfw" else GATEWAY_CATEGORIES
@@ -164,7 +168,9 @@ def nsx(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str, str | None
 def ahv(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str, str | None]:
     require(document.get("native_api_qualified") is True
             and document.get("microseg_policy_priority_qualified") is True
-            and document.get("policy_types_complete") is True,
+            and document.get("policy_types_complete") is True
+            and document.get("policy_exceptions_qualified") is True
+            and document.get("quarantine_and_isolation_qualified") is True,
             "ahv_effective_policy_semantics_unqualified")
     rows = []
     seen_priority = set()
@@ -192,7 +198,9 @@ def neutron(document: dict[str, Any], flow: dict[str, Any]) -> tuple[str, str | 
     """Neutron uses additive per-port security-group allow rules, not priority."""
     require(document.get("native_api_qualified") is True
             and document.get("rules_complete") is True
-            and document.get("default_action") == "deny",
+            and document.get("default_action") == "deny"
+            and document.get("built_in_sg_rules_observed") is True
+            and document.get("anti_spoof_behavior_qualified") is True,
             "neutron_effective_security_unqualified")
     source, target = identity(document, flow["from"]), identity(document, flow["to"])
     ports = document.get("ports")
