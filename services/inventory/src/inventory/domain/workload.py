@@ -149,7 +149,7 @@ def profile_payload(
             raise Rejected("invalid_openstack_security_inventory")
         seen_groups = set()
         for group in groups:
-            shape(group, {"id", "name", "project_id", "stateful", "rules_sha256", "semantics_sha256", "native_sha256"})
+            shape(group, {"id", "name", "project_id", "stateful", "rules_sha256", "semantics_sha256", "rules", "native_sha256"})
             if (not isinstance(group["id"], str) or not group["id"]
                 or group["id"] in seen_groups or group["project_id"] != p["project_id"]
                 or type(group["name"]) is not str
@@ -159,6 +159,27 @@ def profile_payload(
             checksum(group["rules_sha256"])
             if group["semantics_sha256"] is not None:
                 checksum(group["semantics_sha256"])
+            rules = group["rules"]
+            if rules is not None:
+                if not isinstance(rules, list) or len(rules) > 512:
+                    raise Rejected("invalid_openstack_security_inventory")
+                rule_ids = set()
+                for rule in rules:
+                    shape(rule, {
+                        "id", "direction", "ethertype", "protocol", "port_range_min",
+                        "port_range_max", "remote_ip_prefix", "semantic_sha256",
+                    })
+                    if (
+                        not isinstance(rule["id"], str) or not rule["id"]
+                        or rule["id"] in rule_ids
+                        or rule["direction"] not in ("ingress", "egress")
+                        or rule["ethertype"] not in ("IPv4", "IPv6")
+                    ):
+                        raise Rejected("invalid_openstack_security_inventory")
+                    checksum(rule["semantic_sha256"])
+                    rule_ids.add(rule["id"])
+            if rules is None and group["semantics_sha256"] is not None:
+                raise Rejected("missing_openstack_security_rules")
             checksum(group["native_sha256"])
             seen_groups.add(group["id"])
     if ahv:
