@@ -8,7 +8,8 @@ type Platform = { platform: string; installation_id: string; versions: Record<st
 type ApiAlert = { capability_id: string; side: 'source' | 'target'; severity: 'blocker' | 'warning'; reason: string; impact: string; action: string; omission_accepted: boolean };
 type ApiCase = { capability_id: string; side: 'source' | 'target'; criticality: 'critical' | 'optional'; status: string; reason: string; selected_api_family: string | null; selected_api_version: string | null; evidence_sha256: string | null; omission_accepted: boolean };
 type ApiAssessment = { status: 'eligible' | 'conditional' | 'blocked' | 'unknown'; operationally_eligible: boolean; cases: ApiCase[]; administrator_alerts: ApiAlert[] };
-type Route = { route_id: string; guest: string; guest_profile_sha256: string; method: string; source: Platform; target: Platform; constraints: Record<string, string | number>; exclusions: string[]; blockers: string[]; native_qualified: boolean; operationally_accepted: boolean; api_compatibility?: ApiAssessment };
+type Readiness = { schema_version: 1; kind: 'migration_route_readiness'; status: 'eligible' | 'held'; readiness_sha256: string; expires_at: number; evaluated_at: number; holds: string[]; native_e3_qualified: boolean; receiving_e4_accepted: boolean; native_write_authorized: false; workload_admission_authorized: false };
+type Route = { route_id: string; guest: string; guest_profile_sha256: string; method: string; source: Platform; target: Platform; constraints: Record<string, string | number>; exclusions: string[]; blockers: string[]; native_qualified: boolean; operationally_accepted: boolean; api_compatibility?: ApiAssessment; readiness?: Readiness };
 type Support = { tranche_sha256: string; release_sha256: string; directions: { direction: string; state: string; routes: Route[] }[] };
 const props = defineProps<{ tenantId: string; siteId: string; applicationId: string; environment: string; support: Support }>();
 const current = ref(props.support);
@@ -231,6 +232,14 @@ onMounted(() => { void refreshFlowChoices(); });
         </div></td>
         <td class="p-2"><p v-if="!direction.routes.length">Delivery gap. Platform engineering must implement and independently qualify this direction; it remains part of any-to-any scope.</p>
           <div v-for="route in direction.routes" :key="route.route_id" class="mb-4">
+            <section aria-label="Resolved migration readiness" class="mb-2 border-l-4 border-slate-600 pl-3">
+              <p class="font-semibold" :role="!route.readiness || unavailable || route.readiness.status !== 'eligible' ? 'alert' : 'status'">
+                Resolved migration readiness: {{ !unavailable && route.readiness?.status === 'eligible' ? 'Route eligible (not yet authorized to execute)' : 'Held — no admission' }}
+              </p>
+              <p v-if="route.readiness && !unavailable" class="text-xs break-all">Contract SHA-256: {{ route.readiness.readiness_sha256 }} · Valid until: {{ new Date(route.readiness.expires_at * 1000).toLocaleString() }}</p>
+              <p v-if="route.readiness?.holds.length && !unavailable" role="alert">Unresolved: {{ route.readiness.holds.join(', ').replaceAll('_', ' ') }}</p>
+              <p class="text-xs">Planning and Lifecycle recheck independent owner evidence before any native effect; this route view never grants native write authority.</p>
+            </section>
             <p>Native qualification: {{ !unavailable && route.native_qualified ? 'Accepted' : 'Held' }}</p>
             <p>Operating acceptance: {{ !unavailable && route.operationally_accepted ? 'Accepted' : 'Pending' }}</p>
             <p v-if="!route.api_compatibility" role="status" class="text-amber-900">
