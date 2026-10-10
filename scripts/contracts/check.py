@@ -338,6 +338,10 @@ def check_consumer_registry():
     registry = load("architecture/contract-consumers.json")
     inventory = registry["contracts"]
     for source, consumers in {
+        "contracts/openapi/assurance-evidence-v1.json": {"assurance"},
+        "contracts/openapi/inventory-native-input-v1.2.json": {"inventory", "planning"},
+        "contracts/openapi/lifecycle-migration-boundary-v2.json": {"lifecycle", "lifecycle-workers"},
+        "contracts/openapi/planning-immutable-plan-v1.1.json": {"planning", "governance"},
         "contracts/openapi/catalogue-v1.0.1.json": {"catalogue", "console"},
         "contracts/openapi/inventory-v1.9.json": {"inventory", "console"},
         "contracts/openapi/planning-migration-v1.6.json": {"planning", "console"},
@@ -445,6 +449,62 @@ def check_owner_operation_bindings():
 
 
 
+
+def check_implemented_api_contracts():
+    """Independent required-operation canaries: removing both registry maps fails."""
+    release_by_path = {
+        entry["path"]: entry
+        for entry in load("architecture/contract-consumers.json")["active_releases"]
+    }
+    required = {
+        "contracts/openapi/assurance-evidence-v1.json": (
+            "assurance",
+            {
+                ("POST", "/v1/tenants/{tenant}/evidence-uploads"),
+                ("POST", "/v1/tenants/{tenant}/evidence-uploads/{evidence}/finalization"),
+                ("GET", "/v1/tenants/{tenant}/evidence/{evidence}"),
+                ("POST", "/v1/tenants/{tenant}/evidence/{evidence}/reviews"),
+            },
+        ),
+        "contracts/openapi/inventory-native-input-v1.2.json": (
+            "inventory",
+            {("GET", "/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/{revision}/{digest}")},
+        ),
+        "contracts/openapi/lifecycle-migration-boundary-v2.json": (
+            "lifecycle",
+            {("POST", "/internal/native-grants/checks")},
+        ),
+        "contracts/openapi/planning-immutable-plan-v1.1.json": (
+            "planning",
+            {("GET", "/v1/plans/{plan}/revisions/{revision}")},
+        ),
+    }
+    for path, (owner, operations) in required.items():
+        release = release_by_path.get(path)
+        if release is None or release["owner"] != owner:
+            raise ValueError(f"Implemented OpenAPI release not registered: {path}")
+        document = load(path)
+        actual = {
+            (verb.upper(), endpoint)
+            for endpoint, item in document["paths"].items()
+            for verb in item if verb in {"get", "post", "put", "patch", "delete"}
+        }
+        if actual != operations:
+            raise ValueError(f"Implemented OpenAPI operation drift: {path} {sorted(actual ^ operations)}")
+
+    # The independent Inventory producer and packaged Planning consumer both
+    # serve the canonical v4 envelope; a copy mismatch must fail even if the
+    # active registry and OpenAPI document are edited together.
+    api = load("contracts/openapi/inventory-native-input-v1.2.json")
+    endpoint = "/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/{revision}/{digest}"
+    response = api["paths"][endpoint]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
+    canonical = load("contracts/schemas/planning/migration-input-v4.json")
+    installed = load("services/planning/src/planning/infrastructure/inputs/migration-input-v4.json")
+    if response != canonical or canonical != installed:
+        raise ValueError("Inventory native-input v1.2 producer/consumer v4 schema mismatch")
+    Draft202012Validator.check_schema(response)
+
+
 def main():
     sources, bundles = verify()
     id_count = unique_schema_ids()
@@ -464,6 +524,7 @@ def main():
     check_readiness_projection()
     check_consumer_registry()
     check_owner_operation_bindings()
+    check_implemented_api_contracts()
     print(json.dumps(dict(status="PASS", sources=sources, bundles=bundles, unique_ids=id_count, schema_count=schema_count, paths=paths, operations=ops)))
 
 if __name__ == "__main__":
