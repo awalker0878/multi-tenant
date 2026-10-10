@@ -136,7 +136,7 @@ def current_application_flow_proof(
         "CATALOGUE", "GET",
         f"/internal/tenants/{actor.tenant}/applications/{actor.application}"
         f"/environments/{actor.environment}/current-planning-intent",
-        schema_name="catalogue-current-v1",
+        schema_name="catalogue-current-v2",
     )
     if (
         current["revision_id"] != payload.get("source_revision_id")
