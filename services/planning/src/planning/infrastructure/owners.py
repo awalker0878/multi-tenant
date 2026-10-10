@@ -22,6 +22,7 @@ from planning.domain.model import Actor, Rejected, decode, digest, identifier, p
 from planning.domain.placement import fit
 from planning.domain.qualification import binding_digest, verified
 from planning.infrastructure.foundation import mounted_secret
+from planning.infrastructure.owner_contracts import contract_for_operation
 from planning.infrastructure.store import Postgres
 
 
@@ -35,6 +36,8 @@ def request(
     schema_name: str | None = None,
 ) -> dict[str, Any]:
     try:
+        resolved_contract = (contract_for_operation(owner, method, path, schema_name)
+                             if owner in {"CATALOGUE", "INVENTORY", "ASSURANCE"} else None)
         u = urlsplit(os.environ[owner + "_URL"])
         ca = os.environ[owner + "_CA_FILE"]
         if (
@@ -77,21 +80,8 @@ def request(
             result = decode(raw)
             if not isinstance(result, dict):
                 raise ValueError
-            if owner in {"CATALOGUE", "INVENTORY", "ASSURANCE"}:
-                name = {
-                    "CATALOGUE": "catalogue-input-v1",
-                    "INVENTORY": "inventory-input-v2",
-                    "ASSURANCE": "qualification-v2.1",
-                }[owner]
-                if schema_name is not None:
-                    if (owner, schema_name) not in {
-                        ("CATALOGUE", "catalogue-current-v1"),
-                        ("INVENTORY", "migration-input-v4"),
-                        ("ASSURANCE", "migration-support-v2"),
-                        ("ASSURANCE", "qualification-v2.1"),
-                    }:
-                        raise ValueError
-                    name = schema_name
+            if resolved_contract is not None:
+                name = resolved_contract
                 schema = json.loads(
                     files("planning.infrastructure.inputs").joinpath(name + ".json").read_text()
                 )
