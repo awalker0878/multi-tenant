@@ -25,7 +25,7 @@ def current_review_binding(
         f"/internal/tenants/{identifier(actor.tenant)}/migration-inputs/"
         f"{identifier(actor.application)}/{identifier(actor.environment)}/"
         f"{identifier(site)}/{revision}/{review_sha}",
-        schema_name="migration-input-v3",
+        schema_name="migration-input-v4",
     )
     if (records.get("tenant_id") != actor.tenant
             or records.get("site_id") != site
@@ -60,7 +60,7 @@ def current_workload_reconciliation(
         f"{scope['application_id']}/{scope['environment_id']}/"
         f"{scope['site_id']}/{integer(review['revision'], 1)}/"
         f"{sha(review['digest'])}",
-        schema_name="migration-input-v3",
+        schema_name="migration-input-v4",
     )
     if (records.get("tenant_id") != scope["tenant_id"]
             or records.get("site_id") != scope["site_id"]
