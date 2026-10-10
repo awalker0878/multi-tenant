@@ -50,10 +50,12 @@ jobs:
         run: python -m pip install --disable-pip-version-check -e services/planning -e services/lifecycle -e services/inventory pytest==9.1.1
       - name: Probe Inventory and Planning migration operations against real ASGI routers
         env:
-          PYTHONPATH: services/inventory/src:services/planning/src
+          PYTHONPATH: services/inventory/src:services/planning/src:services/lifecycle/src
         run: |
           python scripts/contracts/route_conformance.py --app inventory
           python scripts/contracts/route_conformance.py --app planning-migration
+          python scripts/contracts/route_conformance.py --app lifecycle-native
+          python scripts/contracts/route_conformance.py --app planning-immutable
       - name: Validate real Planning and Lifecycle readiness producers and consumers
         env:
           PYTHONPATH: services/planning/src:services/lifecycle/src:services/inventory/src:services/planning/tests
@@ -66,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [governance, catalogue]
+        app: [governance, catalogue, assurance]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:

@@ -119,3 +119,32 @@ copies are included in consumer parity checks. Live route conformance also
 probes Inventory's separate authenticated Planning-input ASGI router.
 These checks do not by themselves establish successful live deployments,
 independent provider E4 qualification, or authorization for native execution.
+
+## 2026-10-09 registered API and producer-conformance closeout
+
+Inventory's native-read API is now published at
+`openapi/inventory-native-input-v1.2.json`, embedding the exact canonical
+`schemas/planning/migration-input-v4.json` success response. CI checks that
+published response, canonical v4 schema and Planning's installed v4 schema
+are identical. Inventory's real producer response is exercised through its
+authenticated ASGI route and compared with both the API and Planning consumer.
+The published native-input v1.1 schema is retained unchanged as historical.
+
+Assurance evidence v1, Lifecycle migration boundary v2 and Planning's immutable
+plan v1.1 are registered as active implemented OpenAPI releases. The required
+owner/operation set is hard-coded independently of editable registry entries:
+removing a contract from both registry maps does not disable validation.
+
+Assurance evidence-review requests must contain exactly a JSON `decision`
+with no additional fields; extra fields and non-JSON requests fail before
+custody access. Route CI includes Assurance and fails on newly implemented
+`/v1/` or `/internal/` operations unless covered by an active API contract
+or explicitly listed as a pre-existing qualification-operation exception.
+The exceptions are intentionally finite and must be reduced through
+separately versioned specifications, never expanded automatically.
+
+Synthetic, successfully authenticated ASGI contract probes are included for
+Lifecycle's native-grant boundary and Planning's immutable plan. These are
+in addition to Inventory's concrete producer fixture and negative authority
+tests. They validate **transport and wire compatibility**, not independent
+production commissioning or a live provider migration.

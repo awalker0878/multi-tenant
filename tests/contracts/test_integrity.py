@@ -173,6 +173,38 @@ components:
             with self.assertRaisesRegex(ValueError, "Deployed AsyncAPI missing"):
                 check_consumer_registry()
 
+    def test_implemented_openapi_release_and_v4_response_parity(self):
+        from check import check_implemented_api_contracts
+        check_implemented_api_contracts()
+
+    def test_implemented_api_cannot_be_removed_from_both_registry_maps(self):
+        from check import check_implemented_api_contracts
+        registry = load("architecture/contract-consumers.json")
+        missing = "contracts/openapi/assurance-evidence-v1.json"
+        registry["contracts"].pop(missing)
+        registry["active_releases"] = [
+            row for row in registry["active_releases"] if row["path"] != missing
+        ]
+        original = load
+        with patch("check.load", side_effect=lambda name:
+                   registry if name == "architecture/contract-consumers.json"
+                   else original(name)):
+            with self.assertRaisesRegex(ValueError, "Implemented OpenAPI release not registered"):
+                check_implemented_api_contracts()
+
+    def test_native_input_api_response_drift_is_detected(self):
+        from check import check_implemented_api_contracts
+        original = load
+        path = "contracts/openapi/inventory-native-input-v1.2.json"
+        broken = original(path)
+        endpoint = next(iter(broken["paths"].values()))["get"]
+        envelope = endpoint["responses"]["200"]["content"]["application/json"]["schema"]
+        envelope["properties"].pop("collection_coverages")
+        with patch("check.load", side_effect=lambda name:
+                   broken if name == path else original(name)):
+            with self.assertRaisesRegex(ValueError, "producer/consumer v4 schema mismatch"):
+                check_implemented_api_contracts()
+
     def test_all_dynamic_owner_operations_resolve_to_active_copies(self):
         from check import check_owner_operation_bindings
         check_owner_operation_bindings()
