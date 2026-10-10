@@ -86,7 +86,25 @@ def verify_inventory(root: Path = ROOT) -> int:
             missing.append((method, path))
     if missing:
         raise ValueError(f"Inventory OpenAPI operations without executable route matches: {sorted(missing)}")
-    return len(routes_in_openapi(spec))
+
+    # Inventory's PlanningInputApp is a distinct authenticated ASGI router.
+    # Probe it directly; discovery.ROUTES omits this internal producer entirely.
+    import asyncio
+    from inventory.interfaces.planning import PlanningInputApp
+    app = PlanningInputApp(discovery=None, authority=lambda *args: None)
+    tenant, application, environment, site = [SAMPLE_UUID] * 4
+    paths = (
+        f"/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/1/{'a' * 64}",
+        f"/v1/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/1/{'a' * 64}",
+        f"/internal/tenants/{tenant}/planning-capability-inputs/{application}/{environment}/{site}/{SAMPLE_UUID}/{SAMPLE_UUID}",
+    )
+    for path in paths:
+        # Missing auth is 400 after matching; 404 means route/verb not matched.
+        if asyncio.run(_probe_migration(app, path, "GET")) != 400:
+            raise ValueError(f"Inventory owner-operation route unavailable: GET {path}")
+        if asyncio.run(_probe_migration(app, path, "POST")) != 404:
+            raise ValueError(f"Inventory owner-operation unexpectedly accepts POST: {path}")
+    return len(routes_in_openapi(spec)) + len(paths)
 
 
 async def _probe_migration(app, path: str, method: str) -> int:
