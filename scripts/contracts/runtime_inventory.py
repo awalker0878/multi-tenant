@@ -38,13 +38,14 @@ def deployed_copies(root: Path):
             directory = component / "resources/contracts"
             if directory.is_dir():
                 yield from directory.glob("*.json")
-    for subpath in (
-        "services/planning/src/planning/infrastructure/inputs",
-        "services/lifecycle/src/lifecycle/infrastructure/contracts",
-    ):
-        folder = root / subpath
-        if folder.is_dir():
-            yield from folder.glob("*.json")
+    # Python packages use importlib.resources instead of PHP-style resources.
+    for family in ("services", "workers"):
+        for component in (root / family).glob("*"):
+            for infrastructure in (component / "src").glob("*/infrastructure"):
+                for subdir in ("inputs", "contracts", "messaging"):
+                    folder = infrastructure / subdir
+                    if folder.is_dir():
+                        yield from folder.glob("*.json")
 
 
 def discover_runtime_copies(root: Path = ROOT) -> dict[str, list[str]]:
