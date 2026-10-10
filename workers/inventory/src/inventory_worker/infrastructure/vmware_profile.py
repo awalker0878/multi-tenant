@@ -1,5 +1,6 @@
 """Read VMware destination resources under an enrolled datacenter scope."""
 
+import re
 from collections.abc import Callable
 from typing import Any
 from urllib.parse import urlencode
@@ -64,6 +65,88 @@ def collect_vmware(
             }
             for r in rows
         ]
+    # Query read-only VI/JSON EnvironmentBrowser options for each observed
+    # destination host. Never expose guessed guestId/vmx values to operators.
+    # A host without a complete API response simply has no selectable values.
+    # Bound the campaign: hosts beyond this limit require a smaller scope.
+    guest_options_by_host: list[dict[str, Any]] = []
+    if len(records["hosts"]) <= (9 if "nsx_policy" in stream else 15):
+        for host in records["hosts"]:
+            key = host["host"]
+            if not re.fullmatch(r"host-[0-9]+", key):
+                continue
+            prefix = "/sdk/vim25/" + stream["api_version"] + "/"
+            try:
+                before_request()
+                parent = exchange(stream, prefix + "HostSystem/" + key + "/parent", headers)
+                if (
+                    not isinstance(parent, dict)
+                    or parent.get("type") not in {"ComputeResource", "ClusterComputeResource"}
+                    or not isinstance(parent.get("value"), str)
+                    or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,120}", parent["value"])
+                ):
+                    continue
+                before_request()
+                browser = exchange(
+                    stream, prefix + parent["type"] + "/" + parent["value"] + "/environmentBrowser",
+                    headers,
+                )
+                if (
+                    not isinstance(browser, dict)
+                    or browser.get("type") != "EnvironmentBrowser"
+                    or not isinstance(browser.get("value"), str)
+                    or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,120}", browser["value"])
+                ):
+                    continue
+                before_request()
+                option = exchange(
+                    stream, prefix + "EnvironmentBrowser/" + browser["value"] + "/QueryConfigOption",
+                    headers, method="POST",
+                    body={"host": {"_typeName": "ManagedObjectReference",
+                                   "type": "HostSystem", "value": key}},
+                )
+                if not isinstance(option, dict):
+                    continue
+                guests = option.get("guestOSDescriptor")
+                hardware = option.get("version")
+                if (
+                    not isinstance(guests, list) or not 1 <= len(guests) <= 128
+                    or not isinstance(hardware, str)
+                    or re.fullmatch(r"vmx-[0-9]{2}", hardware) is None
+                ):
+                    continue
+                guest_ids = [
+                    desc["id"] for desc in guests if isinstance(desc, dict)
+                    and isinstance(desc.get("id"), str)
+                    and re.fullmatch(r"[A-Za-z0-9_]{1,80}Guest", desc["id"])
+                ]
+                if guest_ids and len(guest_ids) == len(guests) and len(set(guest_ids)) == len(guest_ids):
+                    guest_options_by_host.append({
+                        "host": key, "guest_ids": sorted(guest_ids),
+                        "hardware_versions": [hardware],
+                        "native_sha256": fingerprint([parent, browser, option]),
+                    })
+            except CollectionFailure as error:
+                # A refused/revoked native read cannot be interpreted as an
+                # absent compatibility option. Stop the campaign immediately.
+                if error.reason in {
+                    "permission_denied", "transport_unavailable", "throttled",
+                    "unsafe_destination",
+                }:
+                    raise
+                # Explicitly missing method/unsupported data is not an
+                # operator-definable value: this host offers no selection.
+                continue
+    # NSX is an explicitly enrolled second TLS origin and credential, never
+    # inferred from vCenter or queried through the vCenter session.
+    nsx_observation = None
+    if "nsx_policy" in stream:
+        from inventory_worker.infrastructure.nsx_security import collect_nsx_policy_rules
+
+        nsx = stream["nsx_policy"]
+        nsx_observation = collect_nsx_policy_rules(
+            nsx, nsx["domain_id"], before_request
+        )
     return {
         "schema_version": 3,
         "profile_type": "TargetCapabilityProfile",
@@ -73,8 +156,10 @@ def collect_vmware(
         "api_version": stream["api_version"],
         "installed": about,
         "observed_at": observed_at,
-        "observations_sha256": fingerprint([about, records]),
+        "observations_sha256": fingerprint([about, records, nsx_observation]),
         "inventory_complete": True,
+        "guest_options_by_host": guest_options_by_host,
+        "nsx_policy_observation": nsx_observation,
         "disk_formats": ["vmdk"],
         "image_import_methods": ["vi-json-nfc"],
         **records,

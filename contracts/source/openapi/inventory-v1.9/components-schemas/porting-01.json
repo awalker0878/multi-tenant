@@ -1,0 +1,582 @@
+{
+  "PortingChoice": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string",
+        "enum": [
+          "compute",
+          "zones",
+          "volumes",
+          "subnets",
+          "ports",
+          "routers",
+          "security_groups",
+          "trunks",
+          "qos",
+          "port_security",
+          "provider_networks",
+          "image_import",
+          "image_stores",
+          "placement",
+          "load_balancer",
+          "dns",
+          "key_manager",
+          "shared_files",
+          "object_store",
+          "orchestration",
+          "ahv_storage_containers",
+          "ahv_subnets",
+          "ahv_vpcs",
+          "ahv_categories",
+          "ahv_policies",
+          "vmware_folders",
+          "vmware_resource_pools",
+          "vmware_hosts",
+          "vmware_datastores",
+          "vmware_networks"
+        ]
+      },
+      "required": {
+        "type": "boolean"
+      },
+      "interpretation": {
+        "type": "string",
+        "enum": [
+          "observed",
+          "include",
+          "exclude"
+        ]
+      },
+      "reason": {
+        "type": "string",
+        "maxLength": 240
+      }
+    },
+    "required": [
+      "id",
+      "required",
+      "interpretation",
+      "reason"
+    ]
+  },
+  "PortingManual": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "source_distribution": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "target_distribution": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "backend_release_reference": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "support_entitlement_reference": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "ownership_reference": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "network_mapping_reference": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "guest_mapping_reference": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "service_mapping_reference": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "automation_reference": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "backup_reference": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "activation_reference": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "retirement_reference": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "campaign_reference": {
+        "type": "string",
+        "maxLength": 240
+      }
+    },
+    "required": []
+  },
+  "PortingInput": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "source_endpoint": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "target_endpoint": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "manual": {
+        "$ref": "#/components/schemas/PortingManual"
+      },
+      "choices": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/PortingChoice"
+        },
+        "maxItems": 20,
+        "minItems": 5
+      }
+    },
+    "required": [
+      "source_endpoint",
+      "target_endpoint",
+      "manual",
+      "choices"
+    ]
+  },
+  "PortingRevision": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "source_endpoint": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "target_endpoint": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "manual": {
+        "$ref": "#/components/schemas/PortingManual"
+      },
+      "choices": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/PortingChoice"
+        },
+        "maxItems": 20,
+        "minItems": 5
+      },
+      "revision": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "digest": {
+        "type": "string",
+        "maxLength": 64
+      },
+      "confirmed_by": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "confirmed_at": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "confirmation_current": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "source_endpoint",
+      "target_endpoint",
+      "manual",
+      "choices",
+      "revision",
+      "digest",
+      "confirmed_by",
+      "confirmed_at",
+      "confirmation_current"
+    ]
+  },
+  "PortingResult": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "revision": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "digest": {
+        "type": "string",
+        "maxLength": 64
+      },
+      "native_write_authorized": {
+        "type": "boolean",
+        "const": false
+      }
+    },
+    "required": [
+      "revision",
+      "digest",
+      "native_write_authorized"
+    ]
+  },
+  "PortingConfirm": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "digest": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "required": [
+      "digest"
+    ]
+  },
+  "PortingWorkspace": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "versions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "release": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "name": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "nova_max": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "documentation": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "native_qualification": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "source": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "release",
+            "name",
+            "nova_max",
+            "documentation",
+            "native_qualification",
+            "source"
+          ]
+        },
+        "maxItems": 10
+      },
+      "manual_fields": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 240
+            }
+          },
+          "required": [
+            "id",
+            "label"
+          ]
+        },
+        "maxItems": 20
+      },
+      "endpoints": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "platform": {
+              "type": "string",
+              "enum": [
+                "openstack",
+                "vmware",
+                "ahv"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "platform"
+          ]
+        },
+        "maxItems": 50
+      },
+      "configuration": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/PortingRevision"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "source": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ConfigurationSnapshot"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "target": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ConfigurationSnapshot"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "capabilities": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "query": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "match": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "meaning": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "source_state": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "target_state": {
+              "type": "string",
+              "maxLength": 240
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "query",
+            "match",
+            "meaning",
+            "source_state",
+            "target_state"
+          ]
+        },
+        "maxItems": 20
+      },
+      "holds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "maxItems": 10
+      },
+      "native_write_authorized": {
+        "type": "boolean",
+        "const": false
+      },
+      "ahv_capabilities": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "query": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "match": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "meaning": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "source_state": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "target_state": {
+              "type": "string",
+              "maxLength": 240
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "query",
+            "match",
+            "meaning",
+            "source_state",
+            "target_state"
+          ]
+        },
+        "maxItems": 20
+      },
+      "vmware_capabilities": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "query": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "match": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "meaning": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "source_state": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "target_state": {
+              "type": "string",
+              "maxLength": 240
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "query",
+            "match",
+            "meaning",
+            "source_state",
+            "target_state"
+          ]
+        },
+        "maxItems": 20
+      }
+    },
+    "required": [
+      "versions",
+      "manual_fields",
+      "endpoints",
+      "configuration",
+      "source",
+      "target",
+      "capabilities",
+      "holds",
+      "native_write_authorized",
+      "ahv_capabilities"
+    ]
+  }
+}

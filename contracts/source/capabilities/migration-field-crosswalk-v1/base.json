@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "crosswalk_version": "1.0.0",
+  "status": "declared_mapping_not_native_evidence",
+  "collection_manifest": "contracts/capabilities/migration-collection-manifest-v1.json",
+  "mapping_rules": {
+    "no_equivalent": "A null platform value means no mapped source field; never interpret as unsupported or supported without a separate qualified API capability observation.",
+    "no_auto_security": "Required firewall, isolation and traffic policy remains critical regardless of field presence or a nominal transformation.",
+    "no_copy_native_ids": "VM, disk, network, project, controller, host and storage identifiers are installation-local and must be remapped.",
+    "freshness": "Use minimum age of needed contributing observations; revalidate all critical source, target, owner and API-version evidence at native effect."
+  },
+  "summary": {
+    "groups": 116,
+    "shared_columns": 59,
+    "partial_columns": 57,
+    "platform_specific": 45,
+    "owner_common": 27,
+    "manifest_fields": {
+      "vmware": {
+        "matched": 86,
+        "total": 86
+      },
+      "ahv": {
+        "matched": 89,
+        "total": 89
+      },
+      "openstack": {
+        "matched": 103,
+        "total": 103
+      }
+    }
+  }
+}

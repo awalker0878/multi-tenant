@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { Link, router, useForm } from '@inertiajs/vue3';
 import { capabilityDefinitions } from '../../features/planning/capabilityDefinitions';
 import CatalogueLayout from '../../shared/ui/CatalogueLayout.vue';
 
 type Platform = { platform: string; installation_id: string; versions: Record<string, string> };
-type Route = { route_id: string; guest: string; guest_profile_sha256: string; method: string; source: Platform; target: Platform; constraints: Record<string, string | number>; exclusions: string[]; blockers: string[]; native_qualified: boolean; operationally_accepted: boolean };
+type ApiAlert = { capability_id: string; side: 'source' | 'target'; severity: 'blocker' | 'warning'; reason: string; impact: string; action: string; omission_accepted: boolean };
+type ApiCase = { capability_id: string; side: 'source' | 'target'; criticality: 'critical' | 'optional'; status: string; reason: string; selected_api_family: string | null; selected_api_version: string | null; evidence_sha256: string | null; omission_accepted: boolean };
+type ApiAssessment = { status: 'eligible' | 'conditional' | 'blocked' | 'unknown'; operationally_eligible: boolean; cases: ApiCase[]; administrator_alerts: ApiAlert[] };
+type Readiness = { schema_version: 1; kind: 'migration_route_readiness'; status: 'eligible' | 'held'; readiness_sha256: string; expires_at: number; evaluated_at: number; holds: string[]; native_e3_qualified: boolean; receiving_e4_accepted: boolean; native_write_authorized: false; workload_admission_authorized: false };
+type Route = { route_id: string; guest: string; guest_profile_sha256: string; method: string; source: Platform; target: Platform; constraints: Record<string, string | number>; exclusions: string[]; blockers: string[]; native_qualified: boolean; operationally_accepted: boolean; api_compatibility?: ApiAssessment; readiness?: Readiness };
 type Support = { tranche_sha256: string; release_sha256: string; directions: { direction: string; state: string; routes: Route[] }[] };
 const props = defineProps<{ tenantId: string; siteId: string; applicationId: string; environment: string; support: Support }>();
 const current = ref(props.support);
@@ -29,19 +33,306 @@ async function refresh() {
     if (!active || request.signal.aborted) return;
     if (!data.available || data.support.directions.length !== capabilityDefinitions.platforms.length ** 2) throw new Error();
     current.value = data.support; unavailable.value = false;
+    void refreshFlowChoices();
+    void refreshWorkloadReadiness();
   } catch { if (active) unavailable.value = true; }
   finally { clearTimeout(deadline); running = false; if (active) timer = setTimeout(refresh, 15_000); }
 }
 function visible() { if (!document.hidden) void refresh(); }
 function hide() { unavailable.value = true; controller?.abort(); }
 onMounted(() => { timer = setTimeout(refresh, 15_000); document.addEventListener('visibilitychange', visible); window.addEventListener('pagehide', hide); window.addEventListener('pageshow', visible); });
-onUnmounted(() => { active = false; controller?.abort(); clearTimeout(timer); document.removeEventListener('visibilitychange', visible); window.removeEventListener('pagehide', hide); window.removeEventListener('pageshow', visible); });
+onUnmounted(() => { active = false; controller?.abort(); clearTimeout(timer); clearTimeout(workloadExpiryTimer); document.removeEventListener('visibilitychange', visible); window.removeEventListener('pagehide', hide); window.removeEventListener('pageshow', visible); });
 const versions = (platform: Platform) => Object.entries(platform.versions).map(([key, value]) => `${key}: ${value}`).join('; ');
+
+type NativeChoice = {
+  source_flow_id: string; source: { from: string; to: string; protocol: string; port: number | null };
+  required: boolean; destination_firewall_rule_ids: string[]; destination_route_ids: string[];
+  status: 'choices_observed' | 'held_unobserved' | 'held_optional';
+  destination_path_details?: { selector: string; route_native_refs: string[]; nat_native_refs: string[] }[];
+  native_write_authorized: false;
+};
+type NativeBinding = { source_flow_id: string; rule_native_ref: string; route_native_ref: string };
+type NativeOmission = { source_flow_id: string; reason_code: string };
+type FlowChoices = {
+  context_sha256: string; revision: number; expires_at: number; choices: NativeChoice[];
+  selections: NativeBinding[]; omissions: NativeOmission[]; holds: string[]; status: 'eligible' | 'held' | 'invalidated';
+  native_write_authorized: false;
+};
+const flowBase = url + '/flow-choices';
+const flowSave = url + '/flow-selections';
+const flowState = ref<FlowChoices | null>(null);
+const flowFailure = ref('');
+const flowBusy = ref(false);
+const flowForm = useForm({
+  command_key: crypto.randomUUID(), revision: 0, context_sha256: '',
+  selections: [] as NativeBinding[], omissions: [] as NativeOmission[],
+});
+let submittedFlowFingerprint = '';
+const missingChoices = computed(() => flowState.value?.choices.filter(c =>
+  c.required && (!c.destination_firewall_rule_ids.length || !c.destination_route_ids.length)) ?? []);
+const selectionsComplete = computed(() => Boolean(flowState.value) && flowState.value!.choices.every(c => {
+  const selected = flowForm.selections.find(s => s.source_flow_id === c.source_flow_id);
+  return !c.required || (selected
+    && c.destination_firewall_rule_ids.includes(selected.rule_native_ref)
+    && c.destination_route_ids.includes(selected.route_native_ref));
+}));
+function flowBinding(id: string): NativeBinding {
+  const current = flowForm.selections.find(s => s.source_flow_id === id);
+  if (current) return current;
+  const created = { source_flow_id: id, rule_native_ref: '', route_native_ref: '' };
+  flowForm.selections.push(created);
+  return created;
+}
+function flowSelection(id: string, side: 'rule_native_ref' | 'route_native_ref'): string {
+  return flowForm.selections.find(s => s.source_flow_id === id)?.[side] ?? '';
+}
+function selectFlow(id: string, side: 'rule_native_ref' | 'route_native_ref', value: string) {
+  flowBinding(id)[side] = value;
+  if (value) flowForm.omissions = flowForm.omissions.filter(o => o.source_flow_id !== id);
+}
+function pathLabel(choice: NativeChoice, selector: string): string {
+  if (!selector.startsWith('path:')) return selector;
+  const detail = choice.destination_path_details?.find(p => p.selector === selector);
+  if (!detail) return 'Qualified native path (provenance unavailable — held)';
+  const routeCount = detail.route_native_refs.length;
+  const natCount = detail.nat_native_refs.length;
+  return `Qualified observed path · ${routeCount} native route hops, ${natCount} NAT rules`;
+}
+function omissionFor(id: string): string {
+  return flowForm.omissions.find(o => o.source_flow_id === id)?.reason_code ?? '';
+}
+function requestOmission(id: string, reason: string) {
+  flowForm.omissions = flowForm.omissions.filter(o => o.source_flow_id !== id);
+  if (reason) {
+    flowForm.omissions.push({ source_flow_id: id, reason_code: reason });
+    flowForm.selections = flowForm.selections.filter(s => s.source_flow_id !== id);
+  }
+}
+async function refreshFlowChoices(): Promise<void> {
+  if (!active || flowBusy.value) return;
+  flowBusy.value = true;
+  try {
+    const response = await fetch(flowBase, { credentials: 'same-origin', cache: 'no-store',
+      redirect: 'manual', headers: { Accept: 'application/json' } });
+    if (!active) return;
+    if ([401, 403, 404].includes(response.status) || response.type === 'opaqueredirect') {
+      flowState.value = null; flowFailure.value = 'Application flow access is no longer authorized.';
+      return;
+    }
+    if (!response.ok || !response.headers.get('Content-Type')?.includes('application/json')) throw new Error();
+    const payload = await response.json() as { available: boolean; flow_choices: FlowChoices };
+    const updated = payload.flow_choices;
+    if (!payload.available || !updated || updated.native_write_authorized !== false) throw new Error();
+    if (flowForm.context_sha256 !== updated.context_sha256 || flowForm.revision !== updated.revision) {
+      flowForm.context_sha256 = updated.context_sha256;
+      flowForm.revision = updated.revision;
+      flowForm.selections = updated.selections.map(s => ({ ...s }));
+      flowForm.omissions = updated.omissions.map(o => ({ ...o }));
+      flowForm.command_key = crypto.randomUUID();
+      submittedFlowFingerprint = '';
+      flowForm.clearErrors();
+    }
+    flowState.value = updated;
+    flowFailure.value = '';
+  } catch {
+    if (active) { flowState.value = null; flowFailure.value = 'Source application intent or independent destination evidence could not be refreshed. Choices are blocked.'; }
+  } finally { flowBusy.value = false; }
+}
+function saveFlowChoices() {
+  if (!selectionsComplete.value || flowForm.processing || flowBusy.value || unavailable.value || flowFailure.value || !flowState.value) return;
+  // An optional application dependency may be left unmapped; an incomplete
+  // optional selection is not an operator-created rule and is never posted.
+  flowForm.selections = flowForm.selections.filter(s =>
+    Boolean(s.rule_native_ref) && Boolean(s.route_native_ref));
+  const fingerprint = JSON.stringify({
+    revision: flowForm.revision,
+    context_sha256: flowForm.context_sha256,
+    selections: flowForm.selections, omissions: flowForm.omissions,
+  });
+  if (fingerprint !== submittedFlowFingerprint) {
+    flowForm.command_key = crypto.randomUUID();
+    submittedFlowFingerprint = fingerprint;
+  }
+  flowForm.post(flowSave, {
+    preserveScroll: true,
+    onSuccess: () => { void refreshFlowChoices(); },
+    onError: () => { void refreshFlowChoices(); },
+  });
+}
+onMounted(() => { void refreshFlowChoices(); void refreshCatalogueWorkloads(); });
+
+type WorkloadField = {
+  field: string; disposition: string; required: boolean;
+  desired_value: string | null; observed_value: string | null;
+  evidence_source: string; evidence_age_seconds: number | null;
+  next_action: string;
+};
+type WorkloadDecision = {
+  schema_version: 2; kind: 'migration_workload_readiness'; status: 'eligible' | 'held';
+  holds: string[]; expires_at: number; readiness_sha256: string; native_write_authorized: false;
+  workload_reconciliation: { workloads: { workload_id: string; status: string; holds: string[]; field_dispositions: WorkloadField[] }[] };
+  collection_coverages: { scope: string; status: string; holds: string[]; attributes: { attribute_id: string; status: string; reason: string }[] }[];
+};
+type CatalogueLogicalVm = { id: string; name: string };
+const catalogueWorkloads = ref<CatalogueLogicalVm[]>([]);
+const selectedWorkload = ref('');
+const workloadOptionsError = ref('');
+async function refreshCatalogueWorkloads(): Promise<void> {
+  try {
+    const query = new URLSearchParams({ application: props.applicationId, environment: props.environment });
+    const response = await fetch(
+      `/tenants/${props.tenantId}/inventory/sites/${props.siteId}/migration/catalogue-options?${query}`,
+      { credentials: 'same-origin', cache: 'no-store', redirect: 'manual', headers: { Accept: 'application/json' } },
+    );
+    if (!response.ok) throw new Error();
+    const data = await response.json() as { current?: { workloads: CatalogueLogicalVm[] } };
+    if (!active || !Array.isArray(data.current?.workloads)) throw new Error();
+    catalogueWorkloads.value = data.current.workloads;
+    if (!catalogueWorkloads.value.some(w => w.id === selectedWorkload.value)) {
+      selectedWorkload.value = '';
+      workload.value = null;
+      workloadUnavailable.value = true;
+    }
+    workloadOptionsError.value = '';
+  } catch { if (active) workloadOptionsError.value = 'Current authorized Catalogue workloads unavailable.'; }
+}
+function chooseWorkload(id: string): void {
+  selectedWorkload.value = id;
+  workload.value = null;
+  workloadHolds.value = [];
+  workloadUnavailable.value = true;
+  if (id) void refreshWorkloadReadiness();
+}
+const workload = ref<WorkloadDecision | null>(null);
+const workloadHolds = ref<string[]>([]);
+const workloadUnavailable = ref(true);
+const workloadExpired = ref(true);
+let workloadExpiryTimer: ReturnType<typeof setTimeout> | undefined;
+async function refreshWorkloadReadiness(): Promise<void> {
+  if (!selectedWorkload.value) return;
+  const requested = selectedWorkload.value;
+  try {
+    const response = await fetch(url + '/workload-readiness?workload=' + encodeURIComponent(requested), {
+      credentials: 'same-origin', cache: 'no-store', redirect: 'manual',
+      headers: { Accept: 'application/json' },
+    });
+    if (!active) return;
+    if (!response.ok || !response.headers.get('Content-Type')?.includes('application/json')) throw new Error();
+    const result = await response.json() as {
+      available: boolean; readiness?: WorkloadDecision; holds: string[]; status: string;
+    };
+    if (!active || selectedWorkload.value !== requested || !result.available || !Array.isArray(result.holds)) return;
+    workload.value = result.readiness ?? null;
+    workloadHolds.value = result.holds;
+    workloadUnavailable.value = false;
+    clearTimeout(workloadExpiryTimer);
+    workloadExpired.value = !result.readiness || result.readiness.expires_at <= Math.floor(Date.now() / 1000);
+    if (result.readiness && !workloadExpired.value) {
+      workloadExpiryTimer = setTimeout(() => { workloadExpired.value = true; },
+        Math.min(2_147_483_647, Math.max(1, result.readiness!.expires_at * 1000 - Date.now())));
+    }
+  } catch {
+    if (active) { workloadUnavailable.value = true; workloadExpired.value = true; workload.value = null; }
+  }
+}
 </script>
 
 <template>
   <CatalogueLayout title="Directional migration support" :tenant-id="tenantId">
     <Link :href="`/tenants/${tenantId}/inventory/sites/${siteId}/migration-fleet`" class="text-teal-800 underline">Migration fleet</Link>
+    <section class="mt-5 rounded border border-slate-300 p-4" aria-label="Current application workload admission preview">
+      <h2 class="text-lg font-semibold">Complete workload migration readiness (Planning v2)</h2>
+      <label class="mt-3 block">Published Catalogue logical workload
+        <select :value="selectedWorkload" @change="chooseWorkload(($event.target as HTMLSelectElement).value)">
+          <option value="">Select current authorized workload</option>
+          <option v-for="item in catalogueWorkloads" :key="item.id" :value="item.id">{{ item.name }} · {{ item.id }}</option>
+        </select>
+      </label>
+      <p v-if="workloadOptionsError" role="alert">{{ workloadOptionsError }}</p>
+      <p class="mt-2">This read-only decision is resolved from the confirmed Inventory review, current Catalogue intent, independent field receipts and Planning's admission resolver. It is not an operator-supplied claim or an authorization to execute.</p>
+      <p v-if="!selectedWorkload" role="status" class="mt-2">Select a current Catalogue VM to resolve its scoped Inventory review and application readiness.</p>
+      <p v-else-if="workloadUnavailable" role="alert" class="mt-2">Current workload decision is unavailable. Migration remains held.</p>
+      <template v-else>
+        <p :role="workload?.status === 'eligible' && !workloadExpired ? 'status' : 'alert'" class="mt-2 font-semibold">
+          {{ workload?.status === 'eligible' && !workloadExpired ? 'Current workload evidence resolved — no native write granted' : 'Workload migration held' }}
+        </p>
+        <p v-if="workload" class="text-xs break-all">Contract: {{ workload.readiness_sha256 }} · Valid until {{ new Date(workload.expires_at * 1000).toLocaleString() }}</p>
+        <p v-if="workloadHolds.length" role="alert">Unresolved: {{ workloadHolds.join(', ').replaceAll('_', ' ') }}</p>
+        <div v-for="entry in workload?.workload_reconciliation.workloads ?? []" :key="entry.workload_id" class="mt-3 border-t pt-2">
+          <strong>Logical VM {{ entry.workload_id }} — {{ entry.status }}</strong>
+          <p v-for="hold in entry.holds" :key="hold" class="text-sm">{{ hold.replaceAll('_', ' ') }}</p>
+          <details v-if="entry.field_dispositions.length"><summary>Required native semantics and dispositions</summary>
+            <ul class="list-disc pl-5 text-sm">
+              <li v-for="field in entry.field_dispositions" :key="field.field" class="my-3">
+                <strong>{{ field.field }} · {{ field.disposition.replaceAll('_', ' ') }}{{ field.required ? ' (required)' : ' (optional)' }}</strong>
+                <dl class="grid gap-x-4 md:grid-cols-2">
+                  <dt>Desired</dt><dd class="break-all">{{ field.desired_value ?? 'Not specified' }}</dd>
+                  <dt>Observed</dt><dd class="break-all">{{ field.observed_value ?? 'Unobserved' }}</dd>
+                  <dt>Evidence</dt><dd>{{ field.evidence_source.replaceAll('_', ' ') }} · {{ field.evidence_age_seconds === null ? 'Age unavailable' : field.evidence_age_seconds + ' seconds old' }}</dd>
+                  <dt>Next action</dt><dd>{{ field.next_action.replaceAll('_', ' ') }}</dd>
+                </dl>
+              </li>
+            </ul>
+          </details>
+        </div>
+        <details v-if="workload?.collection_coverages.length" class="mt-3">
+          <summary>Scoped collection evidence and missing attributes</summary>
+          <div v-for="item in workload?.collection_coverages ?? []" :key="item.scope">
+            <strong>{{ item.scope }} — {{ item.status }}</strong>
+            <p v-for="hold in item.holds" :key="hold">{{ hold.replaceAll('_', ' ') }}</p>
+          </div>
+        </details>
+      </template>
+      <button type="button" class="mt-3 underline" :disabled="!selectedWorkload" @click="refreshWorkloadReadiness">Refresh current workload evidence</button>
+    </section>
+    <section class="mt-5 rounded border border-slate-300 p-4" aria-label="Source-approved application flow mapping">
+      <h2 class="text-lg font-semibold">Required application flows → existing destination controls</h2>
+      <p class="mt-2">These dependencies come from the verified application owner's Planning intent—not from VM NICs or generic firewall ACLs. Select only API-discovered destination firewall rules and routes. Save records the choices, but does not authorize migration or replace independent allow/deny, return-path, and tenant-isolation tests.</p>
+      <p v-if="flowFailure" role="alert" class="mt-2 text-red-800">{{ flowFailure }}</p>
+      <p v-if="!flowState" class="mt-2">An approved application migration assessment and fresh native network observations are required before mapping.</p>
+      <template v-else>
+        <p class="mt-2" :role="flowState.status === 'eligible' ? 'status' : 'alert'">
+          {{ flowState.status === 'eligible' ? 'Current flow selections passed review-time checks. Fresh independent E4 proof is still required before admission and at cutover.' :
+             flowState.status === 'invalidated' ? 'Previously saved flow selections are invalidated by changed source intent or destination observations.' :
+             'Application flow selections or independent network/isolation evidence remain held.' }}
+        </p>
+        <p v-if="flowState.holds.length" role="alert">Holds: {{ flowState.holds.join(', ').replaceAll('_', ' ') }}</p>
+        <p v-if="missingChoices.length" role="alert">No matching existing destination rule or route was observed for {{ missingChoices.length }} required application flows. There is no manual resource creation option.</p>
+        <div v-for="choice in flowState.choices" :key="choice.source_flow_id" class="mt-3 border-t pt-3">
+          <p><strong>{{ choice.source.from }} → {{ choice.source.to }}</strong> · {{ choice.source.protocol }}{{ choice.source.port === null ? '' : ':' + choice.source.port }} · {{ choice.required ? 'Critical / required' : 'Optional' }}</p>
+          <div v-if="choice.status === 'choices_observed'" class="mt-1 grid gap-3 md:grid-cols-2">
+            <label>Existing destination firewall rule
+              <select :value="flowSelection(choice.source_flow_id, 'rule_native_ref')" :disabled="flowForm.processing" @change="selectFlow(choice.source_flow_id, 'rule_native_ref', ($event.target as HTMLSelectElement).value)">
+                <option value="">Select observed native rule ID</option>
+                <option v-for="id in choice.destination_firewall_rule_ids" :key="id" :value="id">{{ id }}</option>
+              </select>
+            </label>
+            <label>Existing destination network route
+              <select :value="flowSelection(choice.source_flow_id, 'route_native_ref')" :disabled="flowForm.processing" @change="selectFlow(choice.source_flow_id, 'route_native_ref', ($event.target as HTMLSelectElement).value)">
+                <option value="">Select observed native route ID</option>
+                <option v-for="id in choice.destination_route_ids" :key="id" :value="id">{{ pathLabel(choice, id) }}</option>
+              </select>
+            </label>
+          </div>
+          <p v-else :role="choice.required ? 'alert' : 'status'">{{ choice.required
+             ? 'No qualified existing native controls match this required source flow. Migration remains held.'
+             : 'No qualified native equivalent was found for this optional dependency. Request a separately approved omission below.' }}</p>
+          <label v-if="!choice.required" class="mt-2 block">Optional dependency disposition (separate approval required)
+            <select :value="omissionFor(choice.source_flow_id)" :disabled="flowForm.processing" @change="requestOmission(choice.source_flow_id, ($event.target as HTMLSelectElement).value)">
+              <option value="">Migrate using existing native controls</option>
+              <option value="retired_dependency">Dependency retired in destination</option>
+              <option value="not_required_at_destination">Not required at destination</option>
+              <option value="replaced_by_native_service">Replaced by approved native service</option>
+              <option value="accepted_service_limitation">Proposed service limitation</option>
+            </select>
+          </label>
+          <p v-if="omissionFor(choice.source_flow_id)" role="alert">This is a request only. A separate receiving approver and independent E4 Assurance proof are required before migration.</p>
+        </div>
+        <p v-if="flowForm.errors.flow_mapping" role="alert" class="mt-2">{{ flowForm.errors.flow_mapping }}</p>
+        <button type="button" class="mt-4 rounded border px-4 py-2" :disabled="!selectionsComplete || flowForm.processing || flowBusy || unavailable || !!flowFailure || flowState.expires_at <= Math.floor(Date.now() / 1000)" @click="saveFlowChoices">Save reviewed application flow selections</button>
+        <button type="button" class="ml-3 mt-4 underline" :disabled="flowBusy" @click="refreshFlowChoices">Refresh native options</button>
+      </template>
+    </section>
     <p class="mt-4">Each direction is assessed independently. The versions, guest profile, method and constraints below must all match. A selected route is a delivery commitment; qualification and receiving acceptance are separate gates.</p>
     <p v-if="unavailable" role="alert" class="mt-4 text-red-800">Current support could not be verified. Displayed results are stale; restore the Planning and Assurance connections before proceeding.</p>
     <table class="mt-4 w-full text-left text-sm">
@@ -61,8 +352,53 @@ const versions = (platform: Platform) => Object.entries(platform.versions).map((
         </div></td>
         <td class="p-2"><p v-if="!direction.routes.length">Delivery gap. Platform engineering must implement and independently qualify this direction; it remains part of any-to-any scope.</p>
           <div v-for="route in direction.routes" :key="route.route_id" class="mb-4">
+            <section aria-label="Resolved migration readiness" class="mb-2 border-l-4 border-slate-600 pl-3">
+              <p class="font-semibold" :role="!route.readiness || unavailable || route.readiness.status !== 'eligible' ? 'alert' : 'status'">
+                Resolved migration readiness: {{ !unavailable && route.readiness?.status === 'eligible' ? 'Route eligible (not yet authorized to execute)' : 'Held — no admission' }}
+              </p>
+              <p v-if="route.readiness && !unavailable" class="text-xs break-all">Contract SHA-256: {{ route.readiness.readiness_sha256 }} · Valid until: {{ new Date(route.readiness.expires_at * 1000).toLocaleString() }}</p>
+              <p v-if="route.readiness?.holds.length && !unavailable" role="alert">Unresolved: {{ route.readiness.holds.join(', ').replaceAll('_', ' ') }}</p>
+              <p class="text-xs">Planning and Lifecycle recheck independent owner evidence before any native effect; this route view never grants native write authority.</p>
+            </section>
             <p>Native qualification: {{ !unavailable && route.native_qualified ? 'Accepted' : 'Held' }}</p>
             <p>Operating acceptance: {{ !unavailable && route.operationally_accepted ? 'Accepted' : 'Pending' }}</p>
+            <p v-if="!route.api_compatibility" role="status" class="text-amber-900">
+              Per-feature API version discovery is not yet enrolled for this historical route.
+              Existing route-level qualification is not a feature-by-feature compatibility claim.
+            </p>
+            <section v-if="route.api_compatibility" class="mt-2 border-l-4 border-amber-600 pl-3" aria-label="API feature migration compatibility">
+              <p class="font-semibold">Migration API compatibility: {{ unavailable ? 'Unknown — refresh required' : route.api_compatibility.status }}</p>
+              <p v-if="route.api_compatibility.administrator_alerts.length && !unavailable" role="alert" class="font-semibold">
+                {{ route.api_compatibility.administrator_alerts.length }} feature{{ route.api_compatibility.administrator_alerts.length === 1 ? '' : 's' }} cannot be transferred unchanged.
+              </p>
+              <ul v-if="!unavailable" class="list-disc pl-5">
+                <li v-for="alert in route.api_compatibility.administrator_alerts" :key="alert.side + ':' + alert.capability_id" class="mb-2">
+                  <strong>{{ alert.severity === 'blocker' ? 'Critical — blocks migration' : 'Optional — administrator action required' }}</strong>:
+                  {{ alert.capability_id }} ({{ alert.side }}); {{ alert.reason.replaceAll('_', ' ') }}.
+                  <span>{{ alert.impact }}</span>
+                  <span v-if="alert.omission_accepted">Omission independently accepted, subject to plan revalidation.</span>
+                  <span v-else>{{ alert.action.replaceAll('_', ' ') }}.</span>
+                </li>
+              </ul>
+              <details v-if="!unavailable" class="mt-2">
+                <summary class="cursor-pointer underline">Required API operations and selected versions</summary>
+                <table class="w-full text-xs">
+                  <thead><tr><th scope="col">Feature</th><th scope="col">Side</th><th scope="col">Importance</th><th scope="col">Evidence status</th><th scope="col">Selected API</th></tr></thead>
+                  <tbody>
+                    <tr v-for="operation in route.api_compatibility.cases" :key="operation.side + ':' + operation.capability_id">
+                      <td>{{ operation.capability_id }}</td>
+                      <td>{{ operation.side }}</td>
+                      <td>{{ operation.criticality }}</td>
+                      <td>{{ operation.status }}</td>
+                      <td>{{ operation.selected_api_family && operation.selected_api_version ? operation.selected_api_family + ' ' + operation.selected_api_version : 'Unknown — no qualified release' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </details>
+              <p v-if="route.api_compatibility.status !== 'eligible' || unavailable" class="text-red-800">
+                No migration approval or native write is permitted until every critical requirement is qualified and optional omissions are explicitly accepted.
+              </p>
+            </section>
             <p v-for="blocker in route.blockers" :key="blocker">{{ blocker.replaceAll('_', ' ') }}</p>
             <p v-if="route.blockers.length">Qualification owner: supply current independent evidence for this exact release and route in Assurance. Rejected, expired or revoked evidence must be resolved before admission.</p>
           </div>

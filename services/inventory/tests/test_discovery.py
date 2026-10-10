@@ -541,3 +541,45 @@ def test_retry_exhaustion_emits_original_terminal_fact(campaign: Campaign) -> No
         )
         assert fact is not None and fact["payload"]["reason"] == "throttled"
     assert c.resources(job)["completion"] == "partial"
+
+
+@pytest.mark.parametrize("fault", [
+    "none", "shared_credentials", "shared_origin", "invalid_domain",
+    "untrusted_scheme", "missing_pinned_address",
+])
+def test_vmware_nsx_policy_requires_separate_enrolled_tls_and_identity(fault: str) -> None:
+    base = policy_document()
+    base["platform"], base["native_scope"] = "vmware", "datacenter-1"
+    vcenter = {
+        "base_url": "https://vcenter.example",
+        "addresses": ["127.0.0.1"],
+        "ca_file": "/synthetic/vcenter-ca",
+        "credential_file": "/synthetic/vcenter-token",
+        "api_version": "9.1.1.0",
+    }
+    base["streams"] = [{"kind": kind, **vcenter}
+                       for kind in ("server", "network", "datastore", "target_profile")]
+    nsx = {
+        "kind": "nsx_policy", "base_url": "https://nsx.example",
+        "addresses": ["127.0.0.2"], "ca_file": "/synthetic/nsx-ca",
+        "credential_file": "/synthetic/nsx-basic", "api_version": "policy-v1",
+        "domain_id": "datacenter-policy",
+    }
+    if fault == "shared_credentials":
+        nsx["credential_file"] = vcenter["credential_file"]
+    elif fault == "shared_origin":
+        nsx["base_url"] = vcenter["base_url"]
+    elif fault == "invalid_domain":
+        nsx["domain_id"] = "../../admin"
+    elif fault == "untrusted_scheme":
+        nsx["base_url"] = "http://nsx.example"
+    elif fault == "missing_pinned_address":
+        nsx["addresses"] = []
+    base["streams"][-1]["nsx_policy"] = nsx
+    if fault == "none":
+        p = parse_policy(base)
+        assert p.streams[-1]["nsx_policy"]["credential_file"] != p.streams[-1]["credential_file"]
+        assert p.streams[-1]["nsx_policy"]["base_url"] != p.streams[-1]["base_url"]
+    else:
+        with pytest.raises(Rejected):
+            parse_policy(base)

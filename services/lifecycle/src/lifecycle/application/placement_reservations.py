@@ -17,12 +17,14 @@ class PoolSnapshots(Protocol):
 
 def vector(value: dict[str, Any]) -> dict[str, int]:
     kinds = {"vcpus", "memory_mib", "storage_gib", "addresses"}
-    if not kinds <= set(value) or any(
-        k not in kinds and not re.fullmatch(
-            r"storage_gib:[^:]{1,64}|addresses:[^:]{1,64}:(?:ipv4|ipv6)", k
-        ) for k in value
-    ) or any(
-        type(v) is not int or v < 0 or v > 2**53 - 1 for v in value.values()
+    if (
+        not kinds <= set(value)
+        or any(
+            k not in kinds
+            and not re.fullmatch(r"storage_gib:[^:]{1,64}|addresses:[^:]{1,64}:(?:ipv4|ipv6)", k)
+            for k in value
+        )
+        or any(type(v) is not int or v < 0 or v > 2**53 - 1 for v in value.values())
     ):
         raise Held("placement_vector_invalid")
     return dict(value)
@@ -34,9 +36,7 @@ class PlacementReservations:
     ) -> None:
         self.database, self.snapshots, self.clock = database, snapshots, clock
 
-    def event(
-        self, tx: Transaction, identity: str, state: str, facts: dict[str, Any]
-    ) -> None:
+    def event(self, tx: Transaction, identity: str, state: str, facts: dict[str, Any]) -> None:
         tx.execute(
             "INSERT INTO app.placement_events(id,reservation,state,facts,occurred_at) "
             "VALUES(%s,%s,%s,%s::jsonb,%s)",
@@ -70,9 +70,29 @@ class PlacementReservations:
             ):
                 raise Held("placement_physical_identity_unverified")
             values = vector(allocation["vector"])
+            # When a request declares class-specific usage, the entire
+            # corresponding aggregate must be accounted for. Otherwise a
+            # caller could omit a storage class or IPv6 address debit.
+            for aggregate, prefix in (
+                ("storage_gib", "storage_gib:"),
+                ("addresses", "addresses:"),
+            ):
+                classified = [v for k, v in values.items() if k.startswith(prefix)]
+                if classified and sum(classified) != values[aggregate]:
+                    raise Held("placement_vector_class_totals_inconsistent")
             total = demand.setdefault(identity, {k: 0 for k in values})
             for kind, value in values.items():
                 total[kind] = total.get(kind, 0) + value
+        # Reconcile again after aggregation; one unclassified workload must
+        # not piggyback on a different workload's correctly classified debit.
+        for requested in demand.values():
+            for aggregate, prefix in (
+                ("storage_gib", "storage_gib:"),
+                ("addresses", "addresses:"),
+            ):
+                classified = [v for k, v in requested.items() if k.startswith(prefix)]
+                if classified and sum(classified) != requested[aggregate]:
+                    raise Held("placement_vector_class_totals_inconsistent")
         with self.database.transaction() as tx:
             # One authority for physical pool identities; tenant IDs never partition this lock.
             tx.execute("SELECT pg_advisory_xact_lock(7503016)")
@@ -99,6 +119,22 @@ class PlacementReservations:
                 ):
                     raise Held("placement_native_authority_unavailable")
                 limits, used = vector(pool["limits"]), vector(pool["provider_used"])
+                if set(used) != set(limits) or not set(requested) <= set(limits):
+                    raise Held("placement_pool_class_limit_missing")
+                # If the owner enforces class-specific limits, a positive
+                # aggregate demand must identify its exact physical classes.
+                # Otherwise an unclassified allocation could evade a full
+                # IPv4/IPv6 or storage-class pool.
+                for aggregate, prefix in (
+                    ("storage_gib", "storage_gib:"),
+                    ("addresses", "addresses:"),
+                ):
+                    if (
+                        requested[aggregate] > 0
+                        and any(k.startswith(prefix) for k in limits)
+                        and not any(k.startswith(prefix) for k in requested)
+                    ):
+                        raise Held("placement_pool_class_dimension_missing")
                 debits = tx.all(
                     "SELECT d.native_ref,d.vector,r.id,r.state FROM app.placement_debits d "
                     "JOIN app.placement_reservations r ON r.id=d.reservation "
@@ -116,15 +152,24 @@ class PlacementReservations:
                     ):
                         continue
                     for kind, value in vector(debit["vector"]).items():
+                        if kind not in held:
+                            raise Held("placement_pool_class_limit_missing")
                         held[kind] += value
-                if any(used[k] + held[k] + requested[k] > limits[k] for k in limits):
+                if any(used[k] + held[k] + requested.get(k, 0) > limits[k] for k in limits):
                     state = "denied"
             identity = str(uuid4())
             tx.execute(
                 "INSERT INTO app.placement_reservations(id,tenant,plan_digest,request_digest,"
                 "request,state,expires_at,revision) VALUES(%s,%s,%s,%s,%s::jsonb,%s,%s,1)",
-                (identity, tenant, request["plan_digest"], request_digest, json.dumps(request),
-                 state, self.clock() + 300),
+                (
+                    identity,
+                    tenant,
+                    request["plan_digest"],
+                    request_digest,
+                    json.dumps(request),
+                    state,
+                    self.clock() + 300,
+                ),
             )
             if state == "reserved":
                 for pool_id, values in demand.items():
@@ -166,7 +211,8 @@ class PlacementReservations:
             with self.database.transaction() as tx:
                 tx.execute("SELECT pg_advisory_xact_lock(7503016)")
                 tx.execute(
-                    "UPDATE app.placement_reservations SET state='expired_held',revision=revision+1 "
+                    "UPDATE app.placement_reservations "
+                    "SET state='expired_held',revision=revision+1 "
                     "WHERE id=%s AND state IN ('reserved','confirmed') AND expires_at<=%s",
                     (row["id"], self.clock()),
                 )
@@ -185,14 +231,50 @@ class PlacementReservations:
                 pool = candidates[0]
                 if (
                     pool["native_ref"] != allocation["native_ref"]
+                    or pool["id"] != digest(
+                        {"provider_id": pool["provider_id"], "native_ref": pool["native_ref"]}
+                    )
                     or pool["exclusive_owner"] != "lifecycle-resource-owner"
                     or not pool["native_lease_id"]
                     or pool["lease_expires_at"] <= self.clock()
                     or pool["expires_at"] <= self.clock()
                     or not 0 <= self.clock() - pool["observed_at"] <= 5
                     or pool["policy_sha256"] != row["request"]["policy_sha256"]
+                    or tenant not in pool["allowed_tenants"]
                 ):
                     raise Held("placement_native_authority_unavailable")
+                # A previously accepted reservation is not necessarily feasible
+                # now: real provider-used vectors, native physical limits or
+                # another tenant's debits can change after its original receipt.
+                limits = vector(pool["limits"])
+                used = vector(pool["provider_used"])
+                if set(used) != set(limits) or not set(allocation["vector"]) <= set(limits):
+                    raise Held("placement_pool_class_limit_missing")
+                with self.database.transaction() as ledger:
+                    ledger.execute("SELECT pg_advisory_xact_lock(7503016)")
+                    debits = ledger.all(
+                        "SELECT d.vector,r.state,r.id,d.native_ref "
+                        "FROM app.placement_debits d "
+                        "JOIN app.placement_reservations r ON r.id=d.reservation "
+                        "WHERE d.pool_id=%s AND r.state NOT IN ('released','denied')",
+                        (allocation["pool_id"],),
+                    )
+                    outstanding = {kind: 0 for kind in limits}
+                    for debit in debits:
+                        if debit["native_ref"] != pool["native_ref"]:
+                            raise Held("placement_pool_identity_collision")
+                        if (debit["state"] == "confirmed"
+                            and str(debit["id"]) in pool["accounted_reservation_ids"]):
+                            continue
+                        for kind, amount in vector(debit["vector"]).items():
+                            if kind not in outstanding:
+                                raise Held("placement_pool_limit_missing")
+                            outstanding[kind] += amount
+                    if any(
+                        used[kind] + outstanding[kind] > capacity
+                        for kind, capacity in limits.items()
+                    ):
+                        raise Held("placement_provider_capacity_changed")
                 row["expires_at"] = min(
                     row["expires_at"], pool["expires_at"], pool["lease_expires_at"]
                 )
@@ -228,8 +310,12 @@ class PlacementReservations:
             raise Held("placement_provider_allocation_changed")
         if operation == "confirm" and observed["in_use"] is not True:
             raise Held("placement_provider_allocation_required")
-        state = "released" if operation == "release" else (
-            "confirmed" if operation == "confirm" or observed["in_use"] is True else "reserved"
+        state = (
+            "released"
+            if operation == "release"
+            else (
+                "confirmed" if operation == "confirm" or observed["in_use"] is True else "reserved"
+            )
         )
         with self.database.transaction() as tx:
             tx.execute("SELECT pg_advisory_xact_lock(7503016)")

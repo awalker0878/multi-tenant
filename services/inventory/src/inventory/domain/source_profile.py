@@ -199,3 +199,126 @@ def source_identity(p: dict[str, Any]) -> tuple[Any, Any]:
             )
         ],
     )
+
+
+def source_profile_read_count(profile: dict[str, Any]) -> int:
+    """Count the native GETs required for this exact OpenStack workload.
+
+    The collector independently fetches each unique attached security group;
+    source profile completion must not use an older fixed read count.
+    """
+    if profile.get("platform") != "openstack" or profile.get("schema_version") != 3:
+        raise Rejected("source_profile_read_count_unsupported")
+    native = profile.get("native")
+    metadata = native.get("metadata") if isinstance(native, dict) else None
+    records = native.get("disk_records") if isinstance(native, dict) else None
+    if not isinstance(metadata, dict) or not isinstance(records, list):
+        raise Rejected("source_profile_read_count_unavailable")
+    groups, ports = metadata.get("security_groups"), metadata.get("ports")
+    if not isinstance(groups, list) or not isinstance(ports, list):
+        raise Rejected("source_profile_security_collection_incomplete")
+    group_ids = [g.get("id") for g in groups if isinstance(g, dict)]
+    if (len(group_ids) != len(groups) or len(set(group_ids)) != len(groups)
+            or any(not isinstance(g, str) or not g for g in group_ids)):
+        raise Rejected("source_profile_security_collection_incomplete")
+    attached: set[str] = set()
+    for port in ports:
+        if not isinstance(port, dict):
+            raise Rejected("source_profile_security_collection_incomplete")
+        identities = port.get("security_groups")
+        if identities is None:
+            continue  # Unobserved membership remains an independent hold.
+        if not isinstance(identities, list) or any(not isinstance(i, str) for i in identities):
+            raise Rejected("source_profile_security_collection_incomplete")
+        attached.update(identities)
+    if attached != set(group_ids):
+        raise Rejected("source_profile_security_collection_incomplete")
+    # Server, flavor, attachments, ports, server re-read, all volumes and SGs.
+    volume_count = sum(r.get("role") in {"bootable_volume", "data_volume"} for r in records)
+    count = 5 + volume_count + len(group_ids)
+    if volume_count > 32 or len(group_ids) > 64 or count > 101:
+        raise Rejected("source_profile_collection_bound_exceeded")
+    return count
+
+
+def source_observation(profile: dict[str, Any], binding: dict[str, Any]) -> dict[str, Any]:
+    """Read-only native facts for later Catalogue reconciliation.
+
+    The source owner publishes facts, never a claimed intent match. Missing
+    secure-boot or VMware incarnation evidence stays unknown; externally
+    reviewed datasets and effective network semantics are not manufactured
+    from native device metadata.
+    """
+    facts = profile["facts"]
+    if facts["profile_type"] != "SourceWorkloadProfile":
+        raise Rejected("source_observation_profile_required")
+    platform = facts["platform"]
+    if platform not in {"vmware", "openstack", "ahv"}:
+        raise Rejected("source_observation_platform_invalid")
+    native = facts.get("native")
+    metadata = native.get("metadata") if isinstance(native, dict) else None
+    identity = native.get("identity") if isinstance(native, dict) else None
+    secure_boot: bool | None = None
+    if platform == "ahv" and isinstance(metadata, dict):
+        vm = metadata.get("vm")
+        config = vm.get("bootConfig") if isinstance(vm, dict) else None
+        observed = config.get("isSecureBootEnabled") if isinstance(config, dict) else None
+        secure_boot = observed if type(observed) is bool else None
+    if platform == "vmware":
+        value = facts.get("secure_boot")
+        secure_boot = value if type(value) is bool else None
+        identity = {
+            "vm_id": facts["vm_id"],
+            "instance_uuid": facts.get("instance_uuid"),
+            "bios_uuid": facts.get("bios_uuid"),
+        }
+    result = {
+        "source_identity_sha256": binding["native_identity_sha256"],
+        "generation_id": profile["generation_id"],
+        "profile_sha256": binding["profile_sha256"],
+        "installed_tuple_sha256": binding["tuple_sha256"],
+        "installation_id": facts.get("installation_id", facts.get("vcenter_uuid")),
+        "native_scope": facts.get("native_scope"),
+        "current": profile["current"],
+        "expires_at": profile["expires_at"],
+        "holds": facts["holds"],
+        "facts": {
+            "cpu": facts["cpu"],
+            "memory_mb": facts["memory_mb"],
+            "observed_at": int(profile["collected_at"]) if isinstance(
+                profile.get("collected_at"), (int, float)
+            ) else None,
+            "firmware": facts["firmware"],
+            "secure_boot": secure_boot,
+            # Guest identifiers are raw platform classifications, not
+            # automatically equivalent to Catalogue's OS or hardening.
+            "guest_id": facts.get("guest_id"),
+            "architecture": facts.get("architecture"),
+            "disks": [
+                {
+                    "key": d["key"], "capacity_bytes": d["capacity_bytes"],
+                    "controller_key": d.get("controller_key"),
+                    "unit_number": d.get("unit_number"),
+                    "native_role": next(
+                        (record.get("role") for record in
+                         native.get("disk_records", []) if record.get("key") == d["key"]),
+                        None,
+                    ) if isinstance(native, dict)
+                    and isinstance(native.get("disk_records"), list) else None,
+                }
+                for d in facts["disks"]
+            ],
+            "nics": [{"key": n["key"]} for n in facts["nics"]],
+            "controllers": [
+                {"key": c["key"], "model": c.get("model"),
+                 "bus": c.get("bus"), "sharing": c.get("sharing")}
+                for c in facts.get("controllers", [])
+            ],
+            "native": {"identity": identity},
+        },
+        "owner_dataset_coverage_current": False,
+        "network_semantics_independently_verified": False,
+        "native_write_authorized": False,
+    }
+    result["observation_sha256"] = digest(result)
+    return result

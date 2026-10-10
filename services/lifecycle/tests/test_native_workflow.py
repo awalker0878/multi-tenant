@@ -562,3 +562,30 @@ def test_late_activity_hold_cannot_regress_accepted_terminal_result(native: Any)
     current = service.read(tenant, job)
     assert current["state"] == "active"
     assert current["revision"] == accepted["revision"]
+
+
+def test_revocation_after_preflight_blocks_before_effect_and_never_redeems(native: Any) -> None:
+    service, owners, p, tenant, job = admitted(native)
+    binding = service.prepare(tenant, job, "reserve")
+    assert service.boundary(tenant, binding, p["executor_id"], "preflight")["allowed"]
+    owners.authority_changes = {"plan_current": False, "approval_current": False}
+    with pytest.raises(Rejected, match="authority"):
+        service.boundary(tenant, binding, p["executor_id"], "before_effect")
+    operations = service.read(tenant, job)["operations"]
+    assert not operations[0]["redeemed"]
+    owners.authority_changes = {}
+    # A new effect must still prove all actual prerequisites; the old
+    # preflight response did not itself confer a write grant.
+    assert service.boundary(tenant, binding, p["executor_id"], "before_effect")["allowed"]
+
+
+def test_authority_withdrawn_after_redemption_prevents_during_effect(native: Any) -> None:
+    service, owners, p, tenant, job = admitted(native)
+    binding = service.prepare(tenant, job, "reserve")
+    service.boundary(tenant, binding, p["executor_id"], "preflight")
+    service.boundary(tenant, binding, p["executor_id"], "before_effect")
+    owners.authority_changes = {"provider_fence_current": False}
+    with pytest.raises(Rejected, match="authority"):
+        service.boundary(tenant, binding, p["executor_id"], "during_effect")
+    assert service.read(tenant, job)["operations"][0]["redeemed"]
+    # The proof of an earlier grant cannot replace a fresh current fence.

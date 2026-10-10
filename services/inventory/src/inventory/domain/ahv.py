@@ -5,6 +5,7 @@ from typing import Any
 from uuid import UUID
 
 from inventory.domain.discovery import Rejected, number, shape, text
+from inventory.domain.destination_security import source_security_ids
 
 AHV_FIELDS = {
     "schema_version",
@@ -27,6 +28,7 @@ AHV_FIELDS = {
     "categories",
     "policies",
     "required_capability_evidence",
+    "security_references",
     "holds",
     "native_qualification",
 }
@@ -45,13 +47,37 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
     if (
         p["cluster_id"] != stream["cluster_id"]
         or p["prism_central_id"] != stream["prism_central_id"]
-        or p["api_versions"]
-        != dict.fromkeys(("vmm", "prism", "clustermgmt", "networking", "microseg"), "v4.3")
+        or not isinstance(p["api_versions"], dict)
+        or set(p["api_versions"]) != {"vmm", "prism", "clustermgmt", "networking", "microseg"}
+        or any(v not in {"v4.2", "v4.3"} for v in p["api_versions"].values())
+        or (stream.get("api_versions_verified") is True
+            and p["api_versions"] != stream.get("api_versions"))
+        or (stream.get("api_versions_verified") is not True
+            and p["api_versions"] != dict.fromkeys(
+                ("vmm", "prism", "clustermgmt", "networking", "microseg"), "v4.3"))
         or p["inventory_complete"] is not True
         or p["disk_formats"] != ["raw"]
         or p["image_import_methods"] != ["prism-image-url"]
     ):
         raise Rejected("invalid_ahv_profile")
+    references = p["security_references"]
+    if not isinstance(references, dict) or set(references) != {
+        "entity_groups", "address_groups", "service_groups"
+    }:
+        raise Rejected("invalid_ahv_microseg_reference_catalog")
+    for kind, rows in references.items():
+        if not isinstance(rows, list) or len(rows) > 100:
+            raise Rejected("invalid_ahv_microseg_reference_catalog")
+        seen_refs: set[str] = set()
+        for item in rows:
+            shape(item, {"extId", "native_sha256", "resolution"})
+            identifier = native_uuid(item["extId"])
+            if (identifier in seen_refs
+                    or item["resolution"] != "definition_only"
+                    or not isinstance(item["native_sha256"], str)
+                    or re.fullmatch(r"[a-f0-9]{64}", item["native_sha256"]) is None):
+                raise Rejected("invalid_ahv_microseg_reference_catalog")
+            seen_refs.add(identifier)
     for field in ("storage_containers", "subnets", "vpcs", "categories", "policies"):
         rows = p[field]
         if not isinstance(rows, list) or len(rows) > 1000:
@@ -74,6 +100,49 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
                 and row["extId"] not in stream["shared_resource_ids"]
             ):
                 raise Rejected("foreign_ahv_inventory", 403)
+            if field == "policies":
+                # Project-scoped policy list is not a rule-equivalence guarantee.
+                # Rule bodies may be present, but any unsupported reference
+                # semantics remain unqualified by this profile.
+                rules = row.get("rules")
+                if rules is not None:
+                    if not isinstance(rules, list) or len(rules) > 512:
+                        raise Rejected("invalid_ahv_policy_rules")
+                    seen_rule_ids = set()
+                    for rule in rules:
+                        if (
+                            not isinstance(rule, dict)
+                            or not isinstance(rule.get("extId"), str)
+                            or not rule["extId"]
+                            or rule["extId"] in seen_rule_ids
+                            or not isinstance(rule.get("type"), str)
+                            or not isinstance(rule.get("spec_sha256"), str)
+                            or re.fullmatch(r"[a-f0-9]{64}", rule["spec_sha256"]) is None
+                            or set(rule) != {
+                                "extId", "type", "spec_sha256", "category_ids",
+                                "address_group_ids", "service_group_ids",
+                                "reference_resolution",
+                            }
+                        ):
+                            raise Rejected("invalid_ahv_policy_rules")
+                        for kind in ("category_ids", "address_group_ids", "service_group_ids"):
+                            refs = rule[kind]
+                            if (
+                                not isinstance(refs, list) or len(refs) > 64
+                                or len(set(refs)) != len(refs)
+                                or any(not isinstance(v, str) or not v for v in refs)
+                            ):
+                                raise Rejected("invalid_ahv_rule_references")
+                        known_categories = {item["extId"] for item in p["categories"]}
+                        unresolved = (
+                            bool(set(rule["category_ids"]) - known_categories)
+                            or bool(rule["address_group_ids"] or rule["service_group_ids"])
+                        )
+                        if rule["reference_resolution"] != (
+                            "unresolved" if unresolved else "catalogue_ids_only"
+                        ):
+                            raise Rejected("invalid_ahv_rule_reference_status")
+                        seen_rule_ids.add(rule["extId"])
         if len(ids) != len(set(ids)):
             raise Rejected("invalid_ahv_inventory")
 
@@ -92,6 +161,7 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
             "storage_container_id",
             "category_ids",
             "policy_ids",
+            "security_mappings",
             "disks",
             "nics",
             "firmware",
@@ -115,17 +185,32 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
         raise Rejected("ahv_storage_mapping_unobserved")
     if d["vpc_id"] is not None and d["vpc_id"] not in inventories["vpcs"]:
         raise Rejected("ahv_vpc_mapping_unobserved")
-    for field, inventory in (("category_ids", "categories"), ("policy_ids", "policies")):
-        values = d[field]
-        if (
-            not isinstance(values, list)
-            or not 1 <= len(values) <= 32
-            or len(set(values)) != len(values)
-            or not set(values) <= inventories[inventory].keys()
-        ):
-            raise Rejected("ahv_security_mapping_unobserved")
-    if any(inventories["policies"][key].get("state") != "ENFORCE" for key in d["policy_ids"]):
-        raise Rejected("ahv_policy_not_enforced")
+    # Source categories are optional only when they were actually observed.
+    # No source category => no destination category selector or assignment.
+    native = source.get("native")
+    metadata = native.get("metadata") if isinstance(native, dict) else None
+    vm = metadata.get("vm") if isinstance(metadata, dict) else None
+    source_categories = vm.get("categories") if isinstance(vm, dict) else None
+    if not isinstance(d["category_ids"], list) or len(d["category_ids"]) > 32 or (
+        len(d["category_ids"]) != len(set(d["category_ids"]))
+    ):
+        raise Rejected("ahv_category_selection_invalid")
+    if (
+        (not isinstance(source_categories, list) or not source_categories) and d["category_ids"]
+    ) or not set(d["category_ids"]) <= inventories["categories"].keys():
+        raise Rejected("unobserved_source_or_destination_category")
+    source_ids = source_security_ids(source)
+    # Prism ENFORCE is only a deployment state. Neither group membership
+    # nor raw policy identity proves cross-platform rule semantics. Owners
+    # must not select a potentially unsafe policy merely because it exists.
+    # Preserve an empty draft; a mandatory review hold is set in WorkloadProfiles.
+    if d["security_mappings"] != [] or d["policy_ids"] != []:
+        raise Rejected("destination_security_rule_qualification_required")
+    if source_ids:
+        # The source policy requirement exists, but no qualified AHV rule
+        # crosswalk currently authorizes a destination policy choice.
+        pass
+
     for field in ("disks", "nics"):
         rows = d[field]
         if not isinstance(rows, list) or len(rows) != len(source[field]) or len(rows) > 32:

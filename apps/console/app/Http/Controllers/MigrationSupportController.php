@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Application\Planning\Contracts\PlanningGateway;
+use App\Application\Inventory\Contracts\InventoryGateway;
+use App\Domain\Inventory\InventoryFailure;
 use App\Domain\Planning\PlanningFailure;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -26,14 +30,147 @@ final class MigrationSupportController
         return response()->json(['available' => true, 'support' => $this->read($request, $tenant, $application, $environment, $site, $planning)])->header('Cache-Control', 'no-store, private');
     }
 
+    public function workloadReadiness(
+        Request $request, string $tenant, string $application, string $environment,
+        string $site, PlanningGateway $planning, InventoryGateway $inventory
+    ): JsonResponse {
+        $token = $this->session($request);
+        $chosen = $request->validate([
+            'workload' => ['required', 'uuid', 'lowercase'],
+        ]);
+        $workload = $chosen['workload'];
+        $cursor = null;
+        $matches = [];
+        $profiles = [];
+        // Fleet identities are authenticated Inventory observations. Historical
+        // site-latest reviews may belong to an unrelated application.
+        for ($page = 0; $page < 3; $page++) {
+            $fleet = $inventory->call($token, $tenant, 'getMigrationFleet',
+                ['site' => $site], cursor: $cursor);
+            foreach ($fleet['items'] ?? [] as $item) {
+                $profile = is_array($item) ? ($item['profile_id'] ?? null) : null;
+                if (! is_string($profile) || isset($profiles[$profile])) {
+                    continue;
+                }
+                $profiles[$profile] = true;
+                try {
+                    $current = $inventory->call($token, $tenant, 'getVmMigrationReview',
+                        ['site' => $site, 'profile' => $profile]);
+                } catch (InventoryFailure $error) {
+                    if ($error->status === 404) {
+                        continue;
+                    }
+                    throw $error;
+                }
+                $review = $current['review'] ?? null;
+                $input = is_array($review) ? ($review['input'] ?? null) : null;
+                $link = is_array($input) ? ($input['catalogue_binding'] ?? null) : null;
+                if (is_array($link)
+                    && ($link['application_id'] ?? null) === $application
+                    && ($link['environment_id'] ?? null) === $environment
+                    && ($link['workload_id'] ?? null) === $workload
+                    && ($review['confirmation_current'] ?? false) === true
+                    && is_int($review['revision'] ?? null)
+                    && is_string($review['digest'] ?? null)) {
+                    $matches[] = $review;
+                }
+            }
+            $cursor = $fleet['next_cursor'] ?? null;
+            if ($cursor === null) {
+                break;
+            }
+            if ($page === 2) {
+                return response()->json([
+                    'available' => true, 'status' => 'held',
+                    'holds' => ['current_inventory_review_search_incomplete'],
+                    'native_write_authorized' => false,
+                ])->header('Cache-Control', 'no-store, private');
+            }
+        }
+        if (count($matches) !== 1) {
+            return response()->json([
+                'available' => true, 'status' => 'held',
+                'holds' => [count($matches) === 0
+                    ? 'confirmed_scoped_catalogue_workload_review_missing'
+                    : 'confirmed_scoped_catalogue_workload_review_ambiguous'],
+                'native_write_authorized' => false,
+            ])->header('Cache-Control', 'no-store, private');
+        }
+        $review = $matches[0];
+        $result = $planning->call($token, $tenant, $application, $environment,
+            'POST', 'migration-workload-readiness', [$site], [
+                'site_id' => $site,
+                'review' => ['revision' => $review['revision'], 'digest' => $review['digest']],
+            ]);
+        return response()->json([
+            'available' => true, 'status' => $result['readiness']['status'] ?? 'held',
+            'readiness' => $result['readiness'] ?? null,
+            'holds' => $result['readiness']['holds'] ?? ['migration_workload_preview_incomplete'],
+            'native_write_authorized' => false,
+        ])->header('Cache-Control', 'no-store, private');
+    }
+
+    public function flowChoices(Request $request, string $tenant, string $application, string $environment, string $site, PlanningGateway $planning): JsonResponse
+    {
+        $choices = $planning->call($this->session($request), $tenant, $application, $environment,
+            'POST', 'migration-flow-choices', [$site], ['site_id' => $site]);
+        return response()->json(['available' => true, 'flow_choices' => $choices])->header('Cache-Control', 'no-store, private');
+    }
+
+    public function saveFlows(Request $request, string $tenant, string $application, string $environment, string $site, PlanningGateway $planning): RedirectResponse
+    {
+        $input = $request->validate([
+            'command_key' => ['required', 'uuid', 'lowercase'],
+            'revision' => ['required', 'integer', 'min:0', 'max:1000000'],
+            'context_sha256' => ['required', 'regex:/\\A[a-f0-9]{64}\\z/'],
+            'selections' => ['present', 'array', 'max:512'],
+            'selections.*' => ['required', 'array:source_flow_id,rule_native_ref,route_native_ref'],
+            'selections.*.source_flow_id' => ['required', 'regex:/\\A[a-f0-9]{64}\\z/'],
+            'selections.*.rule_native_ref' => ['required', 'string', 'max:512'],
+            'selections.*.route_native_ref' => ['required', 'string', 'max:512'],
+            'omissions' => ['present', 'array', 'max:512'],
+            'omissions.*' => ['required', 'array:source_flow_id,reason_code'],
+            'omissions.*.source_flow_id' => ['required', 'regex:/\\A[a-f0-9]{64}\\z/'],
+            'omissions.*.reason_code' => ['required', 'in:retired_dependency,not_required_at_destination,replaced_by_native_service,accepted_service_limitation'],
+        ]);
+        try {
+            $response = $planning->call(
+                $this->session($request), $tenant, $application, $environment,
+                'POST', 'migration-flow-selections', [$site], [
+                    'site_id' => $site,
+                    'revision' => (int) $input['revision'],
+                    'context_sha256' => $input['context_sha256'],
+                    'selections' => $input['selections'],
+                    'omissions' => $input['omissions'],
+                ], $input['command_key'],
+            );
+        } catch (PlanningFailure $error) {
+            if (in_array($error->status, [401, 403, 404], true)) {
+                throw $error;
+            }
+            throw ValidationException::withMessages([
+                'flow_mapping' => in_array($error->status, [409, 412, 423], true)
+                    ? 'Native application flow evidence or revision changed. Refresh choices before saving.'
+                    : 'Application flow validation unavailable. No approval was recorded.',
+            ]);
+        }
+        return redirect()->back()->with('flow_notice', ($response['status'] ?? '') === 'eligible'
+            ? 'Application flow choices saved for review. Execution still requires fresh independent E4 evidence.'
+            : 'Application flow draft saved. Required connectivity or isolation evidence remains held.');
+    }
+
+    private function session(Request $request): string
+    {
+        $token = $request->session()->get('identity.token');
+        if (! is_string($token)) {
+            throw new PlanningFailure(403, 'access_unavailable');
+        }
+        return $token;
+    }
+
     /** @return array<string, mixed> */
     private function read(Request $request, string $tenant, string $application, string $environment, string $site, PlanningGateway $planning): array
     {
-        $session = $request->session()->get('identity.token');
-        if (! is_string($session)) {
-            throw new PlanningFailure(403, 'access_unavailable');
-        }
-
-        return $planning->call($session, $tenant, $application, $environment, 'POST', 'migration-support', [$site], ['site_id' => $site]);
+        return $planning->call($this->session($request), $tenant, $application, $environment, 'POST', 'migration-support', [$site], ['site_id' => $site]);
     }
 }

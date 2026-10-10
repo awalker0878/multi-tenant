@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:multi-tenant:native-security-api-registry:v1",
+  "title": "Candidate native security APIs: never evidence of qualification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "interpretation",
+    "providers"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "const": "candidate_paths_require_installed_qualification"
+    },
+    "interpretation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "providers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vmware",
+        "ahv",
+        "openstack"
+      ],
+      "properties": {
+        "vmware": {
+          "$ref": "#/$defs/provider"
+        },
+        "ahv": {
+          "$ref": "#/$defs/provider"
+        },
+        "openstack": {
+          "$ref": "#/$defs/provider"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "namespace",
+        "versions"
+      ],
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "versions": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "required_features",
+              "candidate_endpoints"
+            ],
+            "properties": {
+              "required_features": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "candidate_endpoints": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^/"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

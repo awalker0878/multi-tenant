@@ -11,6 +11,7 @@ from typing import Any
 
 from inventory_worker.infrastructure.native import CollectionFailure, exchange, secret
 from inventory_worker.infrastructure.native_identity import native_id
+from inventory_worker.infrastructure.openstack_security import rule_choices, security_semantics
 from inventory_worker.infrastructure.openstack_source_contract import configuration
 from inventory_worker.infrastructure.profile_digest import fingerprint
 
@@ -69,6 +70,45 @@ def collect_openstack_source(
     volume_ids = [native_id(a.get("volumeId")) for a in attachments if isinstance(a, dict)]
     if len(volume_ids) != len(attachments) or len(set(volume_ids)) != len(volume_ids):
         raise CollectionFailure("invalid_response")
+    source_security_groups: list[dict[str, Any]] = []
+    source_group_ids = set()
+    for port in ports:
+        groups = port.get("security_groups") if isinstance(port, dict) else None
+        if not isinstance(groups, list):
+            continue  # Unobserved; source_security_ids remains unknown.
+        for group_id in groups:
+            if isinstance(group_id, str):
+                source_group_ids.add(group_id)
+    if len(source_group_ids) > 64:
+        raise CollectionFailure("invalid_response")
+    for group_id in sorted(source_group_ids):
+        native_id(group_id)
+        group = read("network", "/security-groups/" + group_id, "security_group")
+        if (
+            not isinstance(group, dict)
+            or group.get("id") != group_id
+            or group.get("project_id", group.get("tenant_id")) != project
+            or not isinstance(group.get("security_group_rules"), list)
+        ):
+            raise CollectionFailure("permission_denied")
+        rule_ids: set[str] = set()
+        for rule in group["security_group_rules"]:
+            if (
+                not isinstance(rule, dict)
+                or not isinstance(rule.get("id"), str)
+                or not rule["id"]
+                or rule.get("security_group_id") != group_id
+                or rule.get("project_id", rule.get("tenant_id")) != project
+                or rule["id"] in rule_ids
+            ):
+                raise CollectionFailure("permission_denied")
+            rule_ids.add(rule["id"])
+        source_security_groups.append({
+            "id": group_id, "project_id": project,
+            "semantics_sha256": security_semantics(group),
+            "rules": rule_choices(group),
+            "native_sha256": fingerprint(group),
+        })
     holds: list[str] = []
     disks: list[dict[str, Any]] = []
     native_disks: list[dict[str, Any]] = []
@@ -207,6 +247,7 @@ def collect_openstack_source(
                 "server": server,
                 "server_configuration": configuration("server", server),
                 "ports": ports,
+                "security_groups": source_security_groups,
                 "flavor": flavor,
                 "guest_provenance": "native_metadata_declaration",
                 "firmware_provenance": "native_metadata_declaration",

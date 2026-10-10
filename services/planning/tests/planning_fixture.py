@@ -45,7 +45,9 @@ def inputs() -> tuple[
         "downtime_seconds": 3600,
         "allowed_zones": ["zone-1"],
         "recovery_profile": {
-            "minimum_load": 1, "parallel_restores": 1, "load_unit": "requests_per_second",
+            "minimum_load": 1, "parallel_restores": 1,
+            "load_unit": "requests_per_second",
+            "maximum_rpo_seconds": 3600, "maximum_rto_seconds": 3600,
         },
         "forbidden_flows": [{
             "from": "foreign-tenant", "to": intent["workloads"][0]["id"],
@@ -64,6 +66,38 @@ def inputs() -> tuple[
             }
             for w in intent["workloads"]
         ],
+    }
+    contextual_flows = [
+        dep for dep in intent["dependencies"] if dep["kind"] == "communication"
+    ] + policy["forbidden_flows"]
+    contextual_flows += [
+        {
+            "from": "foreign-domain-" + str(i),
+            "to": workload["id"],
+            "protocol": "tcp",
+            "port": 22,
+        }
+        for i, workload in enumerate(intent["workloads"])
+    ]
+    policy["network_flow_contexts"] = {
+        digest({k: item[k] for k in ("from", "to", "protocol", "port")}): {
+            "address_family": "ipv4",
+            "vrf_id": "fixture-vrf-" + SITE,
+            "vpc_id": "fixture-vpc-" + SITE,
+            "direction": "source_to_destination",
+            "return_path_policy": "stateful_allow",
+        }
+        for item in contextual_flows
+    }
+    recovery_limits = policy["recovery_profile"]
+    recovery_limits["review"] = {
+        "decision": "approved",
+        "profile_sha256": digest(recovery_limits),
+        "reviewed_by": "fixture-independent-reviewer",
+        "observer_id": "fixture-recovery-observer",
+        "revision": 1,
+        "approved_at": NOW - 60,
+        "expires_at": NOW + 1200,
     }
     project = "10000000-0000-4000-8000-000000000020"
     custody = "10000000-0000-4000-8000-000000000021"
@@ -265,32 +299,49 @@ def snapshot_fixture(
             for family in nic["address_families"]:
                 key = "addresses:" + nic["network_class"] + ":" + family
                 vector[key] = vector.get(key, 0) + 1
-        pools.append({
-            "id": "pool-" + str(index),
-            "native_ref": "fixture://physical-host-" + str(index),
-            "failure_domain": "rack-" + str(index),
-            "zone": "zone-1",
-            "zone_allowed": True,
-            "architecture": "x86_64",
-            "storage_classes": ["standard"],
-            "network_classes": ["private"],
-            "policy_sha256": digest(policy),
-            "ledger_revision": 1,
-            "total": vector,
-            "used": {k: 0 for k in vector},
-            "pending": {k: 0 for k in vector},
-        })
+        pools.append(
+            {
+                "id": "pool-" + str(index),
+                "native_ref": "fixture://physical-host-" + str(index),
+                "failure_domain": "rack-" + str(index),
+                "zone": "zone-1",
+                "zone_allowed": True,
+                "architecture": "x86_64",
+                "storage_classes": ["standard"],
+                "network_classes": ["private"],
+                "policy_sha256": digest(policy),
+                "ledger_revision": 1,
+                "total": vector,
+                "used": {k: 0 for k in vector},
+                "pending": {k: 0 for k in vector},
+            }
+        )
     communication = [d for d in intent["dependencies"] if d["kind"] == "communication"]
     negative = [policy["forbidden_flows"][0] | {"kind": "tenant"}]
-    negative += [{
-        "from": "foreign-domain-" + str(index), "to": workload["id"],
-        "protocol": "tcp", "port": 22, "kind": "domain",
-        "security_domain_id": workload["security_domain"]["id"],
-    } for index, workload in enumerate(intent["workloads"])]
+    negative += [
+        {
+            "from": "foreign-domain-" + str(index),
+            "to": workload["id"],
+            "protocol": "tcp",
+            "port": 22,
+            "kind": "domain",
+            "security_domain_id": workload["security_domain"]["id"],
+        }
+        for index, workload in enumerate(intent["workloads"])
+    ]
     topology: dict[str, Any] = {
         "nodes": {w["id"]: "fixture://native-port-" + w["id"] for w in intent["workloads"]},
-        "routes": [{"from": d["from"], "to": d["to"], "native_ref": "fixture://route"}
-                   for d in communication],
+        "routes": [
+            {
+                "from": d["from"],
+                "to": d["to"],
+                "native_ref": "fixture://route",
+                "context": policy["network_flow_contexts"][
+                    digest({k: d[k] for k in ("from", "to", "protocol", "port")})
+                ],
+            }
+            for d in communication
+        ],
     }
     for flow in negative:
         topology["nodes"][flow["from"]] = "fixture://foreign-port-" + flow["from"]
@@ -300,19 +351,66 @@ def snapshot_fixture(
         "topology_sha256": digest(topology),
         "topology": topology,
         "default_action": "deny",
+        "writer_principal": "fixture-writer",
+        "application_flow_selections": {
+            digest({k: d[k] for k in ("from", "to", "protocol", "port")}): {
+                "rule_native_ref": "fixture://native-firewall-rule",
+                "route_native_ref": "fixture://route",
+                "observer_principal": "fixture-independent-observer",
+                "observed_at": NOW,
+                "expires_at": NOW + 120,
+                "policy_sha256": policy_sha,
+                "topology_sha256": digest(topology),
+            }
+            for d in communication
+        },
         "firewall_rules": [
             {k: d[k] for k in ("from", "to", "protocol", "port")}
-            | {"action": "allow", "native_ref": "fixture://native-firewall-rule"}
+            | {
+                "action": "allow",
+                "egress_action": "allow",
+                "ingress_action": "allow",
+                "native_ref": "fixture://native-firewall-rule",
+                "context": policy["network_flow_contexts"][
+                    digest({k: d[k] for k in ("from", "to", "protocol", "port")})
+                ],
+            }
+            for d in communication
+        ],
+        "return_paths": [
+            {
+                "from": d["to"],
+                "to": d["from"],
+                "protocol": d["protocol"],
+                "port": d["port"],
+                "context": policy["network_flow_contexts"][
+                    digest({k: d[k] for k in ("from", "to", "protocol", "port")})
+                ],
+                "sequence": 1,
+                "outcome": "allow",
+                "observed_at": NOW,
+                "expires_at": NOW + 120,
+                "native_ref": "fixture://return-path-probe",
+                "policy_sha256": policy_sha,
+                "topology_sha256": digest(topology),
+            }
             for d in communication
         ],
         "measurements": [
             {k: d[k] for k in ("from", "to", "protocol", "port")}
             | {
                 "outcome": "allow" if d in communication else "deny",
-                "sequence": 1, "observed_at": NOW, "expires_at": NOW + 120,
+                "sequence": 1,
+                "observed_at": NOW,
+                "expires_at": NOW + 120,
                 "native_subjects": ["fixture://native-probe-client"],
-                "policy_sha256": policy_sha, "topology_sha256": digest(topology),
-            } for d in communication + negative
+                "context": policy["network_flow_contexts"][
+                    digest({k: d[k] for k in ("from", "to", "protocol", "port")})
+                ],
+                "policy_sha256": policy_sha,
+                "topology_sha256": digest(topology),
+            }
+            for d in communication + negative
         ],
     }
     isolation = {
@@ -325,6 +423,26 @@ def snapshot_fixture(
         "writer_principal": "fixture-writer",
         "observed_at": NOW, "expires_at": NOW + 120,
         "negative_flows": negative,
+        "boundary_controls": {
+            kind: {
+                "outcome": "passed",
+                "native_ref": "fixture://native-" + kind + "-negative-probe",
+                "native_scope": destination["native_scope"],
+                "policy_sha256": policy_sha,
+                "observed_at": NOW,
+                "expires_at": NOW + 120,
+            }
+            for kind in ("rbac", "storage", "keys")
+        },
+        "fault_hierarchy": {
+            w["id"]: {
+                "native_ref": pools[i]["native_ref"],
+                "rack": pools[i]["failure_domain"],
+                "zone": pools[i]["zone"],
+                "site_id": destination["site_id"],
+            }
+            for i, w in enumerate(intent["workloads"])
+        },
     }
     recoveries = [{
         "dataset_id": dataset["id"], "sequence": 1,
@@ -341,6 +459,24 @@ def snapshot_fixture(
         "restore_chain_sha256": digest(dataset), "outcome": "passed", "consistency_passed": True,
         "last_consistent_checkpoint_at": NOW - 30, "failure_at": NOW - 30,
         "restore_started_at": NOW - 30, "application_ready_at": NOW,
+        "observer_id": "fixture-recovery-observer",
+        "key_readiness": {
+            "available": True, "verified_at": NOW - 20,
+            "native_ref": "fixture://native-key-readback",
+        },
+        "application_readiness": {
+            "verified": True, "verified_at": NOW,
+            "native_ref": "fixture://application-health-probe",
+        },
+        "dependency_readiness": {
+            f"{dep['from']}->{dep['to']}": {
+                "verified": True, "verified_at": NOW,
+                "native_ref": "fixture://dependent-service-health-probe",
+            }
+            for dep in intent["dependencies"]
+            if dep["strength"] == "required"
+            and dep.get("dataset_id") in (None, dataset["id"])
+        },
     } for dataset in intent["datasets"]]
     return {
         "definition_sha256": DEFINITION_SHA256,
@@ -350,7 +486,9 @@ def snapshot_fixture(
         "observed_at": NOW,
         "expires_at": NOW + 120,
         "data": {
-            "pools": pools, "network": network, "isolation": isolation,
+            "pools": pools,
+            "network": network,
+            "isolation": isolation,
             "recovery_measurements": recoveries,
         },
     }

@@ -1,0 +1,28 @@
+{
+  "tenant_id": {
+    "type": "string",
+    "format": "uuid"
+  },
+  "site_id": {
+    "type": "string",
+    "format": "uuid"
+  },
+  "revision": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 9007199254740991
+  },
+  "digest": {
+    "type": "string",
+    "pattern": "^[0-9a-f]{64}$"
+  },
+  "method": {
+    "enum": [
+      "APPLICATION_REBUILD_RESTORE",
+      "VM_SNAPSHOT_BASELINE_APP_DELTA",
+      "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+      "VM_COLD_EXPORT",
+      "EXTERNAL_BLOCK_REPLICATION"
+    ]
+  }
+}

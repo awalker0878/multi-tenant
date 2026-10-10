@@ -6,13 +6,15 @@ from inventory.application.discovery import Discovery
 from inventory.application.ports import Transaction
 from inventory.domain.discovery import Actor, Rejected, canonical, digest, identifier, shape
 from inventory.domain.migration import destination_input
-from inventory.domain.source_profile import source_identity
+from inventory.domain.destination_security import source_rule_choices, source_security_ids
+from inventory.domain.source_profile import source_identity, source_observation
 from inventory.domain.workload import METHODS, OWNER_FIELDS, review_input
 
 
 class WorkloadProfiles:
-    def __init__(self, discovery: Discovery) -> None:
+    def __init__(self, discovery: Discovery, collection_read=None) -> None:
         self.d = discovery
+        self.collection_read = collection_read
 
     def authorize(self, actor: Actor) -> None:
         if actor.action != "inventory.admin" or actor.site is None:
@@ -131,6 +133,18 @@ class WorkloadProfiles:
             holds.append("current_source_and_target_profiles_required")
         holds.extend("source_" + h for h in source["facts"]["holds"])
         holds.extend("target_" + h for h in target["facts"]["holds"])
+        required_security = source_security_ids(source["facts"])
+        if required_security is None:
+            holds.append("source_security_policy_observation_required")
+        elif required_security and source_rule_choices(source["facts"]) is None:
+            holds.append("source_security_rule_observation_required")
+        elif required_security and target["facts"]["platform"] == "vmware":
+            holds.append("destination_security_policy_catalog_required")
+        elif required_security and target["facts"]["platform"] == "ahv":
+            # Observed enforced Prism policy membership does not prove the
+            # required traffic allows/denies. A separate native E3/E4 check
+            # is needed before confirmation and execution.
+            holds.append("destination_security_flow_equivalence_unproven")
         confirmed = tx.one(
             "SELECT actor,confirmed_at FROM inventory.migration_confirmations "
             "WHERE tenant=%s AND site=%s AND revision=%s",
@@ -272,8 +286,75 @@ class WorkloadProfiles:
             )
             return result
 
+    def source_associations(
+        self, tx: Transaction, actor: Actor, application: str, environment: str
+    ) -> list[dict[str, Any]]:
+        """All site-local confirmed, current source links for one application.
+
+        Only the Inventory authority derives identities and native generations.
+        Old confirmations superseded by a newer review are not silently reused.
+        """
+        identifier(application)
+        identifier(environment)
+        records = tx.all(
+            "SELECT revision,digest,payload,confirming_actor FROM ("
+            "SELECT DISTINCT ON (r.payload->'catalogue_binding'->>'workload_id') "
+            "r.revision,r.digest,r.payload,c.actor AS confirming_actor "
+            "FROM inventory.migration_reviews r "
+            "JOIN inventory.migration_confirmations c "
+            "ON c.tenant=r.tenant AND c.site=r.site "
+            "AND c.revision=r.revision AND c.digest=r.digest "
+            "WHERE r.tenant=%s AND r.site=%s "
+            "AND r.payload->'catalogue_binding'->>'application_id'=%s "
+            "AND r.payload->'catalogue_binding'->>'environment_id'=%s "
+            "ORDER BY r.payload->'catalogue_binding'->>'workload_id',r.revision DESC"
+            ") AS latest ORDER BY revision DESC LIMIT 101",
+            (actor.tenant, actor.site, application, environment),
+        )
+        if len(records) > 100:
+            raise Rejected("source_association_workspace_bound", 423)
+        result: list[dict[str, Any]] = []
+        seen_logical: set[str] = set()
+        authority_cache: dict[str, bool] = {}
+        for record in records:
+            body = record["payload"]
+            link = body.get("catalogue_binding")
+            if (not isinstance(link, dict)
+                    or link.get("application_id") != application
+                    or link.get("environment_id") != environment):
+                continue
+            logical_id = link.get("workload_id")
+            if not isinstance(logical_id, str):
+                raise Rejected("source_association_logical_identity_required", 423)
+            if logical_id in seen_logical:
+                # Latest confirmed review supersedes historical generations;
+                # never reconcile the same Catalogue VM twice.
+                continue
+            seen_logical.add(logical_id)
+            source = self.profile(tx, actor, body["source_profile_id"], authority_cache)
+            selected = self.review(tx, actor, body["source_profile_id"], authority_cache)
+            current = bool(
+                selected and selected["revision"] == record["revision"]
+                and selected["digest"] == record["digest"]
+                and selected["confirmation_current"]
+            )
+            result.append({
+                "catalogue_binding": link,
+                "source_observation": source_observation(source, self.binding(source)),
+                "source_binding": self.binding(source),
+                "datasets": body["datasets"],
+                "revision": record["revision"],
+                "digest": record["digest"],
+                "confirmed_by": str(record["confirming_actor"]),
+                "current": current,
+            })
+            if len(result) > 100:
+                raise Rejected("source_association_workspace_bound", 423)
+        return result
+
     def planning(
-        self, tenant: str, site: str, expected: int, content_digest: str
+        self, tenant: str, site: str, expected: int, content_digest: str,
+        application: str | None = None, environment: str | None = None,
     ) -> dict[str, Any]:
         # Transport has already authenticated the Planning caller and its delegated actor.
         actor = Actor(identifier(tenant), "", "", "inventory.admin", identifier(site))
@@ -310,6 +391,15 @@ class WorkloadProfiles:
                 "target_disk_formats": target["facts"]["disk_formats"],
                 "source": self.binding(source),
                 "target": self.binding(target),
+                "source_observation": source_observation(source, self.binding(source)),
+                "catalogue_binding": review["input"].get("catalogue_binding"),
+                "source_associations": self.source_associations(tx, actor, application, environment)
+                if application is not None and environment is not None else [],
+                "collection_coverages": self.collection_read(
+                    tenant, site, source, target,
+                    self.binding(source), self.binding(target), self.d.clock()
+                ) if self.collection_read is not None and application is not None
+                and environment is not None else [],
                 "datasets": review["input"]["datasets"],
                 "disks": source["facts"]["disks"],
                 "owner_inputs": review["input"]["owner_inputs"],

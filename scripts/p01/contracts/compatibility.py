@@ -15,10 +15,19 @@ def compare(base: dict[str, bytes], head: dict[str, bytes]) -> list[str]:
     return [path for path, value in base.items() if head.get(path) != value]
 
 
+def is_published_contract(path: str) -> bool:
+    """Immutable wire/data releases, not developer source pieces or test inputs."""
+    return (
+        path.startswith("contracts/")
+        and not path.startswith(("contracts/source/", "contracts/fixtures/"))
+        and Path(path).suffix in {".json", ".yaml", ".yml"}
+    )
+
+
 def inventory(root: Path) -> dict[str, bytes]:
     return {str(p.relative_to(root)): p.read_bytes()
             for p in sorted((root / 'contracts').rglob('*'))
-            if p.is_file() and p.suffix in {'.json', '.yaml', '.yml'}}
+            if p.is_file() and is_published_contract(str(p.relative_to(root)))}
 
 
 def check(root: Path, base_revision: str) -> dict:
@@ -40,7 +49,7 @@ def check(root: Path, base_revision: str) -> dict:
     paths = git('log', *history, '--format=', '--name-only', '-z', base_revision,
                 '--', 'contracts').decode().split('\0')
     paths = sorted({p.lstrip('\n') for p in paths
-                    if Path(p.lstrip('\n')).suffix in {'.json', '.yaml', '.yml'}})
+                    if is_published_contract(p.lstrip('\n'))})
     base, published = {}, {}
     for path in paths:
         # The first appearance on the base branch is the published artifact.

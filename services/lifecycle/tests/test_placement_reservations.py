@@ -20,40 +20,66 @@ class Snapshots:
         self.now = NOW
         self.in_use = False
         self.accounted: list[str] = []
+        self.withdrawn_tenants: set[str] = set()
         self.used = {"vcpus": 0, "memory_mib": 0, "storage_gib": 0, "addresses": 0}
         self.pool_id = digest({"provider_id": "physical-provider", "native_ref": "physical-host"})
 
     def pools(self, request: dict[str, Any]) -> list[dict[str, Any]]:
-        return [{
-            "id": self.pool_id, "provider_id": "physical-provider", "native_ref": "physical-host",
-            "observed_at": self.now, "expires_at": self.now + 30,
-            "exclusive_owner": "lifecycle-resource-owner", "native_lease_id": "fixture-lease",
-            "lease_expires_at": self.now + 3600, "policy_sha256": request["policy_sha256"],
-            "allowed_tenants": [request["scope"]["tenant_id"]],
-            "limits": {"vcpus": 8, "memory_mib": 8192, "storage_gib": 80, "addresses": 2},
-            "provider_used": self.used, "accounted_reservation_ids": self.accounted,
-        }]
+        return [
+            {
+                "id": self.pool_id,
+                "provider_id": "physical-provider",
+                "native_ref": "physical-host",
+                "observed_at": self.now,
+                "expires_at": self.now + 30,
+                "exclusive_owner": "lifecycle-resource-owner",
+                "native_lease_id": "fixture-lease",
+                "lease_expires_at": self.now + 3600,
+                "policy_sha256": request["policy_sha256"],
+                "allowed_tenants": (
+                    [] if request["scope"]["tenant_id"] in self.withdrawn_tenants
+                    else [request["scope"]["tenant_id"]]
+                ),
+                "limits": {"vcpus": 8, "memory_mib": 8192, "storage_gib": 80, "addresses": 2},
+                "provider_used": self.used,
+                "accounted_reservation_ids": self.accounted,
+            }
+        ]
 
     def allocation(self, request: dict[str, Any], reservation_id: str) -> dict[str, Any]:
         return {
-            "reservation_id": reservation_id, "plan_digest": request["plan_digest"],
-            "placement_sha256": request["placement_sha256"], "observed_at": self.now,
-            "expires_at": self.now + 30, "outcome": "known", "in_use": self.in_use,
+            "reservation_id": reservation_id,
+            "plan_digest": request["plan_digest"],
+            "placement_sha256": request["placement_sha256"],
+            "observed_at": self.now,
+            "expires_at": self.now + 30,
+            "outcome": "known",
+            "in_use": self.in_use,
             "allocations_absent": not self.in_use,
             "allocations_sha256": digest(request["allocations"]),
         }
 
 
 def request(source: Snapshots, cpu: int = 8) -> dict[str, Any]:
-    allocations = [{
-        "pool_id": source.pool_id, "native_ref": "physical-host", "workload_id": str(uuid4()),
-        "vector": {"vcpus": cpu, "memory_mib": cpu * 1024, "storage_gib": cpu * 10,
-                   "addresses": cpu // 4},
-    }]
+    allocations = [
+        {
+            "pool_id": source.pool_id,
+            "native_ref": "physical-host",
+            "workload_id": str(uuid4()),
+            "vector": {
+                "vcpus": cpu,
+                "memory_mib": cpu * 1024,
+                "storage_gib": cpu * 10,
+                "addresses": cpu // 4,
+            },
+        }
+    ]
     return {
         "scope": {"tenant_id": str(uuid4())},
-        "plan_digest": digest(str(uuid4())), "generation_id": str(uuid4()),
-        "policy_sha256": "a" * 64, "placement_sha256": digest(allocations),
+        "plan_digest": digest(str(uuid4())),
+        "generation_id": str(uuid4()),
+        "policy_sha256": "a" * 64,
+        "placement_sha256": digest(allocations),
         "allocations": allocations,
     }
 
@@ -63,15 +89,17 @@ def test_two_tenants_compete_for_one_atomic_vector(database: Postgres) -> None:
     service = PlacementReservations(database, source, lambda: source.now)
     requests = [request(source), request(source)]
     with ThreadPoolExecutor(2) as pool:
-        receipts = list(pool.map(
-            lambda r: service.reserve(r["scope"]["tenant_id"], r), requests
-        ))
+        receipts = list(pool.map(lambda r: service.reserve(r["scope"]["tenant_id"], r), requests))
     assert sorted(r["state"] for r in receipts) == ["denied", "reserved"]
     with database.transaction() as tx:
-        assert tx.one("SELECT count(*) AS n FROM app.placement_debits")["n"] == 1
-    winner = next(r for r in requests if any(
-        p["plan_digest"] == r["plan_digest"] and p["state"] == "reserved" for p in receipts
-    ))
+        row = tx.one("SELECT count(*) AS n FROM app.placement_debits")
+        assert row is not None
+        assert row["n"] == 1
+    winner = next(
+        r
+        for r in requests
+        if any(p["plan_digest"] == r["plan_digest"] and p["state"] == "reserved" for p in receipts)
+    )
     restarted = PlacementReservations(database, source, lambda: source.now)
     replay = restarted.reserve(winner["scope"]["tenant_id"], winner)
     assert replay["state"] == "reserved"
@@ -93,8 +121,152 @@ def test_expiry_retains_debits_and_confirmed_usage_is_counted_once(database: Pos
     second = request(source, 4)
     assert service.reserve(second["scope"]["tenant_id"], second)["state"] == "reserved"
     source.now += 400
-    assert service.check(first["scope"]["tenant_id"], first["plan_digest"])["state"] == "expired_held"
+    assert (
+        service.check(first["scope"]["tenant_id"], first["plan_digest"])["state"] == "expired_held"
+    )
     with pytest.raises(Held, match="live_or_unknown"):
         service.transition(first["scope"]["tenant_id"], first["plan_digest"], "release")
     third = request(source, 4)
     assert service.reserve(third["scope"]["tenant_id"], third)["state"] == "denied"
+
+
+def test_provider_usage_drift_revokes_previous_readback_without_freeing_debits(
+    database: Postgres,
+) -> None:
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    accepted = service.reserve(selected["scope"]["tenant_id"], selected)
+    assert accepted["state"] == "reserved"
+    source.used = {
+        "vcpus": 6, "memory_mib": 6144, "storage_gib": 60, "addresses": 2,
+    }
+    with pytest.raises(Held, match="provider_capacity_changed"):
+        service.check(selected["scope"]["tenant_id"], selected["plan_digest"])
+    # No silent compensating delete or speculative release on changed facts.
+    with database.transaction() as tx:
+        debit = tx.one(
+            "SELECT count(*) AS n FROM app.placement_debits WHERE reservation=%s",
+            (accepted["reservation_id"],),
+        )
+        assert debit is not None and debit["n"] == 1
+
+
+def test_provider_tenant_authorization_withdrawal_rejects_current_receipt(
+    database: Postgres,
+) -> None:
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    assert service.reserve(selected["scope"]["tenant_id"], selected)["state"] == "reserved"
+    source.withdrawn_tenants.add(selected["scope"]["tenant_id"])
+    with pytest.raises(Held, match="native_authority_unavailable"):
+        service.check(selected["scope"]["tenant_id"], selected["plan_digest"])
+
+
+def test_missing_class_specific_limit_cannot_accept_physical_address_vector(
+    database: Postgres,
+) -> None:
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    selected["allocations"][0]["vector"]["addresses:private:ipv6"] = 1
+    selected["placement_sha256"] = digest(selected["allocations"])
+    with pytest.raises(Held, match="class_limit_missing"):
+        service.reserve(selected["scope"]["tenant_id"], selected)
+    with database.transaction() as tx:
+        saved = tx.one("SELECT count(*) AS n FROM app.placement_reservations")
+    assert saved is not None and saved["n"] == 0
+
+
+def test_provider_usage_class_not_in_limits_invalidates_existing_receipt(
+    database: Postgres,
+) -> None:
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    assert service.reserve(selected["scope"]["tenant_id"], selected)["state"] == "reserved"
+    source.used["storage_gib:premium"] = 10
+    with pytest.raises(Held, match="class_limit_missing"):
+        service.check(selected["scope"]["tenant_id"], selected["plan_digest"])
+
+
+def test_unused_class_limit_does_not_require_an_allocation_in_that_class(
+    database: Postgres,
+) -> None:
+    """A pool may offer IPv6 headroom to an IPv4-only VM."""
+
+    class PoolWithExtraClass(Snapshots):
+        def pools(self, request: dict[str, Any]) -> list[dict[str, Any]]:
+            observed = super().pools(request)
+            for family in ("ipv4", "ipv6"):
+                kind = "addresses:private:" + family
+                observed[0]["limits"][kind] = 2
+                observed[0]["provider_used"][kind] = 0
+            return observed
+
+    source = PoolWithExtraClass()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    selected["allocations"][0]["vector"]["addresses:private:ipv4"] = 1
+    selected["placement_sha256"] = digest(selected["allocations"])
+    receipt = service.reserve(selected["scope"]["tenant_id"], selected)
+    assert receipt["state"] == "reserved"
+    assert (
+        service.check(selected["scope"]["tenant_id"], selected["plan_digest"])["state"]
+        == "reserved"
+    )
+
+
+@pytest.mark.parametrize(
+    "class_key,amount",
+    [("addresses:private:ipv6", 2), ("storage_gib:standard", 41)],
+)
+def test_classified_allocation_must_reconcile_with_aggregate(
+    database: Postgres, class_key: str, amount: int,
+) -> None:
+    """A forged subclass vector cannot consume less aggregate headroom."""
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    selected["allocations"][0]["vector"][class_key] = amount
+    selected["placement_sha256"] = digest(selected["allocations"])
+    with pytest.raises(Held, match="placement_vector_class_totals_inconsistent"):
+        service.reserve(selected["scope"]["tenant_id"], selected)
+    with database.transaction() as tx:
+        assert tx.one("SELECT count(*) AS n FROM app.placement_reservations")["n"] == 0
+
+
+def test_class_limit_owner_rejects_unclassified_demand(database: Postgres) -> None:
+    """An unknown network class must never consume a classified address pool."""
+
+    class ClassifiedPool(Snapshots):
+        def pools(self, request: dict[str, Any]) -> list[dict[str, Any]]:
+            observed = super().pools(request)
+            observed[0]["limits"]["addresses:private:ipv4"] = 2
+            observed[0]["provider_used"]["addresses:private:ipv4"] = 0
+            return observed
+
+    source = ClassifiedPool()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    with pytest.raises(Held, match="placement_pool_class_dimension_missing"):
+        service.reserve(selected["scope"]["tenant_id"], selected)
+
+
+def test_aggregated_vector_rejects_mixed_classified_and_unclassified_allocations(
+    database: Postgres,
+) -> None:
+    """One correctly classified VM cannot hide another VM's missing address class."""
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    first = selected["allocations"][0]
+    first["vector"]["addresses:private:ipv4"] = 1
+    second = deepcopy(first)
+    second["workload_id"] = str(uuid4())
+    del second["vector"]["addresses:private:ipv4"]
+    selected["allocations"].append(second)
+    selected["placement_sha256"] = digest(selected["allocations"])
+    with pytest.raises(Held, match="placement_vector_class_totals_inconsistent"):
+        service.reserve(selected["scope"]["tenant_id"], selected)

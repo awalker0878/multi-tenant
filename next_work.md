@@ -1,522 +1,452 @@
-# Current handoff — P0 / P09-A completion work
-
-Continue on `enhancement/p09-any-to-any`. The uncommitted handoff was recovered
-from `91acffa4200a7e3a4d5d5d767f6db981149d0774`; the approved audit baseline was
-`eda64354816b4884530118f6595c037a5a556807`. Platform discovery, typed outcomes,
-source/destination mechanisms, guest preparation, method contracts, durable
-continuation, native observations, progress and console parity are implemented.
-The [P09-A record](docs/implementation/p09-any-to-any.md) maps G1–G6 and A01–A11;
-the [runbook](docs/operations/runbooks/any-to-any-migration.md) names concrete
-commissioning and operating requirements.
-
-The user explicitly approved publication to `awalker0878/multi-tenant` and opening
-an enhancement PR on 2026-10-08. Direct Git transport has no runtime credential;
-the connected GitHub API is used to publish the same source tree. The original
-local commit history and source identities are preserved in
-`verification/p09/any-to-any-local/source-history.bundle`, with a checksum and
-commit/tree manifest. Hosted checks must bind the newly published commit; local
-evidence keeps its original revision identities. Continue through all actual
-hosted failures before treating software qualification as complete.
-
-Local PostgreSQL fixtures cannot create the required unprivileged process identity;
-PHP 8.5 is unavailable. These checks remain unverified. Installed native platforms,
-owner application/storage interfaces, guest conversion artifacts and independent
-receiving records are also required. Local/synthetic evidence grants no native
-support and does not complete P09/P10/P11 or G09–G11.
-
-# Historical handoffs
-
-# Contextual commissioning and recovery increment
-
-Operator readiness now follows the selected task, migration method and observed
-platforms, with accountable actions and independently signed evidence checks.
-AHV discovery supports bounded numbered pages; export archives can explicitly
-opt into same-lease byte-range continuation. The
-[implementation and operating instructions](docs/implementation/contextual-commissioning.md)
-record the exact behavior, verification commands and remaining native boundaries.
-The user authorizes publishing these tested changes to main.
-[Retained verification](verification/p08/commissioning/README.md) records 1,336
-component tests without skips and five passing browser journeys.
-
-The next concrete work is to enroll the actual source/destination and owner
-producers, populate the existing native/operating input records, and execute the
-VMware-to-OpenStack campaign before widening native qualification to AHV. Guest,
-service, Windows/UEFI and post-write recovery support still need their selected
-owner protocols and original campaigns. Software verification does not create
-those operating inputs or close the receiving gates.
-
-# Next work — P10 operating qualification
-
-Latest engineering source `b1ee0355` passes P07/P08/P09 and all nine P10 campaign
-commands: 1,050 component tests (325 Planning, 371 Lifecycle, 354 worker), with no
-failures, errors or skips. All ten exact-source workflows and the 19 P10 tooling
-checks pass. This increment closes
-credential-rotation/expiry and incomplete-response defects across OpenStack,
-VMware, Glance, owner protocols and platform transport, with pre-effect mounted
-observer checks. Original hosted test failures and the receipt-synchronized test
-correction are retained in [the current evidence](verification/p10/engineering-b1ee0355/README.md).
-Candidate `4d48a81d3a44a807a80cd2cebc97055ec419d2cd6aa0c355d73af067e3241e03`
-still holds all six P10 operating packages. Complete the actual native and owner
-inputs below; these engineering results do not close BL-P07-001, BL-P08-001/002
-or BL-P10-001/002. Development authorization remains effective.
-
-The user approved public publication to `greenfield/enterprise-microservices-plan`.
-P09 is published and its full PostgreSQL conformance passed. The P07/P08 product
-increment adds immutable provision/retire composition, authenticated native jobs
-and strict writer/observer credential separation. P10 now has an executable
-candidate-bound engineering campaign, real database load/restore exercises,
-artifact/alert checks and a release dossier that explicitly holds missing evidence.
-Prior hosted source `0ba5d986` passes all 999 component tests with no skips and all
-nine engineering campaign commands. The 19 P10 tooling checks pass. Candidate
-identity now survives evidence-only commits, original observations and artifact
-identities are required, and receiving reviews bind the exact reviewed packet.
-Independent observation origins and credential rotation at effect boundaries are
-covered by the worker corrections. See [P10's receiving packet](docs/implementation/p10-completion-review.md) and
-[tool instructions](scripts/p10/README.md).
-
-**P07/P08/P09/P10 remain IN_PROGRESS; G07–G10 remain NOT_REVIEWED.** A passing
-synthetic-owner integration campaign cannot qualify an installed platform or
-record a receiving decision. BL-P09-001's publication/database-check obstacle is
-resolved; the original local evidence remains preserved.
-
-Continue with the actual receiving inputs already specified in
-`release/p07-native-inputs.json`, `release/operating-inputs.json` and
-`release/p10-inputs.json`: selected tuples, owner protocols, scoped account/trust
-references, independent provider custody/fencing, data/recovery methods, approved
-workload/recovery targets and real receiving operators. Existing development and
-publication authorization continues; do not ask for it again.
-
-Bind the selected P07 enterprise adapters and P08 guest/delta/continuation/recovery
-methods, execute Q05–Q07 natively, qualify each selected P09 tuple, then run Q09/Q10
-against the frozen installed release. Retain original outcomes, fix actual failures,
-and submit the complete dossier to the independent G10 reviewers. No native
-change, deployment, merge to main or unsupported support claim is implied.
-
-# Retained P08 native migration handoff
-
-P08 operations now include authenticated campaign APIs, a Console schedule/control
-page, staggered windows/blackouts, dependency and outage-group admission, measured
-phase-concurrency limits and independently published resource observations. See
-[P08 operations](docs/implementation/p08-operations.md) for semantics and tested
-limits. The [runtime/commissioning increment](docs/implementation/p08-runtime-commissioning.md)
-adds six-account read-only checks, protected native worker composition, immutable
-recipe-based Planning proposals, bulk Console plan creation and VM-scoped custody.
-The [native control increment](docs/implementation/p08-native-control.md) now supplies
-the Lifecycle process/dispatcher, live Planning/Governance/Inventory owner reads, an
-immutable resolver, unattended recipe revocation and explicit long movement budgets.
-Actual account/provider-custody commissioning, native measurement producers, selected
-guest/data/service/recovery adapters, interrupted-transfer reconciliation and Q07/G08
-acceptance remain open. The
-[completion packet](docs/implementation/p08-completion-review.md) identifies the
-source/target secret references, lab placement and application-owner protocols
-needed to make that work concrete. Existing development authorization continues.
-
-The [native control evidence](verification/p08/control/README.md) qualifies source
-`f765eb9fba61a16565d4085d8e51a4e0ec681ddd`: all 36 commands and 951 component tests
-without skips, all 30 compiler-to-resolver combinations and three migration browser
-journeys pass. Separate unchanged Governance source passes 219 PostgreSQL tests,
-5,919 assertions and 160 campaign checks. Original archives and the architecture
-failure/correction are retained at `c801a13e4b172e6b307303a4c7eccb6e1511e8c6`.
-EV-P08-008 records these boundaries without closing either P08 blocker.
-
-The [runtime evidence](verification/p08/runtime/README.md) qualifies source
-`7860616293cc0be7a1983ca7bc38529aed5e5b7f`: 893 component tests without skips,
-all three browser journeys and all 23 Console quality commands pass. Console
-records 195 Pest passes, 922 assertions and seven separate broker-campaign skips.
-The evidence is retained at `dd5450138ca29bb07468177d56165d3e6a136dd0`.
-Original image-manifest, contract-version and apt-mirror failures are retained;
-the corrected image and strict restored-contract checks pass. Source Kubernetes
-is still queued at the [regression observation](verification/p08/runtime/regression-status.json).
-EV-P08-007 records these measured boundaries without closing either P08 blocker.
-
-The [campaign evidence](verification/p08/campaigns/README.md) qualifies source
-`5e2b4a62f2c940bbdb06432c8922d43301e3482c`: 811 component tests without skips,
-all three migration browser journeys and all Console quality commands pass.
-Console records 192 Pest passes and seven explicit separate-campaign broker skips.
-The original formatting failure and exact final archives remain retained.
-
-P08 development continues on the native-only baseline. Source fleet browsing, named
-groups, VM-specific review and bulk OpenStack preparation are implemented and qualified
-in the [fleet evidence](verification/p08/fleet/README.md): 785 component tests without
-skips, both browser journeys and all Console quality commands pass at `74ab8e4`.
-Console records 187 passed tests and seven explicit separate-campaign broker skips.
-Bulk preparation grants no native write authority. The [implementation record](docs/implementation/p08-execution.md)
-now covers scoped leased profile collection, immutable review/confirmation,
-Console dataset mapping, authenticated Planning preparation and current Lifecycle
-admission, alongside exact-S0 isolated capture, NFC/OVF archives, copy conversion,
-Glance import and durable recovery. The earlier [profile evidence](verification/p08/profiles/qualification-index.json)
-and all original failures and corrections remain recorded with their exact source.
-
-**P08 remains incomplete and G08 NOT_REVIEWED.** The [completion packet](docs/implementation/p08-completion-review.md)
-separates unfinished software (BL-P08-001) from actual native/owner inputs
-(BL-P08-002). Continue in this order under the existing development authorization:
-
-1. Enroll the actual authorized source/target policies and read identities, collect
-   API-visible profiles and confirm the owner-only workload inputs in the delivered
-   Console review. Preserve the accepted rebuild/restore baseline; its concrete
-   guest, data, service and recovery protocols still need their actual owner records.
-2. Commission the protected recipes and create complete proposals from the current
-   Planning assessment and exact VM review. Configure the delivered native resolver,
-   current approval/Inventory interfaces, independent provider-custody and selected stage effects with independent
-   readback; qualify the actual converter rootfs and copied-guest profile. Bind the
-   selected application/file delta, service, native writer-fence, traffic, recovery
-   and cleanup protocols. Extend transfer continuation only with reconciled byte
-   ranges/custody and renewed authority. Version 2 movement now allows up to one day;
-   shorter profile/plan/credential expiry still wins and interruption remains held.
-3. Obtain the packet's exact VMware/OpenStack tuple, guest/data/method/objectives,
-   scoped identities, service/fencing protocols and authorized native lab. Complete
-   the G07 path and its Q05/Q06 obligations before native P08 acceptance.
-4. Execute all Q07 cases with independent observers, both data recovery boundaries,
-   policy/services/restore and measured owner objectives. Retain original results
-   and record real G08 receiving decisions. Software tests cannot supply these.
-
-Use the [native migration runbook](docs/operations/runbooks/native-migration.md).
-No native environment, commissioned owner protocols or Q07/G08 outcomes were supplied.
-No migration effect is enabled by this evidence publication.
-
-# Retained P07 native API qualification
-
-P07 uses immutable native operation plans, direct Neutron/Cinder/Nova requests,
-per-request authority, durable API receipts and independent exact-ID readback.
-ADR-016 is the native API-only baseline; no Terraform dependency, module or
-compatibility path remains in the execution implementation.
-
-The native API source at `4ee67fdd704f6b6c401237137e3d8e2940ba3d1a` passes
-276 Lifecycle and 139 worker tests without skips, 93 preparation tests and 43
-Temporal checks with six replayed histories. The [qualification index](verification/p07/native-api/qualification-index.json)
-retains exact-source archives, original failures and corrections. These E2 checks
-establish component behavior, not installed-platform acceptance.
-The [completion receipt](verification/p07/native-api/regression-completion.json)
-records all 12 source workflows and six publication workflows passing.
-
-1. Preserve the current native-only contracts and qualified software boundaries.
-   Do not restore tool fallback, compatibility plans or automatic migration-method substitution.
-2. Compose actual current-owner and caller-trust integrations from commissioned
-   Governance, Planning, Inventory and independently administered native custody.
-   Do not use simulation authority or synthetic test owners for native writes.
-3. Bind concrete guest/service/reservation/traffic/retirement adapters and native
-   stale-worker exclusion to the discovered installation and validated configuration.
-4. Run Q05/Q06 on the commissioned native topology, including backup/application
-   restoration, denied paths, response loss, revocation and separate retirement.
-   Record original observations and actual G07 receiving decisions.
-
-No native environment, selected service-owner protocols, actual Q05/Q06 evidence
-or G07 acceptance is supplied. Those missing inputs remain explicit in
-[the completion packet](docs/implementation/p07-completion-review.md). Software
-checks cannot establish installed-platform acceptance or complete those outcomes.
-
-P08 follows [the native migration design](docs/implementation/p08-native-migration.md):
-explicit method selection, isolated snapshot-bound clone/export, copy-only conversion
-and guest changes, delta strategies, native import, validation and recovery. The
-newer P08 components and their remaining work are recorded above; they do not
-establish P07 native acceptance or a completed P08 journey.
-
-# Retained P06 engineering handoff
-
-P06 engineering and automated qualification are complete at
-`3a9c136639426087d060845184048f52850fcfc7`; original evidence is committed at
-`4ddb91427236d6ef9f06cc1fb2a937d21102f691`. All six packages deliver atomic
-admission/dispatch, durable simulation, current effect authority, independent
-readback, Assurance custody and the Console Jobs experience. The final run passes
-138 core tests without skips and 148 checks in each of Chromium, Firefox and
-WebKit. Each live campaign replays four actual workflow histories, records five
-alert receipts and preserves 29 accepted effects through an older-journal restore.
-
-Use the [implementation record](docs/implementation/p06-execution.md),
-[qualification index](verification/p06/final/qualification-index.json),
-[check matrix](verification/p06/check-matrix.md),
-[corrections](verification/p06/corrections.md) and
-[simulation runbook](docs/operations/runbooks/durable-simulation.md).
-
-The [regression completion receipt](verification/p06/final/regression-completion.json)
-records all 15 associated workflow passes, including final-source Kubernetes.
-
-1. **BL-P06-001 — designated receiving:** product, qualification, security,
-   Lifecycle, Assurance and SRE reviewers examine the exact evidence and perform
-   the six representative operator tasks in the
-   [completion packet](docs/implementation/p06-completion-review.md). Record actual
-   names, dates, ADR dispositions and decisions. The register keeps formal P06
-   receiving IN_PROGRESS and G06 NOT_REVIEWED; all scoped engineering outputs and
-   automated P06 checks are delivered.
-2. **Next engineering package — P07.01 native site readiness:** inventory the
-   actual OpenStack tuple, project/endpoints/trust, scoped identities, immutable
-   tooling, state/locking/custody owners, image/network/storage constraints,
-   quotas and independent observer. Populate the exact Q05 campaign inputs and
-   record missing inputs with owners using the [P07 card](docs/implementation/phases/p07.md).
-   Existing development authorization continues. A native effect still requires
-   the actual exact-scope campaign authority and operating inputs.
-3. **Carry prior receiving and native limits:** P06 remains E2 isolated simulation;
-   its restored journal safely denies re-enable until independent reconciliation
-   and newly bound authority have an approved implementation. The earlier P00–P05
-   receiving/native/operating obligations below remain explicit.
-
-# Retained P05 receiving and handoff
-
-P05 engineering and automated qualification are delivered at
-`c045badc852960f3671942adf4ca2338821b4f67`. The six packages implement all-eleven-dimension
-capability assessment, exact-source immutable compilation, independent owner reads,
-Lifecycle reservation simulation, Console comparison/diff/approval handoff and
-operational versus isolated-campaign admission contracts. Use the
-[implementation record](docs/implementation/p05-planning.md),
-[verified index](verification/p05/final/qualification-index.json),
-[check matrix](verification/p05/check-matrix.md) and
-[runbook](docs/operations/runbooks/planning-review.md).
-
-1. **BL-P05-001 — G05 receiving:** designated Planning/quality, architecture/Governance,
-   security/Assurance and Lifecycle/quality reviewers examine the exact evidence.
-   Product/quality complete the operator task sheet with the selected managed and
-   assistive combinations. Record actual names, dates, findings and the decision
-   using the [completion packet](docs/implementation/p05-completion-review.md).
-   The register keeps G05 NOT_REVIEWED; development authority is already supplied.
-2. **P06 engineering delivered:** the verified implementation above now consumes
-   P05's immutable contracts and current approvals through real PostgreSQL and
-   Temporal. The next engineering package is P07.01 readiness preparation.
-3. **Carry operating/native limits forward:** P04 native E3 and earlier receiving
-   obligations remain below. P05 eligible fixture records and simulated reservations
-   supply no production support or native-effect authority. Actual source/state/
-   qualification custody and allocation owners must be selected and qualified for
-   the later native scope.
-
-# Retained P04 native receiving obligations
-
-P04 engineering and its automated qualification are delivered at
-`6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9`. The [implementation record](docs/implementation/p04-inventory.md)
-and [verified index](verification/p04/final/qualification-index.json) retain all
-75 Inventory and 24 worker tests passing without skips, plus three live campaigns
-of 60 checks each in Chromium, Firefox and WebKit. Enrollment, scoped collectors,
-durable generations, budget/retry controls, confirmed facts and the Console pass
-those measured boundaries. Twenty local quality commands also pass. Evidence is
-committed at `91ee1152ccd723857056aa32cf2217a5d87608fb`.
-
-The [delivery register](docs/implementation/delivery-register.yaml) keeps P04
-IN_PROGRESS and G04 NOT_REVIEWED: the canonical gate requires actual native E3
-observations and designated receiving reviews, neither of which can be replaced
-by these fixtures. Complete the [receiving packet](docs/implementation/p04-completion-review.md):
-
-1. **BL-P04-001 — Actual native qualification:** obtain the installed VMware and
-   OpenStack tuples, approved destinations/trust, tenant/project/datacenter scope,
-   restricted read identities, independent visibility audit, budgets and observer.
-   Run the five Q02 task groups using the [discovery runbook](docs/operations/runbooks/inventory-discovery.md)
-   and retain original before/after no-change, negative and recovery observations.
-2. **BL-P04-002 — Receiving and operator review:** the named platform, security,
-   SRE, qualification and product roles examine every G04 criterion and the operator
-   task sheet, including selected managed-browser/assistive behavior. Record actual
-   identities, dates, outcomes and unresolved limits. Do not invent review approval.
-3. **Completed regression receipt:** final runtime-source Kubernetes run
-   `37438932585` passed at `fb37bb22`; source-impact checks establish identical
-   product/deployment inputs at the qualified `6b21490a` source. The
-   [completion receipt](verification/p04/final/regression-completion.json) also
-   records passing affected identity, Governance events, messaging, recovery and
-   Catalogue campaigns. The earlier status receipt remains unchanged. These
-   results supply no native or operating acceptance.
-4. **P05 engineering delivered:** the implementation and evidence above now consume P04 owner reads and facts while preserving all declared, unassessed and native qualification holds.
-
-The user's development authorization persists; no new baseline/G00 permission is
-needed. The missing native installation records and receiving people are concrete
-external inputs. P01/P02/P03 receiving obligations remain below.
-
-## P03 receiving obligations
-
-P03 engineering and its automated qualification are delivered at
-`1c51f56a928291870e5125508aeb04935583fd56`. The
-[P03 record](docs/implementation/p03-catalogue.md) and
-[retained index](verification/p03/final/qualification-index.json) bind 89 passing
-PostgreSQL tests and all three passing 38-check live campaigns. The generated
-clients, complete Console workspace, concurrency/restart, broker fault/replay and
-post-revocation delivery are verified. Evidence is committed at
-`187ead3a02521cc3d6be063c6f449f0e3b79113a`; original failures remain available.
-
-The [delivery register](docs/implementation/delivery-register.yaml) retains P03
-IN_PROGRESS and G03 NOT_REVIEWED because actual representative-user and designated
-review obligations remain. Continue with the concrete
-[completion packet](docs/implementation/p03-completion-review.md):
-
-1. **BL-P03-001 — Product/operator review:** identify the representative operator,
-   observer and OP07 browser/OS/policy/assistive combinations. Execute all seven
-   authoring, validation, conflict, comparison, uncertain-retry, access-change and
-   draft tasks; retain comprehension/accessibility findings and resolve defects.
-2. **BL-P03-002 — Criterion reviews:** Catalogue, architecture/quality, independent
-   quality and product owners examine EV-P03-001–003 through the
-   [G03 assessment](docs/qualification/gate-reviews/g03-engineering-assessment-2026-10-06.md).
-   Record actual identities, dates, evidence and the G03 decision. Development and
-   the accepted initial DC03 rules do not require renewed authorization.
-3. **Resolved foundation regression:** final-source Kubernetes run `37405120379`
-   subsequently passed at P03 source `1c51f56a`. The P04 regression receipt records
-   its observed completion; the original P03 receipt remains an immutable record
-   of its previously pending state. This resolves the queued-result follow-up and
-   supplies no representative-user or independent receiving decision.
-
-Preserve the P01/P02 receiving obligations below. No source change, review, native
-result or operating acceptance is inferred from a generated progress view.
-
-## P02 receiving and operating obligations
-
-Active branch: `greenfield/enterprise-microservices-plan`. The requesting user
-continues to authorize P02 development. Support/break-glass policy and bounded
-implementation are complete. Independent recovery custody, signed reconciliation
-and separate resumption are implemented through
-`d5ccd142cca22e51448a1a86996bbd0a14cba2b5`.
-The [delivery register](docs/implementation/delivery-register.yaml) owns status.
-**P02 remains IN_PROGRESS and G02 NOT_REVIEWED** pending the actual operating,
-accessibility and receiving obligations below. G01 receiving conditions carry forward.
-
-## Delivered recovery procedure
-
-Use the [recovery runbook](docs/operations/runbooks/identity-recovery-custody.md)
-and [implementation record](docs/implementation/p02-recovery-custody.md). The
-separate custody process enrolls verified public keys and holds/rotates the epoch.
-Two independent operators sign an exact-state reconciliation plan; owner-only SQL
-revokes stale authority while retaining history. A new two-person release plan,
-database confirmation and separate custodian action precede fresh OIDC sign-in.
-Runtime cannot rewrite recovery bindings/receipts/releases. Credentials must rotate
-without cross-identity reuse. Unselected memberships are revoked and tenants held.
-Local bootstrap remains retired; pre-activation lost-password reset is unsupported.
-
-The [final qualification index](verification/p02/recovery-custody/terminal-hardening/qualification-index.json)
-retains exact-source local and hosted observations, original archives and source/log
-hash verification. The [final regression receipt](verification/p02/recovery-custody/hosted-final.json)
-records all nine workflows passing at Governance/runtime source `7ec7a60`, including
-Compose and Kubernetes. The final protected-terminal refinement repeats all three
-156-check recovery campaigns with 13 custody cases; unchanged runtime tree identities
-are retained explicitly. Failed observations remain failed in
-[the corrections record](verification/p02/corrections.md). The earlier support
-[qualification](verification/p02/support/qualification-index.json) and final
-[regression receipt](verification/p02/support/hosted-final.json) remain unchanged.
-Published contracts, mandatory checks and phase scope are unchanged.
-
-## Remaining actions to complete P02
-
-The [completion review packet](docs/implementation/p02-completion-review.md)
-contains the concrete input table and manual task sheet:
-
-1. **BL-P02-002 — Actual operating custody:** supply the verified recovery owner,
-   distinct security reviewer/public-key fingerprints, separately administered
-   custody host/store, read-only public directory mount and independent backup/change
-   controls. Supply current owner/revocation records, secret recovery and support-audit
-   custody/retention/role identities and supported identity/workload topology. Execute
-   the delivered ceremony with these actual authorities and retain denial/resumption
-   evidence under OP03/OP05/OP06. Synthetic test principals do not appoint people.
-2. **BL-P02-003 — Product/quality:** select OP07's exact managed browser/OS/policy
-   and assistive combinations and support owner. Execute all five manual tasks,
-   including real history-cache behavior, and resolve mandatory defects.
-3. **BL-P02-004 — Independent reviewers:** examine all four G02 criteria, record
-   actual reviewer identities, dates, immutable evidence and receiving decisions.
-
-BL-P02-001 is resolved; the accepted support policy does not need to be requested
-again. The [G02 assessment](docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
-separates measured implementation from outstanding operating/review evidence.
-P03 owns Catalogue resource/wire integration; P05.04 owns the real immutable-plan
-producer; P06.03 owns immediate native-effect rechecks. They keep their own
-checkpoints. OIDC settings remain Console-managed application data.
-
-## Retained P01 handoff
-
-**Correlated diagnostic telemetry is implemented and measured in both runtimes;
-image-security blocker BL-P01-002 remains resolved.** All nine pinned Alpine
-candidates pass exact-image admission at source
-`36a14811b5afa23717566d5e8a08632e011f44a5`. No finding was waived and no severity or scanner
-exclusion was relaxed. The [candidate manifest](release/p01-candidate-set.json)
-now records zero held components and `REQUIRES_INDEPENDENT_QUALIFICATION`;
-`promotion_authorized` remains false. [EV-P01-024 and the remediation record](docs/implementation/p01-image-remediation.md)
-retain the original failures, complete APK correction and passing results.
-
-- **Artifact trust:** all nine isolated builds pass, with 18 CycloneDX image/source
-  SBOMs, nine verified development signatures, 63 expected denials and nine
-  unchanged-byte development transfers. EV-P01-028 verifies 206 build logs and
-  253 unique source bindings, plus all nine package passes with 346 command logs,
-  388 artifact files and 412 unique source bindings.
-- **Runtime, telemetry and resources:** EV-P01-029/030 retain 249 Compose and 266
-  Kubernetes checks, including 70 telemetry checks each. Existing isolation,
-  encrypted shared state, restart and failed-deployment recovery pass. Each
-  environment retains 22 telemetry snapshots and three signal exports, including
-  diagnostic correlation, public-reader denial, real buffer exhaustion, explicit
-  loss, stale-acknowledgment preservation and collection recovery. Seven authorized
-  diagnostic spans match the common caller trace; denial responses and concurrent
-  readiness probes remain in the collected population. See
-  [the telemetry record](docs/implementation/p01-telemetry.md). Each also records 30
-  cgroup-v2 resource samples across all 15 containers before/after recovery,
-  including effective limits and zero observed OOM kills. Compose's observed
-  limits are unlimited; production budgets remain an OP01 decision. See
-  [the resource record](docs/implementation/p01-resource-observation.md).
-- **Affected requalification:** EV-P01-031 retains 28 HTTP fixtures, 79 Permit
-  Desk recovery checks and 59 policy-control tests at the current source. All
-  pass; the repository secret scan reports zero findings across 10,187 tracked
-  files. EV-P01-027 retains 35 real messaging checks, 16 event fixtures and 40
-  stateful-dependency checks at `b7705eef994c50863d87b4d8f9ff272f9397ca37`; those
-  distinct campaign sources and measured boundaries remain unchanged.
-- **Evidence scope:** synthetic alert receipts, selected retained-object recovery
-  and the complete Permit Desk fixture retain their separate measured boundaries.
-  No native effects, full-store recovery, accepted RTO/RPO or operating acceptance
-  is inferred. Historical failures remain available and are not relabeled.
-
-**Open foundation receiving conditions:**
-
-1. Activate repository admission (BL-P01-001): obtain verified reviewer GitHub
-   IDs/logins and the authorized administration/independent reporting path, then
-   install the trusted default-branch hook, role-based CODEOWNERS and required
-   exact-PR checks. The [fresh settings observation](verification/p01/admission/telemetry-settings-observation.json)
-   still shows `protected: false` and no rulesets. The implemented policy and
-   prepared settings body are not active enforcement.
-2. Complete actual [OP01–OP07 inputs](release/operating-inputs.json): runtime/BOM
-   and resource/network budgets; registries/signer/trust; secret/PKI/evidence/key
-   custody; reviewer assignments; real alert route/response owner; recovery and
-   retained inventory; support/accessibility ownership. The strict readiness
-   command still returns HELD for all seven; development fixtures cannot supply
-   these identities or decisions.
-3. Integrate and qualify the measured diagnostics with the actual operating
-   receiver once OP03/OP05 supply the route, access/custody owners, collection
-   cadence and accepted loss/retention policy. Confirm real receiving
-   acknowledgment and response ownership. Correlated application signals,
-   collection-failure recovery and resource sampling are already implemented
-   and measured in the disposable Compose/Kubernetes environments.
-4. Complete independent criterion-by-criterion receiving reviews using
-   [the refreshed G01 assessment](docs/qualification/gate-reviews/g01-engineering-assessment-2026-10-05.md).
-   Record the accountable receiving decision; P02 development entry does not pass G01.
-
-**P01 receiving work and verification remain IN_PROGRESS; G01 remains NOT_REVIEWED.** The
-previous FAILED roll-up is cleared by retained remediation/requalification,
-not by ignoring the mandatory image check. Keep the accepted G00 decision and
-completed foundation campaigns; do not restart P00 or ask for G00 approval again.
-
-## P02 identity baseline
-
-[ADR-009](docs/decisions/adr-009-identity-delegation-and-authorization.md) defines
-console-managed external OIDC and a deployment-created local administrator.
-Initial deployment generates a random temporary password and displays it once
-to the authorized installer. First login requires a different password before
-any other protected function. The administrator configures and tests OIDC
-through the console; verified federated administrator activation disables local
-login and revokes its sessions. Provider values are application settings, not
-deployment configuration. Retries, restarts and provider outages cannot recreate
-the account or reopen local login after activation.
-
-Implement through P02.01/P02.05 and qualify Q01.17–Q01.20 at G02. The identity
-baseline is accepted design; P02.01/P02.05 implementation is IN_PROGRESS under
-the user-authorized development entry. No G01 pass is inferred. Workload trust, custody and repository admission retain
-their distinct receiving inputs.
-
-## Carried inputs and checkpoint ownership
-
-The user's reviewer identity, G00 approval, baseline decision scope, migration direction/method and later checkpoints are recorded with immutable provenance in the [input record](docs/qualification/feasibility/input-record.md). Do not request that baseline approval again. Remaining unknown integration and native fields describe actual inputs still needed, not a reason to stop independent foundation work.
-
-- Review the completed representative Permit Desk fixture and bounded Compose application/configuration recovery in P01.02/P01.06 before G01. Retain EV-P01-013 and the two original P00 database/attachment recovery boundaries with their distinct measured scopes.
-- Review EV-P01-014 against G01.02/G01.05/G01.06 using the [dependency recovery runbook](docs/operations/runbooks/stateful-dependency-recovery.md). Its single-node synthetic probes and one selected object version do not establish product integration, whole-store recovery, HA, retention authority or operational acceptance.
-- Obtain actual runtime, registry/signer, trust, network and dependency facts before the affected P01 integration. Local development artifacts do not establish operated deployment or promotion controls.
-- Obtain installed VMware/OpenStack facts and permitted discovery scope before G04 work, and exact campaign effects/authority before G07/G08 native tests. Native qualifications remain unrun.
-- Retain application outage/data objectives before P08, operating/retained-state obligations at P10/P11, and staffing/dependency dates when supplied. Approval does not invent these facts.
-
-The original P00 task axes continue to show any carried incomplete work; the accountable G00 advancement decision is recorded separately. No unperformed check becomes a pass. P08 follows the native migration architecture, with explicit qualified methods and copy-only conversion/transformation.
-
-Historical `implementation/all-waves` source is pinned at `a2963d8d43e25f08d70fbd99b0e5e19ab5c9828e` for reference. Current documentation, stack and ADR-024 take precedence; no historical implementation, passing result or authority transfers.
-
-## Document each implementation increment
-
-Use the [engineering standards](docs/engineering/README.md) and [coverage map](docs/engineering/coverage.md) when refining P02 and the carried foundation work. P00.03 has measured framework/tool locks, candidate image builds and schema/client tooling. Production adoption, complete service dependencies, managed-browser requirements and the actual mirror/trust path still need operating decisions and evidence. P01 must implement the documented structure, ownership, static analysis, contract and runtime checks before feature expansion; the written standards are not a completed foundation.
-
-Apply the [pragmatic Laravel convention](docs/decisions/adr-024-pragmatic-laravel-domain-convention.md) within the [owning microservice](docs/architecture/context-code-structure.md): capability-based `app/Domain/` and `app/Application/`, Eloquent model behavior, Actions with `handle()`, external adapters in `app/Infrastructure/`, and normal Laravel entrypoints. Capabilities do not automatically become microservices. P00.02 aligns [the context registry](architecture/context-map.yaml) with that accepted convention and settles the remaining service decisions. P00.03 has verified the candidate architecture tools against actual spike locks and intentional violations; P01 must map these rules to the complete registered product source. P01.01/P01.04 implement PHP/Python/frontend dependency checks and actual ownership/review protection. The current registry/fixture workflow has explicit analysis limits; a source-empty pass does not close those packages.
-
-For every coherent change, identify requirement/package IDs and the owning service. Update its behavior/contract specification and any affected ADR; put future API/event schemas in the contract tree, operational procedures under `docs/operations/runbooks/`, and qualification definitions/evidence indexes under `docs/qualification/`. The [documentation guide](docs/documentation-guide.md) defines the complete placement and naming rules.
-
-Record actual source/artifact revisions, environment, positive/negative/recovery results, evidence identity and reviewer in `delivery-register.yaml`. Add a blocker with owner and unblock condition when necessary. Regenerate the progress/traceability views and validate references. Update this file to name the next concrete task, without copying a second status table here.
-
-Use small coherent commits and the established GitHub connector workflow. No historical passing test, approval, credential, native support claim or operational acceptance transfers from the old programme. Scaffolding and design examples cannot be described as completed product behavior.
+# Current next work — Capability runtime assurance (PR #64)
+
+> **Authoritative queue for this branch.** Other handoffs below are archived
+> background and must not override this queue. Update this section whenever
+> a task is completed, blocked, or newly discovered. Branch:
+> `codex/capability-runtime-assurance-audit-fixes`; review:
+> [PR #64](https://github.com/awalker0878/multi-tenant/pull/64); base `main`.
+> Keep the PR **draft**; no automatic merge or native production activation.
+
+**Source baseline:** `09a5285cdb74808d927a9be3720ac636451f07a6` at this queue's
+creation (2026-10-08). Follow-on commits supersede this SHA. All statuses
+below mean **engineering implemented / unverified** unless an exact-source
+CI result or independent native evidence is linked. E2 fixture success is
+not E3 native proof; E3 native proof is not E4 receiving acceptance.
+Check the updated `git rev-parse HEAD` and the
+[PR checks](https://github.com/awalker0878/multi-tenant/pull/64/checks)
+at every checkpoint.
+
+## CT-R01 — Resolved migration-readiness contract (2026-10-09 checkpoint)
+
+**Current branch work committed, not yet end-to-end verified.** See
+[resolved migration-readiness commissioning ledger](docs/implementation/resolved-migration-readiness-rollout.md)
+and the closed contract at `contracts/schemas/planning/migration-readiness-v1.json`.
+This work deliberately preserves Catalogue desired intent, Inventory native facts,
+Assurance qualification/receiving decisions, Planning composition and Lifecycle
+native authority. **Do not merge or promote PR #64 on these changes alone.**
+
+| Phase | Engineering result | Required exit evidence / remaining work |
+| --- | --- | --- |
+| 0. Native reads | Inventory OpenStack profile completion counts independently retrieved Neutron security groups; AHV workload reads select namespace-specific configured v4.2/v4.3 | Manifest-derived read ledger and safe SG-heavy budget handling; versioned readback and negative native probes |
+| 1. Catalogue↔Inventory source | Pure `source_intent_reconciliation.reconcile` compares owner-confirmed logical/native IDs, generation, CPU/RAM, disk/NIC, firmware, Secure Boot, dataset map, dependencies | Authenticated current Catalogue+Inventory owner ports, immutable confirmed links, persisted diff and Planning/Lifecycle effect wiring |
+| 2. Collection field coverage | Pure Inventory `migration_collection_coverage.evaluate` evaluates all scoped manifest rows, freshness, applicability and external owner receipts | Durable raw/field observation ledger, worker binding to native requests, service-only Inventory projection, UI holds and native effect recheck |
+| 3. Installed API/version | Planning per-operation Assurance evidence required; selects lowest qualified installed version; AHV source VMM/Prism/ClusterMgmt API calls no longer hard-code all v4.3 | Native operation-to-adapter code manifest for **all** routes; runtime endpoint/entitlement probes and every version/method negative case, E3 reviewer/E4 receiving records |
+| 4. Single resolved contract | Planning `MigrationSupport.read/require` resolves route readiness; protected Planning execution-plan includes same fresh receipt; Console displays status/holds; Lifecycle verifies scope/digest/route/version/method/E3/E4/API on each current owner read | Bind per-workload reconciliation and field collection into exact service-only receipt; cross-service TLS/revocation/failure matrix, complete CI |
+| 5. Qualification/rollout | Added Inventory/Planning/Lifecycle unit regressions and a closed JSON schema | **NOT complete**: required head CI queued; foundation package/bootstrap workflows early failure; independent real E3/E4 trials and authorization absent |
+
+The v1 contract is **route-level only**, explicitly `workload_admission_authorized=false`
+and `native_write_authorized=false`. It must not be cited as proof a specific
+workload meets Catalogue intent or that all manifest fields were collected.
+Actual deployment requires separate live workload admission and installed
+operation evidence, with independent Assurance decisions. Existing native
+custody, Governance and confirmed Inventory checks remain mandatory.
+
+## Follow-up capacity correctness (current branch)
+
+Five additional source-bound corrections were committed after the original PR #64
+audit remediation. They remain **E2 code/tests, pending exact-head CI**:
+
+- `5beb911`: Planning counts each NIC's observed address families rather than
+  counting each NIC once; dual-stack now requests two addresses.
+- `c6d0386`: Lifecycle permits a physical pool to advertise additional
+  unused class limits without raising an indexing exception.
+- `7ca2c29`: Lifecycle rejects contradictory storage-class and
+  network/address-family subtotals in a requested placement vector.
+- `0c99268`: When a commissioned pool enforces class-specific capacity, a
+  positive allocation must identify the classes being consumed.
+- `7f0253a`: Reconcile class-specific subtotals again after all workload
+  allocations are aggregated, so a partially unclassified multi-VM request
+  cannot evade the physical resource limits.
+
+Associated Planning and Lifecycle regressions are committed. **Do not mark
+CT-N01, CT-N08 or A04/A05 accepted** until hosted Python/PostgreSQL checks
+complete on the exact head and real exclusive capacity-owner evidence is
+independently accepted. No change grants native write authority.
+
+## Active, prioritized work queue
+
+| ID | Priority | Owner / boundary | Status | Required next action and completion evidence |
+| --- | --- | --- | --- | --- |
+| CT-N01 | P0 | Engineering / CI | **BLOCKED: queued/early workflow failures** | Obtain a finished result for **every required check** on the exact PR head, including Assurance PostgreSQL, P05 Planning, Lifecycle, Inventory and capability assurance. Fix the actual failures, rerun, attach exact run/job URLs, no skipped or unrun mandatory checks. All 39 checks on head `7a17079c396dcb1d39b7c038fdf3cddf1a56f667` were queued when last inspected. |
+| CT-N02 | P0 | Assurance + Planning / PostgreSQL | **Implemented, unverified** | Run disposable PostgreSQL migrations `services/assurance/database/migrations/002_qualification_authority.sql` and `services/planning/migrations/003_qualification_invalidations.sql` from scratch; confirm least-privilege role grants, append-only history, epoch triggers, outbox/inbox commit-before-ack, atomic failure and rollback. Retain tests and full execution logs. |
+| CT-N03 | P0 | Planning / P05 CI | **Implemented, unverified** | Prove `scripts/p05/qualify.py` and P05 live jobs exercise the new qualification inbox, read-boundary guards, concurrent plan-save/revocation and tenant isolation; run Ruff format/lint, mypy and the database tests. Capture source-bound pytest/JUnit artifacts and fix failures. |
+| CT-N04 | P0 | Assurance → Planning / E2 composed delivery | **PARTIAL: real Planning DB/ASGI replay test committed** | Provision **disposable** HTTPS/TLS peers and independent tokens; publish a real Assurance SQL event, relay, persist Planning inbox, return exact durable receipt, and deny/hold affected execution. Test lost response, same-event replay, stale/out-of-order epochs, conflicting identity, tenant isolation, TLS failure, sink outage and restart. No accepted E2 cross-service result yet. |
+| CT-N05 | P0 | Security / receiving trust | **OPEN** | Commission TLS certificate/SAN/CA, distinct caller secret custody, network-only ingress authorization, bounded retries, audit logs, receiver ownership and replay/quarantine policy. Verify no reviewer/observer/owner token reuse. The private endpoint is **code only**. |
+| CT-N06 | P0 | Planning/Lifecycle / fail-closed authority | **E2 boundary tests added; live revocation OPEN** | Test every approval, execution, native effect, placement, and retry boundary against **current** Assurance authority, not only a cached hint. Ensure delayed/missing invalidations and unknown scope always hold. Add cross-service revocation between preflight and effect and revoked approval replay. |
+| CT-N07 | P1 | Assurance + Planning / contract | **E2 strict receipt/vectors coded; CI OPEN** | Prove byte-for-byte PHP/Python canonical scope hash and wire schema compatibility for representative Unicode/slashes, installed tuple, tenant, action/method, null decisions, and epochs. Reject unrecognized/changed event contracts; preserve append-only event IDs. |
+| CT-N08 | P1 | Capacity owners / P07 | **E2 current vector/class readback coded; native owner OPEN** | Replace proposed/synthetic capacity with operated owner-backed **exclusive** reservations per physical CPU, memory, storage and address source; check source generations and native readback; verify collision, expiration and multi-owner compensation. No fabricated physical capacity receipt. |
+| CT-N09 | P1 | Native VMware → OpenStack / E3 | **NOT RUN** | Enroll installed-source tuple, export/export lease, guest OS/driver/UEFI, disk conversion/import, native target and independent observer receipts; run selected `VM_COLD_EXPORT` positive, refusal, resume and rollback cases under approved authorization. Do not infer native support from test fixtures. |
+| CT-N10 | P1 | Native network/isolation/recovery / E3 | **NOT RUN** | Qualify real IPv4/IPv6 flows, VRF/VPC tenancy, return paths, ingress/egress, RBAC, keys and storage, topology/fault domains, failure-trigger RTO/RPO, application/dependency recovery and source/target fences with independent observations. |
+| CT-N11 | P1 | Assurance reviewer + receiving owner / E3/E4 | **NOT REVIEWED** | Obtain evidence-bound independent E3 reviewer decisions and E4 receiver sign-off on actual native recovery, service ownership, accepted residual risks, monitoring and operating runbooks. Missing credentials/decision authority cannot be replaced by mock acceptance. |
+| CT-N12 | P1 | Platform governance / shadow adoption | **E2 read-only comparator coded; native shadow OPEN** | Read-only shadow comparison of qualification decisions, profile/adapter behaviour and native outcome changes; reconcile false confidence, stale qualification and method catalogue differences. Record rollout/rollback gates, versioned replay and promotion authority before any cutover. |
+| CT-N13 | P1 | Verification / A01–A16 | **PARTIAL: E2 tests mapped, source CI/native OPEN** | Build and run the complete source-bound acceptance matrix with positive, negative, timeout/retry, cross-tenant, authority-revocation and native-effect cases. Map each A01–A16 to code, test and evidence in the implementation ledger; do not close an A-ID with a mere fixture. |
+| CT-N14 | P0 | Planning + Assurance + Inventory + Console / vendor API compatibility | **PARTIAL: version-aware E2 path and on-screen alerts committed** | Extend exact route `api_usage` coverage to every actual migration method/callsite; live-discover and pin per-site API versions/entitlements; qualify negative+positive probes, E4-approved optional omissions with effect suppression, and end-to-end version/failover readback. Detailed CT-API tasks below. |
+
+## CT-N18 — Source-gated destination fields and native API-backed selections
+
+**E2 code and tests committed; independent/native E3/E4 OPEN.**
+[Design, source observation and security requirements](docs/implementation/source-gated-destination-selection.md).
+
+- The Console's **feature-level destination view** now filters to
+  source-observed relevant attributes, while separately reporting missing
+  mandatory source facts as blockers. Absent source data never creates
+  a selectable destination candidate.
+- Destination selectors appear only when the source has the relevant
+  property: source observed NICs -> network mapping, source AHV
+  categories -> optional category options, source guest identity ->
+  host-scoped VMware guest/hardware dropdown, source Neutron security
+  groups -> destination policy/security-group mapping. Missing source
+  firmware is **unknown**, not silently BIOS.
+- Destination options come from the current API-owned target profile.
+  OpenStack Neutron `GET /security-groups` is collected project-scoped
+  with rule IDs, rule checksum and a normalized flow-semantics SHA.
+  Source OpenStack ports supply source SG IDs; source SGs are individually
+  reread from their scoped native API. The Console only offers target SGs
+  with identical source/target normalized security rule semantics.
+  The backend rejects forged/foreign/duplicate/missing/unequal mappings.
+- AHV policy/category/subnet options use the existing Prism v4 native
+  resource inventory; only observed ENFORCE policies are selectable.
+  Source policy unknown => no policy picker or synthetic mapping.
+  Cross-provider AHV/Neutron security equivalence is not inferred
+  from labels or ENFORCE state: the review can be saved **as draft**
+  but cannot be confirmed until native E3/E4 is available.
+- VMware host compatibility now comes from pinning the native
+  `HostSystem.parent -> ComputeResource.environmentBrowser ->
+  EnvironmentBrowser.QueryConfigOption(host)` read-only VI/JSON
+  sequence, with per-host guest IDs and observed vmx version.
+  The backend rejects invented guest/hardware/host values.
+  Source v1 VMware does **not** collect full NSX/firewall flows.
+  VMware destinations do **not** yet supply a full policy-rule
+  catalogue; critical required flows are held from confirmation.
+- Inventory `WorkloadProfiles.review` adds explicit holds for missing
+  source security discovery and cross-provider unsupported/unevaluated
+  policy translations; `migration_confirm` and Planning reject held
+  reviews. Operator evidence references are not substitutes for
+  native source/target network observations.
+- Domain/worker tests added for source-only filtering, forced
+  dropdown selection, Neutron semantics and VMware guest options.
+  Exact-head hosted CI, E3 and E4 are NOT asserted as passed.
+
+**Follow-on work:** Commission source-effective AHV microseg policy
+discovery and VMware NSX/ACL source + destination APIs, qualified
+Neutron-to-Prism/NSX semantic translation, source/target native
+readback and allow/deny traffic probes; provide a separately
+authorized missing-feature waiver only for nonfunctional E4
+suppressed effects. Review constraints **immediately before native
+effects**. Resolve the paused/queued hosted CI and end-to-end UI
+tests before declaring release eligibility.
+
+## CT-N17 — Feature-wise portability, mandatory owner inputs and Console validation
+
+**Declarative feature policy and Console review guidance committed (E2 only):**
+[feature policy](contracts/capabilities/migration-feature-policy-v1.json),
+[JSON Schema](contracts/schemas/capabilities/migration-feature-policy-v1.json),
+and [operator/feature responsibility table](docs/implementation/migration-feature-portability-and-console-requirements.md).
+
+- **30 feature areas** from all 116 field crosswalk groups; **28 critical**
+  at feature-level (worst-case group severity), **2 conditional optional**
+  (nonfunctional metadata and nonessential QoS); **27 owner/independent
+  evidence requirements** bound to existing review and operator-readiness
+  identifiers, with source applicability and maximum ages retained.
+  Critical conditional attributes remain required when applicable and
+  cannot be made optional by a missing API or operator opinion.
+- All **nine directions** produce candidate mappings only: numeric
+  normalization with readback, qualified native adapter, operator plus
+  independent validation, or no direct field requiring a qualified
+  alternative. No route is auto-qualified from field equivalence.
+- `apps/console/resources/js/pages/inventory/Migration.vue`
+  shows per-direction feature treatment and a mandatory owner/
+  independent evidence checklist. It **never claims the entries
+  are verified**; missing review inputs disable save and confirmation.
+  It links to existing operator-readiness fields for service, scope,
+  security, RTO/RPO, reservation, backup, policy and recovery.
+- `services/inventory/tests/test_workload_profiles.py` now tests
+  the existing authoritative Inventory review validation for all
+  eight owner references, the conditional delta, disk dataset
+  coverage and accepted objectives.
+- `scripts/assurance/test_migration_feature_policy.py` validates
+  complete crosswalk groups, nine-direction bindings, operator
+  Console field names, criticality/age, impossible affirmative
+  qualifications, and byte-identical Console projection. Included
+  in `capability-assurance.yml`. Browser test covers the warnings.
+  Hosted **CI remains unverified at the exact head**.
+
+**Still required for completion (do not declare 30 features qualified):**
+
+1. Make the authoritative Inventory read expose per-feature current
+   native/owner evidence with version, expiry, condition applicability
+   and exact source profile/site/tenant/application binding.
+2. Join per-VM review values with operator-readiness evidence and
+   Assurance independent E3/E4 receipts at the **server**. The
+   separate operator-readiness screen currently records references;
+   it does not yet prove per-VM completion or enforce those references
+   at native-effect admission. Do not use Vue completeness as authority.
+3. Add operator selection/acceptance of actual optional omissions
+   with source/target impact and signed E4 effect-suppressed witness,
+   including post-approval drift/revocation handling.
+4. Execute all 30 feature transformations against real versioned
+   VMware/Prism/OpenStack APIs and native effect/rollback/readback
+   tests; qualify approved target substitutions, security allow/deny
+   and application/service outcomes for each of nine directions.
+5. Reconcile latest PHP/Python/Vue/browser CI, independent E3 labs
+   and E4 receiving sign-off. Keep PR draft until gates pass.
+
+## CT-N16 — Versioned VMware, AHV, OpenStack field crosswalk
+
+**Complete field-level data mapping; native translation OPEN.**
+The [machine-readable crosswalk](contracts/capabilities/migration-field-crosswalk-v1.json)
+and [full readable 116-row matrix](docs/implementation/migration-field-crosswalk.md)
+reconcile **all 278** current manifest attributes (VMware 86, AHV 89,
+OpenStack 103) into **116** canonical source/target/owner groups.
+Every original attribute is referenced **exactly once**. The crosswalk
+preserves exact API field/source, role, collection method, criticality,
+minimum observation TTL, conditional applicability, and missing platform
+equivalents. No row claims installed support or a qualified adapter.
+
+- 59 groups have source-field entries for all three platforms, of which
+  27 are separately attested common owner/independent obligations;
+  57 groups lack at least one platform field; 45 are explicitly
+  platform-specific. Null means **no mapped field / unknown**, not
+  an automatic assertion that the destination is unsupported.
+- Only power state, total CPU, memory and MAC have explicitly described
+  proposed field normalizations. Storage backing/disk sharing, export and
+  import, incarnation, boot/guest drivers, network security and policy,
+  quotas and entitlements remain semantic qualification boundaries.
+- `contracts/schemas/capabilities/migration-field-crosswalk-v1.json`
+  supplies the closed data schema. `scripts/assurance/validate_migration_field_crosswalk.py`
+  rejects any lost/duplicated manifest entry, forged API field, scope
+  drift, criticality downgrade, too-generous freshness or inferred
+  native support. Eight negative/positive regressions live in
+  `scripts/assurance/test_migration_field_crosswalk.py`. The
+  `capability-assurance.yml` E2 lane runs both explicitly. **Hosted CI
+  source verification and native E3/E4 remain OPEN.**
+
+**Outstanding integration:** resolve the crosswalk against installed,
+version-qualified source and destination observations; implement executable
+typed normalization and conversion/adapters; compute nine directed migration
+reports with per-VM critical blockers and optional-E4 omission alerts;
+include readback, backend-specific device/storage/network/rule semantics and
+version/entitlement revocation at each Lifecycle effect. Reconcile exact-head
+CI and signed independent E3/E4 evidence. A crosswalk is not an execution
+license or an automated migration method.
+
+## CT-N15 — Per-VM API collection manifest and freshness obligations
+
+**Requirements/data committed**, not a completed installed discovery,
+qualified API operation or runtime integration. The source of truth is
+[the collection manifest](contracts/capabilities/migration-collection-manifest-v1.json)
+and its [closed JSON Schema](contracts/schemas/capabilities/migration-collection-manifest-v1.json).
+It identifies every currently documented source/destination attribute,
+API field or owner-evidence input, collection method, maximum acceptable
+age, criticality, applicable conditions and source collector module.
+[Policy and source coverage](docs/implementation/migration-collection-manifest.md).
+
+| Platform | Source VM | Destination | Owner/independent | Total |
+| --- | ---: | ---: | ---: | ---: |
+| VMware | 44 | 15 | 27 | 86 |
+| AHV | 41 | 21 | 27 | 89 |
+| OpenStack | 48 | 28 | 27 | 103 |
+| **Total** | **133** | **64** | **81** | **278** |
+
+Test `scripts/assurance/test_migration_collection_manifest.py` checks
+native AHV/OpenStack source contract field names, mandatory disks, network
+and recovery evidence, scope/custody, uniqueness, file references, stale
+power/physical-capacity limits, operator attribution and safe optional
+classifications. The existing `capability-assurance.yml` E2 lane now
+runs an explicit manifest step. These tests are **committed, not yet
+confirmed green at the exact PR head**.
+
+**Remaining to close CT-N15:**
+
+1. Implement the platform-specific Inventory collectors for **every**
+   manifest row and method, including complete pagination, version and
+   scope binding, operator inputs and independent probe results. The
+   `native_field_candidate` label must never be interpreted as already
+   collected or supported.
+2. Persist append-only evidence with identity, exact API version, observed
+   timestamp, expiry, signature/source, interpretation and revocation.
+   Enforce max age and conditional-critical applicability at Inventory,
+   Planning and immediately-before-effect Lifecycle admission. A changed
+   API/identity/backing/topology/policy invalidates a record before TTL.
+3. Display per-VM uncollected critical/optional fields and correct
+   remediation to administrators, with evidence provenance and actual
+   suppressed-effect receipts. Preserve required firewall and negative
+   isolation as critical. Add contract, DB, version-drift, loss/retry,
+   native E3 and receiving E4 tests.
+4. Check native storage, host capacity and project entitlement separately
+   from advertised maximums. Current physical capacity/reservation has
+   a distinct critical 15-second field; it cannot be inferred from
+   datastore size or a Cinder/Placement resource type declaration.
+
+## CT-N14 — Migration API-version compatibility and administrator warnings
+
+[Design, source paths and trust model](docs/implementation/migration-api-capability-compatibility.md).
+
+**E2 code committed, not native support commissioned:** Planning's
+`domain/api_compatibility.py` evaluates per-feature, per-environment
+negotiated API versions and entitlements. `migration_support.py` gates
+current route preview and admission using separately reviewed Assurance
+`migration.api_records` evidence. Existing Planning native validation
+rechecks this on plan create and execution. Console displays **critical
+blockers**, **optional warnings** and a per-feature selected API version.
+`contracts/schemas/capabilities/api-version-record-v1.json` provides
+immutable vendor documentation metadata. Native disk source and target
+adapters for VMware/OpenStack/AHV have code-level usage tags with a
+static test. This is still a **partial rollout**: historical routes lacking
+`api_usage` are visibly labelled unassessed rather than falsely claiming
+per-feature verification.
+
+| ID | Priority | State | Required closure |
+| --- | --- | --- | --- |
+| CT-API-01 | P0 | **OPEN** | Populate official per-API release, spec SHA/URL, version introduction/change/deprecation/sunset catalogue for vSphere VI/JSON/REST, Nova/Neutron/Glance/Cinder/Placement and Prism v4 namespaces. Mark unknown dates, do not guess. Run spec diff + semantically versioned contract tests in CI. |
+| CT-API-02 | P0 | **OPEN** | Enroll exact VMware, OpenStack and AHV installations; observe version ranges, extensions, available namespaces, caller permissions, license entitlements, source identity, observation timestamps and TTL. Independently verify every API version before it enters a route. |
+| CT-API-03 | P0 | **PARTIAL** | Expand code-derived capability tags beyond disk capture/import to VM boot/power, guest preparation, storage formats, network, recovery, data/application interfaces and platform-specific calls; enforce required usage coverage for every selected method and all nine directions. Source tags are not yet a complete static call graph. |
+| CT-API-04 | P0 | **OPEN** | Build bounded live capability probes (authorized create → read → cleanup, with loss/retry/reconciliation and negative tests) per installed API version. Retain E2 contracts separately from native E3 owner evidence; document operations impossible to test without effects. |
+| CT-API-05 | P0 | **PARTIAL / unverified** | Commission Assurance's separately reviewed `migration.api_records` entitlement/observation binding and test producer→Assurance→Planning with real signed E3/E4 records, negative tamper, expiry, multiple versions, missing permissions, wrong scope and revocation. All source-bound PHP/Python/UI CI remains unverified. |
+| CT-API-06 | P0 | **PARTIAL** | Administrator alert UI and impact reasons are implemented. Commission owner-reviewed E4 acceptance for nonessential omissions, verify exact `effect_suppressed_sha256` against a real skipped native operation, persist and display audit/notification/acknowledgment, and reject missing approval or suppression. Required firewall and tenant-isolation flows are **never** an optional bypass. |
+| CT-API-07 | P0 | **OPEN** | Persist each qualified selected API family/version and required capability set with immutable migration/native effect grants; re-check current owner API versions, entitlements and capability qualification immediately before every write and retry; hold if version or adapter bytes changed. |
+| CT-API-08 | P1 | **OPEN** | Model independently qualified adapter substitutions when destination lacks the source capability. Require equivalent outcomes, target API probe, approved adapter identity/expiry and native negative cases; an unqualified mapping must be blocked. |
+| CT-API-09 | P1 | **OPEN** | Execute A01–A16 + multi-version E2 campaigns and native E3 migration tests across all three platforms. Validate admin accessibility, security effects, actual optional suppression, alert delivery and independent E4 receiving sign-off before rollout. |
+| CT-API-10 | P0 | **REQUIREMENTS COMMITTED, COLLECTOR INTEGRATION OPEN** | Enforce [VM migration collection manifest](docs/implementation/migration-collection-manifest.md) per source VM and candidate destination: 278 version-controlled attribute rows, separate native/vendor fields and owner evidence, max-age and conditional-critical requirements, append-only observations, API-version scope, signed provenance, missing-fact holds and administrator omission warnings. The data/schema/static coverage checks are added to CI; live collector enforcement, end-to-end tests and E3/E4 remain open. |
+
+A version string, API spec, operator statement or synthetic E2 fixture
+must never be interpreted as installed support. Missing `api_usage`,
+expired observations, incomplete host entitlement and unqualified critical
+capabilities remain **unknown or blocked**, not silently supported. The
+new API gating is engaged only for routes with reviewed `api_usage`;
+do not claim full programme coverage until CT-API-03/05/07 are closed.
+
+## A01–A16 acceptance coverage (CT-N13)
+
+The precise scenarios are defined in
+[the implementation plan](docs/implementation/capability-runtime-assurance.md).
+A checked engineering implementation is **not** a passed scenario. Retain
+source SHA, original positive/negative results, environment, signed reviewer
+and receiving decision before closing a row. All scenarios are presently
+**acceptance OPEN**.
+
+| Case | Required failure/positive control | Outstanding acceptance evidence |
+| --- | --- | --- |
+| A01 | Missing, tampered or foreign evidence cannot qualify | Run signed-source evidence tamper/tenant denial against enrolled observers; E3 pending |
+| A02 | Failed independent adapter case overrides declaration | Native negative conformance observation, suspension and plan/effect denial; E3 pending |
+| A03 | Drift in adapter bytes, installed tuple or backend/topology forces requalification | Original observation and changed native tuple retest, compare shadow decisions; E3 pending |
+| A04 | Concurrent physical vector reservations do not oversubscribe | Real CPU/memory/storage/address owner conflicts across tenants, durable exclusivity; E3 pending |
+| A05 | Aggregate headroom with no feasible placement must hold | Prove current allocation topology readback and specific reject reason; E3 pending |
+| A06 | Required flow blocked or forbidden flow reachable must fail | Native ingress/egress/return path, address-family and VRF/VPC negatives; E3 pending |
+| A07 | Anti-affinity must span real required fault boundary | Read physical placement/fault domain instead of labels; E3 pending |
+| A08 | Typed 60/120 versus 180 RPO and unit checks | Exact-source type/unit contract CI plus native observed measurements; E3 pending |
+| A09 | RTO/consistency/key/application dependency failure revokes recovery claim | Representative native timed restore, original fault-trigger measurement and review; E3 pending |
+| A10 | Approval-to-effect expiry or revocation must halt effect | Cross-service signed revocation during live Lifecycle preflight/effect, prove no write; E2 composed + E3 pending |
+| A11 | Delayed/duplicate/reordered hint, stale cache or unavailable owner must fail closed | Complete TLS producer/receiver replay, restart and stale-cache campaign; E2 composed + E3 pending |
+| A12 | Omitted mandatory validator/handler cannot skip qualification | Run contract/composition denial checks on exact source and receiving sign-off; E2 + E4 pending |
+| A13 | Owner succeeded but reply lost must reconcile, never double-effect | Real owner retry/readback, exactly fenced request identity, no speculative compensation; E3 pending |
+| A14 | Old plan replay after definition/workflow upgrade must pin or hold | Source-versioned replay matrix, compatibility denial and no silent reinterpretation; E2 + E3 pending |
+| A15 | Registered method without adapter/qualification is visible but not executable | Generator/registry checks, unsupported native-path refusal and reviewed new method; E2 + E3 pending |
+| A16 | Passing E2 must not self-upgrade to E3/E4 | Independent native reviewer and operating receiver recorded; no implicit promotion; E3 + E4 pending |
+
+## Execution sequence and handoff rules
+
+1. **Repair and verify P0 correctness first:** CT-N01–N03, including real
+   PostgreSQL roles/migrations and both languages' format/type suites. CI
+   runs must bind the source SHA of the actual commit being reviewed.
+2. **Prove composed invalidation:** CT-N04/N05 and cross-boundary CT-N06,
+   then CT-N07 contract parity. Durable receive acknowledgment is the
+   only delivery success; no response or ambiguous reply stays pending.
+3. **Complete provider-backed native work:** CT-N08–N10. Never use
+   synthetically generated receipts as capacity exclusivity or native proof.
+4. **Accept or explicitly deny promotion:** CT-N11–N13 with actual owners
+   and independent reviewers. E2 green never implies E3/E4 release.
+
+### Status and evidence conventions
+
+- **Implemented, unverified**: committed code exists but source-bound
+  passing tests are missing. **PARTIAL**: some paths exist, gates remain.
+  **OPEN/NOT RUN**: required integrated/native work not performed.
+  **BLOCKED**: an external prerequisite or queued CI prevents proof.
+  Mark **DONE** only with exact source SHA, command/workflow run URL,
+  negative/recovery results, owner and reviewer where applicable.
+- Update this file first for the next handoff; add durable observations to
+  [the assurance delivery ledger](docs/implementation/capability-runtime-assurance-ledger.md)
+  and commissioning directions to
+  [the invalidation runbook](docs/operations/runbooks/qualification-invalidation.md).
+  The P05 workflow, Assurance PostgreSQL workflow and native qualification
+  evidence remain separate gates.
+- Distinguish **code committed**, **CI passed**, **E3 accepted** and
+  **E4 commissioned** in both the PR body and the tracker. Do not
+  auto-enable the scheduled relay, assert native support, close the delivery
+  ledger or merge PR #64 before all mandatory gates are complete.
+
+---
+
+## Implementation checkpoint — current PR #64
+
+Engineering changes made in this continuation (GitHub commits, **not** a green
+workflow or external native/receiving acceptance):
+
+- `0de8e22b`, `4981e2b3`, `e8bd963e`: established this authoritative
+  13-item queue; archived previous handoffs without losing historical content.
+- `918a269e`: authenticated Planning ASGI receiver backed by a real
+  PostgreSQL fixture; tests commit-before-HTTP-ack, lost-response replay,
+  conflicting event ID, and cross-tenant hold isolation.
+- `824bc476`, `66810472`, `aebac503`, `6ff4ee05`: independent canonical
+  scope SHA-256 goldens shared between Python and PHP (including Unicode and
+  slashes); add both language suites to their existing E2 verification lanes.
+- `ac2cb9cb`, `7a17079c`: Assurance HTTPS publisher rejects incomplete,
+  unexpected, mismatched state/operation and malformed tenant/scope wire bytes
+  *before* any request; adapt positive and negative Pest fixtures.
+
+**Current CI evidence:** the latest inspected engineering head
+`d279e408a48c05cf3cd4796346478dc2fabfb093` (PR #64, 135 commits)
+had 40 queued check runs, with **no passing confirmations**. Two P01
+workflow runs for that same head failed almost immediately and returned no
+job records; root cause is **unknown**, not declared a code/test failure.
+See https://github.com/awalker0878/multi-tenant/actions/runs/37852674326
+and https://github.com/awalker0878/multi-tenant/actions/runs/37852674490.
+CT-N01, CT-N02, CT-N03, CT-N04 and CT-N07 remain OPEN. The Planning ASGI/PostgreSQL test is
+not a commissioned HTTPS Assurance-to-Planning service campaign. Independent
+E3/E4 proof and provider-backed capacity remain outstanding.
+
+### Continued source changes — E2 engineering only
+
+- `7d67a629`, `5e95d9cc`: enforce exact five-field durable inbox
+  acknowledgment, bounded HTTP body, exact approved sink path and epoch range;
+  malformed/surplus HTTP replies are negative Pest scenarios.
+- `6d0e2be7`, `1a17b453`, `318420d6`, `81c82498`,
+  `0778bad3`, `468c60c4`, `d279e408`: read-only shadow comparison
+  tool plus seven unit test scenarios and a GitHub Actions E2 job. Diff
+  coverage includes runtime evidence, adapter bytes, installed tuple,
+  definition, method, status/epoch and expiry. Comparator exit zero means
+  only that supplied snapshots match; it confers no reviewer approval.
+  Runbook: [qualification-shadow-reconciliation.md](docs/operations/runbooks/qualification-shadow-reconciliation.md).
+- `1268adfc`: Lifecycle E2 regression exercises revocation between
+  preflight and effect, and provider fencing lost after grant redemption.
+  Neither grants a native write nor establishes an E3 owner proof.
+- `9a1bd65e`, `888a8914`, `d1c7dc0e`, `dedd6b8f`: provider-used
+  physical capacity, outstanding debits and class-specific physical limits
+  are revalidated on reservation readback; tenant authorization withdrawal
+  and quota drift are negative SQL tests. **No provider-native exclusive
+  capacity owner has been commissioned.**
+
+### Traceability for current E2 test candidates
+
+| Case | Committed E2 test locations | Acceptance status |
+| --- | --- | --- |
+| A01–A03 | `tests/contracts/test_native_qualification.py`; `services/inventory/tests/test_capability_observations.py`; `services/assurance/tests/Feature/QualificationAuthorityLedgerTest.php` | Native signed observer/reviewer proof and exact-head CI open |
+| A04–A05 | `services/lifecycle/tests/test_placement_reservations.py`; `services/planning/tests/test_placement.py` | Operated physical capacity exclusivity open |
+| A06–A07 | `services/planning/tests/test_network_evidence.py`; placement/negative-isolation E2 fixtures | Native topology and security proof open |
+| A08–A09 | `services/planning/tests/test_recovery_evidence.py`; typed matching E2 tests | Native measured RTO/RPO and restoration open |
+| A10–A11 | `services/assurance/tests/Feature/QualificationAuthorityLedgerTest.php`; `services/planning/tests/test_qualification_invalidations.py`; `services/planning/tests/test_qualification_invalidation_http.py`; `services/lifecycle/tests/test_native_workflow.py` | HTTPS composed outage/reorder + native effect interception open |
+| A12–A14 | Lifecycle validation/reconciliation/owner loss fixtures; `services/lifecycle/tests/test_native_workflow.py` | Versioned replay and owner proof open |
+| A15–A16 | Versioned capability registry projections; `services/assurance/tests/Feature/QualificationScopeDigestTest.php`; `services/planning/tests/test_qualification_scope_digests.py` | Unsupported native method and independent E3/E4 gates open |
+
+Nothing in this table asserts that all scenarios passed on the latest source.
+For **each** scenario, retain exact-head CI, independently authorized native
+negative/recovery observations and operating sign-off where required.
+
+## Retained historical handoffs
+
+The previous 38 KB of P0/P01–P10 handoffs, other branch baselines and
+related receiving obligations is preserved, without rewriting its content, in
+[archived-next-work-handoffs.md](docs/implementation/archived-next-work-handoffs.md).
+Those descriptions are not current PR #64 statuses. Return to this file for
+the active tracked blockers and next steps.

@@ -95,7 +95,97 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
     }
     binding["digest"] = digest(binding)
     assignment["plan_digest"] = binding["digest"]
-    record = {"binding": binding, "content": content, "invalidated": False}
+    # Synthetic E2 fixture only: production reads this from Planning after
+    # current Catalogue, Inventory and independent Assurance checks.
+    receipt = {
+        "schema_version": 2, "kind": "migration_workload_readiness",
+        "scope": {
+            "tenant_id": scope["tenant_id"],
+            "application_id": scope["resource_id"],
+            "environment_id": scope["environment"],
+            "site_id": scope["site_id"],
+        },
+        "route_sha256": content["migration_campaign"]["route_sha256"],
+        "tranche_sha256": digest("tranche"), "release_sha256": digest("release"),
+        "source": {
+            "platform": "vmware", "installation_id": "source-installation",
+            "profile_sha256": p["migration"]["source"]["profile_sha256"],
+            "versions": {"api": "8.0"},
+        },
+        "target": {
+            "platform": "openstack", "installation_id": "target-installation",
+            "profile_sha256": p["migration"]["target"]["profile_sha256"],
+            "versions": {"api": "2.1"},
+        },
+        "method": "cold_export",
+        "api_compatibility": {
+            "status": "eligible", "operationally_eligible": True,
+            "administrator_alerts": [], "native_write_authorized": False,
+            "cases": [{
+                "capability_id": "vm.disk.transfer", "side": "source",
+                "criticality": "critical", "status": "eligible",
+                "reason": "synthetic independent evidence",
+                "evidence_sha256": digest("api-qualified"),
+                "selected_api_family": "vim", "selected_api_version": "8.0",
+                "omission_accepted": False, "expires_at": 1800,
+            }],
+        },
+        "native_e3_qualified": True, "receiving_e4_accepted": True,
+        "status": "eligible", "holds": [], "evaluated_at": 1000,
+        "expires_at": 1800, "workload_admission_authorized": False,
+        "native_write_authorized": False,
+    }
+    source_generation = str(uuid4())
+    source_tuple = p["migration"]["source"]["tuple_sha256"]
+    target_tuple = p["migration"]["target"]["tuple_sha256"]
+    reconciliation = {
+        "schema_version": 1, "catalogue_revision_id": str(uuid4()),
+        "catalogue_sha256": digest("intent"),
+        "source_identity_sha256": digest("native-identity"),
+        "source_generation_id": source_generation,
+        "source_profile_sha256": p["migration"]["source"]["profile_sha256"],
+        "source_observation_sha256": digest("source-observation"),
+        "native_review_sha256": p["migration"]["review"]["digest"],
+        "status": "matched", "holds": [], "workloads": [{
+            "workload_id": str(uuid4()), "status": "matched", "holds": [],
+            "source_identity_sha256": digest("native-identity"),
+            "field_dispositions": [{
+                "field": "cpu.count", "disposition": "matched", "required": True,
+                "desired_value": "2", "observed_value": "2",
+                "evidence_source": "inventory_native_profile",
+                "evidence_age_seconds": 1, "next_action": "none",
+            }],
+        }], "expires_at": 1800, "native_write_authorized": False,
+    }
+    reconciliation["reconciliation_sha256"] = digest(reconciliation)
+    coverages = []
+    for side, installation, tuple_sha, generation in (
+        ("source", "source-installation", source_tuple, source_generation),
+        ("target", "target-installation", target_tuple, str(uuid4())),
+        ("owner", "source-installation", source_tuple, source_generation),
+    ):
+        coverage = {
+            "schema_version": 1,
+            "platform": "openstack" if side == "target" else "vmware", "scope": side,
+            "installation_id": installation, "generation_id": generation,
+            "installed_tuple_sha256": tuple_sha,
+            "manifest_sha256": digest("field-manifest"),
+            "evaluated_at": 1000, "expires_at": 1800,
+            "status": "complete", "holds": [],
+            "attributes": [{"attribute_id": "identity", "status": "observed",
+                            "reason": "native", "severity": "critical"}],
+            "independent_e3_e4_qualification": False,
+            "native_write_authorized": False,
+        }
+        coverage["coverage_sha256"] = digest(coverage)
+        coverages.append(coverage)
+    receipt["workload_reconciliation"] = reconciliation
+    receipt["collection_coverages"] = coverages
+    receipt["readiness_sha256"] = digest(receipt)
+    record = {
+        "binding": binding, "content": content, "invalidated": False,
+        "migration_readiness": receipt,
+    }
     approval = {
         "allowed": True,
         "tenant_id": scope["tenant_id"],
@@ -121,7 +211,7 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
     }
     peers = {}
     for index, name in enumerate(
-        ("planning", "governance", "inventory", "custody", "observer", "worker", "caller")
+        ("planning", "governance", "inventory", "custody", "observer", "catalogue", "worker", "caller")
     ):
         token = tmp_path / (name + ".token")
         token.write_text(chr(97 + index) * 64)
@@ -163,6 +253,31 @@ def fixture(tmp_path: Path) -> tuple[NativeOwners, dict[str, Any], dict[str, Any
     def request(owner: str, method: str, route: str, body: Any = None) -> dict[str, Any]:
         if owner == "planning":
             return deepcopy(state["record"])
+        if owner == "catalogue":
+            readiness = state["record"]["migration_readiness"]
+            reconciliation = readiness["workload_reconciliation"]
+            current_ids = [
+                {"id": w["workload_id"]} for w in reconciliation["workloads"]
+            ]
+            if state["fault"] == "catalogue_missing_workload":
+                current_ids.append({"id": str(uuid4())})
+            if state["fault"] == "catalogue_revision":
+                return {
+                    "revision_id": str(uuid4()),
+                    "intent_sha256": reconciliation["catalogue_sha256"],
+                    "intent": {
+                        "environment": {"id": scope["environment"]},
+                        "workloads": current_ids,
+                    },
+                }
+            return {
+                "revision_id": reconciliation["catalogue_revision_id"],
+                "intent_sha256": reconciliation["catalogue_sha256"],
+                "intent": {
+                    "environment": {"id": scope["environment"]},
+                    "workloads": current_ids,
+                },
+            }
         if owner == "governance":
             return deepcopy(state["approval"])
         if owner == "inventory":
@@ -371,3 +486,21 @@ def test_bootstrap_does_not_expose_simulation_and_uses_native_binding_scope(
     with pytest.raises(Rejected):
         control.execute(grant)
     assert configuration(service)["schema_version"] == 1
+
+def test_catalogue_current_membership_is_checked_independently(tmp_path: Path) -> None:
+    owners, ref, state, _ = fixture(tmp_path)
+    state["fault"] = "catalogue_missing_workload"
+    with pytest.raises(Rejected, match="migration_catalogue_workload_set_incomplete"):
+        owners.resolve(ref["tenant_id"], ref)
+    state["fault"] = "catalogue_revision"
+    with pytest.raises(Rejected, match="migration_catalogue_revision_changed"):
+        owners.resolve(ref["tenant_id"], ref)
+
+def test_catalogue_owner_is_mandatory_for_native_migration(tmp_path: Path) -> None:
+    owners, ref, state, config = fixture(tmp_path)
+    del config["owners"]["catalogue"]
+    state["path"].write_text(json.dumps(config))
+    with pytest.raises(Rejected, match="migration_catalogue_owner_not_commissioned"):
+        owners.resolve(ref["tenant_id"], ref)
+
+

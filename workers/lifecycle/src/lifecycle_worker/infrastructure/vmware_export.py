@@ -1,5 +1,7 @@
 """Vmware export; platform mechanisms retain native semantics."""
 
+
+
 import hashlib
 import http.client
 import re
@@ -14,6 +16,9 @@ from lifecycle_worker.application.native import (
 )
 from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection
 from lifecycle_worker.infrastructure.native_json import NativeJson
+
+
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
 
 
 class DownloadSink(Protocol):

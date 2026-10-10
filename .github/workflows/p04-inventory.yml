@@ -24,6 +24,10 @@ jobs:
         with:
           version: '0.12.19'
           enable-cache: false
+      - name: Import and compile all Inventory and collector Python before database startup
+        run: |
+          python -m compileall -q services/inventory/src workers/inventory/src
+          PYTHONPATH=services/inventory/src python -c "import inventory.application.profile_collection; import inventory.application.discovery; import inventory.application.migration_collection_ledger"
       - name: Exercise persistence, revocation, fairness and restart over PostgreSQL TLS
         env:
           P04_POSTGRES_BIN: /usr/lib/postgresql/16/bin

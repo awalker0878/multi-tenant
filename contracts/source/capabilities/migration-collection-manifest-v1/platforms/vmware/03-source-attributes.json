@@ -1,0 +1,80 @@
+[
+  {
+    "id": "network.nic_backing",
+    "scope": "source",
+    "api_family": "vim",
+    "api_field": "VirtualEthernetCard.backing",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 60,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/vmware_workload.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "network.nic_connection",
+    "scope": "source",
+    "api_family": "vim",
+    "api_field": "VirtualEthernetCard.connectable.connected + startConnected",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 30,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/vmware_workload.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "network.nic_guest_control",
+    "scope": "source",
+    "api_family": "vim",
+    "api_field": "VirtualEthernetCard.connectable.allowGuestControl",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 120,
+    "severity": "critical",
+    "condition": "when:quarantine_required",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/vmware_workload.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "compute.passthrough_devices",
+    "scope": "source",
+    "api_family": "vim",
+    "api_field": "VirtualMachine.config.hardware.device[*]._typeName",
+    "owner_evidence_field": null,
+    "collection_method": "derive",
+    "max_age_seconds": 120,
+    "severity": "critical",
+    "condition": "when:present",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/vmware_workload.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "storage.nfc_export",
+    "scope": "source",
+    "api_family": "vim",
+    "api_field": "VirtualMachine.ExportVm + HttpNfcLease.info.deviceUrl",
+    "owner_evidence_field": null,
+    "collection_method": "probe",
+    "max_age_seconds": 300,
+    "severity": "critical",
+    "condition": "when:export",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/vmware_workload.py",
+    "collection_status": "external_evidence_required"
+  },
+  {
+    "id": "storage.ovf_descriptor",
+    "scope": "source",
+    "api_family": "vim",
+    "api_field": "OvfManager.CreateDescriptor + import spec",
+    "owner_evidence_field": null,
+    "collection_method": "probe",
+    "max_age_seconds": 3600,
+    "severity": "critical",
+    "condition": "when:ovf_migration",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/vmware_workload.py",
+    "collection_status": "external_evidence_required"
+  }
+]

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "target": "contracts/openapi/planning-migration-v1.6.json",
+  "base": "base.json",
+  "parts": {
+    "paths": {
+      "kind": "object",
+      "files": [
+        "paths/prepare-and-compose-migration.json",
+        "paths/options-and-support.json",
+        "paths/flow-choices-and-selections.json",
+        "paths/workload-readiness.json"
+      ]
+    },
+    "components.schemas": {
+      "kind": "object",
+      "files": [
+        "components-schemas/foundation-01.json",
+        "components-schemas/migration-options-and-support.json",
+        "components-schemas/flow-choices-and-receipts.json",
+        "components-schemas/workload-readiness.json",
+        "components-schemas/flow-selection-requests.json",
+        "components-schemas/workload-readiness-request.json"
+      ]
+    }
+  },
+  "copies": [
+    "apps/console/resources/contracts/planning-migration-v1.6.json"
+  ]
+}

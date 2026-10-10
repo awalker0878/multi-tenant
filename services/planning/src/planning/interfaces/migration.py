@@ -9,6 +9,7 @@ from typing import Any
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from planning.application.migration_plans import MigrationPlans
+from planning.application.migration_flows import MigrationFlows
 from planning.application.migration_support import MigrationSupport
 from planning.application.ports import Authority
 from planning.domain.model import Rejected, decode, identifier, integer, sha, shape
@@ -22,9 +23,10 @@ class MigrationPreparationApp:
         prepare: Callable[..., dict[str, Any]],
         plans: MigrationPlans | None = None,
         support: MigrationSupport | None = None,
+        flows: MigrationFlows | None = None,
     ) -> None:
         self.authority, self.prepare = authority, prepare
-        self.plans, self.support = plans, support
+        self.plans, self.support, self.flows = plans, support, flows
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
@@ -33,7 +35,7 @@ class MigrationPreparationApp:
             return
         try:
             route = re.fullmatch(
-                rf"/v1/tenants/({UUID})/applications/({UUID})/environments/({UUID})/(migration-preparations|migration-plans|migration-plan-options|migration-support)",
+                rf"/v1/tenants/({UUID})/applications/({UUID})/environments/({UUID})/(migration-preparations|migration-plans|migration-plan-options|migration-support|migration-flow-choices|migration-flow-selections|migration-workload-readiness)",
                 scope["path"],
             )
             if route is None or scope["method"] != "POST" or scope["query_string"]:
@@ -59,9 +61,14 @@ class MigrationPreparationApp:
                     if not event.get("more_body", False):
                         break
             complete = route[4] == "migration-plans"
+            flow_read = route[4] == "migration-flow-choices"
+            flow_save = route[4] == "migration-flow-selections"
             body = shape(
                 decode(bytes(chunks)),
-                ({"site_id"} if route[4] == "migration-support" else {"site_id", "review", "disks"})
+                ({"site_id", "review"} if route[4] == "migration-workload-readiness"
+                 else {"site_id"} if route[4] in {"migration-support", "migration-flow-choices"}
+                 else {"site_id", "revision", "context_sha256", "selections", "omissions"} if flow_save
+                 else {"site_id", "review", "disks"})
                 | ({"base_plan_id", "recipe_id"} if complete else set()),
             )
             review = shape(body["review"], {"revision", "digest"}) if "review" in body else {}
@@ -73,7 +80,7 @@ class MigrationPreparationApp:
                 auth[7:],
                 delegation,
                 tenant,
-                "plan.read" if route[4] == "migration-support" else "plan.create",
+                "plan.read" if route[4] in {"migration-support", "migration-flow-choices", "migration-workload-readiness"} else "plan.create",
                 application,
                 environment,
                 site,
@@ -83,6 +90,24 @@ class MigrationPreparationApp:
                     raise Rejected("migration_support_unavailable", 503)
                 payload = await asyncio.to_thread(self.support.read, actor, site)
                 status = 200
+            elif route[4] == "migration-workload-readiness":
+                if self.support is None:
+                    raise Rejected("migration_support_unavailable", 503)
+                revision = shape(body["review"], {"revision", "digest"})
+                payload = await asyncio.to_thread(self.support.preview, actor, site, revision)
+                status = 200
+            elif flow_read or flow_save:
+                if self.flows is None:
+                    raise Rejected("migration_flow_service_unavailable", 503)
+                if flow_read:
+                    payload = await asyncio.to_thread(self.flows.read, actor, site, delegation)
+                    status = 200
+                else:
+                    payload = await asyncio.to_thread(
+                        self.flows.save, actor, site, delegation, body,
+                        identifier(single(headers, b"idempotency-key")),
+                    )
+                    status = 200
             elif route[4] == "migration-plan-options":
                 if self.plans is None:
                     raise Rejected("migration_plan_composition_unavailable", 503)

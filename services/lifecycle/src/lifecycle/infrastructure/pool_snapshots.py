@@ -37,11 +37,16 @@ class NativePoolSnapshots:
             connection.request(
                 "POST",
                 "/v1/native-pool-observations",
-                json.dumps({
-                    "operation": operation, "request": request, "reservation_id": reservation_id,
-                }),
+                json.dumps(
+                    {
+                        "operation": operation,
+                        "request": request,
+                        "reservation_id": reservation_id,
+                    }
+                ),
                 {
-                    "Authorization": "Bearer " + credential(endpoint(config["endpoint"]).credential_file),
+                    "Authorization": "Bearer "
+                    + credential(endpoint(config["endpoint"]).credential_file),
                     "Content-Type": "application/json",
                     "Accept": "application/json",
                     "Accept-Encoding": "identity",

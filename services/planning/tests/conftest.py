@@ -126,8 +126,11 @@ def database(postgres: dict[str, Any]) -> Any:
         c.execute("DROP SCHEMA IF EXISTS app CASCADE")
         c.execute("CREATE SCHEMA app AUTHORIZATION planning_owner")
         c.execute("GRANT USAGE ON SCHEMA app TO planning_runtime")
-        migration = (
-            Path(__file__).resolve().parents[1] / "migrations/002_planning.sql"
-        ).read_text()
-        c.execute("\n".join(line for line in migration.splitlines() if not line.startswith("\\")))
+        for name in ("002_planning.sql", "003_qualification_invalidations.sql"):
+            migration = (
+                Path(__file__).resolve().parents[1] / "migrations" / name
+            ).read_text()
+            c.execute(
+                "\n".join(line for line in migration.splitlines() if not line.startswith("\\"))
+            )
     return Postgres(postgres | {"user": "planning_runtime"})

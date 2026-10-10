@@ -46,6 +46,7 @@ FIELDS = {
         "scopeReferences",
         "vpcReferences",
         "securedGroups",
+        "rules",
     ),
 }
 
@@ -102,6 +103,32 @@ def collect_list(
     raise CollectionFailure("invalid_response")
 
 
+def resolved_namespace_versions(stream: dict[str, Any]) -> dict[str, str]:
+    """Use only the exact namespace versions enrolled for this native scope."""
+    versions = dict(VERSIONS)
+    installed = stream.get("api_versions")
+    if installed is None and stream.get("api_versions_verified") is not True:
+        version = stream.get("api_version", "v4.3")
+        if stream.get("kind") == "server" and version in {"v4.2", "v4.3"}:
+            # A server listing invokes only VMM; other API namespaces remain
+            # unknown rather than inferred from a v4.2 server stream.
+            versions["vmm"] = version
+            return versions
+        if version != "v4.3":
+            raise CollectionFailure("installed_api_namespace_versions_unqualified")
+        return versions
+    if (
+        stream.get("api_versions_verified") is not True
+        or not isinstance(installed, dict)
+        or set(installed) != set(versions)
+        or any(v not in {"v4.2", "v4.3"} for v in installed.values())
+    ):
+        raise CollectionFailure("installed_api_namespace_versions_unqualified")
+    if stream.get("api_version", installed["vmm"]) != installed["vmm"]:
+        raise CollectionFailure("installed_api_namespace_versions_unqualified")
+    return dict(installed)
+
+
 def collect_ahv(
     policy: dict[str, Any],
     stream: dict[str, Any],
@@ -109,14 +136,17 @@ def collect_ahv(
     before_request: Callable[[], None],
 ) -> dict[str, Any]:
     records: dict[str, Any] = {}
+    versions = resolved_namespace_versions(stream)
+    # Each namespace has a distinct version. Never infer the Microseg
+    # feature namespace from Prism Central or AOS release string.
     routes = {
-        "cluster": "/api/clustermgmt/v4.3/config/clusters/" + stream["cluster_id"],
-        "prism_central": "/api/prism/v4.3/config/domain-managers/" + stream["prism_central_id"],
-        "storage_containers": "/api/clustermgmt/v4.3/config/storage-containers",
-        "subnets": "/api/networking/v4.3/config/subnets",
-        "vpcs": "/api/networking/v4.3/config/vpcs",
-        "categories": "/api/prism/v4.3/config/categories",
-        "policies": "/api/microseg/v4.3/config/policies",
+        "cluster": f"/api/clustermgmt/{versions['clustermgmt']}/config/clusters/" + stream["cluster_id"],
+        "prism_central": f"/api/prism/{versions['prism']}/config/domain-managers/" + stream["prism_central_id"],
+        "storage_containers": f"/api/clustermgmt/{versions['clustermgmt']}/config/storage-containers",
+        "subnets": f"/api/networking/{versions['networking']}/config/subnets",
+        "vpcs": f"/api/networking/{versions['networking']}/config/vpcs",
+        "categories": f"/api/prism/{versions['prism']}/config/categories",
+        "policies": f"/api/microseg/{versions['microseg']}/config/policies",
     }
     inventory: dict[str, list[dict[str, Any]]] = {}
     maximum = policy.get("max_pages", 1)
@@ -161,8 +191,136 @@ def collect_ahv(
             if r.get("projectExtId") == policy["native_scope"]
             or r["extId"] in stream["shared_resource_ids"]
         ]
+    # A policy-list response is not the authoritative rule-list endpoint.
+    # Use the independently documented per-policy native rule GET, subject to
+    # a strict eight-policy/one-page E2 discovery budget. Never follow links
+    # or assume a partial list is complete. Larger scopes remain held.
+    rules_budget_exceeded = len(inventory["policies"]) > 8
+    if not rules_budget_exceeded:
+        for policy_row in inventory["policies"]:
+            native_id = policy_row["extId"]
+            if not isinstance(native_id, str) or not native_id or "/" in native_id:
+                raise CollectionFailure("invalid_response")
+            rules, raw_pages = collect_list(
+                stream, routes["policies"] + "/" + native_id + "/rules",
+                1, before_request,
+            )
+            # If the API also embeds rule bodies, it must agree with the
+            # separate native endpoint rather than silently winning.
+            inline = policy_row.get("rules")
+            if inline is not None and (
+                not isinstance(inline, list)
+                or fingerprint(inline) != fingerprint(rules)
+            ):
+                raise CollectionFailure("invalid_response")
+            policy_row["rules"] = rules
+            records["rules:" + native_id] = raw_pages
+    else:
+        for policy_row in inventory["policies"]:
+            policy_row["rules"] = None
+
+    # The Microseg API exposes separate address/entity/service group
+    # collections. Observe all three within independently accounted budgets.
+    # Configuration definitions do not prove effective VM membership,
+    # exceptions, or fully expanded service behavior.
+    references: dict[str, list[dict[str, Any]]] = {}
+    ref_holds: list[str] = []
+    commissioned = stream.get("microseg_reference_endpoints")
+    authorized = (
+        stream.get("microseg_reference_endpoint_qualified") is True
+        and isinstance(commissioned, dict)
+        and set(commissioned) == {
+            "entity_groups", "address_groups", "service_groups"
+        }
+    )
+    for group_kind in ("entity_groups", "address_groups", "service_groups"):
+        route = commissioned.get(group_kind) if authorized else None
+        expected_prefix = "/api/microseg/" + versions["microseg"] + "/config/"
+        if (not isinstance(route, str)
+                or not route.startswith(expected_prefix)
+                or not route[len(expected_prefix):].replace("-", "").isalnum()
+                or "?" in route or ".." in route):
+            # A still-unqualified API endpoint is an E2 hold, not a reason
+            # to discard independently useful VM/storage/network inventory.
+            references[group_kind] = []
+            ref_holds.append("ahv_" + group_kind + "_api_unqualified")
+            continue
+        rows, documents = collect_list(stream, route, 1, before_request)
+        references[group_kind] = [
+            {"extId": row["extId"], "native_sha256": fingerprint(row),
+             "resolution": "definition_only"}
+            for row in rows
+        ]
+        records["native:" + group_kind] = documents
+
+    # Prism's policy list may include native rule bodies; absence is UNKNOWN.
+    # Never infer rules from policy names, ENFORCE state or category memberships.
+    # Referenced service/address/category groups need independent resolution.
+    for policy_row in inventory["policies"]:
+        rules = policy_row.get("rules")
+        if rules is None:
+            continue
+        if not isinstance(rules, list) or len(rules) > 512:
+            raise CollectionFailure("invalid_response")
+        seen_rule_ids: set[str] = set()
+        for rule in rules:
+            if (
+                not isinstance(rule, dict)
+                or not isinstance(rule.get("extId"), str)
+                or not rule["extId"]
+                or rule["extId"] in seen_rule_ids
+                or not isinstance(rule.get("type"), str)
+                or not isinstance(rule.get("spec"), dict)
+            ):
+                raise CollectionFailure("invalid_response")
+            seen_rule_ids.add(rule["extId"])
+    # Resolve only category IDs found in the same Prism observation.
+    # Address, service and nested selector semantics remain unknown unless a
+    # separately qualified native API collector observes their definitions.
+    categories_observed = {r["extId"] for r in inventory["categories"]}
+    def rule_refs(spec: dict[str, Any]) -> dict[str, Any]:
+        types = {
+            "srcCategoryReferences": "category",
+            "dstCategoryReferences": "category",
+            "sourceCategoryReferences": "category",
+            "destinationCategoryReferences": "category",
+            "addressGroupReferences": "address_group",
+            "serviceGroupReferences": "service_group",
+        }
+        refs: dict[str, list[str]] = {
+            "category": [], "address_group": [], "service_group": [],
+        }
+        unknown = False
+        for field, label in types.items():
+            values = spec.get(field)
+            if values is None:
+                continue
+            if (not isinstance(values, list) or len(values) > 64
+                    or any(not isinstance(item, str) or not item for item in values)):
+                raise CollectionFailure("invalid_response")
+            refs[label].extend(values)
+        if any(len(items) != len(set(items)) or len(items) > 64 for items in refs.values()):
+            raise CollectionFailure("invalid_response")
+        unknown = any(item not in categories_observed for item in refs["category"])
+        unresolved = bool(refs["address_group"] or refs["service_group"] or unknown)
+        # Even a complete category lookup is not a semantic policy proof.
+        return {
+            "category_ids": sorted(refs["category"]),
+            "address_group_ids": sorted(refs["address_group"]),
+            "service_group_ids": sorted(refs["service_group"]),
+            "reference_resolution": "unresolved" if unresolved else "catalogue_ids_only",
+        }
     projected = {
-        k: [{f: r.get(f) for f in fields} | {"native_sha256": fingerprint(r)} for r in inventory[k]]
+        k: [{f: r.get(f) for f in fields if f != "rules"}
+            | ({"rules": [
+                    {"extId": rule["extId"], "type": rule["type"],
+                     "spec_sha256": fingerprint(rule["spec"]),
+                     **rule_refs(rule["spec"])}
+                    for rule in r["rules"]
+                ] if r.get("rules") is not None else None}
+               if k == "policies" else {})
+            | {"native_sha256": fingerprint(r)}
+            for r in inventory[k]]
         for k, fields in FIELDS.items()
     }
     installed = {
@@ -171,7 +329,9 @@ def collect_ahv(
         "cluster_software": config.get("clusterSoftwareMap", []),
         "hypervisors": hypervisors,
     }
-    holds = []
+    holds = list(ref_holds)
+    if rules_budget_exceeded:
+        holds.append("ahv_security_policy_list_exceeds_rule_read_budget")
     if config.get("isAvailable") is not True:
         holds.append("ahv_cluster_unavailable")
     if "AHV" not in installed["hypervisors"]:
@@ -180,6 +340,20 @@ def collect_ahv(
         holds.append("ahv_installed_versions_incomplete")
     if not projected["storage_containers"] or not projected["subnets"]:
         holds.append("ahv_destination_resources_incomplete")
+    if any(row.get("state") == "ENFORCE" and row.get("rules") is None
+           for row in projected["policies"]):
+        holds.append("ahv_security_rule_catalog_incomplete")
+    if any(references[k] for k in references):
+        holds.append("ahv_effective_group_membership_unqualified")
+        holds.append("ahv_service_expansion_unqualified")
+    if any(
+        rule["reference_resolution"] == "unresolved"
+        for row in projected["policies"] if row.get("rules") is not None
+        for rule in row["rules"]
+    ):
+        holds.append("ahv_security_referenced_objects_unresolved")
+    # Even complete native rule bodies are discovery evidence, not independent
+    # end-to-end flow or isolation qualification.
     return {
         "schema_version": 2,
         "profile_type": "TargetCapabilityProfile",
@@ -188,7 +362,7 @@ def collect_ahv(
         "prism_central_id": stream["prism_central_id"],
         "cluster_id": stream["cluster_id"],
         "cluster_name": cluster.get("name") or "",
-        "api_versions": VERSIONS,
+        "api_versions": versions,
         "installed": installed,
         "observed_at": observed_at,
         "observations_sha256": fingerprint(records),
@@ -208,5 +382,6 @@ def collect_ahv(
             "recovery_and_cleanup",
         ],
         "holds": holds,
+        "security_references": references,
         "native_qualification": "not_established",
     }

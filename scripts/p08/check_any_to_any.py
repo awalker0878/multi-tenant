@@ -24,18 +24,18 @@ from planning.domain.model import Rejected as PlanningHeld
 from lifecycle.domain.execution import Rejected as LifecycleHeld
 
 for name in (
-    "inventory-v1.8.json",
+    "inventory-v1.9.json",
     "lifecycle-native-jobs-v1.1.json",
     "worker-migration-effect-v2.1.json",
     "worker-migration-method-v2.json",
-    "planning-migration-v1.5.json",
+    "planning-migration-v1.6.json",
 ):
     spec = json.loads((ROOT / "contracts/openapi" / name).read_text())
     validate_spec(spec)
     client = ROOT / "apps/console/resources/contracts" / name
     if client.exists():
         assert client.read_bytes() == (ROOT / "contracts/openapi" / name).read_bytes()
-api = json.loads((ROOT / "contracts/openapi/inventory-v1.8.json").read_text())
+api = json.loads((ROOT / "contracts/openapi/inventory-v1.9.json").read_text())
 fixture = json.loads((ROOT / "contracts/fixtures/inventory/vmware-destination-v1.json").read_text())
 for name, value in [
     ("VmwareTargetCapabilityProfile", fixture["target"]),
@@ -45,11 +45,11 @@ for name, value in [
         {"$ref": "#/components/schemas/" + name, "components": api["components"]},
         format_checker=FormatChecker(),
     ).validate(value)
-owner = ROOT / "contracts/schemas/planning/migration-input-v3.json"
+owner = ROOT / "contracts/schemas/planning/migration-input-v4.json"
 assert (
     owner.read_bytes()
     == (
-        ROOT / "services/planning/src/planning/infrastructure/inputs/migration-input-v3.json"
+        ROOT / "services/planning/src/planning/infrastructure/inputs/migration-input-v4.json"
     ).read_bytes()
 )
 validator = Draft202012Validator(

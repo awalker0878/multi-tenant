@@ -16,7 +16,7 @@ final class PlanningInputController
         $authority->check($request->headers->all(), $tenant, ['site_id' => $site, 'environment' => $environment, 'resource_id' => $application]);
         $row = DB::table('app.catalogue_revisions as r')->join('app.catalogue_deployments as d', function ($j): void {
             $j->on('r.tenant_id', '=', 'd.tenant_id')->on('r.deployment_id', '=', 'd.id');
-        })->where(['r.tenant_id' => $tenant, 'r.application_id' => $application, 'r.id' => $revision, 'd.environment_id' => $environment])->first(['r.*']);
+        })->where(['r.tenant_id' => $tenant, 'r.application_id' => $application, 'r.id' => $revision, 'd.environment_id' => $environment])->whereColumn('d.current_revision_id', 'r.id')->first(['r.*']);
         abort_if($row === null, 404);
 
         return response()->json(['id' => $row->id, 'application_id' => $application, 'digest' => $row->digest,

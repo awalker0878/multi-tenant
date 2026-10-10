@@ -1,0 +1,28 @@
+[
+  {
+    "id": "identity.display_name",
+    "scope": "source",
+    "api_family": "vmm",
+    "api_field": "data.name",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 300,
+    "severity": "optional",
+    "condition": "when:present",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_workload.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "identity.create_time",
+    "scope": "source",
+    "api_family": "vmm",
+    "api_field": "data.createTime",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 3600,
+    "severity": "optional",
+    "condition": "when:present",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_workload.py",
+    "collection_status": "native_field_candidate"
+  }
+]

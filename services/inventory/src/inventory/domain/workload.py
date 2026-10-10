@@ -63,6 +63,7 @@ TARGET_FIELDS = {
     "flavors",
     "volume_types",
     "network_extensions",
+    "security_groups",
     "compute_version",
     "volume_version",
     "required_capability_evidence",
@@ -85,9 +86,13 @@ def profile_payload(
         return validate_source(value, stream, scope, platform or value.get("platform", ""))
     ahv = not source and isinstance(value, dict) and value.get("platform") == "ahv"
     vmware = not source and isinstance(value, dict) and value.get("platform") == "vmware"
+    if not source and isinstance(value, dict) and value.get("platform") == "vmware":
+        # Older observations cannot supply editable compatibility guesses.
+        value = {**value, "guest_options_by_host": value.get("guest_options_by_host", []),
+                 "nsx_policy_observation": value.get("nsx_policy_observation")}
     p = shape(
         value,
-        SOURCE_FIELDS
+        SOURCE_FIELDS | ({"secure_boot"} if "secure_boot" in value else set())
         if source
         else AHV_FIELDS
         if ahv
@@ -112,6 +117,8 @@ def profile_payload(
     for hold in p["holds"]:
         text(hold, 100)
     if source:
+        if "secure_boot" in p and p["secure_boot"] is not None and type(p["secure_boot"]) is not bool:
+            raise Rejected("source_secure_boot_observation_invalid")
         if p["vm_id"] not in stream["vm_ids"] or p["api_version"] != stream["api_version"]:
             raise Rejected("foreign_profile_scope", 403)
         for field in ("config_sha256", "snapshot_tree_sha256", "key_custody_sha256"):
@@ -139,6 +146,45 @@ def profile_payload(
         validate_devices(p)
     elif p["project_id"] != scope:
         raise Rejected("foreign_profile_scope", 403)
+    if not source and not ahv and not vmware:
+        groups = p["security_groups"]
+        if not isinstance(groups, list) or len(groups) >= 100:
+            raise Rejected("invalid_openstack_security_inventory")
+        seen_groups = set()
+        for group in groups:
+            shape(group, {"id", "name", "project_id", "stateful", "rules_sha256", "semantics_sha256", "rules", "native_sha256"})
+            if (not isinstance(group["id"], str) or not group["id"]
+                or group["id"] in seen_groups or group["project_id"] != p["project_id"]
+                or type(group["name"]) is not str
+                or group["stateful"] not in (None, True, False)
+            ):
+                raise Rejected("foreign_openstack_security_inventory", 403)
+            checksum(group["rules_sha256"])
+            if group["semantics_sha256"] is not None:
+                checksum(group["semantics_sha256"])
+            rules = group["rules"]
+            if rules is not None:
+                if not isinstance(rules, list) or len(rules) > 512:
+                    raise Rejected("invalid_openstack_security_inventory")
+                rule_ids = set()
+                for rule in rules:
+                    shape(rule, {
+                        "id", "direction", "ethertype", "protocol", "port_range_min",
+                        "port_range_max", "remote_ip_prefix", "semantic_sha256",
+                    })
+                    if (
+                        not isinstance(rule["id"], str) or not rule["id"]
+                        or rule["id"] in rule_ids
+                        or rule["direction"] not in ("ingress", "egress")
+                        or rule["ethertype"] not in ("IPv4", "IPv6")
+                    ):
+                        raise Rejected("invalid_openstack_security_inventory")
+                    checksum(rule["semantic_sha256"])
+                    rule_ids.add(rule["id"])
+            if rules is None and group["semantics_sha256"] is not None:
+                raise Rejected("missing_openstack_security_rules")
+            checksum(group["native_sha256"])
+            seen_groups.add(group["id"])
     if ahv:
         validate_profile(p, stream)
     if vmware:
@@ -158,8 +204,57 @@ def review_input(body: dict[str, Any], source: dict[str, Any]) -> None:
             "objectives",
             "overrides",
         }
-        | ({"destination"} if "destination" in body else set()),
+        | ({"destination"} if "destination" in body else set())
+        | ({"catalogue_binding"} if "catalogue_binding" in body else set()),
     )
+    if "catalogue_binding" in body:
+        link = shape(body["catalogue_binding"], {
+            "application_id", "environment_id", "revision_id",
+            "intent_sha256", "workload_id", "disk_mappings", "nic_mappings",
+        } | ({"disk_dispositions"} if "disk_dispositions" in body["catalogue_binding"] else set()))
+        # Datasetless Catalogue disks are not implicitly unimportant or
+        # removable. An owner can attest their uncatalogued identity only;
+        # separate E4 evidence must still bind migration readiness.
+        dispositions = link.get("disk_dispositions", [])
+        if not isinstance(dispositions, list) or len(dispositions) > 32:
+            raise Rejected("catalogue_native_disk_dispositions_invalid")
+        seen_dispositions: set[str] = set()
+        for row in dispositions:
+            shape(row, {"logical_device_id", "native_key", "disposition",
+                        "owner_approval_sha256", "impact_sha256"})
+            logical_id = identifier(row["logical_device_id"])
+            if logical_id in seen_dispositions or row["disposition"] != "uncatalogued_attested":
+                raise Rejected("catalogue_native_disk_disposition_ambiguous", 423)
+            seen_dispositions.add(logical_id)
+            number(row["native_key"], 0, 2147483647)
+            checksum(row["owner_approval_sha256"])
+            checksum(row["impact_sha256"])
+        for field in ("application_id", "environment_id", "revision_id", "workload_id"):
+            identifier(link[field])
+        checksum(link["intent_sha256"])
+        for kind, items in (("disks", link["disk_mappings"]),
+                            ("nics", link["nic_mappings"])):
+            expected = {device["key"] for device in source[kind]}
+            if (not isinstance(items, list) or len(items) != len(expected)
+                    or len(items) > 64):
+                raise Rejected("catalogue_native_device_coverage_required", 423)
+            keys: set[int] = set()
+            logical: set[str] = set()
+            for item in items:
+                shape(item, {"logical_device_id", "native_key"})
+                logical_id = identifier(item["logical_device_id"])
+                native_key = number(item["native_key"], 0, 2147483647)
+                if logical_id in logical or native_key in keys:
+                    raise Rejected("catalogue_native_device_mapping_ambiguous", 423)
+                logical.add(logical_id)
+                keys.add(native_key)
+            if keys != expected:
+                raise Rejected("catalogue_native_device_coverage_required", 423)
+        valid_disks = {row["logical_device_id"]: row["native_key"]
+                       for row in link["disk_mappings"]}
+        if any(valid_disks.get(row["logical_device_id"]) != row["native_key"]
+               for row in dispositions):
+            raise Rejected("catalogue_native_disk_disposition_unmapped", 423)
     identifier(body["source_profile_id"])
     identifier(body["target_profile_id"])
     if body["method"] not in METHODS:

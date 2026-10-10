@@ -1,0 +1,6 @@
+{
+  "ahv": {
+    "source_profile": "SourceWorkloadProfile",
+    "target_profile": "TargetCapabilityProfile"
+  }
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "recovery.restore",
+    "label": "Backup, restore and rollback",
+    "mapping": "operator_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "owner.recovery.rollback_protocol",
+      "owner.recovery.restore_evidence",
+      "owner.operations.backup_coverage"
+    ],
+    "operator_attributes": [
+      "recovery.rollback_protocol",
+      "recovery.restore_evidence",
+      "operations.backup_coverage"
+    ],
+    "qualification": "unqualified",
+    "notes": "Independent restore proof must cover both pre- and post-effect recovery."
+  },
+  {
+    "id": "recovery.retention",
+    "label": "Retention, cleanup and source retirement",
+    "mapping": "operator_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "owner.operations.cleanup_and_retention"
+    ],
+    "operator_attributes": [
+      "operations.cleanup_and_retention"
+    ],
+    "qualification": "unqualified",
+    "notes": "Retention and deletion authorization must be explicitly held."
+  }
+]

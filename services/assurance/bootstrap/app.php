@@ -12,6 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(using: function (): void {
         require __DIR__.'/../routes/api.php';
     })
+    ->withCommands([__DIR__.'/../app/Console/Commands'])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(RequestTelemetry::class);
     })

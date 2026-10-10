@@ -63,15 +63,16 @@ def fit(
                 or amount(overcommit["numerator"]) < overcommit["denominator"]
             ):
                 raise PlacementUnknown("placement_overcommit_policy_invalid")
-            limits["vcpus"] = (
-                limits["vcpus"] * overcommit["numerator"] // overcommit["denominator"]
-            )
+            limits["vcpus"] = limits["vcpus"] * overcommit["numerator"] // overcommit["denominator"]
         free[pool["id"]] = {
-            k: limits[k] - amount(pool["used"][k]) - amount(pool["pending"][k])
-            for k in limits
+            k: limits[k] - amount(pool["used"][k]) - amount(pool["pending"][k]) for k in limits
         }
         if any(v < 0 for v in free[pool["id"]].values()):
-            return {"status": "blocked", "reason": "placement_pool_overallocated", "allocations": []}
+            return {
+                "status": "blocked",
+                "reason": "placement_pool_overallocated",
+                "allocations": [],
+            }
     selected: list[dict[str, Any]] = []
     visited = 0
 
@@ -96,7 +97,10 @@ def fit(
                 continue
             siblings = [r for r in selected if r["failure_group"] == failure["group"]]
             if failure["strength"] == "required" and any(
-                (failure["mode"] == "anti_affinity" and r["failure_domain"] == pool["failure_domain"])
+                (
+                    failure["mode"] == "anti_affinity"
+                    and r["failure_domain"] == pool["failure_domain"]
+                )
                 or (failure["mode"] == "affinity" and r["failure_domain"] != pool["failure_domain"])
                 for r in siblings
             ):
@@ -123,6 +127,8 @@ def fit(
     placed = search(0)
     return {
         "status": "eligible" if placed else "blocked",
-        "reason": "concrete_placement_unreserved" if placed else "placement_fragmented_or_constrained",
+        "reason": "concrete_placement_unreserved"
+        if placed
+        else "placement_fragmented_or_constrained",
         "allocations": selected if placed else [],
     }

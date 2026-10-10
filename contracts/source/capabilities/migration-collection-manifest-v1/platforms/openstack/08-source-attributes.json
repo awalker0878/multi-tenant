@@ -1,0 +1,41 @@
+[
+  {
+    "id": "network.declared_addresses",
+    "scope": "source",
+    "api_family": "nova",
+    "api_field": "server.addresses",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 60,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_workload.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "network.declared_security_groups",
+    "scope": "source",
+    "api_family": "nova",
+    "api_field": "server.security_groups",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 60,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_workload.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "guest.image_metadata",
+    "scope": "source",
+    "api_family": "nova",
+    "api_field": "server.metadata",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 300,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_workload.py",
+    "collection_status": "native_field_candidate"
+  }
+]

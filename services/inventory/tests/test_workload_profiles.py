@@ -70,6 +70,7 @@ def profile(now: float, source: bool = True) -> dict[str, Any]:
             compute_version={"version": "2.100", "min_version": "2.1"},
             volume_version={"version": "3.75", "min_version": "3.0"},
             required_capability_evidence=["guest_driver_profile"],
+            security_groups=[],
         )
     return p
 
@@ -145,7 +146,7 @@ def collected(c: Campaign, source: bool) -> str:
     install(c, source)
     lease = pending(c)
     observed = c.now
-    for request in range(1, 9 if source else 8):
+    for request in range(1, 9):
         assert authorize_read(c.service, c.worker, read_request(lease, request))["allowed"]
         c.now += 1
     body = c.page(lease, [])
@@ -197,6 +198,31 @@ def test_native_facts_and_incomplete_disks_cannot_be_manually_accepted() -> None
             body["overrides"] = [{"field": "firmware", "interpretation": "efi", "reason": "guess"}]
         with pytest.raises(Rejected):
             review_input(body, source)
+
+
+def test_mandatory_console_owner_fields_enforced_by_inventory_not_only_vue() -> None:
+    source = profile(1000)
+    for field in OWNER_FIELDS:
+        document = review(uid(), uid())
+        document["owner_inputs"][field] = ""
+        if field == "delta_protocol":
+            # Cold-export does not require an invented delta protocol.
+            review_input(document, source)
+            document["method"] = "VM_SNAPSHOT_BASELINE_APP_DELTA"
+        with pytest.raises(Rejected):
+            review_input(document, source)
+    for mutation in ("dataset_mapping", "owner_approval", "outage", "data_loss"):
+        document = review(uid(), uid())
+        if mutation == "dataset_mapping":
+            document["datasets"][0]["disk_keys"] = []
+        elif mutation == "owner_approval":
+            document["objectives"]["acceptance_sha256"] = ""
+        elif mutation == "outage":
+            document["objectives"]["max_outage_seconds"] = -1
+        else:
+            document["objectives"]["max_data_loss_bytes"] = -1
+        with pytest.raises(Rejected):
+            review_input(document, source)
 
 
 def test_profile_collection_charges_each_read_and_denies_replay_and_revocation(
@@ -259,3 +285,38 @@ def test_profiles_reviews_and_confirmations_survive_restart_and_reject_stale_sco
     c.now += 400
     with pytest.raises(Rejected, match="current_migration_review_required"):
         restarted.planning(c.actor.tenant, c.actor.site or "", 1, saved["digest"])
+
+
+def test_confirmed_review_can_pin_exact_catalogue_logical_workload() -> None:
+    body = review(uid(), uid())
+    binding = {
+        "application_id": uid(), "environment_id": uid(),
+        "revision_id": uid(), "workload_id": uid(), "intent_sha256": "1" * 64,
+        "disk_mappings": [{"logical_device_id": uid(), "native_key": 2000}],
+        "nic_mappings": [],
+    }
+    body["catalogue_binding"] = binding
+    review_input(body, profile(1000))
+    body["catalogue_binding"] = {**binding, "intent_sha256": "not-a-digest"}
+    with pytest.raises(Rejected, match="invalid_profile_digest"):
+        review_input(body, profile(1000))
+    body["catalogue_binding"] = {**binding, "untrusted": True}
+    with pytest.raises(Rejected, match="unknown_field"):
+        review_input(body, profile(1000))
+
+
+def test_catalogue_mapping_cannot_skip_or_duplicate_native_devices() -> None:
+    body = review(uid(), uid())
+    binding = {
+        "application_id": uid(), "environment_id": uid(),
+        "revision_id": uid(), "workload_id": uid(), "intent_sha256": "2" * 64,
+        "disk_mappings": [{"logical_device_id": uid(), "native_key": 2000}],
+        "nic_mappings": [],
+    }
+    body["catalogue_binding"] = binding
+    review_input(body, profile(1000))
+    for bad in ([], [{"logical_device_id": uid(), "native_key": 2001}],
+                binding["disk_mappings"] * 2):
+        body["catalogue_binding"] = {**binding, "disk_mappings": bad}
+        with pytest.raises(Rejected, match="catalogue_native_device"):
+            review_input(body, profile(1000))

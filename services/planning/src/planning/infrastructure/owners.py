@@ -22,6 +22,7 @@ from planning.domain.model import Actor, Rejected, decode, digest, identifier, p
 from planning.domain.placement import fit
 from planning.domain.qualification import binding_digest, verified
 from planning.infrastructure.foundation import mounted_secret
+from planning.infrastructure.owner_contracts import contract_for_operation
 from planning.infrastructure.store import Postgres
 
 
@@ -35,6 +36,8 @@ def request(
     schema_name: str | None = None,
 ) -> dict[str, Any]:
     try:
+        resolved_contract = (contract_for_operation(owner, method, path, schema_name)
+                             if owner in {"CATALOGUE", "INVENTORY", "ASSURANCE"} else None)
         u = urlsplit(os.environ[owner + "_URL"])
         ca = os.environ[owner + "_CA_FILE"]
         if (
@@ -77,20 +80,8 @@ def request(
             result = decode(raw)
             if not isinstance(result, dict):
                 raise ValueError
-            if owner in {"CATALOGUE", "INVENTORY", "ASSURANCE"}:
-                name = {
-                    "CATALOGUE": "catalogue-input-v1",
-                    "INVENTORY": "inventory-input-v2",
-                    "ASSURANCE": "qualification-v2",
-                }[owner]
-                if schema_name is not None:
-                    if (owner, schema_name) not in {
-                        ("INVENTORY", "migration-input-v3"),
-                        ("ASSURANCE", "migration-support-v1"),
-                        ("ASSURANCE", "qualification-v2"),
-                    }:
-                        raise ValueError
-                    name = schema_name
+            if resolved_contract is not None:
+                name = resolved_contract
                 schema = json.loads(
                     files("planning.infrastructure.inputs").joinpath(name + ".json").read_text()
                 )
@@ -317,7 +308,7 @@ def qualification_current(plan: dict[str, Any]) -> None:
         "POST",
         f"/internal/tenants/{scope['tenant_id']}/qualification-checks",
         {"qualification_scope": pinned["scope"]},
-        schema_name="qualification-v2",
+        schema_name="qualification-v2.1",
     )
     if (
         not verified(current, int(time.time()))
@@ -334,7 +325,8 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
     content, pinned = plan["content"], plan["inputs"][0]
     scope = content["scope"]
     destination = request(
-        "INVENTORY", "GET",
+        "INVENTORY",
+        "GET",
         f"/internal/tenants/{scope['tenant_id']}/planning-capability-inputs/"
         f"{scope['resource_id']}/{scope['environment']}/{scope['site_id']}/"
         f"{scope['endpoint_id']}/{content['inventory_generation']}",
@@ -345,21 +337,47 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
         intent = plan.get("source_intent")
     if not isinstance(intent, dict):
         raise Rejected("placement_intent_unavailable", 423)
+    now = int(time.time())
     result = assess(
-        intent, destination, pinned["profile"], pinned["policy"], current,
-        content["action"], content["method"], int(time.time()),
+        intent,
+        destination,
+        pinned["profile"],
+        pinned["policy"],
+        current,
+        content["action"],
+        content["method"],
+        now,
     )
+    # Capacity is a mandatory current observation, not an exception to revalidation.
     if any(
-        f["mandatory"] and f["status"] != "eligible"
-        for f in result["findings"] if not f["requirement"].startswith("capacity.")
+        finding["mandatory"] and finding["status"] != "eligible"
+        for finding in result["findings"]
     ):
         raise Rejected("current_native_measurement_required", 423)
-    placed = fit(
-        intent, pinned["destination"]["capability_snapshot"]["data"]["pools"],
-        pinned["policy"], int(time.time()),
-    )
-    if placed["status"] != "eligible":
+    try:
+        pinned_placement = fit(
+            intent,
+            pinned["destination"]["capability_snapshot"]["data"]["pools"],
+            pinned["policy"],
+            now,
+        )
+        current_placement = fit(
+            intent,
+            destination["capability_snapshot"]["data"]["pools"],
+            pinned["policy"],
+            now,
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise Rejected("placement_binding_invalid", 423) from error
+    if (
+        pinned_placement["status"] != "eligible"
+        or current_placement["status"] != "eligible"
+        or current_placement["allocations"] != pinned_placement["allocations"]
+    ):
+        # A valid older witness cannot survive a changed pool ledger revision,
+        # class limit, fault domain, resource headroom or placement decision.
         raise Rejected("placement_binding_invalid", 423)
+    placed = current_placement
     receipt = request(
         "CAPACITY", "POST",
         f"/internal/tenants/{scope['tenant_id']}/placement-reservations/checks",
@@ -382,7 +400,5 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
     pools = destination["capability_snapshot"]["data"]["pools"]
     for allocation in placed["allocations"]:
         pool = next((p for p in pools if p["id"] == allocation["pool_id"]), None)
-        if pool is None or any(
-            pool[k] != allocation[k] for k in ("native_ref", "failure_domain")
-        ):
+        if pool is None or any(pool[k] != allocation[k] for k in ("native_ref", "failure_domain")):
             raise Rejected("reserved_placement_topology_changed", 423)

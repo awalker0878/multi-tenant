@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:multi-tenant:planning:independent-e4-field-provenance:v1",
+  "title": "Independent E4 field transformation provenance (future wire v3 prerequisite)",
+  "description": "Standalone evidence contract. Validation alone does not grant migration readiness. Activation requires independently authenticated Assurance reads and a versioned readiness wire upgrade; v2.2 deliberately holds required transformations.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "tenant_id",
+    "application_id",
+    "environment_id",
+    "catalogue_revision_id",
+    "catalogue_sha256",
+    "workload_id",
+    "field",
+    "source_profile_sha256",
+    "intent_field_sha256",
+    "observed_field_sha256",
+    "disposition",
+    "level",
+    "decision",
+    "revoked",
+    "evidence_sha256",
+    "transformation_plan_sha256",
+    "independent_acceptance_sha256",
+    "observed_at",
+    "expires_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "independent_e4_field_provenance"
+    },
+    "tenant_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "application_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "environment_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "catalogue_revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "catalogue_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "workload_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "field": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "source_profile_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "intent_field_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "observed_field_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "disposition": {
+      "const": "qualified_transformation"
+    },
+    "level": {
+      "const": "E4"
+    },
+    "decision": {
+      "const": "accepted"
+    },
+    "revoked": {
+      "const": false
+    },
+    "evidence_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "transformation_plan_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "independent_acceptance_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "observed_at": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "expires_at": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

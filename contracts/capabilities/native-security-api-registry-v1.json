@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "status": "candidate_paths_require_installed_qualification",
+  "interpretation": "Version entries list candidate API namespaces, not native semantic approval. Installed feature witnesses are always mandatory.",
+  "providers": {
+    "vmware": {
+      "namespace": "nsx-policy",
+      "versions": {
+        "v1": {
+          "required_features": [
+            "policy-order",
+            "effective-applied-to",
+            "group-effective-vm-members",
+            "service-expansion",
+            "native-default-action",
+            "realized-revision",
+            "native-route-nat",
+            "active-flow-probes"
+          ],
+          "candidate_endpoints": [
+            "/policy/api/v1/infra/domains/{domain}/security-policies",
+            "/policy/api/v1/infra/domains/{domain}/groups/{group}/members/virtual-machines",
+            "/policy/api/v1/infra/services/{service}"
+          ]
+        }
+      }
+    },
+    "ahv": {
+      "namespace": "microseg",
+      "versions": {
+        "v4.2": {
+          "required_features": [
+            "policy-order",
+            "effective-categories",
+            "entity-membership",
+            "service-expansion",
+            "policy-attachments",
+            "native-route-nat",
+            "active-flow-probes"
+          ],
+          "candidate_endpoints": [
+            "/api/microseg/v4.2/config/policies",
+            "/api/microseg/v4.2/config/policies/{policy}/rules"
+          ]
+        },
+        "v4.3": {
+          "required_features": [
+            "policy-order",
+            "effective-categories",
+            "entity-membership",
+            "service-expansion",
+            "policy-attachments",
+            "native-route-nat",
+            "active-flow-probes"
+          ],
+          "candidate_endpoints": [
+            "/api/microseg/v4.3/config/policies",
+            "/api/microseg/v4.3/config/policies/{policy}/rules"
+          ]
+        }
+      }
+    },
+    "openstack": {
+      "namespace": "neutron",
+      "versions": {
+        "v2.0": {
+          "required_features": [
+            "security-group-port-attachments",
+            "additive-ingress-egress",
+            "remote-member-resolution",
+            "statefulness",
+            "ip-family",
+            "native-route-nat",
+            "active-flow-probes"
+          ],
+          "candidate_endpoints": [
+            "/v2.0/ports",
+            "/v2.0/security-groups",
+            "/v2.0/security-group-rules"
+          ]
+        }
+      }
+    }
+  }
+}

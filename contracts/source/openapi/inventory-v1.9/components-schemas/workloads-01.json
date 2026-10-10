@@ -1,0 +1,113 @@
+{
+  "Resource": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "resource_id",
+      "observation",
+      "collected_at",
+      "expires_at",
+      "holds",
+      "proposed_matches",
+      "ownership",
+      "reserved"
+    ],
+    "properties": {
+      "resource_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "observation": {
+        "$ref": "#/components/schemas/Observation"
+      },
+      "collected_at": {
+        "type": "number"
+      },
+      "expires_at": {
+        "type": "number"
+      },
+      "holds": {
+        "type": "array",
+        "maxItems": 10,
+        "items": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "proposed_matches": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "ownership": {
+        "const": "observation_only"
+      },
+      "reserved": {
+        "const": false
+      }
+    }
+  },
+  "ResourceList": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "items",
+      "next_cursor",
+      "generation_id",
+      "completion",
+      "reason",
+      "endpoint_id",
+      "policy_digest",
+      "consistency"
+    ],
+    "properties": {
+      "items": {
+        "type": "array",
+        "maxItems": 50,
+        "items": {
+          "$ref": "#/components/schemas/Resource"
+        }
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "generation_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "completion": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "endpoint_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "policy_digest": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "consistency": {
+        "const": "bounded_observation_window"
+      }
+    }
+  }
+}

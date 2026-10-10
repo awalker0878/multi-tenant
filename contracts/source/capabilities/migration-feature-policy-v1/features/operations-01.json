@@ -1,0 +1,18 @@
+[
+  {
+    "id": "operations.service",
+    "label": "Time, identity, logging, monitoring, backup",
+    "mapping": "operator_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "owner.operations.monitoring",
+      "owner.operations.time_and_identity"
+    ],
+    "operator_attributes": [
+      "operations.monitoring",
+      "operations.time_and_identity"
+    ],
+    "qualification": "unqualified",
+    "notes": "Receiving owners validate service attachments and monitoring."
+  }
+]

@@ -1,5 +1,7 @@
 """Native image URL import and powered-off AHV VM creation with durable task receipts."""
 
+
+
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -19,6 +21,9 @@ from lifecycle_worker.infrastructure.ahv_tasks import AhvJournal, completed, sub
 from lifecycle_worker.infrastructure.image_conversion import file_digest
 from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
 from lifecycle_worker.infrastructure.native_files import protected_read
+
+
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
 
 
 def owned(document: dict[str, Any], key: str, p: dict[str, Any], b: NativeBinding) -> None:

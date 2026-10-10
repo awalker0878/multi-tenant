@@ -1,0 +1,93 @@
+name: Contract source and consumer integrity
+on:
+  pull_request:
+    paths:
+      - 'contracts/**'
+      - 'services/**'
+      - 'workers/**'
+      - 'apps/console/**'
+      - 'architecture/contract-consumers.json'
+      - 'scripts/contracts/**'
+      - 'scripts/p01/contracts/**'
+      - 'scripts/p03/**'
+      - 'scripts/p04/**'
+      - 'scripts/p05/**'
+      - 'scripts/p06/**'
+      - 'scripts/p07/**'
+      - 'scripts/p08/**'
+      - 'scripts/p09/**'
+      - 'tests/contracts/**'
+      - '.github/workflows/contracts-integrity.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integrity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned contract validators
+        run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+      - name: Check canonical embedded readiness projection
+        run: python scripts/contracts/generate_readiness.py
+      - name: Check assembled contract bundles
+        run: python scripts/contracts/build.py --check
+      - name: Check wire versions, schemas, route parity and consumer drift
+        run: python scripts/contracts/check.py
+      - name: Validate independent inventory, negative drift and API route canaries
+        run: |
+          python -m unittest discover -s tests/contracts -p 'test_integrity.py' -v
+          python -m unittest discover -s tests/contracts -p 'test_route_conformance.py' -v
+      - name: Install bounded owner contract test dependencies
+        run: python -m pip install --disable-pip-version-check -e services/planning -e services/lifecycle -e services/inventory pytest==9.1.1
+      - name: Probe Inventory and Planning migration operations against real ASGI routers
+        env:
+          PYTHONPATH: services/inventory/src:services/planning/src:services/lifecycle/src
+        run: |
+          python scripts/contracts/route_conformance.py --app inventory
+          python scripts/contracts/route_conformance.py --app planning-migration
+          python scripts/contracts/route_conformance.py --app lifecycle-native
+          python scripts/contracts/route_conformance.py --app planning-immutable
+      - name: Validate real Planning and Lifecycle readiness producers and consumers
+        env:
+          PYTHONPATH: services/planning/src:services/lifecycle/src:services/inventory/src:services/planning/tests
+        run: python -m pytest -q services/inventory/tests/test_migration_collection_coverage.py services/inventory/tests/test_migration_collection_evidence.py services/planning/tests/test_migration_readiness.py services/planning/tests/test_migration_owner_contract.py services/planning/tests/test_owner_operation_contracts.py services/planning/tests/test_migration_flows_http.py services/planning/tests/test_migration_api_selection.py services/lifecycle/tests/test_migration_readiness.py services/lifecycle/tests/test_native_owners.py services/planning/tests/test_migration_support.py
+
+  laravel-runtime-routes:
+    name: Live Laravel routes / OpenAPI (${{ matrix.app }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [governance, catalogue, assurance]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, mbstring, openssl, pdo, pdo_pgsql, sockets, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+      - name: Install isolated application from its lockfile
+        run: |
+          mkdir -p services/${{ matrix.app }}/bootstrap/cache services/${{ matrix.app }}/storage/framework/{cache,sessions,views} services/${{ matrix.app }}/storage/logs
+          touch services/${{ matrix.app }}/.env
+          composer install --working-dir=services/${{ matrix.app }} --no-dev --no-plugins --no-scripts --no-interaction --no-progress --prefer-dist
+      - name: Compare the deployed router with every owned active OpenAPI release
+        run: |
+          php services/${{ matrix.app }}/artisan route:list --json > "$RUNNER_TEMP/laravel-routes.json"
+          python scripts/contracts/route_conformance.py --app "${{ matrix.app }}" --routes "$RUNNER_TEMP/laravel-routes.json"

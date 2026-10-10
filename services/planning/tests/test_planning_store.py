@@ -20,8 +20,9 @@ from planning_fixture import (
 )
 
 from planning.application.planning import Planning
+from planning.application.qualification_invalidations import QualificationInvalidations
 from planning.application.validation import PlanValidation
-from planning.domain.model import Actor, Rejected
+from planning.domain.model import Actor, Rejected, digest
 from planning.infrastructure.store import Postgres
 
 
@@ -92,6 +93,15 @@ def test_plan_persistence_invalidation_duplicate_and_conflict(database: Postgres
         a, str(uuid4()), {"assessment_id": r["id"], "candidate": 0, "request": request()}, assessed
     )
     saved = p.get(TENANT, APP, ENV, plan["id"], "plan")
+    with database.transaction() as tx:
+        index = tx.one(
+            "SELECT scope_sha256 FROM app.planning_plan_qualification_scopes WHERE plan=%s",
+            (plan["id"],),
+        )
+    assert index is not None
+    assert index["scope_sha256"] == digest(
+        assessed["inputs"][0]["qualification"]["scope"]
+    )
     assert p.validity(a, saved, {})["current"]
     event = {
         "event_id": str(uuid4()),
@@ -118,3 +128,168 @@ def test_expiry_and_unavailable_inputs_preserve_plan(database: Postgres) -> None
     p.clock = lambda: NOW + 5000
     assert "plan_or_facts_expired" in p.validity(a, saved, {})["holds"]
     assert p.get(TENANT, APP, ENV, r["id"], "plan") == saved
+
+
+def test_negative_qualification_arriving_before_plan_save_cannot_be_missed(
+    database: Postgres,
+) -> None:
+    p, actor, body = setup(database)
+    result = p.assessment(actor, str(uuid4()), body, {})
+    assessed = p.get(TENANT, APP, ENV, result["id"], "assessment")
+    scope_sha256 = digest(assessed["inputs"][0]["qualification"]["scope"])
+    incoming = {
+        "event_id": str(uuid4()),
+        "tenant_id": TENANT,
+        "scope_sha256": scope_sha256,
+        "authority_epoch": 1,
+        "operation": "revoke",
+        "state": "revoked",
+        "decision_sha256": "a" * 64,
+        "event_sha256": "b" * 64,
+    }
+    QualificationInvalidations(database).accept(incoming)
+
+    planned = p.plan(
+        actor,
+        str(uuid4()),
+        {"assessment_id": result["id"], "candidate": 0, "request": request()},
+        assessed,
+    )
+    with database.transaction() as tx:
+        holds = tx.one(
+            "SELECT count(*) AS n FROM app.planning_invalidations WHERE plan=%s",
+            (planned["id"],),
+        )
+    assert holds is not None and holds["n"] == 1
+    saved = p.get(TENANT, APP, ENV, planned["id"], "plan")
+    assert not p.validity(actor, saved, {})["current"]
+
+
+def test_revocation_blocks_approval_execution_and_placement_boundaries(
+    database: Postgres,
+) -> None:
+    p, actor, body = setup(database)
+    assessment_reply = p.assessment(actor, str(uuid4()), body, {})
+    assessed = p.get(TENANT, APP, ENV, assessment_reply["id"], "assessment")
+    planned = p.plan(
+        actor,
+        str(uuid4()),
+        {
+            "assessment_id": assessment_reply["id"],
+            "candidate": 0,
+            "request": request(),
+        },
+        assessed,
+    )
+    scope_hash = digest(assessed["inputs"][0]["qualification"]["scope"])
+    QualificationInvalidations(database).accept(
+        {
+            "event_id": str(uuid4()),
+            "tenant_id": TENANT,
+            "scope_sha256": scope_hash,
+            "authority_epoch": 1,
+            "operation": "revoke",
+            "state": "revoked",
+            "decision_sha256": "a" * 64,
+            "event_sha256": "b" * 64,
+        }
+    )
+    saved = p.get(TENANT, APP, ENV, planned["id"], "plan")
+    assert not p.validity(actor, saved, {})["current"]
+    for boundary in (
+        lambda: p.bound_plan(planned["id"], 1),
+        lambda: p.execution_plan(TENANT, planned["id"], 1),
+        lambda: p.placement_proposal(TENANT, planned["id"], 1),
+    ):
+        with pytest.raises(Rejected) as denied:
+            boundary()
+        assert denied.value.status == 423
+
+
+def test_missing_scope_binding_fails_closed_before_any_plan_effects(
+    database: Postgres,
+) -> None:
+    identity = str(uuid4())
+    p, _, _ = setup(database)
+    with database.transaction() as tx:
+        tx.execute(
+            "INSERT INTO app.planning_records"
+            "(id,tenant,actor,application,environment,kind,payload,digest,created_at) "
+            "VALUES(%s,%s,%s,%s,%s,'plan',%s::jsonb,%s,%s)",
+            (
+                identity,
+                TENANT,
+                ACTOR,
+                APP,
+                ENV,
+                '{"content":{"scope":{"tenant_id":"' + TENANT + '"}}}',
+                "a" * 64,
+                NOW,
+            ),
+        )
+        assert p.qualification_hold(tx, TENANT, identity) == "qualification_scope_unverified"
+    with pytest.raises(Rejected, match="qualification_invalidation_held"):
+        p.bound_plan(identity, 1)
+    with pytest.raises(Rejected, match="qualification_scope_unverified"):
+        p.execution_plan(TENANT, identity, 1)
+
+
+
+def test_concurrent_qualification_revoke_and_new_plan_cannot_leave_an_eligible_plan(
+    database: Postgres,
+) -> None:
+    p, actor, body = setup(database)
+    created = p.assessment(actor, str(uuid4()), body, {})
+    assessed = p.get(TENANT, APP, ENV, created["id"], "assessment")
+    scope_hash = digest(assessed["inputs"][0]["qualification"]["scope"])
+    revoked = {
+        "event_id": str(uuid4()),
+        "tenant_id": TENANT,
+        "scope_sha256": scope_hash,
+        "authority_epoch": 1,
+        "operation": "revoke",
+        "state": "revoked",
+        "decision_sha256": "a" * 64,
+        "event_sha256": "b" * 64,
+    }
+
+    def create_plan() -> dict[str, Any]:
+        return p.plan(
+            actor,
+            str(uuid4()),
+            {"assessment_id": created["id"], "candidate": 0, "request": request()},
+            assessed,
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        plan_future = pool.submit(create_plan)
+        revoke_future = pool.submit(QualificationInvalidations(database).accept, revoked)
+        plan = plan_future.result()
+        assert revoke_future.result()["persisted"] is True
+
+    with database.transaction() as tx:
+        hold = p.qualification_hold(tx, TENANT, plan["id"])
+    assert hold in {"qualification_authority_withdrawn", "owner_change_requires_new_assessment"}
+    saved = p.get(TENANT, APP, ENV, plan["id"], "plan")
+    assert not p.validity(actor, saved, {})["current"]
+
+
+def test_bound_plan_refuses_payload_scope_of_a_different_tenant(
+    database: Postgres,
+) -> None:
+    identity = str(uuid4())
+    wrong_tenant = str(uuid4())
+    with database.transaction() as tx:
+        tx.execute(
+            "INSERT INTO app.planning_records"
+            "(id,tenant,actor,application,environment,kind,payload,digest,created_at) "
+            "VALUES(%s,%s,%s,%s,%s,'plan',%s::jsonb,%s,%s)",
+            (
+                identity, TENANT, ACTOR, APP, ENV,
+                '{"content":{"scope":{"tenant_id":"' + wrong_tenant + '"}}}',
+                "a" * 64, NOW,
+            ),
+        )
+    p, _, _ = setup(database)
+    with pytest.raises(Rejected, match="plan_tenant_mismatch"):
+        p.bound_plan(identity, 1)

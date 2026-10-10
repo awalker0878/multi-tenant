@@ -22,6 +22,7 @@ from inventory.domain.discovery import (
     text,
 )
 from inventory.domain.workload import profile_payload
+from inventory.domain.profile_read_manifest import bounds as profile_read_bounds
 
 
 def uid() -> str:
@@ -536,7 +537,7 @@ class Discovery:
                 "collected_at",
                 "error",
             },
-            {"configuration", "profile"},
+            {"configuration", "profile", "native_read_receipts"},
         )
         job_id, lease = identifier(body["discovery_id"]), identifier(body["lease_token"])
         number(body["sequence"], 0, 100)
@@ -596,6 +597,12 @@ class Discovery:
                     (status, error, failures, now + min(60, 2**failures), now, job_id),
                 )
                 if status == "partial":
+                    tx.execute(
+                        "INSERT INTO inventory.migration_collection_invalidations "
+                        "(tenant,site,endpoint,generation,reason,observed_at) "
+                        "VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING",
+                        (p.tenant, p.site, str(e["id"]), job_id, error, now),
+                    )
                     self.record(
                         tx,
                         p.tenant,
@@ -610,6 +617,24 @@ class Discovery:
                         },
                     )
                 return {"accepted": True, "discovery_id": job_id, "status": status}
+            receipts = body.get("native_read_receipts", [])
+            if not isinstance(receipts, list) or len(receipts) > 128:
+                raise Rejected("native_read_witnesses_invalid")
+            for witness in receipts:
+                if (not isinstance(witness, dict)
+                        or set(witness) != {
+                            "native_operation", "api_version",
+                            "response_sha256", "observed_at"}
+                        or not isinstance(witness["native_operation"], str)
+                        or not re.fullmatch(r"GET /[^\r\n]{1,400}",
+                                            witness["native_operation"])
+                        or not isinstance(witness["api_version"], str)
+                        or len(witness["api_version"]) > 160
+                        or not isinstance(witness["response_sha256"], str)
+                        or not re.fullmatch(r"[a-f0-9]{64}", witness["response_sha256"])
+                        or type(witness["observed_at"]) is not int
+                        or not j["updated_at"] - 2 <= witness["observed_at"] <= now + 2):
+                    raise Rejected("native_read_witness_invalid")
             collected = body["collected_at"]
             if (
                 type(collected) not in {int, float}
@@ -627,28 +652,9 @@ class Discovery:
                 profile = profile_payload(
                     body.get("profile"), stream_spec, p.native_scope, p.platform
                 )
-                minimum_reads = maximum_reads = 8 if kind == "source_profile" else 7
-                if kind == "source_profile" and p.platform == "openstack":
-                    minimum_reads = maximum_reads = 5 + sum(
-                        r["role"] in {"bootable_volume", "data_volume"}
-                        for r in profile["native"]["disk_records"]
-                    )
-                if kind == "source_profile" and p.platform == "ahv":
-                    minimum_reads = maximum_reads = 4
-                if kind == "target_profile" and p.platform == "vmware":
-                    minimum_reads = maximum_reads = 6
-                if kind == "target_profile" and p.platform == "ahv":
-                    minimum_reads = 2 + sum(
-                        max(1, (len(profile[field]) + 99) // 100)
-                        for field in (
-                            "storage_containers",
-                            "subnets",
-                            "vpcs",
-                            "categories",
-                            "policies",
-                        )
-                    )
-                    maximum_reads = 2 + 5 * min(p.max_pages, 10)
+                minimum_reads, maximum_reads = profile_read_bounds(
+                    p.platform, kind, p.max_pages, stream_spec, profile
+                )
                 if (
                     body["observations"]
                     or "configuration" in body
@@ -738,6 +744,14 @@ class Discovery:
                     job_id,
                 ),
             )
+            if status == "partial":
+                tx.execute(
+                    "INSERT INTO inventory.migration_collection_invalidations "
+                    "(tenant,site,endpoint,generation,reason,observed_at) "
+                    "VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING",
+                    (p.tenant, p.site, str(e["id"]), job_id,
+                     reason or "native_collection_incomplete", now),
+                )
             if status in {"complete", "partial"}:
                 self.record(
                     tx,

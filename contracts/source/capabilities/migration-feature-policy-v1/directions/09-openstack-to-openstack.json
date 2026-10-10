@@ -1,0 +1,323 @@
+[
+  {
+    "source": "openstack",
+    "target": "openstack",
+    "features": [
+      {
+        "feature_id": "platform.api",
+        "source_attributes": [
+          "identity.installed_product",
+          "identity.compute_microversion",
+          "identity.volume_microversion",
+          "identity.network_api"
+        ],
+        "target_attributes": [
+          "target.compute_api_bounds",
+          "target.volume_api_bounds",
+          "target.image_api_versions"
+        ],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "vm.identity",
+        "source_attributes": [
+          "identity.server_id",
+          "identity.instance_created",
+          "identity.project"
+        ],
+        "target_attributes": [],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "vm.power",
+        "source_attributes": [
+          "compute.power_state"
+        ],
+        "target_attributes": [],
+        "mapping_proposal": "normalize_data_revalidate",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "vm.compute",
+        "source_attributes": [
+          "compute.vcpus",
+          "compute.memory_mib",
+          "compute.flavor_id"
+        ],
+        "target_attributes": [
+          "target.placement_traits"
+        ],
+        "mapping_proposal": "normalize_data_revalidate",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "vm.placement",
+        "source_attributes": [
+          "compute.availability_zone"
+        ],
+        "target_attributes": [
+          "target.availability_zones",
+          "target.flavors"
+        ],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "guest.firmware",
+        "source_attributes": [
+          "guest.firmware_metadata"
+        ],
+        "target_attributes": [],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "guest.drivers",
+        "source_attributes": [
+          "guest.image_id",
+          "guest.config_drive",
+          "guest.user_key",
+          "guest.image_metadata",
+          "guest.os_metadata"
+        ],
+        "target_attributes": [
+          "target.boot_guest_drivers"
+        ],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "guest.devices",
+        "source_attributes": [],
+        "target_attributes": [],
+        "mapping_proposal": "no_direct_field_qualified_alternative_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "storage.disks",
+        "source_attributes": [
+          "storage.volume_attachments",
+          "storage.server_volume_refs",
+          "storage.volume_size",
+          "compute.local_disk_gib",
+          "storage.volume_type",
+          "storage.volume_image_metadata",
+          "storage.bootable",
+          "storage.volume_id",
+          "compute.swap_and_ephemeral"
+        ],
+        "target_attributes": [],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "storage.controller",
+        "source_attributes": [
+          "guest.boot_device"
+        ],
+        "target_attributes": [],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "storage.sharing",
+        "source_attributes": [
+          "storage.multiattach",
+          "storage.attachments"
+        ],
+        "target_attributes": [],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "storage.encryption",
+        "source_attributes": [
+          "storage.encrypted"
+        ],
+        "target_attributes": [
+          "target.secret_key_backends"
+        ],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "storage.target",
+        "source_attributes": [],
+        "target_attributes": [
+          "target.volume_types",
+          "target.image_stores",
+          "target.placement_inventory",
+          "target.provider_allocations",
+          "target.image_formats"
+        ],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "storage.transfer",
+        "source_attributes": [
+          "storage.local_image_capture",
+          "storage.volume_snapshot_capture"
+        ],
+        "target_attributes": [
+          "target.image_import_probe",
+          "target.vm_create_probe",
+          "target.image_import_methods"
+        ],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "network.nics",
+        "source_attributes": [
+          "network.port_ids",
+          "network.ports_complete",
+          "network.nic_mac",
+          "network.nic_model"
+        ],
+        "target_attributes": [],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "network.routing",
+        "source_attributes": [
+          "network.port_network",
+          "network.fixed_ips",
+          "network.port_project",
+          "network.nic_binding",
+          "network.declared_addresses"
+        ],
+        "target_attributes": [
+          "target.network_subnets",
+          "target.network_ports",
+          "target.network_routers",
+          "target.network_extensions",
+          "target.network_trunks",
+          "target.network_dhcp"
+        ],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "network.flows",
+        "source_attributes": [
+          "network.port_status"
+        ],
+        "target_attributes": [],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "network.security",
+        "source_attributes": [
+          "network.security_groups",
+          "network.port_security",
+          "network.declared_security_groups"
+        ],
+        "target_attributes": [
+          "target.security_group_rules",
+          "target.security_stateful",
+          "target.network_isolation"
+        ],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "security.scope",
+        "source_attributes": [],
+        "target_attributes": [
+          "target.project_quotas",
+          "target.identity_catalog"
+        ],
+        "mapping_proposal": "qualified_adapter_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "app.datasets",
+        "source_attributes": [],
+        "target_attributes": [],
+        "mapping_proposal": "operator_plus_native_proof",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "app.consistency",
+        "source_attributes": [],
+        "target_attributes": [],
+        "mapping_proposal": "operator_plus_native_proof",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "app.dependencies",
+        "source_attributes": [],
+        "target_attributes": [],
+        "mapping_proposal": "operator_plus_native_proof",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "app.objectives",
+        "source_attributes": [],
+        "target_attributes": [],
+        "mapping_proposal": "operator_plus_native_proof",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "app.validation",
+        "source_attributes": [],
+        "target_attributes": [],
+        "mapping_proposal": "operator_plus_native_proof",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "cutover.writer",
+        "source_attributes": [],
+        "target_attributes": [],
+        "mapping_proposal": "operator_plus_native_proof",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "recovery.restore",
+        "source_attributes": [],
+        "target_attributes": [],
+        "mapping_proposal": "operator_plus_native_proof",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "recovery.retention",
+        "source_attributes": [],
+        "target_attributes": [],
+        "mapping_proposal": "operator_plus_native_proof",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "operations.service",
+        "source_attributes": [],
+        "target_attributes": [],
+        "mapping_proposal": "operator_plus_native_proof",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "metadata.optional",
+        "source_attributes": [
+          "storage.volume_metadata"
+        ],
+        "target_attributes": [],
+        "mapping_proposal": "no_direct_field_qualified_alternative_required",
+        "admission": "unknown_requires_installed_qualification"
+      },
+      {
+        "feature_id": "network.qos",
+        "source_attributes": [
+          "network.qos_policy"
+        ],
+        "target_attributes": [
+          "target.qos_policies"
+        ],
+        "mapping_proposal": "optional_requires_e4_if_omitted",
+        "admission": "unknown_requires_installed_qualification"
+      }
+    ]
+  }
+]

@@ -87,7 +87,7 @@ final class CatalogueClient implements CatalogueGateway
                     is_string($reason) && preg_match('/\A[a-z_]{1,80}\z/', $reason) ? $reason : 'catalogue_unavailable', is_string($field) && preg_match('/\A[a-zA-Z0-9_.]{1,200}\z/', $field) ? $field : 'intent');
             }
             $wire = $response->json();
-            $source = file_get_contents(resource_path('contracts/catalogue-v1.json'));
+            $source = file_get_contents(resource_path('contracts/catalogue-v1.0.1.json'));
             if ($source === false) {
                 throw new CatalogueFailure(503);
             }

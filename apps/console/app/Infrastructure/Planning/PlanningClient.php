@@ -19,7 +19,7 @@ final class PlanningClient implements PlanningGateway
 
     public function call(string $session, string $tenant, string $application, string $environment, string $method, string $tail, array $sites, array $body = [], ?string $key = null): array
     {
-        $migration = in_array($tail, ['migration-preparations', 'migration-plans', 'migration-plan-options', 'migration-support'], true);
+        $migration = in_array($tail, ['migration-preparations', 'migration-plans', 'migration-plan-options', 'migration-support', 'migration-flow-choices', 'migration-flow-selections', 'migration-workload-readiness'], true);
         if (($migration && ($method !== 'POST' || count($sites) !== 1)) || count($sites) < 1 || count($sites) > 3 || ! in_array($method, ['GET', 'POST'], true)
             || (! $migration && ! preg_match('/\A(?:assessments|plans)(?:\/[0-9a-f-]{36})?(?:\/(?:validity|diff))?\z/', $tail))) {
             throw new PlanningFailure(422, 'invalid_scope');
@@ -40,7 +40,7 @@ final class PlanningClient implements PlanningGateway
         }
         try {
             $tokens = [];
-            $action = $method === 'POST' && $tail !== 'migration-support' && ! str_ends_with($tail, '/validity') && ! str_ends_with($tail, '/diff') ? 'plan.create' : 'plan.read';
+            $action = $method === 'POST' && ! in_array($tail, ['migration-support', 'migration-flow-choices', 'migration-workload-readiness'], true) && ! str_ends_with($tail, '/validity') && ! str_ends_with($tail, '/diff') ? 'plan.create' : 'plan.read';
             foreach (array_unique($sites) as $site) {
                 $d = $this->governance->send('POST', '/v1/tenants/'.$tenant.'/actor-delegations', $session, ['audience' => 'planning', 'action' => $action,
                     'scope' => ['site_id' => $site, 'environment' => $environment, 'resource_id' => $application]]);
@@ -68,18 +68,21 @@ final class PlanningClient implements PlanningGateway
             $result = json_decode($raw, true, 64, JSON_THROW_ON_ERROR);
             if (! in_array($response->status(), [200, 201], true)) {
                 $reason = is_array($result) ? ($result['error'] ?? '') : '';
-                throw new PlanningFailure(in_array($response->status(), [401, 403, 404, 409, 422, 423, 429], true) ? $response->status() : 503,
+                throw new PlanningFailure(in_array($response->status(), [401, 403, 404, 409, 412, 422, 423, 429], true) ? $response->status() : 503,
                     is_string($reason) && preg_match('/\A[a-z_]{1,80}\z/', $reason) ? $reason : 'planning_unavailable');
             }
             if (! is_array($result) || array_is_list($result)) {
                 throw new PlanningFailure;
             }
 
-            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v1.5.json' : 'contracts/planning-v1.2.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
+            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v1.6.json' : 'contracts/planning-v1.2.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
             $schemaName = $migration ? match ($tail) {
                 'migration-plans' => 'Receipt',
                 'migration-plan-options' => 'MigrationOptions',
                 'migration-support' => 'MigrationSupport',
+                'migration-flow-choices' => 'MigrationFlowChoices',
+                'migration-flow-selections' => 'MigrationFlowReceipt',
+                'migration-workload-readiness' => 'MigrationWorkloadReadiness',
                 default => 'Preparation',
             } : ($response->status() === 201 ? 'Receipt' : (str_ends_with($tail, '/validity') ? 'Validity' : (str_ends_with($tail, '/diff') ? 'Diff' : (str_starts_with($tail, 'plans/') ? 'Plan' : 'Assessment'))));
             $schema = ['$ref' => '#/components/schemas/'.$schemaName, 'components' => $api['components']];

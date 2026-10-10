@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "target": "contracts/openapi/inventory-v1.9.json",
+  "base": "base.json",
+  "parts": {
+    "paths": {
+      "kind": "object",
+      "files": [
+        "paths/foundation-01.json",
+        "paths/discovery-01.json",
+        "paths/foundation-02.json",
+        "paths/discovery-02.json",
+        "paths/foundation-03.json",
+        "paths/discovery-03.json",
+        "paths/porting-01.json",
+        "paths/discovery-04.json",
+        "paths/migration-01.json",
+        "paths/operator-01.json"
+      ]
+    },
+    "components.schemas": {
+      "kind": "object",
+      "files": [
+        "components-schemas/foundation-01.json",
+        "components-schemas/workloads-01.json",
+        "components-schemas/foundation-02.json",
+        "components-schemas/porting-01.json",
+        "components-schemas/workloads-02.json",
+        "components-schemas/platforms-01.json",
+        "components-schemas/workloads-03.json",
+        "components-schemas/migration-01.json",
+        "components-schemas/operator-01.json",
+        "components-schemas/openstack-target-capability-profile.json",
+        "components-schemas/ahv-target-capability-profile.json",
+        "components-schemas/ahv-destination-selection.json",
+        "components-schemas/readiness-01.json",
+        "components-schemas/workloads-04.json",
+        "components-schemas/platforms-03.json"
+      ]
+    }
+  },
+  "copies": [
+    "apps/console/resources/contracts/inventory-v1.9.json"
+  ]
+}

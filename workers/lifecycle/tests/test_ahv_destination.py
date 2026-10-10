@@ -337,3 +337,22 @@ def test_prepared_guest_copy_must_match_destination_platform_and_firmware(
         assert not c["peer"].posts
     else:
         assert c["execution"].execute(c["binding"])["observation"]["outcome"] == "observed_present"
+
+
+
+def test_ahv_transport_requires_exact_commissioned_namespace_before_network(
+    platform_peer: tuple[NativeEndpoint, dict[str, Any]],
+) -> None:
+    endpoint, peer = platform_peer
+    pinned = dict.fromkeys(("vmm", "prism", "clustermgmt", "networking",
+                            "microseg", "iam"), "v4.3")
+    api = AhvHttp(endpoint, read_only=True, api_versions=pinned)
+    with pytest.raises(NativeHeld, match="version_unqualified"):
+        api.call("GET", "/api/vmm/v4.2/ahv/config/vms/" + uid(),
+                 None, {}, lambda: None)
+    with pytest.raises(NativeHeld, match="version_unqualified"):
+        api.call("GET", "/api/prism/v4.2/config/domain-managers/" + uid(),
+                 None, {}, lambda: None)
+    assert peer["requests"] == []
+    with pytest.raises(NativeHeld, match="manifest_invalid"):
+        AhvHttp(endpoint, api_versions={"vmm": "v4.3"})

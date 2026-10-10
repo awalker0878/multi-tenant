@@ -23,8 +23,10 @@ class PlanningInputApp:
         native_authority: Callable[[str, str, str, str, str, int, str], None] | None = None,
         observations: CapabilityObservations | None = None,
         capability_authority: Callable[[str, str, str, str, str, str, str], None] | None = None,
+        collection_read=None,
     ) -> None:
         self.capability_authority = capability_authority
+        self.collection_read = collection_read
         self.observations = observations
         self.discovery, self.authority = discovery, authority
         self.native_authority = native_authority
@@ -55,14 +57,21 @@ class PlanningInputApp:
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", auth):
                 raise Rejected("invalid_workload", 401)
             capability_internal = (
-                scope["path"].startswith("/internal/") and "/planning-capability-inputs/" in scope["path"]
+                scope["path"].startswith("/internal/")
+                and "/planning-capability-inputs/" in scope["path"]
             )
             if capability_internal:
                 if self.capability_authority is None:
                     raise Rejected("capability_reader_not_commissioned", 423)
                 await asyncio.to_thread(
-                    self.capability_authority, auth[7:], tenant, application, environment,
-                    site, endpoint, generation,
+                    self.capability_authority,
+                    auth[7:],
+                    tenant,
+                    application,
+                    environment,
+                    site,
+                    endpoint,
+                    generation,
                 )
             elif scope["path"].startswith("/internal/"):
                 if self.native_authority is None:
@@ -90,11 +99,13 @@ class PlanningInputApp:
                 )
             if migration:
                 payload = await asyncio.to_thread(
-                    WorkloadProfiles(self.discovery).planning,
+                    WorkloadProfiles(self.discovery, self.collection_read).planning,
                     tenant,
                     site,
                     int(endpoint),
                     generation,
+                    application,
+                    environment,
                 )
             elif "/planning-capability-inputs/" in scope["path"]:
                 payload = await asyncio.to_thread(
@@ -110,17 +121,19 @@ class PlanningInputApp:
                 payload = await asyncio.to_thread(
                     planning_input, self.discovery, tenant, site, endpoint, generation
                 )
-            if scope["path"].startswith("/internal/"):
+            if capability_internal:
+                assert self.capability_authority is not None
+                await asyncio.to_thread(
+                    self.capability_authority,
+                    auth[7:], tenant, application, environment,
+                    site, endpoint, generation,
+                )
+            elif scope["path"].startswith("/internal/"):
                 assert self.native_authority is not None
                 await asyncio.to_thread(
                     self.native_authority,
-                    auth[7:],
-                    tenant,
-                    application,
-                    environment,
-                    site,
-                    int(endpoint),
-                    generation,
+                    auth[7:], tenant, application, environment,
+                    site, int(endpoint), generation,
                 )
             status = 200
         except Rejected as e:

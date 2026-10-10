@@ -90,7 +90,8 @@ class PlanningApp:
             )
             placement = re.fullmatch(
                 rf"/internal/tenants/({UUID})/placement-proposals/({UUID})/"
-                rf"revisions/([1-9][0-9]{{0,8}})", scope["path"],
+                rf"revisions/([1-9][0-9]{{0,8}})",
+                scope["path"],
             )
             if placement and scope["method"] == "GET":
                 await asyncio.to_thread(self.authority.caller, credential, "lifecycle_reader")

@@ -1,0 +1,492 @@
+[
+  {
+    "canonical_id": "owner.application.consistency",
+    "scope": "owner",
+    "relationship": "owner_common",
+    "normalization": "signed_owner_scope",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "application.consistency"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "application_consistency"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "application.consistency"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "application_consistency"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "application.consistency"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "application_consistency"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "Common owner requirement. Never treat the same named field as observed API support; bind exact source and destination scope.",
+    "qualification": "not_qualified",
+    "migration_policy": "owner_evidence_required"
+  },
+  {
+    "canonical_id": "owner.application.datasets",
+    "scope": "owner",
+    "relationship": "owner_common",
+    "normalization": "signed_owner_scope",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "application.datasets"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "datasets_and_mounts"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "application.datasets"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "datasets_and_mounts"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "application.datasets"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "datasets_and_mounts"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "Common owner requirement. Never treat the same named field as observed API support; bind exact source and destination scope.",
+    "qualification": "not_qualified",
+    "migration_policy": "owner_evidence_required"
+  },
+  {
+    "canonical_id": "owner.application.dependencies",
+    "scope": "owner",
+    "relationship": "owner_common",
+    "normalization": "signed_owner_scope",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "application.dependencies"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "dependencies"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "application.dependencies"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "dependencies"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "application.dependencies"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "dependencies"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "Common owner requirement. Never treat the same named field as observed API support; bind exact source and destination scope.",
+    "qualification": "not_qualified",
+    "migration_policy": "owner_evidence_required"
+  },
+  {
+    "canonical_id": "owner.application.writer_fencing",
+    "scope": "owner",
+    "relationship": "owner_common",
+    "normalization": "signed_owner_scope",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "application.writer_fencing"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "writer_fencing"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "cutover"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "application.writer_fencing"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "writer_fencing"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "cutover"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "application.writer_fencing"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "writer_fencing"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "cutover"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "Common owner requirement. Never treat the same named field as observed API support; bind exact source and destination scope.",
+    "qualification": "not_qualified",
+    "migration_policy": "owner_evidence_required"
+  },
+  {
+    "canonical_id": "owner.application.final_delta",
+    "scope": "owner",
+    "relationship": "owner_common",
+    "normalization": "signed_owner_scope",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "application.final_delta"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "delta_protocol"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:delta_method"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "application.final_delta"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "delta_protocol"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:delta_method"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "application.final_delta"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "delta_protocol"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:delta_method"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "Common owner requirement. Never treat the same named field as observed API support; bind exact source and destination scope.",
+    "qualification": "not_qualified",
+    "migration_policy": "owner_evidence_required"
+  },
+  {
+    "canonical_id": "owner.application.outage_objective",
+    "scope": "owner",
+    "relationship": "owner_common",
+    "normalization": "signed_owner_scope",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "application.outage_objective"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "max_outage_seconds"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "application.outage_objective"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "max_outage_seconds"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "application.outage_objective"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "max_outage_seconds"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "Common owner requirement. Never treat the same named field as observed API support; bind exact source and destination scope.",
+    "qualification": "not_qualified",
+    "migration_policy": "owner_evidence_required"
+  },
+  {
+    "canonical_id": "owner.application.data_loss_objective",
+    "scope": "owner",
+    "relationship": "owner_common",
+    "normalization": "signed_owner_scope",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "application.data_loss_objective"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "max_data_loss_bytes"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "application.data_loss_objective"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "max_data_loss_bytes"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "application.data_loss_objective"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "max_data_loss_bytes"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "Common owner requirement. Never treat the same named field as observed API support; bind exact source and destination scope.",
+    "qualification": "not_qualified",
+    "migration_policy": "owner_evidence_required"
+  }
+]

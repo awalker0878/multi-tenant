@@ -5,6 +5,8 @@ passthrough/key-bearing devices require their own route qualification. Native
 task acceptance is retained before polling and uncertain submissions are held.
 """
 
+
+
 import re
 import time
 from collections.abc import Callable
@@ -28,6 +30,9 @@ from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.native_files import protected_read
 
 
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
+
+
 def validate(p: dict[str, Any], binding: NativeBinding) -> dict[str, Any]:
     shape(
         p,
@@ -42,11 +47,11 @@ def validate(p: dict[str, Any], binding: NativeBinding) -> dict[str, Any]:
             "vm_sha256",
             "disks",
             "max_seconds",
-        },
+        } | ({"api_versions"} if p.get("schema_version") == 3 else set()),
     )
     if (
         type(p["schema_version"]) is not int
-        or p["schema_version"] != 2
+        or p["schema_version"] not in {2, 3}
         or p["kind"] != "ahv_capture"
         or p["method"] != "VM_COLD_EXPORT"
         or digest(p) != binding.operation_plan_sha256
@@ -54,6 +59,10 @@ def validate(p: dict[str, Any], binding: NativeBinding) -> dict[str, Any]:
         or not sha256(p["vm_sha256"])
     ):
         raise NativeHeld("ahv_capture_plan_changed")
+    if p["schema_version"] == 3 and p.get("api_versions") != dict.fromkeys(
+        ("vmm", "prism", "clustermgmt", "networking", "microseg", "iam"), "v4.3"
+    ):
+        raise NativeHeld("ahv_source_selected_namespace_not_executable")
     for field in ("source_project_id", "source_vm_id", "cluster_id"):
         identity(p[field])
     seconds(p)

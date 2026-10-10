@@ -1,0 +1,71 @@
+{
+  "WorkloadProfile": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "endpoint_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "generation_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "native_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      },
+      "profile_type": {
+        "enum": [
+          "SourceWorkloadProfile",
+          "TargetCapabilityProfile"
+        ]
+      },
+      "digest": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "current": {
+        "type": "boolean"
+      },
+      "expires_at": {
+        "type": "number",
+        "minimum": 0
+      },
+      "collected_at": {
+        "type": "number",
+        "minimum": 0
+      },
+      "facts": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/SourceWorkloadProfile"
+          },
+          {
+            "$ref": "#/components/schemas/TargetCapabilityProfile"
+          },
+          {
+            "$ref": "#/components/schemas/SourceWorkloadProfileV3"
+          }
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "endpoint_id",
+      "generation_id",
+      "native_id",
+      "profile_type",
+      "digest",
+      "current",
+      "expires_at",
+      "collected_at",
+      "facts"
+    ]
+  }
+}
