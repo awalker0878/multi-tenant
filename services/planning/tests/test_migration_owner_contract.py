@@ -197,12 +197,15 @@ def test_real_inventory_planning_response_validates_installed_strict_schema(
             return "identity"
 
     class Connection:
-        def __init__(self, *args, **kwargs): pass
+        def __init__(self, *args, **kwargs):
+            pass
         def request(self, method, path, data, headers):
             assert method == "GET"
             assert "/migration-inputs/" in path
-        def getresponse(self): return Response()
-        def close(self): pass
+        def getresponse(self):
+            return Response()
+        def close(self):
+            pass
 
     monkeypatch.setenv("INVENTORY_URL", "https://inventory.example")
     monkeypatch.setenv("INVENTORY_CA_FILE", "/tmp/test-ca.pem")
