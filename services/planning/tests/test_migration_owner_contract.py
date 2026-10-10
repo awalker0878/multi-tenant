@@ -184,3 +184,36 @@ def test_real_inventory_planning_response_validates_installed_strict_schema(
     assert all(row["expires_at"] == 150
                for row in produced["collection_coverages"])
     assert produced["native_write_authorized"] is False
+
+    # Send the real Inventory producer document through Planning's installed
+    # HTTPS owner client. Synthetic JSON fixtures alone missed the v3/v4 drift.
+    from planning.infrastructure import owners
+
+    class Response:
+        status = 200
+        def read(self, n):
+            return json.dumps(produced).encode()
+        def getheader(self, key, default=None):
+            return "identity"
+
+    class Connection:
+        def __init__(self, *args, **kwargs): pass
+        def request(self, method, path, data, headers):
+            assert method == "GET"
+            assert "/migration-inputs/" in path
+        def getresponse(self): return Response()
+        def close(self): pass
+
+    monkeypatch.setenv("INVENTORY_URL", "https://inventory.example")
+    monkeypatch.setenv("INVENTORY_CA_FILE", "/tmp/test-ca.pem")
+    monkeypatch.setattr(owners, "mounted_secret", lambda name: "test-only-token")
+    monkeypatch.setattr(owners.ssl, "create_default_context", lambda **kwargs: object())
+    monkeypatch.setattr(owners.http.client, "HTTPSConnection", Connection)
+    uri = (f"/internal/tenants/{tenant}/migration-inputs/{application}/"
+           f"{environment}/{site}/1/{digest('review')}")
+    assert owners.request("INVENTORY", "GET", uri, schema_name="migration-input-v4") == produced
+    from planning.domain.model import Rejected
+    with pytest.raises(Rejected) as outdated:
+        owners.request("INVENTORY", "GET", uri, schema_name="migration-input-v3")
+    assert outdated.value.status == 503
+
