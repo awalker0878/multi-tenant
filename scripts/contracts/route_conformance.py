@@ -51,7 +51,7 @@ def compare_declared(spec: dict, runtime: set[tuple[str, str]], label: str) -> N
 
 
 def verify_app(app: str, runtime: set[tuple[str, str]], root: Path = ROOT) -> int:
-    if app not in {"governance", "catalogue"}:
+    if app not in {"governance", "catalogue", "assurance"}:
         raise ValueError(f"Unsupported Laravel service: {app}")
     registry = json.loads((root / "architecture/contract-consumers.json").read_text())
     releases = [
@@ -60,9 +60,28 @@ def verify_app(app: str, runtime: set[tuple[str, str]], root: Path = ROOT) -> in
     ]
     if not releases:
         raise ValueError(f"No active APIs registered for {app}")
+    declared = set()
     for row in releases:
         doc = json.loads((root / row["path"]).read_text())
         compare_declared(doc, runtime, row["path"])
+        declared |= routes_in_openapi(doc)
+    if app == "assurance":
+        # Explicit historical internal operations, not a blanket /internal
+        # exclusion. A new route must be registered in an active API release.
+        legacy_internal = {
+            ("POST", "/v1/tenants/{tenant}/migration-qualifications"),
+            ("POST", "/internal/tenants/{tenant}/qualification-checks"),
+            ("POST", "/internal/tenants/{tenant}/qualification-publications"),
+            ("POST", "/v1/tenants/{tenant}/planning-qualification-v2"),
+            ("POST", "/v1/tenants/{tenant}/planning-qualification"),
+        }
+        relevant = {(verb, path) for verb, path in runtime
+                    if path.startswith(("/v1/", "/internal/"))}
+        extra = relevant - declared - legacy_internal
+        if extra:
+            raise ValueError(f"Unregistered Assurance runtime operations: {sorted(extra)}")
+        if legacy_internal - relevant:
+            raise ValueError("Assurance historical API exception changed; register its release")
     return len(releases)
 
 
@@ -138,13 +157,140 @@ def verify_planning_migration(root: Path = ROOT) -> int:
     return len(declared)
 
 
+
+async def _exchange(app, path: str, method: str, headers, body: bytes = b""):
+    captured = []
+    async def receive():
+        return {"type": "http.request", "body": body, "more_body": False}
+    async def send(message):
+        captured.append(message)
+    await app({
+        "type": "http", "path": path, "method": method,
+        "headers": headers, "query_string": b"",
+    }, receive, send)
+    if len(captured) != 2:
+        raise ValueError(f"Incomplete ASGI response: {method} {path}")
+    return captured[0]["status"], json.loads(captured[1]["body"])
+
+
+def verify_lifecycle_native(root: Path = ROOT) -> int:
+    import asyncio
+    from jsonschema import Draft202012Validator, FormatChecker
+    from lifecycle.interfaces.native import NativeBoundaryApp
+
+    spec = json.loads((root / "contracts/openapi/lifecycle-migration-boundary-v2.json").read_text())
+    if routes_in_openapi(spec) != {("POST", "/internal/native-grants/checks")}:
+        raise ValueError("Lifecycle native-boundary OpenAPI operation changed")
+    request_schema = spec["components"]["schemas"]["BoundaryRequest"]
+    response_schema = spec["components"]["schemas"]["BoundaryReceipt"]
+    binding = {
+        **{k: SAMPLE_UUID for k in (
+            "tenant_id", "site_id", "resource_id", "job_id", "operation_id",
+            "attempt_id", "campaign_id", "executor_id", "epoch",
+            "custody_id", "project_id"
+        )},
+        **{k: "a" * 64 for k in (
+            "plan_digest", "operation_plan_sha256", "ownership_digest"
+        )},
+        "custody_generation": 1, "expires_at": 20,
+    }
+    grant = {
+        **{k: SAMPLE_UUID for k in (
+            "job_id", "operation_id", "attempt_id", "grant_id", "epoch", "executor_id"
+        )},
+        "schema_version": 2, "stage": "capture", "plan_sha256": "a" * 64,
+        "intent_digest": "b" * 64, "expires_at": 20, "native_binding": binding,
+    }
+    request = {"grant": grant, "boundary": "preflight"}
+    receipt = {
+        "binding_sha256": "a" * 64, "epoch": SAMPLE_UUID,
+        "boundary": "preflight", "allowed": True, "authority_use": "native_boundary",
+        "evaluated_at": 1, "expires_at": 20,
+    }
+    validator = FormatChecker()
+    Draft202012Validator(request_schema, format_checker=validator).validate(request)
+    Draft202012Validator(response_schema, format_checker=validator).validate(receipt)
+    calls = []
+    class Workflow:
+        def boundary(self, tenant, submitted, worker, boundary):
+            calls.append((tenant, submitted, worker, boundary))
+            return receipt
+
+    app = NativeBoundaryApp(
+        Workflow(), lambda token: (SAMPLE_UUID, SAMPLE_UUID)
+    )
+    headers = [(b"authorization", b"Bearer " + b"a" * 64),
+               (b"content-type", b"application/json")]
+    path = "/internal/native-grants/checks"
+    code, payload = asyncio.run(_exchange(
+        app, path, "POST", headers, json.dumps(request).encode()
+    ))
+    if code != 200 or payload != receipt or len(calls) != 1:
+        raise ValueError("Lifecycle native-boundary authorized response failed")
+    Draft202012Validator(response_schema, format_checker=validator).validate(payload)
+    invalid = {**request, "uncontracted_grant": True}
+    code, _ = asyncio.run(_exchange(
+        app, path, "POST", headers, json.dumps(invalid).encode()
+    ))
+    if code != 422 or len(calls) != 1:
+        raise ValueError("Lifecycle native-boundary accepted uncontracted input")
+    code, _ = asyncio.run(_exchange(app, path, "GET", headers))
+    if code != 404:
+        raise ValueError("Lifecycle native-boundary accepts uncontracted verb")
+    return 1
+
+
+def verify_planning_immutable(root: Path = ROOT) -> int:
+    import asyncio
+    from jsonschema import Draft202012Validator, FormatChecker
+    from planning.interfaces.planning import PlanningApp
+
+    spec = json.loads((root / "contracts/openapi/planning-immutable-plan-v1.1.json").read_text())
+    if routes_in_openapi(spec) != {("GET", "/v1/plans/{plan}/revisions/{revision}")}:
+        raise ValueError("Planning immutable-plan OpenAPI operation changed")
+    bound = {
+        "plan_id": SAMPLE_UUID, "revision": 1, "tenant_id": SAMPLE_UUID,
+        "action": "application.provision", "site_id": SAMPLE_UUID,
+        "environment": SAMPLE_UUID, "resource_id": SAMPLE_UUID,
+        "requested_by": SAMPLE_UUID, "executor_ids": [SAMPLE_UUID],
+        "valid_until": 20, "digest": "a" * 64,
+        "content_digest": "b" * 64, "canonicalization": "p05-json-v1",
+        "lane": "operational",
+    }
+    checked = []
+    class Authority:
+        def caller(self, credential, audience="console"):
+            if audience != "governance_reader":
+                raise ValueError("Incorrect immutable plan audience")
+            checked.append(credential)
+
+    class Planning:
+        def bound_plan(self, plan, revision):
+            if plan != SAMPLE_UUID or revision != 1:
+                raise ValueError("Wrong planning input binding")
+            return bound
+
+    app = PlanningApp(Planning(), Authority())
+    path = f"/v1/plans/{SAMPLE_UUID}/revisions/1"
+    headers = [(b"authorization", b"Bearer " + b"a" * 64)]
+    status, result = asyncio.run(_exchange(app, path, "GET", headers))
+    if status != 200 or result != bound or checked != ["a" * 64]:
+        raise ValueError("Planning immutable plan authorized response failed")
+    schema = spec["components"]["schemas"]["BoundPlan"]
+    Draft202012Validator(schema, format_checker=FormatChecker()).validate(result)
+    return 1
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--app", choices=["governance", "catalogue", "inventory", "planning-migration"], required=True)
+    parser.add_argument("--app", choices=["governance", "catalogue", "assurance", "inventory", "planning-migration", "lifecycle-native", "planning-immutable"], required=True)
     parser.add_argument("--routes", type=Path)
     args = parser.parse_args()
     if args.app == "inventory":
         count = verify_inventory()
+        print(json.dumps({"status": "PASS", "app": args.app, "runtime_operations": count}))
+    elif args.app in {"lifecycle-native", "planning-immutable"}:
+        count = verify_lifecycle_native() if args.app == "lifecycle-native" else verify_planning_immutable()
         print(json.dumps({"status": "PASS", "app": args.app, "runtime_operations": count}))
     elif args.app == "planning-migration":
         count = verify_planning_migration()
