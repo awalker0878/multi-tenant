@@ -434,7 +434,12 @@ def check_owner_operation_bindings():
     # definition, rather than a loose top-level object with untyped subtrees.
     current = load("contracts/schemas/planning/catalogue-current-v2.json")
     original = load("contracts/schemas/planning/catalogue-input-v1.json")
-    if current.get("$defs", {}).get("Intent") != original["components"]["schemas"]["Intent"]:
+    published = load("contracts/schemas/catalogue/intent-v1.json")
+    projected = current.get("$defs", {}).get("Intent")
+    source = original["components"]["schemas"]["Intent"]
+    keys = ("type", "additionalProperties", "properties", "required")
+    if (projected != source or
+            any(source.get(key) != published.get(key) for key in keys)):
         raise ValueError("Current Catalogue intent projection differs from its canonical source")
     Draft202012Validator.check_schema(current)
 
