@@ -220,3 +220,50 @@ def test_real_inventory_planning_response_validates_installed_strict_schema(
         owners.request("INVENTORY", "GET", uri, schema_name="migration-input-v3")
     assert outdated.value.status == 503
 
+    # The same native Inventory response must satisfy the published v1.2 API,
+    # the installed v4 schema, and the authenticated Inventory ASGI producer.
+    api = json.loads((ROOT / "contracts/openapi/inventory-native-input-v1.2.json").read_text())
+    route = next(iter(api["paths"].values()))["get"]
+    published = route["responses"]["200"]["content"]["application/json"]["schema"]
+    assert published == schema
+    assert not list(Draft202012Validator(published).iter_errors(produced))
+
+    import asyncio
+    from inventory.interfaces.planning import PlanningInputApp
+
+    monkeypatch.setattr(WorkloadProfiles, "planning", lambda self, *args: produced)
+    reader = PlanningInputApp(
+        discovery=None, authority=lambda *args: None,
+        native_authority=lambda *args: None,
+    )
+
+    async def exchange(app):
+        frames = []
+
+        async def receive():
+            return {"type": "http.request", "body": b"", "more_body": False}
+
+        async def send(message):
+            frames.append(message)
+
+        await app({
+            "type": "http", "method": "GET", "path": uri,
+            "query_string": b"", "headers": [
+                (b"authorization", b"Bearer " + b"a" * 64),
+            ],
+        }, receive, send)
+        return frames[0]["status"], json.loads(frames[1]["body"])
+
+    status, response = asyncio.run(exchange(reader))
+    assert status == 200
+    assert response == produced
+    assert not list(Draft202012Validator(published).iter_errors(response))
+
+    from inventory.domain.discovery import Rejected as InventoryRejected
+
+    def revoked(*args):
+        raise InventoryRejected("native_reader_revoked", 403)
+
+    reader.native_authority = revoked
+    assert asyncio.run(exchange(reader))[0] == 403
+
