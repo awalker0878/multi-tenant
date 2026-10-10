@@ -64,6 +64,10 @@
       "inventory",
       "planning"
     ],
+    "contracts/openapi/assurance-evidence-v1.json": [
+      "assurance",
+      "lifecycle-workers"
+    ],
     "contracts/openapi/catalogue-v1.0.1.json": [
       "catalogue",
       "console"
@@ -118,9 +122,18 @@
       "governance",
       "console"
     ],
+    "contracts/openapi/inventory-native-input-v1.2.json": [
+      "inventory",
+      "planning",
+      "lifecycle"
+    ],
     "contracts/openapi/inventory-v1.9.json": [
       "inventory",
       "console"
+    ],
+    "contracts/openapi/lifecycle-migration-boundary-v2.json": [
+      "lifecycle",
+      "lifecycle-workers"
     ],
     "contracts/openapi/lifecycle-migration-campaigns-v1.json": [
       "lifecycle",
@@ -133,6 +146,10 @@
     "contracts/openapi/lifecycle-v1.json": [
       "lifecycle",
       "console"
+    ],
+    "contracts/openapi/planning-immutable-plan-v1.1.json": [
+      "planning",
+      "governance"
     ],
     "contracts/openapi/planning-migration-v1.6.json": [
       "planning",
@@ -354,6 +371,16 @@
       "depends_on": []
     },
     {
+      "path": "contracts/openapi/assurance-evidence-v1.json",
+      "owner": "assurance",
+      "consumers": [
+        "lifecycle-workers"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
       "path": "contracts/openapi/catalogue-v1.0.1.json",
       "owner": "catalogue",
       "consumers": [
@@ -484,6 +511,17 @@
       "depends_on": []
     },
     {
+      "path": "contracts/openapi/inventory-native-input-v1.2.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
       "path": "contracts/openapi/inventory-v1.9.json",
       "owner": "inventory",
       "consumers": [
@@ -493,6 +531,16 @@
         "apps/console/resources/contracts/inventory-v1.9.json"
       ],
       "source_manifest": "contracts/source/openapi/inventory-v1.9/manifest.json",
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/lifecycle-migration-boundary-v2.json",
+      "owner": "lifecycle",
+      "consumers": [
+        "lifecycle-workers"
+      ],
+      "copies": [],
+      "source_manifest": null,
       "depends_on": []
     },
     {
@@ -528,6 +576,16 @@
       "copies": [
         "apps/console/resources/contracts/lifecycle-v1.json"
       ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/planning-immutable-plan-v1.1.json",
+      "owner": "planning",
+      "consumers": [
+        "governance"
+      ],
+      "copies": [],
       "source_manifest": null,
       "depends_on": []
     },

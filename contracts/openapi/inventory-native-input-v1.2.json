@@ -1,0 +1,1788 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Scoped native migration source reads",
+    "version": "1.2.0",
+    "description": "Current Inventory native migration read; response is the canonical Planning migration-input-v4 envelope."
+  },
+  "security": [
+    {
+      "WorkloadBearer": []
+    }
+  ],
+  "paths": {
+    "/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/{revision}/{digest}": {
+      "get": {
+        "operationId": "readNativeMigrationInput",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "application",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "site",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "path",
+            "name": "digest",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exact current confirmed review. Read-only; grants no native writes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "tenant_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "site_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "digest": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "method": {
+                      "enum": [
+                        "APPLICATION_REBUILD_RESTORE",
+                        "VM_SNAPSHOT_BASELINE_APP_DELTA",
+                        "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+                        "VM_COLD_EXPORT",
+                        "EXTERNAL_BLOCK_REPLICATION"
+                      ]
+                    },
+                    "source": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "profile_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "native_identity_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "tuple_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "observed_at": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "expires_at": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "profile_sha256",
+                        "native_identity_sha256",
+                        "tuple_sha256",
+                        "observed_at",
+                        "expires_at"
+                      ]
+                    },
+                    "target": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "profile_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "native_identity_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "tuple_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "observed_at": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "expires_at": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "profile_sha256",
+                        "native_identity_sha256",
+                        "tuple_sha256",
+                        "observed_at",
+                        "expires_at"
+                      ]
+                    },
+                    "datasets": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 240
+                          },
+                          "disk_keys": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 9007199254740991
+                            },
+                            "maxItems": 32,
+                            "minItems": 1,
+                            "uniqueItems": true
+                          },
+                          "mounts": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 240
+                            },
+                            "maxItems": 32,
+                            "minItems": 1
+                          },
+                          "consistency_group": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 240
+                          },
+                          "validation_reference": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 240
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "disk_keys",
+                          "mounts",
+                          "consistency_group",
+                          "validation_reference"
+                        ]
+                      },
+                      "maxItems": 256
+                    },
+                    "disks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "capacity_bytes": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "controller_key": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "unit_number": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "backing_chain": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "type": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "maxLength": 240
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "mode": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "maxLength": 240
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "identity_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{64}$"
+                                },
+                                "encrypted": {
+                                  "type": "boolean"
+                                },
+                                "datastore": {
+                                  "anyOf": [
+                                    {
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "maxLength": 240
+                                        },
+                                        "value": {
+                                          "type": "string",
+                                          "maxLength": 240
+                                        }
+                                      },
+                                      "required": [
+                                        "type",
+                                        "value"
+                                      ]
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "sharing": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "maxLength": 240
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "mode",
+                                "identity_sha256",
+                                "encrypted",
+                                "datastore",
+                                "sharing"
+                              ]
+                            },
+                            "maxItems": 32
+                          },
+                          "native_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "capacity_bytes",
+                          "controller_key",
+                          "unit_number",
+                          "backing_chain",
+                          "native_sha256"
+                        ]
+                      },
+                      "maxItems": 32
+                    },
+                    "owner_inputs": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "application_consistency": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 240
+                        },
+                        "dependencies": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 240
+                        },
+                        "guest_transformation_profile": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 240
+                        },
+                        "delta_protocol": {
+                          "type": "string",
+                          "minLength": 0,
+                          "maxLength": 240
+                        },
+                        "recovery_protocol": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 240
+                        },
+                        "service_and_policy_validation": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 240
+                        },
+                        "writer_fencing": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 240
+                        },
+                        "retention_and_cleanup": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 240
+                        }
+                      },
+                      "required": [
+                        "application_consistency",
+                        "dependencies",
+                        "guest_transformation_profile",
+                        "delta_protocol",
+                        "recovery_protocol",
+                        "service_and_policy_validation",
+                        "writer_fencing",
+                        "retention_and_cleanup"
+                      ]
+                    },
+                    "objectives": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "owner_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "acceptance_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "max_outage_seconds": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 31536000
+                        },
+                        "max_data_loss_bytes": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "owner_id",
+                        "acceptance_sha256",
+                        "max_outage_seconds",
+                        "max_data_loss_bytes"
+                      ]
+                    },
+                    "confirmed_by": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "current": {
+                      "const": true
+                    },
+                    "native_write_authorized": {
+                      "const": false
+                    },
+                    "target_disk_formats": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 30
+                    },
+                    "destination": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "platform": {
+                              "const": "ahv"
+                            },
+                            "project_id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "prism_central_id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "cluster_id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "vpc_id": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "storage_container_id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "category_ids": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "minItems": 1,
+                              "maxItems": 32
+                            },
+                            "policy_ids": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "minItems": 1,
+                              "maxItems": 32
+                            },
+                            "firmware": {
+                              "enum": [
+                                "bios",
+                                "efi"
+                              ]
+                            },
+                            "disks": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "source_key": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "index": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 31
+                                  }
+                                },
+                                "required": [
+                                  "source_key",
+                                  "index"
+                                ]
+                              },
+                              "minItems": 1,
+                              "maxItems": 32
+                            },
+                            "nics": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "source_key": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "quarantine_subnet_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                  },
+                                  "production_subnet_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                  }
+                                },
+                                "required": [
+                                  "source_key",
+                                  "quarantine_subnet_id",
+                                  "production_subnet_id"
+                                ]
+                              },
+                              "minItems": 0,
+                              "maxItems": 32
+                            }
+                          },
+                          "required": [
+                            "platform",
+                            "project_id",
+                            "prism_central_id",
+                            "cluster_id",
+                            "vpc_id",
+                            "storage_container_id",
+                            "category_ids",
+                            "policy_ids",
+                            "firmware",
+                            "disks",
+                            "nics"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "platform": {
+                              "const": "vmware"
+                            },
+                            "project_id": {
+                              "type": "string",
+                              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+                            },
+                            "vcenter_uuid": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 240
+                            },
+                            "folder_id": {
+                              "type": "string",
+                              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+                            },
+                            "resource_pool_id": {
+                              "type": "string",
+                              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+                            },
+                            "host_id": {
+                              "type": "string",
+                              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+                            },
+                            "datastore_id": {
+                              "type": "string",
+                              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+                            },
+                            "guest_id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 85
+                            },
+                            "hardware_version": {
+                              "type": "string",
+                              "pattern": "^vmx-[0-9]{2}$"
+                            },
+                            "firmware": {
+                              "enum": [
+                                "bios",
+                                "efi"
+                              ]
+                            },
+                            "disks": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "source_key": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "index": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 31
+                                  }
+                                },
+                                "required": [
+                                  "source_key",
+                                  "index"
+                                ]
+                              },
+                              "minItems": 1,
+                              "maxItems": 32
+                            },
+                            "nics": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "source_key": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "quarantine_network_id": {
+                                    "type": "string",
+                                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+                                  },
+                                  "production_network_id": {
+                                    "type": "string",
+                                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$"
+                                  }
+                                },
+                                "required": [
+                                  "source_key",
+                                  "quarantine_network_id",
+                                  "production_network_id"
+                                ]
+                              },
+                              "minItems": 0,
+                              "maxItems": 32
+                            }
+                          },
+                          "required": [
+                            "platform",
+                            "project_id",
+                            "vcenter_uuid",
+                            "folder_id",
+                            "resource_pool_id",
+                            "host_id",
+                            "datastore_id",
+                            "guest_id",
+                            "hardware_version",
+                            "firmware",
+                            "disks",
+                            "nics"
+                          ]
+                        }
+                      ]
+                    },
+                    "source_observation": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "source_identity_sha256",
+                        "generation_id",
+                        "profile_sha256",
+                        "installed_tuple_sha256",
+                        "installation_id",
+                        "native_scope",
+                        "current",
+                        "expires_at",
+                        "holds",
+                        "facts",
+                        "owner_dataset_coverage_current",
+                        "network_semantics_independently_verified",
+                        "native_write_authorized",
+                        "observation_sha256"
+                      ],
+                      "properties": {
+                        "source_identity_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "generation_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "profile_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "installed_tuple_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "installation_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "native_scope": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "current": {
+                          "type": "boolean"
+                        },
+                        "expires_at": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "holds": {
+                          "type": "array",
+                          "maxItems": 64,
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "facts": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "cpu",
+                            "memory_mb",
+                            "firmware",
+                            "secure_boot",
+                            "disks",
+                            "nics",
+                            "native"
+                          ],
+                          "properties": {
+                            "cpu": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ],
+                              "minimum": 1
+                            },
+                            "memory_mb": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ],
+                              "minimum": 1
+                            },
+                            "firmware": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "secure_boot": {
+                              "type": [
+                                "boolean",
+                                "null"
+                              ]
+                            },
+                            "disks": {
+                              "type": "array",
+                              "maxItems": 32,
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "key",
+                                  "capacity_bytes",
+                                  "controller_key",
+                                  "unit_number",
+                                  "native_role"
+                                ],
+                                "properties": {
+                                  "key": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "capacity_bytes": {
+                                    "type": [
+                                      "integer",
+                                      "null"
+                                    ],
+                                    "minimum": 0
+                                  },
+                                  "controller_key": {
+                                    "type": [
+                                      "integer",
+                                      "null"
+                                    ]
+                                  },
+                                  "unit_number": {
+                                    "type": [
+                                      "integer",
+                                      "null"
+                                    ]
+                                  },
+                                  "native_role": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ],
+                                    "maxLength": 200
+                                  }
+                                }
+                              }
+                            },
+                            "nics": {
+                              "type": "array",
+                              "maxItems": 32,
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "key"
+                                ],
+                                "properties": {
+                                  "key": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 9007199254740991
+                                  }
+                                }
+                              }
+                            },
+                            "native": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "identity"
+                              ],
+                              "properties": {
+                                "identity": {
+                                  "type": [
+                                    "object",
+                                    "null"
+                                  ]
+                                }
+                              }
+                            },
+                            "guest_id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "maxLength": 200
+                            },
+                            "architecture": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "maxLength": 200
+                            },
+                            "controllers": {
+                              "type": "array",
+                              "maxItems": 128,
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "key": {
+                                    "type": "integer"
+                                  },
+                                  "model": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ],
+                                    "maxLength": 200
+                                  },
+                                  "bus": {
+                                    "type": [
+                                      "integer",
+                                      "null"
+                                    ]
+                                  },
+                                  "sharing": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ],
+                                    "maxLength": 200
+                                  }
+                                },
+                                "required": [
+                                  "key",
+                                  "model",
+                                  "bus",
+                                  "sharing"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "observed_at": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ],
+                              "minimum": 0
+                            }
+                          }
+                        },
+                        "owner_dataset_coverage_current": {
+                          "const": false
+                        },
+                        "network_semantics_independently_verified": {
+                          "const": false
+                        },
+                        "native_write_authorized": {
+                          "const": false
+                        },
+                        "observation_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      }
+                    },
+                    "catalogue_binding": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": false,
+                      "required": [
+                        "application_id",
+                        "environment_id",
+                        "revision_id",
+                        "intent_sha256",
+                        "workload_id",
+                        "disk_mappings",
+                        "nic_mappings"
+                      ],
+                      "properties": {
+                        "application_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "environment_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "revision_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "intent_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "workload_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "disk_mappings": {
+                          "type": "array",
+                          "maxItems": 64,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "logical_device_id",
+                              "native_key"
+                            ],
+                            "properties": {
+                              "logical_device_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "native_key": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              }
+                            }
+                          }
+                        },
+                        "nic_mappings": {
+                          "type": "array",
+                          "maxItems": 32,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "logical_device_id",
+                              "native_key"
+                            ],
+                            "properties": {
+                              "logical_device_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "native_key": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              }
+                            }
+                          }
+                        },
+                        "disk_dispositions": {
+                          "type": "array",
+                          "maxItems": 32,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "logical_device_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "native_key": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "disposition": {
+                                "const": "uncatalogued_attested"
+                              },
+                              "owner_approval_sha256": {
+                                "type": "string",
+                                "pattern": "^[a-f0-9]{64}$"
+                              },
+                              "impact_sha256": {
+                                "type": "string",
+                                "pattern": "^[a-f0-9]{64}$"
+                              }
+                            },
+                            "required": [
+                              "logical_device_id",
+                              "native_key",
+                              "disposition",
+                              "owner_approval_sha256",
+                              "impact_sha256"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "source_associations": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "catalogue_binding",
+                          "source_observation",
+                          "source_binding",
+                          "datasets",
+                          "revision",
+                          "digest",
+                          "confirmed_by",
+                          "current"
+                        ],
+                        "properties": {
+                          "catalogue_binding": {
+                            "type": [
+                              "object",
+                              "null"
+                            ],
+                            "additionalProperties": false,
+                            "required": [
+                              "application_id",
+                              "environment_id",
+                              "revision_id",
+                              "intent_sha256",
+                              "workload_id",
+                              "disk_mappings",
+                              "nic_mappings"
+                            ],
+                            "properties": {
+                              "application_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "environment_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "revision_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "intent_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "workload_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "disk_mappings": {
+                                "type": "array",
+                                "maxItems": 64,
+                                "items": {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": [
+                                    "logical_device_id",
+                                    "native_key"
+                                  ],
+                                  "properties": {
+                                    "logical_device_id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "native_key": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 2147483647
+                                    }
+                                  }
+                                }
+                              },
+                              "nic_mappings": {
+                                "type": "array",
+                                "maxItems": 32,
+                                "items": {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": [
+                                    "logical_device_id",
+                                    "native_key"
+                                  ],
+                                  "properties": {
+                                    "logical_device_id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "native_key": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 2147483647
+                                    }
+                                  }
+                                }
+                              },
+                              "disk_dispositions": {
+                                "type": "array",
+                                "maxItems": 32,
+                                "items": {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "logical_device_id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "native_key": {
+                                      "type": "integer",
+                                      "minimum": 0
+                                    },
+                                    "disposition": {
+                                      "const": "uncatalogued_attested"
+                                    },
+                                    "owner_approval_sha256": {
+                                      "type": "string",
+                                      "pattern": "^[a-f0-9]{64}$"
+                                    },
+                                    "impact_sha256": {
+                                      "type": "string",
+                                      "pattern": "^[a-f0-9]{64}$"
+                                    }
+                                  },
+                                  "required": [
+                                    "logical_device_id",
+                                    "native_key",
+                                    "disposition",
+                                    "owner_approval_sha256",
+                                    "impact_sha256"
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          "source_observation": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "source_identity_sha256",
+                              "generation_id",
+                              "profile_sha256",
+                              "installed_tuple_sha256",
+                              "installation_id",
+                              "native_scope",
+                              "current",
+                              "expires_at",
+                              "holds",
+                              "facts",
+                              "owner_dataset_coverage_current",
+                              "network_semantics_independently_verified",
+                              "native_write_authorized",
+                              "observation_sha256"
+                            ],
+                            "properties": {
+                              "source_identity_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "generation_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "profile_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "installed_tuple_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "installation_id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "native_scope": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "current": {
+                                "type": "boolean"
+                              },
+                              "expires_at": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "holds": {
+                                "type": "array",
+                                "maxItems": 64,
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "facts": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "cpu",
+                                  "memory_mb",
+                                  "firmware",
+                                  "secure_boot",
+                                  "disks",
+                                  "nics",
+                                  "native"
+                                ],
+                                "properties": {
+                                  "cpu": {
+                                    "type": [
+                                      "integer",
+                                      "null"
+                                    ],
+                                    "minimum": 1
+                                  },
+                                  "memory_mb": {
+                                    "type": [
+                                      "integer",
+                                      "null"
+                                    ],
+                                    "minimum": 1
+                                  },
+                                  "firmware": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  },
+                                  "secure_boot": {
+                                    "type": [
+                                      "boolean",
+                                      "null"
+                                    ]
+                                  },
+                                  "disks": {
+                                    "type": "array",
+                                    "maxItems": 32,
+                                    "items": {
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "required": [
+                                        "key",
+                                        "capacity_bytes",
+                                        "controller_key",
+                                        "unit_number",
+                                        "native_role"
+                                      ],
+                                      "properties": {
+                                        "key": {
+                                          "type": "integer",
+                                          "minimum": 0,
+                                          "maximum": 9007199254740991
+                                        },
+                                        "capacity_bytes": {
+                                          "type": [
+                                            "integer",
+                                            "null"
+                                          ],
+                                          "minimum": 0
+                                        },
+                                        "controller_key": {
+                                          "type": [
+                                            "integer",
+                                            "null"
+                                          ]
+                                        },
+                                        "unit_number": {
+                                          "type": [
+                                            "integer",
+                                            "null"
+                                          ]
+                                        },
+                                        "native_role": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "maxLength": 200
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "nics": {
+                                    "type": "array",
+                                    "maxItems": 32,
+                                    "items": {
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "required": [
+                                        "key"
+                                      ],
+                                      "properties": {
+                                        "key": {
+                                          "type": "integer",
+                                          "minimum": 0,
+                                          "maximum": 9007199254740991
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "native": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                      "identity"
+                                    ],
+                                    "properties": {
+                                      "identity": {
+                                        "type": [
+                                          "object",
+                                          "null"
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  "guest_id": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ],
+                                    "maxLength": 200
+                                  },
+                                  "architecture": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ],
+                                    "maxLength": 200
+                                  },
+                                  "controllers": {
+                                    "type": "array",
+                                    "maxItems": 128,
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "key": {
+                                          "type": "integer"
+                                        },
+                                        "model": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "maxLength": 200
+                                        },
+                                        "bus": {
+                                          "type": [
+                                            "integer",
+                                            "null"
+                                          ]
+                                        },
+                                        "sharing": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "maxLength": 200
+                                        }
+                                      },
+                                      "required": [
+                                        "key",
+                                        "model",
+                                        "bus",
+                                        "sharing"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "observed_at": {
+                                    "type": [
+                                      "integer",
+                                      "null"
+                                    ],
+                                    "minimum": 0
+                                  }
+                                }
+                              },
+                              "owner_dataset_coverage_current": {
+                                "const": false
+                              },
+                              "network_semantics_independently_verified": {
+                                "const": false
+                              },
+                              "native_write_authorized": {
+                                "const": false
+                              },
+                              "observation_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            }
+                          },
+                          "source_binding": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "profile_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "native_identity_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "tuple_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "observed_at": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "expires_at": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              }
+                            },
+                            "required": [
+                              "profile_sha256",
+                              "native_identity_sha256",
+                              "tuple_sha256",
+                              "observed_at",
+                              "expires_at"
+                            ]
+                          },
+                          "datasets": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 240
+                                },
+                                "disk_keys": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "maxItems": 32,
+                                  "minItems": 1,
+                                  "uniqueItems": true
+                                },
+                                "mounts": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 240
+                                  },
+                                  "maxItems": 32,
+                                  "minItems": 1
+                                },
+                                "consistency_group": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 240
+                                },
+                                "validation_reference": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 240
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name",
+                                "disk_keys",
+                                "mounts",
+                                "consistency_group",
+                                "validation_reference"
+                              ]
+                            },
+                            "maxItems": 256
+                          },
+                          "revision": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "digest": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "confirmed_by": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "current": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "collection_coverages": {
+                      "type": "array",
+                      "minItems": 0,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "schema_version",
+                          "platform",
+                          "scope",
+                          "installation_id",
+                          "generation_id",
+                          "installed_tuple_sha256",
+                          "manifest_sha256",
+                          "evaluated_at",
+                          "status",
+                          "attributes",
+                          "holds",
+                          "independent_e3_e4_qualification",
+                          "native_write_authorized",
+                          "coverage_sha256",
+                          "expires_at"
+                        ],
+                        "properties": {
+                          "schema_version": {
+                            "const": 1
+                          },
+                          "platform": {
+                            "enum": [
+                              "vmware",
+                              "ahv",
+                              "openstack"
+                            ]
+                          },
+                          "scope": {
+                            "enum": [
+                              "source",
+                              "target",
+                              "owner"
+                            ]
+                          },
+                          "installation_id": {
+                            "type": "string"
+                          },
+                          "generation_id": {
+                            "type": "string"
+                          },
+                          "installed_tuple_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "manifest_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "evaluated_at": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "status": {
+                            "enum": [
+                              "complete",
+                              "held"
+                            ]
+                          },
+                          "attributes": {
+                            "type": "array",
+                            "maxItems": 256,
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "attribute_id",
+                                "status",
+                                "reason",
+                                "severity"
+                              ],
+                              "properties": {
+                                "attribute_id": {
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "observed",
+                                    "not_applicable",
+                                    "held"
+                                  ]
+                                },
+                                "reason": {
+                                  "type": "string"
+                                },
+                                "severity": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "holds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "independent_e3_e4_qualification": {
+                            "const": false
+                          },
+                          "native_write_authorized": {
+                            "const": false
+                          },
+                          "coverage_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "expires_at": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "tenant_id",
+                    "site_id",
+                    "revision",
+                    "digest",
+                    "method",
+                    "source",
+                    "target",
+                    "datasets",
+                    "disks",
+                    "owner_inputs",
+                    "objectives",
+                    "confirmed_by",
+                    "current",
+                    "native_write_authorized",
+                    "target_disk_formats"
+                  ],
+                  "$id": "urn:multi-tenant:planning:migration-input:v4"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope, credential or current read grant denied"
+          },
+          "409": {
+            "description": "Review changed or confirmation expired"
+          },
+          "423": {
+            "description": "Reader has not been commissioned"
+          },
+          "503": {
+            "description": "Owner unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "WorkloadBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {}
+  }
+}
