@@ -72,7 +72,7 @@ def current_workload_reconciliation(
         f"/internal/tenants/{scope['tenant_id']}/applications/"
         f"{scope['application_id']}/environments/{scope['environment_id']}"
         "/current-planning-intent",
-        schema_name="catalogue-current-v1",
+        schema_name="catalogue-current-v2",
     )
     if published["intent"]["environment"]["id"] != scope["environment_id"]:
         raise Rejected("catalogue_native_current_intent_scope_changed", 423)
