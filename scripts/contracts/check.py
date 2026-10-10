@@ -392,6 +392,54 @@ def check_consumer_registry():
     verify_runtime_inventory(registry, ROOT)
 
 
+
+def check_owner_operation_bindings():
+    """Enforce actual Planning owner-operation bindings independently of the registry.
+
+    This closes the loophole where the executable owner selects a JSON file via
+    importlib.resources dynamically and literal filename scanning sees nothing.
+    """
+    import runpy
+
+    module = ROOT / "services/planning/src/planning/infrastructure/owner_contracts.py"
+    operations = runpy.run_path(str(module))["OWNER_OPERATIONS"]
+    registry = load("architecture/contract-consumers.json")
+    releases = {entry["path"]: entry for entry in registry["active_releases"]}
+    required = {
+        ("CATALOGUE", "catalogue-input-v1"),
+        ("CATALOGUE", "catalogue-current-v2"),
+        ("INVENTORY", "inventory-input-v2"),
+        ("INVENTORY", "migration-input-v4"),
+        ("ASSURANCE", "qualification-v2.1"),
+        ("ASSURANCE", "migration-support-v2"),
+    }
+    present = set()
+    for owner, method, pattern, schema in operations:
+        if owner not in {"CATALOGUE", "INVENTORY", "ASSURANCE"} or method not in {"GET", "POST"}:
+            raise ValueError(f"Invalid owner operation: {owner}:{method}:{schema}")
+        re.compile(pattern)
+        present.add((owner, schema))
+        canonical = f"contracts/schemas/planning/{schema}.json"
+        installed = f"services/planning/src/planning/infrastructure/inputs/{schema}.json"
+        item = releases.get(canonical)
+        if (item is None or installed not in item.get("copies", [])
+                or "planning" not in item.get("consumers", [])
+                or item["owner"] != owner.lower()):
+            raise ValueError(f"Runtime owner-operation contract missing from registry: {canonical}")
+        if not (ROOT / installed).is_file() or (ROOT / canonical).read_bytes() != (ROOT / installed).read_bytes():
+            raise ValueError(f"Runtime owner-operation schema drift: {installed}")
+    if present != required:
+        raise ValueError(f"Owner operation binding incomplete: {sorted(required - present)}")
+    # The deployed current-intent v2 schema includes the exact published Intent
+    # definition, rather than a loose top-level object with untyped subtrees.
+    current = load("contracts/schemas/planning/catalogue-current-v2.json")
+    original = load("contracts/schemas/planning/catalogue-input-v1.json")
+    if current.get("$defs", {}).get("Intent") != original["components"]["schemas"]["Intent"]:
+        raise ValueError("Current Catalogue intent projection differs from its canonical source")
+    Draft202012Validator.check_schema(current)
+
+
+
 def main():
     sources, bundles = verify()
     id_count = unique_schema_ids()
@@ -410,6 +458,7 @@ def main():
     check_events()
     check_readiness_projection()
     check_consumer_registry()
+    check_owner_operation_bindings()
     print(json.dumps(dict(status="PASS", sources=sources, bundles=bundles, unique_ids=id_count, schema_count=schema_count, paths=paths, operations=ops)))
 
 if __name__ == "__main__":
