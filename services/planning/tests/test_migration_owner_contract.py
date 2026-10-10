@@ -15,10 +15,10 @@ from inventory.domain.migration_collection_coverage import evaluate
 
 def contracts():
     source = json.loads(
-        (ROOT / "contracts/schemas/planning/migration-input-v3.json").read_text()
+        (ROOT / "contracts/schemas/planning/migration-input-v4.json").read_text()
     )
     installed = json.loads(
-        (ROOT / "services/planning/src/planning/infrastructure/inputs/migration-input-v3.json").read_text()
+        (ROOT / "services/planning/src/planning/infrastructure/inputs/migration-input-v4.json").read_text()
     )
     assert source == installed, "Canonical Inventory response changed without updating installed Planning schema"
     return source
@@ -83,7 +83,7 @@ def test_stale_or_uninstalled_native_field_never_promotes_coverage():
 def test_real_inventory_planning_response_validates_installed_strict_schema(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Inventory's real Planning projection feeds Planning's exact packaged v3 validator."""
+    """Inventory's real Planning projection feeds Planning's exact packaged v4 validator."""
     from contextlib import nullcontext
     from types import SimpleNamespace
     from uuid import uuid4
