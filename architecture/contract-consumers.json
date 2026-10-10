@@ -207,6 +207,18 @@
     "contracts/schemas/expansion/tranche-v1.1.json": [
       "planning"
     ],
+    "contracts/schemas/planning/catalogue-current-v2.json": [
+      "catalogue",
+      "planning"
+    ],
+    "contracts/schemas/planning/catalogue-input-v1.json": [
+      "catalogue",
+      "planning"
+    ],
+    "contracts/schemas/planning/inventory-input-v2.json": [
+      "inventory",
+      "planning"
+    ],
     "contracts/schemas/planning/migration-input-v4.json": [
       "inventory",
       "planning"
@@ -657,7 +669,8 @@
         "planning"
       ],
       "copies": [
-        "services/catalogue/resources/contracts/foundation-event.json"
+        "services/catalogue/resources/contracts/foundation-event.json",
+        "services/planning/src/planning/infrastructure/messaging/foundation-event.json"
       ],
       "source_manifest": null,
       "depends_on": []
@@ -713,6 +726,42 @@
       "owner": "planning",
       "consumers": [],
       "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/catalogue-current-v2.json",
+      "owner": "catalogue",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/catalogue-current-v2.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/catalogue-input-v1.json",
+      "owner": "catalogue",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/catalogue-input-v1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/inventory-input-v2.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/inventory-input-v2.json"
+      ],
       "source_manifest": null,
       "depends_on": []
     },
@@ -773,7 +822,9 @@
         "planning",
         "lifecycle"
       ],
-      "copies": [],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/qualification-v2.1.json"
+      ],
       "source_manifest": null,
       "depends_on": []
     },
