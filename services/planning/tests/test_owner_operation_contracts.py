@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 import json
-from uuid import UUID
-from unittest.mock import Mock
 
 import pytest
 from jsonschema import Draft202012Validator, FormatChecker
@@ -112,3 +110,44 @@ def test_catalogue_current_v2_validates_nested_intent_not_only_envelope():
                "intent": {"workloads": "bad", "datasets": "bad",
                           "dependencies": "bad", "environment": {"id": ENV}}}
     assert list(validator.iter_errors(shallow))
+
+
+def test_catalogue_current_owner_response_uses_real_published_intent(monkeypatch):
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[3]
+    source = json.loads((root / "contracts/fixtures/catalogue/permit-desk-v1.json").read_text())
+    payload = {"revision_id": TENANT, "intent_sha256": SHA, "intent": source}
+    wire = [payload]
+
+    class Response:
+        status = 200
+        def read(self, n):
+            return json.dumps(wire[0]).encode()
+        def getheader(self, name, default=None):
+            return "identity"
+
+    class Connection:
+        def __init__(self, *args, **kwargs):
+            pass
+        def request(self, method, path, data, headers):
+            assert method == "GET" and path.endswith("/current-planning-intent")
+        def getresponse(self):
+            return Response()
+        def close(self):
+            pass
+
+    monkeypatch.setenv("CATALOGUE_URL", "https://catalogue.example")
+    monkeypatch.setenv("CATALOGUE_CA_FILE", "/tmp/ca.pem")
+    monkeypatch.setattr(owners, "mounted_secret", lambda _: "test-only-token")
+    monkeypatch.setattr(owners.ssl, "create_default_context", lambda **kwargs: object())
+    monkeypatch.setattr(owners.http.client, "HTTPSConnection", Connection)
+    path = (f"/internal/tenants/{TENANT}/applications/{APP}"
+            f"/environments/{ENV}/current-planning-intent")
+    assert owners.request("CATALOGUE", "GET", path, schema_name="catalogue-current-v2") == payload
+    wire[0] = {**payload, "intent": {**source, "workloads": "not-a-list"}}
+    with pytest.raises(Rejected) as invalid:
+        owners.request("CATALOGUE", "GET", path, schema_name="catalogue-current-v2")
+    assert invalid.value.status == 503
+    with pytest.raises(Rejected):
+        owners.request("CATALOGUE", "GET", path, schema_name="catalogue-current-v1")
