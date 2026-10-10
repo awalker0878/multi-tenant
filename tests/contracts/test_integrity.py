@@ -173,6 +173,44 @@ components:
             with self.assertRaisesRegex(ValueError, "Deployed AsyncAPI missing"):
                 check_consumer_registry()
 
+    def test_all_dynamic_owner_operations_resolve_to_active_copies(self):
+        from check import check_owner_operation_bindings
+        check_owner_operation_bindings()
+
+    def test_removing_dynamic_owner_contract_from_both_maps_fails(self):
+        from check import check_owner_operation_bindings
+        registry = load("architecture/contract-consumers.json")
+        source = "contracts/schemas/planning/catalogue-current-v2.json"
+        registry["contracts"].pop(source)
+        registry["active_releases"] = [
+            entry for entry in registry["active_releases"] if entry["path"] != source
+        ]
+        original = load
+        with patch("check.load", side_effect=lambda name:
+                   registry if name == "architecture/contract-consumers.json"
+                   else original(name)):
+            with self.assertRaisesRegex(ValueError, "owner-operation contract missing"):
+                check_owner_operation_bindings()
+
+    def test_catalogue_current_projection_cannot_diverge_from_source_intent(self):
+        from check import check_owner_operation_bindings
+        original = load
+        bad = load("contracts/schemas/planning/catalogue-current-v2.json")
+        bad["$defs"]["Intent"]["properties"]["workloads"] = {"type": "string"}
+        with patch("check.load", side_effect=lambda name:
+                   bad if name == "contracts/schemas/planning/catalogue-current-v2.json"
+                   else original(name)):
+            with self.assertRaisesRegex(ValueError, "intent projection differs"):
+                check_owner_operation_bindings()
+
+    def test_planning_event_copy_is_in_runtime_coverage(self):
+        from runtime_inventory import discover_runtime_copies
+        observed = discover_runtime_copies()
+        self.assertIn(
+            "services/planning/src/planning/infrastructure/messaging/foundation-event.json",
+            observed,
+        )
+
     def test_runtime_copies_cannot_disappear_from_both_registries(self):
         from runtime_inventory import verify_runtime_inventory
         registry = load("architecture/contract-consumers.json")
