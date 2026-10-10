@@ -63,7 +63,7 @@ def qualification_records(
             "tranche_sha256": digest(selected),
             "release_sha256": selected["release_sha256"],
         },
-        schema_name="migration-support-v1",
+        schema_name="migration-support-v2",
     )
     if (
         result["scope"] != scope
@@ -104,7 +104,7 @@ def api_capability_records(
             "tranche_sha256": digest(selected),
             "release_sha256": selected["release_sha256"],
         },
-        schema_name="migration-support-v1",
+        schema_name="migration-support-v2",
     )
     if (
         response["scope"] != scope
@@ -155,7 +155,7 @@ def current_application_flow_proof(
             "scope": scope, "tranche_sha256": digest(selected),
             "release_sha256": selected["release_sha256"],
         },
-        schema_name="migration-support-v1",
+        schema_name="migration-support-v2",
     )
     if (
         result["scope"] != scope
