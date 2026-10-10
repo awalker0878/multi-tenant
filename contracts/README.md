@@ -89,3 +89,33 @@ requires a new release; no previous wire version is silently rewritten.
 Do not equate these source-bound and synthetic conformance checks with live
 provider qualification, independent E3/E4 evidence or authority for native
 execution. Those gates remain separate and fail closed.
+
+## 2026-10-09 owner-operation contract remediation
+
+The Planning owner client no longer selects JSON Schema by a caller-defined
+filename allowlist. `planning.infrastructure.owner_contracts` binds each
+authenticated upstream owner, HTTP method and exact route pattern to one
+installed response contract; unknown/mismatched operations fail closed before
+the network call. `scripts/contracts/check.py` independently verifies that
+**all six owner-response schema types** are registered and byte-identical to
+their installed copies, even though `importlib.resources` constructs the
+schema file path dynamically.
+
+Inventory migration-input requests use **v4**, including reconciliation and
+collection-coverage evidence. Assurance migration qualification requests use
+**v2**, including API and application-flow E4 evidence. Historical v3 and v1
+canonical schemas are retained, but are not accepted at these active owner
+operations. The Inventory producer fixture is additionally passed through the
+real Planning HTTPS owner-client validator, with an obsolete-version canary.
+
+`schemas/planning/catalogue-current-v2.json` is a new immutable internal
+Catalogue-current response contract. Its complete `$defs.Intent` is projected
+from `schemas/planning/catalogue-input-v1.json`, and CI prevents divergence.
+Planning consumes the installed v2 copy instead of the earlier shallow v1
+envelope. The existing v1 internal copy remains for historical reference.
+
+Planning's installed Catalogue foundation-event payload and Python package
+copies are included in consumer parity checks. Live route conformance also
+probes Inventory's separate authenticated Planning-input ASGI router.
+These checks do not by themselves establish successful live deployments,
+independent provider E4 qualification, or authorization for native execution.
