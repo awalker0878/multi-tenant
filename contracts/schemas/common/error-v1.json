@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://multi-tenant.invalid/contracts/common/error-v1",
+  "title": "Owner HTTP error envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [],
+  "properties": {
+    "error": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "message": {
+      "type": "string"
+    },
+    "errors": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "field": {
+      "type": "string"
+    }
+  },
+  "anyOf": [
+    {
+      "required": [
+        "error"
+      ]
+    },
+    {
+      "required": [
+        "message"
+      ]
+    }
+  ]
+}

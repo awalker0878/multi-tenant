@@ -1,0 +1,1923 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Assurance scoped qualification service operations",
+    "version": "1.0.0",
+    "description": "Read-only E2 support and independently verified E3/E4 qualification publication gates; publication does not itself confer native writes. Retired unversioned planning-qualification alias is absent."
+  },
+  "security": [
+    {
+      "WorkloadBearer": []
+    }
+  ],
+  "paths": {
+    "/v1/tenants/{tenant}/migration-qualifications": {
+      "post": {
+        "operationId": "readAssuranceMigrationQualification",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "scope",
+                  "tranche_sha256",
+                  "release_sha256"
+                ],
+                "properties": {
+                  "scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "resource_id",
+                      "environment"
+                    ],
+                    "properties": {
+                      "tenant_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "resource_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "environment": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      }
+                    }
+                  },
+                  "tranche_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "release_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current bounded owner result, never a native-write grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationSupport"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "HTTP 422: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/tenants/{tenant}/qualification-checks": {
+      "post": {
+        "operationId": "readAssuranceCurrentQualification",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "qualification_scope"
+                ],
+                "properties": {
+                  "qualification_scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "endpoint_id",
+                      "native_scope",
+                      "installed_tuple",
+                      "action",
+                      "method",
+                      "profile_digest",
+                      "artifacts"
+                    ],
+                    "properties": {
+                      "tenant_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "endpoint_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "native_scope": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "installed_tuple": {
+                        "type": "object",
+                        "additionalProperties": true
+                      },
+                      "action": {
+                        "type": "string"
+                      },
+                      "method": {
+                        "type": "string"
+                      },
+                      "profile_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "artifacts": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current bounded owner result, never a native-write grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Qualification"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "HTTP 422: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/tenants/{tenant}/qualification-publications": {
+      "post": {
+        "operationId": "mutateAssuranceQualificationPublication",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "operation",
+                  "command_id",
+                  "expected_epoch",
+                  "reason",
+                  "qualification_scope"
+                ],
+                "properties": {
+                  "operation": {
+                    "enum": [
+                      "publish",
+                      "suspend",
+                      "revoke",
+                      "restore"
+                    ]
+                  },
+                  "command_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                  },
+                  "expected_epoch": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "qualification_scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "endpoint_id",
+                      "native_scope",
+                      "installed_tuple",
+                      "action",
+                      "method",
+                      "profile_digest",
+                      "artifacts"
+                    ],
+                    "properties": {
+                      "tenant_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "endpoint_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "native_scope": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "installed_tuple": {
+                        "type": "object",
+                        "additionalProperties": true
+                      },
+                      "action": {
+                        "type": "string"
+                      },
+                      "method": {
+                        "type": "string"
+                      },
+                      "profile_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "artifacts": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "bundle": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current bounded owner result, never a native-write grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationReceipt"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "HTTP 409: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "HTTP 413: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "HTTP 422: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "HTTP 423: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/planning-qualification-v2": {
+      "post": {
+        "operationId": "readAssurancePlanningQualificationV2",
+        "parameters": [
+          {
+            "name": "tenant",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "scope",
+                  "action",
+                  "qualification_scope"
+                ],
+                "properties": {
+                  "scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "site_id",
+                      "environment",
+                      "resource_id"
+                    ],
+                    "properties": {
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "environment": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "resource_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      }
+                    }
+                  },
+                  "action": {
+                    "enum": [
+                      "plan.read",
+                      "plan.create"
+                    ]
+                  },
+                  "qualification_scope": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "endpoint_id",
+                      "native_scope",
+                      "installed_tuple",
+                      "action",
+                      "method",
+                      "profile_digest",
+                      "artifacts"
+                    ],
+                    "properties": {
+                      "tenant_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "site_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "endpoint_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      "native_scope": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "installed_tuple": {
+                        "type": "object",
+                        "additionalProperties": true
+                      },
+                      "action": {
+                        "type": "string"
+                      },
+                      "method": {
+                        "type": "string"
+                      },
+                      "profile_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "artifacts": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current bounded owner result, never a native-write grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Qualification"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "HTTP 422: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "HTTP 503: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "WorkloadBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "MigrationSupport": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "scope",
+          "tranche_sha256",
+          "release_sha256",
+          "records",
+          "native_write_authorized"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": 1
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tenant_id",
+              "site_id",
+              "resource_id",
+              "environment"
+            ],
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              "site_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              }
+            }
+          },
+          "tranche_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "records": {
+            "type": "array",
+            "maxItems": 512,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "route_sha256",
+                "tranche_sha256",
+                "release_sha256",
+                "level",
+                "decision",
+                "revoked",
+                "expires_at",
+                "evidence_sha256"
+              ],
+              "properties": {
+                "route_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "tranche_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "release_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "level": {
+                  "enum": [
+                    "E0",
+                    "E1",
+                    "E2",
+                    "E3",
+                    "E4"
+                  ]
+                },
+                "decision": {
+                  "enum": [
+                    "accepted",
+                    "rejected",
+                    "not_reviewed"
+                  ]
+                },
+                "revoked": {
+                  "type": "boolean"
+                },
+                "expires_at": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "evidence_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            }
+          },
+          "native_write_authorized": {
+            "const": false
+          },
+          "api_evidence": {
+            "type": "object",
+            "maxProperties": 512,
+            "propertyNames": {
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "route_sha256",
+                "environments",
+                "observations",
+                "omissions"
+              ],
+              "properties": {
+                "route_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "environments": {
+                  "type": "object"
+                },
+                "observations": {
+                  "type": "array",
+                  "maxItems": 512
+                },
+                "omissions": {
+                  "type": "array",
+                  "maxItems": 64
+                }
+              }
+            }
+          },
+          "flow_evidence": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "schema_version": {
+                    "const": 1
+                  },
+                  "assessment_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                  },
+                  "source_revision_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                  },
+                  "source_intent_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "context_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "selections_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "destination_generation_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                  },
+                  "platform": {
+                    "enum": [
+                      "openstack",
+                      "vmware",
+                      "ahv"
+                    ]
+                  },
+                  "observed_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "expires_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "level": {
+                    "const": "E4"
+                  },
+                  "decision": {
+                    "const": "accepted"
+                  },
+                  "checks": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "native_controls": {
+                        "const": "passed"
+                      },
+                      "source_completeness": {
+                        "const": "passed"
+                      },
+                      "allowed_traffic": {
+                        "const": "passed"
+                      },
+                      "denied_traffic": {
+                        "const": "passed"
+                      },
+                      "return_path": {
+                        "const": "passed"
+                      },
+                      "tenant_isolation": {
+                        "const": "passed"
+                      },
+                      "application_validation": {
+                        "const": "passed"
+                      }
+                    },
+                    "required": [
+                      "native_controls",
+                      "source_completeness",
+                      "allowed_traffic",
+                      "denied_traffic",
+                      "return_path",
+                      "tenant_isolation",
+                      "application_validation"
+                    ]
+                  },
+                  "native_write_authorized": {
+                    "const": false
+                  },
+                  "native_controls_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "omissions_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "omissions_approved": {
+                    "type": "boolean"
+                  },
+                  "omission_approver_id": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "security_cases": {
+                    "type": "array",
+                    "maxItems": 512,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "source_flow_id": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "flow": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "from",
+                            "to",
+                            "protocol",
+                            "port"
+                          ],
+                          "properties": {
+                            "from": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "to": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "protocol": {
+                              "enum": [
+                                "tcp",
+                                "udp",
+                                "icmp"
+                              ]
+                            },
+                            "port": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ],
+                              "minimum": 0,
+                              "maximum": 65535
+                            }
+                          }
+                        },
+                        "document": {
+                          "type": "object",
+                          "required": [
+                            "schema_version",
+                            "platform",
+                            "native_api_qualified",
+                            "workloads",
+                            "paths",
+                            "path_probes",
+                            "boundary_scope",
+                            "boundary_probes",
+                            "api_profile",
+                            "policy_partition",
+                            "tenant_id",
+                            "native_scope",
+                            "rules_complete",
+                            "all_paths_observed",
+                            "path_set_sha256",
+                            "routing_generation_id"
+                          ],
+                          "properties": {
+                            "schema_version": {
+                              "const": 2
+                            },
+                            "platform": {
+                              "enum": [
+                                "vmware",
+                                "ahv",
+                                "openstack"
+                              ]
+                            },
+                            "native_api_qualified": {
+                              "const": true
+                            },
+                            "workloads": {
+                              "type": "object"
+                            },
+                            "paths": {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 16
+                            },
+                            "path_probes": {
+                              "type": "object"
+                            },
+                            "boundary_scope": {
+                              "type": "object"
+                            },
+                            "boundary_probes": {
+                              "type": "object"
+                            },
+                            "api_profile": {
+                              "type": "object",
+                              "required": [
+                                "namespace",
+                                "api_version",
+                                "qualified_features",
+                                "installed",
+                                "profile_sha256",
+                                "evidence_sha256",
+                                "verified"
+                              ],
+                              "properties": {
+                                "namespace": {
+                                  "enum": [
+                                    "nsx-policy",
+                                    "microseg",
+                                    "neutron"
+                                  ]
+                                },
+                                "api_version": {
+                                  "enum": [
+                                    "v1",
+                                    "v2.0",
+                                    "v4.2",
+                                    "v4.3"
+                                  ]
+                                },
+                                "qualified_features": {
+                                  "type": "object"
+                                },
+                                "installed": {
+                                  "type": "object"
+                                },
+                                "profile_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "evidence_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "verified": {
+                                  "const": true
+                                }
+                              }
+                            },
+                            "policy_partition": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "schema_version",
+                                "mode",
+                                "complete",
+                                "independently_verified",
+                                "observer",
+                                "universe_sha256",
+                                "native_rule_set_sha256",
+                                "uncovered_classes",
+                                "unbounded_wildcards",
+                                "class_ids",
+                                "permitted_class_ids",
+                                "partition_sha256"
+                              ],
+                              "properties": {
+                                "schema_version": {
+                                  "const": 1
+                                },
+                                "mode": {
+                                  "const": "disjoint_effective_rule_partition"
+                                },
+                                "complete": {
+                                  "const": true
+                                },
+                                "independently_verified": {
+                                  "const": true
+                                },
+                                "observer": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "universe_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "native_rule_set_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "uncovered_classes": {
+                                  "const": 0
+                                },
+                                "unbounded_wildcards": {
+                                  "const": false
+                                },
+                                "class_ids": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "maxItems": 1024,
+                                  "items": {
+                                    "type": "string",
+                                    "pattern": "^[a-f0-9]{64}$"
+                                  }
+                                },
+                                "permitted_class_ids": {
+                                  "type": "array",
+                                  "maxItems": 1024,
+                                  "items": {
+                                    "type": "string",
+                                    "pattern": "^[a-f0-9]{64}$"
+                                  }
+                                },
+                                "partition_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                }
+                              }
+                            },
+                            "tenant_id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "native_scope": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "rules_complete": {
+                              "const": true
+                            },
+                            "all_paths_observed": {
+                              "const": true
+                            },
+                            "path_set_sha256": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            },
+                            "routing_generation_id": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          }
+                        },
+                        "source_document": {
+                          "type": "object",
+                          "required": [
+                            "schema_version",
+                            "platform",
+                            "native_api_qualified",
+                            "workloads",
+                            "paths",
+                            "path_probes",
+                            "boundary_scope",
+                            "boundary_probes",
+                            "api_profile",
+                            "policy_partition",
+                            "tenant_id",
+                            "native_scope",
+                            "rules_complete",
+                            "all_paths_observed",
+                            "path_set_sha256",
+                            "routing_generation_id"
+                          ],
+                          "properties": {
+                            "schema_version": {
+                              "const": 2
+                            },
+                            "platform": {
+                              "enum": [
+                                "vmware",
+                                "ahv",
+                                "openstack"
+                              ]
+                            },
+                            "native_api_qualified": {
+                              "const": true
+                            },
+                            "workloads": {
+                              "type": "object"
+                            },
+                            "paths": {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 16
+                            },
+                            "path_probes": {
+                              "type": "object"
+                            },
+                            "boundary_scope": {
+                              "type": "object"
+                            },
+                            "boundary_probes": {
+                              "type": "object"
+                            },
+                            "api_profile": {
+                              "type": "object",
+                              "required": [
+                                "namespace",
+                                "api_version",
+                                "qualified_features",
+                                "installed",
+                                "profile_sha256",
+                                "evidence_sha256",
+                                "verified"
+                              ],
+                              "properties": {
+                                "namespace": {
+                                  "enum": [
+                                    "nsx-policy",
+                                    "microseg",
+                                    "neutron"
+                                  ]
+                                },
+                                "api_version": {
+                                  "enum": [
+                                    "v1",
+                                    "v2.0",
+                                    "v4.2",
+                                    "v4.3"
+                                  ]
+                                },
+                                "qualified_features": {
+                                  "type": "object"
+                                },
+                                "installed": {
+                                  "type": "object"
+                                },
+                                "profile_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "evidence_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "verified": {
+                                  "const": true
+                                }
+                              }
+                            },
+                            "policy_partition": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "schema_version",
+                                "mode",
+                                "complete",
+                                "independently_verified",
+                                "observer",
+                                "universe_sha256",
+                                "native_rule_set_sha256",
+                                "uncovered_classes",
+                                "unbounded_wildcards",
+                                "class_ids",
+                                "permitted_class_ids",
+                                "partition_sha256"
+                              ],
+                              "properties": {
+                                "schema_version": {
+                                  "const": 1
+                                },
+                                "mode": {
+                                  "const": "disjoint_effective_rule_partition"
+                                },
+                                "complete": {
+                                  "const": true
+                                },
+                                "independently_verified": {
+                                  "const": true
+                                },
+                                "observer": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "universe_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "native_rule_set_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "uncovered_classes": {
+                                  "const": 0
+                                },
+                                "unbounded_wildcards": {
+                                  "const": false
+                                },
+                                "class_ids": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "maxItems": 1024,
+                                  "items": {
+                                    "type": "string",
+                                    "pattern": "^[a-f0-9]{64}$"
+                                  }
+                                },
+                                "permitted_class_ids": {
+                                  "type": "array",
+                                  "maxItems": 1024,
+                                  "items": {
+                                    "type": "string",
+                                    "pattern": "^[a-f0-9]{64}$"
+                                  }
+                                },
+                                "partition_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                }
+                              }
+                            },
+                            "tenant_id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "native_scope": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "rules_complete": {
+                              "const": true
+                            },
+                            "all_paths_observed": {
+                              "const": true
+                            },
+                            "path_set_sha256": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            },
+                            "routing_generation_id": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          }
+                        },
+                        "boundary": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "schema_version",
+                            "complete",
+                            "workload_set_sha256",
+                            "classes"
+                          ],
+                          "properties": {
+                            "schema_version": {
+                              "const": 1
+                            },
+                            "complete": {
+                              "const": true
+                            },
+                            "workload_set_sha256": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            },
+                            "classes": {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 1024,
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "id",
+                                  "flow",
+                                  "requirement"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^[a-f0-9]{64}$"
+                                  },
+                                  "flow": {
+                                    "type": "object",
+                                    "required": [
+                                      "from",
+                                      "to",
+                                      "protocol",
+                                      "port"
+                                    ],
+                                    "properties": {
+                                      "from": {
+                                        "type": "string"
+                                      },
+                                      "to": {
+                                        "type": "string"
+                                      },
+                                      "protocol": {
+                                        "enum": [
+                                          "tcp",
+                                          "udp",
+                                          "icmp"
+                                        ]
+                                      },
+                                      "port": {
+                                        "type": [
+                                          "integer",
+                                          "null"
+                                        ],
+                                        "minimum": 0,
+                                        "maximum": 65535
+                                      },
+                                      "address_family": {
+                                        "enum": [
+                                          "ipv4",
+                                          "ipv6"
+                                        ]
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  },
+                                  "requirement": {
+                                    "enum": [
+                                      "required",
+                                      "forbidden",
+                                      "observed"
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "source_flow_id",
+                        "flow",
+                        "document",
+                        "source_document",
+                        "boundary"
+                      ]
+                    }
+                  },
+                  "source_platform": {
+                    "enum": [
+                      "vmware",
+                      "ahv",
+                      "openstack"
+                    ]
+                  },
+                  "source_profile_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "target_profile_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "migration_method": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "workload_interface_cases": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "workload_id",
+                        "source_profile_sha256",
+                        "target_profile_sha256",
+                        "logical_nics_sha256",
+                        "native_path_set_sha256",
+                        "allowed_probe_sha256",
+                        "denied_probe_sha256",
+                        "return_probe_sha256",
+                        "isolation_probe_sha256",
+                        "observed_at",
+                        "expires_at",
+                        "level",
+                        "decision",
+                        "revoked",
+                        "evidence_sha256"
+                      ],
+                      "properties": {
+                        "workload_id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                        },
+                        "source_profile_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "target_profile_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "logical_nics_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "native_path_set_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "allowed_probe_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "denied_probe_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "return_probe_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "isolation_probe_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "observed_at": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "expires_at": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "level": {
+                          "const": "E4"
+                        },
+                        "decision": {
+                          "const": "accepted"
+                        },
+                        "revoked": {
+                          "const": false
+                        },
+                        "evidence_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "assessment_id",
+                  "source_revision_id",
+                  "source_intent_sha256",
+                  "context_sha256",
+                  "selections_sha256",
+                  "destination_generation_id",
+                  "platform",
+                  "observed_at",
+                  "expires_at",
+                  "level",
+                  "decision",
+                  "checks",
+                  "native_write_authorized",
+                  "native_controls_sha256",
+                  "omissions_sha256",
+                  "omissions_approved",
+                  "omission_approver_id",
+                  "security_cases",
+                  "source_platform",
+                  "source_profile_sha256",
+                  "target_profile_sha256",
+                  "migration_method"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "$id": "urn:multi-tenant:planning:migration-support:v2"
+      },
+      "Qualification": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "const": 2,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "qualified",
+              "unknown",
+              "unsupported"
+            ]
+          },
+          "evidence_level": {
+            "enum": [
+              null,
+              "E0",
+              "E1",
+              "E2",
+              "E3",
+              "E4"
+            ]
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "revoked": {
+            "type": "boolean"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              "site_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              "endpoint_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              "native_scope": {
+                "type": "string"
+              },
+              "installed_tuple": {
+                "type": "object"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "application.provision",
+                  "application.migrate",
+                  "application.recover",
+                  "application.retire"
+                ]
+              },
+              "method": {
+                "type": "string"
+              },
+              "profile_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "artifacts": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "compiler": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "adapter": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "automation": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "contracts": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "compiler",
+                  "adapter",
+                  "automation",
+                  "contracts"
+                ]
+              }
+            },
+            "required": [
+              "tenant_id",
+              "site_id",
+              "endpoint_id",
+              "native_scope",
+              "installed_tuple",
+              "action",
+              "method",
+              "profile_digest",
+              "artifacts"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 1000
+          },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "installed_identity",
+                "compute_placement",
+                "storage_datasets",
+                "network_vpc",
+                "security_edge",
+                "guest_image",
+                "lifecycle_adoption",
+                "mobility",
+                "shared_services",
+                "resilience_operations",
+                "assurance_sovereignty"
+              ]
+            },
+            "maxItems": 1000
+          },
+          "capabilities": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "enum": [
+                    "observed",
+                    "supported",
+                    "unsupported",
+                    "unknown"
+                  ]
+                },
+                "expires_at": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "values": {
+                  "type": "array",
+                  "items": {},
+                  "maxItems": 1000
+                },
+                "dependencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 1000
+                }
+              },
+              "required": [
+                "status",
+                "expires_at",
+                "values",
+                "dependencies"
+              ]
+            },
+            "maxProperties": 1000
+          },
+          "verification": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "valid": {
+                    "const": true
+                  },
+                  "definition_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "decision_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "runtime_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "record_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "resolved_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "expires_at": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "acceptance_sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "authority_epoch": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "required": [
+                  "valid",
+                  "definition_sha256",
+                  "decision_sha256",
+                  "runtime_sha256",
+                  "record_sha256",
+                  "resolved_at",
+                  "expires_at"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "status",
+          "evidence_level",
+          "expires_at",
+          "revoked",
+          "scope",
+          "evidence_refs",
+          "dimensions",
+          "capabilities",
+          "verification"
+        ],
+        "$id": "urn:multi-tenant:qualification:v2.1",
+        "title": "Verified native qualification v2",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "qualified"
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "properties": {
+                "revoked": {
+                  "const": false
+                },
+                "verification": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PublicationReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scope_sha256",
+          "state",
+          "authority_epoch",
+          "decision_sha256",
+          "decision_revision"
+        ],
+        "properties": {
+          "scope_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "state": {
+            "type": "string"
+          },
+          "authority_epoch": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "decision_sha256": {
+            "type": "string"
+          },
+          "decision_revision": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "error": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "field": {
+            "type": "string"
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "error"
+            ]
+          },
+          {
+            "required": [
+              "message"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

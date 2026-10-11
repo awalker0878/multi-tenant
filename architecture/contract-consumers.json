@@ -68,6 +68,16 @@
       "assurance",
       "lifecycle-workers"
     ],
+    "contracts/openapi/assurance-qualification-v1.json": [
+      "assurance",
+      "planning",
+      "lifecycle"
+    ],
+    "contracts/openapi/catalogue-internal-v1.json": [
+      "catalogue",
+      "planning",
+      "lifecycle"
+    ],
     "contracts/openapi/catalogue-v1.0.1.json": [
       "catalogue",
       "console"
@@ -114,6 +124,14 @@
       "governance",
       "lifecycle"
     ],
+    "contracts/openapi/governance-service-checks-v1.json": [
+      "governance",
+      "catalogue",
+      "inventory",
+      "assurance",
+      "lifecycle",
+      "planning"
+    ],
     "contracts/openapi/governance-support-v1.json": [
       "governance",
       "console"
@@ -123,6 +141,11 @@
       "console"
     ],
     "contracts/openapi/inventory-native-input-v1.2.json": [
+      "inventory",
+      "planning",
+      "lifecycle"
+    ],
+    "contracts/openapi/inventory-native-input-v1.3.json": [
       "inventory",
       "planning",
       "lifecycle"
@@ -205,6 +228,15 @@
     "contracts/schemas/catalogue/intent-v1.json": [
       "catalogue",
       "planning"
+    ],
+    "contracts/schemas/common/error-v1.json": [
+      "contract-platform",
+      "catalogue",
+      "inventory",
+      "governance",
+      "assurance",
+      "planning",
+      "lifecycle"
     ],
     "contracts/schemas/events/catalogue-foundation-recorded-v1.json": [
       "catalogue",
@@ -385,6 +417,36 @@
       "depends_on": []
     },
     {
+      "path": "contracts/openapi/assurance-qualification-v1.json",
+      "owner": "assurance",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": [
+        "contracts/schemas/planning/qualification-v2.1.json",
+        "contracts/schemas/planning/migration-support-v2.json",
+        "contracts/schemas/common/error-v1.json"
+      ]
+    },
+    {
+      "path": "contracts/openapi/catalogue-internal-v1.json",
+      "owner": "catalogue",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": [
+        "contracts/schemas/planning/catalogue-current-v2.json",
+        "contracts/schemas/planning/catalogue-input-v1.json",
+        "contracts/schemas/common/error-v1.json"
+      ]
+    },
+    {
       "path": "contracts/openapi/catalogue-v1.0.1.json",
       "owner": "catalogue",
       "consumers": [
@@ -493,6 +555,22 @@
       "depends_on": []
     },
     {
+      "path": "contracts/openapi/governance-service-checks-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "catalogue",
+        "inventory",
+        "assurance",
+        "lifecycle",
+        "planning"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": [
+        "contracts/schemas/common/error-v1.json"
+      ]
+    },
+    {
       "path": "contracts/openapi/governance-support-v1.json",
       "owner": "governance",
       "consumers": [
@@ -524,6 +602,21 @@
       "copies": [],
       "source_manifest": null,
       "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/inventory-native-input-v1.3.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": [
+        "contracts/schemas/planning/inventory-input-v2.json",
+        "contracts/schemas/planning/migration-input-v4.json",
+        "contracts/schemas/common/error-v1.json"
+      ]
     },
     {
       "path": "contracts/openapi/inventory-v1.9.json",
@@ -733,6 +826,21 @@
       "copies": [
         "services/catalogue/resources/contracts/intent-v1.json"
       ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/common/error-v1.json",
+      "owner": "contract-platform",
+      "consumers": [
+        "catalogue",
+        "inventory",
+        "governance",
+        "assurance",
+        "planning",
+        "lifecycle"
+      ],
+      "copies": [],
       "source_manifest": null,
       "depends_on": []
     },
