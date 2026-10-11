@@ -38,6 +38,8 @@ from planning.interfaces.qualification_invalidations import QualificationInvalid
 from planning.interfaces.telemetry import RequestTelemetry
 
 
+MIGRATION_SUFFIXES = ("/migration-preparations", "/migration-plans", "/migration-plan-options", "/migration-support", "/migration-flow-choices", "/migration-flow-selections", "/migration-workload-readiness")
+
 class PlanningRouter:
     def __init__(self) -> None:
         def clock() -> int:
@@ -80,17 +82,7 @@ class PlanningRouter:
             await self.invalidations(scope, receive, send)
         elif scope["type"] == "http" and scope["path"].endswith("/native-plans"):
             await self.native(scope, receive, send)
-        elif scope["type"] == "http" and scope["path"].endswith(
-            (
-                "/migration-preparations",
-                "/migration-plans",
-                "/migration-plan-options",
-                "/migration-support",
-                "/migration-flow-choices",
-                "/migration-flow-selections",
-                "/migration-workload-readiness",
-            )
-        ):
+        elif scope["type"] == "http" and scope["path"].endswith(MIGRATION_SUFFIXES):
             await self.migration(scope, receive, send)
         elif scope["type"] == "http" and (
             scope["path"].startswith("/v1/")

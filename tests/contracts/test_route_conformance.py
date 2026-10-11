@@ -84,6 +84,15 @@ class HttpRouteConformanceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Undocumented Inventory worker"):
             compare_inventory_worker_routes(frozenset({"/internal/collections/claim", "/internal/collections/hidden"}), declared)
 
+    def test_planning_migration_suffix_catalogue_is_exact(self):
+        from planning.bootstrap.server import MIGRATION_SUFFIXES
+        from route_conformance import routes_in_openapi
+        api = json.loads((ROOT / "contracts/openapi/planning-migration-v1.6.json").read_text())
+        contracted = {"/" + path.rsplit("/", 1)[-1]
+                      for method, path in routes_in_openapi(api) if method == "POST"}
+        self.assertEqual(set(MIGRATION_SUFFIXES), contracted)
+        self.assertNotIn("/legacy-migration-inputs", MIGRATION_SUFFIXES)
+
     def test_declared_paths_include_each_method(self):
         spec = {"paths": {"/v1/example": {"get": {}, "post": {}}}}
         self.assertEqual(routes_in_openapi(spec), {

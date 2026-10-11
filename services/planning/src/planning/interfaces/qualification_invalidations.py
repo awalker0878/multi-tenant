@@ -29,6 +29,8 @@ class QualificationInvalidationApp:
         status = 503
         reply: dict[str, Any] = {"error": "qualification_invalidation_unavailable"}
         try:
+            if scope["path"] != "/internal/qualification-events":
+                raise Rejected("not_found", 404)
             if scope["method"] != "POST":
                 raise Rejected("method_not_allowed", 405)
             headers = list(scope["headers"])

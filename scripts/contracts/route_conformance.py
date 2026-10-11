@@ -318,6 +318,10 @@ def verify_planning_migration(root: Path = ROOT) -> int:
     app = MigrationPreparationApp(authority=None, prepare=lambda *args: {})
     spec = json.loads((root / "contracts/openapi/planning-migration-v1.6.json").read_text())
     declared = routes_in_openapi(spec)
+    from planning.bootstrap.server import MIGRATION_SUFFIXES
+    contracted = {"/" + path.rsplit("/", 1)[-1] for method, path in declared if method == "POST"}
+    if set(MIGRATION_SUFFIXES) != contracted:
+        raise ValueError(f"Undocumented Planning migration route: {sorted(set(MIGRATION_SUFFIXES) ^ contracted)}")
     for method, path in declared:
         status = asyncio.run(_probe_migration(app, synthetic_path(path), method))
         # Missing Authorization is rejected after successful route matching.
