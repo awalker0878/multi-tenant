@@ -35,6 +35,21 @@ class ContractIntegrityTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Owner error body not contracted"):
                 check()
 
+    def test_delegate_headers_and_native_digest_conflict_are_part_of_owner_contracts(self):
+        from check import check_implemented_api_contracts
+        check_implemented_api_contracts()
+        source = load("contracts/openapi/governance-service-checks-v1.json")
+        source["paths"]["/v1/tenants/{tenant}/planning-input-checks"]["post"]["parameters"] = [
+            p for p in source["paths"]["/v1/tenants/{tenant}/planning-input-checks"]["post"]["parameters"]
+            if p["in"] != "header"
+        ]
+        original = load
+        with patch("check.load", side_effect=lambda name:
+                   source if name == "contracts/openapi/governance-service-checks-v1.json"
+                   else original(name)):
+            with self.assertRaisesRegex(ValueError, "Missing delegated authority header"):
+                check_implemented_api_contracts()
+
     def test_sources_assemble_to_current_published_bundles(self):
         sources, bundles = verify()
         self.assertGreaterEqual(sources, 6)

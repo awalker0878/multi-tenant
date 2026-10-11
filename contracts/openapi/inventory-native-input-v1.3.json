@@ -1920,6 +1920,26 @@
               "format": "uuid",
               "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
             }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Action",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan.read",
+                "plan.create"
+              ]
+            }
           }
         ],
         "responses": {
@@ -2078,6 +2098,26 @@
               "type": "string",
               "format": "uuid",
               "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Action",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan.read",
+                "plan.create"
+              ]
             }
           }
         ],
@@ -2394,6 +2434,26 @@
             "schema": {
               "type": "string",
               "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Planning-Action",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan.read",
+                "plan.create"
+              ]
             }
           }
         ],

@@ -77,6 +77,16 @@
               }
             }
           },
+          "409": {
+            "description": "Bound-plan digest differs from its canonical binding",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "422": {
             "description": "HTTP 422: owner authorization, validation, current resource or dependency failure; no native grant",
             "content": {

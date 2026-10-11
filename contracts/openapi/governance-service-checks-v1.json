@@ -24,6 +24,15 @@
               "format": "uuid",
               "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
             }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
           }
         ],
         "requestBody": {
@@ -220,6 +229,16 @@
           },
           "404": {
             "description": "HTTP 404: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Bound-plan digest differs from its canonical binding",
             "content": {
               "application/json": {
                 "schema": {

@@ -66,11 +66,10 @@ def verify_app(app: str, runtime: set[tuple[str, str]], root: Path = ROOT) -> in
         compare_declared(doc, runtime, row["path"])
         declared |= routes_in_openapi(doc)
     # Every deployed v1/internal operation must be part of an active release.
-    # The historical exception set is empty: aliases cannot bypass the gate.
-    legacy_internal: set[tuple[str, str]] = set()
+    # Every deployed v1/internal operation must be declared; no aliases or exemptions.
     relevant = {(verb, path) for verb, path in runtime
                 if path.startswith(("/v1/", "/internal/"))}
-    extra = relevant - declared - legacy_internal
+    extra = relevant - declared
     if extra:
         raise ValueError(f"Undocumented {app} runtime operations: {sorted(extra)}")
     return len(releases)

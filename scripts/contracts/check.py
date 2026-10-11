@@ -558,12 +558,43 @@ def check_implemented_api_contracts():
     # independently exercise each branch before CI can be called exhaustive.
     for path, expected in {
         "contracts/openapi/governance-inventory-collection-v1.1.json": {"200", "401", "403", "422", "503"},
-        "contracts/openapi/governance-native-approval-v1.1.json": {"200", "401", "403", "404", "422", "503"},
+        "contracts/openapi/governance-native-approval-v1.1.json": {"200", "401", "403", "404", "409", "422", "503"},
     }.items():
         release = load(path)
         result = next(iter(release["paths"].values()))["post"]["responses"]
         if set(result) != expected:
             raise ValueError(f"Governance authority status drift: {path} {sorted(set(result) ^ expected)}")
+
+    # Assert headers that convey delegated actor and requested action. Bearer
+    # authentication alone is not a sufficient authority contract.
+    actor_headers = {
+        ("contracts/openapi/governance-service-checks-v1.json",
+         "/v1/tenants/{tenant}/planning-input-checks"): ("X-Actor-Delegation",),
+        ("contracts/openapi/catalogue-internal-v1.json",
+         "/v1/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{revision}"):
+            ("X-Actor-Delegation", "X-Planning-Action"),
+        ("contracts/openapi/assurance-qualification-v1.json",
+         "/v1/tenants/{tenant}/planning-qualification-v2"):
+            ("X-Actor-Delegation", "X-Planning-Action"),
+    }
+    for path in load("contracts/openapi/inventory-native-input-v1.3.json")["paths"]:
+        if path.startswith("/v1/"):
+            actor_headers[("contracts/openapi/inventory-native-input-v1.3.json", path)] = (
+                "X-Actor-Delegation", "X-Planning-Action")
+    for (release, endpoint), required in actor_headers.items():
+        operation = next(op for verb, op in load(release)["paths"][endpoint].items()
+                         if verb in {"get", "post"})
+        actual = {p["name"]: p for p in operation["parameters"] if p["in"] == "header"}
+        if any(name not in actual or actual[name].get("required") is not True for name in required):
+            raise ValueError(f"Missing delegated authority header contract: {release} {endpoint}")
+    for release, endpoint in (
+        ("contracts/openapi/governance-native-approval-v1.1.json",
+         "/v1/tenants/{tenant}/native-approval-checks"),
+        ("contracts/openapi/governance-service-checks-v1.json",
+         "/v1/tenants/{tenant}/execution-approval-checks"),
+    ):
+        if "409" not in load(release)["paths"][endpoint]["post"]["responses"]:
+            raise ValueError(f"Missing Governance bound-plan digest conflict: {release}")
 
     # The independent Inventory producer and packaged Planning consumer both
     # serve the canonical v4 envelope; a copy mismatch must fail even if the
