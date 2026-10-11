@@ -286,7 +286,9 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
         "target": {"profile_sha256": route["target"]["profile_sha256"]},
         "method": "VM_COLD_EXPORT",
     }
-    with pytest.raises(Rejected, match="api_capabilities_unresolved"):
+    # Admission is deliberately stricter than a route preview: absent
+    # commissioned workload evidence is a hold, even before API omissions.
+    with pytest.raises(Rejected, match="migration_workload_admission_not_commissioned"):
         support.require(actor, site, binding)
     owner["omissions"] = [{
         "capability_id": "network.firewall.cosmetic_rule",

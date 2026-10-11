@@ -375,7 +375,7 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     assert receipt["native_write_authorized"] is False
     validity = planner.validity(actor, saved, {SITE: "delegation"})
     assert validity["current"] is True
-    spec = json.loads((Path(__file__).with_name("fixtures") / "planning-v1.1.json").read_text())
+    spec = json.loads((Path(__file__).with_name("fixtures") / "planning-v1.2.json").read_text())
     Draft202012Validator(
         {"$ref": "#/components/schemas/Plan", "components": spec["components"]},
         format_checker=FormatChecker(),

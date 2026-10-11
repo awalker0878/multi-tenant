@@ -4,7 +4,7 @@ import asyncio
 import json
 from copy import deepcopy
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from unittest.mock import Mock
 from uuid import uuid4
 
@@ -334,10 +334,13 @@ def migration_http_exchange(
         messages.append(message)
 
     async def invoke() -> None:
-        await app({
+        from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
+
+        await app(cast(Scope, {
             "type": "http", "method": "POST", "path": path,
             "query_string": b"", "headers": headers,
-        }, receive, send)
+        }), cast(ASGIReceiveCallable, receive),
+            cast(ASGISendCallable, send))
 
     asyncio.run(invoke())
     assert len(messages) == 2
@@ -368,7 +371,7 @@ def test_workload_readiness_http_is_read_only_and_denies_browser_evidence() -> N
     ]
     locator = {"site_id": SITE, "review": {"revision": 1, "digest": "a" * 64}}
     assert migration_http_exchange(app, path, json.dumps(locator).encode(), headers)[0] == 200
-    assert authority.actor.call_args.args[4] == "plan.read"
+    assert authority.actor.call_args.args[3] == "plan.read"
     support.preview.assert_called_once()
     for injected in ({"native_write_authorized": True},
                      {"readiness": {"status": "eligible"}},
