@@ -103,16 +103,14 @@ schema file path dynamically.
 
 Inventory migration-input requests use **v4**, including reconciliation and
 collection-coverage evidence. Assurance migration qualification requests use
-**v2**, including API and application-flow E4 evidence. Historical v3 and v1
-canonical schemas are retained, but are not accepted at these active owner
-operations. The Inventory producer fixture is additionally passed through the
+**v2**, including API and application-flow E4 evidence. Superseded v3 and v1 migration-input schemas have been retired from the working tree; the active owner operations reject those versions. The Inventory producer fixture is additionally passed through the
 real Planning HTTPS owner-client validator, with an obsolete-version canary.
 
 `schemas/planning/catalogue-current-v2.json` is a new immutable internal
 Catalogue-current response contract. Its complete `$defs.Intent` is projected
 from `schemas/planning/catalogue-input-v1.json`, and CI prevents divergence.
 Planning consumes the installed v2 copy instead of the earlier shallow v1
-envelope. The existing v1 internal copy remains for historical reference.
+envelope. Older installed Catalogue-current consumer copies are removed rather than preserved as historical artifacts.
 
 Planning's installed Catalogue foundation-event payload and Python package
 copies are included in consumer parity checks. Live route conformance also
@@ -128,7 +126,7 @@ Inventory's native-read API is now published at
 published response, canonical v4 schema and Planning's installed v4 schema
 are identical. Inventory's real producer response is exercised through its
 authenticated ASGI route and compared with both the API and Planning consumer.
-The published native-input v1.1 schema is retained unchanged as historical.
+Previous native-input releases are available only through Git history.
 
 Assurance evidence v1, Lifecycle migration boundary v2 and Planning's immutable
 plan v1.1 are registered as active implemented OpenAPI releases. The required
@@ -166,15 +164,19 @@ removal from both registry maps a CI failure.
 
 ## 2026-10-11 authority-boundary OpenAPI additions (implemented, unverified)
 
-New active versioned releases are `catalogue-internal-v1`, `inventory-native-input-v1.3`, `governance-service-checks-v1`, and `assurance-qualification-v1`. These explicitly cover source owner reads, execution/Planning authority checks, and qualification operations. The unversioned Assurance `planning-qualification` alias has been removed; `planning-qualification-v2` is the supported route. The older `planning-inputs-v1/v2` aggregates and `inventory-native-input-v1.2` are historical and are not used as active owner-boundary coverage; the published bytes remain untouched.
+New active versioned releases are `catalogue-internal-v1`, `inventory-native-input-v1.3`, `governance-service-checks-v1`, and `assurance-qualification-v1`. These explicitly cover source owner reads, execution/Planning authority checks, and qualification operations. The unversioned Assurance `planning-qualification` alias has been removed; `planning-qualification-v2` is the supported route. The older `planning-inputs-v1/v2` aggregates and `inventory-native-input-v1.2` are removed from the working tree; historical content is recoverable in Git.
 
 The Laravel conformance job now checks both directions for **all** `/v1/` and `/internal/` operations, with no legacy exception set. Inventory native source operations are compared against their registered release and probed through the real ASGI object. Shared errors use `schemas/common/error-v1.json` and canonical lowercase UUIDs are enforced on new releases, with historical bytes frozen by the per-file allowlist. See `docs/contracts/adr-service-authority-errors-idempotency-2026-10-11.md` for implemented body and idempotency semantics. These controls do not establish live E3/E4 qualification, native write authority or an exact-head successful CI run.
 
 The two installed files `services/catalogue/resources/contracts/foundation-event.json` and `services/planning/src/planning/infrastructure/messaging/foundation-event.json` are **installed consumer names** of `contracts/schemas/events/catalogue-foundation-recorded-v1.json`; the active registry pins their byte parity. They are not separate unversioned wire publications and should only be renamed alongside a coordinated producer/consumer deployment.
 
-The separately versioned Governance collection and native approval status contracts `governance-inventory-collection-v1.1` and `governance-native-approval-v1.1` supersede their v1 active releases. The v1 artifacts remain historical on disk. New responses document explicit 401/403/404/422/503 as applicable, with the shared `common/error-v1` envelope; these are not native effect grants. Exact producer-status matrix verification remains outstanding until independently exercised and recorded.
+The separately versioned Governance collection and native approval status contracts `governance-inventory-collection-v1.1` and `governance-native-approval-v1.1` supersede their v1 active releases. The superseded v1 artifacts have been retired from the working tree. New responses document explicit 401/403/404/422/503 as applicable, with the shared `common/error-v1` envelope; these are not native effect grants. Exact producer-status matrix verification remains outstanding until independently exercised and recorded.
 
 
 ### Authority-contract audit remediation (2026-10-11)
 
 Current owner-boundary releases additionally include `inventory-collection-worker-v1` (four worker operations), `planning-qualification-events-v1` (independently authenticated Planning invalidations), `lifecycle-internal-authority-v1` (placement and E2-only simulation evidence), and an activated existing `planning-native-v1`. The broken unqualified Inventory internal Planning-input alias and P00 synthetic compatibility runtime/CI tooling were retired rather than shimmed. `inventory-native-input-v1.3` deduplicates its canonical v4 response schema. Owner schema projections must pass `python scripts/contracts/generate_authority_releases.py --check`, with candidate regenerated releases emitted outside published `contracts/` for explicit review. Modern authority releases use one shared error schema and strict UUID policy without historical compatibility allowlists. All new operations have reverse-route/authority checks; end-to-end producer status completeness and exact-head CI remain acceptance gates. No native-write authority is conferred.
+
+## Active-only contract cleanup
+
+Superseded versioned canonical releases and historical-only consumer bundles do not remain in the checkout. Retirement decisions are recorded in `architecture/retired-contract-releases.json`; Git history holds the old bytes. `inventory-input-v1.json` remains an **active current API component** because `inventory-native-input-v1.3` embeds its PlanningInput response and Planning installs it. The release registry enumerates that installed copy. Current native provisioning boundaries (`lifecycle-native-boundary-v1`, `worker-native-effect-v1`) remain until current independent safety coverage can replace them. The P07 generator that wrote the superseded `lifecycle-native-jobs-v1` contract was removed; the active job release is v1.1.

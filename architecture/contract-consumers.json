@@ -312,6 +312,10 @@
       "planning",
       "lifecycle-workers",
       "assurance"
+    ],
+    "contracts/schemas/planning/inventory-input-v1.json": [
+      "inventory",
+      "planning"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -620,6 +624,7 @@
       "copies": [],
       "source_manifest": null,
       "depends_on": [
+        "contracts/schemas/planning/inventory-input-v1.json",
         "contracts/schemas/planning/inventory-input-v2.json",
         "contracts/schemas/planning/migration-input-v4.json",
         "contracts/schemas/common/error-v1.json"
@@ -1065,6 +1070,18 @@
         "assurance"
       ],
       "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/inventory-input-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/inventory-input-v1.json"
+      ],
       "source_manifest": null,
       "depends_on": []
     }

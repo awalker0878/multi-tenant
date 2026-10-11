@@ -43,7 +43,7 @@ def main():
             stats[k] for k in ("skipped", "unexpected", "flaky")
         ), "Governance browser incomplete")
     final_source = result["campaigns"][0]["source_revision"]
-    for path in ("services/governance", "contracts/openapi/governance-native-approval-v1.json"):
+    for path in ("services/governance",):
         revisions = [subprocess.check_output(
             ["git", "rev-parse", revision + ":" + path], cwd=root
         ) for revision in (report["source_sha"], final_source)]
@@ -65,7 +65,7 @@ def main():
     result["correction"] = correction
     result["limitations"] = [
         "Real PostgreSQL, TLS and browsers; synthetic native platforms and custody/observation peers.",
-        "Governance evidence has a separate exact source; its service tree and native contract are unchanged at the final component source.",
+        "Governance evidence has a separate exact source; its service tree is unchanged at the final component source.",
         "Provider custody/fencing, owner-specific guest/data/service/recovery implementations, interrupted-transfer reconciliation and physical measurements remain open.",
         "No native Q05/Q06/Q07, G07/G08 receiving or operating acceptance.",
     ]

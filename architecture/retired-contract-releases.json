@@ -1,10 +1,11 @@
 {
   "schema_version": 1,
-  "decision": "Owner-authorized retirement of superseded contracts on 2026-10-11. Current active releases remain protected.",
+  "decision": "Owner-authorized retirement of superseded and unused contract artifacts; only current canonical releases and required installed copies remain in the working tree. Git preserves original publication history.",
   "retired": [
     "contracts/openapi/catalogue-v1.json",
     "contracts/openapi/governance-delegation-v1.json",
     "contracts/openapi/governance-inventory-collection-v1.json",
+    "contracts/openapi/governance-native-approval-v1.json",
     "contracts/openapi/inventory-native-input-v1.1.json",
     "contracts/openapi/inventory-native-input-v1.2.json",
     "contracts/openapi/inventory-native-input-v1.json",
@@ -17,6 +18,7 @@
     "contracts/openapi/inventory-v1.7.json",
     "contracts/openapi/inventory-v1.8.json",
     "contracts/openapi/inventory-v1.json",
+    "contracts/openapi/lifecycle-native-jobs-v1.json",
     "contracts/openapi/planning-immutable-plan-v1.json",
     "contracts/openapi/planning-inputs-v1.json",
     "contracts/openapi/planning-inputs-v2.json",
@@ -28,11 +30,16 @@
     "contracts/openapi/planning-migration-v1.json",
     "contracts/openapi/planning-v1.1.json",
     "contracts/openapi/planning-v1.json",
+    "contracts/openapi/worker-migration-effect-v2.json",
+    "contracts/schemas/capabilities/api-version-record-v1.json",
     "contracts/schemas/expansion/tranche-v1.json",
     "contracts/schemas/inventory/collection-page-v1.1.json",
     "contracts/schemas/inventory/collection-page-v1.2.json",
     "contracts/schemas/inventory/collection-page-v1.3.json",
     "contracts/schemas/inventory/collection-page-v1.json",
+    "contracts/schemas/inventory/fact-v1.json",
+    "contracts/schemas/planning/admission-record-v1.json",
+    "contracts/schemas/planning/content-v1.json",
     "contracts/schemas/planning/migration-input-v1.json",
     "contracts/schemas/planning/migration-input-v2.json",
     "contracts/schemas/planning/migration-input-v3.json",
@@ -41,6 +48,7 @@
     "contracts/schemas/planning/migration-readiness-v2.json",
     "contracts/schemas/planning/migration-support-v1.json",
     "contracts/schemas/planning/qualification-v1.json",
-    "contracts/schemas/planning/qualification-v2.json"
+    "contracts/schemas/planning/qualification-v2.json",
+    "contracts/schemas/planning/reservation-receipt-v1.json"
   ]
 }

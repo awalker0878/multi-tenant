@@ -48,8 +48,8 @@ print('Native effect contract: same exact provision grant; unsafe variants denie
 
 for filename, component, positive in (
     ('planning-native-v1.json', 'NativeProposal', {k: '10000000-0000-4000-8000-000000000001' for k in ('site_id', 'base_plan_id', 'recipe_id')}),
-    ('lifecycle-native-jobs-v1.json', 'PlanReference', {'plan_id': '10000000-0000-4000-8000-000000000001', 'approval_id': '10000000-0000-4000-8000-000000000002', 'plan_revision': 1, 'plan_digest': 'a' * 64}),
-    ('lifecycle-native-jobs-v1.json', 'Stop', {'expected_revision': 1}),
+    ('lifecycle-native-jobs-v1.1.json', 'PlanReference', {'plan_id': '10000000-0000-4000-8000-000000000001', 'approval_id': '10000000-0000-4000-8000-000000000002', 'plan_revision': 1, 'plan_digest': 'a' * 64}),
+    ('lifecycle-native-jobs-v1.1.json', 'Stop', {'expected_revision': 1}),
 ):
     product = json.loads((ROOT / 'contracts/openapi' / filename).read_text())
     validate_spec(product)

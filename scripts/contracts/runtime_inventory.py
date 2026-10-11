@@ -1,7 +1,7 @@
 """Discover deployed contract copies from executable code, independently of the registry.
 
-Historical copies are permitted only while not referenced by deployed source.
-This catches removal from *both* registry collections without trusting either.
+Every shipped JSON contract copy must be owned by one active canonical release.
+This catches stale packaged copies even when no executable source references them.
 """
 from __future__ import annotations
 
@@ -75,9 +75,14 @@ def verify_runtime_inventory(registry: dict, root: Path = ROOT) -> dict[str, lis
             if artifact in indexed:
                 raise ValueError(f"Runtime copy declared by multiple active releases: {artifact}")
             indexed[artifact] = release["path"]
+    shipped = {str(path.relative_to(root)) for path in deployed_copies(root)}
+    unregistered = shipped - indexed.keys()
+    if unregistered:
+        raise ValueError("Shipped contract copies missing from active releases: " + repr(sorted(unregistered)))
     missing = {path: sources for path, sources in observed.items() if path not in indexed}
     if missing:
         raise ValueError("Runtime contract copies missing from active releases: " + repr(missing))
+
     # Prevent a self-consistent but false registry entry from mapping a file
     # to an unrelated canonical release or silently dropping its producer.
     for artifact in observed:

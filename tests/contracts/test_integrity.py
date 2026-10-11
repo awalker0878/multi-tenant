@@ -157,7 +157,7 @@ class ContractIntegrityTests(unittest.TestCase):
         check_events()
 
     def test_all_schema_dialects_and_active_projections(self):
-        self.assertGreaterEqual(check_schema_dialects(), 40)
+        self.assertEqual(check_schema_dialects(), len(list((ROOT / "contracts/schemas").rglob("*.json"))))
         check_readiness_projection()
         check_consumer_registry()
 

@@ -95,16 +95,6 @@ def check_copies():
             if (ROOT / destination).read_bytes() != canonical:
                 raise ValueError(f"Packaged contract byte drift: {destination}")
 
-    # Historical canonical releases remain frozen, but these Console bundles
-    # have no current runtime/generator/compatibility-script consumer.
-    # Guard against accidentally reintroducing a stale duplicate copy.
-    for retired in (
-        "apps/console/resources/contracts/inventory-v1.7.json",
-        "apps/console/resources/contracts/inventory-v1.8.json",
-        "apps/console/resources/contracts/planning-migration-v1.4.json",
-    ):
-        if (ROOT / retired).exists():
-            raise ValueError(f"Retired consumer contract copy reintroduced: {retired}")
 
 def check_native_candidates():
     registry = load("contracts/capabilities/native-security-api-registry-v1.json")
@@ -253,16 +243,13 @@ def check_events():
 
 
 def check_schema_dialects():
-    """Validate every schema; only explicitly archived v1 releases may omit $id."""
+    """Validate all current schema releases; document the few pre-ID active formats."""
     archival_without_id = {
-        "capabilities/api-version-record-v1.json",
         "capabilities/migration-collection-manifest-v1.json",
         "capabilities/migration-feature-policy-v1.json",
         "capabilities/migration-field-crosswalk-v1.json",
         "events/catalogue-intent-v1.json",
-        "planning/admission-record-v1.json",
         "planning/catalogue-input-v1.json",
-        "planning/content-v1.json",
         "planning/fact-v1.json",
         "planning/inventory-input-v1.json",
         "planning/inventory-input-v2.json",
@@ -271,7 +258,6 @@ def check_schema_dialects():
         "planning/migration-input-v3.json",
         "planning/migration-support-v1.json",
         "planning/qualification-v1.json",
-        "planning/reservation-receipt-v1.json",
     }
     found = 0
     for path in sorted((ROOT / "contracts/schemas").rglob("*.json")):
@@ -343,7 +329,7 @@ def check_consumer_registry():
     if len(names) != len(set(names)):
         raise ValueError("Duplicate active contract release")
     # Each live service operation belongs to exactly one active versioned owner
-    # release. Historical superseded bundles stay in the tree but are not active.
+    # release; obsolete canonical bundles are removed from the working tree.
     seen_operations = {}
     for entry in releases:
         if not entry["path"].startswith("contracts/openapi/"):
