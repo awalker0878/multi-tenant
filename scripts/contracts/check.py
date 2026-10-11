@@ -478,6 +478,13 @@ def check_implemented_api_contracts():
             "planning",
             {("GET", "/v1/plans/{plan}/revisions/{revision}")},
         ),
+        "contracts/openapi/planning-lifecycle-reads-v1.json": (
+            "planning",
+            {
+                ("GET", "/v1/tenants/{tenant}/execution-plans/{plan}/revisions/{revision}"),
+                ("GET", "/internal/tenants/{tenant}/placement-proposals/{plan}/revisions/{revision}"),
+            },
+        ),
     }
     for path, (owner, operations) in required.items():
         release = release_by_path.get(path)
@@ -503,6 +510,43 @@ def check_implemented_api_contracts():
     if response != canonical or canonical != installed:
         raise ValueError("Inventory native-input v1.2 producer/consumer v4 schema mismatch")
     Draft202012Validator.check_schema(response)
+
+    # Internal Lifecycle reads derive their immutable binding and base content
+    # from published Planning v1.2. The embedded readiness contract is a
+    # relocation of v2.2 with only its local JSON references re-anchored.
+    api = load("contracts/openapi/planning-lifecycle-reads-v1.json")
+    schemas = api["components"]["schemas"]
+    published = load("contracts/openapi/planning-v1.2.json")["components"]["schemas"]
+    if schemas["BoundPlan"] != published["BoundPlan"]:
+        raise ValueError("Planning Lifecycle binding differs from canonical Planning binding")
+    baseline = published["Content"]
+    current = schemas["Content"]
+    if current.get("required") != baseline.get("required") or any(
+        current["properties"].get(key) != value
+        for key, value in baseline["properties"].items()
+    ):
+        raise ValueError("Planning Lifecycle content differs from canonical Planning content")
+    optional = set(current["properties"]) - set(baseline["properties"])
+    if optional != {"native_provisioning", "native_migration", "migration_campaign"}:
+        raise ValueError("Planning Lifecycle content extension list drift")
+    expected = load("contracts/schemas/planning/migration-readiness-v2.2.json")
+    expected.pop("$schema", None)
+    expected.pop("$id", None)
+    def relocate(node):
+        if isinstance(node, list):
+            for value in node:
+                relocate(value)
+        elif isinstance(node, dict):
+            ref = node.get("$ref")
+            if isinstance(ref, str) and ref.startswith("#/$defs/"):
+                node["$ref"] = ref.replace(
+                    "#/$defs/", "#/components/schemas/MigrationReadiness/$defs/", 1
+                )
+            for value in node.values():
+                relocate(value)
+    relocate(expected)
+    if schemas["MigrationReadiness"] != expected:
+        raise ValueError("Planning Lifecycle embedded migration readiness differs from v2.2")
 
 
 def main():

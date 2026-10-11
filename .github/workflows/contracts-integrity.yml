@@ -56,6 +56,7 @@ jobs:
           python scripts/contracts/route_conformance.py --app planning-migration
           python scripts/contracts/route_conformance.py --app lifecycle-native
           python scripts/contracts/route_conformance.py --app planning-immutable
+          python scripts/contracts/route_conformance.py --app planning-lifecycle
       - name: Validate real Planning and Lifecycle readiness producers and consumers
         env:
           PYTHONPATH: services/planning/src:services/lifecycle/src:services/inventory/src:services/planning/tests

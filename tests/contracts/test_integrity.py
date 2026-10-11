@@ -173,6 +173,22 @@ components:
             with self.assertRaisesRegex(ValueError, "Deployed AsyncAPI missing"):
                 check_consumer_registry()
 
+    def test_planning_lifecycle_contract_is_required_and_derived_from_producer(self):
+        from check import check_implemented_api_contracts
+        check_implemented_api_contracts()
+        registry = load("architecture/contract-consumers.json")
+        path = "contracts/openapi/planning-lifecycle-reads-v1.json"
+        registry["contracts"].pop(path)
+        registry["active_releases"] = [
+            row for row in registry["active_releases"] if row["path"] != path
+        ]
+        original = load
+        with patch("check.load", side_effect=lambda name:
+                   registry if name == "architecture/contract-consumers.json"
+                   else original(name)):
+            with self.assertRaisesRegex(ValueError, "Implemented OpenAPI release not registered"):
+                check_implemented_api_contracts()
+
     def test_implemented_openapi_release_and_v4_response_parity(self):
         from check import check_implemented_api_contracts
         check_implemented_api_contracts()

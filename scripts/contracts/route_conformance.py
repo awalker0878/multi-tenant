@@ -281,16 +281,100 @@ def verify_planning_immutable(root: Path = ROOT) -> int:
     return 1
 
 
+
+def verify_planning_lifecycle_reads(root: Path = ROOT) -> int:
+    """Run both current producer endpoints with authorized and rejected requests."""
+    import asyncio
+    from jsonschema import Draft202012Validator, FormatChecker
+    from planning.domain.model import Rejected
+    from planning.interfaces.planning import PlanningApp
+
+    spec = json.loads((root / "contracts/openapi/planning-lifecycle-reads-v1.json").read_text())
+    expected = {
+        ("GET", "/v1/tenants/{tenant}/execution-plans/{plan}/revisions/{revision}"),
+        ("GET", "/internal/tenants/{tenant}/placement-proposals/{plan}/revisions/{revision}"),
+    }
+    if routes_in_openapi(spec) != expected:
+        raise ValueError("Planning Lifecycle current read operations changed")
+    fixture = json.loads((root / "contracts/fixtures/planning/synthetic-plan-v1.1.json").read_text())
+    content, binding = fixture["content"], fixture["binding"]
+    execution = {"content": content, "binding": binding, "invalidated": False}
+    placement = {
+        "scope": content["scope"], "plan_id": binding["plan_id"],
+        "plan_revision": binding["revision"], "plan_digest": binding["digest"],
+        "generation_id": content["inventory_generation"],
+        "policy_sha256": "a" * 64, "placement_sha256": "b" * 64,
+        "allocations": [{
+            "workload_id": "workload-1", "pool_id": "pool-1",
+            "native_ref": "pool-native-id", "failure_domain": "domain-1",
+            "failure_group": "group-1",
+            "vector": {"vcpus": 2, "memory_mib": 2048, "storage_gib": 10,
+                       "addresses": 1, "storage_gib:gold": 10},
+            "ledger_revision": 1,
+        }],
+        "native_write_authorized": False,
+    }
+    validator = Draft202012Validator(
+        {"$ref": "#/components/schemas/ExecutionPlan", "components": spec["components"]},
+        format_checker=FormatChecker()
+    )
+    validator.validate(execution)
+    placement_validator = Draft202012Validator(
+        {"$ref": "#/components/schemas/PlacementProposal", "components": spec["components"]},
+        format_checker=FormatChecker()
+    )
+    placement_validator.validate(placement)
+    if validator.is_valid(execution | {"native_write_authorized": True}):
+        raise ValueError("Execution contract accepts additional native authority")
+    if placement_validator.is_valid(placement | {"native_write_authorized": True}):
+        raise ValueError("Placement contract accepted a write authorization flag")
+    calls = []
+    class Authority:
+        def caller(self, credential, audience="console"):
+            if audience != "lifecycle_reader" or credential != "a" * 64:
+                raise Rejected("not_authorized", 403)
+            calls.append(("authority", audience))
+    class Planning:
+        def execution_plan(self, tenant, plan, revision):
+            calls.append(("execution", tenant, plan, revision))
+            return execution
+        def placement_proposal(self, tenant, plan, revision):
+            calls.append(("placement", tenant, plan, revision))
+            return placement
+
+    app = PlanningApp(Planning(), Authority())
+    base = f"/v1/tenants/{content['scope']['tenant_id']}/execution-plans/{binding['plan_id']}/revisions/1"
+    internal = f"/internal/tenants/{content['scope']['tenant_id']}/placement-proposals/{binding['plan_id']}/revisions/1"
+    headers = [(b"authorization", b"Bearer " + b"a" * 64)]
+    for path, actual, validation in (
+        (base, execution, validator), (internal, placement, placement_validator)
+    ):
+        status, document = asyncio.run(_exchange(app, path, "GET", headers))
+        if status != 200 or document != actual:
+            raise ValueError(f"Planning Lifecycle authorized read failed: {path}")
+        validation.validate(document)
+        status, _ = asyncio.run(_exchange(
+            app, path, "GET", [(b"authorization", b"Bearer " + b"b" * 64)]
+        ))
+        if status != 403:
+            raise ValueError(f"Planning Lifecycle reader denied request unexpectedly succeeded: {path}")
+    if sum(1 for c in calls if c[0] == "authority") != 2:
+        raise ValueError("Planning Lifecycle authority was not checked on each read")
+    return 2
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--app", choices=["governance", "catalogue", "assurance", "inventory", "planning-migration", "lifecycle-native", "planning-immutable"], required=True)
+    parser.add_argument("--app", choices=["governance", "catalogue", "assurance", "inventory", "planning-migration", "lifecycle-native", "planning-immutable", "planning-lifecycle"], required=True)
     parser.add_argument("--routes", type=Path)
     args = parser.parse_args()
     if args.app == "inventory":
         count = verify_inventory()
         print(json.dumps({"status": "PASS", "app": args.app, "runtime_operations": count}))
-    elif args.app in {"lifecycle-native", "planning-immutable"}:
-        count = verify_lifecycle_native() if args.app == "lifecycle-native" else verify_planning_immutable()
+    elif args.app in {"lifecycle-native", "planning-immutable", "planning-lifecycle"}:
+        count = (verify_lifecycle_native() if args.app == "lifecycle-native"
+                 else verify_planning_immutable() if args.app == "planning-immutable"
+                 else verify_planning_lifecycle_reads())
         print(json.dumps({"status": "PASS", "app": args.app, "runtime_operations": count}))
     elif args.app == "planning-migration":
         count = verify_planning_migration()

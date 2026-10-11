@@ -148,3 +148,18 @@ Lifecycle's native-grant boundary and Planning's immutable plan. These are
 in addition to Inventory's concrete producer fixture and negative authority
 tests. They validate **transport and wire compatibility**, not independent
 production commissioning or a live provider migration.
+
+## 2026-10-11 Planning-to-Lifecycle read contracts
+
+`contracts/openapi/planning-lifecycle-reads-v1.json` is the active
+Lifecycle-only transport specification for current execution-plan reads and
+unreserved placement-proposal reads. Both enforce response envelopes and
+explicit immutable bindings; no native write permission is implied by a
+positive placement projection. Base content and immutable bindings derive from
+the published Planning v1.2 specification; the embedded readiness projection
+derives from canonical migration-readiness v2.2. Optional native/migration
+content extensions have explicit names, not an unbounded root envelope.
+
+The executable route probe checks both successful Lifecycle-authenticated reads,
+their wire shapes, and denied requests. Independent operation inventory makes
+removal from both registry maps a CI failure.
