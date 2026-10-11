@@ -97,6 +97,22 @@ class PublishedHistoryTests(unittest.TestCase):
         self.write(path, 'original\n')
         self.assertEqual(check(self.root, readded)['conflicts'], [])
 
+    def test_explicit_owner_retirement_cannot_include_active_releases(self):
+        import json
+        path = "contracts/example-v1.json"
+        self.write(path, '{"retired":true}\n')
+        published = self.commit("Publish historical release")
+        self.write("architecture/retired-contract-releases.json",
+                   json.dumps({"retired": [path]}))
+        self.write("architecture/contract-consumers.json",
+                   json.dumps({"active_releases": []}))
+        (self.root / path).unlink()
+        self.assertEqual(check(self.root, published)["retired"], [path])
+        self.write("architecture/contract-consumers.json",
+                   json.dumps({"active_releases": [{"path": path}]}))
+        with self.assertRaisesRegex(ValueError, "Active contract cannot be retired"):
+            check(self.root, published)
+
     def test_shallow_and_missing_parent_history_fail_explicitly(self):
         self.write('contracts/example-v1.json', '{}\n')
         published = self.commit('Publish v1')
