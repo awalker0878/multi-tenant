@@ -16,6 +16,10 @@ Check the updated `git rev-parse HEAD` and the
 [PR checks](https://github.com/awalker0878/multi-tenant/pull/64/checks)
 at every checkpoint.
 
+## CT-API-AUTH — Service authority-boundary contract coverage (2026-10-11)
+
+**Implemented, unverified.** The unversioned Assurance `planning-qualification` alias is removed in favour of the active `planning-qualification-v2` operation; the controller no longer rewrites its response to v1, and a negative route test guards retirement. The broader M0–M6 coverage plan is in progress. No exact-head green CI URL has been recorded; do not claim it verified or increase E2 evidence to E3/E4. This queue entry is updated before the contract ledger.
+
 ## CT-R01 — Resolved migration-readiness contract (2026-10-09 checkpoint)
 
 **Current branch work committed, not yet end-to-end verified.** See

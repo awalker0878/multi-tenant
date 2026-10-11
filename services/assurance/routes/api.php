@@ -23,8 +23,6 @@ Route::post('/internal/tenants/{tenant}/qualification-publications', Qualificati
 
 Route::post('/v1/tenants/{tenant}/planning-qualification-v2', PlanningQualificationController::class)->whereUuid('tenant');
 
-Route::post('/v1/tenants/{tenant}/planning-qualification', PlanningQualificationController::class)->whereUuid('tenant');
-
 Route::post('/v1/tenants/{tenant}/evidence-uploads', [EvidenceController::class, 'upload'])->whereUuid('tenant');
 Route::post('/v1/tenants/{tenant}/evidence-uploads/{evidence}/finalization', [EvidenceController::class, 'finalize'])->whereUuid(['tenant', 'evidence']);
 Route::get('/v1/tenants/{tenant}/evidence/{evidence}', [EvidenceController::class, 'show'])->whereUuid(['tenant', 'evidence']);

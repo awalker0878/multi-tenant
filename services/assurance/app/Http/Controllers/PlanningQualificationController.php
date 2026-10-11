@@ -21,10 +21,6 @@ final class PlanningQualificationController
         $authority->check($request->headers->all(), $tenant, $input['scope']);
         abort_unless(($input['qualification_scope']['tenant_id'] ?? null) === $tenant && ($input['qualification_scope']['site_id'] ?? null) === $input['scope']['site_id'], 403);
         $result = (new ResolveQualification)->handle($input['qualification_scope']);
-        if (! str_ends_with($request->path(), 'planning-qualification-v2')) {
-            unset($result['verification']);
-            $result['version'] = 1;
-        }
 
         return response()->json($result)->header('Cache-Control', 'no-store, private');
     }
