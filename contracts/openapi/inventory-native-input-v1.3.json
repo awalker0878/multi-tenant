@@ -1785,7 +1785,14 @@
             }
           },
           "403": {
-            "description": "Scope, credential or current read grant denied"
+            "description": "Scope, credential or current read grant denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "404": {
             "description": "HTTP 404: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
@@ -1798,7 +1805,14 @@
             }
           },
           "409": {
-            "description": "Review changed or confirmation expired"
+            "description": "Review changed or confirmation expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "413": {
             "description": "HTTP 413: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
@@ -1811,10 +1825,24 @@
             }
           },
           "423": {
-            "description": "Reader has not been commissioned"
+            "description": "Reader has not been commissioned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "503": {
-            "description": "Owner unavailable"
+            "description": "Owner unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -4189,7 +4217,14 @@
             }
           },
           "403": {
-            "description": "Scope, credential or current read grant denied"
+            "description": "Scope, credential or current read grant denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "404": {
             "description": "HTTP 404: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
@@ -4202,7 +4237,14 @@
             }
           },
           "409": {
-            "description": "Review changed or confirmation expired"
+            "description": "Review changed or confirmation expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "413": {
             "description": "HTTP 413: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
@@ -4215,10 +4257,24 @@
             }
           },
           "423": {
-            "description": "Reader has not been commissioned"
+            "description": "Reader has not been commissioned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "503": {
-            "description": "Owner unavailable"
+            "description": "Owner unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }

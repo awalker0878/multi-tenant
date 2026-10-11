@@ -638,12 +638,48 @@ def check_uuid_policy():
                     raise ValueError(f"New noncanonical UUID in {relative}: {pointer}")
             continue
         raw = path.read_bytes()
-        blob = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\\0" + raw).hexdigest()
+        blob = hashlib.sha1(b"blob " + str(len(raw)).encode() + bytes([0]) + raw)
         if legacy.get(relative) != blob:
             raise ValueError(f"New/changed noncanonical UUID in {relative}: {missing[:3]}")
     if not legacy_files.issubset({p.relative_to(ROOT).as_posix() for p in contract_files}):
         raise ValueError("Historical UUID allowance references missing contract")
     return violations
+
+
+
+def check_error_policy():
+    """New authority releases must use the exact common error envelope.
+
+    Existing published APIs are historical and are not mutated retroactively.
+    The schema allows the already-emitted {"error": "..."} and Laravel
+    {"message": "...", "errors": {...}} forms until a future reviewed version.
+    """
+    expected = load("contracts/schemas/common/error-v1.json")
+    for key in ("$schema", "$id", "title"):
+        expected.pop(key, None)
+    releases = (
+        "catalogue-internal-v1.json",
+        "inventory-native-input-v1.3.json",
+        "governance-service-checks-v1.json",
+        "assurance-qualification-v1.json",
+    )
+    for name in releases:
+        document = current = load("contracts/openapi/" + name)
+        if current["components"]["schemas"].get("Error") != expected:
+            raise ValueError(f"Shared owner error schema drift: {name}")
+        for endpoint, path_item in document["paths"].items():
+            for method, operation in path_item.items():
+                if method not in {"get", "post", "put", "patch", "delete"}:
+                    continue
+                for status, response in operation["responses"].items():
+                    if status.startswith("2"):
+                        continue
+                    schema = (response.get("content", {})
+                              .get("application/json", {}).get("schema"))
+                    if schema != {"$ref": "#/components/schemas/Error"}:
+                        raise ValueError(
+                            f"Owner error body not contracted: {name}:{method} {endpoint}:{status}"
+                        )
 
 
 def main():
@@ -667,6 +703,7 @@ def main():
     check_owner_operation_bindings()
     check_implemented_api_contracts()
     check_uuid_policy()
+    check_error_policy()
     print(json.dumps(dict(status="PASS", sources=sources, bundles=bundles, unique_ids=id_count, schema_count=schema_count, paths=paths, operations=ops)))
 
 if __name__ == "__main__":

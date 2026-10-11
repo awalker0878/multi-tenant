@@ -12,10 +12,21 @@ from build import assemble, verify
 from check import (
     check_consumer_registry, check_copies, check_events, check_readiness_projection,
     check_routes, check_schema_dialects, current_api, load, local_refs,
-    unique_schema_ids,
+    unique_schema_ids, check_error_policy,
 )
 
 class ContractIntegrityTests(unittest.TestCase):
+    def test_new_authority_releases_use_common_error(self):
+        check_error_policy()
+        from check import check_error_policy as check
+        from check import load as real_load
+        original = real_load("contracts/openapi/assurance-qualification-v1.json")
+        altered = json.loads(json.dumps(original))
+        altered["paths"]["/internal/tenants/{tenant}/qualification-publications"]["post"]["responses"]["409"].pop("content")
+        with patch("check.load", side_effect=lambda path: altered if path == "contracts/openapi/assurance-qualification-v1.json" else real_load(path)):
+            with self.assertRaisesRegex(ValueError, "Owner error body not contracted"):
+                check()
+
     def test_sources_assemble_to_current_published_bundles(self):
         sources, bundles = verify()
         self.assertGreaterEqual(sources, 6)

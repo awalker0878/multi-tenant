@@ -163,3 +163,9 @@ content extensions have explicit names, not an unbounded root envelope.
 The executable route probe checks both successful Lifecycle-authenticated reads,
 their wire shapes, and denied requests. Independent operation inventory makes
 removal from both registry maps a CI failure.
+
+## 2026-10-11 authority-boundary OpenAPI additions (implemented, unverified)
+
+New active versioned releases are `catalogue-internal-v1`, `inventory-native-input-v1.3`, `governance-service-checks-v1`, and `assurance-qualification-v1`. These explicitly cover source owner reads, execution/Planning authority checks, and qualification operations. The unversioned Assurance `planning-qualification` alias has been removed; `planning-qualification-v2` is the supported route. The older `planning-inputs-v1/v2` aggregates and `inventory-native-input-v1.2` are historical and are not used as active owner-boundary coverage; the published bytes remain untouched.
+
+The Laravel conformance job now checks both directions for **all** `/v1/` and `/internal/` operations, with no legacy exception set. Inventory native source operations are compared against their registered release and probed through the real ASGI object. Shared errors use `schemas/common/error-v1.json` and canonical lowercase UUIDs are enforced on new releases, with historical bytes frozen by the per-file allowlist. See `docs/contracts/adr-service-authority-errors-idempotency-2026-10-11.md` for implemented body and idempotency semantics. These controls do not establish live E3/E4 qualification, native write authority or an exact-head successful CI run.

@@ -1,6 +1,6 @@
 # Contract conventions and ownership
 
-Status: proposed product contract design for P00/P01. The examples in this document remain illustrative. A separate [P00 contract-tool experiment](../implementation/p00-contract-tooling-results.md) now executes synthetic OpenAPI and JSON Schema fixtures and generated PHP/Python/TypeScript clients; it defines no product API or AsyncAPI channel. Exact cardinalities, authentication delegation and canonicalization await ADR-009/012/013 decisions.
+Status: implemented versioned contract registry and consumer validation, with historical P00/P01 design discussion below. The active release catalogue is `architecture/contract-consumers.json`; executable contract checks are `scripts/contracts/check.py` and `scripts/contracts/route_conformance.py`. See [ADR: service authority errors and retries](adr-service-authority-errors-idempotency-2026-10-11.md) for decisions superseding earlier proposals.
 
 ## Where contracts will live
 
@@ -22,7 +22,8 @@ These paths are destinations to implement in P01.03, not evidence that the files
 - A tenant path/header is a selector. Validate the authenticated service, effective actor, delegation, audience and current action/resource scope independently. Never trust an `actor_id` supplied as an ordinary JSON field.
 - Return `Location` for created/accepted resources and an authorized status link for asynchronous work. Catalogue revision creation is synchronous; discovery/assessment tasks and lifecycle execution jobs have distinct typed IDs.
 - A completed assessment task yields an assessment; an execution job coordinates native operations. Only lifecycle owns native execution jobs. A `202` means accepted for processing, not successfully executed.
-- Require `Idempotency-Key` for commands whose safe retry matters. Scope it by tenant, effective principal, command and relevant parent resource. Persist its canonical payload binding and result with the command's domain mutation.
+- **Design objective, not a blanket current requirement:** require `Idempotency-Key` for commands whose safe retry matters only where the owning service contract actually implements it. Native-effect commands are explicitly excluded because their signed grant and effect journal provide the exactly-once admission boundary. See the per-operation decisions in the ADR. Scope it by tenant, effective principal, command and relevant parent resource. Persist its canonical payload binding and result with the command's domain mutation.
+- Historical proposal (not implemented across all services): Scope it by tenant, effective principal, command and relevant parent resource. Persist its canonical payload binding and result with the command's domain mutation.
 - After checking current caller access, an identical accepted retry returns the original command receipt/IDs without dispatching work again. Different canonical payload under the same key returns `409`. Record whether a request was accepted; transient pre-admission errors must not masquerade as an accepted receipt.
 - A duplicate still in acceptance processing returns a defined in-progress response and status reference when known. Do not start a second transaction path merely because the first response was lost. Exact response/header choices lock in P01.03.
 - For catalogue appends, `If-Match` explicitly names the current parent application ETag, even though the target is the revision collection. An accepted retry is recognized before comparing its now-stale ETag. A new command missing the precondition returns `428`; a mismatched precondition returns `412`.
@@ -33,7 +34,7 @@ Command-receipt retention must exceed the allowed retry window and preserve job/
 
 ## Error contract
 
-Use the proposed `application/problem+json` body with stable `type`, `code`, HTTP `status`, safe `detail`, `correlation_id`, `retryable` and optional scoped field errors or status reference. Callers branch on code, not English text. Never include secrets, SQL, internal stack traces or another tenant's identifiers.
+**Implemented service authority contract:** `contracts/schemas/common/error-v1.json` is the shared, versioned wire schema for newly published authority operations. Current Python owners emit `application/json` with `{"error":"snake_case_code"}`; custom Laravel denials often use the same shape, while framework errors can emit `{"message":"...","errors":{...}}`. These two implemented envelopes are documented; no `application/problem+json` endpoint migration is asserted. The earlier problem+json description was a **proposed future version**, not the current release. Clients branch on a stable snake_case `error` when present and on the documented HTTP status otherwise, never English prose. Do not expose secrets, SQL, internal stack traces or cross-tenant identifiers.
 
 | Response | Meaning / client action |
 | --- | --- |
