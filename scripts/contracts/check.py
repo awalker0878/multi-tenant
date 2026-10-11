@@ -647,7 +647,7 @@ def check_implemented_api_contracts():
             return [normalize_uuids(item) for item in node]
         if isinstance(node, dict):
             result = {key: normalize_uuids(value) for key, value in node.items()}
-            if result.get("format") == "uuid" and "pattern" not in result:
+            if result.get("format") == "uuid":
                 result["pattern"] = UUID_PATTERN
             return result
         return node
@@ -670,9 +670,9 @@ def check_implemented_api_contracts():
         if assurance_api["components"]["schemas"][embedded] != normalize_uuids(load(source)):
             raise ValueError(f"Assurance {embedded} canonical response schema drift")
     catalogue_api = load("contracts/openapi/catalogue-internal-v1.json")
-    if catalogue_api["components"]["schemas"]["PlanningInput"] != normalize_uuids(
-        load("contracts/schemas/planning/catalogue-input-v1.json")
-    ):
+    catalogue_input = normalize_uuids(load("contracts/schemas/planning/catalogue-input-v1.json"))
+    catalogue_input.pop("components", None)  # Source also carries standalone OpenAPI components.
+    if catalogue_api["components"]["schemas"]["PlanningInput"] != catalogue_input:
         raise ValueError("Catalogue PlanningInput canonical response schema drift")
 
     # Internal Lifecycle reads derive their immutable binding and base content
