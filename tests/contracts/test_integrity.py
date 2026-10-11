@@ -248,11 +248,22 @@ components:
         path = "contracts/openapi/inventory-native-input-v1.3.json"
         broken = original(path)
         endpoint = next(iter(broken["paths"].values()))["get"]
-        envelope = endpoint["responses"]["200"]["content"]["application/json"]["schema"]
+        envelope = broken["components"]["schemas"]["MigrationInput"]
         envelope["properties"].pop("collection_coverages")
         with patch("check.load", side_effect=lambda name:
                    broken if name == path else original(name)):
             with self.assertRaisesRegex(ValueError, "producer/consumer v4 schema mismatch"):
+                check_implemented_api_contracts()
+
+    def test_embedded_owner_schema_must_match_canonical_and_installed(self):
+        from check import check_implemented_api_contracts
+        original = load
+        path = "contracts/openapi/inventory-native-input-v1.3.json"
+        changed = load(path)
+        changed["components"]["schemas"]["CapabilityInput"]["properties"].pop("capability_snapshot")
+        with patch("check.load", side_effect=lambda name:
+                   changed if name == path else original(name)):
+            with self.assertRaisesRegex(ValueError, "Inventory native CapabilityInput"):
                 check_implemented_api_contracts()
 
     def test_all_dynamic_owner_operations_resolve_to_active_copies(self):

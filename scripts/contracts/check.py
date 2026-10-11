@@ -609,11 +609,15 @@ def check_implemented_api_contracts():
     # active registry and OpenAPI document are edited together.
     api = load("contracts/openapi/inventory-native-input-v1.3.json")
     endpoint = "/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/{revision}/{digest}"
-    response = api["paths"][endpoint]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
+    response = api["components"]["schemas"]["MigrationInput"]
     canonical = load("contracts/schemas/planning/migration-input-v4.json")
     installed = load("services/planning/src/planning/infrastructure/inputs/migration-input-v4.json")
     if response != canonical or canonical != installed:
         raise ValueError("Inventory native-input v1.3 producer/consumer v4 schema mismatch")
+    for prefix in ("internal", "v1"):
+        endpoint = f"/{prefix}/tenants/{{tenant}}/migration-inputs/{{application}}/{{environment}}/{{site}}/{{revision}}/{{digest}}"
+        if api["paths"][endpoint]["get"]["responses"]["200"]["content"]["application/json"]["schema"] != {"$ref": "#/components/schemas/MigrationInput"}:
+            raise ValueError(f"Inventory v1.3 migration schema reference drift: {endpoint}")
     Draft202012Validator.check_schema(response)
 
     # A schema embedded into OpenAPI must have its local definitions rebased.
@@ -634,6 +638,42 @@ def check_implemented_api_contracts():
     relocate_current(current)
     if embedded != current:
         raise ValueError("Catalogue current-v2 OpenAPI projection drift")
+
+    # Canonical producer -> active OpenAPI -> installed consumer parity.
+    # No release-specific reimplementation of a payload schema is authoritative.
+    # New HTTP releases constrain UUID syntax without changing source field sets.
+    def normalize_uuids(node):
+        if isinstance(node, list):
+            return [normalize_uuids(item) for item in node]
+        if isinstance(node, dict):
+            result = {key: normalize_uuids(value) for key, value in node.items()}
+            if result.get("format") == "uuid" and "pattern" not in result:
+                result["pattern"] = UUID_PATTERN
+            return result
+        return node
+
+    inv_api = load("contracts/openapi/inventory-native-input-v1.3.json")
+    for embedded, source, installed in (
+        ("PlanningInput", "contracts/schemas/planning/inventory-input-v1.json",
+         "services/planning/src/planning/infrastructure/inputs/inventory-input-v1.json"),
+        ("CapabilityInput", "contracts/schemas/planning/inventory-input-v2.json",
+         "services/planning/src/planning/infrastructure/inputs/inventory-input-v2.json"),
+    ):
+        reference = normalize_uuids(load(source))
+        if inv_api["components"]["schemas"][embedded] != reference or load(source) != load(installed):
+            raise ValueError(f"Inventory native {embedded} producer/consumer schema drift")
+    assurance_api = load("contracts/openapi/assurance-qualification-v1.json")
+    for embedded, source in (
+        ("Qualification", "contracts/schemas/planning/qualification-v2.1.json"),
+        ("MigrationSupport", "contracts/schemas/planning/migration-support-v2.json"),
+    ):
+        if assurance_api["components"]["schemas"][embedded] != normalize_uuids(load(source)):
+            raise ValueError(f"Assurance {embedded} canonical response schema drift")
+    catalogue_api = load("contracts/openapi/catalogue-internal-v1.json")
+    if catalogue_api["components"]["schemas"]["PlanningInput"] != normalize_uuids(
+        load("contracts/schemas/planning/catalogue-input-v1.json")
+    ):
+        raise ValueError("Catalogue PlanningInput canonical response schema drift")
 
     # Internal Lifecycle reads derive their immutable binding and base content
     # from published Planning v1.2. The embedded readiness contract is a
@@ -700,14 +740,11 @@ def check_uuid_policy():
     for name in releases:
         doc = load("contracts/openapi/" + name)
         if name == "inventory-native-input-v1.3.json":
-            for prefix in ("internal", "v1"):
-                path = f"/{prefix}/tenants/{{tenant}}/migration-inputs/{{application}}/{{environment}}/{{site}}/{{revision}}/{{digest}}"
-                response = doc["paths"][path]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
-                if response != canonical:
-                    raise ValueError(f"Canonical Inventory migration schema drift: {path}")
-                # Existing v4 migration payload is exact and immutable; validate
-                # it independently, not as a newly authored route declaration.
-                del doc["paths"][path]["get"]["responses"]["200"]
+            if doc["components"]["schemas"]["MigrationInput"] != canonical:
+                raise ValueError("Canonical Inventory migration component schema drift")
+            # Canonical v4 is independently pinned to the installed Planning
+            # consumer; don't impose newer URL-UUID rules on its embedded fields.
+            del doc["components"]["schemas"]["MigrationInput"]
         def visit(node, pointer=""):
             nonlocal violations
             if isinstance(node, list):
