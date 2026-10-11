@@ -1294,7 +1294,7 @@
             "pattern": "^[0-9a-f]{64}$"
           },
           "intent": {
-            "$ref": "#/$defs/Intent"
+            "$ref": "#/components/schemas/CurrentPlanningIntent/$defs/Intent"
           }
         },
         "$defs": {

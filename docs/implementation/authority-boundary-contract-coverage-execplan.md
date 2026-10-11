@@ -131,3 +131,7 @@ Python 3.12, PHP 8.5 and the service Composer lockfiles as specified in `.github
 ## Outcomes & Retrospective
 
 The engineering branch now has the missing owner release documents, an explicit retirement of the unversioned Assurance alias, active-release uniqueness protection, stricter two-direction Laravel coverage, Inventory route/status probes, shared error conventions, a historical UUID pin, and concrete retry semantics. The important remaining gaps are **exact-head test evidence, exhaustive real-producer response-status coverage, and full Python reverse route enumeration**, including worker-only internal routes. No native execution authority, E3 evidence or E4 acceptance has been created.
+
+### CI discovery: embedded Catalogue schema reference (2026-10-11)
+
+The earlier head `1acf83c0` had all three Laravel reverse-route jobs pass, but `scripts/contracts/check.py` failed before tests at `Invalid catalogue-internal-v1.json local $ref: #/$defs/Intent`. The producer's standalone `catalogue-current-v2` schema was embedded in OpenAPI with an absolute-to-schema-root reference. The new bundle now relocates that reference to `#/components/schemas/CurrentPlanningIntent/$defs/Intent`, and `check_implemented_api_contracts` asserts exact projection equality after relocation. The historical canonical schema remains unchanged. **The latest amended head still needs a fresh green run.**

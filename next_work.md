@@ -26,6 +26,8 @@ at every checkpoint.
 
 - 2026-10-11 additional boundary closeout: Governance collection/native approval status releases are now v1.1 (historical v1 retained), with explicit status canaries. Inventory discovery has a negative undocumented-route test. This remains **Implemented, unverified** without an exact-head green CI run or comprehensive per-status Laravel tests.
 
+- 2026-10-11 CI diagnostic: an earlier head's three Laravel route-conformance jobs passed, but integrity failed because Catalogue's embedded `#/$defs/Intent` reference was not rebased under OpenAPI components. The reference was relocated and an exact schema projection canary added. The corrected exact head is **unverified** pending a new CI run.
+
 ## CT-R01 — Resolved migration-readiness contract (2026-10-09 checkpoint)
 
 **Current branch work committed, not yet end-to-end verified.** See
