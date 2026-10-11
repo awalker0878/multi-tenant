@@ -63,12 +63,27 @@ def check(root: Path, base_revision: str) -> dict:
         published[path] = revisions[0]
         base[path] = git('show', revisions[0] + ':' + path)
     current = inventory(root)
+    # Product-approved contract retirement: only active releases are immutable
+    # going forward. Previously published versions deliberately retired by the
+    # owner are listed in an independent exact-path retirement manifest.
+    retirement_file = root / "architecture/retired-contract-releases.json"
+    retired = set(json.loads(retirement_file.read_text())["retired"]) if retirement_file.exists() else set()
+    active_file = root / "architecture/contract-consumers.json"
+    if active_file.exists():
+        registry = json.loads(active_file.read_text())
+        active = {row["path"] for row in registry["active_releases"]}
+        if retired & active:
+            raise ValueError("Active contract cannot be retired: " + ", ".join(sorted(retired & active)))
+        if any(not is_published_contract(path) for path in retired):
+            raise ValueError("Retirement manifest contains a non-contract path")
+    current = {path: body for path, body in current.items() if path not in retired}
+    base = {path: body for path, body in base.items() if path not in retired}
     conflicts = compare(base, current)
     report = {'base_revision': base_revision, 'policy': 'immutable-existing-contract-artifacts',
               'baseline': 'first-publication-on-base-first-parent-history',
               'published_revisions': published,
               'baseline_sha256': {p: hashlib.sha256(v).hexdigest() for p, v in base.items()},
-              'added': sorted(set(current) - set(base)), 'conflicts': conflicts}
+              'added': sorted(set(current) - set(base)), 'retired': sorted(retired), 'conflicts': conflicts}
     if conflicts:
         raise ValueError('Published contract removed or changed: ' + ', '.join(conflicts))
     return report
