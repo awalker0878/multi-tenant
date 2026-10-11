@@ -65,23 +65,14 @@ def verify_app(app: str, runtime: set[tuple[str, str]], root: Path = ROOT) -> in
         doc = json.loads((root / row["path"]).read_text())
         compare_declared(doc, runtime, row["path"])
         declared |= routes_in_openapi(doc)
-    if app == "assurance":
-        # Explicit historical internal operations, not a blanket /internal
-        # exclusion. A new route must be registered in an active API release.
-        legacy_internal = {
-            ("POST", "/v1/tenants/{tenant}/migration-qualifications"),
-            ("POST", "/internal/tenants/{tenant}/qualification-checks"),
-            ("POST", "/internal/tenants/{tenant}/qualification-publications"),
-            ("POST", "/v1/tenants/{tenant}/planning-qualification-v2"),
-            ("POST", "/v1/tenants/{tenant}/planning-qualification"),
-        }
-        relevant = {(verb, path) for verb, path in runtime
-                    if path.startswith(("/v1/", "/internal/"))}
-        extra = relevant - declared - legacy_internal
-        if extra:
-            raise ValueError(f"Unregistered Assurance runtime operations: {sorted(extra)}")
-        if legacy_internal - relevant:
-            raise ValueError("Assurance historical API exception changed; register its release")
+    # Every deployed v1/internal operation must be part of an active release.
+    # The historical exception set is empty: aliases cannot bypass the gate.
+    legacy_internal: set[tuple[str, str]] = set()
+    relevant = {(verb, path) for verb, path in runtime
+                if path.startswith(("/v1/", "/internal/"))}
+    extra = relevant - declared - legacy_internal
+    if extra:
+        raise ValueError(f"Undocumented {app} runtime operations: {sorted(extra)}")
     return len(releases)
 
 
@@ -98,27 +89,47 @@ def synthetic_path(path: str) -> str:
 def verify_inventory(root: Path = ROOT) -> int:
     from inventory.interfaces.discovery import ROUTES
     spec = json.loads((root / "contracts/openapi/inventory-v1.9.json").read_text())
-    missing = []
-    for method, path in routes_in_openapi(spec):
-        concrete = synthetic_path(path)
-        if not any(m == method and re.fullmatch(pattern, concrete) for m, pattern, _, _ in ROUTES):
-            missing.append((method, path))
-    if missing:
-        raise ValueError(f"Inventory OpenAPI operations without executable route matches: {sorted(missing)}")
+    # The executable Inventory discovery route table is the independent
+    # source of truth. A new route added to ROUTES cannot disappear merely
+    # because the OpenAPI and registry were edited together.
+    declared_discovery = routes_in_openapi(spec)
+    for method, pattern, _, _ in ROUTES:
+        matching = [(verb, path) for verb, path in declared_discovery
+                    if verb == method and re.fullmatch(pattern, synthetic_path(path))]
+        if len(matching) != 1:
+            raise ValueError(f"Undocumented Inventory discovery route: {method} {pattern}")
+    for method, path in declared_discovery:
+        if not any(m == method and re.fullmatch(pattern, synthetic_path(path))
+                   for m, pattern, _, _ in ROUTES):
+            raise ValueError(f"Inventory OpenAPI operation without executable route: {method} {path}")
 
-    # Inventory's PlanningInputApp is a distinct authenticated ASGI router.
-    # Probe it directly; discovery.ROUTES omits this internal producer entirely.
-    import asyncio
     from inventory.interfaces.planning import PlanningInputApp
+    import asyncio
+    owner_api = json.loads((root / "contracts/openapi/inventory-native-input-v1.3.json").read_text())
+    declared_owner = routes_in_openapi(owner_api)
+    expected_owner = {
+        (method, f"/{prefix}/tenants/{{tenant}}/{resource}/{{application}}/{{environment}}/{{site}}/{suffix}")
+        for method in ("GET",)
+        for prefix in ("internal", "v1")
+        for resource, suffix in (
+            ("migration-inputs", "{revision}/{digest}"),
+            ("planning-inputs", "{endpoint}/{generation}"),
+            ("planning-capability-inputs", "{endpoint}/{generation}"),
+        )
+    }
+    if declared_owner != expected_owner:
+        raise ValueError(f"Inventory PlanningInputApp contract omissions: {sorted(expected_owner ^ declared_owner)}")
     app = PlanningInputApp(discovery=None, authority=lambda *args: None)
-    tenant, application, environment, site = [SAMPLE_UUID] * 4
-    paths = (
-        f"/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/1/{'a' * 64}",
-        f"/v1/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/1/{'a' * 64}",
-        f"/internal/tenants/{tenant}/planning-capability-inputs/{application}/{environment}/{site}/{SAMPLE_UUID}/{SAMPLE_UUID}",
+    paths = sorted(
+        f"/{prefix}/tenants/{SAMPLE_UUID}/{resource}/{SAMPLE_UUID}/{SAMPLE_UUID}/{SAMPLE_UUID}/{suffix}"
+        for prefix in ("internal", "v1")
+        for resource, suffix in (
+            ("migration-inputs", f"1/{'a' * 64}"),
+            ("planning-inputs", f"{SAMPLE_UUID}/{SAMPLE_UUID}"),
+            ("planning-capability-inputs", f"{SAMPLE_UUID}/{SAMPLE_UUID}"),
+        )
     )
     for path in paths:
-        # Missing auth is 400 after matching; 404 means route/verb not matched.
         if asyncio.run(_probe_migration(app, path, "GET")) != 400:
             raise ValueError(f"Inventory owner-operation route unavailable: GET {path}")
         if asyncio.run(_probe_migration(app, path, "POST")) != 404:
@@ -136,7 +147,7 @@ def verify_inventory(root: Path = ROOT) -> int:
         discovery=None, authority=lambda *args: None,
         native_authority=native_reader,
     )
-    native_path = paths[0]
+    native_path = next(p for p in paths if p.startswith('/internal/') and '/migration-inputs/' in p)
     headers = [(b"authorization", b"Bearer " + b"a" * 64)]
     with patch.object(WorkloadProfiles, "planning",
                       lambda *args: {"native_write_authorized": False}):
@@ -149,7 +160,7 @@ def verify_inventory(root: Path = ROOT) -> int:
         status, _ = asyncio.run(_exchange(native_app, native_path, "GET", headers))
         if status != 403:
             raise ValueError("Inventory native reader accepted revoked authority")
-    return len(routes_in_openapi(spec)) + len(paths)
+    return len(declared_discovery) + len(declared_owner)
 
 
 async def _probe_migration(app, path: str, method: str) -> int:

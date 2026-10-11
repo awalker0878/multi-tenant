@@ -340,6 +340,11 @@ def check_consumer_registry():
     for source, consumers in {
         "contracts/openapi/assurance-evidence-v1.json": {"assurance"},
         "contracts/openapi/inventory-native-input-v1.2.json": {"inventory", "planning"},
+        "contracts/openapi/inventory-native-input-v1.3.json": {"inventory", "planning", "lifecycle"},
+        "contracts/openapi/catalogue-internal-v1.json": {"catalogue", "planning", "lifecycle"},
+        "contracts/openapi/governance-service-checks-v1.json": {"governance", "planning"},
+        "contracts/openapi/assurance-qualification-v1.json": {"assurance", "planning"},
+        "contracts/schemas/common/error-v1.json": {"contract-platform", "inventory", "governance", "catalogue", "assurance"},
         "contracts/openapi/lifecycle-migration-boundary-v2.json": {"lifecycle", "lifecycle-workers"},
         "contracts/openapi/planning-immutable-plan-v1.1.json": {"planning", "governance"},
         "contracts/openapi/catalogue-v1.0.1.json": {"catalogue", "console"},
@@ -470,6 +475,37 @@ def check_implemented_api_contracts():
             "inventory",
             {("GET", "/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/{revision}/{digest}")},
         ),
+        "contracts/openapi/catalogue-internal-v1.json": (
+            "catalogue", {
+                ("GET", "/v1/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{revision}"),
+                ("GET", "/internal/tenants/{tenant}/applications/{application}/environments/{environment}/current-planning-intent"),
+            },
+        ),
+        "contracts/openapi/inventory-native-input-v1.3.json": (
+            "inventory", {
+                ( "GET", f"/{prefix}/tenants/{{tenant}}/{resource}/{{application}}/{{environment}}/{{site}}/{suffix}")
+                for prefix in ("internal", "v1")
+                for resource, suffix in (
+                    ("migration-inputs", "{revision}/{digest}"),
+                    ("planning-inputs", "{endpoint}/{generation}"),
+                    ("planning-capability-inputs", "{endpoint}/{generation}"),
+                )
+            },
+        ),
+        "contracts/openapi/governance-service-checks-v1.json": (
+            "governance", {
+                ("POST", "/v1/tenants/{tenant}/planning-input-checks"),
+                ("POST", "/v1/tenants/{tenant}/execution-approval-checks"),
+            },
+        ),
+        "contracts/openapi/assurance-qualification-v1.json": (
+            "assurance", {
+                ("POST", "/v1/tenants/{tenant}/migration-qualifications"),
+                ("POST", "/internal/tenants/{tenant}/qualification-checks"),
+                ("POST", "/internal/tenants/{tenant}/qualification-publications"),
+                ("POST", "/v1/tenants/{tenant}/planning-qualification-v2"),
+            },
+        ),
         "contracts/openapi/lifecycle-migration-boundary-v2.json": (
             "lifecycle",
             {("POST", "/internal/native-grants/checks")},
@@ -502,13 +538,13 @@ def check_implemented_api_contracts():
     # The independent Inventory producer and packaged Planning consumer both
     # serve the canonical v4 envelope; a copy mismatch must fail even if the
     # active registry and OpenAPI document are edited together.
-    api = load("contracts/openapi/inventory-native-input-v1.2.json")
+    api = load("contracts/openapi/inventory-native-input-v1.3.json")
     endpoint = "/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/{revision}/{digest}"
     response = api["paths"][endpoint]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
     canonical = load("contracts/schemas/planning/migration-input-v4.json")
     installed = load("services/planning/src/planning/infrastructure/inputs/migration-input-v4.json")
     if response != canonical or canonical != installed:
-        raise ValueError("Inventory native-input v1.2 producer/consumer v4 schema mismatch")
+        raise ValueError("Inventory native-input v1.3 producer/consumer v4 schema mismatch")
     Draft202012Validator.check_schema(response)
 
     # Internal Lifecycle reads derive their immutable binding and base content

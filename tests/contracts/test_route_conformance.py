@@ -34,34 +34,40 @@ class HttpRouteConformanceTests(unittest.TestCase):
         }])
         self.assertEqual(actual, {("GET", "/v1/tenants/{tenant}/approvals/{approval}")})
 
-    def test_unregistered_assurance_runtime_operation_fails(self):
-        # Unregistered new routes must fail even if the central registry omits
-        # them entirely, while the exact pre-existing qualification exceptions
-        # remain visible and reviewable.
-        legacy = {
-            ("POST", "/v1/tenants/{tenant}/migration-qualifications"),
-            ("POST", "/internal/tenants/{tenant}/qualification-checks"),
-            ("POST", "/internal/tenants/{tenant}/qualification-publications"),
-            ("POST", "/v1/tenants/{tenant}/planning-qualification-v2"),
-            ("POST", "/v1/tenants/{tenant}/planning-qualification"),
-        }
-        spec_path = "contracts/openapi/assurance-evidence-v1.json"
-        spec = json.loads((ROOT / spec_path).read_text())
-        runtime = routes_in_openapi(spec) | legacy
+    def test_unregistered_runtime_operations_fail_in_every_laravel_owner(self):
+        for owner in ("governance", "catalogue", "assurance"):
+            with self.subTest(owner=owner), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                (root / "architecture").mkdir()
+                path = f"contracts/openapi/{owner}-test-v1.json"
+                target = root / path
+                target.parent.mkdir(parents=True)
+                route = ("GET", "/v1/tenants/{tenant}/current-owner-read")
+                doc = {"paths": {route[1]: {"get": {"operationId": "readCurrentOwner",
+                        "responses": {"200": {"description": "OK"}}}}}}
+                target.write_text(json.dumps(doc))
+                (root / "architecture/contract-consumers.json").write_text(json.dumps(
+                    {"active_releases": [{"path": path, "owner": owner}]}))
+                self.assertEqual(verify_app(owner, {route}, root), 1)
+                with self.assertRaisesRegex(ValueError, f"Undocumented {owner}"):
+                    verify_app(owner, {route, ("GET", "/internal/tenants/{tenant}/x")}, root)
+                with self.assertRaisesRegex(ValueError, f"Undocumented {owner}"):
+                    verify_app(owner, {route, ("POST", "/v1/tenants/{tenant}/surprise")}, root)
+
+    def test_retired_unversioned_qualification_alias_is_not_exempt(self):
+        spec = json.loads((ROOT / "contracts/openapi/assurance-qualification-v1.json").read_text())
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "architecture").mkdir()
-            target = root / spec_path
+            path = "contracts/openapi/assurance-qualification-v1.json"
+            target = root / path
             target.parent.mkdir(parents=True)
             target.write_text(json.dumps(spec))
-            (root / "architecture/contract-consumers.json").write_text(
-                json.dumps({"active_releases": [{"path": spec_path, "owner": "assurance"}]})
-            )
-            self.assertEqual(verify_app("assurance", runtime, root), 1)
-            with self.assertRaisesRegex(ValueError, "Unregistered Assurance"):
-                verify_app("assurance", runtime | {
-                    ("POST", "/v1/tenants/{tenant}/unpublished-custody")
-                }, root)
+            (root / "architecture/contract-consumers.json").write_text(json.dumps(
+                {"active_releases": [{"path": path, "owner": "assurance"}]}))
+            with self.assertRaisesRegex(ValueError, "Undocumented assurance"):
+                verify_app("assurance", routes_in_openapi(spec) | {
+                    ("POST", "/v1/tenants/{tenant}/planning-qualification")}, root)
 
     def test_declared_paths_include_each_method(self):
         spec = {"paths": {"/v1/example": {"get": {}, "post": {}}}}
