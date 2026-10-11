@@ -493,6 +493,20 @@ def check_implemented_api_contracts():
                 ("GET", "/internal/tenants/{tenant}/applications/{application}/environments/{environment}/current-planning-intent"),
             },
         ),
+        "contracts/openapi/planning-native-v1.json": (
+            "planning", {("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/native-plans")},
+        ),
+        "contracts/openapi/planning-qualification-events-v1.json": (
+            "planning", {("POST", "/internal/qualification-events")},
+        ),
+        "contracts/openapi/lifecycle-internal-authority-v1.json": (
+            "lifecycle", {
+                *{("POST", "/internal/tenants/{tenant}/placement-reservations/" + command)
+                  for command in ("reserve", "checks", "confirm", "renew", "release")},
+                ("GET", "/internal/evidence-bindings/{tenant}/{job}"),
+                ("POST", "/internal/simulation-grants/redemptions"),
+            },
+        ),
         "contracts/openapi/inventory-collection-worker-v1.json": (
             "inventory", {
                 ("POST", "/internal/collections/claim"),
@@ -730,6 +744,8 @@ def check_uuid_policy():
         "catalogue-internal-v1.json",
         "inventory-native-input-v1.3.json",
         "inventory-collection-worker-v1.json",
+        "planning-qualification-events-v1.json",
+        "lifecycle-internal-authority-v1.json",
         "governance-service-checks-v1.json",
         "assurance-qualification-v1.json",
         "governance-inventory-collection-v1.1.json",

@@ -297,6 +297,21 @@
     "contracts/openapi/inventory-collection-worker-v1.json": [
       "inventory",
       "inventory-workers"
+    ],
+    "contracts/openapi/planning-native-v1.json": [
+      "planning",
+      "lifecycle",
+      "console"
+    ],
+    "contracts/openapi/planning-qualification-events-v1.json": [
+      "planning",
+      "assurance"
+    ],
+    "contracts/openapi/lifecycle-internal-authority-v1.json": [
+      "lifecycle",
+      "planning",
+      "lifecycle-workers",
+      "assurance"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -1018,6 +1033,39 @@
       "owner": "inventory",
       "consumers": [
         "inventory-workers"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/planning-native-v1.json",
+      "owner": "planning",
+      "consumers": [
+        "lifecycle",
+        "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/planning-qualification-events-v1.json",
+      "owner": "planning",
+      "consumers": [
+        "assurance"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/lifecycle-internal-authority-v1.json",
+      "owner": "lifecycle",
+      "consumers": [
+        "planning",
+        "lifecycle-workers",
+        "assurance"
       ],
       "copies": [],
       "source_manifest": null,
