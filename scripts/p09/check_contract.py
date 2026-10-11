@@ -36,8 +36,14 @@ extended['routes'][0]['constraints']['maximum_data_loss_bytes'] = 0
 validator.validate(extended)
 tranche(extended)
 assert not legacy.is_valid(extended), 'Published v1 must retain its original exact fields'
+current_api = json.loads((ROOT / 'contracts/openapi/planning-migration-v1.6.json').read_text())
+current_support_wire = Draft202012Validator(
+    {'$ref': '#/components/schemas/MigrationSupport', 'components': current_api['components']},
+    format_checker=FormatChecker(),
+)
 actor = Actor(str(uuid4()), str(uuid4()), 'plan.read', str(uuid4()), str(uuid4()))
 support = MigrationSupport(lambda *_: extended, lambda *_: [], lambda: 100).read(actor, str(uuid4()))
+current_support_wire.validate(support)
 for version in ('1.4', '1.5'):
     path = ROOT / f'contracts/openapi/planning-migration-v{version}.json'
     assert path.read_bytes() == (ROOT / 'apps/console/resources/contracts' / path.name).read_bytes()
