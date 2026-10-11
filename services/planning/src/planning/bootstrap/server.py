@@ -14,7 +14,7 @@ from planning.application.native_plans import NativePlans
 from planning.application.planning import Planning
 from planning.application.qualification_invalidations import QualificationInvalidations
 from planning.application.validation import MigrationValidation, NativeValidation, PlanValidation
-from planning.infrastructure.foundation import database_ready
+from planning.infrastructure.foundation import database_ready, mounted_secret
 from planning.infrastructure.migration import prepare_migration
 from planning.infrastructure.migration_collection_manifest import binding as collection_manifest_binding
 from planning.infrastructure.workload_reconciliation import (
@@ -65,7 +65,7 @@ class PlanningRouter:
         self.support.workload_review = current_review_binding
         self.support.collection_manifest = collection_manifest_binding
         self.foundation = FoundationApp(database_ready)
-        self.invalidations = QualificationInvalidationApp(QualificationInvalidations(Postgres()))
+        self.invalidations = QualificationInvalidationApp(QualificationInvalidations(Postgres()), mounted_secret)
         migrations = MigrationPlans(self.planning.planning, validation.migration, visible_recipes)
         self.migration = MigrationPreparationApp(
             self.planning.authority, prepare_migration, migrations, self.support, self.flows

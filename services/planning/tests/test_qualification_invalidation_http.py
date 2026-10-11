@@ -11,6 +11,7 @@ from unittest.mock import Mock
 import pytest
 
 from planning.application.qualification_invalidations import QualificationInvalidations
+from planning.infrastructure.foundation import mounted_secret
 from planning.infrastructure.store import Postgres
 from planning.interfaces.qualification_invalidations import QualificationInvalidationApp
 
@@ -67,7 +68,7 @@ def receiver(
         "authority_epoch": 1,
         "event_sha256": "b" * 64,
     }
-    return QualificationInvalidationApp(cast(QualificationInvalidations, inbox)), inbox
+    return QualificationInvalidationApp(cast(QualificationInvalidations, inbox), mounted_secret), inbox
 
 
 def test_exact_authenticated_held_event_is_acked_after_receiver_persistence(

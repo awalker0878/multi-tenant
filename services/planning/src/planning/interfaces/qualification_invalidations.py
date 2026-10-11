@@ -4,6 +4,7 @@ import asyncio
 import hmac
 import json
 import os
+from collections.abc import Callable
 from typing import Any
 
 import psycopg
@@ -11,12 +12,14 @@ from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from planning.application.qualification_invalidations import QualificationInvalidations
 from planning.domain.model import Rejected, decode
-from planning.infrastructure.foundation import mounted_secret
 
 
 class QualificationInvalidationApp:
-    def __init__(self, inbox: QualificationInvalidations) -> None:
-        self.inbox = inbox
+    def __init__(
+        self, inbox: QualificationInvalidations,
+        secret_reader: Callable[[str], str],
+    ) -> None:
+        self.inbox, self.secret_reader = inbox, secret_reader
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
@@ -33,14 +36,14 @@ class QualificationInvalidationApp:
                 raise Rejected("request_bound", 413)
             # The read-only Assurance and outgoing Governance credentials cannot
             # stand in for a separately enrolled inbound invalidation principal.
-            expected = mounted_secret("PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE")
+            expected = self.secret_reader("PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE")
             for other in (
                 "PLANNING_ASSURANCE_CREDENTIAL_FILE",
                 "PLANNING_GOVERNANCE_CREDENTIAL_FILE",
                 "PLANNING_CONSOLE_CREDENTIAL_FILE",
             ):
                 if os.environ.get(other) and hmac.compare_digest(
-                    expected, mounted_secret(other)
+                    expected, self.secret_reader(other)
                 ):
                     raise Rejected("invalidation_authority_not_independent", 503)
             authorization = [v for k, v in headers if k.lower() == b"authorization"]
