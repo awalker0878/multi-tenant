@@ -123,6 +123,32 @@ def verify_inventory(root: Path = ROOT) -> int:
             raise ValueError(f"Inventory owner-operation route unavailable: GET {path}")
         if asyncio.run(_probe_migration(app, path, "POST")) != 404:
             raise ValueError(f"Inventory owner-operation unexpectedly accepts POST: {path}")
+    # Positive native-reader path belongs to Inventory's installed runtime,
+    # not Planning's package. A revoked reader must fail independently of the
+    # response envelope, even if a previously accepted payload exists.
+    from unittest.mock import patch
+    from inventory.application.workload import WorkloadProfiles
+    from inventory.domain.discovery import Rejected
+    authorized = []
+    def native_reader(*arguments):
+        authorized.append(arguments)
+    native_app = PlanningInputApp(
+        discovery=None, authority=lambda *args: None,
+        native_authority=native_reader,
+    )
+    native_path = paths[0]
+    headers = [(b"authorization", b"Bearer " + b"a" * 64)]
+    with patch.object(WorkloadProfiles, "planning",
+                      lambda *args: {"native_write_authorized": False}):
+        status, response = asyncio.run(_exchange(native_app, native_path, "GET", headers))
+        if status != 200 or response != {"native_write_authorized": False} or len(authorized) != 2:
+            raise ValueError("Inventory authenticated native read failed")
+        def revoked(*args):
+            raise Rejected("native_reader_revoked", 403)
+        native_app.native_authority = revoked
+        status, _ = asyncio.run(_exchange(native_app, native_path, "GET", headers))
+        if status != 403:
+            raise ValueError("Inventory native reader accepted revoked authority")
     return len(routes_in_openapi(spec)) + len(paths)
 
 
