@@ -6,7 +6,7 @@ The contract root owns **wire contracts**, not provider eligibility or native ex
 - `contracts/openapi/`, `contracts/schemas/`, and `contracts/capabilities/` contain versioned, deployment-ready **bundles**. They remain self-contained because PHP, Python and generated clients load these artifacts directly.
 - `scripts/contracts/build.py --check` reconstructs every split bundle and verifies its canonical and installed copies. Use `--write` only when intentionally assembling a reviewed unpublished version.
 - Consumers must load exact versioned artifact names. Do not give a new version an old filename or schema `$id`.
-- Previously published canonical versions are retained as historical references until a separately reviewed removal determines no external consumers or compatibility commitments remain. Unused *consumer copies* may be removed once all code generators, loaders and CI checks target the replacement.
+- Only current active releases and the explicitly retained native-boundary qualification contracts remain in the working tree. The product owner approved retiring obsolete canonical releases, historical-only tests and installed copies on 2026-10-11. The exact removed paths are recorded in `architecture/retired-contract-releases.json`. Current registered contracts are protected by `scripts/p01/contracts/compatibility.py` and active-route/schema validation.
 - Wire readiness `v2` is immutable; the `v2.2` validation profile strengthens conditional eligibility and rejects unresolved required fields without changing the wire schema_version. Planning and Lifecycle both install the exact v2.2 profile. `scripts/contracts/generate_readiness.py` checks the embedded v2 OpenAPI projection.
 - `migration-workload-readiness` is a **read-only eligibility assessment**. It never grants native writes or workload admission. Runtime still independently verifies signed custody, exact scope, freshness and E3/E4 evidence.
 
@@ -29,19 +29,19 @@ The byte-identical `contracts/fixtures/planning/synthetic-plan-v1.json` was remo
 
 The `planning/qualification-v2.1.json` validation profile tightens the externally delivered v2 qualification payload; its wire `version` remains `2` and Assurance keeps the existing v2 endpoint. This is a schema contract revision, **not** a native evidence upgrade.
 
-## Archived duplicate schema identities
+## Retired duplicate schema identities
 
-The published Inventory collection-page v1.1, v1.2 and v1.3 specifications historically declared the same `$id`. Their original bytes are preserved and pinned to Git blob identities; **do not register these three files together by `$id`**. The new `schemas/inventory/collection-page-v1.4.json` has its own identifier and represents the current schema definition. CI allows only those exact archived duplicates and rejects all new collisions or mutations to those historical artifacts.
+The retired Inventory collection-page v1.1–v1.3 documents historically reused one schema ID. Their files and SHA-based compatibility exceptions are now removed. Current schemas must have unique IDs, enforced directly in `scripts/contracts/check.py`. The current `collection-page-v1.4.json` remains available.
 
 ## Collection-manifest source partitions
 
 The Inventory collection manifest is authored in platform headers and ordered scope-specific arrays under `contracts/source/capabilities/migration-collection-manifest-v1/platforms/<provider>/`. Numeric prefixes preserve the published attribute sequence, including interleaved source/target/owner groups. Do not reorder these files or aggregate by scope: the resulting contract must continue matching the canonical bundle via `scripts/contracts/build.py --check`.
 
-The archived Inventory and Planning API releases remain immutable. Unused Console copies of Inventory v1.7/v1.8 and Planning Migration v1.4 were pruned; the current consumers use Inventory v1.9 and Planning Migration v1.6. Older copies explicitly exercised by historical compatibility scripts remain in place.
+Superseded Inventory and Planning releases and historical-only replay fixtures have been deleted under the explicit retirement manifest. Current Console consumers use Inventory v1.9 and Planning Migration v1.6. Native grant conformance tests required by P10 are retained until equivalent current safety-negative coverage is available.
 
 ## Active producer and consumer ownership
 
-`architecture/contract-consumers.json` owns the **editable** active-release catalogue with per-contract producers, downstream consumers, installed artifact paths, source manifests, and explicit dependencies. `scripts/contracts/check.py` checks every declaration against real files and byte-identical installed copies. This is separate from immutable historical contract publications; replacing an active release updates the registry, never rewrites an older published API or schema.
+`architecture/contract-consumers.json` owns the **editable** active-release catalogue with per-contract producers, downstream consumers, installed artifact paths, source manifests, and explicit dependencies. `scripts/contracts/check.py` checks every declaration against real files and byte-identical installed copies. Replacing an active release updates the registry and creates a new version; a retirement is authorized explicitly rather than silently removing an active API.
 
 All contracts with a declared implemented consumer are now represented by an active-release record. The registry validates source manifests, installed byte parity and the active OpenAPI specifications, including OpenAPI 3.0 foundation health. Asynchronous events are checked for channel/address uniqueness, valid operation bindings and referenced JSON Schema payloads; this is not a substitute for measured broker-event conformance.
 
