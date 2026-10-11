@@ -129,11 +129,32 @@ def verify_inventory(root: Path = ROOT) -> int:
             ("planning-capability-inputs", f"{SAMPLE_UUID}/{SAMPLE_UUID}"),
         )
     )
+    from jsonschema import Draft202012Validator
+    common_error = json.loads((root / "contracts/schemas/common/error-v1.json").read_text())
+    error_validator = Draft202012Validator(common_error)
+    for prefix in ("internal", "v1"):
+        for resource, suffix in (
+            ("migration-inputs", "{revision}/{digest}"),
+            ("planning-inputs", "{endpoint}/{generation}"),
+            ("planning-capability-inputs", "{endpoint}/{generation}"),
+        ):
+            template = f"/{prefix}/tenants/{{tenant}}/{resource}/{{application}}/{{environment}}/{{site}}/{suffix}"
+            path = next(p for p in paths if p.startswith(f"/{prefix}/") and f"/{resource}/" in p)
+            allowed = set(owner_api["paths"][template]["get"]["responses"])
+            for label, headers, expected in (
+                ("missing-header", [], 400),
+                ("malformed-identity", [(b"authorization", b"Bearer short")], 401),
+                ("header-bound", [(b"x-header", b"value")] * 41, 413),
+            ):
+                status, body = asyncio.run(_exchange(app, path, "GET", headers))
+                if status != expected or str(status) not in allowed:
+                    raise ValueError(f"Inventory owner status drift: {template} {label} => {status}")
+                error_validator.validate(body)
+            if asyncio.run(_probe_migration(app, path, "POST")) != 404:
+                raise ValueError(f"Inventory owner-operation unexpectedly accepts POST: {path}")
     for path in paths:
         if asyncio.run(_probe_migration(app, path, "GET")) != 400:
             raise ValueError(f"Inventory owner-operation route unavailable: GET {path}")
-        if asyncio.run(_probe_migration(app, path, "POST")) != 404:
-            raise ValueError(f"Inventory owner-operation unexpectedly accepts POST: {path}")
     # Positive native-reader path belongs to Inventory's installed runtime,
     # not Planning's package. A revoked reader must fail independently of the
     # response envelope, even if a previously accepted payload exists.
@@ -160,6 +181,19 @@ def verify_inventory(root: Path = ROOT) -> int:
         status, _ = asyncio.run(_exchange(native_app, native_path, "GET", headers))
         if status != 403:
             raise ValueError("Inventory native reader accepted revoked authority")
+        for code in (409, 422):
+            native_app.native_authority = lambda *args, code=code: (_ for _ in ()).throw(Rejected("native_source_rejected", code))
+            status, error = asyncio.run(_exchange(native_app, native_path, "GET", headers))
+            if status != code or str(status) not in owner_api["paths"][
+                "/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/{revision}/{digest}"
+            ]["get"]["responses"]:
+                raise ValueError(f"Inventory native reader status {code} not contracted")
+            error_validator.validate(error)
+        native_app.native_authority = lambda *args: (_ for _ in ()).throw(RuntimeError("unavailable"))
+        status, error = asyncio.run(_exchange(native_app, native_path, "GET", headers))
+        if status != 503:
+            raise ValueError("Inventory native reader unexpected exception did not fail closed")
+        error_validator.validate(error)
     return len(declared_discovery) + len(declared_owner)
 
 

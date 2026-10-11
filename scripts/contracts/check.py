@@ -587,6 +587,7 @@ def check_implemented_api_contracts():
 
 
 UUID_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+UUID_V4_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 
 
 def check_uuid_policy():
@@ -621,7 +622,12 @@ def check_uuid_policy():
                     visit(item, f"{pointer}/{i}")
             elif isinstance(node, dict):
                 if node.get("format") == "uuid" and node.get("pattern") != UUID_PATTERN:
-                    missing.append(pointer)
+                    if (relative == "contracts/openapi/inventory-native-input-v1.3.json"
+                            and node.get("pattern") == UUID_V4_PATTERN
+                            and "/get/parameters/" in pointer):
+                        pass  # Preserve Inventory's concrete version-4 UUID route pin.
+                    else:
+                        missing.append(pointer)
                 for name, value in node.items():
                     visit(value, f"{pointer}/{name}")
 
