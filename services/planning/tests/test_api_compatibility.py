@@ -308,7 +308,10 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
         if direction["direction"] == "vmware->openstack"
     )["routes"][0]
     assert upgraded["api_compatibility"]["status"] == "eligible"
-    support.require(actor, site, binding)
+    # Successful API omission review is not a workload admission credential.
+    # Uncommissioned collection/E4 flow owners must still deny native plans.
+    with pytest.raises(Rejected, match="migration_workload_admission_not_commissioned"):
+        support.require(actor, site, binding)
 
 
 def test_operator_reported_api_versions_cannot_substitute_live_installation_probe() -> None:
