@@ -151,6 +151,10 @@
       "planning",
       "governance"
     ],
+    "contracts/openapi/planning-lifecycle-reads-v1.json": [
+      "planning",
+      "lifecycle"
+    ],
     "contracts/openapi/planning-migration-v1.6.json": [
       "planning",
       "console"
@@ -588,6 +592,18 @@
       "copies": [],
       "source_manifest": null,
       "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/planning-lifecycle-reads-v1.json",
+      "owner": "planning",
+      "consumers": [
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": [
+        "contracts/schemas/planning/migration-readiness-v2.2.json"
+      ]
     },
     {
       "path": "contracts/openapi/planning-migration-v1.6.json",
