@@ -91,6 +91,9 @@ jobs:
           mkdir -p services/${{ matrix.app }}/bootstrap/cache services/${{ matrix.app }}/storage/framework/{cache,sessions,views} services/${{ matrix.app }}/storage/logs
           touch services/${{ matrix.app }}/.env
           composer install --working-dir=services/${{ matrix.app }} --no-dev --no-plugins --no-scripts --no-interaction --no-progress --prefer-dist
+      - name: Verify Governance approval 409 producer behavior
+        if: matrix.app == 'governance'
+        run: php scripts/contracts/verify_governance_approval_status.php
       - name: Compare the deployed router with every owned active OpenAPI release
         run: |
           php services/${{ matrix.app }}/artisan route:list --json > "$RUNNER_TEMP/laravel-routes.json"
