@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import json
 import re
-import hashlib
 from pathlib import Path
 
 import yaml
@@ -19,39 +18,17 @@ def load(name: str):
     return json.loads((ROOT / name).read_text(encoding="utf-8"))
 
 def unique_schema_ids():
-    """Never rewrite historical published schema bytes to repair old ID aliases.
-
-    These *exact* three historical Inventory documents are archived: they shared
-    an identifier before publication. A different file or changed byte fails.
-    Only collection-page-v1.4 is active and has its own distinct schema $id.
-    """
-    old_id = "https://multi-tenant.invalid/contracts/inventory/collection-page-v1.1"
-    historical = {
-        "contracts/schemas/inventory/collection-page-v1.1.json":
-            "9ae92e3af4b3a7cb96a00e721ce904d318263628",
-        "contracts/schemas/inventory/collection-page-v1.2.json":
-            "d9b9b241b29b5234a095a195476cc852041fe1dc",
-        "contracts/schemas/inventory/collection-page-v1.3.json":
-            "9f2d1c18bb26dee8072163853808d0504de4e828",
-    }
-    seen: dict[str, list[Path]] = {}
-    for p in sorted((ROOT / "contracts/schemas").rglob("*.json")):
-        item = json.loads(p.read_text(encoding="utf-8"))
-        identifier = item.get("$id")
-        if identifier:
-            seen.setdefault(identifier, []).append(p)
-    for identifier, paths in seen.items():
-        if len(paths) <= 1:
+    """Every retained schema has a unique identifier; no historical exceptions."""
+    seen: dict[str, Path] = {}
+    for path in sorted((ROOT / "contracts/schemas").rglob("*.json")):
+        document = json.loads(path.read_text(encoding="utf-8"))
+        identifier = document.get("$id")
+        if not identifier:
             continue
-        if identifier != old_id or {str(p.relative_to(ROOT)) for p in paths} != set(historical):
-            raise ValueError(f"Unexpected duplicate schema $id {identifier}: {paths}")
-        for p in paths:
-            content = p.read_bytes()
-            raw = b"blob " + str(len(content)).encode() + bytes([0]) + content
-            digest = hashlib.sha1(raw).hexdigest()
-            if digest != historical[str(p.relative_to(ROOT))]:
-                raise ValueError(f"Historical schema was rewritten instead of versioned: {p}")
-    return sum(len(paths) for paths in seen.values())
+        if identifier in seen:
+            raise ValueError(f"Duplicate schema $id {identifier}: {seen[identifier]} and {path}")
+        seen[identifier] = path
+    return len(seen)
 
 
 def local_refs(doc, label):
