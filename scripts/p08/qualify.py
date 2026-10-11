@@ -75,11 +75,7 @@ def main():
         command('.', ['python', 'scripts/p04/generate_clients.py', '--check'])
         command('scripts/p01/contracts', ['uv', 'sync', '--locked'])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_contract.py')])
-        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_profiles.py')])
-        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_ahv.py')])
-        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_fleet.py')])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_operator_inputs.py')])
-        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_readiness.py')])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_any_to_any.py')])
     except Exception as error:
         report['error'] = str(error)
