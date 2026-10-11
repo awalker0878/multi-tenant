@@ -342,6 +342,8 @@ def check_consumer_registry():
         "contracts/openapi/inventory-native-input-v1.3.json": {"inventory", "planning", "lifecycle"},
         "contracts/openapi/catalogue-internal-v1.json": {"catalogue", "planning", "lifecycle"},
         "contracts/openapi/governance-service-checks-v1.json": {"governance", "planning"},
+        "contracts/openapi/governance-inventory-collection-v1.1.json": {"governance", "inventory"},
+        "contracts/openapi/governance-native-approval-v1.1.json": {"governance", "lifecycle"},
         "contracts/openapi/assurance-qualification-v1.json": {"assurance", "planning"},
         "contracts/schemas/common/error-v1.json": {"contract-platform", "inventory", "governance", "catalogue", "assurance"},
         "contracts/openapi/lifecycle-migration-boundary-v2.json": {"lifecycle", "lifecycle-workers"},
@@ -501,6 +503,12 @@ def check_implemented_api_contracts():
                     ("planning-capability-inputs", "{endpoint}/{generation}"),
                 )
             },
+        ),
+        "contracts/openapi/governance-inventory-collection-v1.1.json": (
+            "governance", {("POST", "/v1/tenants/{tenant}/inventory-collection-checks")},
+        ),
+        "contracts/openapi/governance-native-approval-v1.1.json": (
+            "governance", {("POST", "/v1/tenants/{tenant}/native-approval-checks")},
         ),
         "contracts/openapi/governance-service-checks-v1.json": (
             "governance", {
@@ -678,6 +686,8 @@ def check_error_policy():
         "inventory-native-input-v1.3.json",
         "governance-service-checks-v1.json",
         "assurance-qualification-v1.json",
+        "governance-inventory-collection-v1.1.json",
+        "governance-native-approval-v1.1.json",
     )
     for name in releases:
         document = current = load("contracts/openapi/" + name)

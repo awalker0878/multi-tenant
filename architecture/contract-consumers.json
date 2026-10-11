@@ -112,7 +112,7 @@
       "governance",
       "console"
     ],
-    "contracts/openapi/governance-inventory-collection-v1.json": [
+    "contracts/openapi/governance-inventory-collection-v1.1.json": [
       "governance",
       "inventory"
     ],
@@ -120,7 +120,7 @@
       "governance",
       "console"
     ],
-    "contracts/openapi/governance-native-approval-v1.json": [
+    "contracts/openapi/governance-native-approval-v1.1.json": [
       "governance",
       "lifecycle"
     ],
@@ -520,14 +520,16 @@
       "depends_on": []
     },
     {
-      "path": "contracts/openapi/governance-inventory-collection-v1.json",
+      "path": "contracts/openapi/governance-inventory-collection-v1.1.json",
       "owner": "governance",
       "consumers": [
         "inventory"
       ],
       "copies": [],
       "source_manifest": null,
-      "depends_on": []
+      "depends_on": [
+        "contracts/schemas/common/error-v1.json"
+      ]
     },
     {
       "path": "contracts/openapi/governance-local-identity-v1.json",
@@ -540,14 +542,16 @@
       "depends_on": []
     },
     {
-      "path": "contracts/openapi/governance-native-approval-v1.json",
+      "path": "contracts/openapi/governance-native-approval-v1.1.json",
       "owner": "governance",
       "consumers": [
         "lifecycle"
       ],
       "copies": [],
       "source_manifest": null,
-      "depends_on": []
+      "depends_on": [
+        "contracts/schemas/common/error-v1.json"
+      ]
     },
     {
       "path": "contracts/openapi/governance-service-checks-v1.json",
