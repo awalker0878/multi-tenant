@@ -69,7 +69,7 @@ CI should regenerate clients, validate valid/invalid fixtures, compare schema co
 
 ## Measured tool candidate
 
-[ADR-012](../decisions/adr-012-contracts-and-event-evolution.md) records the tested OpenAPI 3.0.4 subset, JSON Schema 2020-12 event envelope and OpenAPI Generator 7.25.0 candidate. The [isolated source](../../spikes/compatibility/contracts/README.md) supplies locked reproduction commands and negative fixtures. Generator outputs remain private Infrastructure adapters; wire-schema validation must precede domain translation because generated models and decoders do not enforce every constraint.
+[ADR-012](../decisions/adr-012-contracts-and-event-evolution.md) records the tested OpenAPI 3.0.4 subset, JSON Schema 2020-12 event envelope and OpenAPI Generator 7.25.0 candidate. That former synthetic prototype has been retired: current contract integrity is enforced by the independently versioned owner releases and [the contract-integrity workflow](../../.github/workflows/contracts-integrity.yml), including live Laravel routes, Python ASGI route conformance, canonical producer/consumer projections and rejection tests. Generator outputs remain private Infrastructure adapters; wire-schema validation must precede domain translation because generated models and decoders do not enforce every constraint.
 
 P01.03 must still publish the reviewed product schemas in this contract tree, choose AsyncAPI channels/bindings, implement the selected compatibility checker and golden digest/error/idempotency vectors, and execute real provider/consumer and outbox/inbox tests. Deterministic generation and synthetic fixture rejection do not complete those gates.
 
