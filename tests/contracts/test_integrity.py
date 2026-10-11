@@ -58,6 +58,29 @@ class ContractIntegrityTests(unittest.TestCase):
         modified["components"]["schemas"]["CapabilityInput"]["properties"].pop("capability_snapshot")
         self.assertNotEqual(generated, modified)
 
+    def test_current_uuid_policy_rejects_noncanonical_new_routes_without_legacy_allowlist(self):
+        from check import check_uuid_policy
+        self.assertEqual(check_uuid_policy(), 0)
+        self.assertFalse((ROOT / "scripts/contracts/uuid-legacy-v1.json").exists())
+        original = load
+        api = load("contracts/openapi/inventory-collection-worker-v1.json")
+        api["paths"]["/internal/collections/receipts"]["post"]["requestBody"][
+            "content"]["application/json"]["schema"]["properties"]["tenant_id"][
+                "pattern"] = r"^[0-9a-f-]{36}$"
+        with patch("check.load", side_effect=lambda path:
+                   api if path == "contracts/openapi/inventory-collection-worker-v1.json"
+                   else original(path)):
+            with self.assertRaisesRegex(ValueError, "Noncanonical UUID"):
+                check_uuid_policy()
+
+    def test_retired_internal_planning_input_alias_is_not_published(self):
+        registry = load("architecture/contract-consumers.json")
+        self.assertNotIn(
+            "/internal/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{endpoint}/{generation}",
+            load("contracts/openapi/inventory-native-input-v1.3.json")["paths"],
+        )
+        self.assertNotIn("scripts/contracts/uuid-legacy-v1.json", registry["contracts"])
+
     def test_sources_assemble_to_current_published_bundles(self):
         sources, bundles = verify()
         self.assertGreaterEqual(sources, 6)
