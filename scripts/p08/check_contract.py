@@ -8,7 +8,7 @@ from openapi_spec_validator import validate_spec
 
 ROOT = Path(__file__).resolve().parents[2]
 fixture = json.loads((ROOT / 'contracts/fixtures/lifecycle/migration-stage-grant-v2.json').read_text())
-for name,request in [('lifecycle-migration-boundary-v2.json','BoundaryRequest'),('worker-migration-effect-v2.json','EffectRequest')]:
+for name,request in [('lifecycle-migration-boundary-v2.json','BoundaryRequest'),('worker-migration-effect-v2.1.json','EffectRequest')]:
     spec=json.loads((ROOT / 'contracts/openapi' / name).read_text())
     validate_spec(spec)
     validator=Draft202012Validator(spec['components']['schemas'][request],format_checker=FormatChecker())
