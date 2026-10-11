@@ -553,6 +553,18 @@ def check_implemented_api_contracts():
         if actual != operations:
             raise ValueError(f"Implemented OpenAPI operation drift: {path} {sorted(actual ^ operations)}")
 
+    # Independent emitted-status expectations for the freshly versioned
+    # Governance admission boundaries. Controller/HTTP fixture tests must still
+    # independently exercise each branch before CI can be called exhaustive.
+    for path, expected in {
+        "contracts/openapi/governance-inventory-collection-v1.1.json": {"200", "401", "403", "422", "503"},
+        "contracts/openapi/governance-native-approval-v1.1.json": {"200", "401", "403", "404", "422", "503"},
+    }.items():
+        release = load(path)
+        result = next(iter(release["paths"].values()))["post"]["responses"]
+        if set(result) != expected:
+            raise ValueError(f"Governance authority status drift: {path} {sorted(set(result) ^ expected)}")
+
     # The independent Inventory producer and packaged Planning consumer both
     # serve the canonical v4 envelope; a copy mismatch must fail even if the
     # active registry and OpenAPI document are edited together.

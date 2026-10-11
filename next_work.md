@@ -24,6 +24,8 @@ at every checkpoint.
 
 **Living execution plan:** [Authority-boundary contract coverage](docs/implementation/authority-boundary-contract-coverage-execplan.md). **Status: Implemented, unverified**. Native status coverage and exhaustive Python reverse route mapping remain open; no exact-head green CI run recorded. The unversioned Assurance alias was intentionally removed at the user's request.
 
+- 2026-10-11 additional boundary closeout: Governance collection/native approval status releases are now v1.1 (historical v1 retained), with explicit status canaries. Inventory discovery has a negative undocumented-route test. This remains **Implemented, unverified** without an exact-head green CI run or comprehensive per-status Laravel tests.
+
 ## CT-R01 — Resolved migration-readiness contract (2026-10-09 checkpoint)
 
 **Current branch work committed, not yet end-to-end verified.** See

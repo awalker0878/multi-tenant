@@ -86,22 +86,24 @@ def synthetic_path(path: str) -> str:
     return PARAMETER.sub(SAMPLE_UUID, path)
 
 
-def verify_inventory(root: Path = ROOT) -> int:
-    from inventory.interfaces.discovery import ROUTES
-    spec = json.loads((root / "contracts/openapi/inventory-v1.9.json").read_text())
-    # The executable Inventory discovery route table is the independent
-    # source of truth. A new route added to ROUTES cannot disappear merely
-    # because the OpenAPI and registry were edited together.
-    declared_discovery = routes_in_openapi(spec)
-    for method, pattern, _, _ in ROUTES:
-        matching = [(verb, path) for verb, path in declared_discovery
+def compare_inventory_discovery_routes(runtime_routes, declared: set[tuple[str, str]]) -> None:
+    """Fail for either a new runtime Inventory route or a missing producer route."""
+    for method, pattern, _, _ in runtime_routes:
+        matching = [(verb, path) for verb, path in declared
                     if verb == method and re.fullmatch(pattern, synthetic_path(path))]
         if len(matching) != 1:
             raise ValueError(f"Undocumented Inventory discovery route: {method} {pattern}")
-    for method, path in declared_discovery:
+    for method, path in declared:
         if not any(m == method and re.fullmatch(pattern, synthetic_path(path))
-                   for m, pattern, _, _ in ROUTES):
+                   for m, pattern, _, _ in runtime_routes):
             raise ValueError(f"Inventory OpenAPI operation without executable route: {method} {path}")
+
+
+def verify_inventory(root: Path = ROOT) -> int:
+    from inventory.interfaces.discovery import ROUTES
+    spec = json.loads((root / "contracts/openapi/inventory-v1.9.json").read_text())
+    declared_discovery = routes_in_openapi(spec)
+    compare_inventory_discovery_routes(ROUTES, declared_discovery)
 
     from inventory.interfaces.planning import PlanningInputApp
     import asyncio

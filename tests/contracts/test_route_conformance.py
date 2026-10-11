@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
-from route_conformance import compare_declared, routes_in_laravel, routes_in_openapi, verify_app
+from route_conformance import compare_declared, compare_inventory_discovery_routes, routes_in_laravel, routes_in_openapi, verify_app
 
 
 class HttpRouteConformanceTests(unittest.TestCase):
@@ -68,6 +68,15 @@ class HttpRouteConformanceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Undocumented assurance"):
                 verify_app("assurance", routes_in_openapi(spec) | {
                     ("POST", "/v1/tenants/{tenant}/planning-qualification")}, root)
+
+    def test_inventory_reverse_route_negative_injection(self):
+        segment = r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+        real = ("GET", rf"/v1/tenants/({segment})/sites", "sites", "inventory.read")
+        declared = {("GET", "/v1/tenants/{tenant}/sites")}
+        compare_inventory_discovery_routes((real,), declared)
+        dummy = ("GET", rf"/internal/tenants/({segment})/x", "undocumented", "inventory.read")
+        with self.assertRaisesRegex(ValueError, "Undocumented Inventory"):
+            compare_inventory_discovery_routes((real, dummy), declared)
 
     def test_declared_paths_include_each_method(self):
         spec = {"paths": {"/v1/example": {"get": {}, "post": {}}}}
