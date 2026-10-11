@@ -16,6 +16,14 @@ from check import (
 )
 
 class ContractIntegrityTests(unittest.TestCase):
+    def test_catalogue_embedded_schema_references_rebase_to_active_release(self):
+        canonical = load("contracts/openapi/catalogue-internal-v1.json")
+        local_refs(canonical, "catalogue-internal-v1.json")
+        broken = json.loads(json.dumps(canonical))
+        broken["components"]["schemas"]["CurrentPlanningIntent"]["properties"]["intent"]["$ref"] = "#/$defs/Intent"
+        with self.assertRaisesRegex(ValueError, "Invalid catalogue-internal-v1.json local"):
+            local_refs(broken, "catalogue-internal-v1.json")
+
     def test_new_authority_releases_use_common_error(self):
         check_error_policy()
         from check import check_error_policy as check

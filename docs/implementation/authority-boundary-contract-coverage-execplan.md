@@ -135,3 +135,7 @@ The engineering branch now has the missing owner release documents, an explicit 
 ### CI discovery: embedded Catalogue schema reference (2026-10-11)
 
 The earlier head `1acf83c0` had all three Laravel reverse-route jobs pass, but `scripts/contracts/check.py` failed before tests at `Invalid catalogue-internal-v1.json local $ref: #/$defs/Intent`. The producer's standalone `catalogue-current-v2` schema was embedded in OpenAPI with an absolute-to-schema-root reference. The new bundle now relocates that reference to `#/components/schemas/CurrentPlanningIntent/$defs/Intent`, and `check_implemented_api_contracts` asserts exact projection equality after relocation. The historical canonical schema remains unchanged. **The latest amended head still needs a fresh green run.**
+
+### Negative regression canary for embedded local references
+
+The contract-integrity suite now includes a negative fixture which changes the sole Catalogue current-intent projection reference back to the invalid `#/$defs/Intent` root and asserts `local_refs` rejects it. Keep this test alongside the exact canonical projection equality check. No previously published producer schema was edited.
