@@ -339,7 +339,6 @@ def check_consumer_registry():
     inventory = registry["contracts"]
     for source, consumers in {
         "contracts/openapi/assurance-evidence-v1.json": {"assurance"},
-        "contracts/openapi/inventory-native-input-v1.2.json": {"inventory", "planning"},
         "contracts/openapi/inventory-native-input-v1.3.json": {"inventory", "planning", "lifecycle"},
         "contracts/openapi/catalogue-internal-v1.json": {"catalogue", "planning", "lifecycle"},
         "contracts/openapi/governance-service-checks-v1.json": {"governance", "planning"},
@@ -364,6 +363,21 @@ def check_consumer_registry():
         raise ValueError("Active contract registry does not cover every declared consumer")
     if len(names) != len(set(names)):
         raise ValueError("Duplicate active contract release")
+    # Each live service operation belongs to exactly one active versioned owner
+    # release. Historical superseded bundles stay in the tree but are not active.
+    seen_operations = {}
+    for entry in releases:
+        if not entry["path"].startswith("contracts/openapi/"):
+            continue
+        api = load(entry["path"])
+        for endpoint, methods in api["paths"].items():
+            for method in methods:
+                if method not in {"get", "post", "put", "patch", "delete"}:
+                    continue
+                operation = (entry["owner"], method.upper(), endpoint)
+                if operation in seen_operations:
+                    raise ValueError(f"Overlapping active owner operation: {operation} in {seen_operations[operation]} and {entry['path']}")
+                seen_operations[operation] = entry["path"]
     # The deployed broker definitions are all implemented products, not optional
     # self-declared inventory entries. Their schema dependencies must be active.
     # This detects removal of an event spec from both editable registry maps.
@@ -470,10 +484,6 @@ def check_implemented_api_contracts():
                 ("GET", "/v1/tenants/{tenant}/evidence/{evidence}"),
                 ("POST", "/v1/tenants/{tenant}/evidence/{evidence}/reviews"),
             },
-        ),
-        "contracts/openapi/inventory-native-input-v1.2.json": (
-            "inventory",
-            {("GET", "/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/{revision}/{digest}")},
         ),
         "contracts/openapi/catalogue-internal-v1.json": (
             "catalogue", {

@@ -140,11 +140,6 @@
       "governance",
       "console"
     ],
-    "contracts/openapi/inventory-native-input-v1.2.json": [
-      "inventory",
-      "planning",
-      "lifecycle"
-    ],
     "contracts/openapi/inventory-native-input-v1.3.json": [
       "inventory",
       "planning",
@@ -587,17 +582,6 @@
       "owner": "governance",
       "consumers": [
         "console"
-      ],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/openapi/inventory-native-input-v1.2.json",
-      "owner": "inventory",
-      "consumers": [
-        "planning",
-        "lifecycle"
       ],
       "copies": [],
       "source_manifest": null,
