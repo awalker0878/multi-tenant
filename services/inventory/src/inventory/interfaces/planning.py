@@ -41,6 +41,11 @@ class PlanningInputApp:
                 rf"/(?:v1|internal)/tenants/({UUID})/(?:planning-inputs|planning-capability-inputs)/({UUID})/({UUID})/({UUID})/({UUID})/({UUID})",
                 scope["path"],
             )
+            # Retired internal planning-input alias had no UUID-scoped reader
+            # and used to convert its endpoint UUID to an integer (HTTP 503).
+            # Internal callers must use the qualified capability or migration read.
+            if route and scope["path"].startswith("/internal/") and "/planning-inputs/" in scope["path"]:
+                raise Rejected("not_found", 404)
             migration = re.fullmatch(
                 rf"/(?:v1|internal)/tenants/({UUID})/migration-inputs/({UUID})/({UUID})/({UUID})/([1-9][0-9]{{0,8}})/([0-9a-f]{{64}})",
                 scope["path"],

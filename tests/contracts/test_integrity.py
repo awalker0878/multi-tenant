@@ -230,7 +230,7 @@ components:
     def test_native_input_api_response_drift_is_detected(self):
         from check import check_implemented_api_contracts
         original = load
-        path = "contracts/openapi/inventory-native-input-v1.2.json"
+        path = "contracts/openapi/inventory-native-input-v1.3.json"
         broken = original(path)
         endpoint = next(iter(broken["paths"].values()))["get"]
         envelope = endpoint["responses"]["200"]["content"]["application/json"]["schema"]

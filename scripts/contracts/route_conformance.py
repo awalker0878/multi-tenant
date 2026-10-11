@@ -117,7 +117,7 @@ def verify_inventory(root: Path = ROOT) -> int:
             ("migration-inputs", "{revision}/{digest}"),
             ("planning-inputs", "{endpoint}/{generation}"),
             ("planning-capability-inputs", "{endpoint}/{generation}"),
-        )
+        ) if not (prefix == "internal" and resource == "planning-inputs")
     }
     if declared_owner != expected_owner:
         raise ValueError(f"Inventory PlanningInputApp contract omissions: {sorted(expected_owner ^ declared_owner)}")
@@ -129,7 +129,7 @@ def verify_inventory(root: Path = ROOT) -> int:
             ("migration-inputs", f"1/{'a' * 64}"),
             ("planning-inputs", f"{SAMPLE_UUID}/{SAMPLE_UUID}"),
             ("planning-capability-inputs", f"{SAMPLE_UUID}/{SAMPLE_UUID}"),
-        )
+        ) if not (prefix == "internal" and resource == "planning-inputs")
     )
     from jsonschema import Draft202012Validator
     common_error = json.loads((root / "contracts/schemas/common/error-v1.json").read_text())
@@ -140,6 +140,8 @@ def verify_inventory(root: Path = ROOT) -> int:
             ("planning-inputs", "{endpoint}/{generation}"),
             ("planning-capability-inputs", "{endpoint}/{generation}"),
         ):
+            if prefix == "internal" and resource == "planning-inputs":
+                continue
             template = f"/{prefix}/tenants/{{tenant}}/{resource}/{{application}}/{{environment}}/{{site}}/{suffix}"
             path = next(p for p in paths if p.startswith(f"/{prefix}/") and f"/{resource}/" in p)
             allowed = set(owner_api["paths"][template]["get"]["responses"])
@@ -154,6 +156,9 @@ def verify_inventory(root: Path = ROOT) -> int:
                 error_validator.validate(body)
             if asyncio.run(_probe_migration(app, path, "POST")) != 404:
                 raise ValueError(f"Inventory owner-operation unexpectedly accepts POST: {path}")
+    retired = f"/internal/tenants/{SAMPLE_UUID}/planning-inputs/{SAMPLE_UUID}/{SAMPLE_UUID}/{SAMPLE_UUID}/{SAMPLE_UUID}/{SAMPLE_UUID}"
+    if asyncio.run(_probe_migration(app, retired, "GET")) != 404:
+        raise ValueError("Retired unqualified internal planning-input alias remains exposed")
     for path in paths:
         if asyncio.run(_probe_migration(app, path, "GET")) != 400:
             raise ValueError(f"Inventory owner-operation route unavailable: GET {path}")
