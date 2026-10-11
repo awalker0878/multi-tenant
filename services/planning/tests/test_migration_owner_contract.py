@@ -155,7 +155,7 @@ def test_real_inventory_planning_response_validates_installed_strict_schema(
         def transaction(self):
             return nullcontext(Transaction())
 
-    db = SimpleNamespace(database=Database())
+    db = SimpleNamespace(database=Database(), clock=lambda: now)
     app = WorkloadProfiles(
         db, collection_read=lambda *_: [
             native_producer_case(s) for s in ("source", "target", "owner")

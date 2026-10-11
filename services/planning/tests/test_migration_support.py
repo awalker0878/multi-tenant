@@ -1,5 +1,6 @@
 """Production support reads and admission never inherit another direction's evidence."""
 
+import asyncio
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -319,6 +320,31 @@ def test_execution_support_binds_entire_qualified_artifact_set(fault: str) -> No
                 support.require(actor, SITE, review_only)
 
 
+def migration_http_exchange(
+    app: MigrationPreparationApp, path: str, body: bytes,
+    headers: list[tuple[bytes, bytes]],
+) -> tuple[int, dict[str, Any]]:
+    """Exercise the exact absolute MigrationPreparationApp path, without a PlanningApp prefix."""
+    messages: list[dict[str, Any]] = []
+
+    async def receive() -> dict[str, Any]:
+        return {"type": "http.request", "body": body, "more_body": False}
+
+    async def send(message: dict[str, Any]) -> None:
+        messages.append(message)
+
+    async def invoke() -> None:
+        await app({
+            "type": "http", "method": "POST", "path": path,
+            "query_string": b"", "headers": headers,
+        }, receive, send)
+
+    asyncio.run(invoke())
+    assert len(messages) == 2
+    assert (b"cache-control", b"no-store, private") in messages[0]["headers"]
+    return messages[0]["status"], json.loads(messages[1]["body"])
+
+
 def test_workload_readiness_http_is_read_only_and_denies_browser_evidence() -> None:
     authority, support = Mock(), Mock()
     session = Actor(str(uuid4()), str(uuid4()), "plan.read", str(uuid4()), str(uuid4()))
@@ -341,13 +367,13 @@ def test_workload_readiness_http_is_read_only_and_denies_browser_evidence() -> N
         (b"x-actor-delegation", b"b" * 64),
     ]
     locator = {"site_id": SITE, "review": {"revision": 1, "digest": "a" * 64}}
-    assert exchange(app, path, json.dumps(locator).encode(), headers)[0] == 200
+    assert migration_http_exchange(app, path, json.dumps(locator).encode(), headers)[0] == 200
     assert authority.actor.call_args.args[4] == "plan.read"
     support.preview.assert_called_once()
     for injected in ({"native_write_authorized": True},
                      {"readiness": {"status": "eligible"}},
                      {"source_profile_sha256": "c" * 64}):
         support.reset_mock()
-        status = exchange(app, path, json.dumps(locator | injected).encode(), headers)[0]
+        status = migration_http_exchange(app, path, json.dumps(locator | injected).encode(), headers)[0]
         assert status == 422
         support.preview.assert_not_called()
