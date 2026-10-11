@@ -796,6 +796,9 @@ def check_error_policy():
     releases = (
         "catalogue-internal-v1.json",
         "inventory-native-input-v1.3.json",
+        "inventory-collection-worker-v1.json",
+        "planning-qualification-events-v1.json",
+        "lifecycle-internal-authority-v1.json",
         "governance-service-checks-v1.json",
         "assurance-qualification-v1.json",
         "governance-inventory-collection-v1.1.json",
