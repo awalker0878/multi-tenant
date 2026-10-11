@@ -536,7 +536,7 @@ def verify_planning_lifecycle_reads(root: Path = ROOT) -> int:
             raise ValueError(f"Planning Lifecycle reader denied request unexpectedly succeeded: {path}")
     if sum(1 for c in calls if c[0] == "authority") != 2:
         raise ValueError("Planning Lifecycle authority was not checked on each read")
-    for path in paths:
+    for path in (base, internal):
         assert_planning_composed_route(path, "planning", "GET")
     return 2
 
