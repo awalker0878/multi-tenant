@@ -81,7 +81,11 @@ def test_workload_coverage_requires_release_pinned_full_attribute_set() -> None:
         "status": "matched", "holds": [], "expires_at": 180,
         "native_write_authorized": False,
     }
-    reconciliation.setdefault("workloads", [{"status": "matched", "holds": []}])
+    reconciliation.setdefault("workloads", [{"status": "matched", "holds": [], "workload_id": "test-workload",
+                                         "field_dispositions": [{"field": "guest.firmware", "required": True,
+                                                                 "disposition": "matched",
+                                                                 "evidence_source": "inventory_native_profile",
+                                                                 "evidence_age_seconds": 0}]}])
     reconciliation["reconciliation_sha256"] = digest(reconciliation)
     manifest = {
         "release_sha256": route_result["release_sha256"],
@@ -130,7 +134,11 @@ def test_incomplete_eligible_readiness_must_not_leave_planning() -> None:
         "status": "matched", "holds": [], "expires_at": 180,
         "native_write_authorized": False,
     }
-    reconciliation.setdefault("workloads", [{"status": "matched", "holds": []}])
+    reconciliation.setdefault("workloads", [{"status": "matched", "holds": [], "workload_id": "test-workload",
+                                         "field_dispositions": [{"field": "guest.firmware", "required": True,
+                                                                 "disposition": "matched",
+                                                                 "evidence_source": "inventory_native_profile",
+                                                                 "evidence_age_seconds": 0}]}])
     reconciliation["reconciliation_sha256"] = digest(reconciliation)
     manifest = {
         "release_sha256": route_result["release_sha256"],

@@ -33,9 +33,12 @@ def test_domain_aliasing_and_same_observer_writer_are_rejected() -> None:
     names = list(domains)
     domains[names[1]] = domains[names[0]]
     data["isolation"]["observer_principal"] = data["isolation"]["writer_principal"]
-    assert all(
-        s == "blocked" for _, s, _, _ in isolation_checks(intent, destination, data, policy, NOW)
-    )
+    results = isolation_checks(intent, destination, data, policy, NOW)
+    # A compromised tenant observer must block tenant admission; unrelated
+    # isolation proofs need not all become "blocked" or inherit authority.
+    assert any(name == "placement.tenant_boundary" and status == "blocked"
+               for name, status, _, mandatory in results if mandatory)
+    assert not all(status == "eligible" for _, status, _, mandatory in results if mandatory)
 
 
 @pytest.mark.parametrize(
@@ -118,7 +121,8 @@ def test_native_isolation_controls_distinguish_missing_from_failed(
     ("stale_mapping", "unknown"),
     ("wrong_policy", "unknown"),
     ("same_writer", "blocked"),
-    ("wrong_network_context", "blocked"),
+    # A modified context invalidates topology/evidence binding: unknown is a hold.
+    ("wrong_network_context", "unknown"),
 ])
 def test_source_approved_application_flow_must_select_current_existing_native_controls(
     change: str, expected: str

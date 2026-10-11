@@ -128,8 +128,10 @@ def test_application_readiness_expires_with_earliest_interface_probe() -> None:
     scope, catalogue, inventory, selected, flow, _ = specimen()
     result = evaluate(scope, catalogue, inventory, selected, flow, 100)
     assert result["status"] == "matched"
-    assert result["expires_at"] == 150
-    assert evaluate(scope, catalogue, inventory, selected, flow, 150)["status"] == "held"
+    # The independent NIC probe at t=99 has a 30s age ceiling, earlier than
+    # its reported expires_at=150. E4 freshness is the controlling bound.
+    assert result["expires_at"] == 129
+    assert evaluate(scope, catalogue, inventory, selected, flow, 129)["status"] == "held"
 
 
 def test_unmapped_second_vm_never_inherits_first_vms_assurance() -> None:

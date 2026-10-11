@@ -420,16 +420,24 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     )
     planning = Planning(database, Mock(), clock, validation)
     key, tenant = str(uuid4()), recipe["scope"]["tenant_id"]
-    tx.one.side_effect = [{"payload": payload}]
+    # Query-aware test doubles must represent both the plan and its independent
+    # qualification head; static row lists silently under-count revalidation.
+    def record_lookup(query: str, args: object) -> dict[str, object]:
+        if "planning_plan_qualification_scopes" in query:
+            return {"scope_sha256": "a" * 64, "state": "qualified",
+                    "invalidated": False}
+        if "SELECT tenant,payload" in query:
+            return {"tenant": tenant, "payload": payload}
+        return {"payload": payload}
+
+    tx.one.side_effect = record_lookup
     with pytest.raises(Rejected, match="validation_authority"):
         denied.execution_plan(tenant, key, 1)
-    tx.one.side_effect = [{"payload": payload}, None, {"payload": payload}]
     assert planning.execution_plan(tenant, key, 1)["invalidated"] is False
     assert planning.bound_plan(key, 1) == payload["binding"]
     assert recipes.call_count == 2
     recipes.return_value = recipe | {"expires_at": 999}
     for native in (True, False):
-        tx.one.side_effect = [{"payload": payload}]
         with pytest.raises(Rejected, match="recipe_changed"):
             if native:
                 planning.execution_plan(tenant, key, 1)
