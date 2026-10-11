@@ -208,6 +208,73 @@ def verify_inventory(root: Path = ROOT) -> int:
         if status != 503:
             raise ValueError("Inventory native reader unexpected exception did not fail closed")
         error_validator.validate(error)
+    # Exercise every Inventory worker operation against the real ASGI boundary,
+    # including authentication, method, content, response schema and denial.
+    from types import SimpleNamespace
+    from unittest.mock import patch as mocked
+    from inventory.interfaces.discovery import InventoryApp
+    from inventory.application.migration_collection_ledger import MigrationCollectionLedger
+    workers = SimpleNamespace(worker=lambda *args: SimpleNamespace(identity="worker", fingerprint="current"))
+    fake_discovery = SimpleNamespace(
+        claim=lambda *args: {"job": None, "retry_after": 1},
+        submit=lambda *args: {"accepted": True, "discovery_id": SAMPLE_UUID, "status": "running"},
+    )
+    worker_app = InventoryApp(discovery=fake_discovery, authority=workers)
+    good_headers = [(b"authorization", b"Bearer " + b"a" * 64),
+                    (b"content-type", b"application/json")]
+    bodies = {
+        "claim": {},
+        "pages": {},
+        "profile-reads": {},
+        "receipts": {},
+    }
+    from jsonschema import Draft202012Validator
+    with mocked("inventory.interfaces.discovery.authorize_read",
+                lambda *args: {"allowed": True, "retry_after": 0}), mocked.object(
+                MigrationCollectionLedger, "publish",
+                lambda *args: {"envelope_sha256": "a" * 64, "status": "recorded",
+                               "coverage": [], "native_write_authorized": False}):
+        for name, body in bodies.items():
+            route = "/internal/collections/" + name
+            operation = worker_spec["paths"][route]["post"]
+            valid = set(operation["responses"])
+            request_body = json.dumps(body).encode()
+            for label, method, headers, expected in (
+                ("missing-header", "POST", [], 400),
+                ("malformed-workload", "POST", [(b"authorization", b"Bearer x")], 401),
+                ("unsupported-method", "GET", good_headers, 405),
+                ("missing-content-type", "POST", good_headers[:1], 415),
+                ("header-bound", "POST", [(b"x-header", b"x")] * 41, 413),
+            ):
+                status, response = asyncio.run(_exchange(worker_app, route, method, headers, request_body))
+                if status != expected or str(status) not in valid:
+                    raise ValueError(f"Inventory worker emitted undeclared status: {name} {label}={status}")
+                error_validator.validate(response)
+            status, response = asyncio.run(_exchange(worker_app, route, "POST", good_headers, request_body))
+            if status != 200 or "200" not in valid:
+                raise ValueError(f"Inventory worker authorized route unavailable: {route}={status}")
+            Draft202012Validator(operation["responses"]["200"]["content"]["application/json"]["schema"]).validate(response)
+            # Exercise owner-raised denial statuses, not just schema fixtures.
+            for denied in (403, 404, 409, 422, 423, 503):
+                def reject(*args, denied=denied):
+                    if denied == 503:
+                        raise RuntimeError("unavailable")
+                    raise Rejected("worker_rejected", denied)
+                if name == "claim":
+                    fake_discovery.claim = reject
+                elif name == "pages":
+                    fake_discovery.submit = reject
+                elif name == "profile-reads":
+                    worker_app.authority.worker = reject
+                else:
+                    worker_app.authority.worker = reject
+                status, response = asyncio.run(_exchange(worker_app, route, "POST", good_headers, request_body))
+                if status != denied or str(status) not in valid:
+                    raise ValueError(f"Inventory worker denial drift: {route} {denied}=>{status}")
+                error_validator.validate(response)
+            fake_discovery.claim = lambda *args: {"job": None, "retry_after": 1}
+            fake_discovery.submit = lambda *args: {"accepted": True, "discovery_id": SAMPLE_UUID, "status": "running"}
+            worker_app.authority.worker = lambda *args: SimpleNamespace(identity="worker", fingerprint="current")
     return len(declared_discovery) + len(declared_owner) + len(WORKER_ROUTES)
 
 
