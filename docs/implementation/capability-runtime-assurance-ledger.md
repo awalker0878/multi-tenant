@@ -492,3 +492,11 @@ destination rule inventories are missing. They must be commissioned
 before cross-hypervisor security portability can be approved.
 Native E3/E4 and actual CI green remain unverified. The implementation
 is **not** a declaration that every migration method is ready.
+
+## CT-API-AUTH — 2026-10-11 inter-service authority OpenAPI coverage (draft PR #64)
+
+**Implemented, unverified.** Source: [Authority-boundary contract coverage ExecPlan](authority-boundary-contract-coverage-execplan.md), with the 2026-10-11 first checkpoint `58a101bd` and subsequent additive commits `961d4c5c`, `665706ce`, `0b716b75`, `1acf83c0`, `35030351`, `608e69f8`.
+
+Added active Catalogue current and Planning intent, Inventory native-input v1.3, Governance source/execution approval, and Assurance qualification releases. Retired the unversioned Assurance qualification alias and the unused Planning Catalogue current-v1 consumer. Preserved historical published API bundles, retaining v1.2 on disk but removing its duplicate active registration. Strict Laravel route-reverse coverage and Inventory operation/status probes exist; shared error and UUID-policy gates were added. Scoped error and retry decisions are in `docs/contracts/adr-service-authority-errors-idempotency-2026-10-11.md`.
+
+**Acceptance pending:** Record an exact-head successful [contract integrity workflow](https://github.com/awalker0878/multi-tenant/actions/workflows/contracts-integrity.yml), the real `check.py` operation count, full independently exercised owner response statuses (including Laravel exception/status branches), and full Planning/Lifecycle/Inventory-worker internal reverse route enumeration. Existing E2 probes are not live native E3/E4. Keep PR #64 draft.

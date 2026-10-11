@@ -120,3 +120,5 @@ All receipts remain explicitly E2 simulation with no native support authority.
 drift; the live campaign validates actual successful wire responses against them.
 Use the [implementation record](../implementation/p06-execution.md) for effect
 certainty, current authority and recovery behavior.
+
+The foundation event `foundation-event.json` service copies are exact installed aliases of the canonical versioned `contracts/schemas/events/catalogue-foundation-recorded-v1.json` event. A filename alias is not an independent wire publication.

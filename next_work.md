@@ -22,6 +22,8 @@ at every checkpoint.
 
 - 2026-10-11 contract boundary checkpoint: four new authority OpenAPI releases, two-direction Laravel route conformance, six Inventory PlanningInputApp paths, hard-coded owner canaries, immutable historical UUID allowance and shared error schema implemented on this branch, still **unverified** (no exact-head successful CI URL). Error and command retry decisions are in `docs/contracts/adr-service-authority-errors-idempotency-2026-10-11.md`. Full producer-status execution and remaining ASGI reverse-route enumeration are still outstanding; E2 is not E3/E4.
 
+**Living execution plan:** [Authority-boundary contract coverage](docs/implementation/authority-boundary-contract-coverage-execplan.md). **Status: Implemented, unverified**. Native status coverage and exhaustive Python reverse route mapping remain open; no exact-head green CI run recorded. The unversioned Assurance alias was intentionally removed at the user's request.
+
 ## CT-R01 — Resolved migration-readiness contract (2026-10-09 checkpoint)
 
 **Current branch work committed, not yet end-to-end verified.** See
