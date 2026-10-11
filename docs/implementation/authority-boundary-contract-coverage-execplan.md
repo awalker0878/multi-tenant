@@ -142,3 +142,7 @@ The earlier head `1acf83c0` had all three Laravel reverse-route jobs pass, but `
 ### Negative regression canary for embedded local references
 
 The contract-integrity suite now includes a negative fixture which changes the sole Catalogue current-intent projection reference back to the invalid `#/$defs/Intent` root and asserts `local_refs` rejects it. Keep this test alongside the exact canonical projection equality check. No previously published producer schema was edited.
+
+## Repository simplification decision (2026-10-11)
+
+The product owner has directed removal of superseded canonical contracts and historical-only test suites to reduce repository size. Current active releases, runtime loaders, generators and CI remain authoritative. A historical copy must not be deleted while a current command or CI job still reads it; update that dependency to a current contract or retire the historical-only validation in the same change. This supersedes the earlier blanket preservation policy. Current authority, negative-path and E2-only controls must remain intact.
