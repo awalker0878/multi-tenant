@@ -1,12 +1,14 @@
 <?php
 
 declare(strict_types=1);
+
 use App\Application\Authorization\Contracts\ConsoleCaller;
 use App\Application\Authorization\Contracts\DelegatedAuthority;
 use App\Application\Authorization\Contracts\OwnerDirectory;
 use App\Application\Authorization\Data\ActorContext;
 use App\Application\Messaging\Actions\PublishCatalogueEvent;
 use App\Application\Messaging\Contracts\CataloguePublisher;
+use App\Application\Planning\Contracts\PlanningInputAuthority;
 use App\Domain\Authorization\AccessDenied;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +30,7 @@ beforeEach(function (): void {
     $this->intent = catalogueIntent();
     $this->denied = false;
     $test = $this;
-    $this->app->instance(ConsoleCaller::class, new class implements ConsoleCaller
+    $this->app->instance(ConsoleCaller::class, new class() implements ConsoleCaller
     {
         public function accepts(string $credential): bool
         {
@@ -48,7 +50,7 @@ beforeEach(function (): void {
             return new ActorContext($this->test->actor, $tenant, $action, $scope, '00000000-0000-4000-8000-000000000005');
         }
     });
-    $this->app->instance(OwnerDirectory::class, new class implements OwnerDirectory
+    $this->app->instance(OwnerDirectory::class, new class() implements OwnerDirectory
     {
         public function assertOwners(ActorContext $actor, array $owners): void {}
     });
@@ -182,7 +184,7 @@ it('bounds representative large tenant pages and rejects foreign cursors', funct
 it('retains stable event identity on uncertain delivery and publishes each aggregate in order', function (): void {
     $first = publishCatalogue($this)->assertCreated()->json();
     $second = publishCatalogue($this, $first['application_id'], $first['etag'])->assertCreated()->json();
-    $publisher = new class implements CataloguePublisher
+    $publisher = new class() implements CataloguePublisher
     {
         public bool $fail = true;
 
@@ -217,9 +219,9 @@ it('denies superseded Planning intent while service-only reads return current pu
     $first = publishCatalogue($this)->assertCreated()->json();
     $second = publishCatalogue($this, $first['application_id'], $first['etag'])
         ->assertCreated()->json();
-    $authority = Mockery::mock(\App\Application\Planning\Contracts\PlanningInputAuthority::class);
+    $authority = Mockery::mock(PlanningInputAuthority::class);
     $authority->shouldReceive('check')->twice()->andReturn([]);
-    $this->app->instance(\App\Application\Planning\Contracts\PlanningInputAuthority::class, $authority);
+    $this->app->instance(PlanningInputAuthority::class, $authority);
     $app = $first['application_id'];
     $environment = $this->intent['environment']['id'];
     $site = '00000000-0000-4000-8000-000000000009';
