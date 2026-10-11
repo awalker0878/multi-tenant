@@ -585,6 +585,67 @@ def check_implemented_api_contracts():
         raise ValueError("Planning Lifecycle embedded migration readiness differs from v2.2")
 
 
+
+UUID_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+
+
+def check_uuid_policy():
+    """Freeze historical uncanonical UUIDs by Git blob, enforce all new releases.
+
+    This per-file historical exemption ledger may only shrink. No new entry may
+    be added to accommodate a new format:uuid without the canonical pattern.
+    Embedded Inventory migration-input-v4 payload is a narrow exception because
+    its exact byte-for-byte schema is separately checked against the consumer.
+    """
+    legacy = load("scripts/contracts/uuid-legacy-v1.json")
+    legacy_files = set(legacy)
+    contract_files = sorted([
+        *ROOT.glob("contracts/openapi/*.json"),
+        *ROOT.glob("contracts/schemas/**/*.json"),
+    ])
+    canonical = load("contracts/schemas/planning/migration-input-v4.json")
+    native = load("contracts/openapi/inventory-native-input-v1.3.json")
+    for prefix in ("internal", "v1"):
+        p = f"/{prefix}/tenants/{{tenant}}/migration-inputs/{{application}}/{{environment}}/{{site}}/{{revision}}/{{digest}}"
+        if native["paths"][p]["get"]["responses"]["200"]["content"]["application/json"]["schema"] != canonical:
+            raise ValueError(f"Inventory v1.3 migration input projection not canonical: {p}")
+    violations = 0
+    for path in contract_files:
+        relative = path.relative_to(ROOT).as_posix()
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        missing = []
+
+        def visit(node, pointer=""):
+            if isinstance(node, list):
+                for i, item in enumerate(node):
+                    visit(item, f"{pointer}/{i}")
+            elif isinstance(node, dict):
+                if node.get("format") == "uuid" and node.get("pattern") != UUID_PATTERN:
+                    missing.append(pointer)
+                for name, value in node.items():
+                    visit(value, f"{pointer}/{name}")
+
+        visit(doc)
+        if not missing:
+            continue
+        violations += len(missing)
+        if relative == "contracts/openapi/inventory-native-input-v1.3.json":
+            for pointer in missing:
+                if not (pointer.startswith("/paths//internal/tenants/") or
+                        pointer.startswith("/paths//v1/tenants/")) or (
+                        "/migration-inputs/" not in pointer or
+                        "/get/responses/200/content/application/json/schema/" not in pointer):
+                    raise ValueError(f"New noncanonical UUID in {relative}: {pointer}")
+            continue
+        raw = path.read_bytes()
+        blob = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\\0" + raw).hexdigest()
+        if legacy.get(relative) != blob:
+            raise ValueError(f"New/changed noncanonical UUID in {relative}: {missing[:3]}")
+    if not legacy_files.issubset({p.relative_to(ROOT).as_posix() for p in contract_files}):
+        raise ValueError("Historical UUID allowance references missing contract")
+    return violations
+
+
 def main():
     sources, bundles = verify()
     id_count = unique_schema_ids()
@@ -605,6 +666,7 @@ def main():
     check_consumer_registry()
     check_owner_operation_bindings()
     check_implemented_api_contracts()
+    check_uuid_policy()
     print(json.dumps(dict(status="PASS", sources=sources, bundles=bundles, unique_ids=id_count, schema_count=schema_count, paths=paths, operations=ops)))
 
 if __name__ == "__main__":

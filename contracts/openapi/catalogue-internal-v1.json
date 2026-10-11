@@ -898,17 +898,17 @@
           "application_id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "revision_id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "deployment_id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "digest": {
             "type": "string",
@@ -938,7 +938,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "name": {
             "type": "string"
@@ -960,7 +960,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "name": {
             "type": "string"
@@ -978,17 +978,17 @@
                 "id": {
                   "type": "string",
                   "format": "uuid",
-                  "pattern": "^[0-9a-f-]{36}$"
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
                 },
                 "environment_id": {
                   "type": "string",
                   "format": "uuid",
-                  "pattern": "^[0-9a-f-]{36}$"
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
                 },
                 "current_revision_id": {
                   "type": "string",
                   "format": "uuid",
-                  "pattern": "^[0-9a-f-]{36}$"
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
                 }
               },
               "required": [
@@ -1013,12 +1013,12 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "deployment_id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "sequence": {
             "type": "integer"
@@ -1032,7 +1032,7 @@
           "actor_id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "digest": {
             "type": "string"
@@ -1058,17 +1058,17 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "application_id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "deployment_id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "sequence": {
             "type": "integer"
@@ -1082,7 +1082,7 @@
           "actor_id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "digest": {
             "type": "string"
@@ -1113,7 +1113,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "pattern": "^[0-9a-f-]{36}$"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "kind": {
             "enum": [
@@ -1141,7 +1141,7 @@
               "owner_id": {
                 "type": "string",
                 "format": "uuid",
-                "pattern": "^[0-9a-f-]{36}$"
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               "shareable": {
                 "type": "boolean"
