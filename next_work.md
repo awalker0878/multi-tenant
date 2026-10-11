@@ -28,6 +28,14 @@ at every checkpoint.
 
 - 2026-10-11 CI diagnostic: an earlier head's three Laravel route-conformance jobs passed, but integrity failed because Catalogue's embedded `#/$defs/Intent` reference was not rebased under OpenAPI components. The reference was relocated and an exact schema projection canary added. The corrected exact head is **unverified** pending a new CI run.
 
+### 2026-10-11 follow-up: fix contract audit and retire compatibility shims
+
+**Engineering changes committed / CI unverified.** The audit's historical UUID digest-object comparator and its 101-file legacy compatibility SHA allowlist are completely retired; current authority releases enforce canonical lowercase UUID directly, with a source-backed v4 migration payload exception. The nonfunctional Inventory internal Planning-input UUID-as-integer read alias was removed, and the active v1.3 OpenAPI plus producer conformance reflect that removal. The active Inventory worker contract covers all four collection endpoints with reverse conformance, HTTP status/shape probes, and explicit `native_write_authorized=false` receipt limits.
+
+Required `X-Actor-Delegation`/`X-Planning-Action` headers and actual Governance 409 bound-plan digest conflict are contracted and regression checked. Canonical owner response schemas are regenerated to separate candidate output and checked against immutable active releases in CI, with one shared Inventory migration v4 component replacing its duplicated 200-response copies. The composed Planning router now dispatches workload-readiness and internal placement reads. Planning and Lifecycle runtimes now fail closed for unregistered `/v1/`/`/internal/` routes and their explicit full HTTP-operation manifests are compared against separately published active contracts. Previously uncovered Planning native/invalidation and Lifecycle internal placement/simulation authority paths now have active registered releases. The obsolete P00 synthetic compatibility runner, fixtures and workflow were removed while historic published releases remain immutable.
+
+**Still open:** exact-head real CI green; independent producer/status/body validation for every Laravel operation and all Planning/Lifecycle owner status branches, not only owner-specific route and representative error probes; real E3/E4 native qualification (explicitly out of scope). Until a successful real CI run is recorded, PR #64 remains draft and **no native-write authority is granted**.
+
 ## CT-R01 — Resolved migration-readiness contract (2026-10-09 checkpoint)
 
 **Current branch work committed, not yet end-to-end verified.** See
