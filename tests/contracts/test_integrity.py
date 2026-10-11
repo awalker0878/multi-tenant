@@ -50,6 +50,14 @@ class ContractIntegrityTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Missing delegated authority header"):
                 check_implemented_api_contracts()
 
+    def test_owner_release_components_are_rebuilt_from_source_contracts(self):
+        from generate_authority_releases import verify as verify_authority, assemble
+        self.assertEqual(verify_authority(), 3)
+        generated = assemble("inventory-native-input-v1.3.json")
+        modified = load("contracts/openapi/inventory-native-input-v1.3.json")
+        modified["components"]["schemas"]["CapabilityInput"]["properties"].pop("capability_snapshot")
+        self.assertNotEqual(generated, modified)
+
     def test_sources_assemble_to_current_published_bundles(self):
         sources, bundles = verify()
         self.assertGreaterEqual(sources, 6)
