@@ -294,6 +294,24 @@ async def _probe_migration(app, path: str, method: str) -> int:
     return captured[0]
 
 
+def assert_planning_composed_route(path: str, destination: str, method: str = "POST") -> None:
+    """Probe the deployed router composition, not just its internal handler."""
+    import asyncio
+    from planning.bootstrap.server import PlanningRouter
+    router = PlanningRouter.__new__(PlanningRouter)
+    called = []
+    for name in ("migration", "native", "planning", "invalidations", "foundation"):
+        async def responder(scope, receive, send, owner=name):
+            called.append(owner)
+            data = json.dumps({"owner": owner}).encode()
+            await send({"type": "http.response.start", "status": 200, "headers": []})
+            await send({"type": "http.response.body", "body": data})
+        setattr(router, name, responder)
+    status, payload = asyncio.run(_exchange(router, path, method, []))
+    if status != 200 or called != [destination] or payload != {"owner": destination}:
+        raise ValueError(f"Composed Planning router dispatched {method} {path} to {called}, expected {destination}")
+
+
 def verify_planning_migration(root: Path = ROOT) -> int:
     import asyncio
     from planning.interfaces.migration import MigrationPreparationApp
@@ -306,6 +324,8 @@ def verify_planning_migration(root: Path = ROOT) -> int:
         # A 404 indicates no matching runtime route (or wrong HTTP method).
         if status == 404:
             raise ValueError(f"Planning migration OpenAPI lacks executable route: {method} {path}")
+    for method, path in declared:
+        assert_planning_composed_route(synthetic_path(path), "migration", method)
     return len(declared)
 
 
@@ -512,6 +532,8 @@ def verify_planning_lifecycle_reads(root: Path = ROOT) -> int:
             raise ValueError(f"Planning Lifecycle reader denied request unexpectedly succeeded: {path}")
     if sum(1 for c in calls if c[0] == "authority") != 2:
         raise ValueError("Planning Lifecycle authority was not checked on each read")
+    for path in paths:
+        assert_planning_composed_route(path, "planning", "GET")
     return 2
 
 

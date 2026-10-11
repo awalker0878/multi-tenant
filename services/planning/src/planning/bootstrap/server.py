@@ -88,10 +88,15 @@ class PlanningRouter:
                 "/migration-support",
                 "/migration-flow-choices",
                 "/migration-flow-selections",
+                "/migration-workload-readiness",
             )
         ):
             await self.migration(scope, receive, send)
-        elif scope["type"] == "http" and scope["path"].startswith("/v1/"):
+        elif scope["type"] == "http" and (
+            scope["path"].startswith("/v1/")
+            or (scope["path"].startswith("/internal/tenants/")
+                and "/placement-proposals/" in scope["path"])
+        ):
             await self.planning(scope, receive, send)
         else:
             await self.foundation(scope, receive, send)
