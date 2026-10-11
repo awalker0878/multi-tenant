@@ -716,7 +716,6 @@
       ],
       "source_manifest": "contracts/source/openapi/planning-migration-v1.6/manifest.json",
       "depends_on": [
-        "contracts/schemas/planning/migration-readiness-v2.json",
         "contracts/schemas/planning/migration-support-v2.json"
       ]
     },
@@ -988,9 +987,7 @@
         "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.2.json"
       ],
       "source_manifest": null,
-      "depends_on": [
-        "contracts/schemas/planning/migration-readiness-v2.json"
-      ]
+      "depends_on": []
     },
     {
       "path": "contracts/schemas/planning/migration-support-v2.json",

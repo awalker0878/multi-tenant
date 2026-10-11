@@ -1,7 +1,8 @@
-"""Rebuild the Planning OpenAPI readiness component from canonical wire v2.
+"""Project the active v2.2 validation profile into the stable readiness v2 wire.
 
-The stronger v2.1 validation profile is intentionally not a new payload
-schema_version; no historical canonical contract may be overwritten here.
+The stricter v2.2 eligibility gates are consumer-side validation rules, not
+published v2 wire requirements. Keep the v2 projection source in the active
+contract rather than loading a retired v2 canonical schema.
 """
 from __future__ import annotations
 
@@ -11,7 +12,7 @@ from copy import deepcopy
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / "contracts/schemas/planning/migration-readiness-v2.json"
+SOURCE = ROOT / "contracts/schemas/planning/migration-readiness-v2.2.json"
 FRAGMENT = (ROOT / "contracts/source/openapi/planning-migration-v1.6/"
             "components-schemas/workload-readiness.json")
 
@@ -20,6 +21,14 @@ def embedded_payload() -> dict:
     schema = deepcopy(json.loads(SOURCE.read_text(encoding="utf-8")))
     schema.pop("$id", None)
     schema.pop("$schema", None)
+
+    # The v2.2 validation profile tightens eligibility but does not change
+    # the current v2 payload. Project the three stronger admission checks out
+    # of the embedded wire schema; retain all other fields and definitions.
+    eligible = schema["allOf"][0]["then"]["properties"]
+    eligible["api_compatibility"]["properties"].pop("status")
+    eligible["workload_reconciliation"]["properties"].pop("workloads")
+    eligible["collection_coverages"]["items"]["properties"].pop("attributes")
 
     def update_refs(value: object) -> None:
         if isinstance(value, list):
