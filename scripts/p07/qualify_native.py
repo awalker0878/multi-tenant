@@ -54,6 +54,7 @@ def main():
             raise RuntimeError('P07_POSTGRES_BIN is required; skipped persistence tests cannot qualify the worker')
         command(ROOT / 'scripts/p01/contracts', ['uv', 'sync', '--locked'])
         command(ROOT / 'scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_contract.py')])
+        command(ROOT / 'scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p07/check_native_contract.py')])
         env['P05_POSTGRES_BIN'] = env['P07_POSTGRES_BIN']
         service = ROOT / 'services/lifecycle'
         for argv in (
