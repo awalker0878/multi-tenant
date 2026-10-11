@@ -85,13 +85,19 @@ class HttpRouteConformanceTests(unittest.TestCase):
             compare_inventory_worker_routes(frozenset({"/internal/collections/claim", "/internal/collections/hidden"}), declared)
 
     def test_planning_migration_suffix_catalogue_is_exact(self):
-        from planning.bootstrap.server import MIGRATION_SUFFIXES
+        import ast
         from route_conformance import routes_in_openapi
+        source = ast.parse((ROOT / "services/planning/src/planning/bootstrap/server.py").read_text())
+        variants = next(ast.literal_eval(assignment.value)
+                        for assignment in source.body
+                        if isinstance(assignment, ast.Assign)
+                        and any(isinstance(t, ast.Name) and t.id == "MIGRATION_SUFFIXES"
+                                for t in assignment.targets))
         api = json.loads((ROOT / "contracts/openapi/planning-migration-v1.6.json").read_text())
         contracted = {"/" + path.rsplit("/", 1)[-1]
                       for method, path in routes_in_openapi(api) if method == "POST"}
-        self.assertEqual(set(MIGRATION_SUFFIXES), contracted)
-        self.assertNotIn("/legacy-migration-inputs", MIGRATION_SUFFIXES)
+        self.assertEqual(set(variants), contracted)
+        self.assertNotIn("/legacy-migration-inputs", variants)
 
     def test_declared_paths_include_each_method(self):
         spec = {"paths": {"/v1/example": {"get": {}, "post": {}}}}
