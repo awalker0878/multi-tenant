@@ -59,7 +59,7 @@ def discover_runtime_copies(root: Path = ROOT) -> dict[str, list[str]]:
         for name in names & by_name.keys():
             for artifact in by_name[name]:
                 # A different product's deployed package is not used merely
-                # because two products ship a same-named historical file.
+                # because two products may ship a same-named current contract.
                 if artifact.relative_to(root).parts[:2] != source.relative_to(root).parts[:2]:
                     continue
                 path = str(artifact.relative_to(root))

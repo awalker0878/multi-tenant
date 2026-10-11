@@ -253,11 +253,6 @@ def check_schema_dialects():
         "planning/fact-v1.json",
         "planning/inventory-input-v1.json",
         "planning/inventory-input-v2.json",
-        "planning/migration-input-v1.json",
-        "planning/migration-input-v2.json",
-        "planning/migration-input-v3.json",
-        "planning/migration-support-v1.json",
-        "planning/qualification-v1.json",
     }
     found = 0
     for path in sorted((ROOT / "contracts/schemas").rglob("*.json")):
@@ -300,6 +295,15 @@ def check_readiness_projection():
 def check_consumer_registry():
     registry = load("architecture/contract-consumers.json")
     inventory = registry["contracts"]
+    retired = set(load("architecture/retired-contract-releases.json")["retired"])
+    active = {entry["path"] for entry in registry["active_releases"]}
+    if retired & active:
+        raise ValueError("Retired canonical contract is registered as active")
+    for path in retired:
+        if not path.startswith("contracts/") or ".." in Path(path).parts:
+            raise ValueError(f"Invalid retired contract path: {path}")
+        if (ROOT / path).exists():
+            raise ValueError(f"Retired canonical contract reintroduced: {path}")
     for source, consumers in {
         "contracts/openapi/assurance-evidence-v1.json": {"assurance"},
         "contracts/openapi/inventory-native-input-v1.3.json": {"inventory", "planning", "lifecycle"},

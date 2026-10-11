@@ -343,8 +343,35 @@ components:
         registry["active_releases"] = [
             entry for entry in registry["active_releases"] if entry["path"] != source
         ]
-        with self.assertRaisesRegex(ValueError, "Runtime contract copies missing"):
+        with self.assertRaisesRegex(ValueError, "Shipped contract copies missing"):
             verify_runtime_inventory(registry)
+
+    def test_unreferenced_packaged_contract_is_rejected(self):
+        from runtime_inventory import verify_runtime_inventory
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            package = root / "apps/demo/resources/contracts/retired-v1.json"
+            package.parent.mkdir(parents=True)
+            package.write_text("{}")
+            with self.assertRaisesRegex(ValueError, "Shipped contract copies missing"):
+                verify_runtime_inventory({"active_releases": []}, root)
+
+    def test_retired_canonical_file_cannot_reappear(self):
+        from check import check_consumer_registry
+        from check import load as real_load
+        registry = real_load("architecture/contract-consumers.json")
+        retired_path = "contracts/openapi/governance-native-approval-v1.json"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            reintroduced = root / retired_path
+            reintroduced.parent.mkdir(parents=True)
+            reintroduced.write_text("{}")
+            with patch("check.ROOT", root), patch("check.load", side_effect=lambda path:
+                       registry if path == "architecture/contract-consumers.json"
+                       else {"retired": [retired_path]} if path == "architecture/retired-contract-releases.json"
+                       else real_load(path)):
+                with self.assertRaisesRegex(ValueError, "Retired canonical contract reintroduced"):
+                    check_consumer_registry()
 
     def test_runtime_discovery_is_bounded_to_own_product(self):
         from runtime_inventory import discover_runtime_copies
