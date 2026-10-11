@@ -109,7 +109,7 @@ def campaign(c, extension=None):
     for service in ['planning','assurance']:c['stop'](service);c['start'](service)
     candidates=[{k:d[k] for k in ['site_id','endpoint_id','generation_id']} for d in [a,b]]
     base=f'/v1/tenants/{tenant}/applications/{application}/environments/{environment}'
-    api=json.loads((root/'contracts/openapi/planning-v1.json').read_text());validate_spec(api)
+    api=json.loads((root/'contracts/openapi/planning-v1.2.json').read_text());validate_spec(api)
     def grants(sites,action='plan.create',token=None):
         headers=[]
         for site in dict.fromkeys(sites):
