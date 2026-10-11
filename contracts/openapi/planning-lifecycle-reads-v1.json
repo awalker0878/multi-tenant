@@ -869,6 +869,18 @@
               "recipe_sha256": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{64}$"
+              },
+              "recipe_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "base_plan_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "api_selection": {
+                "type": "object",
+                "minProperties": 1
               }
             }
           },
