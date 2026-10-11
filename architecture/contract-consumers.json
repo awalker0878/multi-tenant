@@ -293,6 +293,10 @@
       "inventory",
       "inventory-workers",
       "lifecycle-workers"
+    ],
+    "contracts/openapi/inventory-collection-worker-v1.json": [
+      "inventory",
+      "inventory-workers"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -1004,6 +1008,16 @@
       "consumers": [
         "inventory-workers",
         "lifecycle-workers"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/inventory-collection-worker-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "inventory-workers"
       ],
       "copies": [],
       "source_manifest": null,

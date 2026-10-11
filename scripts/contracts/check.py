@@ -493,6 +493,14 @@ def check_implemented_api_contracts():
                 ("GET", "/internal/tenants/{tenant}/applications/{application}/environments/{environment}/current-planning-intent"),
             },
         ),
+        "contracts/openapi/inventory-collection-worker-v1.json": (
+            "inventory", {
+                ("POST", "/internal/collections/claim"),
+                ("POST", "/internal/collections/pages"),
+                ("POST", "/internal/collections/profile-reads"),
+                ("POST", "/internal/collections/receipts"),
+            },
+        ),
         "contracts/openapi/inventory-native-input-v1.3.json": (
             "inventory", {
                 ( "GET", f"/{prefix}/tenants/{{tenant}}/{resource}/{{application}}/{{environment}}/{{site}}/{suffix}")
@@ -681,6 +689,7 @@ def check_uuid_policy():
     releases = (
         "catalogue-internal-v1.json",
         "inventory-native-input-v1.3.json",
+        "inventory-collection-worker-v1.json",
         "governance-service-checks-v1.json",
         "assurance-qualification-v1.json",
         "governance-inventory-collection-v1.1.json",

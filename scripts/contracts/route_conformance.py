@@ -98,11 +98,19 @@ def compare_inventory_discovery_routes(runtime_routes, declared: set[tuple[str, 
             raise ValueError(f"Inventory OpenAPI operation without executable route: {method} {path}")
 
 
+def compare_inventory_worker_routes(runtime_routes: frozenset[str] | set[str], declared: set[tuple[str, str]]) -> None:
+    expected = {("POST", path) for path in runtime_routes}
+    if declared != expected:
+        raise ValueError(f"Undocumented Inventory worker route or inactive declaration: {sorted(expected ^ declared)}")
+
+
 def verify_inventory(root: Path = ROOT) -> int:
-    from inventory.interfaces.discovery import ROUTES
+    from inventory.interfaces.discovery import ROUTES, WORKER_ROUTES
     spec = json.loads((root / "contracts/openapi/inventory-v1.9.json").read_text())
     declared_discovery = routes_in_openapi(spec)
     compare_inventory_discovery_routes(ROUTES, declared_discovery)
+    worker_spec = json.loads((root / "contracts/openapi/inventory-collection-worker-v1.json").read_text())
+    compare_inventory_worker_routes(WORKER_ROUTES, routes_in_openapi(worker_spec))
 
     from inventory.interfaces.planning import PlanningInputApp
     import asyncio
@@ -200,7 +208,7 @@ def verify_inventory(root: Path = ROOT) -> int:
         if status != 503:
             raise ValueError("Inventory native reader unexpected exception did not fail closed")
         error_validator.validate(error)
-    return len(declared_discovery) + len(declared_owner)
+    return len(declared_discovery) + len(declared_owner) + len(WORKER_ROUTES)
 
 
 async def _probe_migration(app, path: str, method: str) -> int:

@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
-from route_conformance import compare_declared, compare_inventory_discovery_routes, routes_in_laravel, routes_in_openapi, verify_app
+from route_conformance import compare_declared, compare_inventory_discovery_routes, compare_inventory_worker_routes, routes_in_laravel, routes_in_openapi, verify_app
 
 
 class HttpRouteConformanceTests(unittest.TestCase):
@@ -77,6 +77,12 @@ class HttpRouteConformanceTests(unittest.TestCase):
         dummy = ("GET", rf"/internal/tenants/({segment})/x", "undocumented", "inventory.read")
         with self.assertRaisesRegex(ValueError, "Undocumented Inventory"):
             compare_inventory_discovery_routes((real, dummy), declared)
+
+    def test_unregistered_inventory_worker_route_fails(self):
+        declared = {("POST", "/internal/collections/claim")}
+        compare_inventory_worker_routes(frozenset({"/internal/collections/claim"}), declared)
+        with self.assertRaisesRegex(ValueError, "Undocumented Inventory worker"):
+            compare_inventory_worker_routes(frozenset({"/internal/collections/claim", "/internal/collections/hidden"}), declared)
 
     def test_declared_paths_include_each_method(self):
         spec = {"paths": {"/v1/example": {"get": {}, "post": {}}}}

@@ -21,6 +21,13 @@ from inventory.application.workload import WorkloadProfiles
 from inventory.domain.discovery import Rejected
 
 UUID = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+WORKER_ROUTES = frozenset({
+    "/internal/collections/claim",
+    "/internal/collections/pages",
+    "/internal/collections/profile-reads",
+    "/internal/collections/receipts",
+})
+
 ROUTES = (
     (
         "GET",
@@ -238,12 +245,7 @@ class InventoryApp:
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", header):
                 raise Rejected("invalid_workload", 401)
             credential = header[7:]
-            worker_route = scope["path"] in {
-                "/internal/collections/claim",
-                "/internal/collections/pages",
-                "/internal/collections/profile-reads",
-                "/internal/collections/receipts",
-            }
+            worker_route = scope["path"] in WORKER_ROUTES
             selected = next(
                 (
                     (m, op, action)
