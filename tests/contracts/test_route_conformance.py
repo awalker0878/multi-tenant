@@ -99,6 +99,19 @@ class HttpRouteConformanceTests(unittest.TestCase):
         self.assertEqual(set(variants), contracted)
         self.assertNotIn("/legacy-migration-inputs", variants)
 
+    def test_composed_python_route_negative_injection(self):
+        from route_conformance import compare_composed_routes
+        base = {("GET", "/v1/tenants/{tenant}/jobs")}
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "contracts/openapi").mkdir(parents=True)
+            (root / "contracts/openapi/example.json").write_text(json.dumps({
+                "paths": {"/v1/tenants/{tenant}/jobs": {"get": {"responses": {"200": {}}}}}
+            }))
+            self.assertEqual(compare_composed_routes("Lifecycle", base, ("example.json",), root), 1)
+            with self.assertRaisesRegex(ValueError, "Undocumented Lifecycle"):
+                compare_composed_routes("Lifecycle", base | {("POST", "/internal/hidden")}, ("example.json",), root)
+
     def test_declared_paths_include_each_method(self):
         spec = {"paths": {"/v1/example": {"get": {}, "post": {}}}}
         self.assertEqual(routes_in_openapi(spec), {

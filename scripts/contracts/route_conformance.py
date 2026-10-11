@@ -541,12 +541,33 @@ def verify_planning_lifecycle_reads(root: Path = ROOT) -> int:
     return 2
 
 
+def compare_composed_routes(owner: str, runtime: set[tuple[str, str]],
+                            releases: tuple[str, ...], root: Path = ROOT) -> int:
+    declared = set()
+    for name in releases:
+        spec = json.loads((root / "contracts/openapi" / name).read_text())
+        declared |= routes_in_openapi(spec)
+    if declared != runtime:
+        raise ValueError(f"Undocumented {owner} composed runtime route: {sorted(declared ^ runtime)}")
+    return len(declared)
+
+
+def verify_python_composition(root: Path = ROOT) -> int:
+    from planning.bootstrap.server import HTTP_OPERATIONS as planning_routes
+    from lifecycle.bootstrap.server import HTTP_OPERATIONS as lifecycle_routes
+    return (compare_composed_routes("Planning", set(planning_routes), tuple(["planning-v1.2.json","planning-migration-v1.6.json","planning-native-v1.json","planning-immutable-plan-v1.1.json","planning-lifecycle-reads-v1.json","planning-qualification-events-v1.json"]), root)
+            + compare_composed_routes("Lifecycle", set(lifecycle_routes), tuple(["lifecycle-v1.json","lifecycle-migration-campaigns-v1.json","lifecycle-internal-authority-v1.json"]), root))
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--app", choices=["governance", "catalogue", "assurance", "inventory", "planning-migration", "lifecycle-native", "planning-immutable", "planning-lifecycle"], required=True)
+    parser.add_argument("--app", choices=["governance", "catalogue", "assurance", "inventory", "planning-migration", "lifecycle-native", "planning-immutable", "planning-lifecycle", "python-composed"], required=True)
     parser.add_argument("--routes", type=Path)
     args = parser.parse_args()
-    if args.app == "inventory":
+    if args.app == "python-composed":
+        count = verify_python_composition()
+        print(json.dumps({"status": "PASS", "app": args.app, "runtime_operations": count}))
+    elif args.app == "inventory":
         count = verify_inventory()
         print(json.dumps({"status": "PASS", "app": args.app, "runtime_operations": count}))
     elif args.app in {"lifecycle-native", "planning-immutable", "planning-lifecycle"}:

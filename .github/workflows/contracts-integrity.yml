@@ -56,6 +56,7 @@ jobs:
         run: |
           python scripts/contracts/route_conformance.py --app inventory
           python scripts/contracts/route_conformance.py --app planning-migration
+          python scripts/contracts/route_conformance.py --app python-composed
           python scripts/contracts/route_conformance.py --app lifecycle-native
           python scripts/contracts/route_conformance.py --app planning-immutable
           python scripts/contracts/route_conformance.py --app planning-lifecycle

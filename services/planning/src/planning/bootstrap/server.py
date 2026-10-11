@@ -1,6 +1,7 @@
 """Compose the persistent synthetic diagnostic service without product operations."""
 
 import argparse
+import re
 import time
 from collections.abc import Sequence
 
@@ -40,6 +41,56 @@ from planning.interfaces.telemetry import RequestTelemetry
 
 MIGRATION_SUFFIXES = ("/migration-preparations", "/migration-plans", "/migration-plan-options", "/migration-support", "/migration-flow-choices", "/migration-flow-selections", "/migration-workload-readiness")
 
+HTTP_OPERATIONS = (
+    ("POST", "/internal/qualification-events"),
+    ("GET", "/internal/tenants/{tenant}/placement-proposals/{plan}/revisions/{revision}"),
+    ("GET", "/v1/plans/{plan}/revisions/{revision}"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments"),
+    ("GET", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments/{record}"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-flow-choices"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-flow-selections"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plan-options"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plans"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-preparations"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-support"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-workload-readiness"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/native-plans"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans"),
+    ("GET", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}/diff"),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}/validity"),
+    ("GET", "/v1/tenants/{tenant}/execution-plans/{plan}/revisions/{revision}"),
+)
+
+def _parameter_pattern(match: re.Match[str]) -> str:
+    name = match.group()[1:-1]
+    if name == "revision":
+        return r"[1-9][0-9]{0,8}"
+    if name == "digest":
+        return r"[0-9a-f]{64}"
+    return r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+
+HTTP_ROUTE_PATTERNS = tuple(
+    (verb, re.compile(re.sub(r"\{[a-z_]+\}", _parameter_pattern, path)))
+    for verb, path in HTTP_OPERATIONS
+)
+
+
+async def reject_unpublished_route(scope: Scope, send: ASGISendCallable) -> bool:
+    if scope["type"] != "http" or not scope["path"].startswith(("/v1/", "/internal/")):
+        return False
+    if any(verb == scope["method"] and pat.fullmatch(scope["path"])
+           for verb, pat in HTTP_ROUTE_PATTERNS):
+        return False
+    body = b'{"error":"not_found"}'
+    await send({"type": "http.response.start", "status": 404,
+                "headers": [(b"content-type", b"application/json"),
+                            (b"cache-control", b"no-store"),
+                            (b"content-length", str(len(body)).encode())]})
+    await send({"type": "http.response.body", "body": body})
+    return True
+
+
 class PlanningRouter:
     def __init__(self) -> None:
         def clock() -> int:
@@ -78,6 +129,8 @@ class PlanningRouter:
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
+        if await reject_unpublished_route(scope, send):
+            return
         if scope["type"] == "http" and scope["path"] == "/internal/qualification-events":
             await self.invalidations(scope, receive, send)
         elif scope["type"] == "http" and scope["path"].endswith("/native-plans"):
