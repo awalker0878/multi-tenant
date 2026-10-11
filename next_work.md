@@ -470,3 +470,10 @@ related receiving obligations is preserved, without rewriting its content, in
 [archived-next-work-handoffs.md](docs/implementation/archived-next-work-handoffs.md).
 Those descriptions are not current PR #64 statuses. Return to this file for
 the active tracked blockers and next steps.
+
+
+### Contract working-tree reduction — 2026-10-11
+
+**Implemented, CI unverified:** Removed 40 superseded canonical releases (26 OpenAPI, 14 JSON Schema), 20 superseded installed consumer snapshots, and five obsolete P05/P08 historical-only generator/checker scripts. Tracked file reduction: 65 files, approximately 3.15 MiB of current-tree blob contents. The explicit approved list lives in `architecture/retired-contract-releases.json`; P01 history-gate conformance now exempts only these retired paths and rejects any retired path still registered as active. Contract integrity now rejects every duplicate retained JSON Schema `$id` with no historical SHA exception. P05/P08/P09 current qualification scripts and Planning P05 live campaign now read supported current releases. P07/P10 native grant-negative checks are retained until an equivalent current replacement exists.
+
+**Validation outstanding:** Exact-head CI jobs remain queued. After checks run, resolve genuine failures without restoring retired versions. Do not promote any native capability above E2 or authorize writes based on this cleanup. Preserve PR #64 draft until verified.
