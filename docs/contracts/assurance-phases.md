@@ -81,3 +81,24 @@ python scripts/contracts/assurance.py --output /tmp/contract-inventory.json
 Retired canonical versions still have separately managed consumer-clearance
 obligations under `docs/contracts/retirement-approval.md`. This assurance
 work does not fabricate or waive those reviews.
+
+## Phase 3: new-publication quality admission
+
+`architecture/contract-quality-policy.json` and `scripts/contracts/quality.py`
+enforce current security, error, idempotency, JSON Schema identity and event
+delivery requirements on all newly published canonical versions. Semantic
+change analysis rejects same-major changes to previously guaranteed response
+schemas, consumer parameters, authorization, idempotency scope/retention,
+public exposure, and channel/message bindings. See
+`docs/contracts/release-quality.md`.
+
+## Phase 4: method/mode executable qualification
+
+`scripts/contracts/qualify_capabilities.py` requires a passing native-worker
+JUnit receipt for **every** defined method/mode, every implemented native
+data-operation stage, cold capture, independent readback and revocation.
+The Contract Integrity and P08 jobs fail if a result is missing, skipped,
+failing or unqualified. This is strictly E2 synthetic behavior qualification;
+installed versions require separate independently signed E3/E4 custody and
+review and cannot be promoted from these results. See
+`docs/contracts/capability-qualification.md`.
