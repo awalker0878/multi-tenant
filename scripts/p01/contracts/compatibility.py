@@ -110,7 +110,20 @@ def check(root: Path, base_revision: str) -> dict:
         return json.loads(git("show", base_revision + ":" + path)) if present == path else default
 
     prior_retired = set(base_json("architecture/retired-contract-releases.json", {"retired": []})["retired"])
-    new_retirements = retired - prior_retired
+    # These owner-directed removals predate the new two-stage review gate.
+    # Their exact, pinned names remain an UNCLEARED backlog; no new deletion
+    # may be smuggled into this exemption.
+    frozen_file = root / "architecture/retirement-unverified-baseline.txt"
+    frozen = set()
+    if frozen_file.is_file():
+        raw = frozen_file.read_bytes()
+        git_blob = b"blob " + str(len(raw)).encode() + bytes([0]) + raw
+        if hashlib.sha1(git_blob).hexdigest() != "5a5ba6316d1b8d4148d20ec070d3f3afa01ab71c":
+            raise ValueError("Previously unverified retirement roster was modified")
+        frozen = set(raw.decode("utf-8").splitlines())
+        if not frozen <= retired:
+            raise ValueError("Historical retirement record missing")
+    new_retirements = retired - prior_retired - frozen
     clearance_file = root / CLEARANCES
     current_clearances = (json.loads(clearance_file.read_text()) if clearance_file.is_file()
                           else {"schema_version": 1, "clearances": {}})
@@ -120,7 +133,7 @@ def check(root: Path, base_revision: str) -> dict:
     if base_clearances.get("schema_version") != 1 or not isinstance(base_clearances.get("clearances"), dict):
         raise ValueError("Invalid review-base retirement clearance registry")
 
-    for path in sorted(new_retirements | missing):
+    for path in sorted(new_retirements | (missing - frozen)):
         # Pre-existing historical removals are tracked but do not masquerade as cleared.
         if path in prior_retired:
             continue
