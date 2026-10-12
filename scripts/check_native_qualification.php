@@ -15,7 +15,7 @@ $result = $resolver->resolve($fixture['bundle'], $fixture['keys'], $fixture['sco
 if ($result['verification']['valid'] !== true || $result['version'] !== 2) {
     throw new RuntimeException('signed_native_record_failed');
 }
-foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', 'runtime', 'definition'] as $fault) {
+foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', 'runtime', 'definition', 'missing_method', 'false_support'] as $fault) {
     $bundle = $fixture['bundle'];
     $keys = $fixture['keys'];
     $scope = $fixture['scope'];
@@ -33,6 +33,11 @@ foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', '
         $keys['reviewer']['role'] = 'observer';
     } elseif ($fault === 'runtime') {
         $bundle['runtime'] = $bundle['evidence'][0];
+    } elseif ($fault === 'missing_method') {
+        array_pop($bundle['record']['method_modes']);
+    } elseif ($fault === 'false_support') {
+        $name = array_key_first($bundle['record']['method_modes']);
+        $bundle['record']['method_modes'][$name] = 'passed';
     } else {
         $bundle['record']['scope']['artifacts']['adapter'] = str_repeat('f', 64);
     }
@@ -43,4 +48,4 @@ foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', '
     }
     throw new RuntimeException('unsafe_qualification_accepted:'.$fault);
 }
-echo "Native qualification cryptographic positive and eight negative controls passed (E2)\n";
+echo "Native qualification cryptographic positive and ten negative controls passed (E2)\n";

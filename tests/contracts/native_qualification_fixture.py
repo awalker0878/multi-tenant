@@ -19,7 +19,8 @@ def signed_fixture(record, directory, now=None, inventory=None, snapshot=None, r
     directory.mkdir(parents=True, exist_ok=True)
     now = int(time.time()) if now is None else now
     source = Path(__file__).resolve().parents[2] / 'contracts/capabilities/definitions-v1.json'
-    definition = digest(json.loads(source.read_text()))
+    definition_data = json.loads(source.read_text())
+    definition = digest(definition_data)
     scope = record['scope']
     keys = {}
     for role in (('observer', 'reviewer', 'receiver') if receiving else ('observer', 'reviewer')):
@@ -42,8 +43,8 @@ def signed_fixture(record, directory, now=None, inventory=None, snapshot=None, r
 
     method_modes = {
         'method:' + method['v1_alias'] + ':' + mode: 'unsupported'
-        for method in json.loads(source.read_text())['methods'].values()
-        for mode in json.loads(source.read_text())['modes']
+        for method in definition_data['methods'].values()
+        for mode in definition_data['modes']
     }
     record = copy.deepcopy(record)
     record.pop('verification', None)
