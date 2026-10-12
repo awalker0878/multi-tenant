@@ -116,6 +116,12 @@ class ArtifactTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "unregistered contract"):
                 check_wheel("services/planning", self.wheel, self.root)
 
+    def test_artifact_workflow_attests_main_and_pull_requests(self):
+        workflow = (ROOT / ".github/workflows/contracts-artifacts.yml").read_text()
+        self.assertIn("  push:\\n    branches: [main]".replace("\\\\n", "\\n"), workflow)
+        self.assertIn("docker build", workflow)
+        self.assertIn("aggregate_artifacts.py", workflow)
+
     def test_oci_image_requires_exact_source_sha_label(self):
         fake = [{
             "Id": "sha256:" + "e" * 64,
