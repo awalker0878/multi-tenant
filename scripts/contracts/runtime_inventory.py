@@ -75,15 +75,15 @@ def executable_contract_loads(source: Path) -> set[str]:
         return {
             name
             for line in body.splitlines()
-            if "file_get_contents(" in line
+            if "file_get_contents(" in line.split("//", 1)[0]
             and not line.lstrip().startswith(("//", "#", "*", "/*"))
-            for name in FILENAME.findall(line)
+            for name in FILENAME.findall(line.split("//", 1)[0])
         }
     if source.suffix in {".ts", ".vue"}:
         return {
             name
             for line in body.splitlines()
-            if re.search(r"^\\s*import\\s+(?!type\\b).*?\\sfrom\\s+['\\\"]", line)
+            if re.search(r"^\s*import\s+(?!type\b).*?\sfrom\s+['\"]", line)
             for name in FILENAME.findall(line)
         }
     return set()
