@@ -386,9 +386,13 @@ def check_consumer_registry():
         path = entry["path"]
         owner = entry["owner"]
         consumers = entry["consumers"]
+        # Owners/consumers are registered deployable bounded contexts, not
+        # keys of a separately editable architectural dependency DAG.
+        from artifact_attestation import COMPONENTS
+        known_contexts = {context for context, _ in COMPONENTS.values()} | {"contract-platform"}
         if (not (ROOT / path).is_file()
-                or owner not in registry["dependencies"]
-                or set(consumers) - set(registry["dependencies"])):
+                or owner not in known_contexts
+                or set(consumers) - known_contexts):
             raise ValueError(f"Invalid active release ownership or consumers: {path}")
         if not {owner, *consumers}.issubset(set(inventory.get(path, []))):
             raise ValueError(f"Undeclared active release consumer: {path}")

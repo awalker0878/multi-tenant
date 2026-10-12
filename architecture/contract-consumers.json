@@ -1,25 +1,5 @@
 {
   "schema_version": 1,
-  "dependencies": {
-    "catalogue": [],
-    "planning": [
-      "catalogue"
-    ],
-    "inventory": [],
-    "lifecycle": [],
-    "governance": [],
-    "assurance": [],
-    "console": [
-      "governance"
-    ],
-    "inventory-workers": [
-      "inventory"
-    ],
-    "lifecycle-workers": [
-      "lifecycle"
-    ],
-    "contract-platform": []
-  },
   "contracts": {
     "contracts/asyncapi/catalogue-intent.yaml": [
       "catalogue",
