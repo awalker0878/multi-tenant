@@ -22,7 +22,7 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
     prefixes = ('services/lifecycle/src/', 'services/lifecycle/tests/', 'scripts/p07/',
-                '.github/workflows/p07-', 'release/p07-native-inputs.json',
+                '.github/workflows/qualification.yml', 'release/p07-native-inputs.json',
                 'services/lifecycle/pyproject.toml', 'services/lifecycle/uv.lock')
     selected = [p for p in paths if p.startswith(prefixes) and (ROOT / p).is_file()]
     report = {

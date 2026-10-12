@@ -263,7 +263,7 @@ def main() -> int:
     bound = sources + [workspace / path for path in (
         "scripts/p01/run_images.py", "deploy/build/components.json", "deploy/build/inputs.lock.json",
         "scripts/p01/python_lock.py", "scripts/p01/alpine_inputs.py", "deploy/build/alpine-packages.lock.json",
-        ".github/workflows/p01-images.yml", "scripts/p01/select_components.py",
+        ".github/workflows/qualification.yml", "scripts/p01/select_components.py",
         "scripts/p01/check_jobs.py", "scripts/p01/candidates.json",
     )]
     if component["language"] == "php":

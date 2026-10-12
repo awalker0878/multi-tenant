@@ -16,7 +16,7 @@ def main():
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
     args.output.mkdir(parents=True, exist_ok=False)
-    paths = [Path(__file__).relative_to(root), Path('.github/workflows/p01-policy-controls.yml'),
+    paths = [Path(__file__).relative_to(root), Path('.github/workflows/ci.yml'),
              Path('.github/workflows/p01-admission.yml'), Path('scripts/p01/select_components.py'),
              Path('scripts/p01/verify_retained.py'),
              *[p.relative_to(root) for directory in ['scripts/p01/artifacts', 'scripts/p01/admission', 'release', 'architecture']

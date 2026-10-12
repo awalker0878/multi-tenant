@@ -31,7 +31,7 @@ def main():
                 'contracts/openapi/worker-native-', 'contracts/fixtures/lifecycle/',
                 'scripts/p07/', 'scripts/p06/temporal_', 'scripts/p01/stateful/runtime.py',
                 'scripts/p01/local_runtime.py', 'deploy/fixtures/stateful/', 'deploy/dependencies/stateful/inputs.lock.json',
-                '.github/workflows/p07-native-readiness.yml')
+                '.github/workflows/qualification.yml')
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'observed_at': datetime.now(timezone.utc).isoformat(), 'environment': platform.platform(),

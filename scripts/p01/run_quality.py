@@ -420,7 +420,7 @@ def main() -> int:
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(path, target)
             e.state["source_sha256"][str(path.relative_to(workspace))] = sha256(path)
-        for path in [*files(workspace / "scripts/p01"), workspace / ".github/workflows/p01-foundations.yml"]:
+        for path in [*files(workspace / "scripts/p01"), workspace / ".github/workflows/ci.yml"]:
             e.state["source_sha256"][str(path.relative_to(workspace))] = sha256(path)
         e.save()
         if config["language"] == "python":
