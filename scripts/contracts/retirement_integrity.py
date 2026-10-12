@@ -60,10 +60,22 @@ def verify_retirement_decisions(root: Path, retired: set[str], reviews: dict) ->
 
 def verify_retired_references(root: Path, retired: set[str]) -> None:
     """No active code, test, generator, or workflow may load a retired artifact."""
+    registry_path = root / "architecture/contract-consumers.json"
+    registry = (json.loads(registry_path.read_text(encoding="utf-8"))
+                if registry_path.is_file() else {"active_releases": []})
+    active_basenames = {
+        Path(name).name
+        for entry in registry["active_releases"]
+        for name in (entry["path"], *entry.get("copies", []))
+    }
+    basenames = [Path(path).name for path in retired]
+    duplicates = {name for name in basenames if basenames.count(name) > 1}
     patterns = {
         path: re.compile(r"(?<![A-Za-z0-9_.-])" + re.escape(Path(path).name)
                          + r"(?![A-Za-z0-9_.-])")
         for path in retired
+        if Path(path).name not in active_basenames
+        and Path(path).name not in duplicates
     }
     failures: list[str] = []
     for folder in SOURCE_FOLDERS:
@@ -76,8 +88,10 @@ def verify_retired_references(root: Path, retired: set[str]) -> None:
                 continue
             text = source.read_text(encoding="utf-8")
             for number, line in enumerate(text.splitlines(), 1):
-                for path, pattern in patterns.items():
-                    if path in line or pattern.search(line):
+                for path in retired:
+                    relative_path = path.removeprefix("contracts/")
+                    if path in line or relative_path in line or (
+                            path in patterns and patterns[path].search(line)):
                         failures.append(f"{source.relative_to(root)}:{number}: {path}")
     if failures:
         raise ValueError("Retired contracts still referenced by executable code: "

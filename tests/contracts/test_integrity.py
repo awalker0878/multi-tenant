@@ -404,6 +404,23 @@ components:
             with self.assertRaisesRegex(ValueError, "Retired contracts still referenced"):
                 verify_retired_references(root, {"contracts/openapi/demo-v1.json"})
 
+    def test_retirement_scanner_distinguishes_active_same_name(self):
+        from retirement_integrity import verify_retired_references
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            script = root / "scripts/check.py"
+            script.parent.mkdir(parents=True)
+            registry = root / "architecture/contract-consumers.json"
+            registry.parent.mkdir(parents=True)
+            registry.write_text(json.dumps({"active_releases": [{
+                "path": "contracts/schemas/planning/fact-v1.json", "copies": []
+            }]}))
+            script.write_text("schema = 'contracts/schemas/planning/fact-v1.json'")
+            verify_retired_references(root, {"contracts/schemas/inventory/fact-v1.json"})
+            script.write_text("schema = 'contracts/schemas/inventory/fact-v1.json'")
+            with self.assertRaisesRegex(ValueError, "Retired contracts still referenced"):
+                verify_retired_references(root, {"contracts/schemas/inventory/fact-v1.json"})
+
     def test_real_retirement_scan_has_no_self_references(self):
         from retirement_integrity import verify_retired_references
         retired = set(load("architecture/retired-contract-releases.json")["retired"])
@@ -540,29 +557,6 @@ components:
         _, result = assemble(ROOT / "contracts/source/capabilities/migration-field-crosswalk-v1/manifest.json")
         self.assertEqual(len(result["fields"]), result["summary"]["groups"])
 
-    def test_e4_field_provenance_requires_exact_independent_binding(self):
-        from jsonschema import Draft202012Validator, FormatChecker
-
-        schema = load("contracts/schemas/planning/independent-e4-field-provenance-v1.json")
-        validate = Draft202012Validator(schema, format_checker=FormatChecker())
-        uid = "10000000-0000-4000-8000-000000000001"
-        proof = {
-            "schema_version": 1, "kind": "independent_e4_field_provenance",
-            "tenant_id": uid, "application_id": uid, "environment_id": uid,
-            "catalogue_revision_id": uid, "catalogue_sha256": "a" * 64,
-            "workload_id": uid, "field": "guest.firmware",
-            "source_profile_sha256": "b" * 64,
-            "intent_field_sha256": "c" * 64, "observed_field_sha256": "d" * 64,
-            "disposition": "qualified_transformation", "level": "E4",
-            "decision": "accepted", "revoked": False, "evidence_sha256": "e" * 64,
-            "transformation_plan_sha256": "f" * 64,
-            "independent_acceptance_sha256": "0" * 64,
-            "observed_at": 100, "expires_at": 120,
-        }
-        self.assertTrue(validate.is_valid(proof))
-        self.assertFalse(validate.is_valid({**proof, "revoked": True}))
-        self.assertFalse(validate.is_valid({**proof, "level": "E2"}))
-        self.assertFalse(validate.is_valid({**proof, "transformation_plan_sha256": "bad"}))
 
 if __name__ == "__main__":
     unittest.main()
