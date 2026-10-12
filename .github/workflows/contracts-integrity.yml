@@ -176,6 +176,9 @@ jobs:
           mkdir -p services/${{ matrix.app }}/bootstrap/cache services/${{ matrix.app }}/storage/framework/{cache,sessions,views} services/${{ matrix.app }}/storage/logs
           touch services/${{ matrix.app }}/.env
           composer install --working-dir=services/${{ matrix.app }} --no-dev --no-plugins --no-scripts --no-interaction --no-progress --prefer-dist
+      - name: Verify independent E3/E4 signed method/mode evidence and receiving controls
+        if: matrix.app == 'assurance'
+        run: python -m unittest discover -s tests/contracts -p 'test_native_qualification.py' -v
       - name: Verify Governance approval 409 producer behavior
         if: matrix.app == 'governance'
         run: php scripts/contracts/verify_governance_approval_status.php
@@ -219,7 +222,7 @@ jobs:
       - name: Execute all 30 current method/mode and independent native tests
         run: |
           cd workers/lifecycle
-          uv run --frozen pytest -q tests/test_capability_qualification.py tests/test_method_protocol.py tests/test_openstack_source.py tests/test_migration_bootstrap.py --junitxml="$RUNNER_TEMP/worker-capabilities.xml"
+          uv run --frozen pytest -q tests/test_capability_qualification.py tests/test_method_protocol.py tests/test_openstack_source.py tests/test_migration_bootstrap.py tests/test_capability_conformance.py --junitxml="$RUNNER_TEMP/worker-capabilities.xml"
       - name: Verify no missing method, native dispatch, cold capture or denied-effect cases
         run: python scripts/contracts/qualify_capabilities.py --worker-junit "$RUNNER_TEMP/worker-capabilities.xml" --output "$RUNNER_TEMP/capability-qualification.json"
       - name: Preserve Phase 4 executable E2 results
