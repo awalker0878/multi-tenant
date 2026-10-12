@@ -79,8 +79,9 @@ def request(
             result = decode(raw)
             if not isinstance(result, dict):
                 raise ValueError
+            name = resolved_contract
             schema = json.loads(
-                files("planning.infrastructure.inputs").joinpath(resolved_contract + ".json").read_text()
+                files("planning.infrastructure.inputs").joinpath(name + ".json").read_text()
             )
             if not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(result):
                 raise ValueError

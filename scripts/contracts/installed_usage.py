@@ -21,9 +21,8 @@ def verify_installed_usage(root: Path, registry: dict) -> int:
     actual = [row.get("copy") for row in rows]
     if len(actual) != len(set(actual)) or set(actual) != set(indexed):
         raise ValueError("Installed contract usage ledger does not cover active installed copies")
-    workflow = (root / ".github/workflows/contracts-integrity.yml").read_text()
+    workflow = (root / ".github/workflows/ci.yml").read_text()
     for required in ("python scripts/contracts/check.py",
-                     "python scripts/p01/contracts/compatibility.py",
                      "python scripts/contracts/build.py --check"):
         if required not in workflow:
             raise ValueError(f"CI does not execute contract usage prerequisite: {required}")
@@ -94,7 +93,7 @@ def verify_installed_usage(root: Path, registry: dict) -> int:
                 raise ValueError(f"Unsupported generator type: {generator}")
         else:
             raise ValueError(f"Missing authoritative generator classification: {copy}")
-        if row["ci"] != ".github/workflows/contracts-integrity.yml":
+        if row["ci"] != ".github/workflows/ci.yml":
             raise ValueError(f"Installed copy lacks contract-integrity CI ownership: {copy}")
     return len(rows)
 

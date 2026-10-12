@@ -28,7 +28,7 @@ def verify(root: Path = ROOT) -> dict:
     unmapped = copied_components - set(COMPONENTS)
     if unmapped:
         raise ValueError(f"Shipped contract component not mapped to built image: {sorted(unmapped)}")
-    file = root / ".github/workflows/contracts-artifacts.yml"
+    file = root / ".github/workflows/qualification.yml"
     workflow = yaml.safe_load(file.read_text(encoding="utf-8"))
     matrix = workflow["jobs"]["artifact-bindings"]["strategy"]["matrix"]["include"]
     declared = [entry["component"] for entry in matrix]

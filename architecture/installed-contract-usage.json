@@ -13,7 +13,7 @@
       "package_data_marker": null,
       "generator": "scripts/p03/generate_clients.py",
       "generation_mode": "generated_or_source_assembled",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "apps/console/resources/contracts/governance-change-v1.json",
@@ -26,7 +26,7 @@
       "package_data_marker": null,
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "apps/console/resources/contracts/identity-change-v1.json",
@@ -39,7 +39,7 @@
       "package_data_marker": null,
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "apps/console/resources/contracts/inventory-v1.9.json",
@@ -52,7 +52,7 @@
       "package_data_marker": null,
       "generator": "scripts/p04/generate_clients.py",
       "generation_mode": "generated_or_source_assembled",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "apps/console/resources/contracts/lifecycle-migration-campaigns-v1.json",
@@ -65,7 +65,7 @@
       "package_data_marker": null,
       "generator": "scripts/p04/generate_clients.py",
       "generation_mode": "generated_or_source_assembled",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "apps/console/resources/contracts/lifecycle-native-jobs-v1.1.json",
@@ -78,7 +78,7 @@
       "package_data_marker": null,
       "generator": "scripts/p04/generate_clients.py",
       "generation_mode": "generated_or_source_assembled",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "apps/console/resources/contracts/lifecycle-v1.json",
@@ -91,7 +91,7 @@
       "package_data_marker": null,
       "generator": "scripts/p06/generate_contracts.py",
       "generation_mode": "generated_or_source_assembled",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "apps/console/resources/contracts/migration-feature-policy-v1.json",
@@ -104,7 +104,7 @@
       "package_data_marker": null,
       "generator": "contracts/source/capabilities/migration-feature-policy-v1/manifest.json",
       "generation_mode": "generated_or_source_assembled",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "apps/console/resources/contracts/planning-migration-v1.6.json",
@@ -117,7 +117,7 @@
       "package_data_marker": null,
       "generator": "contracts/source/openapi/planning-migration-v1.6/manifest.json",
       "generation_mode": "generated_or_source_assembled",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "apps/console/resources/contracts/planning-v1.2.json",
@@ -130,7 +130,7 @@
       "package_data_marker": null,
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/catalogue/resources/contracts/foundation-event.json",
@@ -143,7 +143,7 @@
       "package_data_marker": null,
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/catalogue/resources/contracts/intent-v1.json",
@@ -156,7 +156,7 @@
       "package_data_marker": null,
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/governance/resources/contracts/governance-change-v1.json",
@@ -169,7 +169,7 @@
       "package_data_marker": null,
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/governance/resources/contracts/identity-change-v1.json",
@@ -182,7 +182,7 @@
       "package_data_marker": null,
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/governance/resources/contracts/support-change-v1.json",
@@ -195,7 +195,7 @@
       "package_data_marker": null,
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.2.json",
@@ -208,7 +208,7 @@
       "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/placement-reservation-v1.json",
@@ -221,7 +221,7 @@
       "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/catalogue-current-v2.json",
@@ -234,7 +234,7 @@
       "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/catalogue-input-v1.json",
@@ -247,7 +247,7 @@
       "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/governance-delegation-response-v1.json",
@@ -260,7 +260,7 @@
       "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/inventory-input-v2.json",
@@ -273,7 +273,7 @@
       "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/migration-input-v4.json",
@@ -286,7 +286,7 @@
       "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
       "generator": "contracts/source/schemas/migration-input-v4/manifest.json",
       "generation_mode": "generated_or_source_assembled",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.2.json",
@@ -299,7 +299,7 @@
       "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/migration-support-v2.json",
@@ -312,7 +312,7 @@
       "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/placement-reservation-v1.json",
@@ -325,7 +325,7 @@
       "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/qualification-v2.1.json",
@@ -338,7 +338,7 @@
       "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     },
     {
       "copy": "services/planning/src/planning/infrastructure/messaging/foundation-event.json",
@@ -351,7 +351,7 @@
       "package_data_marker": "\"planning.infrastructure.messaging\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
+      "ci": ".github/workflows/ci.yml"
     }
   ]
 }

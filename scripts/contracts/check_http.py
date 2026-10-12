@@ -302,6 +302,26 @@ UUID_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 UUID_V4_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 
 
+def check_owner_response_projections():
+    """Current bounded response profiles must reflect their owner-authored API and producer."""
+    delegation = load("contracts/openapi/governance-delegation-v1.1.json")
+    projected = load("contracts/schemas/planning/governance-delegation-response-v1.json")
+    embedded = json.loads(json.dumps(delegation["components"]["schemas"]["CurrentDelegation"]))
+    embedded["properties"]["scope"] = {"$ref": "#/$defs/Scope"}
+    projected_scope = projected.pop("$defs", None)
+    for key in ("$id", "$schema", "title"):
+        projected.pop(key, None)
+    if projected != embedded or projected_scope != {"Scope": delegation["components"]["schemas"]["Scope"]}:
+        raise ValueError("Planning Governance response differs from published owner API")
+    receipt = load("contracts/schemas/planning/placement-reservation-v1.json")
+    required = {"tenant_id", "plan_digest", "placement_sha256", "allocations",
+                "state", "observed_at", "expires_at", "native_write_authorized"}
+    if (not required <= set(receipt.get("required", []))
+            or receipt.get("additionalProperties") is not False
+            or receipt.get("properties", {}).get("native_write_authorized") != {"const": False}):
+        raise ValueError("Lifecycle placement receipt lacks bounded authority invariants")
+
+
 def check_uuid_policy():
     """Enforce current authority-release identifiers without historical exceptions.
 
