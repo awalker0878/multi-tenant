@@ -10,8 +10,8 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SCHEMA = ROOT / "contracts/schemas/planning/migration-readiness-v2.json"
-ROUTE_SCHEMA = ROOT / "contracts/schemas/planning/migration-readiness-v1.json"
+SCHEMA = ROOT / "contracts/schemas/planning/migration-readiness-v2.2.json"
+ROUTE_SCHEMA = ROOT / "contracts/openapi/planning-migration-v1.6.json"
 PLANNING = ROOT / "services/planning/src/planning/domain/migration_readiness.py"
 LIFECYCLE = ROOT / "services/lifecycle/src/lifecycle/domain/migration_readiness.py"
 CONSOLE = ROOT / "apps/console/resources/js/pages/planning/MigrationSupport.vue"
@@ -35,11 +35,12 @@ def literal_keys(path: Path, name: str) -> set[str]:
 class ResolvedMigrationReadinessContractTests(unittest.TestCase):
     def test_planning_lifecycle_and_wire_schema_share_exact_keys(self) -> None:
         schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
-        route_schema = json.loads(ROUTE_SCHEMA.read_text(encoding="utf-8"))
+        route_schema = json.loads(ROUTE_SCHEMA.read_text(encoding="utf-8"))["components"]["schemas"]["MigrationReadinessPayload"]
         route_produced = literal_keys(PLANNING, "result") | {"readiness_sha256"}
         produced = route_produced | {"workload_reconciliation", "collection_coverages"}
         consumed = literal_keys(LIFECYCLE, "REQUIRED")
-        self.assertEqual(set(route_schema["required"]), route_produced)
+        self.assertEqual(set(route_schema["required"]), produced)
+        self.assertEqual(set(route_schema["properties"]), produced)
         self.assertEqual(set(schema["required"]), produced)
         self.assertEqual(consumed, produced)
         self.assertEqual(set(schema["properties"]), produced)
