@@ -5,6 +5,7 @@ This catches stale packaged copies even when no executable source references the
 """
 from __future__ import annotations
 
+import ast
 import re
 from pathlib import Path
 
@@ -48,6 +49,46 @@ def deployed_copies(root: Path):
                         yield from folder.glob("*.json")
 
 
+def executable_contract_loads(source: Path) -> set[str]:
+    """Recognize actual JSON reads/imports, never arbitrary filename comments."""
+    body = source.read_text(encoding="utf-8")
+    if source.suffix == ".py":
+        tree = ast.parse(body, filename=str(source))
+        loaded = set()
+        for call in ast.walk(tree):
+            if (not isinstance(call, ast.Call)
+                    or not isinstance(call.func, ast.Attribute)
+                    or call.func.attr not in {"read_text", "read_bytes"}):
+                continue
+            for child in ast.walk(call.func.value):
+                if (isinstance(child, ast.Call)
+                        and isinstance(child.func, ast.Attribute)
+                        and child.func.attr == "joinpath"):
+                    loaded.update(
+                        value.value for arg in child.args
+                        for value in ast.walk(arg)
+                        if isinstance(value, ast.Constant) and isinstance(value.value, str)
+                        and value.value.endswith(".json")
+                    )
+        return loaded
+    if source.suffix == ".php":
+        return {
+            name
+            for line in body.splitlines()
+            if "file_get_contents(" in line
+            and not line.lstrip().startswith(("//", "#", "*", "/*"))
+            for name in FILENAME.findall(line)
+        }
+    if source.suffix in {".ts", ".vue"}:
+        return {
+            name
+            for line in body.splitlines()
+            if re.search(r"^\\s*import\\s+(?!type\\b).*?\\sfrom\\s+['\\\"]", line)
+            for name in FILENAME.findall(line)
+        }
+    return set()
+
+
 def discover_runtime_copies(root: Path = ROOT) -> dict[str, list[str]]:
     copies = sorted(deployed_copies(root))
     by_name: dict[str, list[Path]] = {}
@@ -55,11 +96,9 @@ def discover_runtime_copies(root: Path = ROOT) -> dict[str, list[str]]:
         by_name.setdefault(artifact.name, []).append(artifact)
     usages: dict[str, set[str]] = {}
     for source in runtime_sources(root):
-        names = set(FILENAME.findall(source.read_text(encoding="utf-8")))
+        names = executable_contract_loads(source)
         for name in names & by_name.keys():
             for artifact in by_name[name]:
-                # A different product's deployed package is not used merely
-                # because two products may ship a same-named current contract.
                 if artifact.relative_to(root).parts[:2] != source.relative_to(root).parts[:2]:
                     continue
                 path = str(artifact.relative_to(root))

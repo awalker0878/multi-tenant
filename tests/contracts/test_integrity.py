@@ -456,7 +456,7 @@ components:
             root = Path(directory)
             src = root / "services/alpha/app/Infrastructure/EventEncoder.php"
             src.parent.mkdir(parents=True)
-            src.write_text("<?php resource_path('contracts/example-v1.json');")
+            src.write_text("<?php file_get_contents(resource_path('contracts/example-v1.json'));")
             copy = root / "services/alpha/resources/contracts/example-v1.json"
             copy.parent.mkdir(parents=True)
             copy.write_text("{}")
@@ -466,6 +466,25 @@ components:
             observed = discover_runtime_copies(root)
             self.assertIn(str(copy.relative_to(root)), observed)
             self.assertNotIn(str(other.relative_to(root)), observed)
+
+    def test_literal_filename_without_executable_loader_does_not_count(self):
+        from runtime_inventory import verify_runtime_inventory
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            canonical = root / "contracts/openapi/demo-v1.json"
+            copy = root / "apps/demo/resources/contracts/demo-v1.json"
+            code = root / "apps/demo/app/Demo.php"
+            for file in (canonical, copy, code):
+                file.parent.mkdir(parents=True, exist_ok=True)
+            canonical.write_text("{}")
+            copy.write_text("{}")
+            code.write_text("<?php // file_get_contents(resource_path('contracts/demo-v1.json'));")
+            registry = {"active_releases": [{
+                "path": "contracts/openapi/demo-v1.json",
+                "copies": ["apps/demo/resources/contracts/demo-v1.json"],
+            }]}
+            with self.assertRaisesRegex(ValueError, "no executable consumer"):
+                verify_runtime_inventory(registry, root)
 
     def test_channel_specific_discriminator_rejects_other_valid_event_type(self):
         from check import event_discriminator
