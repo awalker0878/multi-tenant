@@ -90,13 +90,15 @@ class ArtifactTests(unittest.TestCase):
 
     def test_wheel_contains_exact_installed_schema_bytes(self):
         self.wheel_contents()
-        with patch("artifact_attestation.expected", return_value=([self.copy], [])):
+        with patch("artifact_attestation.expected", return_value=([self.copy], [])), \
+                patch("artifact_attestation.consumed_bindings", return_value=[]):
             report = check_wheel("services/planning", self.wheel, self.root)
         self.assertEqual(report["installed_copies"], [self.copy])
         self.assertEqual(len(report["artifact_sha256"]), 64)
 
     def test_missing_drifting_and_unregistered_wheel_contracts_fail(self):
-        with patch("artifact_attestation.expected", return_value=([self.copy], [])):
+        with patch("artifact_attestation.expected", return_value=([self.copy], [])), \
+                patch("artifact_attestation.consumed_bindings", return_value=[]):
             self.wheel_contents(schema=b'{"kind":"old"}')
             with self.assertRaisesRegex(ValueError, "stale contract bytes"):
                 check_wheel("services/planning", self.wheel, self.root)
