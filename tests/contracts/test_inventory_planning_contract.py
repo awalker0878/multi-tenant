@@ -218,10 +218,13 @@ def test_real_inventory_planning_response_validates_installed_strict_schema(
         owners.request("INVENTORY", "GET", uri, schema_name="migration-input-v3")
     assert outdated.value.status == 503
 
-    # The same native Inventory response must satisfy the published v1.2 API,
-    # the installed v4 schema, and the authenticated Inventory ASGI producer.
-    api = json.loads((ROOT / "contracts/openapi/inventory-native-input-v1.2.json").read_text())
-    route = next(iter(api["paths"].values()))["get"]
+    # Validate the current v1.3 API response against the canonical and installed
+    # v4 schema without loading a retired native-input release.
+    api = json.loads((ROOT / "contracts/openapi/inventory-native-input-v1.3.json").read_text())
+    route = api["paths"]["/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/{revision}/{digest}"]["get"]
     published = route["responses"]["200"]["content"]["application/json"]["schema"]
-    assert published == schema
-    assert not list(Draft202012Validator(published).iter_errors(produced))
+    assert published == {"$ref": "#/components/schemas/MigrationInput"}
+    assert not list(Draft202012Validator(
+        {"$ref": published["$ref"], "components": api["components"]}
+    ).iter_errors(produced))
+    assert not list(Draft202012Validator(schema).iter_errors(produced))
