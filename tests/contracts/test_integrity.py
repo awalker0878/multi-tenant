@@ -395,7 +395,7 @@ components:
             reintroduced.write_text("{}")
             with patch("check.ROOT", root), patch("check.load", side_effect=lambda path:
                        registry if path == "architecture/contract-consumers.json"
-                       else {"retired": [retired_path]} if path == "architecture/retired-contract-releases.json"
+                       else {"retired": [retired_path], "reviews": {retired_path: {"reason": "negative test", "internal_consumer_review": "fixture", "external_consumer_review": "fixture", "decision": "fixture"}}} if path == "architecture/retired-contract-releases.json"
                        else real_load(path)):
                 with self.assertRaisesRegex(ValueError, "Retired canonical contract reintroduced"):
                     check_consumer_registry()
