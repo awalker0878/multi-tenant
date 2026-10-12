@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import re
 from pathlib import Path
 
@@ -103,6 +104,9 @@ async def probe(owner: str) -> tuple[list[dict], list[str]]:
             "release_sha256": op["release_sha256"],
             "test": "python_denials.py:unauthenticated_" + str(code),
         })
+    for observation in measured:
+        observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
+        observation["revision"] = os.environ.get("GITHUB_SHA")
     return measured, unresolved
 
 

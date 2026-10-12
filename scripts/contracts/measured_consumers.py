@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -62,6 +63,9 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
                 "result": "PASS", "release_sha256": current[key]["release_sha256"],
                 "test": test,
             })
+    for observation in evidence:
+        observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
+        observation["revision"] = os.environ.get("GITHUB_SHA")
     return evidence
 
 

@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 from collections import Counter
 from pathlib import Path
@@ -124,7 +125,8 @@ def inventory(root: Path = ROOT) -> dict:
     }
 
 
-def assess(root: Path = ROOT, observations: list[dict] | None = None) -> dict:
+def assess(root: Path = ROOT, observations: list[dict] | None = None,
+           require_provenance: bool = False) -> dict:
     data = inventory(root)
     operations = {r["key"]: r for r in data["operations"]}
     releases = {r["path"]: r for r in data["releases"]}
@@ -140,6 +142,11 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None) -> dict:
             expected_hash = releases[key]["sha256"]
         if observation.get("release_sha256") != expected_hash:
             raise ValueError(f"Stale operation evidence: {key}")
+        if require_provenance:
+            run_id, revision = os.environ.get("GITHUB_RUN_ID"), os.environ.get("GITHUB_SHA")
+            if (not run_id or not revision or observation.get("run_id") != run_id
+                    or observation.get("revision") != revision):
+                raise ValueError(f"Unattested operation evidence for current CI run: {key}")
         if observation.get("source") not in {"live-router", "live-producer", "live-consumer", "live-denial"}:
             raise ValueError(f"Non-executable evidence is inadmissible: {key}")
         appropriate = {
@@ -216,7 +223,7 @@ def main() -> int:
     parser.add_argument("--require-qualified", action="store_true")
     args = parser.parse_args()
     evidence = read(args.observations) if args.observations else []
-    result = assess(observations=evidence)
+    result = assess(observations=evidence, require_provenance=args.require_qualified)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, indent=2) + "\n")

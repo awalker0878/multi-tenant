@@ -71,6 +71,8 @@ foreach ($registry['active_releases'] as $entry) {
                 'source' => 'live-denial',
                 'result' => 'PASS',
                 'release_sha256' => $fingerprint,
+                'run_id' => getenv('GITHUB_RUN_ID') ?: null,
+                'revision' => getenv('GITHUB_SHA') ?: null,
                 'test' => 'laravel_denials.php:unauthenticated_'.$code,
             ];
         }

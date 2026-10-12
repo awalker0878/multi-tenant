@@ -31,7 +31,8 @@ def main() -> int:
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--require-qualified", action="store_true")
     args = parser.parse_args()
-    outcome = assess(observations=combine(args.input_directory))
+    outcome = assess(observations=combine(args.input_directory),
+                     require_provenance=args.require_qualified)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(outcome, indent=2) + "\n", encoding="utf-8")
     missing = (outcome["summary"]["unqualified_http_operations"]
