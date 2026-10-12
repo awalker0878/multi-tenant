@@ -18,6 +18,7 @@
     "contracts/openapi/inventory-v1.7.json",
     "contracts/openapi/inventory-v1.8.json",
     "contracts/openapi/inventory-v1.json",
+    "contracts/openapi/lifecycle-native-boundary-v1.json",
     "contracts/openapi/lifecycle-native-jobs-v1.json",
     "contracts/openapi/planning-immutable-plan-v1.json",
     "contracts/openapi/planning-inputs-v1.json",
@@ -31,6 +32,7 @@
     "contracts/openapi/planning-v1.1.json",
     "contracts/openapi/planning-v1.json",
     "contracts/openapi/worker-migration-effect-v2.json",
+    "contracts/openapi/worker-native-effect-v1.json",
     "contracts/schemas/capabilities/api-version-record-v1.json",
     "contracts/schemas/expansion/tranche-v1.json",
     "contracts/schemas/inventory/collection-page-v1.1.json",
@@ -358,6 +360,18 @@
     "contracts/schemas/planning/reservation-receipt-v1.json": {
       "reason": "Previously retired under owner-directed active-only contract cleanup.",
       "internal_consumer_review": "prior-retirement-record",
+      "external_consumer_review": "not-independently-verified",
+      "decision": "owner-directed-retirement"
+    },
+    "contracts/openapi/lifecycle-native-boundary-v1.json": {
+      "reason": "Superseded native endpoint duplicated an active v2 migration contract. P07 request/denial tests now target the v2 owner and worker APIs.",
+      "internal_consumer_review": "P07 migrated to active v2 contracts; no source loader expected",
+      "external_consumer_review": "not-independently-verified",
+      "decision": "owner-directed-retirement"
+    },
+    "contracts/openapi/worker-native-effect-v1.json": {
+      "reason": "Superseded native endpoint duplicated an active v2 migration contract. P07 request/denial tests now target the v2 owner and worker APIs.",
+      "internal_consumer_review": "P07 migrated to active v2 contracts; no source loader expected",
       "external_consumer_review": "not-independently-verified",
       "decision": "owner-directed-retirement"
     }

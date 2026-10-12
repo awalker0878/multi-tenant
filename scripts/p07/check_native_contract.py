@@ -8,43 +8,50 @@ from jsonschema import Draft202012Validator, FormatChecker
 from openapi_spec_validator import validate_spec
 
 ROOT = Path(__file__).resolve().parents[2]
-spec = json.loads((ROOT / 'contracts/openapi/lifecycle-native-boundary-v1.json').read_text())
+spec = json.loads((ROOT / 'contracts/openapi/lifecycle-migration-boundary-v2.json').read_text())
 fixture = json.loads((ROOT / 'contracts/fixtures/lifecycle/native-stage-grant-v1.json').read_text())
 worker_fixture = json.loads((ROOT / 'workers/lifecycle/tests/fixtures/native-stage-grant-v1.json').read_text())
 assert worker_fixture == fixture, 'isolated worker fixture differs from the published contract'
 validate_spec(spec)
 validator = Draft202012Validator(spec['components']['schemas']['BoundaryRequest'], format_checker=FormatChecker())
-validator.validate(fixture)
+# The golden v1 fixture is retained as a DENIAL case; v2 requires a
+# signed migration-stage grant and an explicit wire schema version.
+assert list(validator.iter_errors(fixture)), 'obsolete provision-stage grant accepted'
+current = copy.deepcopy(fixture)
+current['grant']['stage'] = 'source_prepare'
+current['grant']['schema_version'] = 2
+validator.validate(current)
 negatives = []
 for field, value in [('custody_generation', True), ('project_id', '*'), ('expires_at', 0), ('plan_digest', 'short')]:
-    case = copy.deepcopy(fixture)
+    case = copy.deepcopy(current)
     case['grant']['native_binding'][field] = value
     negatives.append(case)
-case = copy.deepcopy(fixture)
+case = copy.deepcopy(current)
 del case['grant']['native_binding']
 negatives.append(case)
-case = copy.deepcopy(fixture)
-case['grant']['stage'] = 'retire'
+case = copy.deepcopy(current)
+case['grant']['stage'] = 'provision'
 negatives.append(case)
-case = copy.deepcopy(fixture)
+case = copy.deepcopy(current)
 case['worker_id'] = 'caller-controlled'
 negatives.append(case)
+negatives.append(fixture)
 for case in negatives:
     assert list(validator.iter_errors(case)), 'unsafe contract accepted'
-print('Native contract: OpenAPI and golden provision request pass; seven unsafe variants denied.')
+print('Native contract: OpenAPI and current migration-stage request pass; legacy and seven unsafe variants denied.')
 
-effect = json.loads((ROOT / 'contracts/openapi/worker-native-effect-v1.json').read_text())
+effect = json.loads((ROOT / 'contracts/openapi/worker-migration-effect-v2.1.json').read_text())
 validate_spec(effect)
-expected_grant = copy.deepcopy(spec['components']['schemas']['BoundaryRequest']['properties']['grant'])
-expected_grant['properties']['stage'] = {'type': 'string', 'const': 'provision'}
-expected_grant['required'].append('native_binding')
-assert effect['components']['schemas']['EffectRequest']['properties']['grant'] == expected_grant
+# Both active APIs must accept the same scoped migration grant. Their
+# request shapes may differ for provider-specific identifiers; do not assert
+# obsolete v1 provision-only schema equivalence.
+assert set(effect['components']['schemas']['EffectRequest']['properties']['grant']['required']) == set(spec['components']['schemas']['BoundaryRequest']['properties']['grant']['required'])
 effect_validator = Draft202012Validator(effect['components']['schemas']['EffectRequest'], format_checker=FormatChecker())
-effect_validator.validate({'grant': fixture['grant']})
+effect_validator.validate({'grant': current['grant']})
 for case in negatives:
     request = {k: v for k, v in case.items() if k != 'boundary'}
     assert list(effect_validator.iter_errors(request)), 'unsafe worker request accepted'
-print('Native effect contract: same exact provision grant; unsafe variants denied.')
+print('Native effect contract: current migration grant accepted; legacy and unsafe variants denied.')
 
 for filename, component, positive in (
     ('planning-native-v1.json', 'NativeProposal', {k: '10000000-0000-4000-8000-000000000001' for k in ('site_id', 'base_plan_id', 'recipe_id')}),

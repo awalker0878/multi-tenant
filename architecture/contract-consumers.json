@@ -317,14 +317,6 @@
       "inventory",
       "planning"
     ],
-    "contracts/openapi/lifecycle-native-boundary-v1.json": [
-      "lifecycle",
-      "lifecycle-workers"
-    ],
-    "contracts/openapi/worker-native-effect-v1.json": [
-      "lifecycle-workers",
-      "lifecycle"
-    ],
     "contracts/schemas/expansion/adapter-package-v1.json": [
       "planning"
     ],
@@ -1094,26 +1086,6 @@
       "owner": "inventory",
       "consumers": [
         "planning"
-      ],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/openapi/lifecycle-native-boundary-v1.json",
-      "owner": "lifecycle",
-      "consumers": [
-        "lifecycle-workers"
-      ],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/openapi/worker-native-effect-v1.json",
-      "owner": "lifecycle-workers",
-      "consumers": [
-        "lifecycle"
       ],
       "copies": [],
       "source_manifest": null,
