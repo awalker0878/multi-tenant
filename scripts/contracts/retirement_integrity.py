@@ -27,6 +27,12 @@ def verify_retirement_decisions(root: Path, retired: set[str], reviews: dict) ->
         raise ValueError("Historical retirement record missing")
     if set(reviews) != retired:
         raise ValueError("Every retired contract requires its own review entry")
+    clearances_file = root / "architecture/retirement-clearances.json"
+    staged = (json.loads(clearances_file.read_text(encoding="utf-8"))
+              if clearances_file.is_file()
+              else {"schema_version": 1, "clearances": {}})
+    if staged.get("schema_version") != 1 or not isinstance(staged.get("clearances"), dict):
+        raise ValueError("Invalid staged external consumer clearance records")
     for path, review in reviews.items():
         if not isinstance(review, dict) or not all(
             isinstance(review.get(key), str) and review[key].strip()
@@ -44,6 +50,12 @@ def verify_retirement_decisions(root: Path, retired: set[str], reviews: dict) ->
                 or not review["external_review_evidence"].strip()
                 or review.get("compatibility_commitments") not in {"none", "satisfied"}):
             raise ValueError(f"External consumer review evidence missing: {path}")
+        approval = staged["clearances"].get(path)
+        if (not isinstance(approval, dict) or approval.get("status") != "approved"
+                or approval.get("decision") != "retire"
+                or approval.get("consumer_inventory_evidence") != review["external_review_evidence"]
+                or approval.get("compatibility_commitments") != review["compatibility_commitments"]):
+            raise ValueError(f"Retirement lacks separately reviewed staged clearance: {path}")
 
 
 def verify_retired_references(root: Path, retired: set[str]) -> None:

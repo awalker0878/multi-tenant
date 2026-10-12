@@ -439,9 +439,10 @@ components:
         reviews[candidate]["external_consumer_review"] = "verified_no_external_consumers"
         with self.assertRaisesRegex(ValueError, "review evidence missing"):
             verify_retirement_decisions(ROOT, retired, reviews)
-        reviews[candidate]["external_review_evidence"] = "review://example-no-clients"
+        reviews[candidate]["external_review_evidence"] = "https://example.invalid/no-clients"
         reviews[candidate]["compatibility_commitments"] = "none"
-        verify_retirement_decisions(ROOT, retired, reviews)
+        with self.assertRaisesRegex(ValueError, "lacks separately reviewed staged clearance"):
+            verify_retirement_decisions(ROOT, retired, reviews)
 
     def test_unverified_backlog_cannot_expand_silently(self):
         from retirement_integrity import verify_retirement_decisions
