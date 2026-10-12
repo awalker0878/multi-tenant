@@ -94,8 +94,8 @@ def verify(write: bool = False):
         canonical = safe_destination(target, canonical=True)
         if canonical.is_file():
             # A changed authoring fragment must publish a NEW contract version.
-            # Never reorder or overwrite historical canonical JSON as a side
-            # effect of rebuilding its semantically equivalent source parts.
+            # Do not overwrite an active canonical release when assembling
+            # semantically equivalent source partitions.
             if read(canonical) != rendered:
                 raise ValueError(f"Published contract requires a new version: {target}")
         elif write:

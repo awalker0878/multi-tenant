@@ -70,7 +70,7 @@ def assemble(name: str, root: Path = ROOT) -> dict:
             value.pop("components", None)
         if component == "CurrentPlanningIntent":
             value = current_intent(value)
-        elif component != "MigrationInput":  # historical immutable v4 payload
+        elif component != "MigrationInput":  # current embedded v4 wire payload
             value = normalized(value)
         output["components"]["schemas"][component] = value
     return output

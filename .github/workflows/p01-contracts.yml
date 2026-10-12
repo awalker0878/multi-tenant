@@ -33,7 +33,7 @@ jobs:
           extensions: ctype, fileinfo, mbstring, openssl, pdo, pdo_pgsql, sockets, tokenizer
           coverage: none
           tools: composer:2.10.3
-      - name: Replay locks, freeze published versions and generate clients twice
+      - name: Replay locks, validate current releases and generate clients twice
         env:
           EVENT_NAME: ${{ github.event_name }}
           EVENT_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
