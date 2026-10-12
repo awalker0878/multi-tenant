@@ -63,7 +63,7 @@ def request_breaks(old: dict, new: dict, before: dict, after: dict, at: str) -> 
     """Is every request admissible by old still admissible by new?"""
     a, b = ref(old, before), ref(new, after)
     failures = []
-    if type_set(a) and type_set(b) and not type_set(a) <= type_set(b):
+    if type_set(b) and (not type_set(a) or not type_set(a) <= type_set(b)):
         failures.append(at + ": request type narrowed")
     if b.get("const") is not None and a.get("const") != b["const"]:
         failures.append(at + ": request const narrowed")
@@ -102,7 +102,7 @@ def response_breaks(old: dict, new: dict, before: dict, after: dict, at: str) ->
     """Does new producer still guarantee the properties previously promised?"""
     a, b = ref(old, before), ref(new, after)
     failures = []
-    if type_set(a) and type_set(b) and not type_set(b) <= type_set(a):
+    if type_set(a) and (not type_set(b) or not type_set(b) <= type_set(a)):
         failures.append(at + ": response type widened")
     if a.get("const") is not None and b.get("const") != a["const"]:
         failures.append(at + ": response constant changed")
@@ -112,6 +112,10 @@ def response_breaks(old: dict, new: dict, before: dict, after: dict, at: str) ->
         failures.append(at + ": previously required response properties became optional")
     if a.get("additionalProperties") is False and b.get("additionalProperties") is not False:
         failures.append(at + ": response allows unknown fields")
+    if a.get("additionalProperties") is False:
+        added = set(b.get("properties", {})) - set(a.get("properties", {}))
+        if added:
+            failures.append(at + ": strict consumer sees new response fields " + repr(sorted(added)))
     for lo, hi in (("minimum", "maximum"), ("minLength", "maxLength"),
                    ("minItems", "maxItems")):
         if lo in a and (lo not in b or b[lo] < a[lo]):
