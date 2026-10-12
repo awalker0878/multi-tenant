@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "profile": "strict-new-publications",
+  "applies_to": "canonical paths newly introduced relative to trusted Git review base",
+  "schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+  "error_schema": "contracts/schemas/common/error-v2.json",
+  "required_error_responses": [
+    "401",
+    "403",
+    "503"
+  ],
+  "body_validation_status": "422",
+  "mutation_conflict_status": "409",
+  "idempotency_header": "Idempotency-Key",
+  "idempotency_scope": [
+    "tenant_id",
+    "actor_id",
+    "operation_id",
+    "request_digest"
+  ],
+  "min_idempotency_seconds": 300,
+  "max_idempotency_seconds": 604800,
+  "public_paths": [
+    "/health/live",
+    "/health/ready"
+  ],
+  "event_guarantee": "at-least-once",
+  "event_required_fields": [
+    "event_id",
+    "event_type",
+    "tenant_id",
+    "correlation_id",
+    "occurred_at",
+    "schema_version"
+  ]
+}

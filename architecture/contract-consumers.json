@@ -306,6 +306,9 @@
     ],
     "contracts/schemas/planning/fact-v1.json": [
       "planning"
+    ],
+    "contracts/schemas/common/error-v2.json": [
+      "contract-platform"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -603,6 +606,16 @@
       "depends_on": []
     },
     {
+      "path": "contracts/openapi/inventory-collection-worker-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "inventory-workers"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
       "path": "contracts/openapi/inventory-native-input-v1.3.json",
       "owner": "inventory",
       "consumers": [
@@ -628,6 +641,18 @@
         "apps/console/resources/contracts/inventory-v1.9.json"
       ],
       "source_manifest": "contracts/source/openapi/inventory-v1.9/manifest.json",
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/lifecycle-internal-authority-v1.json",
+      "owner": "lifecycle",
+      "consumers": [
+        "planning",
+        "lifecycle-workers",
+        "assurance"
+      ],
+      "copies": [],
+      "source_manifest": null,
       "depends_on": []
     },
     {
@@ -711,6 +736,27 @@
       "depends_on": [
         "contracts/schemas/planning/migration-support-v2.json"
       ]
+    },
+    {
+      "path": "contracts/openapi/planning-native-v1.json",
+      "owner": "planning",
+      "consumers": [
+        "lifecycle",
+        "console"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/planning-qualification-events-v1.json",
+      "owner": "planning",
+      "consumers": [
+        "assurance"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
     },
     {
       "path": "contracts/openapi/planning-v1.2.json",
@@ -844,6 +890,14 @@
       "depends_on": []
     },
     {
+      "path": "contracts/schemas/common/error-v2.json",
+      "owner": "contract-platform",
+      "consumers": [],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
       "path": "contracts/schemas/events/catalogue-foundation-recorded-v1.json",
       "owner": "catalogue",
       "consumers": [
@@ -903,9 +957,27 @@
       "depends_on": []
     },
     {
+      "path": "contracts/schemas/expansion/adapter-package-v1.json",
+      "owner": "planning",
+      "consumers": [],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
       "path": "contracts/schemas/expansion/tranche-v1.1.json",
       "owner": "planning",
       "consumers": [],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/inventory/fact-v1.1.json",
+      "owner": "inventory",
+      "consumers": [
+        "inventory-workers"
+      ],
       "copies": [],
       "source_manifest": null,
       "depends_on": []
@@ -931,6 +1003,24 @@
       "copies": [
         "services/planning/src/planning/infrastructure/inputs/catalogue-input-v1.json"
       ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/fact-v1.json",
+      "owner": "planning",
+      "consumers": [],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/inventory-input-v1.json",
+      "owner": "inventory",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [],
       "source_manifest": null,
       "depends_on": []
     },
@@ -1014,85 +1104,6 @@
         "inventory-workers",
         "lifecycle-workers"
       ],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/openapi/inventory-collection-worker-v1.json",
-      "owner": "inventory",
-      "consumers": [
-        "inventory-workers"
-      ],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/openapi/planning-native-v1.json",
-      "owner": "planning",
-      "consumers": [
-        "lifecycle",
-        "console"
-      ],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/openapi/planning-qualification-events-v1.json",
-      "owner": "planning",
-      "consumers": [
-        "assurance"
-      ],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/openapi/lifecycle-internal-authority-v1.json",
-      "owner": "lifecycle",
-      "consumers": [
-        "planning",
-        "lifecycle-workers",
-        "assurance"
-      ],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/schemas/planning/inventory-input-v1.json",
-      "owner": "inventory",
-      "consumers": [
-        "planning"
-      ],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/schemas/expansion/adapter-package-v1.json",
-      "owner": "planning",
-      "consumers": [],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/schemas/inventory/fact-v1.1.json",
-      "owner": "inventory",
-      "consumers": [
-        "inventory-workers"
-      ],
-      "copies": [],
-      "source_manifest": null,
-      "depends_on": []
-    },
-    {
-      "path": "contracts/schemas/planning/fact-v1.json",
-      "owner": "planning",
-      "consumers": [],
       "copies": [],
       "source_manifest": null,
       "depends_on": []
