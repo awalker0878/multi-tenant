@@ -1,3 +1,33 @@
+## Contract framework: Phase 4 and Phase 5 closeout (2026-10-12)
+
+**Phase 4 — executable capability qualification:** E2 implementation strengthened.
+The worker's published 5-method × 6-mode matrix must be present in executed,
+non-skipped JUnit evidence. The native data-method registry must match exactly
+the declared handlers; every implemented method/stage must run the full 3×3
+platform-direction matrix, complete negative fault matrix, independent dataset
+readback, source capture and revocation tests. Duplicate JUnit cases, skipped
+tests, inaccurate suites and missing dispatch evidence fail closed. The
+software result remains E2; **no installed E3 or independent E4 reviewer/site
+qualification or native-write authorization is inferred from unit tests.**
+
+**Phase 5 — framework consolidation and governance:** Contract integrity is
+partitioned into schema, event, canonical-registry and HTTP/authority invariants
+with a small orchestrator, and tests import their actual invariants rather
+than a compatibility shim. Removed the three-sample byte-parity check and
+regex-only route checker: full installed-copy inventory and executable route
+conformance remain authoritative. An independent retirement report and optional
+strict workflow gate cover every current historical retirement.
+
+**Unclosed external dependencies:** all 53 pre-enforcement canonical retirements
+remain `not-independently-verified`. The external client inventory, contractual
+disposition, independent approvals and proof of supported version removal cannot
+be created by this repository. Obtain actual reviews before claiming Phase 5
+governance closure. A recent commit has no published completed required check
+results; P08, Capability Assurance and Contract Integrity must pass at the exact
+final SHA before changing PR #64 from draft. E2 tests are not an E3/E4 substitute.
+
+See [contract implementation and qualification assessment](docs/contracts/phase4-phase5-review.md).
+
 # Current next work — Capability runtime assurance (PR #64)
 
 > **Authoritative queue for this branch.** Other handoffs below are archived
