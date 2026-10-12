@@ -97,3 +97,7 @@ by `architecture/retirement-unverified-baseline.txt` and the digest in
 requires genuine external evidence; no repository-only scan can establish the
 absence of external consumers. Previous bytes remain in Git history rather than
 being copied into the working tree.
+
+For the independent two-stage external clearance process, historically unresolved
+removals and per-copy dependency evidence, see
+[contract retirement and installed-copy removal](../docs/contracts/retirement-approval.md).
