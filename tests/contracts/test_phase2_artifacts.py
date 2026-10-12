@@ -118,7 +118,7 @@ class ArtifactTests(unittest.TestCase):
 
     def test_artifact_workflow_attests_main_and_pull_requests(self):
         workflow = (ROOT / ".github/workflows/contracts-artifacts.yml").read_text()
-        self.assertIn("  push:\\n    branches: [main]".replace("\\\\n", "\\n"), workflow)
+        self.assertIn("  push:" + chr(10) + "    branches: [main]", workflow)
         self.assertIn("docker build", workflow)
         self.assertIn("aggregate_artifacts.py", workflow)
 
