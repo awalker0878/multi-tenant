@@ -126,15 +126,19 @@ def inventory(root: Path = ROOT) -> dict:
 
 def assess(root: Path = ROOT, observations: list[dict] | None = None) -> dict:
     data = inventory(root)
-    expected = {r["key"]: r for r in data["operations"]}
-    proofs = {key: {} for key in expected}
+    operations = {r["key"]: r for r in data["operations"]}
+    releases = {r["path"]: r for r in data["releases"]}
+    proofs = {key: {} for key in [*operations, *releases]}
     for observation in observations or []:
         key = observation.get("key")
         claim = observation.get("claim")
-        if key not in expected or claim not in CLAIMS:
+        if key not in proofs or claim not in CLAIMS:
             raise ValueError(f"Unregistered operation or evidence claim: {key} {claim}")
-        operation = expected[key]
-        if observation.get("release_sha256") != operation["release_sha256"]:
+        if key in operations:
+            expected_hash = operations[key]["release_sha256"]
+        else:
+            expected_hash = releases[key]["sha256"]
+        if observation.get("release_sha256") != expected_hash:
             raise ValueError(f"Stale operation evidence: {key}")
         if observation.get("source") not in {"live-router", "live-producer", "live-consumer", "live-denial"}:
             raise ValueError(f"Non-executable evidence is inadmissible: {key}")
@@ -147,11 +151,13 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None) -> dict:
             raise ValueError(f"Wrong evidence source or verdict: {key} {claim}")
         if not isinstance(observation.get("test"), str) or not observation["test"].strip():
             raise ValueError(f"Missing executable test identity: {key} {claim}")
+        if key in releases and claim not in {"producer", "consumer"}:
+            raise ValueError(f"Release assurance cannot claim HTTP-only evidence: {key} {claim}")
         if claim in proofs[key]:
             raise ValueError(f"Duplicate operation assurance evidence: {key} {claim}")
         proofs[key][claim] = {"source": observation["source"], "test": observation["test"]}
     coverage = []
-    for key, operation in expected.items():
+    for key, operation in operations.items():
         required = ["route", "producer", "consumer"]
         if operation["security_required"]:
             required += ["authorization", "tenant_isolation"]
@@ -161,14 +167,44 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None) -> dict:
             "required": required, "verified": sorted(proofs[key]),
             "missing": missing, "qualified": not missing,
         })
+    groups: dict[str, list[dict]] = {}
+    for operation in coverage:
+        groups.setdefault(operation["release"], []).append(operation)
+    release_coverage = []
+    for path, release in releases.items():
+        if release["kind"] == "openapi":
+            members = groups.get(path, [])
+            if len(members) != release["operation_count"] or not members:
+                raise ValueError(f"Active HTTP release has no complete operation coverage: {path}")
+            qualified = all(member["qualified"] for member in members)
+            missing = sorted({claim for member in members for claim in member["missing"]})
+            verified = sorted({claim for member in members for claim in member["verified"]})
+            required = sorted({claim for member in members for claim in member["required"]})
+        else:
+            required = ["producer", "consumer"]
+            verified = sorted(proofs[path])
+            missing = [claim for claim in required if claim not in proofs[path]]
+            qualified = not missing
+        release_coverage.append({
+            "path": path, "kind": release["kind"],
+            "required": required, "verified": verified,
+            "missing": missing, "qualified": qualified,
+        })
     data["coverage"] = coverage
+    data["release_coverage"] = release_coverage
     data["summary"] = {
-        "canonical_releases": len(data["releases"]),
-        "http_operations": len(data["operations"]),
+        "canonical_releases": len(releases),
+        "http_operations": len(operations),
+        "qualified_canonical_releases": sum(c["qualified"] for c in release_coverage),
+        "unqualified_canonical_releases": sum(not c["qualified"] for c in release_coverage),
         "qualified_http_operations": sum(c["qualified"] for c in coverage),
         "unqualified_http_operations": sum(not c["qualified"] for c in coverage),
-        "required_claims": sum(len(c["required"]) for c in coverage),
-        "verified_claims": sum(len(c["verified"]) for c in coverage),
+        "required_claims": sum(len(c["required"]) for c in coverage)
+                           + sum(len(c["required"]) for c in release_coverage
+                                 if c["kind"] != "openapi"),
+        "verified_claims": sum(len(c["verified"]) for c in coverage)
+                           + sum(len(c["verified"]) for c in release_coverage
+                                 if c["kind"] != "openapi"),
     }
     return data
 
@@ -185,7 +221,7 @@ def main() -> int:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result["summary"], sort_keys=True))
-    if args.require_qualified and result["summary"]["unqualified_http_operations"]:
+    if args.require_qualified and (result["summary"]["unqualified_http_operations"] or result["summary"]["unqualified_canonical_releases"]):
         print("UNQUALIFIED operations: " + ", ".join(
             item["key"] for item in result["coverage"] if not item["qualified"]
         )[:3500])
