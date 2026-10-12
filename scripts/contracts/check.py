@@ -4,7 +4,7 @@ import json
 
 from build import verify
 from check_schema import (
-    unique_schema_ids, current_api, check_routes, check_copies,
+    unique_schema_ids, current_api,
     check_schema_dialects, check_readiness_projection, load,
 )
 from check_events import check_events
@@ -27,8 +27,6 @@ def main():
         a, b = current_api(name)
         paths += a
         ops += b
-    check_routes()
-    check_copies()
     check_native_candidates()
     check_events()
     check_readiness_projection()

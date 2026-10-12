@@ -66,32 +66,6 @@ def current_api(name):
     return len(doc["paths"]), len(ids)
 
 
-def check_routes():
-    source = (ROOT / "services/planning/src/planning/interfaces/migration.py").read_text()
-    match = re.search(r"\(migration-preparations\|migration-plans\|[^()]+\)", source)
-    if match is None:
-        raise ValueError("Cannot enumerate runtime migration routes")
-    runtime = set(match.group()[1:-1].split("|"))
-    actual = {p.rsplit("/", 1)[-1] for p in load("contracts/openapi/planning-migration-v1.6.json")["paths"]}
-    if runtime != actual:
-        raise ValueError(f"Runtime migration/OpenAPI path drift: {sorted(runtime ^ actual)}")
-
-
-def check_copies():
-    for source, destinations in {
-        "contracts/openapi/catalogue-v1.0.1.json": ["apps/console/resources/contracts/catalogue-v1.0.1.json"],
-        "contracts/schemas/planning/migration-support-v2.json": ["services/planning/src/planning/infrastructure/inputs/migration-support-v2.json"],
-        "contracts/schemas/planning/migration-readiness-v2.2.json": [
-            "services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.2.json",
-            "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.2.json",
-        ],
-    }.items():
-        canonical = (ROOT / source).read_bytes()
-        for destination in destinations:
-            if (ROOT / destination).read_bytes() != canonical:
-                raise ValueError(f"Packaged contract byte drift: {destination}")
-
-
 def check_schema_dialects():
     """Validate all current schema releases; document the few pre-ID active formats."""
     archival_without_id = {

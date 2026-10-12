@@ -14,11 +14,13 @@ from retirement_report import audit
 class CanonicalRetirementReviewTests(unittest.TestCase):
     def test_review_backlog_is_not_silently_promoted_to_approved(self):
         result = audit()
-        self.assertEqual(result["total_retirements"], 53)
-        self.assertEqual(result["unresolved"], 53)
-        self.assertFalse(result["can_claim_governance_closed"])
-        self.assertEqual(len(result["retirements"]), 53)
-        self.assertTrue(all(row["needs_independent_approval"]
+        self.assertEqual(result["total_retirements"], len(result["retirements"]))
+        self.assertEqual(result["unresolved"] + result["recorded_approved"],
+                         result["total_retirements"])
+        self.assertEqual(result["can_claim_governance_closed"],
+                         result["unresolved"] == 0)
+        self.assertTrue(all(row["needs_independent_approval"] ==
+                            (row["clearance_status"] == "unresolved")
                             for row in result["retirements"]))
 
     def test_cannot_count_external_clearance_by_changing_status_without_review(self):

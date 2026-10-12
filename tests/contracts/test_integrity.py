@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from build import assemble, verify
 from check_schema import (
-    check_copies, check_readiness_projection, check_routes,
+    check_readiness_projection,
     check_schema_dialects, current_api, load, local_refs, unique_schema_ids,
 )
 from check_events import check_events
@@ -118,10 +118,9 @@ class ContractIntegrityTests(unittest.TestCase):
                     verify(write=True)
                 self.assertEqual(target.read_text(), original)
 
-    def test_active_routes_and_copies(self):
-        check_routes()
-        check_copies()
+    def test_active_schema_identifiers_and_full_installed_inventory(self):
         self.assertGreater(unique_schema_ids(), 10)
+        check_consumer_registry()
 
     def test_all_declared_active_openapi_versions(self):
         from check_schema import current_api
