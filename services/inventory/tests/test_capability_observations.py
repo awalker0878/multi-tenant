@@ -12,7 +12,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 from inventory.application.capability_observations import capability_input
-from inventory.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS
+from inventory.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS, MODES, WIRE_METHODS
 from inventory.domain.discovery import Rejected
 from inventory.infrastructure.capability_observations import MountedCapabilityObservations
 
@@ -40,7 +40,7 @@ def test_projection_preserves_discovery_holds_and_expiry() -> None:
     assert result["expires_at"] == 900
 
 
-@pytest.mark.parametrize("fault", ["none", "signature", "expired", "tuple", "suspended"])
+@pytest.mark.parametrize("fault", ["none", "signature", "expired", "tuple", "suspended", "missing_method", "false_method"])
 def test_signed_observation_is_not_an_adapter_assertion(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
 ) -> None:
@@ -50,6 +50,10 @@ def test_signed_observation_is_not_an_adapter_assertion(
         k: k for k in ("tenant_id", "site_id", "endpoint_id", "generation_id", "native_scope")
     }
     base["installed_tuple"] = {"platform": "synthetic"}
+    method_modes = {
+        "method:" + method + ":" + mode: "unsupported"
+        for method in WIRE_METHODS for mode in MODES
+    }
     payload = {
         "inventory": base,
         "subject_id": "observer",
@@ -63,13 +67,21 @@ def test_signed_observation_is_not_an_adapter_assertion(
         "observed_at": now,
         "expires_at": now + 30,
         "dimensions": list(DIMENSIONS),
-        "cases": {"dimension:" + d: "passed" for d in DIMENSIONS},
+        "cases": {
+            **{"dimension:" + d: "passed" for d in DIMENSIONS},
+            **method_modes,
+        },
+        "method_modes": method_modes,
         "snapshot": {},
     }
     if fault == "expired":
         payload["expires_at"] = now - 1
     if fault == "tuple":
         payload["inventory"] = base | {"installed_tuple": {"platform": "changed"}}
+    if fault == "missing_method":
+        payload["method_modes"].pop(next(iter(method_modes)))
+    if fault == "false_method":
+        payload["method_modes"][next(iter(method_modes))] = "passed"
     raw = json.dumps(payload).encode()
     import hashlib
 

@@ -13,7 +13,7 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
-from inventory.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS
+from inventory.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS, MODES, WIRE_METHODS
 from inventory.domain.discovery import Rejected
 
 
@@ -50,6 +50,10 @@ class MountedCapabilityObservations:
             trust = protected_document(Path(os.environ["INVENTORY_CAPABILITY_TRUST_FILE"]))
             now = int(time.time())
             results = []
+            method_keys = {
+                "method:" + method + ":" + mode
+                for method in WIRE_METHODS for mode in MODES
+            }
             if state["schema_version"] != 1 or trust["schema_version"] != 1:
                 raise ValueError
             for decision, envelope in state["records"].items():
@@ -101,6 +105,13 @@ class MountedCapabilityObservations:
                     or observed["expires_at"] > key["expires_at"]
                     or set(observed["dimensions"]) != set(DIMENSIONS)
                     or any(observed["cases"].get("dimension:" + d) != "passed" for d in DIMENSIONS)
+                    or not isinstance(observed.get("method_modes"), dict)
+                    or set(observed["method_modes"]) != method_keys
+                    or any(
+                        observed["method_modes"][name] not in {"passed", "unsupported"}
+                        or observed["cases"].get(name) != observed["method_modes"][name]
+                        for name in method_keys
+                    )
                 ):
                     raise ValueError
                 results.append(
