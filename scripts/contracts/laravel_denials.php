@@ -64,7 +64,7 @@ foreach ($registry['active_releases'] as $entry) {
                 $failures[] = $entry['path'].':'.strtoupper($verb).' '.$template.': expected 401/403, received '.$code;
                 continue;
             }
-            $key = json_encode([$owner, strtoupper($verb), $template], JSON_THROW_ON_ERROR);
+            $key = json_encode([$owner, strtoupper($verb), $template], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
             $evidence[] = [
                 'key' => $key,
                 'claim' => 'authorization',
