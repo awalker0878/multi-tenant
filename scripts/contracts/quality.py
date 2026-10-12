@@ -298,7 +298,8 @@ def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
                         or type(header_schema.get("minLength")) is not int
                         or header_schema["minLength"] < 16
                         or type(header_schema.get("maxLength")) is not int
-                        or header_schema["maxLength"] > 256):
+                        or header_schema["maxLength"] > 256
+                        or header_schema["maxLength"] < header_schema["minLength"]):
                     raise ValueError("Mutation idempotency header must be bounded and strong: " + label)
                 setting = op.get("x-idempotency", {})
                 if (not isinstance(setting, dict) or
@@ -334,11 +335,12 @@ def quality_event(path: str, doc: dict, policy: dict, root: Path) -> None:
                 or delivery.get("acknowledgment") != "after-commit"
                 or delivery.get("backoff_strategy") != "exponential-jitter"
                 or type(delivery.get("dead_letter_retention_seconds")) is not int
-                or delivery["dead_letter_retention_seconds"] < 86400
+                or not 86400 <= delivery["dead_letter_retention_seconds"] <= 7776000
                 or type(delivery.get("deduplication_window_seconds")) is not int
-                or delivery["deduplication_window_seconds"] < 3600
+                or not 3600 <= delivery["deduplication_window_seconds"] <= 2592000
                 or not isinstance(delivery.get("dead_letter_address"), str)
-                or not delivery["dead_letter_address"] or
+                or not delivery["dead_letter_address"]
+                or delivery["dead_letter_address"] == channel.get("address") or
                 type(delivery.get("max_attempts")) is not int or not 1 <= delivery["max_attempts"] <= 100):
             raise ValueError("Channel missing bounded ordering, retry and DLQ rules: " + key)
         if not channel.get("address") or not channel.get("messages"):
