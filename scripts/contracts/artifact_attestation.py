@@ -134,8 +134,26 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                     pkg += "_worker"
                 app_root = f"/opt/venv/lib/python3.12/site-packages/{pkg}"
                 local_root = destination / pkg
-            # docker cp works with created containers; application code is not run.
-            # A directory may be absent for a component with no installed copies.
+            # Verify actual application code exists for every mapped owner,
+            # including components with zero installed JSON copies.
+            if COMPONENTS[component][1] == "php":
+                executable = "/app/routes/api.php"
+                source = root / component / "routes/api.php"
+            else:
+                source = (root / component / "src" / pkg / "bootstrap"
+                          / ("native.py" if component == "workers/lifecycle"
+                             else "collect.py" if component == "workers/inventory"
+                             else "server.py" if component != "services/inventory"
+                             else "server.py"))
+                executable = app_root + "/bootstrap/" + source.name
+            if not source.is_file():
+                raise ValueError(f"Unbound executable entrypoint source: {component}")
+            entry = destination / "runtime-entrypoint"
+            run("docker", "cp", cid + ":" + executable, str(entry))
+            if not entry.is_file() or sha(entry.read_bytes()) != sha(source.read_bytes()):
+                raise ValueError(f"Image executable entrypoint differs from release source: {component}")
+            # Copy every shipped contract JSON folder, not only individual
+            # expected files. Extra packaged schemas may not silently ship.
             if copies:
                 run("docker", "cp", cid + ":" + app_root, str(local_root))
             for item in copies:
@@ -151,6 +169,19 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                 expected_names = {Path(x["path"]).name for x in copies}
                 if actual != expected_names:
                     raise ValueError(f"Image has orphan contract JSON: {sorted(actual ^ expected_names)}")
+            if COMPONENTS[component][1] == "python" and copies:
+                found = set()
+                for namespace in ("inputs", "contracts", "messaging"):
+                    folder = local_root / "infrastructure" / namespace
+                    found.update(
+                        str(p.relative_to(local_root)) for p in folder.glob("*.json")
+                    )
+                expected_names = {
+                    "/".join(Path(x["path"].split("/src/", 1)[1]).parts[1:])
+                    for x in copies
+                }
+                if found != expected_names:
+                    raise ValueError(f"Image contains orphan Python contracts: {sorted(found ^ expected_names)}")
     finally:
         run("docker", "rm", cid)
     return {
