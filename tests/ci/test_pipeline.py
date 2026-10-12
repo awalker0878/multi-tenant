@@ -23,7 +23,7 @@ class ScopeTests(unittest.TestCase):
         self.assertFalse(any(lanes[x] for x in ("contracts", "native", "security", "routes", "authority")))
 
     def test_contracts_requalify_consumers(self):
-        lanes = module("scope").classify(["contracts/openapi/planning-v1.json"])
+        lanes = module("scope").classify(["contracts/openapi/planning-v1.2.json"])
         self.assertTrue(all(lanes.values()))
 
     def test_shared_ci_change_runs_all(self):
