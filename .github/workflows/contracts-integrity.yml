@@ -88,6 +88,7 @@ jobs:
           python -m unittest discover -s tests/contracts -p 'test_integrity.py' -v
           python -m unittest discover -s tests/contracts -p 'test_route_conformance.py' -v
           python -m unittest discover -s tests/contracts -p 'test_assurance.py' -v
+          python -m unittest discover -s tests/contracts -p 'test_active_contracts.py' -v
           python -m unittest discover -s tests/contracts -p 'test_phase2_artifacts.py' -v
           python -m unittest discover -s tests/contracts -p 'test_dependency_impact.py' -v
       - name: Install bounded owner contract test dependencies
