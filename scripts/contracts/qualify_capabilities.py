@@ -20,6 +20,8 @@ from xml.etree import ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 MANDATORY = (
+    "test_current_definition_has_no_unqualified_method_mode_and_no_unknown_stage",
+    "test_data_loss_budget_applies_to_all_datasets_together",
     "test_cold_capture_includes_root_and_every_volume_without_uploading_production_volume",
     "test_capture_failure_retains_partial_receipts_and_never_replays",
     "test_mismatched_data_method_is_held_before_native_submission",

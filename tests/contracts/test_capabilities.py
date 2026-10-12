@@ -1,4 +1,4 @@
-"""Definition projections, handler coverage and all historical stage combinations."""
+"""Definition projections, handler references and the active stage matrix."""
 
 import copy
 import importlib.util
@@ -13,12 +13,13 @@ spec.loader.exec_module(generator)
 
 
 class CapabilityDefinitionsTest(unittest.TestCase):
-    def test_projections_and_all_thirty_orders(self):
+    def test_projections_cover_all_current_methods_and_modes(self):
         data = json.loads(generator.SOURCE.read_text())
         projected = generator.projections(data)
         for path, content in projected.items():
             self.assertEqual(path.read_text(), content, str(path))
-        self.assertEqual(sum(len(v['stages']) for v in data['methods'].values()), 30)
+        self.assertEqual(sum(len(v['stages']) for v in data['methods'].values()),
+                         len(data['methods']) * len(data['modes']))
         source = projected[ROOT / 'services/planning/src/planning/domain/capability_definitions.py']
         for root, package in generator.PYTHON.items():
             self.assertEqual(source, projected[ROOT / f'{root}/src/{package}/domain/capability_definitions.py'])
