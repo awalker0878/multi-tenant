@@ -101,6 +101,11 @@ def request(
                 if (response.status != expected_status
                         or not Draft202012Validator(wire, format_checker=FormatChecker()).is_valid(result)):
                     raise ValueError("owner_response_contract_invalid")
+                # Reject structurally valid cross-tenant authority from an upstream service.
+                tenant_route = re.fullmatch(r"/v1/tenants/([^/]+)/.*", path)
+                if (tenant_route and "tenant_id" in result
+                        and result["tenant_id"] != tenant_route[1]):
+                    raise ValueError("owner_response_tenant_mismatch")
             return result
         finally:
             connection.close()

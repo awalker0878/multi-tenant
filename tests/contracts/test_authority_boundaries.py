@@ -111,3 +111,59 @@ class OwnerBoundaryContracts(unittest.TestCase):
         with self.assertRaises(ValueError):
             contract_for_operation("GOVERNANCE", "POST",
                 f"/v1/tenants/{TENANT}/undocumented-authority")
+
+
+class LifecycleOwnerTransportContracts(unittest.TestCase):
+    def test_real_lifecycle_consumer_validates_current_assurance_receipt(self):
+        import os
+        from unittest.mock import patch
+        from lifecycle.domain.execution import Rejected
+        from lifecycle.infrastructure import execution_owners
+
+        wire = [{"id": TENANT, "state": "uploaded"}]
+        code = [201]
+
+        class Response:
+            def read(self, limit):
+                return json.dumps(wire[0]).encode()
+
+            def getheader(self, name, default=None):
+                return "identity"
+
+            @property
+            def status(self):
+                return code[0]
+
+        class Connection:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def request(self, method, path, data, headers):
+                self.method, self.path = method, path
+
+            def getresponse(self):
+                return Response()
+
+            def close(self):
+                pass
+
+        with patch.dict(os.environ, {"ASSURANCE_URL": "https://assurance.example",
+                                  "ASSURANCE_CA_FILE": "/tmp/synthetic-ca"}), \\
+                patch.object(execution_owners, "mounted_secret", return_value="synthetic-token"), \\
+                patch.object(execution_owners.ssl, "create_default_context", return_value=object()), \\
+                patch.object(execution_owners.http.client, "HTTPSConnection", Connection):
+            path = f"/v1/tenants/{TENANT}/evidence-uploads"
+            self.assertEqual(execution_owners.request("ASSURANCE", "POST", path, {}), wire[0])
+            for invalid in ({"id": TENANT, "state": "uploaded", "unexpected": True},
+                            {"id": TENANT, "state": "finalized"},
+                            {"id": "not-a-uuid", "state": "uploaded"}):
+                wire[0] = invalid
+                with self.assertRaises(Rejected) as error:
+                    execution_owners.request("ASSURANCE", "POST", path, {})
+                self.assertEqual(error.exception.status, 503)
+            wire[0] = {"id": TENANT, "state": "uploaded"}
+            code[0] = 200
+            with self.assertRaises(Rejected):
+                execution_owners.request("ASSURANCE", "POST", path, {})
+            with self.assertRaises(Rejected):
+                execution_owners.request("ASSURANCE", "POST", f"/v1/tenants/{OTHER}/unregistered", {})
