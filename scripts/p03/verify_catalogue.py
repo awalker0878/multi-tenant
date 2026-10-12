@@ -11,7 +11,7 @@ def main():
  report={'result':'RUNNING','source_revision':os.environ['GITHUB_SHA'],'observed_at':datetime.datetime.now(datetime.UTC).isoformat(),'commands':[],
          'limitations':['Synthetic authorities in Catalogue feature suite; live Governance/Console wire integration is a distinct campaign.','No operated deployment, native qualification, manual accessibility or independent G03 receiving review.']}
  paths=subprocess.check_output(['git','ls-files'],cwd=root,text=True).splitlines()
- report['source_sha256']={n:hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/catalogue/','services/governance/','scripts/p03/','contracts/','.github/workflows/p03'))}
+ report['source_sha256']={n:hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/catalogue/','services/governance/','scripts/p03/','contracts/','.github/workflows/qualification.yml'))}
  private_values=[os.environ['P03_ADMIN_PASSWORD']];pg_env=os.environ|{'PGHOST':'127.0.0.1','PGPORT':'5432','PGUSER':'postgres','PGPASSWORD':private_values[0]}
  def redact(s):
   for value in private_values:s=s.replace(value,'[REDACTED]')

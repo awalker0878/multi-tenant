@@ -54,7 +54,7 @@ def main():
 
     try:
         check('disposable-postgres-only', os.environ.get('P02_TEST_POSTGRES') == '1')
-        paths = ['services/governance', 'contracts/schemas/events/governance-change-v1.json', 'contracts/asyncapi/governance.yaml', 'contracts/schemas/events/identity-change-v1.json', 'contracts/asyncapi/identity.yaml', 'contracts/schemas/events/support-change-v1.json', 'contracts/asyncapi/support.yaml', 'scripts/p02', '.github/workflows/p02-governance-events.yml']
+        paths = ['services/governance', 'contracts/schemas/events/governance-change-v1.json', 'contracts/asyncapi/governance.yaml', 'contracts/schemas/events/identity-change-v1.json', 'contracts/asyncapi/identity.yaml', 'contracts/schemas/events/support-change-v1.json', 'contracts/asyncapi/support.yaml', 'scripts/p02', '.github/workflows/qualification.yml']
         tracked = subprocess.check_output(['git', 'ls-files', '--', *paths], cwd=root, text=True).splitlines()
         report['source_sha256'] = {p: hashlib.sha256((root / p).read_bytes()).hexdigest() for p in tracked}
         check('clean-campaign-source', not subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=all', '--', *paths], cwd=root).strip())

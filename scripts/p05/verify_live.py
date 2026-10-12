@@ -53,7 +53,7 @@ def main(extension=None):
             'TLS application peers terminate at disposable loopback forwarding proxies; no operated ingress qualification.',
             'Automated browser checks do not establish representative operator, screen-reader or independent G05 receiving acceptance.']}
     paths = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
-    report['source_sha256'] = {n: hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/planning/', 'services/lifecycle/', 'services/assurance/', 'services/inventory/', 'workers/inventory/', 'workers/lifecycle/', 'scripts/p06/', '.github/workflows/p06', 'services/governance/', 'services/catalogue/', 'apps/console/', 'contracts/', 'scripts/p03/seed_', 'scripts/p04/', 'scripts/p05/', '.github/workflows/p05', 'deploy/dependencies/stateful/inventory-facts.json'))}
+    report['source_sha256'] = {n: hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/planning/', 'services/lifecycle/', 'services/assurance/', 'services/inventory/', 'workers/inventory/', 'workers/lifecycle/', 'scripts/p06/', '.github/workflows/qualification.yml', 'services/governance/', 'services/catalogue/', 'apps/console/', 'contracts/', 'scripts/p03/seed_', 'scripts/p04/', 'scripts/p05/', '.github/workflows/qualification.yml', 'deploy/dependencies/stateful/inventory-facts.json'))}
     private_values = [os.environ['P05_ADMIN_PASSWORD']]
     processes, handles, proxies = {}, [], []
     broker = None

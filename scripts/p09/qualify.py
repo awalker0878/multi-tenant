@@ -24,7 +24,7 @@ def main():
     prefixes = ('services/planning/', 'services/lifecycle/', 'workers/lifecycle/',
                 'scripts/p09/', 'scripts/generate_capabilities.py', 'tests/contracts/test_capabilities.py',
                 'contracts/capabilities/', 'contracts/schemas/capabilities/', 'contracts/schemas/expansion/', 'contracts/fixtures/expansion/',
-                'contracts/openapi/expansion-', '.github/workflows/p09-')
+                'contracts/openapi/expansion-', '.github/workflows/ci.yml')
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'observed_at': datetime.now(timezone.utc).isoformat(), 'environment': platform.platform(),
