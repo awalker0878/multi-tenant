@@ -112,7 +112,7 @@ an in-flight effect graph or source artifact is not a routine replay upgrade.
 
 Run `python scripts/p06/qualify.py --output <new-directory>` in the pinned toolchain
 with `P05_POSTGRES_BIN` pointing to PostgreSQL 16 tools. The complete disposable
-GitHub Actions campaign is `.github/workflows/p06-execution.yml`; its live driver
+The manually dispatched GitHub Actions campaign is `.github/workflows/qualification.yml`; its live driver
 requires the explicit fixture environment and rejects ordinary deployments.
 Retain source bindings, failed runs, all four journey observations, engine replay,
 alert acknowledgements, evidence denials, restore decisions and browser results.

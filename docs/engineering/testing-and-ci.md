@@ -98,7 +98,7 @@ Run complete integration regressions on the protected integration branch and rel
 
 ## Required pipeline outcomes
 
-The committed Context policy workflow supplies registry, fixture and documentation feedback today. P01 implements the application jobs below using verified commands and locked tools; the current workflow does not establish those application results.
+The consolidated [CI workflow](../../.github/workflows/ci.yml) runs registry, fixture, documentation and affected application checks; expensive end-to-end qualification is available through [manual campaigns](../../.github/workflows/qualification.yml). Neither replaces independent enforced branch rules or native acceptance evidence.
 
 1. Validate documentation, the ownership/dependency inventory, contracts and deterministic generated-client drift. Execute the pinned language-aware architecture tools: no sibling-service runtime import, no shared private ORM/domain model, no forbidden layer dependency and no hidden runtime bootstrap from legacy code. Fail unknown/unclassified source, unexpected empty scans and unapproved exclusion growth. Run negative tool fixtures whenever rules, parser versions or source discovery change. Database/network role denial tests complement static import checks.
 2. Run the service's pinned formatter/linter and type/static analyzer under the [developer standard](developer-workflow.md). Validate manifest/lock consistency, dependency advisories, secrets and licenses; compare suppression and policy baselines with the reviewed base. Reject expired exceptions or silent baseline expansion. A clean static scan is one signal, not proof of authorization correctness.

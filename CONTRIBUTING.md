@@ -30,7 +30,7 @@ python -m unittest discover -s tests/documentation -p 'test_*.py' -v
 
 The scripts require Python 3.10 or newer and the pinned PyYAML dependency. They generate progress/traceability views and check links, IDs, statuses and register references. The scripts themselves do not install packages or contact external systems. Use `python scripts/render_delivery_views.py --check` to detect stale views without modifying them. These checks do not run application tests or native campaigns.
 
-The architecture check reports registry validation separately from supported source analysis and absent applications. Its fixture tests verify accepted/rejected examples; they do not establish full PHP or frontend analyzer coverage. [The Context policy workflow](.github/workflows/architecture-policy.yml) runs these checks for this branch and pull requests targeting it, using read-only permissions and pinned action revisions. Publishing a workflow does not activate required reviews or branch protection; P01.04 must verify those settings and the complete application gates.
+The architecture check reports registry validation separately from supported source analysis and absent applications. Its fixture tests verify accepted/rejected examples; they do not establish full PHP or frontend analyzer coverage. [The consolidated pull-request CI workflow](.github/workflows/ci.yml) runs these checks for this branch and pull requests targeting it, using read-only permissions and pinned action revisions. Publishing a workflow does not activate required reviews or branch protection; P01.04 must verify those settings and the complete application gates.
 
 ## Change description
 

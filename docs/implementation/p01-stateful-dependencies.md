@@ -33,7 +33,7 @@ retention authority. Its AGPL source and exact source/build closure remain expli
 Product dependencies do not import this integration-driver environment.
 
 The [candidate inventory](../../deploy/dependencies/stateful/candidates.json) and
-[observation workflow](../../.github/workflows/p01-stateful-inputs.yml) collected actual
+historical input observation (the automatic observation workflow was removed; use the source resolver directly) collected actual
 platform manifests, both source-archive checksums and client closure. The
 [immutable lock](../../deploy/dependencies/stateful/inputs.lock.json) binds four
 Linux/amd64 image manifests (RabbitMQ, Temporal server, Temporal admin-tools and Go),
@@ -95,7 +95,7 @@ standalone uv invocation lacked the operating-system utilities needed for resolu
 
 The [private fixture](../../deploy/fixtures/stateful/README.md),
 [campaign](../../scripts/p01/run_stateful.py) and
-[integration workflow](../../.github/workflows/p01-stateful-integration.yml) install
+[manual qualification workflow](../../.github/workflows/qualification.yml) install
 real dependencies with no host-published ports. Probes exercise scoped broker users,
 Temporal namespace JWT authorization and separate PostgreSQL roles, and retained S3
 versions restored to an empty second store. The probe clients are support tooling;

@@ -151,7 +151,7 @@ and post-write preservation/forward-or-reverse recovery boundaries.
 
 Component checks use synthetic Prism responses, actual TLS, private file delivery,
 versioned contracts, PostgreSQL custody tests and the actual Vue review. They are
-**E2 only**. `.github/workflows/ahv-destination.yml` runs the full migration suites
+**E2 only**. Manually dispatching `.github/workflows/qualification.yml` runs the migration suites
 with PostgreSQL and the five browser scenarios on the default branch's PRs.
 
 The [Q08 AHV campaign](../qualification/campaigns/ahv-destination-tranche.md) must run
