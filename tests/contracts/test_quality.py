@@ -123,6 +123,25 @@ class HttpQualityTests(unittest.TestCase):
         del new["paths"]["/v2/things"]["post"]["responses"]["409"]
         self.assertIn("response status removed", repr(api_breakages(old, new)))
 
+    def test_unclassified_constraints_and_parameter_changes_are_breaking(self):
+        old = {"type": "object", "additionalProperties": False,
+               "properties": {"reference": {"type": "string", "format": "uuid"}}}
+        change = copy.deepcopy(old)
+        change["properties"]["reference"]["format"] = "email"
+        self.assertIn("unclassified schema assertion", repr(schema_breakages(old, change, "wire")))
+        change = copy.deepcopy(old)
+        change["properties"]["reference"]["minProperties"] = 1
+        self.assertIn("unclassified schema assertion", repr(schema_breakages(old, change, "wire")))
+        old_api = good_api()
+        replacement = copy.deepcopy(old_api)
+        route = replacement["paths"]["/v2/things"]["post"]
+        route["parameters"][0]["schema"]["minLength"] = 22
+        self.assertIn("parameter", repr(api_breakages(old_api, replacement)))
+        replacement = copy.deepcopy(old_api)
+        response = replacement["paths"]["/v2/things"]["post"]["responses"]["201"]
+        response["headers"] = {"ETag": {"schema": {"type": "string"}}}
+        self.assertIn("header guarantees", repr(api_breakages(old_api, replacement)))
+
     def test_schema_required_and_enum_narrowing_are_breaking(self):
         old = {"type": "object", "required": ["id"], "additionalProperties": False,
                "properties": {"id": {"enum": ["a", "b"]}}}

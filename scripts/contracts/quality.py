@@ -59,10 +59,32 @@ def type_set(schema: dict) -> set[str]:
     return set(value) if isinstance(value, list) else {value} if value else set()
 
 
+# Unmodelled JSON Schema assertions are never silently assumed compatible.
+# Annotations can change without altering the accepted wire set.
+HANDLED_ASSERTIONS = frozenset({
+    "type", "const", "enum", "minimum", "maximum", "minLength",
+    "maxLength", "minItems", "maxItems", "required", "items",
+    "additionalProperties", "properties", "oneOf", "anyOf", "allOf",
+    "not", "pattern", "patternProperties", "$ref",
+})
+ANNOTATIONS = frozenset({
+    "$id", "$schema", "$anchor", "$comment", "title", "description",
+    "examples", "deprecated",
+})
+
+
+def unknown_assertion_changes(old: dict, new: dict, at: str) -> list[str]:
+    keys = (set(old) | set(new)) - HANDLED_ASSERTIONS - ANNOTATIONS
+    return [
+        at + ": unclassified schema assertion changed " + key
+        for key in sorted(keys) if old.get(key) != new.get(key)
+    ]
+
+
 def request_breaks(old: dict, new: dict, before: dict, after: dict, at: str) -> list[str]:
     """Is every request admissible by old still admissible by new?"""
     a, b = ref(old, before), ref(new, after)
-    failures = []
+    failures = unknown_assertion_changes(a, b, at)
     if type_set(b) and (not type_set(a) or not type_set(a) <= type_set(b)):
         failures.append(at + ": request type narrowed")
     if b.get("const") is not None and a.get("const") != b["const"]:
@@ -101,7 +123,7 @@ def request_breaks(old: dict, new: dict, before: dict, after: dict, at: str) -> 
 def response_breaks(old: dict, new: dict, before: dict, after: dict, at: str) -> list[str]:
     """Does new producer still guarantee the properties previously promised?"""
     a, b = ref(old, before), ref(new, after)
-    failures = []
+    failures = unknown_assertion_changes(a, b, at)
     if type_set(a) and (not type_set(b) or not type_set(b) <= type_set(a)):
         failures.append(at + ": response type widened")
     if a.get("const") is not None and b.get("const") != a["const"]:
@@ -179,21 +201,37 @@ def api_breakages(old: dict, new: dict) -> list[str]:
                     failures.append(at + ": request body/schema removed")
                 else:
                     failures.extend(request_breaks(req_before, req_after, old, new, at))
-            old_params = {p.get("name"): p for p in parameters(prior, item)
-                          if p.get("required")}
-            new_params = {p.get("name"): p for p in parameters(current, target)}
+            old_params = {(p.get("in"), p.get("name")): p
+                          for p in parameters(prior, item)}
+            new_params = {(p.get("in"), p.get("name")): p
+                          for p in parameters(current, target)}
             for name, parameter in old_params.items():
-                if name not in new_params:
-                    failures.append(at + ": required parameter removed " + str(name))
+                replacement = new_params.get(name)
+                if replacement is None:
+                    failures.append(at + ": parameter removed " + repr(name))
+                    continue
+                if parameter.get("required") != replacement.get("required"):
+                    failures.append(at + ": parameter requiredness changed " + repr(name))
+                if any(parameter.get(k) != replacement.get(k)
+                       for k in ("style", "explode", "allowReserved", "allowEmptyValue", "content")):
+                    failures.append(at + ": parameter serialization changed " + repr(name))
+                if parameter.get("schema") != replacement.get("schema"):
+                    if not isinstance(parameter.get("schema"), dict) or not isinstance(replacement.get("schema"), dict):
+                        failures.append(at + ": parameter schema changed " + repr(name))
+                    else:
+                        failures.extend(request_breaks(parameter["schema"], replacement["schema"],
+                                                       old, new, at + "/parameter/" + repr(name)))
             for name, parameter in new_params.items():
-                if parameter.get("required") and name not in old_params:
-                    failures.append(at + ": required parameter introduced " + str(name))
+                if name not in old_params and parameter.get("required"):
+                    failures.append(at + ": required parameter introduced " + repr(name))
             for status, response in prior.get("responses", {}).items():
                 if status not in current.get("responses", {}):
                     failures.append(at + ": response status removed " + status)
                     continue
                 if set(response.get("content", {})) != set(current["responses"][status].get("content", {})):
                     failures.append(at + ": response media type changed " + status)
+                if response.get("headers", {}) != current["responses"][status].get("headers", {}):
+                    failures.append(at + ": response header guarantees changed " + status)
                 oa, na = body(prior, status), body(current, status)
                 if oa is not None and na is None:
                     failures.append(at + ": response payload removed " + status)
@@ -229,6 +267,8 @@ def event_breakages(old: dict, new: dict) -> list[str]:
     for key, op in old.get("operations", {}).items():
         if key not in new.get("operations", {}) or new["operations"][key].get("action") != op.get("action"):
             failures.append("Event publish/subscribe operation removed/changed: " + key)
+        elif new["operations"][key].get("channel") != op.get("channel"):
+            failures.append("Event operation channel binding changed: " + key)
     return failures
 
 
