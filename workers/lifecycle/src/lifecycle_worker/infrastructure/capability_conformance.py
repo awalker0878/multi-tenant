@@ -14,7 +14,12 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 from lifecycle_worker.application.native import NativeHeld, decode, digest
-from lifecycle_worker.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS, MODES, WIRE_METHODS
+from lifecycle_worker.domain.capability_definitions import (
+    DEFINITION_SHA256,
+    DIMENSIONS,
+    MODES,
+    WIRE_METHODS,
+)
 from lifecycle_worker.infrastructure.evidence_probes import ProbeJson, fresh_measurement, matches
 from lifecycle_worker.infrastructure.native_files import protected_read
 

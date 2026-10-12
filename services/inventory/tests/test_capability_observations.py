@@ -12,7 +12,12 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 from inventory.application.capability_observations import capability_input
-from inventory.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS, MODES, WIRE_METHODS
+from inventory.domain.capability_definitions import (
+    DEFINITION_SHA256,
+    DIMENSIONS,
+    MODES,
+    WIRE_METHODS,
+)
 from inventory.domain.discovery import Rejected
 from inventory.infrastructure.capability_observations import MountedCapabilityObservations
 
@@ -40,7 +45,10 @@ def test_projection_preserves_discovery_holds_and_expiry() -> None:
     assert result["expires_at"] == 900
 
 
-@pytest.mark.parametrize("fault", ["none", "signature", "expired", "tuple", "suspended", "missing_method", "false_method"])
+@pytest.mark.parametrize(
+    "fault",
+    ["none", "signature", "expired", "tuple", "suspended", "missing_method", "false_method"],
+)
 def test_signed_observation_is_not_an_adapter_assertion(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
 ) -> None:

@@ -13,7 +13,12 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
-from inventory.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS, MODES, WIRE_METHODS
+from inventory.domain.capability_definitions import (
+    DEFINITION_SHA256,
+    DIMENSIONS,
+    MODES,
+    WIRE_METHODS,
+)
 from inventory.domain.discovery import Rejected
 
 

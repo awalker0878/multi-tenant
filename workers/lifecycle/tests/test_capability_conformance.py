@@ -9,7 +9,12 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 from lifecycle_worker.application.native import NativeHeld, digest
-from lifecycle_worker.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS, MODES, WIRE_METHODS
+from lifecycle_worker.domain.capability_definitions import (
+    DEFINITION_SHA256,
+    DIMENSIONS,
+    MODES,
+    WIRE_METHODS,
+)
 from lifecycle_worker.infrastructure.capability_conformance import ConformancePublisher
 
 
