@@ -94,6 +94,8 @@ jobs:
           python scripts/contracts/assurance_routes.py --app inventory --output "$RUNNER_TEMP/contract-assurance/python-inventory.json"
           python scripts/contracts/assurance_routes.py --app python-composed --output "$RUNNER_TEMP/contract-assurance/python-composed.json"
           python scripts/contracts/assurance_routes.py --app lifecycle-native --output "$RUNNER_TEMP/contract-assurance/python-native.json"
+          python scripts/contracts/assurance_routes.py --app planning-immutable --producer-only --output "$RUNNER_TEMP/contract-assurance/python-immutable-producers.json"
+          python scripts/contracts/assurance_routes.py --app planning-lifecycle --producer-only --output "$RUNNER_TEMP/contract-assurance/python-lifecycle-producers.json"
           python scripts/contracts/python_denials.py --owner inventory --output "$RUNNER_TEMP/contract-assurance/python-inventory-denials.json"
           python scripts/contracts/python_denials.py --owner planning --output "$RUNNER_TEMP/contract-assurance/python-planning-denials.json"
           python scripts/contracts/python_denials.py --owner lifecycle --output "$RUNNER_TEMP/contract-assurance/python-lifecycle-denials.json"
