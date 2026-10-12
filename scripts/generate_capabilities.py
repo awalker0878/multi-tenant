@@ -68,8 +68,10 @@ def projections(data):
     # Use the locked product formatter to produce checked-in source, not a network formatter.
     import subprocess
 
-    formatter = ROOT / 'services/planning/.venv/bin/ruff'
-    text = subprocess.check_output([str(formatter), 'format', '--stdin-filename', 'capability_definitions.py'], input=text, text=True)
+    import shutil
+
+    formatter = shutil.which('ruff') or str(ROOT / 'services/planning/.venv/bin/ruff')
+    text = subprocess.check_output([formatter, 'format', '--stdin-filename', 'capability_definitions.py'], input=text, text=True)
     output = {ROOT / f'{root}/src/{package}/domain/capability_definitions.py': text for root, package in PYTHON.items()}
     php = "<?php\n\ndeclare(strict_types=1);\n\nnamespace App\\Domain\\Qualification;\n\n"
     php += '/** Generated definition metadata; Assurance decisions remain independent. */\nfinal class CapabilityDefinitions\n{\n'

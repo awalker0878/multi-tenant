@@ -116,9 +116,10 @@ class ArtifactTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "unregistered contract"):
                 check_wheel("services/planning", self.wheel, self.root)
 
-    def test_artifact_workflow_attests_main_and_pull_requests(self):
-        workflow = (ROOT / ".github/workflows/contracts-artifacts.yml").read_text()
-        self.assertIn("  push:" + chr(10) + "    branches: [main]", workflow)
+    def test_artifact_qualification_is_explicit_and_checks_built_image_bindings(self):
+        workflow = (ROOT / ".github/workflows/qualification.yml").read_text()
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertIn("contract-artifacts", workflow)
         self.assertIn("docker build", workflow)
         self.assertIn("aggregate_artifacts.py", workflow)
 

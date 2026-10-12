@@ -27,7 +27,7 @@ def response(schema=None):
 
 
 def good_api():
-    api_error = {k: v for k, v in ERROR.items() if k not in ("$id", "$schema")}
+    api_error = {k: copy.deepcopy(v) for k, v in ERROR.items() if k not in ("$id", "$schema")}
     operation = {
         "operationId": "createThing",
         "security": [{"Caller": []}],
