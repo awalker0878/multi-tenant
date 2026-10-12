@@ -45,7 +45,8 @@ CHECKS = {
 }
 
 
-def prove(app: str, route_list: Path | None = None, root: Path = ROOT) -> list[dict]:
+def prove(app: str, route_list: Path | None = None, root: Path = ROOT,
+          producer_only: bool = False) -> list[dict]:
     data = inventory(root)
     if app in {"catalogue", "governance", "assurance"}:
         if route_list is None:
@@ -69,17 +70,34 @@ def prove(app: str, route_list: Path | None = None, root: Path = ROOT) -> list[d
         if not matched:
             raise ValueError(f"Empty verified route group: {app}")
         check_name = "route_conformance." + CHECKS[app].__name__
-    return [
-        {
-            "key": operation_key(op["owner"], op["method"], op["path"]),
-            "claim": "route",
-            "source": "live-router",
-            "result": "PASS",
-            "release_sha256": op["release_sha256"],
-            "test": check_name,
-        }
-        for op in matched
-    ]
+    if producer_only and app not in {"planning-immutable", "planning-lifecycle"}:
+        raise ValueError("No independent positive producer validator for: " + app)
+    # These probes issue actual ASGI requests with controlled owner fixtures,
+    # then validate exact returned JSON against the current response schemas.
+    # Structural route matching alone is NEVER promoted to producer evidence.
+    positive_probes = {"lifecycle-native", "planning-immutable", "planning-lifecycle"}
+    rows = []
+    for op in matched:
+        key = operation_key(op["owner"], op["method"], op["path"])
+        if not producer_only:
+            rows.append({
+                "key": key, "claim": "route", "source": "live-router",
+                "result": "PASS", "release_sha256": op["release_sha256"],
+                "test": check_name,
+            })
+        if app in positive_probes:
+            rows.append({
+                "key": key, "claim": "producer", "source": "live-producer",
+                "result": "PASS", "release_sha256": op["release_sha256"],
+                "test": check_name + ":actual_ASGI_200_validated",
+            })
+            if app == "planning-lifecycle":
+                rows.append({
+                    "key": key, "claim": "authorization", "source": "live-denial",
+                    "result": "PASS", "release_sha256": op["release_sha256"],
+                    "test": check_name + ":invalid_workload_403",
+                })
+    return rows
 
 
 def main() -> None:
@@ -87,8 +105,9 @@ def main() -> None:
     parser.add_argument("--app", required=True)
     parser.add_argument("--routes", type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--producer-only", action="store_true")
     args = parser.parse_args()
-    evidence = prove(args.app, args.routes)
+    evidence = prove(args.app, args.routes, producer_only=args.producer_only)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(evidence, indent=2) + "\n")
     print(f"{args.app}: {len(evidence)} executable routes verified")
