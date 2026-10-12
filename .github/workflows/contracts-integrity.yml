@@ -102,6 +102,7 @@ jobs:
           python -m unittest discover -s tests/contracts -p 'test_active_contracts.py' -v
           python -m unittest discover -s tests/contracts -p 'test_phase2_artifacts.py' -v
           python -m unittest discover -s tests/contracts -p 'test_quality.py' -v
+          python -m unittest discover -s tests/contracts -p 'test_capability_qualification.py' -v
           python -m unittest discover -s tests/contracts -p 'test_dependency_impact.py' -v
       - name: Install bounded owner contract test dependencies
         run: python -m pip install --disable-pip-version-check -e services/planning -e services/lifecycle -e services/inventory pytest==9.1.1
@@ -213,7 +214,8 @@ jobs:
           version: '0.12.19'
           enable-cache: false
       - name: Install frozen native worker and test dependencies
-        run: uv sync --directory workers/lifecycle --locked --group build
+        working-directory: workers/lifecycle
+        run: uv sync --locked --group build
       - name: Execute all 30 current method/mode and independent native tests
         run: |
           cd workers/lifecycle
